@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "default_provider": "mock",
+  "default_model": "mock-model",
+  "providers": {
+    "mock": {
+      "module": "llm.abstraction.providers.mock",
+      "class": "MockProvider",
+      "facade_class": "MockFacade",
+      "enabled": true,
+      "config_file": "config/providers/mock.json"
+    },
+    "anthropic": {
+      "module": "llm.abstraction.providers.anthropic",
+      "class": "AnthropicProvider",
+      "facade_class": "AnthropicFacade",
+      "enabled": true,
+      "config_file": "config/providers/anthropic.json"
+    },
+    "openai": {
+      "module": "llm.abstraction.providers.openai",
+      "class": "OpenAIProvider",
+      "facade_class": "OpenAIFacade",
+      "enabled": true,
+      "config_file": "config/providers/openai.json"
+    }
+  },
+  "global_settings": {
+    "max_retries": 3,
+    "timeout": 30,
+    "rate_limit_enabled": false,
+    "history_size": 50,
+    "log_level": "INFO"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "provider": "openai",
+  "api_version": "v1",
+  "base_url": "https://api.openai.com/v1",
+  "models": [
+    {
+      "name": "gpt-4-turbo-preview",
+      "version": "2024-01",
+      "description": "Most capable GPT-4 model",
+      "strengths": ["reasoning", "creativity", "coding"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.01,
+        "output_per_1k": 0.03
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "gpt-4",
+      "version": "2023-06",
+      "description": "Standard GPT-4 model",
+      "strengths": ["reasoning", "analysis"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.03,
+        "output_per_1k": 0.06
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo",
+      "version": "2023-03",
+      "description": "Fast and efficient GPT-3.5 model",
+      "strengths": ["speed", "efficiency", "general-purpose"],
+      "context_window": 16385,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0005,
+        "output_per_1k": 0.0015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    }
+  ]
+}
