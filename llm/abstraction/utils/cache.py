@@ -116,3 +116,63 @@ def cached(
         
         return wrapper
     return decorator
+
+
+class ResponseCache:
+    """
+    Specialized cache for LLM responses.
+    
+    Wraps LRUCache with a convenient API for caching LLM responses
+    based on prompt, model, and parameters.
+    """
+    
+    def __init__(self, max_size: int = 100, ttl: Optional[float] = None):
+        """
+        Initialize ResponseCache.
+        
+        Args:
+            max_size: Maximum number of cached responses
+            ttl: Time-to-live in seconds (None = no expiration)
+        """
+        self._cache = LRUCache(max_size=max_size, ttl_seconds=ttl)
+    
+    def _make_key(self, prompt: str, model: str, **kwargs) -> str:
+        """Generate cache key from prompt, model, and parameters"""
+        params_str = "|".join(f"{k}={v}" for k, v in sorted(kwargs.items()))
+        return f"{prompt}|{model}|{params_str}"
+    
+    def get(self, prompt: str, model: str, **kwargs) -> Optional[str]:
+        """
+        Get cached response.
+        
+        Args:
+            prompt: The prompt text
+            model: The model name
+            **kwargs: Additional parameters (e.g., temperature=0.7)
+        
+        Returns:
+            Cached response or None if not found
+        """
+        key = self._make_key(prompt, model, **kwargs)
+        return self._cache.get(key)
+    
+    def set(self, prompt: str, model: str, response: str, **kwargs):
+        """
+        Cache a response.
+        
+        Args:
+            prompt: The prompt text
+            model: The model name
+            response: The response to cache
+            **kwargs: Additional parameters (e.g., temperature=0.7)
+        """
+        key = self._make_key(prompt, model, **kwargs)
+        self._cache.set(key, response)
+    
+    def clear(self):
+        """Clear all cached responses"""
+        self._cache.clear()
+    
+    def get_stats(self) -> dict:
+        """Get cache statistics"""
+        return self._cache.get_stats()
