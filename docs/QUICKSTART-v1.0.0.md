@@ -13,7 +13,7 @@
 
 2. **Install dependencies:**
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements-v1.0.0.txt
    ```
 
 3. **Configure API keys:**

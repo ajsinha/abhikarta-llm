@@ -1,0 +1,47 @@
+{
+  "provider": "meta",
+  "api_version": "v1",
+  "base_url": "https://api.replicate.com",
+  "models": [
+    {
+      "name": "llama-2-70b-chat",
+      "version": "2.0",
+      "description": "Meta's Llama 2 70B chat model",
+      "replicate_model": "meta/llama-2-70b-chat",
+      "strengths": ["chat", "reasoning", "code"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.00275
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-2-13b-chat",
+      "version": "2.0",
+      "description": "Meta's Llama 2 13B chat model",
+      "replicate_model": "meta/llama-2-13b-chat",
+      "strengths": ["chat", "efficiency"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0001,
+        "output_per_1k": 0.0005
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    }
+  ]
+}

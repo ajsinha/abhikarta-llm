@@ -23,6 +23,20 @@
       "facade_class": "OpenAIFacade",
       "enabled": true,
       "config_file": "config/providers/openai.json"
+    },
+    "google": {
+      "module": "llm.abstraction.providers.google",
+      "class": "GoogleProvider",
+      "facade_class": "GoogleFacade",
+      "enabled": true,
+      "config_file": "config/providers/google.json"
+    },
+    "meta": {
+      "module": "llm.abstraction.providers.meta",
+      "class": "MetaProvider",
+      "facade_class": "MetaFacade",
+      "enabled": true,
+      "config_file": "config/providers/meta.json"
     }
   },
   "global_settings": {
@@ -30,6 +44,8 @@
     "timeout": 30,
     "rate_limit_enabled": false,
     "history_size": 50,
-    "log_level": "INFO"
+    "log_level": "INFO",
+    "cache_enabled": true,
+    "cache_ttl_seconds": 3600
   }
 }

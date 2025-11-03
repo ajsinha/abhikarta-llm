@@ -1,0 +1,14 @@
+{
+  "provider": "awsbedrock",
+  "models": [
+    {
+      "name": "anthropic.claude-v2",
+      "version": "2.0",
+      "description": "Claude 2 via AWS Bedrock",
+      "context_window": 100000,
+      "max_output": 4096,
+      "cost": {"input_per_1k": 0.008, "output_per_1k": 0.024},
+      "capabilities": {"chat": true, "completion": true, "streaming": false, "function_calling": false, "vision": false}
+    }
+  ]
+}

@@ -144,7 +144,7 @@ llm_abstraction/
 ```bash
 tar -xzf llm_abstraction.tar.gz
 cd llm_abstraction
-pip install -r requirements.txt
+pip install -r requirements-v1.0.0.txt
 ```
 
 ### 2. Test with Mock Provider (No API Keys!)

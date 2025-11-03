@@ -15,13 +15,13 @@ def read_file(filename):
         return f.read()
 
 # Get version from __init__.py
-version = '1.0.0'
+version = '2.0.0'
 
 setup(
     name='abhikarta-llm',
     version=version,
     description='Unified LLM abstraction system with multi-provider support',
-    long_description=read_file('README.md') if os.path.exists('README.md') else '',
+    long_description=read_file('README-v2.0.0.md') if os.path.exists('README-v2.0.0.md') else '',
     long_description_content_type='text/markdown',
     author='Ashutosh Sinha',
     author_email='ajsinha@gmail.com',
