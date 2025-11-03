@@ -15,6 +15,35 @@ from .pii_detector import (
     PIIDetectedException
 )
 
+# Import standalone PII detection functions
+from .detect_pii import (
+    detect_pii,
+    detect_emails,
+    detect_phone_numbers,
+    detect_ssn,
+    detect_credit_cards,
+    has_pii,
+    count_pii,
+    get_pii_locations,
+    find_emails,
+    find_phone_numbers,
+    scan_for_sensitive_data
+)
+
+# Import standalone PII redaction functions
+from .redact_pii import (
+    redact_pii,
+    mask_pii,
+    hash_pii,
+    redact_emails,
+    redact_phone_numbers,
+    redact_ssn,
+    redact_credit_cards,
+    redact_all_pii,
+    sanitize_text,
+    clean_text_for_llm
+)
+
 from .content_filter import (
     ContentFilter,
     ContentCategory,
@@ -45,14 +74,45 @@ from .rbac import (
     ResourceLimitExceededError
 )
 
+# Aliases for backward compatibility
+PIIBlockedException = PIIDetectedException
+AccessDeniedException = PermissionDeniedError
+RotationSchedule = KeyRotationPolicy
+
 __all__ = [
-    # PII Detection
+    # PII Detection - Classes
     'PIIDetector',
     'PIIType',
     'PIIAction',
     'PIIMatch',
     'PIIDetectionResult',
     'PIIDetectedException',
+    'PIIBlockedException',  # Alias
+    
+    # PII Detection - Functions
+    'detect_pii',
+    'detect_emails',
+    'detect_phone_numbers',
+    'detect_ssn',
+    'detect_credit_cards',
+    'has_pii',
+    'count_pii',
+    'get_pii_locations',
+    'find_emails',
+    'find_phone_numbers',
+    'scan_for_sensitive_data',
+    
+    # PII Redaction - Functions
+    'redact_pii',
+    'mask_pii',
+    'hash_pii',
+    'redact_emails',
+    'redact_phone_numbers',
+    'redact_ssn',
+    'redact_credit_cards',
+    'redact_all_pii',
+    'sanitize_text',
+    'clean_text_for_llm',
     
     # Content Filtering
     'ContentFilter',
@@ -70,6 +130,7 @@ __all__ = [
     'KeyRotationManager',
     'KeyRotationPolicy',
     'APIKey',
+    'RotationSchedule',  # Alias
     
     # RBAC
     'RBACManager',
@@ -79,4 +140,5 @@ __all__ = [
     'RBACException',
     'PermissionDeniedError',
     'ResourceLimitExceededError',
+    'AccessDeniedException',  # Alias
 ]

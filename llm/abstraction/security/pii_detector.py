@@ -423,3 +423,72 @@ class PIIDetectedException(Exception):
         self.matches = matches
         types = ', '.join(set(m.pii_type.value for m in matches))
         super().__init__(f"PII detected and blocked: {types}")
+
+
+# Convenience functions for easy usage
+
+def detect_pii(
+    text: str,
+    detect: List[str] = None,
+    confidence_threshold: float = 0.8,
+    custom_patterns: Dict[str, str] = None
+) -> List[PIIMatch]:
+    """
+    Detect PII in text (convenience function).
+    
+    Args:
+        text: Text to scan for PII
+        detect: List of PII types to detect (default: all)
+        confidence_threshold: Minimum confidence for detection
+        custom_patterns: Custom regex patterns
+        
+    Returns:
+        List of PIIMatch objects
+        
+    Example:
+        >>> matches = detect_pii("Email: john@example.com")
+        >>> print(f"Found {len(matches)} PII items")
+    """
+    detector = PIIDetector(
+        detect=detect,
+        action='alert',  # Just detect, don't modify
+        confidence_threshold=confidence_threshold,
+        custom_patterns=custom_patterns
+    )
+    result = detector.process(text)
+    return result.matches
+
+
+def redact_pii(
+    text: str,
+    detect: List[str] = None,
+    action: str = 'redact',
+    confidence_threshold: float = 0.8,
+    custom_patterns: Dict[str, str] = None
+) -> str:
+    """
+    Redact PII from text (convenience function).
+    
+    Args:
+        text: Text to redact
+        detect: List of PII types to detect (default: all)
+        action: Action to take ('redact', 'mask', 'hash')
+        confidence_threshold: Minimum confidence for detection
+        custom_patterns: Custom regex patterns
+        
+    Returns:
+        Redacted text string
+        
+    Example:
+        >>> clean = redact_pii("Email: john@example.com", detect=['email'])
+        >>> print(clean)  # "Email: [EMAIL_REDACTED]"
+    """
+    detector = PIIDetector(
+        detect=detect,
+        action=action,
+        confidence_threshold=confidence_threshold,
+        custom_patterns=custom_patterns
+    )
+    result = detector.process(text)
+    return result.redacted_text
+
