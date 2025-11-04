@@ -16,7 +16,7 @@ Last Updated: November 4, 2025
 
 ## 📚 Core Documentation (6 Files)
 
-### 1. [README.md](README.md) - Start Here!
+### 1. [README.md](../README.md) - Start Here!
 **Purpose**: Quick overview and getting started  
 **Size**: 5.3 KB  
 **Read Time**: 5 minutes  
