@@ -387,6 +387,27 @@ class RBACManager:
         
         return False
     
+    def enforce_permission(
+        self,
+        user_id: str,
+        permission: str,
+        error_message: str = None
+    ) -> None:
+        """
+        Enforce that a user has a specific permission, raise exception if not.
+        
+        Args:
+            user_id: User identifier
+            permission: Permission to check
+            error_message: Custom error message (optional)
+            
+        Raises:
+            PermissionError: If user doesn't have permission
+        """
+        if not self.check_permission(user_id, permission):
+            msg = error_message or f"User '{user_id}' does not have permission '{permission}'"
+            raise PermissionError(msg)
+    
     def get_resource_limits(self, user_id: str) -> ResourceLimit:
         """
         Get effective resource limits for a user.

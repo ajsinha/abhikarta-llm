@@ -1,4 +1,11 @@
 """
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+"""
+
+"""
 Security Import Verification Test
 
 Verifies that all security modules can be imported correctly.

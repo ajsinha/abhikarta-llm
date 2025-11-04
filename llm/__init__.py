@@ -1,7 +1,10 @@
 """
 LLM Package
 
-© 2025-2030 All rights reserved Ashutosh Sinha
-email: ajsinha@gmail.com
-https://www.github.com/ajsinha/abhikarta
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
 """
+
+__version__ = "3.1.2"

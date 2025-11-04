@@ -1,3 +1,10 @@
+<!--
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+-->
+
 # Security Module - Complete API Reference
 
 **Version:** v2.1.0  
@@ -802,3 +809,10 @@ All security features have minimal performance impact:
 **Version:** v2.1.0  
 **Status:** ✅ Production Ready  
 **Test Coverage:** 95%+
+
+---
+
+**Copyright 2025-2030 all rights reserved**  
+**Ashutosh Sinha**  
+**Email: ajsinha@gmail.com**  
+**Version: 3.1.2**

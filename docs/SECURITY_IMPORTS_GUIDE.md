@@ -1,3 +1,10 @@
+<!--
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+-->
+
 # Security Module - Correct Import Guide
 
 **Version:** v2.1.0  
@@ -351,3 +358,10 @@ All 5 security modules are **fully functional** with the correct imports shown a
 **Version:** v2.1.0  
 **Test File:** tests/test_security_imports.py  
 **Status:** ✅ All Working
+
+---
+
+**Copyright 2025-2030 all rights reserved**  
+**Ashutosh Sinha**  
+**Email: ajsinha@gmail.com**  
+**Version: 3.1.2**

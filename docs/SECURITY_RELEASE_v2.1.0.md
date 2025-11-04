@@ -1,3 +1,10 @@
+<!--
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+-->
+
 # Abhikarta LLM v2.1.0 - Security Enhancements Release
 
 **Release Date:** November 3, 2025  
@@ -321,7 +328,7 @@ response = client.complete(clean_prompt.text)
 
 ## 🚀 What's Next
 
-### Coming in v3.0.0
+### Coming in v3.1.2
 See `docs/FUTURE_ENHANCEMENTS_V3.md` for the complete roadmap:
 
 - Monitoring & Observability (5 features)
@@ -383,3 +390,10 @@ See `docs/FUTURE_ENHANCEMENTS_V3.md` for the complete roadmap:
 **Quality:** ⭐⭐⭐⭐⭐
 
 **Download:** [abhikarta-llm-v2.1.0.tar.gz](abhikarta-llm-v2.1.0.tar.gz)
+
+---
+
+**Copyright 2025-2030 all rights reserved**  
+**Ashutosh Sinha**  
+**Email: ajsinha@gmail.com**  
+**Version: 3.1.2**

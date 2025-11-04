@@ -1,3 +1,10 @@
+<!--
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+-->
+
 # Abhikarta LLM Abstraction System - Enhancements v1.1
 
 **Version:** 1.1.0  
@@ -530,3 +537,10 @@ All while maintaining **100% backward compatibility** with v1.0!
 
 © 2025-2030 All rights reserved  
 Ashutosh Sinha | ajsinha@gmail.com
+
+---
+
+**Copyright 2025-2030 all rights reserved**  
+**Ashutosh Sinha**  
+**Email: ajsinha@gmail.com**  
+**Version: 3.1.2**

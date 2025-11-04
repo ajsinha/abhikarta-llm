@@ -1,3 +1,10 @@
+"""
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+"""
+
 """AWS Bedrock LLM Provider"""
 import os
 from typing import Any, Dict, List

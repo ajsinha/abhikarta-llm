@@ -1,4 +1,11 @@
 """
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+"""
+
+"""
 Quick Security Demo
 
 Demonstrates all 5 security features in action

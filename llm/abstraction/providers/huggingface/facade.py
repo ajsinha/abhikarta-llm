@@ -1,3 +1,10 @@
+"""
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+"""
+
 """HuggingFace LLM Facade"""
 from typing import List, Iterator, Any
 from ...core.facade import LLMFacade, Message, CompletionResponse, ChatResponse, ModelInfo

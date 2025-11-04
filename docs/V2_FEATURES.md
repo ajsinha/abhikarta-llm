@@ -1,3 +1,10 @@
+<!--
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+-->
+
 # Abhikarta LLM v2.0.0 - New Features & Enhancements
 
 **Release Date:** November 3, 2025  
@@ -642,3 +649,10 @@ response = await async_client.complete("prompt")
 ---
 
 **Version 2.0.0** - A major leap forward for LLM abstraction! 🚀
+
+---
+
+**Copyright 2025-2030 all rights reserved**  
+**Ashutosh Sinha**  
+**Email: ajsinha@gmail.com**  
+**Version: 3.1.2**

@@ -1,4 +1,11 @@
 """
+Copyright 2025-2030 all rights reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+Version: 3.1.2
+"""
+
+"""
 Test Standalone PII Functions
 
 Tests the detect_pii and redact_pii standalone functions.
