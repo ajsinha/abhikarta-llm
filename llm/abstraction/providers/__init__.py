@@ -4,7 +4,7 @@ Providers Package
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.0.1
+Version: 3.1.3
 """
 
 # Import providers
@@ -44,6 +44,16 @@ except:
     ReplicateProvider = None
 
 try:
+    from .awsbedrock.provider import AWSBedrockProvider
+except:
+    AWSBedrockProvider = None
+
+try:
+    from .meta.provider import MetaProvider
+except:
+    MetaProvider = None
+
+try:
     from .groq import GroqProvider
 except:
     GroqProvider = None
@@ -74,6 +84,8 @@ for name, cls in [
     ('huggingface', HuggingFaceProvider),
     ('cohere', CohereProvider),
     ('replicate', ReplicateProvider),
+    ('awsbedrock', AWSBedrockProvider),
+    ('meta', MetaProvider),
     ('groq', GroqProvider),
     ('mistral', MistralProvider),
     ('together', TogetherProvider),

@@ -2,12 +2,12 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.2
+Version: 3.1.3
 -->
 
 # Abhikarta LLM Architecture and Design
 
-**Version: 3.1.2**  
+**Version: 3.1.3**  
 **Technical Specification and Design Document**
 
 ---
@@ -179,7 +179,7 @@ This document covers:
 
 ### 3.1 Core Components
 
-#### 3.1.2 UnifiedLLMFacade
+#### 3.1.3 UnifiedLLMFacade
 
 ```python
 class UnifiedLLMFacade:
@@ -207,7 +207,7 @@ class UnifiedLLMFacade:
 - Lazy provider loading
 - Thread-safe operations
 
-#### 3.1.2 BaseLLMProvider
+#### 3.1.3 BaseLLMProvider
 
 ```python
 class BaseLLMProvider(ABC):
@@ -1305,4 +1305,4 @@ class ThreadSafeProvider:
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.2**
+**Version: 3.1.3**

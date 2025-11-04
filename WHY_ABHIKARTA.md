@@ -2,14 +2,14 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.2
+Version: 3.1.3
 -->
 
 # Why Choose Abhikarta LLM?
 
 **The definitive guide to why Abhikarta LLM is the best choice for your LLM applications**
 
-Version: 3.1.2
+Version: 3.1.3
 
 ---
 
@@ -257,8 +257,8 @@ async_response = await facade.acomplete(prompt)
 - USER_GUIDE.md          - Complete tutorials
 - USE_CASES.md           - Real applications
 - WHY_ABHIKARTA.md       - This document
-- NEW_PROVIDERS_v3.1.2.md - New features
-- CHANGELOG_v3.1.2.md     - What's new
+- NEW_PROVIDERS_v3.1.3.md - New features
+- CHANGELOG_v3.1.3.md     - What's new
 - 13 Complete Examples    - 2,686 lines of code
 ```
 
@@ -690,7 +690,7 @@ facade.register_plugin(MyCustomPlugin())
 - Enhanced multi-modal
 - Plugin system
 
-**v3.1.2** (Q3 2026):
+**v3.1.3** (Q3 2026):
 - Real-time fine-tuning
 - Custom deployments
 - GUI tools
@@ -751,10 +751,10 @@ facade.register_plugin(MyCustomPlugin())
 
 ```bash
 # Download
-wget abhikarta-llm-v3.1.2-COMPLETE.tar.gz
+wget abhikarta-llm-v3.1.3-COMPLETE.tar.gz
 
 # Extract
-tar -xzf abhikarta-llm-v3.1.2-COMPLETE.tar.gz
+tar -xzf abhikarta-llm-v3.1.3-COMPLETE.tar.gz
 cd abhikarta-llm
 
 # Install
@@ -811,4 +811,4 @@ python examples/capabilities/01_basic_usage.py
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.2**
+**Version: 3.1.3**

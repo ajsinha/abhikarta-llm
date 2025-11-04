@@ -2,7 +2,7 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.2
+Version: 3.1.3
 -->
 
 # Abhikarta LLM v2.0.0 - New Features & Enhancements
@@ -655,4 +655,4 @@ response = await async_client.complete("prompt")
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.2**
+**Version: 3.1.3**

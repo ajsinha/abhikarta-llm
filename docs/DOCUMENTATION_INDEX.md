@@ -2,21 +2,21 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.2
+Version: 3.1.3
 -->
 
 # Abhikarta LLM - Documentation Index
 
 **Complete guide to all documentation resources**
 
-Version: 3.1.2  
+Version: 3.1.3  
 Last Updated: November 4, 2025
 
 ---
 
 ## 📚 Core Documentation (6 Files)
 
-### 1. [README.md](../README.md) - Start Here!
+### 1. [README.md](README.md) - Start Here!
 **Purpose**: Quick overview and getting started  
 **Size**: 5.3 KB  
 **Read Time**: 5 minutes  
@@ -106,7 +106,7 @@ Last Updated: November 4, 2025
 
 ---
 
-### 6. [WHY_ABHIKARTA.md](../WHY_ABHIKARTA.md) ⭐ NEW! - Why Choose Us
+### 6. [WHY_ABHIKARTA.md](WHY_ABHIKARTA.md) ⭐ NEW! - Why Choose Us
 **Purpose**: Competitive advantages explained  
 **Size**: 17 KB  
 **Read Time**: 30 minutes  
@@ -128,17 +128,17 @@ Last Updated: November 4, 2025
 
 ## 📖 Additional Documentation (4 Files)
 
-### 7. [NEW_PROVIDERS_v3.1.2.md](NEW_PROVIDERS_v3.1.2.md)
+### 7. [NEW_PROVIDERS_v3.1.3.md](NEW_PROVIDERS_v3.1.3.md)
 **Purpose**: New provider guide  
 **Size**: 8.5 KB  
 **Contents**: Ollama, Groq, Mistral, Together setup & usage
 
-### 8. [CHANGELOG_v3.1.2.md](CHANGELOG_v3.1.2.md)
-**Purpose**: What's new in v3.1.2  
+### 8. [CHANGELOG_v3.1.3.md](CHANGELOG_v3.1.3.md)
+**Purpose**: What's new in v3.1.3  
 **Size**: 9.9 KB  
 **Contents**: New features, changes, migration guide
 
-### 9. [COMPLETE_PACKAGE_v3.1.2.md](COMPLETE_PACKAGE_v3.1.2.md)
+### 9. [COMPLETE_PACKAGE_v3.1.3.md](COMPLETE_PACKAGE_v3.1.3.md)
 **Purpose**: Complete package overview  
 **Size**: 14 KB  
 **Contents**: Everything in the package, quick reference
@@ -274,7 +274,7 @@ Located in `examples/capabilities/`:
 3. USE_CASES.md - ROI & real results
 
 **Then consider**:
-- CHANGELOG_v3.1.2.md - Latest features
+- CHANGELOG_v3.1.3.md - Latest features
 - Examples - See it in action
 
 ---
@@ -288,7 +288,7 @@ Located in `examples/capabilities/`:
 
 ### Provider Setup
 - USER_GUIDE.md (Provider Configuration)
-- NEW_PROVIDERS_v3.1.2.md
+- NEW_PROVIDERS_v3.1.3.md
 - examples/02_multiple_providers.py
 - examples/13_new_providers.py
 
@@ -337,7 +337,7 @@ Located in `examples/capabilities/`:
 → CAPABILITIES_DOCUMENTATION.md
 
 **...set up new providers**
-→ NEW_PROVIDERS_v3.1.2.md + USER_GUIDE.md
+→ NEW_PROVIDERS_v3.1.3.md + USER_GUIDE.md
 
 **...troubleshoot issues**
 → USER_GUIDE.md (Troubleshooting) + verify_installation.py
@@ -352,10 +352,10 @@ Located in `examples/capabilities/`:
 ### Option 1: Download Package
 ```bash
 # Download complete package (626 KB)
-wget abhikarta-llm-v3.1.2-COMPLETE.tar.gz
+wget abhikarta-llm-v3.1.3-COMPLETE.tar.gz
 
 # Extract
-tar -xzf abhikarta-llm-v3.1.2-COMPLETE.tar.gz
+tar -xzf abhikarta-llm-v3.1.3-COMPLETE.tar.gz
 cd abhikarta-llm
 
 # All docs are included!
@@ -465,4 +465,4 @@ python -m markdown README.md > README.html
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.2**
+**Version: 3.1.3**

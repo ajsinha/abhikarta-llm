@@ -2,7 +2,7 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.2
+Version: 3.1.3
 -->
 
 # Abhikarta LLM v2.1.0 - Security Enhancements Release
@@ -328,7 +328,7 @@ response = client.complete(clean_prompt.text)
 
 ## 🚀 What's Next
 
-### Coming in v3.1.2
+### Coming in v3.1.3
 See `docs/FUTURE_ENHANCEMENTS_V3.md` for the complete roadmap:
 
 - Monitoring & Observability (5 features)
@@ -396,4 +396,4 @@ See `docs/FUTURE_ENHANCEMENTS_V3.md` for the complete roadmap:
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.2**
+**Version: 3.1.3**

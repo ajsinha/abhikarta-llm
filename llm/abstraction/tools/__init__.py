@@ -217,6 +217,14 @@ class ToolRegistry:
     def clear_history(self) -> None:
         """Clear execution history"""
         self.execution_history.clear()
+    
+    def get_all_tools(self) -> List[Tool]:
+        """Get all registered tools"""
+        return list(self.tools.values())
+    
+    def to_dict_list(self) -> List[Dict[str, Any]]:
+        """Convert all tools to dictionary format"""
+        return [tool.to_dict() for tool in self.tools.values()]
 
 
 @dataclass

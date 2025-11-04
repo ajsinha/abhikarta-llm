@@ -2,732 +2,536 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.2
+Version: 3.1.3
 -->
 
 # Abhikarta LLM - Architecture & Design
 
-**Technical Architecture Documentation**
+**System Architecture Documentation v3.1.3**
 
 ---
 
-## Table of Contents
+## 📐 Overview
 
-1. [System Overview](#system-overview)
-2. [Design Principles](#design-principles)
-3. [Core Architecture](#core-architecture)
-4. [Component Details](#component-details)
-5. [Design Patterns](#design-patterns)
-6. [Data Flow](#data-flow)
-7. [Extension Points](#extension-points)
-8. [Performance Considerations](#performance-considerations)
+Abhikarta LLM is built on a **layered architecture** with clear separation of concerns, enabling modularity, extensibility, and maintainability.
 
----
+### Design Principles
 
-## System Overview
-
-Abhikarta LLM is built using a **layered architecture** with the Facade pattern at its core, providing a unified interface to 11 different LLM providers.
-
-### High-Level Architecture
-
-\`\`\`
-┌─────────────────────────────────────────────────────────┐
-│                  Application Layer                       │
-│            (Your code using Abhikarta)                   │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│                  Facade Layer                            │
-│         UnifiedLLMFacade (Single Entry Point)            │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │
-│  │ Complete │ │  Stream  │ │  Tools   │ │   RAG    │  │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘  │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│              Provider Abstraction Layer                  │
-│           Base LLM Provider Interface                    │
-└────────────────────┬────────────────────────────────────┘
-                     │
-        ┌────────────┼────────────┬──────────┐
-        ▼            ▼            ▼          ▼
-   ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐
-   │ OpenAI │  │  Groq  │  │Mistral │  │ Ollama │
-   │Provider│  │Provider│  │Provider│  │Provider│
-   └───┬────┘  └───┬────┘  └───┬────┘  └───┬────┘
-       │           │            │            │
-       ▼           ▼            ▼            ▼
-   [OpenAI]    [Groq]      [Mistral]    [Ollama]
-     API         API          API        Local
-\`\`\`
-
-### Key Components
-
-1. **Facade Layer** - Single entry point
-2. **Provider Layer** - Abstractions for each LLM
-3. **Feature Modules** - RAG, Tools, Validation, etc.
-4. **Utility Layer** - Caching, metrics, security
-5. **Configuration Layer** - Provider setup
+1. **Single Responsibility**: Each component has one clear purpose
+2. **Open/Closed**: Open for extension, closed for modification
+3. **Dependency Inversion**: Depend on abstractions, not concretions
+4. **Provider Agnostic**: No coupling to specific LLM APIs
+5. **Configuration-Driven**: Behavior controlled by configuration
+6. **Production-Ready**: Enterprise-grade reliability and security
 
 ---
 
-## Design Principles
+## 🏛️ High-Level Architecture
 
-### 1. **Single Responsibility Principle**
-Each component has one clear purpose:
-- Facade: Unified interface
-- Providers: LLM-specific logic
-- Modules: Feature implementation
-
-### 2. **Open/Closed Principle**
-- Open for extension (new providers)
-- Closed for modification (stable core)
-
-### 3. **Liskov Substitution**
-All providers implement `BaseLLMProvider` interface:
-\`\`\`python
-class BaseLLMProvider(ABC):
-    @abstractmethod
-    def complete(self, prompt: str, **kwargs) -> LLMResponse:
-        pass
-    
-    @abstractmethod
-    def stream_complete(self, prompt: str, **kwargs) -> Iterator[StreamChunk]:
-        pass
-\`\`\`
-
-### 4. **Dependency Inversion**
-High-level modules depend on abstractions, not concrete implementations:
-\`\`\`python
-# Good: Depends on abstraction
-facade = UnifiedLLMFacade(config)
-
-# Not: facade = OpenAIProvider()  # Direct dependency
-\`\`\`
-
-### 5. **Interface Segregation**
-Providers only implement what they need:
-- All: `complete()`, `stream_complete()`
-- Optional: `embed()`, `list_models()`
-
----
-
-## Core Architecture
-
-### Facade Pattern
-
-The UnifiedLLMFacade is the single entry point:
-
-\`\`\`python
-class UnifiedLLMFacade:
-    def __init__(self, config: Dict):
-        self.providers = self._initialize_providers(config)
-        self.default_provider = self._get_default()
-    
-    def complete(self, prompt: str, provider: str = None, **kwargs):
-        """Route request to appropriate provider"""
-        provider_instance = self.providers[provider or self.default_provider]
-        return provider_instance.complete(prompt, **kwargs)
-\`\`\`
-
-### Provider Architecture
-
-Each provider implements the base interface:
-
-\`\`\`python
-class OpenAIProvider(BaseLLMProvider):
-    def initialize(self, config: Dict):
-        self.client = OpenAI(api_key=config['api_key'])
-        self.model = config.get('model', 'gpt-3.5-turbo')
-    
-    def complete(self, prompt: str, **kwargs) -> LLMResponse:
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
-            **kwargs
-        )
-        return LLMResponse(
-            text=response.choices[0].message.content,
-            metadata={'model': self.model, 'usage': response.usage}
-        )
-\`\`\`
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                     Application Layer                            │
+│  (Your Code - Chat Apps, AI Agents, Knowledge Systems, etc.)    │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+                                ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                      Facade Layer                                │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │          UnifiedLLMFacade (Main Entry Point)               │  │
+│  │  • Single API for all operations                           │  │
+│  │  • Provider selection & routing                            │  │
+│  │  • Feature orchestration                                   │  │
+│  └────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │
+            ┌───────────────────┼───────────────────┐
+            ▼                   ▼                   ▼
+┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐
+│  Feature Modules │ │ Provider Manager │ │ Security Layer   │
+│                  │ │                  │ │                  │
+│ • RAG System     │ │ • Provider       │ │ • PII Detection  │
+│ • Function Call  │ │   Registration   │ │ • Content Filter │
+│ • Templates      │ │ • Load Balancing │ │ • RBAC           │
+│ • Validation     │ │ • Fallback       │ │ • Audit Logging  │
+│ • Batch Proc     │ │ • Health Checks  │ │ • Key Rotation   │
+│ • Conversation   │ │                  │ │                  │
+│ • Embeddings     │ │                  │ │                  │
+│ • Caching        │ │                  │ │                  │
+└──────────────────┘ └───────┬──────────┘ └──────────────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        ▼                    ▼                    ▼
+┌──────────────┐  ┌──────────────┐    ┌──────────────┐
+│   Provider   │  │   Provider   │ ...│   Provider   │
+│   Adapter    │  │   Adapter    │    │   Adapter    │
+│   (OpenAI)   │  │   (Groq)     │    │   (Ollama)   │
+└──────┬───────┘  └──────┬───────┘    └──────┬───────┘
+       │                 │                    │
+       ▼                 ▼                    ▼
+┌──────────────┐  ┌──────────────┐    ┌──────────────┐
+│  External    │  │  External    │    │    Local     │
+│  LLM API     │  │  LLM API     │    │  LLM Server  │
+│  (Cloud)     │  │  (Cloud)     │    │  (Machine)   │
+└──────────────┘  └──────────────┘    └──────────────┘
+```
 
 ---
 
-## Component Details
+## 📦 Component Architecture
 
 ### 1. Facade Layer
 
-**File**: `llm/abstraction/facade.py`
+**Purpose**: Provides unified interface to all functionality
+
+**Key Classes**:
+- `UnifiedLLMFacade` - Main entry point
+- `ProviderRouter` - Routes requests to providers
+- `ConfigManager` - Manages configuration
 
 **Responsibilities**:
-- Provider initialization
-- Request routing
+- API simplification
+- Provider abstraction
+- Feature coordination
 - Error handling
-- Response formatting
+- Configuration management
 
-**Key Methods**:
-\`\`\`python
-def complete(prompt, provider=None, **kwargs) -> LLMResponse
-def stream_complete(prompt, provider=None, **kwargs) -> Iterator[StreamChunk]
-def embed(text, provider=None) -> Embedding
-\`\`\`
+**Code Location**: `llm/abstraction/facade.py`
 
 ### 2. Provider Layer
 
-**Directory**: `llm/abstraction/providers/`
+**Purpose**: Adapters for different LLM providers
 
-**Base Interface**: `BaseLLMProvider`
+**Base Class**: `BaseLLMProvider`
 
-**Providers** (11 total):
-1. `openai.py` - OpenAI (GPT)
-2. `anthropic.py` - Anthropic (Claude)
-3. `cohere.py` - Cohere
-4. `google.py` - Google (Gemini)
-5. `groq.py` - Groq (ultra-fast)
-6. `mistral.py` - Mistral AI
-7. `together.py` - Together AI
-8. `ollama.py` - Ollama (local)
-9. `huggingface.py` - Hugging Face
-10. `replicate.py` - Replicate
-11. `mock.py` - Mock (testing)
+**Provider Implementations** (11 total):
+1. `OpenAIProvider` - GPT-3.5, GPT-4
+2. `AnthropicProvider` - Claude 3
+3. `CohereProvider` - Command
+4. `GoogleProvider` - Gemini
+5. `GroqProvider` - Mixtral (ultra-fast) 🆕
+6. `MistralProvider` - Mistral models 🆕
+7. `TogetherProvider` - 50+ open models 🆕
+8. `OllamaProvider` - Local LLMs 🆕
+9. `HuggingFaceProvider` - Community models
+10. `ReplicateProvider` - Various models
+11. `MockProvider` - Testing
+
+**Interface Contract**:
+```python
+class BaseLLMProvider:
+    def initialize(config: Dict) -> None
+    def complete(prompt: str, **kwargs) -> LLMResponse
+    def stream_complete(prompt: str, **kwargs) -> Iterator[StreamChunk]
+    def get_cost(usage: Dict) -> float
+    def get_model_info() -> Dict
+```
+
+**Code Location**: `llm/abstraction/providers/`
 
 ### 3. Feature Modules
 
-**Function Calling**:
-\`\`\`
-llm/abstraction/tools/
-├── __init__.py
-├── tool.py          # Tool definition
-├── registry.py      # Tool management
-└── executor.py      # Tool execution
-\`\`\`
+#### RAG System (`llm/abstraction/rag/`)
+- `RAGClient` - Main RAG interface
+- `DocumentChunker` - Text chunking strategies
+- `VectorStore` - Embedding storage
+- `Retriever` - Semantic search
+- `ContextBuilder` - Context construction
 
-**RAG System**:
-\`\`\`
-llm/abstraction/rag/
-├── __init__.py
-├── client.py        # RAG client
-├── retriever.py     # Document retrieval
-└── chunker.py       # Document chunking
-\`\`\`
+#### Function Calling (`llm/abstraction/tools/`)
+- `Tool` - Tool definition
+- `ToolRegistry` - Tool management
+- `ToolExecutor` - Execution engine
+- `ParameterValidator` - Input validation
 
-**Prompt Templates**:
-\`\`\`
-llm/abstraction/prompts/
-├── __init__.py
-├── template.py      # Template class
-├── registry.py      # Template storage
-└── defaults.py      # Default templates
-\`\`\`
+#### Prompt Templates (`llm/abstraction/prompts/`)
+- `PromptTemplate` - Template definition
+- `PromptRegistry` - Template management
+- `TemplateEngine` - Rendering engine
+- `VariableExtractor` - Variable parsing
 
-**Validation**:
-\`\`\`
-llm/abstraction/validation/
-├── __init__.py
-├── validator.py     # Schema validation
-└── retry.py         # Auto-retry logic
-\`\`\`
+#### Response Validation (`llm/abstraction/validation/`)
+- `ResponseValidator` - Schema validation
+- `RetryHandler` - Auto-retry logic
+- `SchemaRegistry` - Schema management
+- `TypeConverter` - Type conversion
 
-### 4. Utility Layer
+#### Batch Processing (`llm/abstraction/batch/`)
+- `BatchProcessor` - Concurrent processing
+- `RateLimiter` - Rate limiting
+- `ProgressTracker` - Progress monitoring
+- `ErrorCollector` - Error aggregation
 
-**Caching**:
-- `advanced/cache.py` - Semantic caching
-- `advanced/pool.py` - Connection pooling
+#### Conversation (`llm/abstraction/conversation/`)
+- `ChatClient` - Chat interface
+- `Conversation` - History management
+- `MessageStore` - Message persistence
+- `ContextManager` - Context window management
 
-**Metrics**:
-- `utils/metrics.py` - Performance tracking
-- `utils/streaming.py` - Stream metrics
+#### Embeddings (`llm/abstraction/embeddings/`)
+- `EmbeddingClient` - Embedding generation
+- `VectorStore` - Vector storage
+- `SemanticSearch` - Similarity search
+- `Clustering` - Vector clustering
 
-**Security**:
-- `security/pii.py` - PII detection
-- `security/filter.py` - Content filtering
-- `security/rbac.py` - Access control
-- `security/audit.py` - Audit logging
+#### Advanced Features (`llm/abstraction/advanced/`)
+- `SemanticCache` - Similarity-based caching
+- `ConnectionPool` - HTTP connection pooling
+- `LoadBalancer` - Provider load balancing
+- `CircuitBreaker` - Failure protection
 
----
+### 4. Security Layer
 
-## Design Patterns
+**Components**:
+- `PIIDetector` - Detects 12 types of PII
+- `ContentFilter` - Filters 12 content categories
+- `RBACManager` - Role-based access control
+- `AuditLogger` - Comprehensive logging
+- `KeyRotator` - API key management
 
-### 1. Facade Pattern
-**Used**: Core architecture
-**Purpose**: Simplify complex subsystems
+**Code Location**: `llm/abstraction/security/`
 
-### 2. Factory Pattern
-**Used**: Provider creation
-**Purpose**: Decouple object creation
+### 5. Utilities
 
-\`\`\`python
-def get_provider(name: str) -> BaseLLMProvider:
-    providers = {
-        'openai': OpenAIProvider,
-        'groq': GroqProvider,
-        'mistral': MistralProvider
-    }
-    return providers[name]()
-\`\`\`
+**Streaming** (`llm/abstraction/utils/streaming/`):
+- `StreamHandler` - Stream processing
+- `StreamMetrics` - Performance tracking
+- `BufferManager` - Stream buffering
 
-### 3. Strategy Pattern
-**Used**: Provider selection
-**Purpose**: Interchangeable algorithms
+**Caching** (`llm/abstraction/utils/caching/`):
+- `CacheManager` - Cache coordination
+- `ExactCache` - Exact match caching
+- `SemanticCache` - Similarity caching
+- `CacheEviction` - LRU eviction
 
-### 4. Observer Pattern
-**Used**: Streaming callbacks
-**Purpose**: Event notification
-
-\`\`\`python
-handler = StreamHandler(
-    on_token=lambda t: print(t),
-    on_complete=lambda: print("Done!")
-)
-\`\`\`
-
-### 5. Decorator Pattern
-**Used**: Caching, metrics
-**Purpose**: Add functionality
-
-\`\`\`python
-@cache_response
-@track_metrics
-def complete(prompt):
-    return provider.complete(prompt)
-\`\`\`
-
-### 6. Template Method Pattern
-**Used**: Base provider
-**Purpose**: Define skeleton
-
-### 7. Registry Pattern
-**Used**: Tools, prompts
-**Purpose**: Central registration
+**Metrics** (`llm/abstraction/utils/metrics/`):
+- `MetricsCollector` - Metrics gathering
+- `PerformanceTracker` - Performance monitoring
+- `CostCalculator` - Cost tracking
 
 ---
 
-## Data Flow
+## 🔄 Request Flow
 
-### Request Flow
+### Basic Completion Flow
 
-\`\`\`
-User Request
-    │
-    ▼
-Facade.complete(prompt)
-    │
-    ├─► Validate input
-    ├─► Select provider
-    ├─► Apply middleware (cache check)
-    │
-    ▼
-Provider.complete(prompt)
-    │
-    ├─► Prepare request
-    ├─► Call LLM API
-    ├─► Parse response
-    │
-    ▼
-Return LLMResponse
-    │
-    ├─► Apply middleware (cache store)
-    ├─► Track metrics
-    ├─► Log audit
-    │
-    ▼
-User receives response
-\`\`\`
+```
+1. Application makes request
+   └─> facade.complete("prompt")
+
+2. Facade validates and prepares
+   ├─> Check configuration
+   ├─> Select provider
+   ├─> Apply security filters
+   └─> Check cache
+
+3. Route to provider
+   ├─> Provider adapter transforms request
+   ├─> Call external API
+   ├─> Transform response
+   └─> Apply post-processing
+
+4. Return to application
+   ├─> Update cache
+   ├─> Log to audit
+   ├─> Track metrics
+   └─> Return LLMResponse
+```
 
 ### Streaming Flow
 
-\`\`\`
-User Request Stream
-    │
-    ▼
-Facade.stream_complete(prompt)
-    │
-    ▼
-Provider.stream_complete(prompt)
-    │
-    ├─► Prepare request
-    ├─► Open stream
-    │
-    ▼
-For each chunk:
-    │
-    ├─► Parse chunk
-    ├─► Track metrics (TTFT, TPS)
-    ├─► Fire callbacks
-    ├─► Yield StreamChunk
-    │
-    ▼
-Stream complete
-\`\`\`
+```
+1. Application requests stream
+   └─> facade.stream_complete("prompt")
+
+2. Facade sets up stream
+   ├─> Initialize StreamHandler
+   ├─> Configure callbacks
+   └─> Start metrics tracking
+
+3. Provider streams tokens
+   ├─> Each token arrives
+   ├─> StreamHandler processes
+   ├─> Callbacks triggered
+   └─> Metrics updated
+
+4. Stream completes
+   ├─> Final metrics calculated
+   ├─> Audit log written
+   └─> Resources cleaned up
+```
 
 ### RAG Flow
 
-\`\`\`
-User Query
-    │
-    ▼
-RAGClient.query(question)
-    │
-    ├─► Generate query embedding
-    │
-    ▼
-VectorStore.search(embedding)
-    │
-    ├─► Find similar documents
-    ├─► Return top-k results
-    │
-    ▼
-Build context prompt
-    │
-    ├─► Format: "Context: ... Question: ..."
-    │
-    ▼
-Facade.complete(prompt)
-    │
-    ▼
-Return answer with citations
-\`\`\`
+```
+1. User asks question
+   └─> rag.query("What is X?")
+
+2. Retrieve relevant documents
+   ├─> Generate query embedding
+   ├─> Search vector store
+   ├─> Rank by similarity
+   └─> Get top K documents
+
+3. Build context
+   ├─> Combine documents
+   ├─> Add citations
+   └─> Format prompt
+
+4. Generate answer
+   ├─> Call LLM with context
+   ├─> Extract answer
+   └─> Return with sources
+```
 
 ---
 
-## Extension Points
+## 🔌 Extension Points
 
-### Adding New Provider
+### Adding a New Provider
 
 1. **Create provider class**:
-\`\`\`python
-# llm/abstraction/providers/newprovider.py
+```python
 class NewProvider(BaseLLMProvider):
     def initialize(self, config):
         # Setup
-        pass
-    
+        
     def complete(self, prompt, **kwargs):
         # Implementation
-        pass
-    
+        
     def stream_complete(self, prompt, **kwargs):
-        # Implementation
-        pass
-\`\`\`
+        # Streaming
+```
 
-2. **Register in `__init__.py`**:
-\`\`\`python
-from .newprovider import NewProvider
-__all__.append('NewProvider')
-\`\`\`
+2. **Register in factory**:
+```python
+# providers/__init__.py
+from .new_provider import NewProvider
+```
 
-3. **Add to facade**:
-Provider auto-discovered by facade
+3. **Add configuration**:
+```python
+config = {
+    'providers': {
+        'new_provider': {
+            'enabled': True,
+            'api_key': '...'
+        }
+    }
+}
+```
 
-### Adding New Feature
+### Adding a Feature Module
 
-1. **Create module directory**:
-\`\`\`
-llm/abstraction/newfeature/
-├── __init__.py
-├── client.py
-└── utils.py
-\`\`\`
-
-2. **Implement feature**:
-\`\`\`python
-class NewFeatureClient:
-    def __init__(self, facade):
-        self.facade = facade
-    
-    def do_something(self):
-        # Implementation
-        pass
-\`\`\`
-
-3. **Export from `__init__.py`**:
-\`\`\`python
-from .client import NewFeatureClient
-__all__ = ['NewFeatureClient']
-\`\`\`
+1. **Create module directory**: `llm/abstraction/new_feature/`
+2. **Implement core classes**
+3. **Add to facade**: Integrate with `UnifiedLLMFacade`
+4. **Write tests**: Add comprehensive tests
+5. **Document**: Add to CAPABILITIES.md
 
 ---
 
-## Performance Considerations
+## 📊 Data Flow
 
-### 1. Connection Pooling
-Reuse HTTP connections:
-\`\`\`python
-from llm.abstraction.advanced import ConnectionPool
+### Configuration Flow
 
-pool = ConnectionPool(pool_size=10)
-# Connections reused across requests
-\`\`\`
+```
+config.yaml
+    ↓
+ConfigManager.load()
+    ↓
+Validate configuration
+    ↓
+Initialize providers
+    ↓
+Setup feature modules
+    ↓
+Ready for requests
+```
 
-### 2. Caching
-Semantic caching reduces API calls:
-\`\`\`python
-from llm.abstraction.advanced import SemanticCache
+### Response Flow
 
-cache = SemanticCache(embedding_client)
-# Similar queries hit cache
-\`\`\`
-
-### 3. Batch Processing
-Process multiple requests concurrently:
-\`\`\`python
-from llm.abstraction.batch import BatchProcessor
-
-processor = BatchProcessor(facade, max_concurrent=10)
-# 10-15x faster than sequential
-\`\`\`
-
-### 4. Streaming
-Reduce latency with streaming:
-\`\`\`python
-# Non-streaming: Wait for full response
-response = facade.complete(prompt)  # 2-5 seconds
-
-# Streaming: Show tokens as generated
-for chunk in facade.stream_complete(prompt):
-    print(chunk.text)  # Immediate feedback
-\`\`\`
-
-### 5. Provider Selection
-Choose provider based on needs:
-- **Speed**: Groq (500+ tok/s)
-- **Cost**: Ollama (free) or Mistral ($15/mo)
-- **Quality**: OpenAI GPT-4
+```
+LLM API Response
+    ↓
+Provider transforms
+    ↓
+LLMResponse object
+    ↓
+Post-processing
+    ↓
+Cache update
+    ↓
+Metrics logging
+    ↓
+Return to user
+```
 
 ---
 
-## Security Architecture
+## 🔐 Security Architecture
 
 ### Defense in Depth
 
-\`\`\`
-Application Code
-    │
-    ▼
-┌─────────────────────┐
-│   Input Validation   │ ◄─ Validate prompts
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│   PII Detection      │ ◄─ Redact sensitive data
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│  Content Filtering   │ ◄─ Block harmful content
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│   RBAC Check         │ ◄─ Verify permissions
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│   Audit Logging      │ ◄─ Log all actions
-└──────────┬──────────┘
-           │
-           ▼
-Provider API Call
-\`\`\`
+```
+Layer 1: Input Validation
+    ├─> Parameter validation
+    ├─> Type checking
+    └─> Size limits
+
+Layer 2: PII Detection
+    ├─> Scan for sensitive data
+    ├─> Redact if found
+    └─> Log detection
+
+Layer 3: Content Filtering
+    ├─> Check categories
+    ├─> Apply strictness level
+    └─> Block or warn
+
+Layer 4: RBAC
+    ├─> Check permissions
+    ├─> Verify role
+    └─> Allow/deny
+
+Layer 5: Audit Logging
+    ├─> Log all actions
+    ├─> Encrypt logs
+    └─> Retain per policy
+```
 
 ---
 
-## Scalability
+## ⚡ Performance Optimizations
+
+### 1. Connection Pooling
+- Reuse HTTP connections
+- 30-50% faster requests
+- Reduced latency
+
+### 2. Caching
+- **Exact Cache**: Fast lookups (hash-based)
+- **Semantic Cache**: Similarity-based (embeddings)
+- **Multi-level**: L1 (memory) + L2 (disk)
+
+### 3. Batch Processing
+- Concurrent requests
+- Rate-limited execution
+- 10-15x throughput improvement
+
+### 4. Streaming
+- Token-by-token delivery
+- Reduced perceived latency
+- Better UX
+
+---
+
+## 📈 Scalability
 
 ### Horizontal Scaling
 
-\`\`\`
+```
 Load Balancer
-    │
-    ├─► Abhikarta Instance 1
-    ├─► Abhikarta Instance 2
-    └─► Abhikarta Instance 3
-         │
-         ├─► Provider Pool 1 (OpenAI)
-         ├─► Provider Pool 2 (Groq)
-         └─► Provider Pool 3 (Mistral)
-\`\`\`
+    ├─> Instance 1 (Abhikarta)
+    ├─> Instance 2 (Abhikarta)
+    └─> Instance N (Abhikarta)
+         └─> Shared Cache (Redis)
+         └─> Shared DB (PostgreSQL)
+```
 
-### Vertical Scaling
+### Provider Load Balancing
 
-- **Batch Processing**: Handle more concurrent requests
-- **Connection Pooling**: Reuse connections
-- **Caching**: Reduce API calls
-
----
-
-## Error Handling
-
-### Retry Strategy
-
-\`\`\`python
-@retry(
-    max_attempts=3,
-    backoff=exponential,
-    exceptions=[RateLimitError, APIError]
-)
-def complete_with_retry(prompt):
-    return provider.complete(prompt)
-\`\`\`
-
-### Fallback Chain
-
-\`\`\`python
-providers = ['groq', 'mistral', 'ollama']
-
-for provider in providers:
-    try:
-        return facade.complete(prompt, provider=provider)
-    except Exception:
-        continue  # Try next provider
-\`\`\`
+```
+Request
+    ↓
+Load Balancer
+    ├─> Provider 1 (if available)
+    ├─> Provider 2 (if available)
+    └─> Provider N (if available)
+```
 
 ---
 
-## Monitoring & Observability
+## 🎯 Design Patterns Used
 
-### Metrics Tracked
-
-1. **Request Metrics**
-   - Request count
-   - Response time
-   - Token usage
-   - Cost per request
-
-2. **Provider Metrics**
-   - Provider usage
-   - Success rate
-   - Error rate
-   - Latency
-
-3. **Feature Metrics**
-   - Cache hit rate
-   - Tool execution time
-   - RAG retrieval time
-
-### Logging Levels
-
-\`\`\`
-DEBUG   - Detailed information
-INFO    - General information
-WARNING - Warning messages
-ERROR   - Error messages
-CRITICAL - Critical issues
-\`\`\`
+1. **Facade**: UnifiedLLMFacade simplifies complexity
+2. **Adapter**: Provider adapters normalize APIs
+3. **Strategy**: Different caching/validation strategies
+4. **Factory**: Provider factory for instantiation
+5. **Observer**: Event callbacks for streaming
+6. **Singleton**: Configuration manager
+7. **Template Method**: Base provider template
+8. **Chain of Responsibility**: Security filters
 
 ---
 
-## Testing Architecture
+## 📝 Code Organization
 
-### Test Pyramid
-
-\`\`\`
-         ┌────┐
-         │ E2E│     End-to-end tests
-         └────┘
-       ┌────────┐
-       │Integration│  Integration tests
-       └────────┘
-     ┌──────────────┐
-     │   Unit Tests  │  Unit tests
-     └──────────────┘
-\`\`\`
-
-### Mock Provider
-
-For testing without API calls:
-\`\`\`python
-config = {'providers': {'mock': {'enabled': True}}}
-facade = UnifiedLLMFacade(config)
-
-# Returns simulated responses
-response = facade.complete("test")
-\`\`\`
-
----
-
-## Deployment Architecture
-
-### Standalone Deployment
-
-\`\`\`
-Application
-    │
-    └─► Abhikarta LLM
-            │
-            ├─► OpenAI API
-            ├─► Groq API
-            └─► Local Ollama
-\`\`\`
-
-### Microservices Deployment
-
-\`\`\`
-API Gateway
-    │
-    ├─► Service A (Abhikarta)
-    ├─► Service B (Abhikarta)
-    └─► Service C (Abhikarta)
-\`\`\`
+```
+abhikarta-llm/
+├── llm/
+│   └── abstraction/
+│       ├── facade.py           # Main facade
+│       ├── providers/          # Provider adapters
+│       │   ├── base.py
+│       │   ├── openai.py
+│       │   ├── groq.py
+│       │   └── ...
+│       ├── tools/              # Function calling
+│       ├── rag/                # RAG system
+│       ├── prompts/            # Templates
+│       ├── validation/         # Validation
+│       ├── batch/              # Batch processing
+│       ├── conversation/       # Chat management
+│       ├── embeddings/         # Embeddings
+│       ├── advanced/           # Advanced features
+│       ├── security/           # Security
+│       └── utils/              # Utilities
+├── examples/                   # Examples
+├── tests/                      # Tests
+└── docs/                       # Documentation
+```
 
 ---
 
-## Best Practices
+## 🔍 Testing Strategy
 
-### 1. Configuration Management
-- Use environment variables
-- Separate dev/prod configs
-- Never commit API keys
+### Unit Tests
+- Test each component in isolation
+- Mock external dependencies
+- High code coverage (>80%)
 
-### 2. Error Handling
-- Always use try/except
-- Implement retry logic
-- Have fallback providers
+### Integration Tests
+- Test component interactions
+- Use test doubles for providers
+- Verify end-to-end flows
 
-### 3. Performance
-- Use caching when possible
-- Batch requests for efficiency
-- Choose appropriate provider
+### Provider Tests
+- Test each provider adapter
+- Mock external APIs
+- Verify contract compliance
 
-### 4. Security
-- Enable PII detection
-- Use RBAC
-- Enable audit logging
-- Rotate API keys regularly
-
-### 5. Monitoring
-- Track metrics
-- Set up alerts
-- Monitor costs
-- Review audit logs
+### Performance Tests
+- Benchmark critical paths
+- Load testing
+- Stress testing
 
 ---
 
-## Conclusion
+## 📚 Further Reading
 
-Abhikarta LLM's architecture provides:
-- **Flexibility**: 11 providers, easy to add more
-- **Reliability**: Fallbacks, retry, error handling
-- **Performance**: Caching, pooling, batch processing
-- **Security**: PII, filtering, RBAC, audit
-- **Scalability**: Horizontal and vertical scaling
-- **Maintainability**: Clean architecture, SOLID principles
-
-The facade pattern with provider abstraction enables **zero vendor lock-in** while maintaining a **simple, unified API**.
+- [CAPABILITIES.md](CAPABILITIES.md) - Feature documentation
+- [USE_CASES.md](USE_CASES.md) - Use cases
+- [USER_GUIDE.md](USER_GUIDE.md) - User guide
+- [WHY_ABHIKARTA.md](WHY_ABHIKARTA.md) - Comparisons
 
 ---
 
-**© 2025-2030 Ashutosh Sinha | ajsinha@gmail.com**
+© 2025-2030 Ashutosh Sinha | ajsinha@gmail.com
 
 ---
 
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.2**
+**Version: 3.1.3**

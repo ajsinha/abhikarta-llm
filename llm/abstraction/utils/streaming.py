@@ -2,7 +2,7 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.2
+Version: 3.1.3
 
 Streaming Utilities - Comprehensive streaming support for LLM responses
 """
@@ -284,5 +284,5 @@ __all__ = [
 
 """
 Copyright 2025-2030 all rights reserved
-Ashutosh Sinha | ajsinha@gmail.com | Version: 3.1.2
+Ashutosh Sinha | ajsinha@gmail.com | Version: 3.1.3
 """

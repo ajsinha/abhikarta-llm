@@ -15,7 +15,7 @@ def read_file(filename):
         return f.read()
 
 # Get version from __init__.py
-version="3.1.2"
+version="3.1.3"
 
 setup(
     name='abhikarta-llm',
@@ -56,7 +56,7 @@ setup(
             'pytest>=7.0.0',
             'pytest-cov>=4.0.0',
             'pytest-asyncio>=0.21.0',
-            'black>=23.1.2',
+            'black>=23.1.3',
             'flake8>=6.0.0',
             'mypy>=1.0.0',
         ],

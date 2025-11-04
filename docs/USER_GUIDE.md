@@ -2,14 +2,14 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.2
+Version: 3.1.3
 -->
 
 # Abhikarta LLM - Complete User Guide
 
 **Comprehensive tutorials and how-to guides for all features**
 
-Version: 3.1.2
+Version: 3.1.3
 
 ---
 
@@ -40,7 +40,7 @@ pip install pydantic numpy urllib3
 #### Install Abhikarta LLM
 ```bash
 # Extract package
-tar -xzf abhikarta-llm-v3.1.2-COMPLETE.tar.gz
+tar -xzf abhikarta-llm-v3.1.3-COMPLETE.tar.gz
 cd abhikarta-llm
 
 # Install in editable mode
@@ -705,4 +705,4 @@ processor = BatchProcessor(
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.2**
+**Version: 3.1.3**
