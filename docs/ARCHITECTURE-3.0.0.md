@@ -523,7 +523,7 @@ abhikarta-llm/
 - [CAPABILITIES.md](CAPABILITIES.md) - Feature documentation
 - [USE_CASES.md](USE_CASES.md) - Use cases
 - [USER_GUIDE.md](USER_GUIDE.md) - User guide
-- [WHY_ABHIKARTA.md](WHY_ABHIKARTA.md) - Comparisons
+- [WHY_ABHIKARTA.md](../WHY_ABHIKARTA.md) - Comparisons
 
 ---
 

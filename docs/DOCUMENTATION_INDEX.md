@@ -106,7 +106,7 @@ Last Updated: November 4, 2025
 
 ---
 
-### 6. [WHY_ABHIKARTA.md](WHY_ABHIKARTA.md) ⭐ NEW! - Why Choose Us
+### 6. [WHY_ABHIKARTA.md](../WHY_ABHIKARTA.md) ⭐ NEW! - Why Choose Us
 **Purpose**: Competitive advantages explained  
 **Size**: 17 KB  
 **Read Time**: 30 minutes  
