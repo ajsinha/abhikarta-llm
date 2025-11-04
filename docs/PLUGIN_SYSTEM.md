@@ -2,7 +2,7 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.3
+Version: 3.1.4
 -->
 
 # Plugin System Documentation
@@ -321,4 +321,4 @@ To contribute a provider to the main repository:
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.3**
+**Version: 3.1.4**

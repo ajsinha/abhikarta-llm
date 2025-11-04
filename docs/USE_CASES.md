@@ -2,14 +2,14 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.3
+Version: 3.1.4
 -->
 
 # Abhikarta LLM - Use Cases & Limitations
 
 **Real-world applications, best practices, and known limitations**
 
-Version: 3.1.3
+Version: 3.1.4
 
 ---
 
@@ -675,4 +675,4 @@ print(f"Annual savings: ${savings_per_year:,.2f}")
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.3**
+**Version: 3.1.4**

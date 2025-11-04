@@ -2,7 +2,7 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.3
+Version: 3.1.4
 -->
 
 # Security Module - Correct Import Guide
@@ -364,4 +364,4 @@ All 5 security modules are **fully functional** with the correct imports shown a
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.3**
+**Version: 3.1.4**

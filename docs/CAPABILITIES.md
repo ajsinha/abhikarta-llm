@@ -2,14 +2,14 @@
 Copyright 2025-2030 all rights reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-Version: 3.1.3
+Version: 3.1.4
 -->
 
 # Abhikarta LLM - Capabilities & Features
 
 **Complete reference for all 36+ features**
 
-Version: 3.1.3 | Last Updated: November 3, 2025
+Version: 3.1.4 | Last Updated: November 3, 2025
 
 ---
 
@@ -940,7 +940,7 @@ print(f"Total: ${sum(costs.values()):.2f}")
 - Enhanced multi-modal
 - Advanced caching
 
-### v3.1.3 (Q2 2026)
+### v3.1.4 (Q2 2026)
 - GUI interface
 - Custom fine-tuning
 - Enterprise features
@@ -955,4 +955,4 @@ print(f"Total: ${sum(costs.values()):.2f}")
 **Copyright 2025-2030 all rights reserved**  
 **Ashutosh Sinha**  
 **Email: ajsinha@gmail.com**  
-**Version: 3.1.3**
+**Version: 3.1.4**

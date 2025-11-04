@@ -1,6 +1,6 @@
 """
 Copyright 2025-2030 all rights reserved
-Ashutosh Sinha | Email: ajsinha@gmail.com | Version: 3.1.3
+Ashutosh Sinha | Email: ajsinha@gmail.com | Version: 3.1.6
 
 Example 14: Meta Llama Provider (Direct)
 """
@@ -39,4 +39,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-"""Copyright 2025-2030 all rights reserved | Ashutosh Sinha | ajsinha@gmail.com | Version: 3.1.3"""
+"""Copyright 2025-2030 all rights reserved | Ashutosh Sinha | ajsinha@gmail.com | Version: 3.1.6"""

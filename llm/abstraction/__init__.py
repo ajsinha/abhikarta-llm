@@ -26,7 +26,7 @@ from .core import (
     ValidationError
 )
 
-__version__ = "3.1.3"
+__version__ = "3.1.6"
 
 __all__ = [
     # Factories - Main entry points
