@@ -94,8 +94,10 @@ class UnifiedLLMFacade:
                         model = defaults.get(provider_name, 'default')
                     
                     # Create facade for this provider
-                    facade = provider.create_facade(model)
-                    
+                    if type(model) == dict:
+                        facade = provider.create_facade(model['name'])
+                    else: # must be string
+                        facade = provider.create_facade(model)
                     self.providers[provider_name] = facade
                     
                     # Set first enabled provider as default

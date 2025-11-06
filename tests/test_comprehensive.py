@@ -13,7 +13,6 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from llm.abstraction import LLMClientFactory
-from llm.abstraction.core.exceptions import *
 
 
 def test_all_providers():
@@ -154,7 +153,7 @@ def test_configuration():
     print()
     
     try:
-        from llm.abstraction.config import PropertiesConfigurator
+        from core.config import PropertiesConfigurator
         
         config = PropertiesConfigurator()
         

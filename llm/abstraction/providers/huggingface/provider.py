@@ -36,12 +36,16 @@ class HuggingFaceProvider(LLMProvider):
             )
     
     def create_facade(self, model_name: str) -> LLMFacade:
-        if model_name not in self.list_available_models():
+        available_models = self.list_available_models()
+        if model_name not in available_models:
             raise ModelNotFoundError(f"Model '{model_name}' not found")
         return HuggingFaceFacade(self, model_name, self.client)
     
     def list_available_models(self) -> List[str]:
-        return [model['name'] for model in self.config.get('models', [])]
+        #return [model['name'] for model in self.config.get('models', [])]
+        available_models = self.list_available_models_using_config(self.config)
+        return available_models
+
     
     def validate_credentials(self) -> bool:
         return self.initialized

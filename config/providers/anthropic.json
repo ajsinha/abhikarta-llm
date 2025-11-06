@@ -1,64 +1,546 @@
 {
   "provider": "anthropic",
-  "api_version": "2024-01-01",
+  "api_version": "2023-06-01",
   "base_url": "https://api.anthropic.com",
+  "notes": {
+    "authentication": "All models require x-api-key header with ANTHROPIC_API_KEY",
+    "pricing": "Prices shown are per 1M tokens (input/output). Batch API offers 50% discount",
+    "streaming": "All models support server-sent events (SSE) streaming via stream parameter",
+    "rate_limits": "Rate limits vary by tier. Tier 1: 50 requests/min, 40K tokens/min. Higher tiers available",
+    "context_windows": "Context windows range from 200K tokens (Claude 3 Opus/Sonnet/Haiku) to 100K (Claude 2)",
+    "prompt_caching": "Supported on Claude 3.5 Sonnet, Claude 3 Opus, and Claude 3 Haiku. Cache writes cost more, reads cost less",
+    "extended_thinking": "Claude 3.7 Sonnet supports extended thinking for complex reasoning tasks",
+    "message_batches": "Batch API available for processing up to 10,000 requests with 50% cost reduction and 24-hour processing",
+    "vision": "Claude 3 family supports image inputs (PNG, JPEG, WEBP, GIF). Max 5MB per image, multiple images per message",
+    "function_calling": "Tool use (function calling) supported on all Claude 3 models via tools parameter",
+    "system_prompts": "Support for system prompts to set context, role, and instructions",
+    "thinking_tokens": "Extended thinking models output reasoning tokens before final response",
+    "json_mode": "No dedicated JSON mode, but models excel at structured output with proper prompting",
+    "sdk_support": "Official SDKs for Python and TypeScript. Community SDKs available for other languages",
+    "max_tokens_parameter": "Required parameter specifying maximum output tokens. Models won't exceed this limit",
+    "anthropic_version": "Required header specifying API version (e.g., '2023-06-01')",
+    "token_counting": "Use token counting API to estimate costs before requests",
+    "constitutional_ai": "Models trained with Constitutional AI for helpfulness, harmlessness, and honesty",
+    "workbench": "Claude console provides workbench for prompt engineering and testing",
+    "prompt_improver": "Built-in prompt improvement tools in console for optimization",
+    "beta_features": "Some features like prompt caching require anthropic-beta header"
+  },
   "models": [
     {
-      "name": "claude-3-opus-20240229",
-      "version": "2024-02-29",
-      "description": "Most capable Claude model for complex tasks",
-      "strengths": ["reasoning", "creativity", "analysis", "coding"],
+      "name": "claude-3-7-sonnet-20250219",
+      "version": "3.7",
+      "description": "Most intelligent Claude model with extended thinking capabilities",
+      "strengths": ["extended-thinking", "reasoning", "coding", "analysis", "complex-problems"],
       "context_window": 200000,
-      "max_output": 4096,
+      "max_output": 8192,
       "cost": {
-        "input_per_1k": 0.015,
-        "output_per_1k": 0.075
+        "input_per_1m": 3.0,
+        "output_per_1m": 15.0,
+        "cache_write_per_1m": 3.75,
+        "cache_read_per_1m": 0.30
       },
       "capabilities": {
         "chat": true,
-        "completion": true,
+        "completion": false,
         "streaming": true,
         "function_calling": true,
-        "vision": true
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": true,
+        "extended_thinking": true,
+        "batch_api": true
+      }
+    },
+    {
+      "name": "claude-3-5-sonnet-20241022",
+      "version": "3.5",
+      "description": "Latest Claude 3.5 Sonnet with improved coding and agentic capabilities",
+      "strengths": ["coding", "reasoning", "agentic-tasks", "visual-analysis", "general-purpose"],
+      "context_window": 200000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 3.0,
+        "output_per_1m": 15.0,
+        "cache_write_per_1m": 3.75,
+        "cache_read_per_1m": 0.30
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": true,
+        "extended_thinking": false,
+        "batch_api": true
+      }
+    },
+    {
+      "name": "claude-3-5-sonnet-20240620",
+      "version": "3.5",
+      "description": "Original Claude 3.5 Sonnet release from June 2024",
+      "strengths": ["coding", "reasoning", "analysis", "visual-understanding", "writing"],
+      "context_window": 200000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 3.0,
+        "output_per_1m": 15.0,
+        "cache_write_per_1m": 3.75,
+        "cache_read_per_1m": 0.30
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": true,
+        "extended_thinking": false,
+        "batch_api": true
+      }
+    },
+    {
+      "name": "claude-3-5-haiku-20241022",
+      "version": "3.5",
+      "description": "Fastest and most cost-effective Claude 3.5 model",
+      "strengths": ["speed", "efficiency", "cost-effective", "coding", "vision"],
+      "context_window": 200000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 1.0,
+        "output_per_1m": 5.0,
+        "cache_write_per_1m": 1.25,
+        "cache_read_per_1m": 0.10
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": true,
+        "extended_thinking": false,
+        "batch_api": true
+      }
+    },
+    {
+      "name": "claude-3-opus-20240229",
+      "version": "3.0",
+      "description": "Most capable Claude 3 model for complex tasks",
+      "strengths": ["reasoning", "analysis", "mathematics", "coding", "creative-writing"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 15.0,
+        "output_per_1m": 75.0,
+        "cache_write_per_1m": 18.75,
+        "cache_read_per_1m": 1.50
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": true,
+        "extended_thinking": false,
+        "batch_api": true
       }
     },
     {
       "name": "claude-3-sonnet-20240229",
-      "version": "2024-02-29",
-      "description": "Balanced performance and speed",
-      "strengths": ["balanced", "general-purpose"],
+      "version": "3.0",
+      "description": "Balanced Claude 3 model for most tasks",
+      "strengths": ["reasoning", "coding", "analysis", "general-purpose", "balance"],
       "context_window": 200000,
       "max_output": 4096,
       "cost": {
-        "input_per_1k": 0.003,
-        "output_per_1k": 0.015
+        "input_per_1m": 3.0,
+        "output_per_1m": 15.0,
+        "cache_write_per_1m": 3.75,
+        "cache_read_per_1m": 0.30
       },
       "capabilities": {
         "chat": true,
-        "completion": true,
+        "completion": false,
         "streaming": true,
         "function_calling": true,
-        "vision": true
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": true,
+        "extended_thinking": false,
+        "batch_api": true
       }
     },
     {
       "name": "claude-3-haiku-20240307",
-      "version": "2024-03-07",
-      "description": "Fastest Claude model for simple tasks",
-      "strengths": ["speed", "efficiency"],
+      "version": "3.0",
+      "description": "Fast and compact Claude 3 model",
+      "strengths": ["speed", "efficiency", "cost-effective", "quick-responses"],
       "context_window": 200000,
       "max_output": 4096,
       "cost": {
-        "input_per_1k": 0.00025,
-        "output_per_1k": 0.00125
+        "input_per_1m": 0.25,
+        "output_per_1m": 1.25,
+        "cache_write_per_1m": 0.30,
+        "cache_read_per_1m": 0.03
       },
       "capabilities": {
         "chat": true,
-        "completion": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": true,
+        "extended_thinking": false,
+        "batch_api": true
+      }
+    },
+    {
+      "name": "claude-3-opus-20240229-aws",
+      "version": "3.0",
+      "description": "Claude 3 Opus via AWS Bedrock",
+      "strengths": ["reasoning", "analysis", "aws-integration", "enterprise"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 15.0,
+        "output_per_1m": 75.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": false,
+        "extended_thinking": false,
+        "batch_api": false
+      }
+    },
+    {
+      "name": "claude-3-sonnet-20240229-aws",
+      "version": "3.0",
+      "description": "Claude 3 Sonnet via AWS Bedrock",
+      "strengths": ["reasoning", "coding", "aws-integration", "enterprise"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 3.0,
+        "output_per_1m": 15.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": false,
+        "extended_thinking": false,
+        "batch_api": false
+      }
+    },
+    {
+      "name": "claude-3-haiku-20240307-aws",
+      "version": "3.0",
+      "description": "Claude 3 Haiku via AWS Bedrock",
+      "strengths": ["speed", "efficiency", "aws-integration", "cost-effective"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 0.25,
+        "output_per_1m": 1.25
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": false,
+        "extended_thinking": false,
+        "batch_api": false
+      }
+    },
+    {
+      "name": "claude-3-opus-20240229-gcp",
+      "version": "3.0",
+      "description": "Claude 3 Opus via Google Cloud Vertex AI",
+      "strengths": ["reasoning", "analysis", "gcp-integration", "enterprise"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 15.0,
+        "output_per_1m": 75.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": false,
+        "extended_thinking": false,
+        "batch_api": false
+      }
+    },
+    {
+      "name": "claude-3-sonnet-20240229-gcp",
+      "version": "3.0",
+      "description": "Claude 3 Sonnet via Google Cloud Vertex AI",
+      "strengths": ["reasoning", "coding", "gcp-integration", "enterprise"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 3.0,
+        "output_per_1m": 15.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": false,
+        "extended_thinking": false,
+        "batch_api": false
+      }
+    },
+    {
+      "name": "claude-3-haiku-20240307-gcp",
+      "version": "3.0",
+      "description": "Claude 3 Haiku via Google Cloud Vertex AI",
+      "strengths": ["speed", "efficiency", "gcp-integration", "cost-effective"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 0.25,
+        "output_per_1m": 1.25
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "prompt_caching": false,
+        "extended_thinking": false,
+        "batch_api": false
+      }
+    },
+    {
+      "name": "claude-2.1",
+      "version": "2.1",
+      "description": "Enhanced Claude 2 with reduced hallucinations",
+      "strengths": ["long-context", "accuracy", "reasoning", "legacy"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 8.0,
+        "output_per_1m": 24.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
         "streaming": true,
         "function_calling": false,
-        "vision": true
+        "tool_use": false,
+        "vision": false,
+        "prompt_caching": false,
+        "extended_thinking": false,
+        "batch_api": false
+      }
+    },
+    {
+      "name": "claude-2.0",
+      "version": "2.0",
+      "description": "Original Claude 2 model",
+      "strengths": ["long-context", "reasoning", "legacy"],
+      "context_window": 100000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 8.0,
+        "output_per_1m": 24.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "prompt_caching": false,
+        "extended_thinking": false,
+        "batch_api": false
+      }
+    },
+    {
+      "name": "claude-instant-1.2",
+      "version": "1.2",
+      "description": "Fast and lightweight Claude model (legacy)",
+      "strengths": ["speed", "cost-effective", "efficiency", "legacy"],
+      "context_window": 100000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 0.8,
+        "output_per_1m": 2.4
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "prompt_caching": false,
+        "extended_thinking": false,
+        "batch_api": false
       }
     }
-  ]
+  ],
+  "model_families": {
+    "claude_3_7": {
+      "description": "Most advanced Claude with extended thinking capabilities",
+      "models": ["claude-3-7-sonnet-20250219"],
+      "features": ["extended-thinking", "vision", "tool-use", "prompt-caching"]
+    },
+    "claude_3_5": {
+      "description": "Enhanced Claude 3 models with improved performance",
+      "models": [
+        "claude-3-5-sonnet-20241022",
+        "claude-3-5-sonnet-20240620",
+        "claude-3-5-haiku-20241022"
+      ],
+      "features": ["vision", "tool-use", "prompt-caching", "improved-coding"]
+    },
+    "claude_3": {
+      "description": "Multimodal Claude models with vision capabilities",
+      "models": [
+        "claude-3-opus-20240229",
+        "claude-3-sonnet-20240229",
+        "claude-3-haiku-20240307"
+      ],
+      "features": ["vision", "tool-use", "prompt-caching", "200k-context"]
+    },
+    "claude_2": {
+      "description": "Previous generation text-only models",
+      "models": ["claude-2.1", "claude-2.0"],
+      "features": ["long-context", "text-only", "legacy"]
+    },
+    "claude_instant": {
+      "description": "Fast and lightweight legacy models",
+      "models": ["claude-instant-1.2"],
+      "features": ["speed", "efficiency", "legacy"]
+    }
+  },
+  "prompt_caching": {
+    "description": "Cache frequently used context to reduce costs and latency",
+    "supported_models": [
+      "claude-3-7-sonnet-20250219",
+      "claude-3-5-sonnet-20241022",
+      "claude-3-5-sonnet-20240620",
+      "claude-3-5-haiku-20241022",
+      "claude-3-opus-20240229",
+      "claude-3-sonnet-20240229",
+      "claude-3-haiku-20240307"
+    ],
+    "minimum_cache_size": 1024,
+    "ttl": "5 minutes",
+    "pricing_model": "cache writes cost 25% more, cache reads cost 90% less than base input tokens",
+    "use_cases": ["RAG", "long-documents", "repeated-context", "agentic-workflows"]
+  },
+  "extended_thinking": {
+    "description": "Model thinks through problems before responding with internal reasoning",
+    "supported_models": ["claude-3-7-sonnet-20250219"],
+    "thinking_budget": "Can use up to 10,000+ tokens for internal reasoning",
+    "output_format": "Thinking tokens shown separately from response",
+    "pricing": "Thinking tokens billed as output tokens",
+    "use_cases": ["complex-reasoning", "mathematics", "coding", "analysis", "planning"]
+  },
+  "batch_api": {
+    "description": "Process up to 10,000 requests asynchronously with 50% cost reduction",
+    "supported_models": [
+      "claude-3-7-sonnet-20250219",
+      "claude-3-5-sonnet-20241022",
+      "claude-3-5-sonnet-20240620",
+      "claude-3-5-haiku-20241022",
+      "claude-3-opus-20240229",
+      "claude-3-sonnet-20240229",
+      "claude-3-haiku-20240307"
+    ],
+    "discount": "50% off standard pricing",
+    "processing_time": "24 hours",
+    "max_batch_size": 10000,
+    "use_cases": ["evaluations", "data-processing", "batch-analysis", "cost-optimization"]
+  },
+  "vision_capabilities": {
+    "description": "Process and analyze images alongside text",
+    "supported_models": [
+      "claude-3-7-sonnet-20250219",
+      "claude-3-5-sonnet-20241022",
+      "claude-3-5-sonnet-20240620",
+      "claude-3-5-haiku-20241022",
+      "claude-3-opus-20240229",
+      "claude-3-sonnet-20240229",
+      "claude-3-haiku-20240307"
+    ],
+    "supported_formats": ["PNG", "JPEG", "WEBP", "GIF"],
+    "max_image_size": "5MB per image",
+    "images_per_request": "Multiple images supported",
+    "use_cases": ["document-analysis", "chart-interpretation", "visual-qa", "image-description"]
+  },
+  "tool_use": {
+    "description": "Connect Claude to external tools and APIs",
+    "supported_models": [
+      "claude-3-7-sonnet-20250219",
+      "claude-3-5-sonnet-20241022",
+      "claude-3-5-sonnet-20240620",
+      "claude-3-5-haiku-20241022",
+      "claude-3-opus-20240229",
+      "claude-3-sonnet-20240229",
+      "claude-3-haiku-20240307"
+    ],
+    "max_tools": "Dozens of tools can be defined",
+    "tool_choice": "auto, any, or specific tool",
+    "use_cases": ["api-integration", "data-retrieval", "actions", "agentic-workflows"]
+  },
+  "deployment_options": {
+    "anthropic_api": {
+      "description": "Direct API access with latest features",
+      "features": ["prompt-caching", "batch-api", "extended-thinking", "all-models"]
+    },
+    "aws_bedrock": {
+      "description": "Claude via AWS Bedrock for enterprise deployments",
+      "features": ["aws-integration", "enterprise-security", "guardrails"],
+      "limitations": ["no-prompt-caching", "no-batch-api", "model-lag"]
+    },
+    "gcp_vertex": {
+      "description": "Claude via Google Cloud Vertex AI",
+      "features": ["gcp-integration", "enterprise-security", "vertex-tools"],
+      "limitations": ["no-prompt-caching", "no-batch-api", "model-lag"]
+    }
+  },
+  "best_practices": {
+    "max_tokens": "Always specify max_tokens parameter (required)",
+    "system_prompts": "Use system parameter for role and context setting",
+    "prompt_engineering": "Be clear, specific, and provide examples",
+    "thinking_budget": "For complex tasks with extended thinking, allow sufficient budget",
+    "prompt_caching": "Structure prompts with static content at the beginning",
+    "error_handling": "Implement exponential backoff for rate limit errors",
+    "streaming": "Use streaming for better user experience with long responses",
+    "temperature": "Use 0 for deterministic outputs, 1 for creative tasks",
+    "vision": "Provide high-quality images and specific questions",
+    "tool_use": "Provide clear tool descriptions and schemas"
+  }
 }

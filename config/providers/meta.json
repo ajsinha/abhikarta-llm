@@ -4,16 +4,196 @@
   "base_url": "https://api.replicate.com",
   "models": [
     {
-      "name": "llama-2-70b-chat",
+      "name": "llama-3.2-1b-instruct",
+      "version": "3.2",
+      "description": "Llama 3.2 1B - Compact model for edge and mobile deployment",
+      "replicate_model": "meta/llama-3.2-1b-instruct",
+      "strengths": ["efficiency", "edge", "mobile"],
+      "context_window": 131072,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00004,
+        "output_per_1k": 0.00016
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-3.2-3b-instruct",
+      "version": "3.2",
+      "description": "Llama 3.2 3B - Efficient lightweight model with improved performance",
+      "replicate_model": "meta/llama-3.2-3b-instruct",
+      "strengths": ["efficiency", "chat", "reasoning"],
+      "context_window": 131072,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00006,
+        "output_per_1k": 0.00024
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-3.2-11b-vision-instruct",
+      "version": "3.2",
+      "description": "Llama 3.2 11B Vision - Multimodal model with image understanding",
+      "replicate_model": "meta/llama-3.2-11b-vision-instruct",
+      "strengths": ["vision", "multimodal", "image-analysis", "chat"],
+      "context_window": 131072,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00035,
+        "output_per_1k": 0.0014
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": true
+      }
+    },
+    {
+      "name": "llama-3.2-90b-vision-instruct",
+      "version": "3.2",
+      "description": "Llama 3.2 90B Vision - Advanced multimodal model with superior vision capabilities",
+      "replicate_model": "meta/llama-3.2-90b-vision-instruct",
+      "strengths": ["vision", "multimodal", "reasoning", "complex-analysis"],
+      "context_window": 131072,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0007,
+        "output_per_1k": 0.0028
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": true
+      }
+    },
+    {
+      "name": "llama-3.1-8b-instruct",
+      "version": "3.1",
+      "description": "Llama 3.1 8B - Efficient model with 128K context and tool use",
+      "replicate_model": "meta/llama-3.1-8b-instruct",
+      "strengths": ["efficiency", "tool-use", "function-calling", "reasoning"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-3.1-70b-instruct",
+      "version": "3.1",
+      "description": "Llama 3.1 70B - High-performance model with tool use and 128K context",
+      "replicate_model": "meta/llama-3.1-70b-instruct",
+      "strengths": ["reasoning", "tool-use", "function-calling", "complex-tasks"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.0026
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-3.1-405b-instruct",
+      "version": "3.1",
+      "description": "Llama 3.1 405B - Flagship model with exceptional capabilities and 128K context",
+      "replicate_model": "meta/llama-3.1-405b-instruct",
+      "strengths": ["reasoning", "tool-use", "complex-reasoning", "multilingual", "math"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.00275,
+        "output_per_1k": 0.011
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-3-8b-instruct",
+      "version": "3.0",
+      "description": "Llama 3 8B - Efficient instruction-following model",
+      "replicate_model": "meta/llama-3-8b-instruct",
+      "strengths": ["efficiency", "chat", "reasoning"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-3-70b-instruct",
+      "version": "3.0",
+      "description": "Llama 3 70B - High-performance instruction-following model",
+      "replicate_model": "meta/llama-3-70b-instruct",
+      "strengths": ["reasoning", "chat", "code", "complex-tasks"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.0026
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-2-7b-chat",
       "version": "2.0",
-      "description": "Meta's Llama 2 70B chat model",
-      "replicate_model": "meta/llama-2-70b-chat",
-      "strengths": ["chat", "reasoning", "code"],
+      "description": "Meta's Llama 2 7B chat model - efficient and accessible",
+      "replicate_model": "meta/llama-2-7b-chat",
+      "strengths": ["chat", "efficiency"],
       "context_window": 4096,
       "max_output": 2048,
       "cost": {
-        "input_per_1k": 0.00065,
-        "output_per_1k": 0.00275
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
       },
       "capabilities": {
         "chat": true,
@@ -42,6 +222,254 @@
         "function_calling": false,
         "vision": false
       }
+    },
+    {
+      "name": "llama-2-70b-chat",
+      "version": "2.0",
+      "description": "Meta's Llama 2 70B chat model",
+      "replicate_model": "meta/llama-2-70b-chat",
+      "strengths": ["chat", "reasoning", "code"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.00275
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "codellama-7b-instruct",
+      "version": "1.0",
+      "description": "Code Llama 7B - Specialized for code generation and understanding",
+      "replicate_model": "meta/codellama-7b-instruct",
+      "strengths": ["code", "programming", "debugging"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "codellama-13b-instruct",
+      "version": "1.0",
+      "description": "Code Llama 13B - Enhanced code generation with better understanding",
+      "replicate_model": "meta/codellama-13b-instruct",
+      "strengths": ["code", "programming", "debugging", "explanation"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0001,
+        "output_per_1k": 0.0005
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "codellama-34b-instruct",
+      "version": "1.0",
+      "description": "Code Llama 34B - Advanced code generation and analysis",
+      "replicate_model": "meta/codellama-34b-instruct",
+      "strengths": ["code", "programming", "complex-algorithms", "refactoring"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0002,
+        "output_per_1k": 0.001
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "codellama-70b-instruct",
+      "version": "1.0",
+      "description": "Code Llama 70B - Highest performing code model with advanced capabilities",
+      "replicate_model": "meta/codellama-70b-instruct",
+      "strengths": ["code", "architecture", "complex-systems", "optimization"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.00275
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "codellama-7b-python",
+      "version": "1.0",
+      "description": "Code Llama 7B Python - Specialized for Python programming",
+      "replicate_model": "meta/codellama-7b-python",
+      "strengths": ["python", "scripting", "data-science"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "codellama-13b-python",
+      "version": "1.0",
+      "description": "Code Llama 13B Python - Enhanced Python code generation",
+      "replicate_model": "meta/codellama-13b-python",
+      "strengths": ["python", "frameworks", "libraries", "data-science"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0001,
+        "output_per_1k": 0.0005
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "codellama-34b-python",
+      "version": "1.0",
+      "description": "Code Llama 34B Python - Advanced Python programming assistant",
+      "replicate_model": "meta/codellama-34b-python",
+      "strengths": ["python", "advanced-frameworks", "optimization", "testing"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0002,
+        "output_per_1k": 0.001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "codellama-70b-python",
+      "version": "1.0",
+      "description": "Code Llama 70B Python - Flagship Python programming model",
+      "replicate_model": "meta/codellama-70b-python",
+      "strengths": ["python", "system-design", "performance", "best-practices"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.00275
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-2-7b",
+      "version": "2.0",
+      "description": "Llama 2 7B Base - Foundation model for fine-tuning",
+      "replicate_model": "meta/llama-2-7b",
+      "strengths": ["base-model", "fine-tuning"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-2-13b",
+      "version": "2.0",
+      "description": "Llama 2 13B Base - Foundation model for custom applications",
+      "replicate_model": "meta/llama-2-13b",
+      "strengths": ["base-model", "fine-tuning"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0001,
+        "output_per_1k": 0.0005
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-2-70b",
+      "version": "2.0",
+      "description": "Llama 2 70B Base - Large foundation model",
+      "replicate_model": "meta/llama-2-70b",
+      "strengths": ["base-model", "fine-tuning", "transfer-learning"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.00275
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
     }
-  ]
+  ],
+  "notes": {
+    "authentication": "Requires REPLICATE_API_TOKEN environment variable",
+    "pricing": "Costs are approximate and based on Replicate's standard pricing as of 2025",
+    "usage": "All models support streaming. Vision models accept image inputs alongside text",
+    "context_windows": "Llama 3.1 and 3.2 models support up to 128K tokens context",
+    "function_calling": "Only Llama 3.1 models (8B, 70B, 405B) support native function calling",
+    "vision": "Only Llama 3.2 Vision models (11B, 90B) support image understanding"
+  }
 }

@@ -109,8 +109,9 @@ def get_provider(provider_name: str, config: dict):
         provider = provider_class(config)
     except TypeError:
         provider = provider_class()
-        if hasattr(provider, 'initialize'):
-            provider.initialize(config)
+
+    if hasattr(provider, 'initialize'):
+        provider.initialize(config)
     
     return provider
 

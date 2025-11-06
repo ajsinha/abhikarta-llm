@@ -107,3 +107,10 @@ class LLMProvider(ABC):
             True if initialized, False otherwise
         """
         return self.initialized
+
+    def list_available_models_using_config(self, config: Dict[str, Any]) -> List[str]:
+        if "model" in config.keys():
+            model = config.get("model")
+            return [model['name']]
+        else:
+            return [model['name'] for model in config.get('models', [])]
