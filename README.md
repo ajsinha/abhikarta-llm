@@ -632,37 +632,8 @@ def answer_question(question: str) -> str:
    - Code snippets
    - Troubleshooting quick fixes
 
-6. **[DELIVERY_SUMMARY.md](./DELIVERY_SUMMARY.md)** (303 lines)
-   - Implementation summary
-   - Testing results
-   - Feature checklist
 
-### Source Code Files
 
-7. **model_registry.py** (668 lines)
-   - Main registry implementation
-   - Singleton pattern
-   - Auto-reload system
-   - Thread-safe operations
-
-8. **model_provider.py** (646 lines)
-   - ModelProvider class
-   - Model class
-   - JSON configuration loading
-
-9. **model_management.py** (520 lines)
-   - ModelCapability enum (100+ capabilities)
-   - ProviderType enum
-   - Helper methods
-
-10. **exceptions.py** (94 lines)
-    - Custom exception classes
-    - Error handling
-
-11. **test_model_registry.py** (313 lines)
-    - Comprehensive test suite
-    - Thread safety tests
-    - Integration tests
 
 ---
 
