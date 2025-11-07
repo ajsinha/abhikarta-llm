@@ -1,0 +1,1728 @@
+{
+  "provider": "ollama",
+  "api_version": "v1",
+  "base_url": "http://localhost:11434",
+  "notes": {
+    "authentication": "No authentication required for local instance. Optional for remote deployments",
+    "pricing": "Free and open-source. No API costs - only hardware costs",
+    "streaming": "All models support streaming responses via REST API",
+    "rate_limits": "No rate limits - limited only by your hardware",
+    "local_inference": "Models run entirely on your local machine - no data sent to cloud",
+    "model_library": "Large library of pre-built models with automatic quantization",
+    "installation": "Simple installation: curl -fsSL https://ollama.com/install.sh | sh",
+    "hardware_requirements": "CPU or GPU support. Recommended: 8GB+ RAM for 7B models, 16GB+ for 13B, 32GB+ for 70B",
+    "quantization": "Models available in Q4_0, Q4_K_M, Q5_K_M, Q8_0 and other formats",
+    "gpu_acceleration": "Automatic GPU detection and usage (NVIDIA CUDA, Apple Metal, AMD ROCm)",
+    "model_download": "Models downloaded via 'ollama pull MODEL_NAME'",
+    "custom_models": "Create custom models with Modelfile",
+    "rest_api": "RESTful API compatible with OpenAI format",
+    "cli": "Simple command-line interface for chat and model management",
+    "docker": "Available as Docker container",
+    "open_source": "All models are open-source. No proprietary models available",
+    "privacy": "Complete data privacy - everything runs locally",
+    "no_internet": "Run models offline after initial download",
+    "model_size": "Models range from 1B to 405B parameters with various quantization levels",
+    "concurrency": "Single model instance per session. Multiple concurrent requests queue",
+    "embedding_models": "Specialized embedding models available",
+    "vision_models": "Multimodal models support image inputs",
+    "no_claude": "Anthropic Claude models NOT available (proprietary)"
+  },
+  "models": [
+    {
+      "name": "llama3.3",
+      "model_id": "llama3.3",
+      "provider": "meta",
+      "version": "3.3",
+      "description": "Latest Llama 3.3 70B (default Q4_K_M quantization)",
+      "strengths": ["reasoning", "instruction-following", "coding", "general-purpose"],
+      "parameters": "70B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "43GB",
+      "hardware_requirements": {
+        "ram": "48GB minimum",
+        "vram": "43GB for full GPU",
+        "cpu": "Works on CPU with sufficient RAM"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3.3:70b-instruct-q8_0",
+      "model_id": "llama3.3:70b-instruct-q8_0",
+      "provider": "meta",
+      "version": "3.3",
+      "description": "Llama 3.3 70B with Q8_0 quantization (higher quality)",
+      "strengths": ["reasoning", "quality", "instruction-following", "coding"],
+      "parameters": "70B",
+      "context_window": 131072,
+      "quantization": "Q8_0",
+      "size": "75GB",
+      "hardware_requirements": {
+        "ram": "80GB minimum",
+        "vram": "75GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3.2-vision",
+      "model_id": "llama3.2-vision",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Llama 3.2 90B with vision capabilities",
+      "strengths": ["vision", "multimodal", "reasoning", "image-understanding"],
+      "parameters": "90B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "55GB",
+      "hardware_requirements": {
+        "ram": "64GB minimum",
+        "vram": "55GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": true,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3.2-vision:11b",
+      "model_id": "llama3.2-vision:11b",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Efficient Llama 3.2 11B with vision",
+      "strengths": ["vision", "efficiency", "multimodal"],
+      "parameters": "11B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "7.9GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "8GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": true,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3.2",
+      "model_id": "llama3.2",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Llama 3.2 3B for edge deployment (default)",
+      "strengths": ["efficiency", "edge-deployment", "speed"],
+      "parameters": "3B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "2.0GB",
+      "hardware_requirements": {
+        "ram": "4GB minimum",
+        "vram": "2GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3.2:1b",
+      "model_id": "llama3.2:1b",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Ultra-compact Llama 3.2 1B",
+      "strengths": ["efficiency", "mobile", "ultra-low-resource"],
+      "parameters": "1B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "1.3GB",
+      "hardware_requirements": {
+        "ram": "2GB minimum",
+        "vram": "1.5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3.1",
+      "model_id": "llama3.1",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Llama 3.1 8B (default)",
+      "strengths": ["efficiency", "general-purpose", "speed"],
+      "parameters": "8B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "4.7GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3.1:70b",
+      "model_id": "llama3.1:70b",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Llama 3.1 70B for complex tasks",
+      "strengths": ["reasoning", "coding", "complex-tasks"],
+      "parameters": "70B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "43GB",
+      "hardware_requirements": {
+        "ram": "48GB minimum",
+        "vram": "43GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3.1:405b",
+      "model_id": "llama3.1:405b",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Largest Llama 3.1 model",
+      "strengths": ["reasoning", "coding", "mathematics", "complex-tasks"],
+      "parameters": "405B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "231GB",
+      "hardware_requirements": {
+        "ram": "256GB minimum",
+        "vram": "231GB for full GPU (multi-GPU required)"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3",
+      "model_id": "llama3",
+      "provider": "meta",
+      "version": "3.0",
+      "description": "Llama 3 8B (default)",
+      "strengths": ["efficiency", "general-purpose"],
+      "parameters": "8B",
+      "context_window": 8192,
+      "quantization": "Q4_K_M",
+      "size": "4.7GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama3:70b",
+      "model_id": "llama3:70b",
+      "provider": "meta",
+      "version": "3.0",
+      "description": "Llama 3 70B",
+      "strengths": ["reasoning", "instruction-following"],
+      "parameters": "70B",
+      "context_window": 8192,
+      "quantization": "Q4_K_M",
+      "size": "43GB",
+      "hardware_requirements": {
+        "ram": "48GB minimum",
+        "vram": "43GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama2",
+      "model_id": "llama2",
+      "provider": "meta",
+      "version": "2.0",
+      "description": "Llama 2 7B (default)",
+      "strengths": ["efficiency", "general-purpose"],
+      "parameters": "7B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "3.8GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "4GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama2:13b",
+      "model_id": "llama2:13b",
+      "provider": "meta",
+      "version": "2.0",
+      "description": "Llama 2 13B",
+      "strengths": ["balance", "efficiency"],
+      "parameters": "13B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "7.4GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "8GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llama2:70b",
+      "model_id": "llama2:70b",
+      "provider": "meta",
+      "version": "2.0",
+      "description": "Llama 2 70B",
+      "strengths": ["reasoning", "complex-tasks"],
+      "parameters": "70B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "39GB",
+      "hardware_requirements": {
+        "ram": "48GB minimum",
+        "vram": "39GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "mistral",
+      "model_id": "mistral",
+      "provider": "mistral",
+      "version": "0.3",
+      "description": "Mistral 7B v0.3 (default)",
+      "strengths": ["efficiency", "multilingual", "instruction-following"],
+      "parameters": "7B",
+      "context_window": 32768,
+      "quantization": "Q4_K_M",
+      "size": "4.1GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "mistral-small",
+      "model_id": "mistral-small",
+      "provider": "mistral",
+      "version": "latest",
+      "description": "Mistral Small 22B",
+      "strengths": ["efficiency", "multilingual", "reasoning"],
+      "parameters": "22B",
+      "context_window": 32768,
+      "quantization": "Q4_K_M",
+      "size": "13GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "13GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "mistral-large",
+      "model_id": "mistral-large",
+      "provider": "mistral",
+      "version": "latest",
+      "description": "Mistral Large 123B",
+      "strengths": ["reasoning", "coding", "complex-tasks"],
+      "parameters": "123B",
+      "context_window": 128000,
+      "quantization": "Q4_K_M",
+      "size": "69GB",
+      "hardware_requirements": {
+        "ram": "80GB minimum",
+        "vram": "69GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "mistral-nemo",
+      "model_id": "mistral-nemo",
+      "provider": "mistral",
+      "version": "latest",
+      "description": "Mistral NeMo 12B",
+      "strengths": ["efficiency", "reasoning", "multilingual"],
+      "parameters": "12B",
+      "context_window": 128000,
+      "quantization": "Q4_K_M",
+      "size": "7.1GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "8GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "mixtral",
+      "model_id": "mixtral",
+      "provider": "mistral",
+      "version": "8x7b",
+      "description": "Mixtral 8x7B MoE (default)",
+      "strengths": ["efficiency", "multilingual", "reasoning", "moe"],
+      "parameters": "47B (8x7B MoE)",
+      "context_window": 32768,
+      "quantization": "Q4_K_M",
+      "size": "26GB",
+      "hardware_requirements": {
+        "ram": "32GB minimum",
+        "vram": "26GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "mixtral:8x22b",
+      "model_id": "mixtral:8x22b",
+      "provider": "mistral",
+      "version": "8x22b",
+      "description": "Mixtral 8x22B MoE",
+      "strengths": ["reasoning", "coding", "mathematics", "moe"],
+      "parameters": "141B (8x22B MoE)",
+      "context_window": 65536,
+      "quantization": "Q4_K_M",
+      "size": "80GB",
+      "hardware_requirements": {
+        "ram": "96GB minimum",
+        "vram": "80GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "qwen2.5",
+      "model_id": "qwen2.5",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Qwen 2.5 7B (default)",
+      "strengths": ["efficiency", "multilingual", "coding"],
+      "parameters": "7B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "4.7GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "qwen2.5:14b",
+      "model_id": "qwen2.5:14b",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Qwen 2.5 14B",
+      "strengths": ["efficiency", "multilingual", "coding"],
+      "parameters": "14B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "9.0GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "9GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "qwen2.5:32b",
+      "model_id": "qwen2.5:32b",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Qwen 2.5 32B",
+      "strengths": ["reasoning", "coding", "multilingual"],
+      "parameters": "32B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "19GB",
+      "hardware_requirements": {
+        "ram": "24GB minimum",
+        "vram": "19GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "qwen2.5:72b",
+      "model_id": "qwen2.5:72b",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Qwen 2.5 72B",
+      "strengths": ["reasoning", "coding", "mathematics"],
+      "parameters": "72B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "43GB",
+      "hardware_requirements": {
+        "ram": "48GB minimum",
+        "vram": "43GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "qwen2.5-coder",
+      "model_id": "qwen2.5-coder",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Qwen 2.5 Coder 7B (default)",
+      "strengths": ["coding", "code-generation", "debugging"],
+      "parameters": "7B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "4.7GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "qwen2.5-coder:32b",
+      "model_id": "qwen2.5-coder:32b",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Qwen 2.5 Coder 32B",
+      "strengths": ["coding", "code-generation", "technical"],
+      "parameters": "32B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "19GB",
+      "hardware_requirements": {
+        "ram": "24GB minimum",
+        "vram": "19GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "qwq",
+      "model_id": "qwq",
+      "provider": "alibaba",
+      "version": "32b",
+      "description": "QwQ 32B with reasoning and reflection",
+      "strengths": ["reasoning", "problem-solving", "mathematics"],
+      "parameters": "32B",
+      "context_window": 32768,
+      "quantization": "Q4_K_M",
+      "size": "19GB",
+      "hardware_requirements": {
+        "ram": "24GB minimum",
+        "vram": "19GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "gemma2",
+      "model_id": "gemma2",
+      "provider": "google",
+      "version": "2.0",
+      "description": "Gemma 2 9B (default)",
+      "strengths": ["efficiency", "instruction-following"],
+      "parameters": "9B",
+      "context_window": 8192,
+      "quantization": "Q4_K_M",
+      "size": "5.4GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "6GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "gemma2:27b",
+      "model_id": "gemma2:27b",
+      "provider": "google",
+      "version": "2.0",
+      "description": "Gemma 2 27B",
+      "strengths": ["reasoning", "instruction-following"],
+      "parameters": "27B",
+      "context_window": 8192,
+      "quantization": "Q4_K_M",
+      "size": "16GB",
+      "hardware_requirements": {
+        "ram": "20GB minimum",
+        "vram": "16GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "gemma2:2b",
+      "model_id": "gemma2:2b",
+      "provider": "google",
+      "version": "2.0",
+      "description": "Ultra-compact Gemma 2 2B",
+      "strengths": ["efficiency", "edge-deployment"],
+      "parameters": "2B",
+      "context_window": 8192,
+      "quantization": "Q4_K_M",
+      "size": "1.6GB",
+      "hardware_requirements": {
+        "ram": "4GB minimum",
+        "vram": "2GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "phi3.5",
+      "model_id": "phi3.5",
+      "provider": "microsoft",
+      "version": "3.5",
+      "description": "Microsoft Phi 3.5 3.8B (default)",
+      "strengths": ["efficiency", "reasoning", "compact"],
+      "parameters": "3.8B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "2.2GB",
+      "hardware_requirements": {
+        "ram": "4GB minimum",
+        "vram": "3GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "phi3",
+      "model_id": "phi3",
+      "provider": "microsoft",
+      "version": "3.0",
+      "description": "Microsoft Phi 3 3.8B (default)",
+      "strengths": ["efficiency", "reasoning"],
+      "parameters": "3.8B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "2.2GB",
+      "hardware_requirements": {
+        "ram": "4GB minimum",
+        "vram": "3GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "phi3:14b",
+      "model_id": "phi3:14b",
+      "provider": "microsoft",
+      "version": "3.0",
+      "description": "Microsoft Phi 3 Medium 14B",
+      "strengths": ["efficiency", "reasoning", "long-context"],
+      "parameters": "14B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "7.9GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "8GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "deepseek-r1",
+      "model_id": "deepseek-r1",
+      "provider": "deepseek",
+      "version": "1.0",
+      "description": "DeepSeek R1 with reasoning capabilities",
+      "strengths": ["reasoning", "problem-solving", "mathematics", "coding"],
+      "parameters": "70B",
+      "context_window": 131072,
+      "quantization": "Q4_K_M",
+      "size": "43GB",
+      "hardware_requirements": {
+        "ram": "48GB minimum",
+        "vram": "43GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "deepseek-coder-v2",
+      "model_id": "deepseek-coder-v2",
+      "provider": "deepseek",
+      "version": "2.0",
+      "description": "DeepSeek Coder V2 16B",
+      "strengths": ["coding", "code-generation", "debugging"],
+      "parameters": "16B",
+      "context_window": 16384,
+      "quantization": "Q4_K_M",
+      "size": "8.9GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "9GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "codellama",
+      "model_id": "codellama",
+      "provider": "meta",
+      "version": "1.0",
+      "description": "Code Llama 7B (default)",
+      "strengths": ["coding", "code-generation"],
+      "parameters": "7B",
+      "context_window": 16384,
+      "quantization": "Q4_K_M",
+      "size": "3.8GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "4GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "codellama:13b",
+      "model_id": "codellama:13b",
+      "provider": "meta",
+      "version": "1.0",
+      "description": "Code Llama 13B",
+      "strengths": ["coding", "code-generation", "debugging"],
+      "parameters": "13B",
+      "context_window": 16384,
+      "quantization": "Q4_K_M",
+      "size": "7.4GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "8GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "codellama:34b",
+      "model_id": "codellama:34b",
+      "provider": "meta",
+      "version": "1.0",
+      "description": "Code Llama 34B",
+      "strengths": ["coding", "debugging", "code-explanation"],
+      "parameters": "34B",
+      "context_window": 16384,
+      "quantization": "Q4_K_M",
+      "size": "19GB",
+      "hardware_requirements": {
+        "ram": "24GB minimum",
+        "vram": "19GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "codellama:70b",
+      "model_id": "codellama:70b",
+      "provider": "meta",
+      "version": "1.0",
+      "description": "Code Llama 70B",
+      "strengths": ["coding", "debugging", "architecture"],
+      "parameters": "70B",
+      "context_window": 16384,
+      "quantization": "Q4_K_M",
+      "size": "39GB",
+      "hardware_requirements": {
+        "ram": "48GB minimum",
+        "vram": "39GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "starcoder2",
+      "model_id": "starcoder2",
+      "provider": "bigcode",
+      "version": "2.0",
+      "description": "StarCoder 2 7B (default)",
+      "strengths": ["coding", "code-generation", "multilingual-code"],
+      "parameters": "7B",
+      "context_window": 16384,
+      "quantization": "Q4_K_M",
+      "size": "4.0GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "4GB for full GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "starcoder2:15b",
+      "model_id": "starcoder2:15b",
+      "provider": "bigcode",
+      "version": "2.0",
+      "description": "StarCoder 2 15B",
+      "strengths": ["coding", "code-generation", "80-languages"],
+      "parameters": "15B",
+      "context_window": 16384,
+      "quantization": "Q4_K_M",
+      "size": "9.1GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "9GB for full GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "solar",
+      "model_id": "solar",
+      "provider": "upstage",
+      "version": "1.0",
+      "description": "SOLAR 10.7B depth-upscaled model",
+      "strengths": ["reasoning", "efficiency", "instruction-following"],
+      "parameters": "10.7B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "6.1GB",
+      "hardware_requirements": {
+        "ram": "12GB minimum",
+        "vram": "7GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "yi",
+      "model_id": "yi",
+      "provider": "01-ai",
+      "version": "1.0",
+      "description": "Yi 6B (default)",
+      "strengths": ["multilingual", "reasoning", "chinese-english"],
+      "parameters": "6B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "3.5GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "4GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "yi:34b",
+      "model_id": "yi:34b",
+      "provider": "01-ai",
+      "version": "1.0",
+      "description": "Yi 34B",
+      "strengths": ["multilingual", "reasoning", "long-context"],
+      "parameters": "34B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "19GB",
+      "hardware_requirements": {
+        "ram": "24GB minimum",
+        "vram": "19GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "falcon2",
+      "model_id": "falcon2",
+      "provider": "tii",
+      "version": "2.0",
+      "description": "Falcon 2 11B (default)",
+      "strengths": ["multilingual", "reasoning"],
+      "parameters": "11B",
+      "context_window": 8192,
+      "quantization": "Q4_K_M",
+      "size": "6.4GB",
+      "hardware_requirements": {
+        "ram": "12GB minimum",
+        "vram": "7GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "vicuna",
+      "model_id": "vicuna",
+      "provider": "lmsys",
+      "version": "1.5",
+      "description": "Vicuna 7B v1.5 (default)",
+      "strengths": ["conversation", "instruction-following"],
+      "parameters": "7B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "3.8GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "4GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "vicuna:13b",
+      "model_id": "vicuna:13b",
+      "provider": "lmsys",
+      "version": "1.5",
+      "description": "Vicuna 13B v1.5",
+      "strengths": ["conversation", "instruction-following"],
+      "parameters": "13B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "7.4GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "8GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "orca-mini",
+      "model_id": "orca-mini",
+      "provider": "microsoft",
+      "version": "1.0",
+      "description": "Orca Mini 3B (default)",
+      "strengths": ["efficiency", "compact", "explanation"],
+      "parameters": "3B",
+      "context_window": 2048,
+      "quantization": "Q4_K_M",
+      "size": "1.9GB",
+      "hardware_requirements": {
+        "ram": "4GB minimum",
+        "vram": "2GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "orca-mini:7b",
+      "model_id": "orca-mini:7b",
+      "provider": "microsoft",
+      "version": "1.0",
+      "description": "Orca Mini 7B",
+      "strengths": ["efficiency", "explanation", "reasoning"],
+      "parameters": "7B",
+      "context_window": 2048,
+      "quantization": "Q4_K_M",
+      "size": "3.8GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "4GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "openchat",
+      "model_id": "openchat",
+      "provider": "openchat",
+      "version": "3.5",
+      "description": "OpenChat 3.5 7B (default)",
+      "strengths": ["conversation", "instruction-following"],
+      "parameters": "7B",
+      "context_window": 8192,
+      "quantization": "Q4_K_M",
+      "size": "4.1GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "nous-hermes2",
+      "model_id": "nous-hermes2",
+      "provider": "nous-research",
+      "version": "2.0",
+      "description": "Nous Hermes 2 7B (default)",
+      "strengths": ["instruction-following", "reasoning"],
+      "parameters": "7B",
+      "context_window": 8192,
+      "quantization": "Q4_K_M",
+      "size": "4.1GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "dolphin-mixtral",
+      "model_id": "dolphin-mixtral",
+      "provider": "cognitive-computations",
+      "version": "8x7b",
+      "description": "Dolphin Mixtral 8x7B (uncensored)",
+      "strengths": ["reasoning", "uncensored", "instruction-following"],
+      "parameters": "47B (8x7B MoE)",
+      "context_window": 32768,
+      "quantization": "Q4_K_M",
+      "size": "26GB",
+      "hardware_requirements": {
+        "ram": "32GB minimum",
+        "vram": "26GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": false,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llava",
+      "model_id": "llava",
+      "provider": "lmsys",
+      "version": "1.6",
+      "description": "LLaVA 7B with vision (default)",
+      "strengths": ["vision", "multimodal", "image-understanding"],
+      "parameters": "7B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "4.7GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": true,
+        "embedding": false
+      }
+    },
+    {
+      "name": "llava:13b",
+      "model_id": "llava:13b",
+      "provider": "lmsys",
+      "version": "1.6",
+      "description": "LLaVA 13B with vision",
+      "strengths": ["vision", "multimodal", "image-understanding"],
+      "parameters": "13B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "8.0GB",
+      "hardware_requirements": {
+        "ram": "16GB minimum",
+        "vram": "8GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": true,
+        "embedding": false
+      }
+    },
+    {
+      "name": "bakllava",
+      "model_id": "bakllava",
+      "provider": "lmsys",
+      "version": "1.0",
+      "description": "BakLLaVA 7B with vision",
+      "strengths": ["vision", "multimodal", "efficiency"],
+      "parameters": "7B",
+      "context_window": 4096,
+      "quantization": "Q4_K_M",
+      "size": "4.7GB",
+      "hardware_requirements": {
+        "ram": "8GB minimum",
+        "vram": "5GB for full GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "vision": true,
+        "embedding": false
+      }
+    },
+    {
+      "name": "nomic-embed-text",
+      "model_id": "nomic-embed-text",
+      "provider": "nomic",
+      "version": "1.5",
+      "description": "Nomic Embed Text v1.5 for embeddings",
+      "strengths": ["embeddings", "semantic-search", "rag", "long-context"],
+      "parameters": "137M",
+      "context_window": 8192,
+      "quantization": "fp16",
+      "size": "274MB",
+      "hardware_requirements": {
+        "ram": "1GB minimum",
+        "vram": "512MB for full GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "vision": false,
+        "embedding": true,
+        "dimensions": 768
+      }
+    },
+    {
+      "name": "mxbai-embed-large",
+      "model_id": "mxbai-embed-large",
+      "provider": "mixedbread",
+      "version": "1.0",
+      "description": "MixedBread Large embedding model",
+      "strengths": ["embeddings", "semantic-search", "quality"],
+      "parameters": "335M",
+      "context_window": 512,
+      "quantization": "fp16",
+      "size": "670MB",
+      "hardware_requirements": {
+        "ram": "2GB minimum",
+        "vram": "1GB for full GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "vision": false,
+        "embedding": true,
+        "dimensions": 1024
+      }
+    },
+    {
+      "name": "all-minilm",
+      "model_id": "all-minilm",
+      "provider": "sentence-transformers",
+      "version": "l6-v2",
+      "description": "All-MiniLM-L6-v2 for fast embeddings",
+      "strengths": ["embeddings", "speed", "efficiency"],
+      "parameters": "22M",
+      "context_window": 256,
+      "quantization": "fp32",
+      "size": "46MB",
+      "hardware_requirements": {
+        "ram": "512MB minimum",
+        "vram": "256MB for full GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "vision": false,
+        "embedding": true,
+        "dimensions": 384
+      }
+    },
+    {
+      "name": "snowflake-arctic-embed",
+      "model_id": "snowflake-arctic-embed",
+      "provider": "snowflake",
+      "version": "1.0",
+      "description": "Snowflake Arctic Embed for retrieval",
+      "strengths": ["embeddings", "retrieval", "semantic-search"],
+      "parameters": "137M",
+      "context_window": 512,
+      "quantization": "fp16",
+      "size": "274MB",
+      "hardware_requirements": {
+        "ram": "1GB minimum",
+        "vram": "512MB for full GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "vision": false,
+        "embedding": true,
+        "dimensions": 768
+      }
+    }
+  ],
+  "quantization_levels": {
+    "Q2_K": {
+      "description": "2-bit quantization (K-quant)",
+      "memory_reduction": "~87%",
+      "quality": "Lowest quality, smallest size",
+      "use_case": "Extreme memory constraints"
+    },
+    "Q3_K_S": {
+      "description": "3-bit quantization small (K-quant)",
+      "memory_reduction": "~81%",
+      "quality": "Low quality",
+      "use_case": "Very limited memory"
+    },
+    "Q3_K_M": {
+      "description": "3-bit quantization medium (K-quant)",
+      "memory_reduction": "~81%",
+      "quality": "Low-medium quality",
+      "use_case": "Limited memory"
+    },
+    "Q4_0": {
+      "description": "4-bit quantization (legacy)",
+      "memory_reduction": "~75%",
+      "quality": "Good quality",
+      "use_case": "Standard quantization"
+    },
+    "Q4_K_M": {
+      "description": "4-bit quantization medium (K-quant)",
+      "memory_reduction": "~75%",
+      "quality": "Good quality (recommended)",
+      "use_case": "Default quantization - best quality/size balance"
+    },
+    "Q4_K_S": {
+      "description": "4-bit quantization small (K-quant)",
+      "memory_reduction": "~75%",
+      "quality": "Good quality, smaller",
+      "use_case": "Slightly smaller than Q4_K_M"
+    },
+    "Q5_0": {
+      "description": "5-bit quantization (legacy)",
+      "memory_reduction": "~69%",
+      "quality": "Very good quality",
+      "use_case": "Higher quality needs"
+    },
+    "Q5_K_M": {
+      "description": "5-bit quantization medium (K-quant)",
+      "memory_reduction": "~69%",
+      "quality": "Very good quality",
+      "use_case": "Higher quality with reasonable size"
+    },
+    "Q6_K": {
+      "description": "6-bit quantization (K-quant)",
+      "memory_reduction": "~63%",
+      "quality": "Excellent quality",
+      "use_case": "Near-original quality"
+    },
+    "Q8_0": {
+      "description": "8-bit quantization",
+      "memory_reduction": "~50%",
+      "quality": "Highest quality quantized",
+      "use_case": "Maximum quality, larger size"
+    },
+    "fp16": {
+      "description": "16-bit floating point",
+      "memory_reduction": "~50%",
+      "quality": "Original model quality",
+      "use_case": "No quality loss"
+    },
+    "fp32": {
+      "description": "32-bit floating point",
+      "memory_reduction": "0%",
+      "quality": "Full precision",
+      "use_case": "Original unquantized model"
+    }
+  },
+  "cli_commands": {
+    "pull": {
+      "command": "ollama pull MODEL_NAME",
+      "description": "Download a model from the library",
+      "example": "ollama pull llama3.3"
+    },
+    "run": {
+      "command": "ollama run MODEL_NAME",
+      "description": "Run a model interactively",
+      "example": "ollama run llama3.3"
+    },
+    "list": {
+      "command": "ollama list",
+      "description": "List downloaded models"
+    },
+    "rm": {
+      "command": "ollama rm MODEL_NAME",
+      "description": "Remove a downloaded model"
+    },
+    "ps": {
+      "command": "ollama ps",
+      "description": "List running models"
+    },
+    "create": {
+      "command": "ollama create NAME -f Modelfile",
+      "description": "Create custom model from Modelfile"
+    },
+    "push": {
+      "command": "ollama push NAME",
+      "description": "Push custom model to registry"
+    },
+    "serve": {
+      "command": "ollama serve",
+      "description": "Start Ollama server"
+    }
+  },
+  "api_endpoints": {
+    "generate": {
+      "endpoint": "/api/generate",
+      "method": "POST",
+      "description": "Generate completion",
+      "streaming": true
+    },
+    "chat": {
+      "endpoint": "/api/chat",
+      "method": "POST",
+      "description": "Chat completion",
+      "streaming": true
+    },
+    "embeddings": {
+      "endpoint": "/api/embeddings",
+      "method": "POST",
+      "description": "Generate embeddings"
+    },
+    "pull": {
+      "endpoint": "/api/pull",
+      "method": "POST",
+      "description": "Download model"
+    },
+    "push": {
+      "endpoint": "/api/push",
+      "method": "POST",
+      "description": "Upload model"
+    },
+    "create": {
+      "endpoint": "/api/create",
+      "method": "POST",
+      "description": "Create custom model"
+    },
+    "tags": {
+      "endpoint": "/api/tags",
+      "method": "GET",
+      "description": "List local models"
+    }
+  },
+  "modelfile": {
+    "description": "Define custom models with Modelfile",
+    "directives": {
+      "FROM": "Base model to start from",
+      "PARAMETER": "Set model parameters (temperature, top_p, etc.)",
+      "TEMPLATE": "Custom prompt template",
+      "SYSTEM": "System message",
+      "ADAPTER": "LoRA adapters",
+      "LICENSE": "Model license",
+      "MESSAGE": "Example messages"
+    },
+    "example": "FROM llama3.3\nPARAMETER temperature 0.7\nSYSTEM You are a helpful assistant."
+  },
+  "hardware_acceleration": {
+    "nvidia": {
+      "description": "NVIDIA GPU acceleration via CUDA",
+      "requirement": "CUDA-capable GPU with drivers installed",
+      "automatic": "Automatically detected and used"
+    },
+    "apple_silicon": {
+      "description": "Apple Silicon acceleration via Metal",
+      "requirement": "M1/M2/M3 Mac",
+      "automatic": "Automatically detected and used"
+    },
+    "amd": {
+      "description": "AMD GPU acceleration via ROCm",
+      "requirement": "ROCm-compatible GPU",
+      "setup": "May require manual configuration"
+    },
+    "cpu": {
+      "description": "CPU-only inference",
+      "fallback": "Automatically used if no GPU detected",
+      "performance": "Slower than GPU but works on any system"
+    }
+  },
+  "integration": {
+    "langchain": {
+      "description": "Use Ollama with LangChain",
+      "install": "pip install langchain-ollama",
+      "url": "https://python.langchain.com/docs/integrations/llms/ollama"
+    },
+    "llamaindex": {
+      "description": "Use Ollama with LlamaIndex",
+      "install": "pip install llama-index-llms-ollama",
+      "url": "https://docs.llamaindex.ai/en/stable/examples/llm/ollama/"
+    },
+    "openwebui": {
+      "description": "Web UI for Ollama",
+      "install": "docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway ghcr.io/open-webui/open-webui:main",
+      "url": "https://github.com/open-webui/open-webui"
+    },
+    "continue": {
+      "description": "VS Code extension for coding with Ollama",
+      "url": "https://continue.dev"
+    },
+    "openai_sdk": {
+      "description": "Use OpenAI SDK with Ollama",
+      "base_url": "http://localhost:11434/v1",
+      "compatible": true
+    }
+  },
+  "deployment_options": {
+    "local": {
+      "description": "Run on local machine",
+      "install": "curl -fsSL https://ollama.com/install.sh | sh",
+      "platforms": ["Linux", "macOS", "Windows"],
+      "best_for": ["development", "personal-use", "privacy"]
+    },
+    "docker": {
+      "description": "Run in Docker container",
+      "command": "docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama",
+      "best_for": ["deployment", "isolation", "scaling"]
+    },
+    "server": {
+      "description": "Deploy on remote server",
+      "setup": "Install Ollama on server and expose port 11434",
+      "security": "Use reverse proxy with authentication",
+      "best_for": ["team-sharing", "production"]
+    },
+    "kubernetes": {
+      "description": "Deploy on Kubernetes",
+      "helm": "Helm charts available",
+      "best_for": ["enterprise", "scaling", "multi-model"]
+    }
+  },
+  "best_practices": {
+    "model_selection": "Start with smaller models (7B-13B) for testing, scale up as needed",
+    "quantization": "Use Q4_K_M for best quality/size balance, Q8_0 for maximum quality",
+    "hardware": "GPU acceleration highly recommended for models >7B",
+    "memory": "Ensure sufficient RAM/VRAM before downloading large models",
+    "storage": "Models can be large (1GB-231GB) - ensure sufficient disk space",
+    "networking": "Initial download requires internet - models cached locally after",
+    "updates": "Regularly update Ollama for latest features and model support",
+    "custom_models": "Use Modelfile to create custom configurations and prompts",
+    "monitoring": "Use 'ollama ps' to monitor running models and resource usage",
+    "cleanup": "Remove unused models with 'ollama rm' to free space",
+    "concurrent": "Run one model at a time for best performance",
+    "temperature": "Adjust temperature parameter for creativity vs consistency"
+  },
+  "use_cases": {
+    "local_development": {
+      "recommended_models": ["llama3.2:3b", "phi3.5", "gemma2:2b"],
+      "benefits": ["fast-iteration", "no-api-costs", "privacy"]
+    },
+    "coding_assistant": {
+      "recommended_models": ["codellama", "qwen2.5-coder", "deepseek-coder-v2"],
+      "integration": ["VS Code", "Continue", "IDE plugins"]
+    },
+    "document_analysis": {
+      "recommended_models": ["llama3.3", "mixtral", "qwen2.5:32b"],
+      "features": ["long-context", "reasoning"]
+    },
+    "vision_tasks": {
+      "recommended_models": ["llama3.2-vision", "llava"],
+      "use_cases": ["image-qa", "ocr", "visual-understanding"]
+    },
+    "embeddings": {
+      "recommended_models": ["nomic-embed-text", "mxbai-embed-large"],
+      "use_cases": ["semantic-search", "rag", "clustering"]
+    },
+    "chat_application": {
+      "recommended_models": ["llama3.3", "mistral", "gemma2"],
+      "features": ["streaming", "low-latency", "privacy"]
+    },
+    "research": {
+      "recommended_models": ["llama3.1:70b", "mixtral:8x22b", "qwen2.5:72b"],
+      "benefits": ["reproducibility", "customization", "no-rate-limits"]
+    },
+    "edge_deployment": {
+      "recommended_models": ["llama3.2:1b", "phi3.5", "gemma2:2b"],
+      "platforms": ["raspberry-pi", "mobile", "iot"]
+    }
+  },
+  "limitations": {
+    "no_proprietary": "No access to proprietary models (GPT-4, Claude, Gemini Pro)",
+    "hardware_dependent": "Performance limited by local hardware",
+    "storage": "Requires significant disk space for model storage",
+    "memory": "Large models need substantial RAM/VRAM",
+    "single_instance": "Typically runs one model at a time",
+    "no_cloud_features": "No built-in fine-tuning, no cloud scaling",
+    "download_required": "Models must be downloaded before use"
+  },
+  "advantages": {
+    "privacy": "Complete data privacy - everything runs locally",
+    "cost": "Free to use - no API costs",
+    "offline": "Works without internet after initial download",
+    "no_rate_limits": "No rate limiting - limited only by hardware",
+    "customization": "Full control over models and configuration",
+    "open_source": "All models are open-source",
+    "simple": "Easy installation and usage",
+    "portable": "Run same models across different machines"
+  },
+  "system_requirements": {
+    "minimum": {
+      "ram": "8GB for 7B models",
+      "disk": "10GB free space",
+      "os": "Linux, macOS, or Windows"
+    },
+    "recommended": {
+      "ram": "16GB+ for 13B models, 32GB+ for 70B models",
+      "gpu": "NVIDIA GPU with 8GB+ VRAM or Apple Silicon",
+      "disk": "100GB+ for multiple models",
+      "cpu": "Modern multi-core processor"
+    },
+    "optimal": {
+      "ram": "64GB+ for large models",
+      "gpu": "NVIDIA RTX 4090 or A100",
+      "disk": "1TB+ SSD",
+      "cpu": "High-end workstation CPU"
+    }
+  },
+  "getting_started": {
+    "step_1": "Install Ollama: curl -fsSL https://ollama.com/install.sh | sh",
+    "step_2": "Pull a model: ollama pull llama3.2",
+    "step_3": "Run the model: ollama run llama3.2",
+    "step_4": "Start chatting or use the API",
+    "step_5": "Explore more models: ollama.com/library"
+  },
+  "resources": {
+    "website": "https://ollama.com",
+    "github": "https://github.com/ollama/ollama",
+    "library": "https://ollama.com/library",
+    "documentation": "https://github.com/ollama/ollama/blob/main/docs/api.md",
+    "discord": "https://discord.gg/ollama"
+  }
+}

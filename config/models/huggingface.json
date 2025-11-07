@@ -1,0 +1,1571 @@
+{
+  "provider": "huggingface",
+  "api_version": "v1",
+  "base_url": "https://api-inference.huggingface.co",
+  "notes": {
+    "authentication": "Requires Authorization header with Bearer token (HF_TOKEN or HF_API_TOKEN)",
+    "pricing": "Free tier with rate limits. PRO ($9/month) for higher limits. Inference Endpoints for dedicated instances",
+    "streaming": "Supported via text_generation endpoint with stream parameter",
+    "rate_limits": "Free: ~1000 requests/day. PRO: higher limits. Inference Endpoints: unlimited",
+    "inference_api": "Serverless API for quick testing - free with rate limits, shared infrastructure",
+    "inference_endpoints": "Dedicated instances with guaranteed availability, custom hardware, private deployment",
+    "text_generation_inference": "Open-source inference server (TGI) for self-hosting with optimized performance",
+    "model_types": "Text generation, embeddings, code, multimodal, speech, vision models available",
+    "quantization": "GPTQ, AWQ, GGUF quantized models available for reduced memory usage",
+    "context_windows": "Vary by model - from 2K to 200K+ tokens",
+    "open_source": "All models are open-source and can be downloaded for local use",
+    "model_cards": "Detailed documentation, licensing, and performance metrics for each model",
+    "spaces": "Deploy interactive demos with Gradio or Streamlit",
+    "datasets": "Access to 100K+ datasets for training and evaluation",
+    "transformers": "Official Python library for model usage: pip install transformers",
+    "peft": "Parameter-efficient fine-tuning with LoRA, QLoRA adapters",
+    "autoawq": "Automatic AWQ quantization for faster inference",
+    "no_claude": "Anthropic Claude models are NOT available on Hugging Face (proprietary)",
+    "enterprise": "Enterprise Hub for private model hosting, SSO, and compliance features"
+  },
+  "models": [
+    {
+      "name": "meta-llama/Llama-3.3-70B-Instruct",
+      "model_id": "meta-llama/Llama-3.3-70B-Instruct",
+      "provider": "meta",
+      "version": "3.3",
+      "description": "Latest Llama 3.3 70B instruction model",
+      "strengths": ["reasoning", "instruction-following", "coding", "multilingual"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "70B",
+      "license": "Llama 3.3",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$4-8/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-3.2-90B-Vision-Instruct",
+      "model_id": "meta-llama/Llama-3.2-90B-Vision-Instruct",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Llama 3.2 90B with vision capabilities",
+      "strengths": ["vision", "multimodal", "reasoning", "image-understanding"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "90B",
+      "license": "Llama 3.2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$5-10/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+      "model_id": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Efficient Llama 3.2 11B with vision",
+      "strengths": ["vision", "efficiency", "multimodal", "cost-effective"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "11B",
+      "license": "Llama 3.2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-3.2-3B-Instruct",
+      "model_id": "meta-llama/Llama-3.2-3B-Instruct",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Compact Llama 3.2 3B for edge deployment",
+      "strengths": ["efficiency", "edge-deployment", "speed", "low-resource"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "3B",
+      "license": "Llama 3.2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.50-1/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-3.2-1B-Instruct",
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Ultra-compact Llama 3.2 1B for mobile/edge",
+      "strengths": ["efficiency", "mobile", "edge-deployment", "ultra-low-resource"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "1B",
+      "license": "Llama 3.2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.30-0.60/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-3.1-405B-Instruct",
+      "model_id": "meta-llama/Llama-3.1-405B-Instruct",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Largest Llama 3.1 model with exceptional capabilities",
+      "strengths": ["reasoning", "coding", "mathematics", "multilingual", "complex-tasks"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "405B",
+      "license": "Llama 3.1",
+      "cost": {
+        "inference_api": "Not available (too large)",
+        "inference_endpoints": "$15-30/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-3.1-70B-Instruct",
+      "model_id": "meta-llama/Llama-3.1-70B-Instruct",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Balanced Llama 3.1 70B model",
+      "strengths": ["reasoning", "coding", "multilingual", "general-purpose"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "70B",
+      "license": "Llama 3.1",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$4-8/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-3.1-8B-Instruct",
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Efficient Llama 3.1 8B model",
+      "strengths": ["efficiency", "speed", "cost-effective", "general-purpose"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "8B",
+      "license": "Llama 3.1",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Meta-Llama-3-70B-Instruct",
+      "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
+      "provider": "meta",
+      "version": "3.0",
+      "description": "Original Llama 3 70B instruction model",
+      "strengths": ["reasoning", "instruction-following", "general-purpose"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "parameters": "70B",
+      "license": "Llama 3",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$4-8/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "provider": "meta",
+      "version": "3.0",
+      "description": "Compact Llama 3 8B instruction model",
+      "strengths": ["efficiency", "speed", "cost-effective"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "parameters": "8B",
+      "license": "Llama 3",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-2-70b-chat-hf",
+      "model_id": "meta-llama/Llama-2-70b-chat-hf",
+      "provider": "meta",
+      "version": "2.0",
+      "description": "Llama 2 70B chat model",
+      "strengths": ["conversation", "reasoning", "general-purpose"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "parameters": "70B",
+      "license": "Llama 2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$4-8/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-2-13b-chat-hf",
+      "model_id": "meta-llama/Llama-2-13b-chat-hf",
+      "provider": "meta",
+      "version": "2.0",
+      "description": "Llama 2 13B chat model",
+      "strengths": ["efficiency", "conversation", "cost-effective"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "parameters": "13B",
+      "license": "Llama 2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "meta-llama/Llama-2-7b-chat-hf",
+      "model_id": "meta-llama/Llama-2-7b-chat-hf",
+      "provider": "meta",
+      "version": "2.0",
+      "description": "Compact Llama 2 7B chat model",
+      "strengths": ["efficiency", "speed", "low-resource"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "parameters": "7B",
+      "license": "Llama 2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.60-1.20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "mistralai/Mixtral-8x22B-Instruct-v0.1",
+      "model_id": "mistralai/Mixtral-8x22B-Instruct-v0.1",
+      "provider": "mistral",
+      "version": "0.1",
+      "description": "Large Mixture-of-Experts model from Mistral",
+      "strengths": ["reasoning", "multilingual", "coding", "mathematics"],
+      "context_window": 65536,
+      "max_output": 8192,
+      "parameters": "141B (8x22B MoE)",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$8-15/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    },
+    {
+      "name": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "model_id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "provider": "mistral",
+      "version": "0.1",
+      "description": "Efficient Mixture-of-Experts model",
+      "strengths": ["efficiency", "multilingual", "reasoning", "cost-effective"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "parameters": "47B (8x7B MoE)",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "mistralai/Mistral-7B-Instruct-v0.3",
+      "model_id": "mistralai/Mistral-7B-Instruct-v0.3",
+      "provider": "mistral",
+      "version": "0.3",
+      "description": "Latest Mistral 7B instruction model",
+      "strengths": ["efficiency", "multilingual", "instruction-following"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "parameters": "7B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.60-1.20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "mistralai/Mistral-Large-Instruct-2407",
+      "model_id": "mistralai/Mistral-Large-Instruct-2407",
+      "provider": "mistral",
+      "version": "2.0",
+      "description": "Mistral's most capable model",
+      "strengths": ["reasoning", "coding", "multilingual", "complex-tasks"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "123B",
+      "license": "Mistral Research License",
+      "cost": {
+        "inference_api": "Limited availability",
+        "inference_endpoints": "$6-12/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    },
+    {
+      "name": "Qwen/Qwen2.5-72B-Instruct",
+      "model_id": "Qwen/Qwen2.5-72B-Instruct",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Alibaba's Qwen 2.5 72B instruction model",
+      "strengths": ["reasoning", "coding", "mathematics", "multilingual"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "72B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$4-8/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "Qwen/Qwen2.5-32B-Instruct",
+      "model_id": "Qwen/Qwen2.5-32B-Instruct",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Mid-size Qwen 2.5 model",
+      "strengths": ["reasoning", "coding", "efficiency", "multilingual"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "32B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "Qwen/Qwen2.5-14B-Instruct",
+      "model_id": "Qwen/Qwen2.5-14B-Instruct",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Efficient Qwen 2.5 14B model",
+      "strengths": ["efficiency", "multilingual", "coding", "cost-effective"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "14B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "Qwen/Qwen2.5-7B-Instruct",
+      "model_id": "Qwen/Qwen2.5-7B-Instruct",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Compact Qwen 2.5 7B model",
+      "strengths": ["efficiency", "speed", "multilingual"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "7B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.60-1.20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "Qwen/Qwen2.5-Coder-32B-Instruct",
+      "model_id": "Qwen/Qwen2.5-Coder-32B-Instruct",
+      "provider": "alibaba",
+      "version": "2.5",
+      "description": "Specialized Qwen 2.5 model for coding",
+      "strengths": ["coding", "debugging", "code-generation", "technical"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "32B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "Qwen/QwQ-32B-Preview",
+      "model_id": "Qwen/QwQ-32B-Preview",
+      "provider": "alibaba",
+      "version": "preview",
+      "description": "Qwen with reasoning and reflection capabilities",
+      "strengths": ["reasoning", "reflection", "problem-solving", "mathematics"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "parameters": "32B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    },
+    {
+      "name": "google/gemma-2-27b-it",
+      "model_id": "google/gemma-2-27b-it",
+      "provider": "google",
+      "version": "2.0",
+      "description": "Google's Gemma 2 27B instruction-tuned model",
+      "strengths": ["instruction-following", "reasoning", "efficiency"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "parameters": "27B",
+      "license": "Gemma",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "google/gemma-2-9b-it",
+      "model_id": "google/gemma-2-9b-it",
+      "provider": "google",
+      "version": "2.0",
+      "description": "Efficient Gemma 2 9B instruction model",
+      "strengths": ["efficiency", "instruction-following", "cost-effective"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "parameters": "9B",
+      "license": "Gemma",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "google/gemma-2-2b-it",
+      "model_id": "google/gemma-2-2b-it",
+      "provider": "google",
+      "version": "2.0",
+      "description": "Ultra-compact Gemma 2 2B model",
+      "strengths": ["efficiency", "edge-deployment", "low-resource"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "parameters": "2B",
+      "license": "Gemma",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.40-0.80/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "microsoft/Phi-3.5-mini-instruct",
+      "model_id": "microsoft/Phi-3.5-mini-instruct",
+      "provider": "microsoft",
+      "version": "3.5",
+      "description": "Microsoft's compact Phi 3.5 model",
+      "strengths": ["efficiency", "reasoning", "compact", "quality"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "3.8B",
+      "license": "MIT",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.50-1/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "microsoft/Phi-3-medium-128k-instruct",
+      "model_id": "microsoft/Phi-3-medium-128k-instruct",
+      "provider": "microsoft",
+      "version": "3.0",
+      "description": "Phi 3 Medium with 128K context",
+      "strengths": ["long-context", "reasoning", "efficiency"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "parameters": "14B",
+      "license": "MIT",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "HuggingFaceH4/zephyr-7b-beta",
+      "model_id": "HuggingFaceH4/zephyr-7b-beta",
+      "provider": "huggingface",
+      "version": "beta",
+      "description": "Zephyr 7B fine-tuned with DPO",
+      "strengths": ["instruction-following", "helpful", "aligned"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "parameters": "7B",
+      "license": "MIT",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.60-1.20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+      "model_id": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+      "provider": "nous-research",
+      "version": "2.0",
+      "description": "Nous Research's DPO-trained Mixtral variant",
+      "strengths": ["instruction-following", "reasoning", "multi-turn"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "parameters": "47B (8x7B MoE)",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    },
+    {
+      "name": "openchat/openchat-3.5-0106",
+      "model_id": "openchat/openchat-3.5-0106",
+      "provider": "openchat",
+      "version": "3.5",
+      "description": "OpenChat's improved chat model",
+      "strengths": ["conversation", "instruction-following", "efficiency"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "parameters": "7B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.60-1.20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "deepseek-ai/deepseek-llm-67b-chat",
+      "model_id": "deepseek-ai/deepseek-llm-67b-chat",
+      "provider": "deepseek",
+      "version": "1.0",
+      "description": "DeepSeek's large language model for conversation",
+      "strengths": ["reasoning", "coding", "mathematics", "chinese"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "parameters": "67B",
+      "license": "DeepSeek License",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$4-8/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    },
+    {
+      "name": "deepseek-ai/deepseek-coder-33b-instruct",
+      "model_id": "deepseek-ai/deepseek-coder-33b-instruct",
+      "provider": "deepseek",
+      "version": "1.0",
+      "description": "DeepSeek's specialized coding model",
+      "strengths": ["coding", "code-generation", "debugging", "technical"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "parameters": "33B",
+      "license": "DeepSeek License",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "tiiuae/falcon-180B-chat",
+      "model_id": "tiiuae/falcon-180B-chat",
+      "provider": "tii",
+      "version": "1.0",
+      "description": "Large Falcon model from TII",
+      "strengths": ["reasoning", "multilingual", "general-purpose"],
+      "context_window": 2048,
+      "max_output": 2048,
+      "parameters": "180B",
+      "license": "Falcon-180B License",
+      "cost": {
+        "inference_api": "Not available (too large)",
+        "inference_endpoints": "$10-20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ"]
+      }
+    },
+    {
+      "name": "tiiuae/falcon-40b-instruct",
+      "model_id": "tiiuae/falcon-40b-instruct",
+      "provider": "tii",
+      "version": "1.0",
+      "description": "Falcon 40B instruction model",
+      "strengths": ["reasoning", "multilingual", "general-purpose"],
+      "context_window": 2048,
+      "max_output": 2048,
+      "parameters": "40B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "codellama/CodeLlama-70b-Instruct-hf",
+      "model_id": "codellama/CodeLlama-70b-Instruct-hf",
+      "provider": "meta",
+      "version": "1.0",
+      "description": "Large Code Llama model for complex coding",
+      "strengths": ["coding", "debugging", "code-refactoring", "architecture"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "parameters": "70B",
+      "license": "Llama 2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$4-8/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    },
+    {
+      "name": "codellama/CodeLlama-34b-Instruct-hf",
+      "model_id": "codellama/CodeLlama-34b-Instruct-hf",
+      "provider": "meta",
+      "version": "1.0",
+      "description": "Code Llama 34B for code generation",
+      "strengths": ["coding", "debugging", "code-explanation"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "parameters": "34B",
+      "license": "Llama 2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "codellama/CodeLlama-13b-Instruct-hf",
+      "model_id": "codellama/CodeLlama-13b-Instruct-hf",
+      "provider": "meta",
+      "version": "1.0",
+      "description": "Efficient Code Llama 13B model",
+      "strengths": ["coding", "efficiency", "code-generation"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "parameters": "13B",
+      "license": "Llama 2",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "bigcode/starcoder2-15b",
+      "model_id": "bigcode/starcoder2-15b",
+      "provider": "bigcode",
+      "version": "2.0",
+      "description": "StarCoder 2 for code generation",
+      "strengths": ["coding", "code-generation", "multilingual-code"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "parameters": "15B",
+      "license": "BigCode OpenRAIL-M",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "stabilityai/stablelm-2-zephyr-1_6b",
+      "model_id": "stabilityai/stablelm-2-zephyr-1_6b",
+      "provider": "stability",
+      "version": "2.0",
+      "description": "Ultra-compact StableLM model",
+      "strengths": ["efficiency", "edge-deployment", "low-resource"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "parameters": "1.6B",
+      "license": "StabilityAI Community",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.30-0.60/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "01-ai/Yi-34B-Chat",
+      "model_id": "01-ai/Yi-34B-Chat",
+      "provider": "01-ai",
+      "version": "1.0",
+      "description": "01.AI's Yi model with bilingual capabilities",
+      "strengths": ["multilingual", "reasoning", "chinese-english"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "parameters": "34B",
+      "license": "Yi License",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$2-4/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "databricks/dbrx-instruct",
+      "model_id": "databricks/dbrx-instruct",
+      "provider": "databricks",
+      "version": "1.0",
+      "description": "Databricks' open MoE model",
+      "strengths": ["reasoning", "coding", "efficiency", "enterprise"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "parameters": "132B (16x12B MoE)",
+      "license": "Databricks Open Model",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$6-12/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    },
+    {
+      "name": "sentence-transformers/all-MiniLM-L6-v2",
+      "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+      "provider": "sentence-transformers",
+      "version": "2.0",
+      "description": "Fast and efficient sentence embedding model",
+      "strengths": ["embeddings", "semantic-search", "efficiency", "speed"],
+      "context_window": 256,
+      "max_output": 384,
+      "parameters": "22M",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.20-0.40/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 384
+      }
+    },
+    {
+      "name": "sentence-transformers/all-mpnet-base-v2",
+      "model_id": "sentence-transformers/all-mpnet-base-v2",
+      "provider": "sentence-transformers",
+      "version": "2.0",
+      "description": "High-quality sentence embedding model",
+      "strengths": ["embeddings", "semantic-search", "quality"],
+      "context_window": 384,
+      "max_output": 768,
+      "parameters": "109M",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.30-0.60/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 768
+      }
+    },
+    {
+      "name": "BAAI/bge-large-en-v1.5",
+      "model_id": "BAAI/bge-large-en-v1.5",
+      "provider": "baai",
+      "version": "1.5",
+      "description": "High-performance English embedding model",
+      "strengths": ["embeddings", "semantic-search", "retrieval", "quality"],
+      "context_window": 512,
+      "max_output": 1024,
+      "parameters": "335M",
+      "license": "MIT",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.40-0.80/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 1024
+      }
+    },
+    {
+      "name": "BAAI/bge-base-en-v1.5",
+      "model_id": "BAAI/bge-base-en-v1.5",
+      "provider": "baai",
+      "version": "1.5",
+      "description": "Efficient English embedding model",
+      "strengths": ["embeddings", "semantic-search", "efficiency"],
+      "context_window": 512,
+      "max_output": 768,
+      "parameters": "109M",
+      "license": "MIT",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.30-0.60/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 768
+      }
+    },
+    {
+      "name": "thenlper/gte-large",
+      "model_id": "thenlper/gte-large",
+      "provider": "alibaba",
+      "version": "1.0",
+      "description": "General Text Embedding large model",
+      "strengths": ["embeddings", "semantic-search", "multilingual"],
+      "context_window": 512,
+      "max_output": 1024,
+      "parameters": "335M",
+      "license": "MIT",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.40-0.80/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 1024
+      }
+    },
+    {
+      "name": "intfloat/e5-mistral-7b-instruct",
+      "model_id": "intfloat/e5-mistral-7b-instruct",
+      "provider": "microsoft",
+      "version": "1.0",
+      "description": "E5 embedding model based on Mistral 7B",
+      "strengths": ["embeddings", "quality", "instruction-following"],
+      "context_window": 32768,
+      "max_output": 4096,
+      "parameters": "7B",
+      "license": "MIT",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.60-1.20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 4096
+      }
+    },
+    {
+      "name": "openai/whisper-large-v3",
+      "model_id": "openai/whisper-large-v3",
+      "provider": "openai",
+      "version": "3.0",
+      "description": "Latest Whisper model for speech-to-text",
+      "strengths": ["speech-to-text", "multilingual", "transcription"],
+      "context_window": null,
+      "max_output": null,
+      "parameters": "1.5B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.60-1.20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "speech_to_text": true,
+        "translation": true,
+        "timestamp": true,
+        "languages": "99+"
+      }
+    },
+    {
+      "name": "distil-whisper/distil-large-v3",
+      "model_id": "distil-whisper/distil-large-v3",
+      "provider": "huggingface",
+      "version": "3.0",
+      "description": "Distilled Whisper for faster transcription",
+      "strengths": ["speech-to-text", "speed", "efficiency"],
+      "context_window": null,
+      "max_output": null,
+      "parameters": "756M",
+      "license": "MIT",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.40-0.80/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "speech_to_text": true,
+        "translation": false,
+        "timestamp": true,
+        "languages": "Multiple"
+      }
+    },
+    {
+      "name": "stabilityai/stable-diffusion-xl-base-1.0",
+      "model_id": "stabilityai/stable-diffusion-xl-base-1.0",
+      "provider": "stability",
+      "version": "1.0",
+      "description": "Stable Diffusion XL for image generation",
+      "strengths": ["image-generation", "quality", "photorealism"],
+      "context_window": 77,
+      "max_output": 1,
+      "parameters": "3.5B",
+      "license": "CreativeML Open RAIL++-M",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "runwayml/stable-diffusion-v1-5",
+      "model_id": "runwayml/stable-diffusion-v1-5",
+      "provider": "stability",
+      "version": "1.5",
+      "description": "Classic Stable Diffusion v1.5",
+      "strengths": ["image-generation", "versatile", "well-supported"],
+      "context_window": 77,
+      "max_output": 1,
+      "parameters": "860M",
+      "license": "CreativeML Open RAIL-M",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.60-1.20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "upstage/SOLAR-10.7B-Instruct-v1.0",
+      "model_id": "upstage/SOLAR-10.7B-Instruct-v1.0",
+      "provider": "upstage",
+      "version": "1.0",
+      "description": "Upstage's depth-upscaled LLaMA model",
+      "strengths": ["reasoning", "efficiency", "instruction-following"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "parameters": "10.7B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "teknium/OpenHermes-2.5-Mistral-7B",
+      "model_id": "teknium/OpenHermes-2.5-Mistral-7B",
+      "provider": "teknium",
+      "version": "2.5",
+      "description": "OpenHermes fine-tune of Mistral 7B",
+      "strengths": ["instruction-following", "efficiency", "general-purpose"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "parameters": "7B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$0.60-1.20/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ", "GGUF"]
+      }
+    },
+    {
+      "name": "EleutherAI/gpt-neox-20b",
+      "model_id": "EleutherAI/gpt-neox-20b",
+      "provider": "eleutherai",
+      "version": "1.0",
+      "description": "EleutherAI's GPT-NeoX 20B model",
+      "strengths": ["reasoning", "general-purpose", "open-research"],
+      "context_window": 2048,
+      "max_output": 2048,
+      "parameters": "20B",
+      "license": "Apache 2.0",
+      "cost": {
+        "inference_api": "Free with rate limits",
+        "inference_endpoints": "$1-2/hour depending on GPU"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "quantization": ["GPTQ", "AWQ"]
+      }
+    }
+  ],
+  "model_families": {
+    "llama": {
+      "description": "Meta's Llama family - industry-leading open models",
+      "total_models": 13,
+      "versions": ["3.3", "3.2", "3.1", "3.0", "2.0"],
+      "features": ["128k-context", "vision", "function-calling", "multilingual"],
+      "use_cases": ["general-purpose", "coding", "reasoning", "multimodal"]
+    },
+    "mistral": {
+      "description": "Mistral AI's efficient and multilingual models",
+      "total_models": 4,
+      "features": ["moe-architecture", "multilingual", "long-context", "function-calling"],
+      "use_cases": ["multilingual", "reasoning", "efficiency"]
+    },
+    "qwen": {
+      "description": "Alibaba's Qwen family with strong coding capabilities",
+      "total_models": 6,
+      "features": ["128k-context", "coding", "multilingual", "reasoning"],
+      "use_cases": ["coding", "multilingual", "reasoning", "mathematics"]
+    },
+    "gemma": {
+      "description": "Google's open-source Gemma models",
+      "total_models": 3,
+      "features": ["efficiency", "instruction-following"],
+      "use_cases": ["edge-deployment", "general-purpose"]
+    },
+    "code_models": {
+      "description": "Specialized coding models",
+      "models": ["CodeLlama", "DeepSeek Coder", "StarCoder", "Qwen Coder"],
+      "use_cases": ["code-generation", "debugging", "code-explanation"]
+    },
+    "embeddings": {
+      "description": "Text embedding models for semantic search",
+      "total_models": 7,
+      "use_cases": ["semantic-search", "rag", "clustering", "classification"]
+    },
+    "multimodal": {
+      "description": "Vision and speech models",
+      "models": ["Llama 3.2 Vision", "Whisper", "Stable Diffusion"],
+      "use_cases": ["image-understanding", "speech-to-text", "image-generation"]
+    }
+  },
+  "inference_options": {
+    "inference_api": {
+      "description": "Serverless API for quick testing and prototyping",
+      "pricing": "Free with rate limits, PRO $9/month for higher limits",
+      "infrastructure": "Shared",
+      "availability": "Best effort",
+      "cold_start": "Possible for less popular models",
+      "rate_limits": {
+        "free": "~1000 requests/day",
+        "pro": "Higher limits, varies by model"
+      },
+      "best_for": ["development", "testing", "low-volume", "experimentation"]
+    },
+    "inference_endpoints": {
+      "description": "Dedicated instances for production workloads",
+      "pricing": "Pay per hour based on GPU type",
+      "infrastructure": "Dedicated",
+      "availability": "High availability with SLA",
+      "cold_start": "None",
+      "scaling": "Auto-scaling supported",
+      "gpu_options": ["T4", "A10G", "A100", "H100"],
+      "best_for": ["production", "high-volume", "guaranteed-performance", "private-deployment"]
+    },
+    "text_generation_inference": {
+      "description": "Open-source inference server for self-hosting",
+      "url": "https://github.com/huggingface/text-generation-inference",
+      "features": [
+        "continuous-batching",
+        "tensor-parallelism",
+        "quantization",
+        "flash-attention",
+        "paged-attention"
+      ],
+      "deployment": "Self-hosted on your infrastructure",
+      "best_for": ["self-hosting", "on-premises", "custom-requirements"]
+    },
+    "transformers": {
+      "description": "Python library for running models locally",
+      "install": "pip install transformers",
+      "features": ["local-inference", "fine-tuning", "full-control"],
+      "best_for": ["research", "development", "custom-workflows"]
+    }
+  },
+  "quantization": {
+    "description": "Reduce model size and memory usage",
+    "methods": {
+      "GPTQ": {
+        "description": "4-bit quantization for GPU inference",
+        "memory_reduction": "~75%",
+        "quality_loss": "Minimal",
+        "library": "auto-gptq"
+      },
+      "AWQ": {
+        "description": "Activation-aware quantization for better quality",
+        "memory_reduction": "~75%",
+        "quality_loss": "Very minimal",
+        "library": "autoawq"
+      },
+      "GGUF": {
+        "description": "Quantization format for CPU inference",
+        "memory_reduction": "50-95% depending on bits",
+        "quality_loss": "Varies",
+        "library": "llama.cpp"
+      },
+      "bitsandbytes": {
+        "description": "8-bit and 4-bit quantization",
+        "memory_reduction": "50-75%",
+        "quality_loss": "Minimal",
+        "library": "bitsandbytes"
+      }
+    },
+    "use_cases": {
+      "gptq": "GPU inference with limited VRAM",
+      "awq": "Best quality 4-bit quantization",
+      "gguf": "CPU inference on consumer hardware",
+      "bitsandbytes": "Training and inference with limited memory"
+    }
+  },
+  "fine_tuning": {
+    "description": "Customize models on your data",
+    "methods": {
+      "full_fine_tuning": {
+        "description": "Update all model parameters",
+        "memory": "High",
+        "cost": "High",
+        "quality": "Best"
+      },
+      "lora": {
+        "description": "Low-Rank Adaptation - efficient fine-tuning",
+        "memory": "Low",
+        "cost": "Low",
+        "quality": "Good",
+        "library": "peft"
+      },
+      "qlora": {
+        "description": "Quantized LoRA for even lower memory",
+        "memory": "Very low",
+        "cost": "Very low",
+        "quality": "Good",
+        "library": "peft + bitsandbytes"
+      }
+    },
+    "platforms": {
+      "autotrain": "No-code fine-tuning platform",
+      "sagemaker": "AWS SageMaker integration",
+      "spaces": "Deploy fine-tuned models as apps",
+      "local": "Fine-tune with transformers library"
+    }
+  },
+  "enterprise_hub": {
+    "description": "Enterprise features for teams and organizations",
+    "features": {
+      "sso": "Single sign-on with SAML/OIDC",
+      "private_models": "Host private models securely",
+      "access_control": "Fine-grained permissions",
+      "audit_logs": "Comprehensive audit logging",
+      "compliance": "SOC2, GDPR compliant",
+      "support": "Priority enterprise support",
+      "billing": "Centralized billing and usage tracking"
+    },
+    "pricing": "Contact sales for custom pricing"
+  },
+  "datasets": {
+    "description": "Access to 100K+ datasets for training and evaluation",
+    "categories": ["text", "code", "vision", "audio", "multimodal"],
+    "features": {
+      "dataset_viewer": "Preview datasets in browser",
+      "streaming": "Stream large datasets without downloading",
+      "preprocessing": "Built-in preprocessing tools"
+    }
+  },
+  "spaces": {
+    "description": "Deploy ML demos and applications",
+    "frameworks": ["Gradio", "Streamlit", "Static", "Docker"],
+    "hosting": "Free hosting for public spaces",
+    "hardware": "Upgrade to GPU/TPU for paid tiers",
+    "use_cases": ["demos", "prototypes", "internal-tools", "public-apps"]
+  },
+  "limitations": {
+    "no_claude": "Anthropic Claude models NOT available (proprietary)",
+    "no_gpt4": "OpenAI GPT-4/ChatGPT NOT available (proprietary)",
+    "inference_api_limits": "Rate limits on free tier",
+    "cold_starts": "Possible on Inference API for unpopular models",
+    "community_models": "Quality varies for community-uploaded models"
+  },
+  "best_practices": {
+    "model_selection": "Start with popular models, check model cards for details",
+    "inference_api": "Use for development and testing only",
+    "inference_endpoints": "Use for production with dedicated capacity",
+    "quantization": "Use quantized models for faster inference and lower memory",
+    "caching": "Enable caching for repeated requests",
+    "batch_processing": "Use batching for high-throughput applications",
+    "monitoring": "Track usage and performance metrics",
+    "version_control": "Pin specific model versions for reproducibility",
+    "local_testing": "Test locally with transformers before deploying",
+    "cost_optimization": "Use appropriate hardware tier for workload"
+  },
+  "getting_started": {
+    "step_1": "Create account at huggingface.co",
+    "step_2": "Get API token from Settings > Access Tokens",
+    "step_3": "Install libraries: pip install huggingface_hub transformers",
+    "step_4": "Use Inference API or deploy Inference Endpoint",
+    "step_5": "Integrate with your application"
+  },
+  "api_usage": {
+    "python": "from huggingface_hub import InferenceClient\nclient = InferenceClient(token='your-token')",
+    "curl": "curl https://api-inference.huggingface.co/models/MODEL_ID -H 'Authorization: Bearer YOUR_TOKEN'",
+    "javascript": "import { HfInference } from '@huggingface/inference'\nconst hf = new HfInference('your-token')"
+  },
+  "key_differentiators": {
+    "open_source": "All models are open-source and downloadable",
+    "variety": "100K+ models covering all modalities",
+    "community": "Largest ML community with contributions",
+    "flexibility": "Multiple deployment options (API, Endpoints, self-hosted)",
+    "transparency": "Model cards with full documentation",
+    "cost": "Free tier available, competitive paid pricing",
+    "no_vendor_lock": "Download and run models anywhere"
+  },
+  "popular_use_cases": {
+    "chatbots": "Deploy conversational AI with Llama or Mistral",
+    "code_generation": "Use CodeLlama or Qwen Coder",
+    "embeddings": "Build semantic search with BGE or sentence-transformers",
+    "rag": "Combine embedding models with text generation",
+    "image_generation": "Create images with Stable Diffusion",
+    "speech_to_text": "Transcribe audio with Whisper",
+    "fine_tuning": "Customize models for domain-specific tasks",
+    "research": "Experiment with cutting-edge models",
+    "multilingual": "Deploy models supporting 100+ languages"
+  }
+}
