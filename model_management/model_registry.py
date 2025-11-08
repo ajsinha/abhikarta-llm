@@ -1,5 +1,5 @@
 """
-Abhikarta LLM Model Registry - Thread-Safe Singleton with Auto-Reload
+Abhikarta LLM Model Registry - Abstract Base Class
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
@@ -19,12 +19,8 @@ Patent Pending: Certain architectural patterns and implementations described in 
 document may be subject to patent applications.
 """
 
-import json
-import os
 import threading
-import time
-import hashlib
-from pathlib import Path
+from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Any, Tuple
 from model_provider import ModelProvider, Model
 from exceptions import (
@@ -32,308 +28,90 @@ from exceptions import (
     ProviderDisabledException,
     ModelNotFoundException,
     ModelDisabledException,
-    NoModelsAvailableException,
-    ConfigurationError
+    NoModelsAvailableException
 )
 
 
-class ModelRegistry:
+class ModelRegistry(ABC):
     """
-    Thread-safe singleton registry for managing ModelProvider instances.
+    Abstract base class for model registry implementations.
 
-    This class:
-    - Loads all JSON configuration files from a specified directory
-    - Creates and manages ModelProvider instances
-    - Auto-reloads configurations at configurable intervals
-    - Provides convenience methods for accessing models across providers
-    - Handles provider and model enable/disable states
-    - Tracks file changes to minimize unnecessary reloads
+    This class defines the interface that all registry implementations must follow,
+    whether they use database storage, JSON files, or any other backend.
 
-    The registry runs a background thread that periodically checks for:
-    - New JSON files (automatically added)
-    - Removed JSON files (providers removed from registry)
-    - Modified JSON files (providers updated)
+    The registry provides:
+    - Provider management
+    - Model querying
+    - Cross-provider operations
+    - Cost optimization
+    - Enable/disable functionality
 
     Thread Safety:
-        All methods are thread-safe using RLock for reentrant locking.
+        All methods must be thread-safe in implementations.
         Safe for concurrent access from multiple threads.
-
-    Usage:
-        >>> registry = ModelRegistry.get_instance("/path/to/configs")
-        >>> registry.start_auto_reload(interval_seconds=600)  # 10 minutes
-        >>>
-        >>> # Get all providers
-        >>> providers = registry.get_all_providers()
-        >>>
-        >>> # Get specific model
-        >>> model = registry.get_model_from_provider_by_name("anthropic", "claude-opus-4")
-        >>>
-        >>> # Find cheapest model for capability
-        >>> cheapest = registry.get_cheapest_model_for_capability("vision")
     """
 
-    _instance: Optional['ModelRegistry'] = None
-    _instance_lock = threading.RLock()
-
-    def __init__(self, config_directory: str, auto_reload_interval: int = 600):
-        """
-        Initialize the ModelRegistry.
-
-        Note: Use get_instance() instead of direct initialization to ensure singleton.
-
-        Args:
-            config_directory: Directory containing JSON configuration files
-            auto_reload_interval: Auto-reload interval in seconds (default: 600 = 10 minutes)
-
-        Raises:
-            FileNotFoundError: If the configuration directory doesn't exist
-            ConfigurationError: If there are errors loading configurations
-        """
-        self._config_dir = Path(config_directory)
-        if not self._config_dir.exists():
-            raise FileNotFoundError(f"Configuration directory not found: {self._config_dir}")
-        if not self._config_dir.is_dir():
-            raise NotADirectoryError(f"Path is not a directory: {self._config_dir}")
-
-        # Thread safety
+    def __init__(self):
+        """Initialize the ModelRegistry base class."""
         self._lock = threading.RLock()
-
-        # Provider storage
         self._providers: Dict[str, ModelProvider] = {}
 
-        # File tracking for change detection
-        self._file_hashes: Dict[str, str] = {}
+    # ==================================================================================
+    # ABSTRACT METHODS - Must be implemented by subclasses
+    # ==================================================================================
 
-        # Auto-reload configuration
-        self._auto_reload_interval = auto_reload_interval
-        self._auto_reload_thread: Optional[threading.Thread] = None
-        self._stop_auto_reload = threading.Event()
-        self._auto_reload_enabled = False
-
-        # Initial load
-        self._load_all_providers()
-
-    @classmethod
-    def get_instance(cls, config_directory: str = None, auto_reload_interval: int = 600) -> 'ModelRegistry':
-        """
-        Get the singleton instance of ModelRegistry.
-
-        Args:
-            config_directory: Directory containing JSON configuration files (required on first call)
-            auto_reload_interval: Auto-reload interval in seconds (default: 600 = 10 minutes)
-
-        Returns:
-            The singleton ModelRegistry instance
-
-        Raises:
-            ValueError: If config_directory is None on first call
-
-        Example:
-            >>> # First initialization
-            >>> registry = ModelRegistry.get_instance("/path/to/configs")
-            >>>
-            >>> # Subsequent calls
-            >>> registry = ModelRegistry.get_instance()  # Uses existing instance
-        """
-        with cls._instance_lock:
-            if cls._instance is None:
-                if config_directory is None:
-                    raise ValueError("config_directory must be provided on first call to get_instance()")
-                cls._instance = cls(config_directory, auto_reload_interval)
-            return cls._instance
-
-    @classmethod
-    def reset_instance(cls) -> None:
-        """
-        Reset the singleton instance (mainly for testing).
-
-        This will stop any running auto-reload thread and clear the instance.
-        """
-        with cls._instance_lock:
-            if cls._instance is not None:
-                cls._instance.stop_auto_reload()
-                cls._instance = None
-
-    def _calculate_file_hash(self, file_path: Path) -> str:
-        """
-        Calculate MD5 hash of a file to detect changes.
-
-        Args:
-            file_path: Path to the file
-
-        Returns:
-            MD5 hash as hex string
-        """
-        hasher = hashlib.md5()
-        with open(file_path, 'rb') as f:
-            hasher.update(f.read())
-        return hasher.hexdigest()
-
+    @abstractmethod
     def _load_all_providers(self) -> None:
         """
-        Load all provider configurations from JSON files in the config directory.
+        Load all provider configurations from storage.
 
-        This method:
-        - Scans for all .json files
-        - Loads new providers
-        - Updates modified providers
-        - Removes providers for deleted files
-
-        Raises:
-            ConfigurationError: If there are errors loading configurations
+        This method should populate self._providers with ModelProvider instances.
         """
-        with self._lock:
-            json_files = set(self._config_dir.glob("*.json"))
-            current_files = {f.stem: f for f in json_files}
+        pass
 
-            # Track which providers to remove
-            providers_to_remove = set(self._providers.keys()) - set(current_files.keys())
-
-            # Remove providers for deleted files
-            for provider_name in providers_to_remove:
-                print(f"Removing provider '{provider_name}' (file deleted)")
-                del self._providers[provider_name]
-                if provider_name in self._file_hashes:
-                    del self._file_hashes[provider_name]
-
-            # Load or update providers
-            for file_stem, file_path in current_files.items():
-                try:
-                    # Calculate file hash
-                    current_hash = self._calculate_file_hash(file_path)
-                    previous_hash = self._file_hashes.get(file_stem)
-
-                    # Only load/reload if file is new or changed
-                    if previous_hash is None:
-                        # New file
-                        print(f"Loading new provider from: {file_path.name}")
-                        provider = ModelProvider(str(file_path))
-                        self._providers[provider.provider] = provider
-                        self._file_hashes[file_stem] = current_hash
-                    elif current_hash != previous_hash:
-                        # File changed
-                        print(f"Reloading modified provider from: {file_path.name}")
-                        provider = ModelProvider(str(file_path))
-                        self._providers[provider.provider] = provider
-                        self._file_hashes[file_stem] = current_hash
-                    # else: file unchanged, skip reload
-
-                except Exception as e:
-                    print(f"Error loading provider from {file_path.name}: {e}")
-                    raise ConfigurationError(str(e), str(file_path))
-
-    def reload_all_providers(self) -> int:
+    @abstractmethod
+    def reload_from_storage(self) -> None:
         """
-        Manually trigger a reload of all provider configurations.
+        Reload all providers from storage.
 
-        This checks for new, modified, and deleted configuration files.
-
-        Returns:
-            Number of providers currently loaded
-
-        Example:
-            >>> count = registry.reload_all_providers()
-            >>> print(f"Loaded {count} providers")
+        This is useful when data has been updated externally.
         """
-        with self._lock:
-            self._load_all_providers()
-            return len(self._providers)
+        pass
 
-    def start_auto_reload(self, interval_seconds: Optional[int] = None) -> None:
+    @abstractmethod
+    def start_auto_reload(self, interval_minutes: int = 10) -> None:
         """
-        Start the auto-reload background thread.
+        Start automatic reloading of data at specified intervals.
 
         Args:
-            interval_seconds: Reload interval in seconds (uses configured value if None)
+            interval_minutes: Reload interval in minutes (default: 10)
+
+        Note:
+            Implementation-specific. Some implementations may not support
+            auto-reload or may implement it as a no-op.
 
         Example:
-            >>> registry.start_auto_reload(600)  # Reload every 10 minutes
-            >>> # ... do work ...
-            >>> registry.stop_auto_reload()
+            >>> registry.start_auto_reload(interval_minutes=5)
         """
-        with self._lock:
-            if self._auto_reload_enabled:
-                print("Auto-reload is already running")
-                return
+        pass
 
-            if interval_seconds is not None:
-                self._auto_reload_interval = interval_seconds
-
-            self._stop_auto_reload.clear()
-            self._auto_reload_thread = threading.Thread(
-                target=self._auto_reload_worker,
-                daemon=True,
-                name="ModelRegistry-AutoReload"
-            )
-            self._auto_reload_enabled = True
-            self._auto_reload_thread.start()
-            print(f"Auto-reload started with interval: {self._auto_reload_interval} seconds")
-
+    @abstractmethod
     def stop_auto_reload(self) -> None:
         """
-        Stop the auto-reload background thread.
+        Stop automatic reloading of data.
+
+        Note:
+            Implementation-specific. Some implementations may not support
+            auto-reload or may implement it as a no-op.
 
         Example:
             >>> registry.stop_auto_reload()
         """
-        with self._lock:
-            if not self._auto_reload_enabled:
-                return
-
-            self._stop_auto_reload.set()
-            self._auto_reload_enabled = False
-
-            if self._auto_reload_thread and self._auto_reload_thread.is_alive():
-                self._auto_reload_thread.join(timeout=5)
-
-            print("Auto-reload stopped")
-
-    def _auto_reload_worker(self) -> None:
-        """
-        Background worker thread for auto-reloading configurations.
-
-        This runs in a separate daemon thread and periodically calls reload_all_providers().
-        """
-        while not self._stop_auto_reload.is_set():
-            try:
-                # Wait for the specified interval, but check stop flag periodically
-                if self._stop_auto_reload.wait(timeout=self._auto_reload_interval):
-                    break  # Stop flag was set
-
-                print("Auto-reload: Checking for configuration changes...")
-                self.reload_all_providers()
-
-            except Exception as e:
-                print(f"Error in auto-reload worker: {e}")
-                # Continue running despite errors
+        pass
 
     # ==================================================================================
-    # PROVIDER ACCESS METHODS
+    # PROVIDER MANAGEMENT
     # ==================================================================================
-
-    def get_all_providers(self, include_disabled: bool = False) -> Dict[str, ModelProvider]:
-        """
-        Get all providers in the registry.
-
-        Args:
-            include_disabled: Whether to include disabled providers (default: False)
-
-        Returns:
-            Dictionary mapping provider names to ModelProvider instances
-
-        Example:
-            >>> providers = registry.get_all_providers()
-            >>> for name, provider in providers.items():
-            ...     print(f"{name}: {provider.get_model_count()} models")
-        """
-        with self._lock:
-            if include_disabled:
-                return self._providers.copy()
-            return {
-                name: provider
-                for name, provider in self._providers.items()
-                if provider.enabled
-            }
 
     def get_provider_by_name(self, provider_name: str) -> ModelProvider:
         """
@@ -351,17 +129,80 @@ class ModelRegistry:
 
         Example:
             >>> provider = registry.get_provider_by_name("anthropic")
-            >>> print(provider.api_version)
+            >>> print(f"Found: {provider.provider}")
         """
         with self._lock:
             if provider_name not in self._providers:
                 raise ProviderNotFoundException(provider_name)
 
             provider = self._providers[provider_name]
+
             if not provider.enabled:
                 raise ProviderDisabledException(provider_name)
 
             return provider
+
+    def get_all_providers(self, include_disabled: bool = False) -> Dict[str, ModelProvider]:
+        """
+        Get all providers.
+
+        Args:
+            include_disabled: Whether to include disabled providers (default: False)
+
+        Returns:
+            Dictionary mapping provider names to ModelProvider instances
+
+        Example:
+            >>> providers = registry.get_all_providers()
+            >>> for name, provider in providers.items():
+            ...     print(f"- {name}: {provider.get_model_count()} models")
+        """
+        with self._lock:
+            if include_disabled:
+                return self._providers.copy()
+            return {
+                name: provider
+                for name, provider in self._providers.items()
+                if provider.enabled
+            }
+
+    def enable_provider(self, provider_name: str) -> bool:
+        """
+        Enable a provider.
+
+        Args:
+            provider_name: Name of the provider
+
+        Returns:
+            True if provider was found and enabled, False otherwise
+
+        Example:
+            >>> registry.enable_provider("anthropic")
+        """
+        with self._lock:
+            if provider_name in self._providers:
+                self._providers[provider_name].enabled = True
+                return True
+            return False
+
+    def disable_provider(self, provider_name: str) -> bool:
+        """
+        Disable a provider.
+
+        Args:
+            provider_name: Name of the provider
+
+        Returns:
+            True if provider was found and disabled, False otherwise
+
+        Example:
+            >>> registry.disable_provider("mock")
+        """
+        with self._lock:
+            if provider_name in self._providers:
+                self._providers[provider_name].enabled = False
+                return True
+            return False
 
     # ==================================================================================
     # MODEL ACCESS METHODS
@@ -373,7 +214,7 @@ class ModelRegistry:
             model_name: str
     ) -> Model:
         """
-        Get a specific model from a specific provider.
+        Get a specific model from a provider by name.
 
         Args:
             provider_name: Name of the provider
@@ -399,6 +240,7 @@ class ModelRegistry:
 
         with self._lock:
             model = provider.get_model_by_name(model_name)
+
             if model is None:
                 raise ModelNotFoundException(model_name, provider_name)
 
@@ -414,12 +256,15 @@ class ModelRegistry:
             capability: str
     ) -> Model:
         """
-        Get a model from a provider only if it has a specific capability.
+        Get a specific model from a provider by name and verify it has a capability.
+
+        This method combines model retrieval with capability validation, ensuring
+        the model not only exists but also supports the required capability.
 
         Args:
             provider_name: Name of the provider
             model_name: Name of the model
-            capability: Required capability
+            capability: Required capability (use ModelCapability enum values)
 
         Returns:
             Model instance
@@ -427,29 +272,63 @@ class ModelRegistry:
         Raises:
             ProviderNotFoundException: If provider not found
             ProviderDisabledException: If provider is disabled
-            ModelNotFoundException: If model not found or doesn't have capability
+            ModelNotFoundException: If model not found
             ModelDisabledException: If model is disabled
+            NoModelsAvailableException: If model doesn't have the required capability
 
         Example:
             >>> model = registry.get_model_from_provider_by_name_capability(
-            ...     "anthropic",
-            ...     "claude-opus-4",
+            ...     "google",
+            ...     "gemini-1.5-pro",
             ...     "vision"
             ... )
+            >>> print(f"Found vision-capable model: {model.name}")
         """
+        # First get the model (handles all provider/model exceptions)
         model = self.get_model_from_provider_by_name(provider_name, model_name)
 
+        # Verify the model has the required capability
         if not model.has_capability(capability):
-            raise ModelNotFoundException(
-                model_name,
-                provider_name
+            raise NoModelsAvailableException(
+                f"Model '{model_name}' from provider '{provider_name}' "
+                f"does not support capability '{capability}'"
             )
 
         return model
 
-    # ==================================================================================
-    # CROSS-PROVIDER MODEL SEARCH METHODS
-    # ==================================================================================
+    def get_all_models_from_provider(
+            self,
+            provider_name: str,
+            include_disabled: bool = False
+    ) -> List[Model]:
+        """
+        Get all models from a specific provider.
+
+        Args:
+            provider_name: Name of the provider
+            include_disabled: Whether to include disabled models
+
+        Returns:
+            List of Model instances
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ProviderDisabledException: If provider is disabled (unless include_disabled=True)
+
+        Example:
+            >>> models = registry.get_all_models_from_provider("anthropic")
+            >>> for model in models:
+            ...     print(f"- {model.name}")
+        """
+        if not include_disabled:
+            provider = self.get_provider_by_name(provider_name)
+        else:
+            with self._lock:
+                if provider_name not in self._providers:
+                    raise ProviderNotFoundException(provider_name)
+                provider = self._providers[provider_name]
+
+        return provider.get_all_models(include_disabled)
 
     def get_all_models_for_capability(
             self,
@@ -579,6 +458,48 @@ class ModelRegistry:
             return cheapest, cost
 
     # ==================================================================================
+    # MODEL ENABLE/DISABLE
+    # ==================================================================================
+
+    def enable_model(self, provider_name: str, model_name: str) -> bool:
+        """
+        Enable a specific model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+
+        Returns:
+            True if model was found and enabled, False otherwise
+
+        Example:
+            >>> registry.enable_model("anthropic", "claude-3-haiku-20240307")
+        """
+        with self._lock:
+            if provider_name not in self._providers:
+                return False
+            return self._providers[provider_name].enable_model(model_name)
+
+    def disable_model(self, provider_name: str, model_name: str) -> bool:
+        """
+        Disable a specific model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+
+        Returns:
+            True if model was found and disabled, False otherwise
+
+        Example:
+            >>> registry.disable_model("anthropic", "claude-instant-1.2")
+        """
+        with self._lock:
+            if provider_name not in self._providers:
+                return False
+            return self._providers[provider_name].disable_model(model_name)
+
+    # ==================================================================================
     # UTILITY METHODS
     # ==================================================================================
 
@@ -640,9 +561,6 @@ class ModelRegistry:
                 'provider_count': self.get_provider_count(),
                 'total_provider_count': len(self._providers),
                 'total_model_count': self.get_total_model_count(),
-                'auto_reload_enabled': self._auto_reload_enabled,
-                'auto_reload_interval': self._auto_reload_interval,
-                'config_directory': str(self._config_dir),
                 'providers': providers_info
             }
 
@@ -652,8 +570,7 @@ class ModelRegistry:
             return (
                 f"ModelRegistry("
                 f"providers={self.get_provider_count()}, "
-                f"models={self.get_total_model_count()}, "
-                f"auto_reload={'on' if self._auto_reload_enabled else 'off'})"
+                f"models={self.get_total_model_count()})"
             )
 
     def __str__(self) -> str:

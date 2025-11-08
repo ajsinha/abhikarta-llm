@@ -1,5 +1,5 @@
 """
-Abhikarta LLM Model Provider and Model Classes
+Abhikarta LLM Model Provider - Abstract Base Class
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
@@ -14,11 +14,9 @@ Patent Pending: Certain architectural patterns and implementations described in 
 module may be subject to patent applications.
 """
 
-import json
 import threading
+from abc import ABC, abstractmethod
 from typing import Optional, List, Dict, Any
-from pathlib import Path
-from model_management import ModelCapability
 
 
 class Model:
@@ -32,7 +30,7 @@ class Model:
         name (str): Unique identifier for the model
         version (str): Model version
         description (str): Human-readable description
-        provider (str): Original model provider (if different from hosting provider)
+        provider (str): Original model provider
         strengths (List[str]): Model's key strengths and use cases
         context_window (int): Maximum input tokens
         max_output (int): Maximum output tokens
@@ -42,46 +40,45 @@ class Model:
         performance (Dict[str, Any]): Performance metrics (if available)
         capabilities (Dict[str, Any]): Feature flags and metadata
         enabled (bool): Whether the model is enabled for use
-        _raw_config (Dict[str, Any]): Original configuration from JSON
     """
 
-    def __init__(self, config: Dict[str, Any], enabled: bool = True):
+    def __init__(self, model_data: Dict[str, Any]):
         """
-        Initialize a Model instance from configuration dictionary.
+        Initialize a Model instance from data dictionary.
 
         Args:
-            config: Dictionary containing model configuration from JSON
-            enabled: Whether the model is enabled (default: True)
+            model_data: Dictionary containing model data
 
         Raises:
-            KeyError: If required fields are missing from config
-            ValueError: If config values are invalid
+            KeyError: If required fields are missing from model_data
+            ValueError: If model_data values are invalid
         """
         # Thread safety lock
         self._lock = threading.RLock()
 
         # Required fields
-        self.name: str = config['name']
-        self.version: str = config['version']
-        self.description: str = config['description']
-        self.context_window: int = config['context_window']
-        self.max_output: int = config['max_output']
-        self.capabilities: Dict[str, Any] = config['capabilities']
-        self.cost: Dict[str, Any] = config['cost']
+        self.name: str = model_data['name']
+        self.version: str = model_data['version']
+        self.description: str = model_data['description']
+        self.context_window: int = model_data['context_window']
+        self.max_output: int = model_data['max_output']
+        self.capabilities: Dict[str, Any] = model_data.get('capabilities', {})
+        self.cost: Dict[str, Any] = model_data.get('cost', {})
 
         # Optional fields with defaults
-        self.provider: Optional[str] = config.get('provider')
-        self.model_id: Optional[str] = config.get('model_id')
-        self.strengths: List[str] = config.get('strengths', [])
-        self.parameters: Optional[str] = config.get('parameters')
-        self.license: Optional[str] = config.get('license')
-        self.performance: Dict[str, Any] = config.get('performance', {})
+        self.provider: Optional[str] = model_data.get('provider')
+        self.model_id: Optional[str] = model_data.get('model_id')
+        self.replicate_model: Optional[str] = model_data.get('replicate_model')
+        self.strengths: List[str] = model_data.get('strengths', [])
+        self.parameters: Optional[str] = model_data.get('parameters')
+        self.license: Optional[str] = model_data.get('license')
+        self.performance: Dict[str, Any] = model_data.get('performance', {})
 
         # State
-        self._enabled: bool = enabled
+        self._enabled: bool = model_data.get('enabled', True)
 
-        # Store raw config for reference
-        self._raw_config: Dict[str, Any] = config.copy()
+        # Store ID if provided (for database implementations)
+        self.id: Optional[int] = model_data.get('id')
 
     @property
     def enabled(self) -> bool:
@@ -193,12 +190,13 @@ class Model:
         Returns:
             Dictionary with all model information
         """
-        return {
+        result = {
             'name': self.name,
             'version': self.version,
             'description': self.description,
             'provider': self.provider,
             'model_id': self.model_id,
+            'replicate_model': self.replicate_model,
             'strengths': self.strengths,
             'context_window': self.context_window,
             'max_output': self.max_output,
@@ -209,6 +207,9 @@ class Model:
             'capabilities': self.capabilities,
             'enabled': self.enabled
         }
+        if self.id is not None:
+            result['id'] = self.id
+        return result
 
     def __repr__(self) -> str:
         """String representation of the Model."""
@@ -220,49 +221,31 @@ class Model:
         return f"{self.name} (v{self.version}) - {self.description}"
 
 
-class ModelProvider:
+class ModelProvider(ABC):
     """
-    Represents an LLM provider with its configuration and available models.
+    Abstract base class for LLM provider implementations.
 
-    This class manages a collection of models from a specific provider, loading
-    configuration from JSON files and providing convenient methods for model
-    selection based on capabilities and cost.
+    This class defines the interface that all provider implementations must follow,
+    whether they use database storage, JSON files, or any other backend.
 
     Attributes:
         provider (str): Provider identifier (e.g., "anthropic", "openai")
         api_version (str): API version
         base_url (str): Base URL for API requests
-        notes (Dict[str, str]): Provider-specific documentation
+        notes (Dict[str, Any]): Additional provider notes
         models (List[Model]): List of Model instances
         enabled (bool): Whether the provider is enabled
-        config_path (Path): Path to the configuration JSON file
-        _raw_config (Dict[str, Any]): Original configuration from JSON
     """
 
-    def __init__(self, config_path: str, enabled: bool = True):
-        """
-        Initialize a ModelProvider by loading configuration from a JSON file.
-
-        Args:
-            config_path: Path to the JSON configuration file
-            enabled: Whether the provider is enabled (default: True)
-
-        Raises:
-            FileNotFoundError: If the configuration file doesn't exist
-            json.JSONDecodeError: If the JSON is malformed
-            KeyError: If required fields are missing
-
-        Example:
-            >>> provider = ModelProvider("config/anthropic.json")
-            >>> print(provider.provider)
-            'anthropic'
-        """
-        # Thread safety lock - must be created before any other operations
+    def __init__(self):
+        """Initialize the ModelProvider base class."""
         self._lock = threading.RLock()
-
-        self.config_path = Path(config_path)
-        self._enabled = enabled
-        self._load_config()
+        self.provider: str = ""
+        self.api_version: str = ""
+        self.base_url: Optional[str] = None
+        self._enabled: bool = True
+        self.notes: Dict[str, Any] = {}
+        self.models: List[Model] = []
 
     @property
     def enabled(self) -> bool:
@@ -275,140 +258,70 @@ class ModelProvider:
         """Thread-safe setter for enabled status."""
         with self._lock:
             self._enabled = value
+            self._on_enabled_changed(value)
 
-    def _load_config(self) -> None:
+    @abstractmethod
+    def _on_enabled_changed(self, enabled: bool) -> None:
         """
-        Load configuration from the JSON file.
-
-        This is an internal method called by __init__ and reload().
-
-        Raises:
-            FileNotFoundError: If the configuration file doesn't exist
-            json.JSONDecodeError: If the JSON is malformed
-            KeyError: If required fields are missing
+        Hook method called when enabled status changes.
+        
+        Implementations should override this to persist the change.
+        
+        Args:
+            enabled: New enabled status
         """
-        with self._lock:
-            if not self.config_path.exists():
-                raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
+        pass
 
-            with open(self.config_path, 'r', encoding='utf-8') as f:
-                config = json.load(f)
-
-            # Store raw config
-            self._raw_config = config
-
-            # Required fields
-            self.provider: str = config['provider']
-            self.api_version: str = config['api_version']
-            self.base_url: Optional[str] = config.get('base_url')
-
-            # Optional fields
-            self.notes: Dict[str, str] = config.get('notes', {})
-            self.model_families: Dict[str, Any] = config.get('model_families', {})
-            self.prompt_caching: Dict[str, Any] = config.get('prompt_caching', {})
-            self.extended_thinking: Dict[str, Any] = config.get('extended_thinking', {})
-            self.batch_api: Dict[str, Any] = config.get('batch_api', {})
-            self.vision_capabilities: Dict[str, Any] = config.get('vision_capabilities', {})
-            self.tool_use: Dict[str, Any] = config.get('tool_use', {})
-            self.deployment_options: Dict[str, Any] = config.get('deployment_options', {})
-            self.best_practices: Dict[str, Any] = config.get('best_practices', {})
-
-            # Load models
-            self.models: List[Model] = []
-            for model_config in config.get('models', []):
-                try:
-                    model = Model(model_config, enabled=True)
-                    self.models.append(model)
-                except (KeyError, ValueError) as e:
-                    # Log warning but continue loading other models
-                    print(f"Warning: Failed to load model from {self.provider}: {e}")
-                    continue
-
+    @abstractmethod
     def reload(self) -> None:
         """
-        Reload the configuration from the JSON file.
-
-        This method re-reads the configuration file and updates all internal data.
-        Useful for picking up configuration changes without restarting the application.
-
-        Raises:
-            FileNotFoundError: If the configuration file doesn't exist
-            json.JSONDecodeError: If the JSON is malformed
-
-        Example:
-            >>> provider.reload()
-            >>> print(f"Reloaded {len(provider.models)} models")
+        Reload provider and model data from storage.
+        
+        This is useful when data has been updated externally.
         """
-        self._load_config()
+        pass
 
     def get_model_by_name(self, model_name: str) -> Optional[Model]:
         """
         Get a model by its name.
 
         Args:
-            model_name: The name of the model to retrieve
+            model_name: Name of the model to retrieve
 
         Returns:
-            Model instance if found and enabled, None otherwise
+            Model instance or None if not found
 
         Example:
-            >>> model = provider.get_model_by_name("claude-3-7-sonnet-20250219")
+            >>> model = provider.get_model_by_name("claude-opus-4")
             >>> if model:
-            ...     print(model.description)
+            ...     print(f"Found: {model.name}")
         """
-        for model in self.models:
-            if model.name == model_name and model.enabled:
-                return model
-        return None
-
-    def get_model_by_name_and_capability(
-            self,
-            model_name: str,
-            capability: str
-    ) -> Optional[Model]:
-        """
-        Get a model by name only if it supports the requested capability.
-
-        Args:
-            model_name: The name of the model to retrieve
-            capability: The required capability (use ModelCapability enum values)
-
-        Returns:
-            Model instance if found, enabled, and has capability, None otherwise
-
-        Example:
-            >>> model = provider.get_model_by_name_and_capability(
-            ...     "claude-3-5-sonnet-20241022",
-            ...     ModelCapability.VISION.value
-            ... )
-            >>> if model:
-            ...     print(f"{model.name} supports vision")
-        """
-        model = self.get_model_by_name(model_name)
-        if model and model.has_capability(capability):
-            return model
-        return None
+        with self._lock:
+            for model in self.models:
+                if model.name == model_name:
+                    return model
+            return None
 
     def get_cheapest_model_for_capability(
-            self,
-            capability: str,
-            input_tokens: int = 1000,
-            output_tokens: int = 500
+        self,
+        capability: str,
+        input_tokens: int = 100000,
+        output_tokens: int = 1000
     ) -> Optional[Model]:
         """
-        Get the most cost-effective model that supports a capability.
+        Find the cheapest model that supports a specific capability.
 
         Args:
-            capability: The required capability (use ModelCapability enum values)
-            input_tokens: Expected input tokens for cost calculation (default: 1000)
-            output_tokens: Expected output tokens for cost calculation (default: 500)
+            capability: Required capability (use ModelCapability enum values)
+            input_tokens: Number of input tokens for cost calculation (default: 100000)
+            output_tokens: Number of output tokens for cost calculation (default: 1000)
 
         Returns:
-            The cheapest Model with the capability, or None if no models support it
+            Cheapest Model instance or None if no models support the capability
 
         Example:
             >>> cheapest = provider.get_cheapest_model_for_capability(
-            ...     ModelCapability.CHAT.value,
+            ...     ModelCapability.VISION.value,
             ...     input_tokens=5000,
             ...     output_tokens=1000
             ... )
@@ -602,46 +515,4 @@ class ModelProvider:
         return f"{self.provider} Provider (API v{self.api_version}) - {model_count} models"
 
 
-# Convenience function for loading multiple providers
-def load_providers(config_dir: str, provider_names: Optional[List[str]] = None) -> Dict[str, ModelProvider]:
-    """
-    Load multiple ModelProvider instances from a directory.
-
-    Args:
-        config_dir: Directory containing provider JSON files
-        provider_names: Optional list of provider names to load. If None, loads all.
-
-    Returns:
-        Dictionary mapping provider names to ModelProvider instances
-
-    Example:
-        >>> providers = load_providers("./config", ["anthropic", "openai"])
-        >>> anthropic = providers["anthropic"]
-    """
-    from pathlib import Path
-
-    config_path = Path(config_dir)
-    providers = {}
-
-    if provider_names:
-        # Load specific providers
-        for name in provider_names:
-            json_file = config_path / f"{name}.json"
-            if json_file.exists():
-                try:
-                    providers[name] = ModelProvider(str(json_file))
-                except Exception as e:
-                    print(f"Warning: Failed to load provider {name}: {e}")
-    else:
-        # Load all JSON files in directory
-        for json_file in config_path.glob("*.json"):
-            try:
-                provider = ModelProvider(str(json_file))
-                providers[provider.provider] = provider
-            except Exception as e:
-                print(f"Warning: Failed to load provider from {json_file}: {e}")
-
-    return providers
-
-
-__all__ = ['Model', 'ModelProvider', 'load_providers']
+__all__ = ['Model', 'ModelProvider']

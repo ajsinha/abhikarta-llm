@@ -12,6 +12,8 @@ This script demonstrates all features of the ModelRegistry including:
 
 import time
 import threading
+
+from model_management.model_registry_json import ModelRegistryJSON
 from model_registry import ModelRegistry
 from exceptions import (
     ProviderNotFoundException,
@@ -203,7 +205,7 @@ def test_auto_reload(registry: ModelRegistry):
 
     # Start auto-reload with short interval for testing
     print("Starting auto-reload with 5-second interval...")
-    registry.start_auto_reload(interval_seconds=5)
+    registry.start_auto_reload(interval_minutes=5)
 
     print("Waiting 12 seconds to see auto-reload in action...")
     print("(Check console for reload messages)")
@@ -287,7 +289,7 @@ def run_all_tests():
 
     # Test singleton and get instance
     test_singleton_pattern()
-    registry = ModelRegistry.get_instance()
+    registry = ModelRegistryJSON.get_instance()
 
     # Run all tests
     test_get_all_providers(registry)

@@ -6,7 +6,7 @@ Ashutosh Sinha
 Email: ajsinha@gmail.com
 """
 
-from __init__ import ModelCapability, ProviderType
+from model_management import ModelCapability, ProviderType
 from typing import List, Set, Dict, Any
 
 
