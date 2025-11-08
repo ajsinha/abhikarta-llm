@@ -1,0 +1,23 @@
+# Abhikarta LLM - Tool Management Framework
+# Requirements File
+#
+# Copyright © 2025-2030, All Rights Reserved
+# Ashutosh Sinha (ajsinha@gmail.com)
+
+# Core dependencies
+httpx>=0.24.0  # Required for HTTP transport in MCP client
+pydantic>=2.0.0
+
+# Optional: MCP and LLM integrations
+# Uncomment if needed:
+# anthropic>=0.18.0
+# openai>=1.0.0
+
+# Development dependencies (optional)
+# Uncomment for development:
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+# pytest-cov>=4.0.0
+# black>=23.0.0
+# mypy>=1.0.0
+# flake8>=6.0.0
