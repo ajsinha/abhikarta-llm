@@ -64,6 +64,15 @@ class ModelDisabledException(ModelRegistryException):
             super().__init__(f"Model '{model_name}' is disabled")
 
 
+class ModelAlreadyExistsException(ModelRegistryException):
+    """Raised when trying to create a model that already exists."""
+
+    def __init__(self, model_name: str, provider_name: str):
+        self.model_name = model_name
+        self.provider_name = provider_name
+        super().__init__(f"Model '{model_name}' already exists in provider '{provider_name}'")
+
+
 class NoModelsAvailableException(ModelRegistryException):
     """Raised when no models are available for a specific capability or criteria."""
 
@@ -89,6 +98,7 @@ __all__ = [
     'ProviderDisabledException',
     'ModelNotFoundException',
     'ModelDisabledException',
+    'ModelAlreadyExistsException',
     'NoModelsAvailableException',
     'ConfigurationError'
 ]

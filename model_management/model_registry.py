@@ -110,6 +110,512 @@ class ModelRegistry(ABC):
         pass
 
     # ==================================================================================
+    # MODEL CRUD OPERATIONS
+    # ==================================================================================
+
+    @abstractmethod
+    def create_model(
+            self,
+            provider_name: str,
+            model_data: Dict[str, Any]
+    ) -> Model:
+        """
+        Create a new model for a provider.
+
+        Args:
+            provider_name: Name of the provider
+            model_data: Dictionary containing model configuration
+
+        Returns:
+            The created Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelAlreadyExistsException: If model already exists
+            ConfigurationError: If model_data is invalid
+
+        Example:
+            >>> model_data = {
+            ...     'name': 'new-model-v1',
+            ...     'description': 'New model',
+            ...     'version': '1.0',
+            ...     'enabled': True,
+            ...     'context_window': 8192,
+            ...     'max_output': 4096,
+            ...     'input_cost_per_million': 1.0,
+            ...     'output_cost_per_million': 2.0,
+            ...     'supports_streaming': True,
+            ...     'supports_function_calling': True,
+            ...     'capabilities': {'chat': True},
+            ...     'release_date': '2024-01-01'
+            ... }
+            >>> model = registry.create_model('anthropic', model_data)
+        """
+        pass
+
+    @abstractmethod
+    def delete_model(
+            self,
+            provider_name: str,
+            model_name: str
+    ) -> None:
+        """
+        Permanently delete a model from a provider.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model to delete
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> registry.delete_model('anthropic', 'old-model-v1')
+        """
+        pass
+
+    @abstractmethod
+    def update_model(
+            self,
+            provider_name: str,
+            model_name: str,
+            updates: Dict[str, Any]
+    ) -> Model:
+        """
+        Update multiple attributes of a model at once.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            updates: Dictionary of attributes to update
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+            ConfigurationError: If updates are invalid
+
+        Example:
+            >>> updates = {
+            ...     'description': 'Updated description',
+            ...     'version': '2.0',
+            ...     'context_window': 16384
+            ... }
+            >>> model = registry.update_model('anthropic', 'claude-opus-4', updates)
+        """
+        pass
+
+    # ==================================================================================
+    # MODEL ATTRIBUTE UPDATES - BASIC PROPERTIES
+    # ==================================================================================
+
+    @abstractmethod
+    def update_model_description(
+            self,
+            provider_name: str,
+            model_name: str,
+            description: str
+    ) -> Model:
+        """
+        Update the description of a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            description: New description
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> model = registry.update_model_description(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     'Most powerful model with enhanced reasoning'
+            ... )
+        """
+        pass
+
+    @abstractmethod
+    def update_model_version(
+            self,
+            provider_name: str,
+            model_name: str,
+            version: str
+    ) -> Model:
+        """
+        Update the version of a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            version: New version string
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> model = registry.update_model_version(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     '2.0'
+            ... )
+        """
+        pass
+
+    @abstractmethod
+    def update_model_context_window(
+            self,
+            provider_name: str,
+            model_name: str,
+            context_window: int
+    ) -> Model:
+        """
+        Update the context window size of a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            context_window: New context window size in tokens
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+            ValueError: If context_window is invalid
+
+        Example:
+            >>> model = registry.update_model_context_window(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     200000
+            ... )
+        """
+        pass
+
+    @abstractmethod
+    def update_model_max_output(
+            self,
+            provider_name: str,
+            model_name: str,
+            max_output: int
+    ) -> Model:
+        """
+        Update the maximum output tokens of a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            max_output: New maximum output tokens
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+            ValueError: If max_output is invalid
+
+        Example:
+            >>> model = registry.update_model_max_output(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     8192
+            ... )
+        """
+        pass
+
+    @abstractmethod
+    def update_model_costs(
+            self,
+            provider_name: str,
+            model_name: str,
+            input_cost_per_million: float,
+            output_cost_per_million: float
+    ) -> Model:
+        """
+        Update the costs of a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            input_cost_per_million: New input cost per million tokens
+            output_cost_per_million: New output cost per million tokens
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+            ValueError: If costs are invalid
+
+        Example:
+            >>> model = registry.update_model_costs(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     15.0,
+            ...     75.0
+            ... )
+        """
+        pass
+
+    # ==================================================================================
+    # MODEL ATTRIBUTE UPDATES - CAPABILITIES
+    # ==================================================================================
+
+    @abstractmethod
+    def add_model_capability(
+            self,
+            provider_name: str,
+            model_name: str,
+            capability: str,
+            value: Any = True
+    ) -> Model:
+        """
+        Add or update a capability for a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            capability: Capability name (e.g., 'vision', 'streaming')
+            value: Capability value (default: True)
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> model = registry.add_model_capability(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     'vision',
+            ...     True
+            ... )
+        """
+        pass
+
+    @abstractmethod
+    def remove_model_capability(
+            self,
+            provider_name: str,
+            model_name: str,
+            capability: str
+    ) -> Model:
+        """
+        Remove a capability from a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            capability: Capability name to remove
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> model = registry.remove_model_capability(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     'vision'
+            ... )
+        """
+        pass
+
+    @abstractmethod
+    def update_model_capability(
+            self,
+            provider_name: str,
+            model_name: str,
+            capability: str,
+            value: Any
+    ) -> Model:
+        """
+        Update the value of an existing capability.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            capability: Capability name
+            value: New capability value
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> model = registry.update_model_capability(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     'max_batch_size',
+            ...     100
+            ... )
+        """
+        pass
+
+    @abstractmethod
+    def update_model_capabilities(
+            self,
+            provider_name: str,
+            model_name: str,
+            capabilities: Dict[str, Any]
+    ) -> Model:
+        """
+        Replace all capabilities of a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            capabilities: New capabilities dictionary
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> capabilities = {
+            ...     'chat': True,
+            ...     'vision': True,
+            ...     'streaming': True,
+            ...     'function_calling': True
+            ... }
+            >>> model = registry.update_model_capabilities(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     capabilities
+            ... )
+        """
+        pass
+
+    # ==================================================================================
+    # MODEL ATTRIBUTE UPDATES - STRENGTHS
+    # ==================================================================================
+
+    @abstractmethod
+    def add_model_strength(
+            self,
+            provider_name: str,
+            model_name: str,
+            strength: str
+    ) -> Model:
+        """
+        Add a strength to a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            strength: Strength description to add
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> model = registry.add_model_strength(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     'Excellent mathematical reasoning'
+            ... )
+        """
+        pass
+
+    @abstractmethod
+    def remove_model_strength(
+            self,
+            provider_name: str,
+            model_name: str,
+            strength: str
+    ) -> Model:
+        """
+        Remove a strength from a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            strength: Strength description to remove
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> model = registry.remove_model_strength(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     'Outdated strength description'
+            ... )
+        """
+        pass
+
+    @abstractmethod
+    def update_model_strengths(
+            self,
+            provider_name: str,
+            model_name: str,
+            strengths: List[str]
+    ) -> Model:
+        """
+        Replace all strengths of a model.
+
+        Args:
+            provider_name: Name of the provider
+            model_name: Name of the model
+            strengths: New list of strength descriptions
+
+        Returns:
+            The updated Model instance
+
+        Raises:
+            ProviderNotFoundException: If provider not found
+            ModelNotFoundException: If model not found
+
+        Example:
+            >>> strengths = [
+            ...     'Best-in-class reasoning',
+            ...     'Excellent code generation',
+            ...     'Multilingual support'
+            ... ]
+            >>> model = registry.update_model_strengths(
+            ...     'anthropic',
+            ...     'claude-opus-4',
+            ...     strengths
+            ... )
+        """
+        pass
+
+    # ==================================================================================
     # PROVIDER MANAGEMENT
     # ==================================================================================
 

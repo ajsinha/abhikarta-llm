@@ -26,7 +26,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 from model_registry import ModelRegistry
 from model_provider_json import ModelProviderJSON
-from exceptions import ConfigurationError
+from model_provider import Model
+from exceptions import ConfigurationError, ModelNotFoundException
 
 
 class ModelRegistryJSON(ModelRegistry):
@@ -310,6 +311,208 @@ class ModelRegistryJSON(ModelRegistry):
                 'config_directory': str(self._config_dir)
             })
             return base_summary
+
+    # ==================================================================================
+    # MODEL CRUD OPERATIONS
+    # ==================================================================================
+
+    def create_model(self, provider_name: str, model_data: Dict[str, Any]) -> Model:
+        """Create a new model for a provider."""
+        import json
+        from exceptions import ModelAlreadyExistsException
+        from model_provider import Model
+        
+        provider = self.get_provider_by_name(provider_name)
+        
+        with self._lock:
+            # Check if model already exists
+            try:
+                existing = self.get_model_from_provider_by_name(provider_name, model_data['name'])
+                raise ModelAlreadyExistsException(model_data['name'], provider_name)
+            except ModelNotFoundException:
+                # Model doesn't exist, safe to create
+                pass
+            
+            # Prepare cost dictionary if individual cost fields are provided
+            if 'input_cost_per_million' in model_data or 'output_cost_per_million' in model_data:
+                if 'cost' not in model_data:
+                    model_data['cost'] = {}
+                if 'input_cost_per_million' in model_data:
+                    model_data['cost']['input_per_1m'] = model_data['input_cost_per_million']
+                if 'output_cost_per_million' in model_data:
+                    model_data['cost']['output_per_1m'] = model_data['output_cost_per_million']
+            
+            # Find the JSON file for this provider
+            json_file = self._config_dir / f"{provider_name}.json"
+            
+            # Read current data
+            with open(json_file, 'r') as f:
+                data = json.load(f)
+            
+            # Add the new model
+            data['models'].append(model_data)
+            
+            # Write back to file
+            with open(json_file, 'w') as f:
+                json.dump(data, f, indent=2)
+            
+            # Update file hash
+            self._file_hashes[json_file.name] = self._calculate_file_hash(json_file)
+            
+            # Reload provider
+            self._providers[provider_name] = ModelProviderJSON(str(json_file))
+            
+            return self.get_model_from_provider_by_name(provider_name, model_data['name'])
+
+    def delete_model(self, provider_name: str, model_name: str) -> None:
+        """Permanently delete a model from a provider."""
+        import json
+        
+        provider = self.get_provider_by_name(provider_name)
+        
+        with self._lock:
+            # Verify model exists
+            model = self.get_model_from_provider_by_name(provider_name, model_name)
+            
+            # Find the JSON file for this provider
+            json_file = self._config_dir / f"{provider_name}.json"
+            
+            # Read current data
+            with open(json_file, 'r') as f:
+                data = json.load(f)
+            
+            # Remove the model
+            data['models'] = [m for m in data['models'] if m['name'] != model_name]
+            
+            # Write back to file
+            with open(json_file, 'w') as f:
+                json.dump(data, f, indent=2)
+            
+            # Update file hash
+            self._file_hashes[json_file.name] = self._calculate_file_hash(json_file)
+            
+            # Reload provider
+            self._providers[provider_name] = ModelProviderJSON(str(json_file))
+
+    def update_model(self, provider_name: str, model_name: str, updates: Dict[str, Any]) -> Model:
+        """Update multiple attributes of a model at once."""
+        import json
+        
+        provider = self.get_provider_by_name(provider_name)
+        
+        with self._lock:
+            # Verify model exists
+            model = self.get_model_from_provider_by_name(provider_name, model_name)
+            
+            # Find the JSON file for this provider
+            json_file = self._config_dir / f"{provider_name}.json"
+            
+            # Read current data
+            with open(json_file, 'r') as f:
+                data = json.load(f)
+            
+            # Find and update the model
+            for model_data in data['models']:
+                if model_data['name'] == model_name:
+                    model_data.update(updates)
+                    break
+            
+            # Write back to file
+            with open(json_file, 'w') as f:
+                json.dump(data, f, indent=2)
+            
+            # Update file hash
+            self._file_hashes[json_file.name] = self._calculate_file_hash(json_file)
+            
+            # Reload provider
+            self._providers[provider_name] = ModelProviderJSON(str(json_file))
+            
+            return self.get_model_from_provider_by_name(provider_name, model_name)
+
+    def update_model_description(self, provider_name: str, model_name: str, description: str) -> Model:
+        """Update the description of a model."""
+        return self.update_model(provider_name, model_name, {'description': description})
+
+    def update_model_version(self, provider_name: str, model_name: str, version: str) -> Model:
+        """Update the version of a model."""
+        return self.update_model(provider_name, model_name, {'version': version})
+
+    def update_model_context_window(self, provider_name: str, model_name: str, context_window: int) -> Model:
+        """Update the context window size of a model."""
+        if context_window <= 0:
+            raise ValueError("Context window must be positive")
+        return self.update_model(provider_name, model_name, {'context_window': context_window})
+
+    def update_model_max_output(self, provider_name: str, model_name: str, max_output: int) -> Model:
+        """Update the maximum output tokens of a model."""
+        if max_output <= 0:
+            raise ValueError("Max output must be positive")
+        return self.update_model(provider_name, model_name, {'max_output': max_output})
+
+    def update_model_costs(self, provider_name: str, model_name: str, 
+                           input_cost_per_million: float, output_cost_per_million: float) -> Model:
+        """Update the costs of a model."""
+        if input_cost_per_million < 0 or output_cost_per_million < 0:
+            raise ValueError("Costs cannot be negative")
+        
+        # Get current model to merge with existing cost structure
+        model = self.get_model_from_provider_by_name(provider_name, model_name)
+        cost = model.cost.copy() if model.cost else {}
+        cost['input_per_1m'] = input_cost_per_million
+        cost['output_per_1m'] = output_cost_per_million
+        
+        return self.update_model(provider_name, model_name, {'cost': cost})
+
+    def add_model_capability(self, provider_name: str, model_name: str, 
+                            capability: str, value: Any = True) -> Model:
+        """Add or update a capability for a model."""
+        model = self.get_model_from_provider_by_name(provider_name, model_name)
+        capabilities = model.capabilities.copy()
+        capabilities[capability] = value
+        return self.update_model(provider_name, model_name, {'capabilities': capabilities})
+
+    def remove_model_capability(self, provider_name: str, model_name: str, capability: str) -> Model:
+        """Remove a capability from a model."""
+        model = self.get_model_from_provider_by_name(provider_name, model_name)
+        capabilities = model.capabilities.copy()
+        if capability in capabilities:
+            del capabilities[capability]
+        return self.update_model(provider_name, model_name, {'capabilities': capabilities})
+
+    def update_model_capability(self, provider_name: str, model_name: str, 
+                               capability: str, value: Any) -> Model:
+        """Update the value of an existing capability."""
+        return self.add_model_capability(provider_name, model_name, capability, value)
+
+    def update_model_capabilities(self, provider_name: str, model_name: str, 
+                                 capabilities: Dict[str, Any]) -> Model:
+        """Replace all capabilities of a model."""
+        return self.update_model(provider_name, model_name, {'capabilities': capabilities})
+
+    def add_model_strength(self, provider_name: str, model_name: str, strength: str) -> Model:
+        """Add a strength to a model."""
+        model = self.get_model_from_provider_by_name(provider_name, model_name)
+        strengths = model.strengths.copy() if model.strengths else []
+        if strength not in strengths:
+            strengths.append(strength)
+        return self.update_model(provider_name, model_name, {'strengths': strengths})
+
+    def remove_model_strength(self, provider_name: str, model_name: str, strength: str) -> Model:
+        """Remove a strength from a model."""
+        model = self.get_model_from_provider_by_name(provider_name, model_name)
+        strengths = model.strengths.copy() if model.strengths else []
+        if strength in strengths:
+            strengths.remove(strength)
+        return self.update_model(provider_name, model_name, {'strengths': strengths})
+
+    def update_model_strengths(self, provider_name: str, model_name: str, 
+                              strengths: List[str]) -> Model:
+        """Replace all strengths of a model."""
+        return self.update_model(provider_name, model_name, {'strengths': strengths})
+
+    # ==================================================================================
+    # STRING REPRESENTATIONS
+    # ==================================================================================
 
     def __repr__(self) -> str:
         """String representation of the ModelRegistryJSON."""

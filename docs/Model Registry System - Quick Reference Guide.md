@@ -1,1369 +1,1586 @@
-# Model Registry System - Quick Reference Guide
+# Abhikarta LLM Model Registry System - Complete Quick Reference Guide
 
-**Abhikarta LLM Model Management System v2.1**
+**Version 2.4 - Comprehensive API Reference & Practical Usage Guide**
 
 **Copyright © 2025-2030, All Rights Reserved**  
 **Ashutosh Sinha**  
-**Email:** ajsinha@gmail.com
+**Email: ajsinha@gmail.com**
 
 ---
 
 ## Table of Contents
 
-1. [Quick Start](#quick-start)
-2. [Installation](#installation)
-3. [Configuration](#configuration)
-4. [Basic Usage](#basic-usage)
-5. [Database Implementation](#database-implementation)
-6. [JSON Implementation](#json-implementation)
-7. [Common Operations](#common-operations)
-8. [API Reference](#api-reference)
-9. [Code Examples](#code-examples)
-10. [Deployment Guide](#deployment-guide)
-11. [Best Practices](#best-practices)
-12. [Troubleshooting](#troubleshooting)
-13. [Performance Tuning](#performance-tuning)
-14. [Migration Guide](#migration-guide)
+1. [Installation Guide](#installation-guide)
+2. [5-Minute Quick Start](#5-minute-quick-start)
+3. [Complete API Reference](#complete-api-reference)
+4. [CRUD Operations Guide](#crud-operations-guide)
+5. [Advanced Features](#advanced-features)
+6. [Production Deployment](#production-deployment)
+7. [Best Practices](#best-practices)
+8. [Troubleshooting Guide](#troubleshooting-guide)
+9. [Configuration Reference](#configuration-reference)
+10. [Code Examples](#code-examples)
 
 ---
 
-## Quick Start
+## Installation Guide
 
-### 30-Second Start
+### System Requirements
 
-**Option 1: Database (Recommended for Production)**
+- **Python:** 3.8 or higher
+- **Operating System:** Linux, macOS, Windows
+- **Dependencies:** None (uses Python standard library only)
+- **Storage:** Minimal (< 1MB for code, variable for data)
+
+### Installation Steps
+
+**Step 1: Create Project Directory**
+```bash
+mkdir abhikarta-registry
+cd abhikarta-registry
+```
+
+**Step 2: Copy Files**
+```bash
+# Copy all 11 Python modules
+# Copy test files
+# Copy example configuration
+```
+
+**Step 3: Verify Installation**
+```bash
+python quick_test.py
+```
+
+Expected output:
+```
+🎉 ALL TESTS PASSED - System is working correctly!
+```
+
+### Directory Structure
+
+```
+abhikarta-registry/
+├── exceptions.py
+├── model_management.py
+├── model_management_db_handler.py
+├── model_provider.py
+├── model_provider_db.py
+├── model_provider_json.py
+├── model_registry.py
+├── model_registry_db.py
+├── model_registry_db_crud.py
+├── model_registry_json.py
+├── sample_usage.py
+├── quick_test.py
+├── test_model_crud.py
+└── example_provider_config.json
+```
+
+### Configuration Setup
+
+**For Production (Database):**
+```bash
+mkdir -p data configs
+# Database created automatically on first use
+```
+
+**For Development (JSON):**
+```bash
+mkdir -p json_configs
+cp example_provider_config.json json_configs/my_provider.json
+```
+
+---
+
+## 5-Minute Quick Start
+
+### Step 1: Choose Implementation (1 minute)
+
+**For Production - Database:**
 ```python
 from model_registry_db import ModelRegistryDB
 
-# Initialize
-registry = ModelRegistryDB.get_instance(db_path="./models.db")
-
-# Import JSON configs (one-time)
-registry.load_json_directory("./json_configs")
-
-# Use it
-provider, model, cost = registry.get_cheapest_model_for_capability("chat")
-print(f"{provider}/{model.name}: ${cost:.4f}")
+registry = ModelRegistryDB.get_instance(db_path="./data/models.db")
 ```
 
-**Option 2: JSON (Recommended for Development)**
+**For Development - JSON:**
 ```python
 from model_registry_json import ModelRegistryJSON
 
-# Initialize with auto-reload
 registry = ModelRegistryJSON.get_instance("./json_configs")
-registry.start_auto_reload(interval_seconds=300)
-
-# Use it
-provider, model, cost = registry.get_cheapest_model_for_capability("vision")
-print(f"{provider}/{model.name}: ${cost:.4f}")
+registry.start_auto_reload(interval_minutes=5)  # Auto-reload changes
 ```
 
-### Which One Should I Use?
+### Step 2: Create Configuration (2 minutes)
 
-| Use Case | Recommended |
-|----------|-------------|
-| Production | Database (`ModelRegistryDB`) |
-| Development | JSON (`ModelRegistryJSON`) |
-| High volume (100+ models) | Database |
-| Simple setup (<50 models) | JSON |
-| Need auto-reload | JSON |
-| Need complex queries | Database |
-
----
-
-## Installation
-
-### Requirements
-
-- Python 3.8+
-- No external dependencies (uses standard library only)
-
-### File Structure
-
-```
-your_project/
-├── model_provider.py              # Abstract base class
-├── model_registry.py              # Abstract base class
-├── model_provider_db.py           # Database implementation
-├── model_registry_db.py           # Database implementation
-├── model_provider_json.py         # JSON implementation
-├── model_registry_json.py         # JSON implementation
-├── model_management_db_handler.py # Database handler
-├── model_management.py            # Enums and constants
-├── exceptions.py                  # Exception classes
-└── json_configs/                  # JSON configuration files
-    ├── anthropic.json
-    ├── openai.json
-    └── google.json
-```
-
-### Setup Steps
-
-1. **Copy Files**
-   ```bash
-   # Copy all Python files to your project directory
-   cp *.py /path/to/your/project/
-   ```
-
-2. **Create Config Directory**
-   ```bash
-   mkdir -p /path/to/your/project/json_configs
-   ```
-
-3. **Add JSON Configurations**
-   ```bash
-   # Copy your provider JSON files
-   cp provider_configs/*.json /path/to/your/project/json_configs/
-   ```
-
-4. **Initialize (Database Only)**
-   ```python
-   from model_registry_db import ModelRegistryDB
-   
-   registry = ModelRegistryDB.get_instance(db_path="./models.db")
-   registry.load_json_directory("./json_configs")
-   ```
-
----
-
-## Configuration
-
-### JSON Configuration Format
-
-Each provider has a JSON configuration file:
-
+Create `openai.json`:
 ```json
 {
-  "provider": "anthropic",
-  "api_version": "2023-06-01",
-  "base_url": "https://api.anthropic.com",
-  "notes": {
-    "description": "Anthropic's Claude models"
-  },
+  "provider": "openai",
+  "api_base_url": "https://api.openai.com/v1",
+  "enabled": true,
   "models": [
     {
-      "name": "claude-opus-4",
-      "version": "4.0",
-      "description": "Most capable Claude model",
-      "model_id": "claude-opus-4-20250514",
-      "context_window": 200000,
+      "name": "gpt-4o",
+      "description": "High-intelligence flagship model",
+      "version": "2024-11-20",
+      "enabled": true,
+      "context_window": 128000,
       "max_output": 16384,
-      "parameters": "Unknown",
-      "license": "Proprietary",
-      "strengths": [
-        "Complex reasoning",
-        "Long context",
-        "Multimodal"
-      ],
+      "cost": {
+        "input_per_1m": 2.50,
+        "output_per_1m": 10.00
+      },
       "capabilities": {
         "chat": true,
         "vision": true,
-        "function_calling": true,
         "streaming": true,
-        "json_mode": true
+        "function_calling": true
       },
+      "strengths": [
+        "Excellent reasoning",
+        "Vision capabilities",
+        "Large context window"
+      ],
+      "release_date": "2024-11-20"
+    },
+    {
+      "name": "gpt-4o-mini",
+      "description": "Affordable and intelligent small model",
+      "version": "2024-07-18",
+      "enabled": true,
+      "context_window": 128000,
+      "max_output": 16384,
       "cost": {
-        "input_per_1m": 15.0,
-        "output_per_1m": 75.0
+        "input_per_1m": 0.15,
+        "output_per_1m": 0.60
       },
-      "performance": {
-        "mmlu": 0.887,
-        "gsm8k": 0.956
+      "capabilities": {
+        "chat": true,
+        "vision": true,
+        "streaming": true,
+        "function_calling": true
       },
-      "enabled": true
+      "release_date": "2024-07-18"
     }
   ]
 }
 ```
 
-### Model Capabilities
-
-Standard capabilities defined in `ModelCapability` enum:
+### Step 3: Query Models (2 minutes)
 
 ```python
-from model_management import ModelCapability
+# Get summary
+summary = registry.get_registry_summary()
+print(f"Providers: {summary['provider_count']}")
+print(f"Models: {summary['total_model_count']}")
 
-# Text capabilities
-ModelCapability.CHAT              # Chat/completion
-ModelCapability.INSTRUCT          # Instruction following
-ModelCapability.CODE              # Code generation
-ModelCapability.RETRIEVAL         # RAG/retrieval
-
-# Multimodal
-ModelCapability.VISION            # Image understanding
-ModelCapability.IMAGE_GEN         # Image generation
-ModelCapability.AUDIO             # Audio processing
-
-# Advanced features
-ModelCapability.FUNCTION_CALLING  # Tool use
-ModelCapability.JSON_MODE         # Structured output
-ModelCapability.STREAMING         # Streaming responses
-ModelCapability.EMBEDDINGS        # Text embeddings
-
-# Context sizes
-ModelCapability.LONG_CONTEXT      # >100k tokens
-ModelCapability.EXTENDED_CONTEXT  # >32k tokens
-```
-
----
-
-## Basic Usage
-
-### Initializing the Registry
-
-**Database Implementation:**
-```python
-from model_registry_db import ModelRegistryDB
-
-# First time - provide path
-registry = ModelRegistryDB.get_instance(db_path="./models.db")
-
-# Subsequent calls - path not needed
-registry = ModelRegistryDB.get_instance()
-
-# Reset (testing only)
-ModelRegistryDB.reset_instance()
-```
-
-**JSON Implementation:**
-```python
-from model_registry_json import ModelRegistryJSON
-
-# First time - provide directory
-registry = ModelRegistryJSON.get_instance("./json_configs")
-
-# Subsequent calls - directory not needed
-registry = ModelRegistryJSON.get_instance()
-
-# Reset (testing only)
-ModelRegistryJSON.reset_instance()
-```
-
-### Getting Providers
-
-```python
-# Get specific provider
-provider = registry.get_provider_by_name("anthropic")
-print(f"Provider: {provider.provider}")
-print(f"Models: {provider.get_model_count()}")
-
-# Get all providers
-providers = registry.get_all_providers()
-for name, provider in providers.items():
-    print(f"{name}: {provider.get_model_count()} models")
-
-# Include disabled providers
-all_providers = registry.get_all_providers(include_disabled=True)
-```
-
-### Getting Models
-
-```python
-# Get specific model from provider
-model = registry.get_model_from_provider_by_name(
-    "anthropic",
-    "claude-opus-4"
-)
-print(f"Model: {model.name}")
-print(f"Context: {model.context_window} tokens")
-
-# Get all models from provider
-models = registry.get_all_models_from_provider("anthropic")
-for model in models:
-    print(f"- {model.name}")
-
-# Get models by capability (all providers)
-vision_models = registry.get_all_models_for_capability("vision")
-for provider_name, model in vision_models:
-    print(f"{provider_name}/{model.name}")
-```
-
-### Cost Optimization
-
-```python
-from model_management import ModelCapability
-
-# Find cheapest model globally
+# Find cheapest chat model
 provider_name, model, cost = registry.get_cheapest_model_for_capability(
-    ModelCapability.CHAT.value,
-    input_tokens=100000,
+    "chat",
+    input_tokens=10000,
     output_tokens=1000
 )
 print(f"Cheapest: {provider_name}/{model.name}")
-print(f"Cost for 100k input, 1k output: ${cost:.4f}")
-
-# Find cheapest model from specific provider
-model, cost = registry.get_cheapest_model_for_provider_and_capability(
-    "anthropic",
-    ModelCapability.VISION.value,
-    input_tokens=5000,
-    output_tokens=500
-)
-print(f"Cheapest Anthropic vision model: {model.name}")
 print(f"Cost: ${cost:.4f}")
-```
 
-### Enable/Disable
+# Get model with capability validation (v2.3)
+model = registry.get_model_from_provider_by_name_capability(
+    "openai",
+    "gpt-4o",
+    "vision"
+)
+print(f"Vision model: {model.name}")
+print(f"Context window: {model.context_window:,} tokens")
 
-```python
-# Enable/disable provider
-registry.enable_provider("anthropic")
-registry.disable_provider("mock")
-
-# Enable/disable specific model
-registry.enable_model("anthropic", "claude-opus-4")
-registry.disable_model("anthropic", "claude-instant-1.2")
-
-# Check status
-provider = registry.get_provider_by_name("anthropic")
-print(f"Provider enabled: {provider.enabled}")
-
-model = provider.get_model_by_name("claude-opus-4")
-print(f"Model enabled: {model.enabled}")
+# Calculate cost for specific workload
+cost = model.calculate_cost(5000, 500)
+print(f"Cost for 5k input + 500 output: ${cost:.4f}")
 ```
 
 ---
 
-## Database Implementation
+## Complete API Reference
 
-### Initialization
+### Provider Management (8 Methods)
+
+#### 1. get_provider_by_name(provider_name: str) -> ModelProvider
+
+Get a specific provider by name.
+
+```python
+provider = registry.get_provider_by_name("openai")
+print(f"Provider: {provider.provider_name}")
+print(f"Enabled: {provider.enabled}")
+print(f"Models: {provider.get_model_count()}")
+```
+
+**Parameters:**
+- `provider_name` (str): Provider identifier
+
+**Returns:** `ModelProvider` instance
+
+**Raises:** `ProviderNotFoundException` if not found
+
+#### 2. get_all_providers(include_disabled: bool = False) -> Dict[str, ModelProvider]
+
+Get all providers.
+
+```python
+providers = registry.get_all_providers(include_disabled=False)
+for name, provider in providers.items():
+    model_count = provider.get_model_count()
+    print(f"{name}: {model_count} models")
+```
+
+**Parameters:**
+- `include_disabled` (bool): Include disabled providers (default: False)
+
+**Returns:** Dictionary of provider_name -> ModelProvider
+
+#### 3. enable_provider(provider_name: str)
+
+Enable a provider.
+
+```python
+registry.enable_provider("openai")
+```
+
+**Parameters:**
+- `provider_name` (str): Provider to enable
+
+**Raises:** `ProviderNotFoundException` if not found
+
+#### 4. disable_provider(provider_name: str)
+
+Disable a provider.
+
+```python
+registry.disable_provider("legacy_provider")
+```
+
+**Parameters:**
+- `provider_name` (str): Provider to disable
+
+**Raises:** `ProviderNotFoundException` if not found
+
+#### 5. get_provider_count(include_disabled: bool = False) -> int
+
+Get total number of providers.
+
+```python
+active_count = registry.get_provider_count(include_disabled=False)
+total_count = registry.get_provider_count(include_disabled=True)
+print(f"Active: {active_count}, Total: {total_count}")
+```
+
+**Parameters:**
+- `include_disabled` (bool): Include disabled providers
+
+**Returns:** Integer count
+
+#### 6. enable_all_providers()
+
+Enable all providers.
+
+```python
+registry.enable_all_providers()
+```
+
+#### 7. disable_all_providers()
+
+Disable all providers.
+
+```python
+registry.disable_all_providers()
+```
+
+#### 8. get_enabled_provider_names() -> List[str]
+
+Get list of enabled provider names.
+
+```python
+enabled = registry.get_enabled_provider_names()
+print(f"Enabled providers: {', '.join(enabled)}")
+```
+
+**Returns:** List of provider names
+
+### Model Query Methods (15 Methods)
+
+#### 1. get_model_from_provider_by_name(provider_name: str, model_name: str) -> Model
+
+Get a specific model from a provider.
+
+```python
+model = registry.get_model_from_provider_by_name("openai", "gpt-4o")
+print(f"Model: {model.name}")
+print(f"Version: {model.version}")
+print(f"Context: {model.context_window:,} tokens")
+print(f"Max output: {model.max_output:,} tokens")
+print(f"Enabled: {model.enabled}")
+```
+
+**Parameters:**
+- `provider_name` (str): Provider identifier
+- `model_name` (str): Model name
+
+**Returns:** `Model` instance
+
+**Raises:**
+- `ProviderNotFoundException` if provider not found
+- `ModelNotFoundException` if model not found
+
+#### 2. get_model_from_provider_by_name_capability(provider_name: str, model_name: str, capability: str) -> Model
+
+Get model and validate it has required capability (v2.3).
+
+```python
+# Ensures model has vision capability
+model = registry.get_model_from_provider_by_name_capability(
+    "openai",
+    "gpt-4o",
+    "vision"
+)
+print(f"✓ {model.name} has vision capability")
+```
+
+**Parameters:**
+- `provider_name` (str): Provider identifier
+- `model_name` (str): Model name
+- `capability` (str): Required capability
+
+**Returns:** `Model` instance
+
+**Raises:**
+- `ProviderNotFoundException` if provider not found
+- `ModelNotFoundException` if model not found
+- `NoModelsAvailableException` if model doesn't have capability
+
+**Use Case:**
+```python
+try:
+    model = registry.get_model_from_provider_by_name_capability(
+        "google", "gemini-1.5-pro", "vision"
+    )
+    # Use model knowing it has vision capability
+    process_image_with_model(model, image)
+except NoModelsAvailableException:
+    # Fallback to non-vision model
+    model = get_fallback_model()
+```
+
+#### 3. get_all_models_from_provider(provider_name: str, include_disabled: bool = False) -> Dict[str, Model]
+
+Get all models from a provider.
+
+```python
+models = registry.get_all_models_from_provider(
+    "anthropic",
+    include_disabled=False
+)
+for name, model in models.items():
+    print(f"{name}: {model.context_window:,} tokens")
+```
+
+**Parameters:**
+- `provider_name` (str): Provider identifier
+- `include_disabled` (bool): Include disabled models
+
+**Returns:** Dictionary of model_name -> Model
+
+**Raises:** `ProviderNotFoundException` if provider not found
+
+#### 4. get_all_models_for_capability(capability: str) -> List[Tuple[str, Model]]
+
+Get all models with a specific capability.
+
+```python
+vision_models = registry.get_all_models_for_capability("vision")
+print(f"Found {len(vision_models)} vision-capable models:")
+for provider_name, model in vision_models:
+    cost = model.calculate_cost(10000, 1000)
+    print(f"  {provider_name}/{model.name} - ${cost:.4f}")
+```
+
+**Parameters:**
+- `capability` (str): Required capability
+
+**Returns:** List of tuples (provider_name, Model)
+
+**Use Case:**
+```python
+# Find all streaming models
+streaming_models = registry.get_all_models_for_capability("streaming")
+
+# Find all function-calling models
+function_models = registry.get_all_models_for_capability("function_calling")
+
+# Find all chat models
+chat_models = registry.get_all_models_for_capability("chat")
+```
+
+#### 5. get_total_model_count(include_disabled: bool = False) -> int
+
+Get total number of models across all providers.
+
+```python
+active = registry.get_total_model_count(include_disabled=False)
+total = registry.get_total_model_count(include_disabled=True)
+print(f"Active: {active}, Total: {total}")
+```
+
+**Parameters:**
+- `include_disabled` (bool): Include disabled models
+
+**Returns:** Integer count
+
+#### 6. enable_model(provider_name: str, model_name: str)
+
+Enable a specific model.
+
+```python
+registry.enable_model("openai", "gpt-4o")
+```
+
+**Parameters:**
+- `provider_name` (str): Provider identifier
+- `model_name` (str): Model name
+
+**Raises:**
+- `ProviderNotFoundException`
+- `ModelNotFoundException`
+
+#### 7. disable_model(provider_name: str, model_name: str)
+
+Disable a specific model.
+
+```python
+registry.disable_model("openai", "old-model")
+```
+
+**Parameters:**
+- `provider_name` (str): Provider identifier
+- `model_name` (str): Model name
+
+**Raises:**
+- `ProviderNotFoundException`
+- `ModelNotFoundException`
+
+#### 8-15. Additional Query Methods
+
+```python
+# Get models by multiple criteria
+models = registry.get_models_with_min_context_window(100000)
+models = registry.get_models_with_max_output_min(4096)
+
+# Get enabled models only
+enabled_models = registry.get_all_enabled_models()
+
+# Get specific provider models
+openai_models = registry.get_all_models_from_provider("openai")
+```
+
+### Cost Optimization Methods (5 Methods)
+
+#### 1. get_cheapest_model_for_capability(capability: str, input_tokens: int, output_tokens: int) -> Tuple[str, Model, float]
+
+Find the cheapest model for a specific capability.
+
+```python
+provider_name, model, total_cost = registry.get_cheapest_model_for_capability(
+    capability="chat",
+    input_tokens=10000,
+    output_tokens=1000
+)
+
+print(f"Cheapest chat model:")
+print(f"  Provider: {provider_name}")
+print(f"  Model: {model.name}")
+print(f"  Cost: ${total_cost:.4f}")
+print(f"  Context window: {model.context_window:,} tokens")
+print(f"  Max output: {model.max_output:,} tokens")
+```
+
+**Parameters:**
+- `capability` (str): Required capability
+- `input_tokens` (int): Number of input tokens
+- `output_tokens` (int): Number of output tokens
+
+**Returns:** Tuple of (provider_name, Model, cost)
+
+**Raises:** `NoModelsAvailableException` if no suitable model found
+
+**Use Cases:**
+```python
+# Find cheapest for small workload
+provider, model, cost = registry.get_cheapest_model_for_capability(
+    "chat", 1000, 100
+)
+
+# Find cheapest for large workload
+provider, model, cost = registry.get_cheapest_model_for_capability(
+    "chat", 1000000, 10000
+)
+
+# Find cheapest vision model
+provider, model, cost = registry.get_cheapest_model_for_capability(
+    "vision", 5000, 500
+)
+```
+
+#### 2. get_cheapest_model_for_provider_and_capability(provider_name: str, capability: str, input_tokens: int, output_tokens: int) -> Tuple[str, Model, float]
+
+Find cheapest model for a specific provider and capability.
+
+```python
+provider_name, model, cost = registry.get_cheapest_model_for_provider_and_capability(
+    provider_name="anthropic",
+    capability="chat",
+    input_tokens=50000,
+    output_tokens=2000
+)
+
+print(f"Cheapest Anthropic chat model: {model.name} (${cost:.4f})")
+```
+
+**Parameters:**
+- `provider_name` (str): Specific provider
+- `capability` (str): Required capability
+- `input_tokens` (int): Input tokens
+- `output_tokens` (int): Output tokens
+
+**Returns:** Tuple of (provider_name, Model, cost)
+
+**Raises:**
+- `ProviderNotFoundException`
+- `NoModelsAvailableException`
+
+#### 3. compare_model_costs(models: List[Tuple[str, Model]], input_tokens: int, output_tokens: int) -> List[Tuple[str, str, float]]
+
+Compare costs across multiple models.
+
+```python
+# Get all chat models
+chat_models = registry.get_all_models_for_capability("chat")
+
+# Compare costs
+comparisons = registry.compare_model_costs(
+    chat_models,
+    input_tokens=10000,
+    output_tokens=1000
+)
+
+# Display sorted by cost
+comparisons.sort(key=lambda x: x[2])
+for provider, model_name, cost in comparisons[:5]:
+    print(f"{provider:15} {model_name:25} ${cost:.4f}")
+```
+
+**Parameters:**
+- `models` (List[Tuple[str, Model]]): Models to compare
+- `input_tokens` (int): Input tokens
+- `output_tokens` (int): Output tokens
+
+**Returns:** List of (provider, model_name, cost) tuples
+
+#### 4-5. Additional Cost Methods
+
+```python
+# Calculate total cost for batch processing
+total_cost = registry.calculate_batch_cost(
+    provider_name="openai",
+    model_name="gpt-4o-mini",
+    requests=[(10000, 1000), (5000, 500), (20000, 2000)]
+)
+
+# Get cost summary
+summary = registry.get_cost_summary_for_capability("chat")
+```
+
+### CRUD Operations (18 Methods) [v2.4]
+
+#### 1. create_model(provider_name: str, model_data: Dict[str, Any]) -> Model
+
+Create a new model programmatically.
+
+```python
+model_data = {
+    'name': 'gpt-5',
+    'description': 'Next generation model',
+    'version': '1.0',
+    'enabled': True,
+    'context_window': 128000,
+    'max_output': 4096,
+    'cost': {
+        'input_per_1m': 5.0,
+        'output_per_1m': 15.0
+    },
+    'capabilities': {
+        'chat': True,
+        'streaming': True,
+        'function_calling': True,
+        'vision': True
+    },
+    'strengths': [
+        'Exceptional reasoning',
+        'Multilingual support',
+        'Advanced code generation'
+    ],
+    'release_date': '2025-01-01'
+}
+
+model = registry.create_model('openai', model_data)
+print(f"✓ Created: {model.name} v{model.version}")
+```
+
+**Required Fields:**
+- `name` - Model name
+- `description` - Description
+- `version` - Version string
+- `enabled` - Boolean
+- `context_window` - Integer
+- `max_output` - Integer
+- `cost` - Dictionary with 'input_per_1m' and 'output_per_1m'
+- `capabilities` - Dictionary
+- `release_date` - ISO date string
+
+**Optional Fields:**
+- `strengths` - List of strings
+- `supports_streaming` - Boolean
+- `supports_function_calling` - Boolean
+
+**Raises:** `ModelAlreadyExistsException` if model exists
+
+#### 2. update_model(provider_name: str, model_name: str, updates: Dict[str, Any]) -> Model
+
+Update multiple attributes at once (batch update).
+
+```python
+updates = {
+    'description': 'Updated model with new features',
+    'version': '2.0',
+    'context_window': 256000,
+    'max_output': 16384
+}
+
+model = registry.update_model('openai', 'gpt-5', updates)
+print(f"✓ Updated {len(updates)} attributes")
+```
+
+**Parameters:**
+- `provider_name` (str): Provider identifier
+- `model_name` (str): Model name
+- `updates` (Dict): Key-value pairs to update
+
+**Returns:** Updated Model instance
+
+#### 3. update_model_description(provider_name: str, model_name: str, description: str) -> Model
+
+Update model description.
+
+```python
+model = registry.update_model_description(
+    'openai',
+    'gpt-5',
+    'Enhanced with improved reasoning capabilities'
+)
+```
+
+#### 4. update_model_version(provider_name: str, model_name: str, version: str) -> Model
+
+Update model version.
+
+```python
+model = registry.update_model_version('openai', 'gpt-5', '2.0')
+```
+
+#### 5. update_model_context_window(provider_name: str, model_name: str, context_window: int) -> Model
+
+Update context window size.
+
+```python
+model = registry.update_model_context_window('openai', 'gpt-5', 200000)
+```
+
+**Validates:** Context window must be positive
+
+#### 6. update_model_max_output(provider_name: str, model_name: str, max_output: int) -> Model
+
+Update maximum output tokens.
+
+```python
+model = registry.update_model_max_output('openai', 'gpt-5', 8192)
+```
+
+**Validates:** Max output must be positive
+
+#### 7. update_model_costs(provider_name: str, model_name: str, input_cost_per_million: float, output_cost_per_million: float) -> Model
+
+Update model pricing.
+
+```python
+model = registry.update_model_costs(
+    'openai',
+    'gpt-5',
+    input_cost_per_million=3.0,
+    output_cost_per_million=9.0
+)
+print(f"✓ Updated costs: ${model.cost}")
+```
+
+**Validates:** Costs cannot be negative
+
+#### 8. add_model_capability(provider_name: str, model_name: str, capability: str, value: Any = True) -> Model
+
+Add or update a capability.
+
+```python
+# Add boolean capability
+model = registry.add_model_capability('openai', 'gpt-5', 'vision', True)
+
+# Add capability with value
+model = registry.add_model_capability('openai', 'gpt-5', 'max_images', 50)
+```
+
+#### 9. remove_model_capability(provider_name: str, model_name: str, capability: str) -> Model
+
+Remove a capability.
+
+```python
+model = registry.remove_model_capability('openai', 'gpt-5', 'vision')
+```
+
+#### 10. update_model_capability(provider_name: str, model_name: str, capability: str, value: Any) -> Model
+
+Update capability value.
+
+```python
+model = registry.update_model_capability('openai', 'gpt-5', 'max_images', 100)
+```
+
+#### 11. update_model_capabilities(provider_name: str, model_name: str, capabilities: Dict[str, Any]) -> Model
+
+Replace all capabilities.
+
+```python
+capabilities = {
+    'chat': True,
+    'vision': True,
+    'streaming': True,
+    'function_calling': True,
+    'json_mode': True,
+    'max_images': 50
+}
+
+model = registry.update_model_capabilities('openai', 'gpt-5', capabilities)
+```
+
+#### 12. add_model_strength(provider_name: str, model_name: str, strength: str) -> Model
+
+Add a strength description.
+
+```python
+model = registry.add_model_strength(
+    'openai',
+    'gpt-5',
+    'Excellent code generation'
+)
+```
+
+#### 13. remove_model_strength(provider_name: str, model_name: str, strength: str) -> Model
+
+Remove a strength description.
+
+```python
+model = registry.remove_model_strength('openai', 'gpt-5', 'Old strength')
+```
+
+#### 14. update_model_strengths(provider_name: str, model_name: str, strengths: List[str]) -> Model
+
+Replace all strengths.
+
+```python
+strengths = [
+    'Best-in-class reasoning',
+    'Multilingual excellence',
+    'Long context handling',
+    'Advanced code generation'
+]
+
+model = registry.update_model_strengths('openai', 'gpt-5', strengths)
+```
+
+#### 15. delete_model(provider_name: str, model_name: str) -> None
+
+Permanently delete a model.
+
+```python
+registry.delete_model('openai', 'old-model')
+print("✓ Model permanently deleted")
+```
+
+**Warning:** This is permanent and cannot be undone! Consider disabling first.
+
+### Auto-Reload API (3 Methods) [v2.2]
+
+#### 1. start_auto_reload(interval_minutes: int = 10)
+
+Start automatic configuration reloading.
+
+```python
+# Database implementation (no-op)
+registry.start_auto_reload(interval_minutes=10)
+
+# JSON implementation (active monitoring)
+registry.start_auto_reload(interval_minutes=5)
+print("Auto-reload started - monitoring for changes")
+```
+
+**Parameters:**
+- `interval_minutes` (int): Check interval in minutes (default: 10)
+
+**Behavior:**
+- **Database:** No-op (changes reflected immediately)
+- **JSON:** Starts background thread monitoring files
+
+#### 2. stop_auto_reload()
+
+Stop automatic reloading.
+
+```python
+registry.stop_auto_reload()
+print("Auto-reload stopped")
+```
+
+#### 3. reload_from_storage()
+
+Manually reload from storage.
+
+```python
+registry.reload_from_storage()
+print("Reloaded from storage")
+```
+
+### Utility Methods
+
+#### get_registry_summary() -> Dict
+
+Get comprehensive registry statistics.
+
+```python
+summary = registry.get_registry_summary()
+print(f"Total providers: {summary['total_provider_count']}")
+print(f"Enabled providers: {summary['provider_count']}")
+print(f"Total models: {summary['total_model_count']}")
+print(f"Enabled models: {summary['enabled_model_count']}")
+
+# JSON implementation includes auto-reload info
+if 'auto_reload_enabled' in summary:
+    print(f"Auto-reload: {summary['auto_reload_enabled']}")
+    print(f"Check interval: {summary['auto_reload_interval_minutes']} min")
+```
+
+**Returns:** Dictionary with:
+- `total_provider_count` - All providers
+- `provider_count` - Enabled providers
+- `enabled_provider_count` - Same as provider_count
+- `total_model_count` - All models
+- `enabled_model_count` - Enabled models
+- `auto_reload_enabled` - Auto-reload status (JSON only)
+- `auto_reload_interval_minutes` - Check interval (JSON only)
+
+---
+
+## CRUD Operations Guide
+
+### Complete Model Lifecycle
 
 ```python
 from model_registry_db import ModelRegistryDB
+from exceptions import *
 
-# Initialize with database
 registry = ModelRegistryDB.get_instance(db_path="./models.db")
 
-# Import JSON configurations (one-time)
-loaded = registry.load_json_directory("./json_configs")
-print(f"Loaded {len(loaded)} providers")
+# 1. CREATE
+model_data = {
+    'name': 'custom-model',
+    'description': 'Custom model for specific use case',
+    'version': '1.0',
+    'enabled': True,
+    'context_window': 8192,
+    'max_output': 4096,
+    'cost': {
+        'input_per_1m': 1.0,
+        'output_per_1m': 2.0
+    },
+    'capabilities': {
+        'chat': True,
+        'streaming': True
+    },
+    'strengths': [
+        'Fast inference',
+        'Cost effective'
+    ],
+    'release_date': '2024-01-01'
+}
 
-# Or import single file
-provider_name = registry.load_json_file("./json_configs/anthropic.json")
-print(f"Loaded provider: {provider_name}")
+try:
+    model = registry.create_model('my_provider', model_data)
+    print(f"✓ Created: {model.name}")
+except ModelAlreadyExistsException:
+    print("Model exists, updating instead...")
+    model = registry.update_model('my_provider', model_data['name'], model_data)
+
+# 2. READ
+model = registry.get_model_from_provider_by_name('my_provider', 'custom-model')
+print(f"Current version: {model.version}")
+print(f"Capabilities: {list(model.capabilities.keys())}")
+
+# 3. UPDATE
+# Update basic properties
+registry.update_model_version('my_provider', 'custom-model', '2.0')
+registry.update_model_context_window('my_provider', 'custom-model', 16384)
+registry.update_model_costs('my_provider', 'custom-model', 0.8, 1.5)
+
+# Manage capabilities
+registry.add_model_capability('my_provider', 'custom-model', 'function_calling', True)
+registry.add_model_capability('my_provider', 'custom-model', 'vision', True)
+
+# Manage strengths
+registry.add_model_strength('my_provider', 'custom-model', 'Excellent accuracy')
+registry.add_model_strength('my_provider', 'custom-model', 'Low latency')
+
+# Batch update
+updates = {
+    'description': 'Updated custom model with new features',
+    'max_output': 8192
+}
+registry.update_model('my_provider', 'custom-model', updates)
+
+# 4. DELETE
+# Soft delete first (reversible)
+registry.disable_model('my_provider', 'custom-model')
+print("✓ Model disabled")
+
+# Later, if truly not needed (hard delete - permanent)
+confirm = input("Permanently delete? (yes/no): ")
+if confirm.lower() == 'yes':
+    registry.delete_model('my_provider', 'custom-model')
+    print("✓ Model deleted permanently")
 ```
 
-### Database Operations
+### Error Handling
 
 ```python
-# Get database handler for advanced operations
-db_handler = registry.get_database_handler()
+from exceptions import *
 
-# Get statistics
-stats = db_handler.get_statistics()
-print(f"Total providers: {stats['total_providers']}")
-print(f"Enabled providers: {stats['enabled_providers']}")
-print(f"Total models: {stats['total_models']}")
-
-# Direct database queries (advanced)
-providers = db_handler.get_all_providers()
-models = db_handler.get_models_by_provider("anthropic")
-```
-
-### Reloading Data
-
-```python
-# Reload all providers from database
-registry.reload_from_storage()
-
-# Reload specific provider
-provider = registry.get_provider_by_name("anthropic")
-provider.reload()
-```
-
-### Database File Management
-
-```python
-import shutil
-from pathlib import Path
-
-# Backup database
-db_path = Path("./models.db")
-backup_path = Path("./backups/models_backup.db")
-shutil.copy2(db_path, backup_path)
-
-# Check database size
-size_mb = db_path.stat().st_size / (1024 * 1024)
-print(f"Database size: {size_mb:.2f} MB")
+try:
+    model = registry.create_model('provider', model_data)
+    
+except ModelAlreadyExistsException as e:
+    print(f"Model '{e.model_name}' already exists in '{e.provider_name}'")
+    # Option 1: Update instead
+    model = registry.update_model('provider', e.model_name, model_data)
+    # Option 2: Use existing
+    model = registry.get_model_from_provider_by_name('provider', e.model_name)
+    
+except ProviderNotFoundException as e:
+    print(f"Provider '{e.provider_name}' not found")
+    print("Create provider first or check spelling")
+    
+except ValueError as e:
+    print(f"Invalid value: {e}")
+    # Fix data and retry
+    
+except Exception as e:
+    print(f"Unexpected error: {e}")
+    # Log and handle appropriately
 ```
 
 ---
 
-## JSON Implementation
+## Advanced Features
 
-### Initialization with Auto-Reload
+### Auto-Reload for Development
+
+Perfect when configuration changes frequently:
 
 ```python
 from model_registry_json import ModelRegistryJSON
 
-# Initialize
+# Initialize with auto-reload
 registry = ModelRegistryJSON.get_instance("./json_configs")
+registry.start_auto_reload(interval_minutes=2)
 
-# Start auto-reload (checks every 5 minutes)
-registry.start_auto_reload(interval_seconds=300)
+print("Registry is monitoring configuration files...")
+print("Edit JSON files and changes will be detected automatically!")
 
-# Stop auto-reload when done
+# Your application runs here...
+# Configuration changes are automatically picked up
+
+# Clean shutdown
 registry.stop_auto_reload()
 ```
 
-### Manual Reload
+### Capability Validation in Queries
+
+Ensure models have required capabilities:
 
 ```python
-# Reload all providers from JSON files
-registry.reload_from_storage()
-
-# Changes will be detected automatically:
-# - New files added
-# - Existing files modified
-# - Files removed
-```
-
-### Auto-Reload Configuration
-
-```python
-# Start with custom interval (10 minutes)
-registry.start_auto_reload(interval_seconds=600)
-
-# Check if auto-reload is running
-summary = registry.get_registry_summary()
-print(f"Auto-reload: {summary['auto_reload_enabled']}")
-print(f"Interval: {summary['auto_reload_interval']} seconds")
-```
-
-### File Watching
-
-The JSON implementation automatically detects:
-- **New files** - Providers added automatically
-- **Modified files** - Providers reloaded with new data
-- **Deleted files** - Providers removed from registry
-
-Files are tracked using MD5 hashes, so only changed files are reloaded.
-
----
-
-## Common Operations
-
-### 1. Find Best Model for Task
-
-```python
-from model_management import ModelCapability
-
-# Find cheapest vision model
-provider, model, cost = registry.get_cheapest_model_for_capability(
-    ModelCapability.VISION.value,
-    input_tokens=10000,
-    output_tokens=500
-)
-
-# Check if it has other capabilities
-if model.has_capability(ModelCapability.FUNCTION_CALLING.value):
-    print("Model supports function calling!")
-
-# Calculate actual cost
-actual_cost = model.calculate_cost(
-    input_tokens=15000,
-    output_tokens=750
-)
-print(f"Actual cost: ${actual_cost:.4f}")
-```
-
-### 2. List All Models with Capability
-
-```python
-# Get all models with vision capability
-vision_models = registry.get_all_models_for_capability("vision")
-
-print("Vision-capable models:")
-for provider_name, model in vision_models:
-    cost = model.calculate_cost(10000, 500)
-    print(f"  {provider_name:15} {model.name:30} ${cost:.4f}")
-```
-
-### 3. Compare Providers
-
-```python
-providers = ["anthropic", "openai", "google"]
-
-print("Provider Comparison:")
-for provider_name in providers:
-    try:
-        provider = registry.get_provider_by_name(provider_name)
-        model_count = provider.get_model_count()
-        caps = provider.get_capabilities_summary()
-        
-        print(f"\n{provider_name}:")
-        print(f"  Models: {model_count}")
-        print(f"  Vision models: {caps.get('vision', 0)}")
-        print(f"  Function calling: {caps.get('function_calling', 0)}")
-    except Exception as e:
-        print(f"{provider_name}: Not available")
-```
-
-### 4. Get Registry Statistics
-
-```python
-summary = registry.get_registry_summary()
-
-print("Registry Summary:")
-print(f"  Providers: {summary['provider_count']}")
-print(f"  Total models: {summary['total_model_count']}")
-
-for provider_info in summary['providers']:
-    print(f"\n  {provider_info['name']}:")
-    print(f"    Enabled: {provider_info['enabled']}")
-    print(f"    Models: {provider_info['model_count']}")
-    print(f"    API: {provider_info['api_version']}")
-```
-
-### 5. Filter Models by Multiple Capabilities
-
-```python
-# Find models with vision AND function calling
-provider = registry.get_provider_by_name("anthropic")
-multimodal = provider.get_models_for_capabilities([
-    "vision",
-    "function_calling"
-])
-
-print("Multimodal models with tools:")
-for model in multimodal:
-    print(f"  {model.name}")
-```
-
-### 6. Working with Model Metadata
-
-```python
-model = registry.get_model_from_provider_by_name(
-    "anthropic",
-    "claude-opus-4"
-)
-
-# Basic info
-print(f"Name: {model.name}")
-print(f"Version: {model.version}")
-print(f"Description: {model.description}")
-
-# Context and output
-print(f"Context window: {model.context_window:,} tokens")
-print(f"Max output: {model.max_output:,} tokens")
-
-# Strengths
-print("Strengths:")
-for strength in model.strengths:
-    print(f"  - {strength}")
-
-# Performance metrics
-if model.performance:
-    print("Performance:")
-    for metric, value in model.performance.items():
-        print(f"  {metric}: {value}")
-
-# Cost structure
-print("Cost:")
-for key, value in model.cost.items():
-    print(f"  {key}: ${value}")
-```
-
----
-
-## API Reference
-
-### ModelRegistry Methods
-
-#### Provider Methods
-
-```python
-# Get provider by name
-get_provider_by_name(provider_name: str) -> ModelProvider
-
-# Get all providers
-get_all_providers(include_disabled: bool = False) -> Dict[str, ModelProvider]
-
-# Enable/disable provider
-enable_provider(provider_name: str) -> bool
-disable_provider(provider_name: str) -> bool
-```
-
-#### Model Query Methods
-
-```python
-# Get specific model
-get_model_from_provider_by_name(
-    provider_name: str,
-    model_name: str
-) -> Model
-
-# Get all models from provider
-get_all_models_from_provider(
-    provider_name: str,
-    include_disabled: bool = False
-) -> List[Model]
-
-# Get models by capability (all providers)
-get_all_models_for_capability(
-    capability: str,
-    include_disabled_providers: bool = False
-) -> List[Tuple[str, Model]]
-```
-
-#### Cost Optimization Methods
-
-```python
-# Find cheapest model globally
-get_cheapest_model_for_capability(
-    capability: str,
-    input_tokens: int = 100000,
-    output_tokens: int = 1000
-) -> Tuple[str, Model, float]
-
-# Find cheapest model from provider
-get_cheapest_model_for_provider_and_capability(
-    provider_name: str,
-    capability: str,
-    input_tokens: int = 100000,
-    output_tokens: int = 1000
-) -> Tuple[Model, float]
-```
-
-#### Model Enable/Disable Methods
-
-```python
-# Enable/disable specific model
-enable_model(provider_name: str, model_name: str) -> bool
-disable_model(provider_name: str, model_name: str) -> bool
-```
-
-#### Statistics Methods
-
-```python
-# Get provider count
-get_provider_count(include_disabled: bool = False) -> int
-
-# Get total model count
-get_total_model_count(include_disabled: bool = False) -> int
-
-# Get registry summary
-get_registry_summary() -> Dict[str, Any]
-
-# Reload from storage
-reload_from_storage() -> None
-```
-
-### ModelProvider Methods
-
-```python
-# Get model by name
-get_model_by_name(model_name: str) -> Optional[Model]
-
-# Get models by capability
-get_models_for_capability(capability: str) -> List[Model]
-
-# Get models by multiple capabilities
-get_models_for_capabilities(capabilities: List[str]) -> List[Model]
-
-# Get cheapest model for capability
-get_cheapest_model_for_capability(
-    capability: str,
-    input_tokens: int = 100000,
-    output_tokens: int = 1000
-) -> Optional[Model]
-
-# Get all models
-get_all_models(include_disabled: bool = False) -> List[Model]
-
-# Model count
-get_model_count(include_disabled: bool = False) -> int
-
-# Enable/disable models
-enable_model(model_name: str) -> bool
-disable_model(model_name: str) -> bool
-
-# Capabilities summary
-get_capabilities_summary() -> Dict[str, int]
-
-# Convert to dict
-to_dict() -> Dict[str, Any]
-
-# Reload from storage
-reload() -> None
-```
-
-### Model Methods
-
-```python
-# Check capability
-has_capability(capability: str) -> bool
-
-# Check multiple capabilities
-has_all_capabilities(capabilities: List[str]) -> bool
-
-# Calculate cost
-calculate_cost(input_tokens: int, output_tokens: int) -> float
-
-# Get capability value
-get_capability_value(capability: str) -> Any
-
-# Convert to dict
-to_dict() -> Dict[str, Any]
-```
-
----
-
-## Code Examples
-
-### Example 1: Simple Model Selection
-
-```python
-from model_registry_db import ModelRegistryDB
-from model_management import ModelCapability
-
-def select_model_for_task(task_type: str, budget_per_100k: float):
-    """Select the best model for a task within budget."""
-    registry = ModelRegistryDB.get_instance()
-    
-    # Find cheapest model for capability
-    provider, model, cost = registry.get_cheapest_model_for_capability(
-        task_type,
-        input_tokens=100000,
-        output_tokens=1000
+from exceptions import NoModelsAvailableException
+
+# Old way (2 steps - v2.2 and earlier)
+model = registry.get_model_from_provider_by_name("google", "gemini-1.5-pro")
+if not model.has_capability("vision"):
+    raise Exception("No vision support")
+
+# New way (1 step - v2.3+)
+try:
+    model = registry.get_model_from_provider_by_name_capability(
+        "google",
+        "gemini-1.5-pro",
+        "vision"
     )
+    print(f"✓ {model.name} has vision capability")
+    # Use model with confidence
+    process_image(model, image_data)
     
-    # Check if within budget
-    if cost <= budget_per_100k:
-        print(f"✓ Selected: {provider}/{model.name}")
-        print(f"  Cost: ${cost:.4f} per 100k tokens")
-        return provider, model
-    else:
-        print(f"✗ Cheapest model (${cost:.4f}) exceeds budget (${budget_per_100k})")
-        return None, None
-
-# Use it
-provider, model = select_model_for_task(
-    ModelCapability.CHAT.value,
-    budget_per_100k=0.50
-)
+except NoModelsAvailableException:
+    print("✗ Model doesn't support vision")
+    # Use fallback or different model
+    model = get_fallback_model()
 ```
 
-### Example 2: Multi-Capability Search
+### Cost Comparison
+
+Compare models for specific workloads:
 
 ```python
-def find_multimodal_models():
-    """Find models that support both vision and function calling."""
-    registry = ModelRegistryDB.get_instance()
-    
-    # Get all vision models
-    vision_models = registry.get_all_models_for_capability("vision")
-    
-    # Filter for function calling
-    results = []
-    for provider_name, model in vision_models:
-        if model.has_capability("function_calling"):
-            cost = model.calculate_cost(10000, 1000)
-            results.append({
-                'provider': provider_name,
-                'model': model.name,
-                'cost': cost,
-                'context': model.context_window
-            })
-    
-    # Sort by cost
-    results.sort(key=lambda x: x['cost'])
-    
-    # Display
-    print("Multimodal models with function calling:")
-    for r in results:
-        print(f"  {r['provider']:12} {r['model']:30} "
-              f"${r['cost']:.4f}  {r['context']:,} ctx")
-    
-    return results
+# Define workload
+workload = {
+    'input_tokens': 10000,
+    'output_tokens': 1000
+}
 
-# Use it
-models = find_multimodal_models()
+# Get all chat models
+chat_models = registry.get_all_models_for_capability("chat")
+
+# Calculate and compare costs
+costs = []
+for provider_name, model in chat_models:
+    cost = model.calculate_cost(
+        workload['input_tokens'],
+        workload['output_tokens']
+    )
+    costs.append((provider_name, model.name, cost, model.context_window))
+
+# Sort by cost
+costs.sort(key=lambda x: x[2])
+
+# Display results
+print(f"Cost comparison for {workload['input_tokens']} input + {workload['output_tokens']} output tokens:")
+print(f"{'Provider':<15} {'Model':<25} {'Cost':>10} {'Context':>12}")
+print("-" * 65)
+for provider, model_name, cost, context in costs[:10]:
+    print(f"{provider:<15} {model_name:<25} ${cost:>9.4f} {context:>11,}")
 ```
 
-### Example 3: Cost Comparison
+### Dynamic Model Management
+
+Monitor and adjust based on usage:
 
 ```python
-def compare_costs(capability: str, input_tokens: int, output_tokens: int):
-    """Compare costs across all providers for a capability."""
-    registry = ModelRegistryDB.get_instance()
+def optimize_model_selection(usage_stats: Dict[Tuple[str, str], int]):
+    """Dynamically enable/disable models based on usage."""
     
-    models = registry.get_all_models_for_capability(capability)
+    low_usage_threshold = 100
+    high_usage_threshold = 10000
     
-    costs = []
-    for provider_name, model in models:
-        cost = model.calculate_cost(input_tokens, output_tokens)
-        costs.append({
-            'provider': provider_name,
-            'model': model.name,
-            'cost': cost,
-            'cost_per_1k': (cost / (input_tokens + output_tokens)) * 1000
-        })
-    
-    # Sort by cost
-    costs.sort(key=lambda x: x['cost'])
-    
-    print(f"\nCost comparison for {capability}:")
-    print(f"Input: {input_tokens:,} tokens, Output: {output_tokens:,} tokens\n")
-    print(f"{'Provider':<15} {'Model':<30} {'Total':<10} {'Per 1k tokens'}")
-    print("-" * 70)
-    
-    for c in costs:
-        print(f"{c['provider']:<15} {c['model']:<30} "
-              f"${c['cost']:<9.4f} ${c['cost_per_1k']:.6f}")
-    
-    return costs
-
-# Use it
-costs = compare_costs("chat", 50000, 2000)
-```
-
-### Example 4: Dynamic Provider Selection
-
-```python
-class ModelSelector:
-    """Intelligent model selector based on requirements."""
-    
-    def __init__(self):
-        self.registry = ModelRegistryDB.get_instance()
-    
-    def select_model(self, 
-                     capabilities: List[str],
-                     max_cost: float = None,
-                     min_context: int = None,
-                     preferred_providers: List[str] = None):
-        """
-        Select best model based on requirements.
+    for (provider_name, model_name), usage in usage_stats.items():
+        if usage < low_usage_threshold:
+            # Disable low-usage models
+            registry.disable_model(provider_name, model_name)
+            print(f"Disabled {provider_name}/{model_name} (usage: {usage})")
         
-        Args:
-            capabilities: Required capabilities
-            max_cost: Maximum cost per 100k tokens
-            min_context: Minimum context window
-            preferred_providers: Preferred provider names
-        """
-        # Get candidates with primary capability
-        candidates = self.registry.get_all_models_for_capability(
-            capabilities[0]
-        )
-        
-        # Filter by additional capabilities
-        if len(capabilities) > 1:
-            candidates = [
-                (p, m) for p, m in candidates
-                if m.has_all_capabilities(capabilities[1:])
-            ]
-        
-        # Filter by context window
-        if min_context:
-            candidates = [
-                (p, m) for p, m in candidates
-                if m.context_window >= min_context
-            ]
-        
-        # Filter by cost
-        if max_cost:
-            candidates = [
-                (p, m) for p, m in candidates
-                if m.calculate_cost(100000, 1000) <= max_cost
-            ]
-        
-        # Sort by preferred providers, then cost
-        def sort_key(item):
-            provider, model = item
-            cost = model.calculate_cost(100000, 1000)
-            
-            if preferred_providers and provider in preferred_providers:
-                priority = preferred_providers.index(provider)
-            else:
-                priority = 999
-            
-            return (priority, cost)
-        
-        candidates.sort(key=sort_key)
-        
-        if candidates:
-            return candidates[0]
-        return None, None
+        elif usage > high_usage_threshold:
+            # Ensure high-usage models are enabled
+            registry.enable_model(provider_name, model_name)
+            print(f"Enabled {provider_name}/{model_name} (usage: {usage})")
 
-# Use it
-selector = ModelSelector()
-provider, model = selector.select_model(
-    capabilities=["vision", "function_calling"],
-    max_cost=0.50,
-    min_context=100000,
-    preferred_providers=["anthropic", "openai"]
-)
+# Example usage
+usage_stats = {
+    ('openai', 'gpt-4o'): 50000,
+    ('openai', 'gpt-3.5-turbo'): 25,
+    ('anthropic', 'claude-3-5-sonnet-20241022'): 15000,
+}
 
-if model:
-    print(f"Selected: {provider}/{model.name}")
-else:
-    print("No model found matching requirements")
-```
-
-### Example 5: Batch Processing
-
-```python
-def process_multiple_tasks(tasks: List[Dict]):
-    """Process multiple tasks with optimal model selection."""
-    registry = ModelRegistryDB.get_instance()
-    results = []
-    
-    for task in tasks:
-        # Select model for this task
-        provider, model, cost = registry.get_cheapest_model_for_capability(
-            task['capability'],
-            input_tokens=task['input_tokens'],
-            output_tokens=task['output_tokens']
-        )
-        
-        results.append({
-            'task_id': task['id'],
-            'provider': provider,
-            'model': model.name,
-            'estimated_cost': cost
-        })
-    
-    # Calculate total cost
-    total_cost = sum(r['estimated_cost'] for r in results)
-    
-    print(f"Batch Processing Plan:")
-    print(f"  Total tasks: {len(tasks)}")
-    print(f"  Estimated cost: ${total_cost:.4f}")
-    print(f"\nTask breakdown:")
-    for r in results:
-        print(f"  {r['task_id']}: {r['provider']}/{r['model']} "
-              f"(${r['estimated_cost']:.4f})")
-    
-    return results
-
-# Use it
-tasks = [
-    {'id': 'task1', 'capability': 'chat', 'input_tokens': 5000, 'output_tokens': 500},
-    {'id': 'task2', 'capability': 'vision', 'input_tokens': 10000, 'output_tokens': 1000},
-    {'id': 'task3', 'capability': 'code', 'input_tokens': 20000, 'output_tokens': 2000},
-]
-
-results = process_multiple_tasks(tasks)
+optimize_model_selection(usage_stats)
 ```
 
 ---
 
-## Deployment Guide
+## Production Deployment
 
-### Production Deployment
+### Pre-Deployment Checklist
 
-#### 1. Database Setup
+**Testing:**
+- [ ] All tests pass (`python quick_test.py`)
+- [ ] CRUD tests pass (`python test_model_crud.py`)
+- [ ] Provider configurations validated
+- [ ] JSON files validated (if using JSON implementation)
+
+**Environment:**
+- [ ] Python 3.8+ installed on server
+- [ ] All .py files deployed
+- [ ] Data directory created with correct permissions
+- [ ] Database path configured
+- [ ] Logging configured
+
+**Backups:**
+- [ ] Backup strategy defined
+- [ ] Backup scripts in place
+- [ ] Recovery procedures documented
+
+### Production Setup (Database Implementation)
+
+```bash
+# Create directory structure
+sudo mkdir -p /opt/abhikarta/{data,configs,logs,backups}
+sudo chown appuser:appuser /opt/abhikarta -R
+
+# Copy files
+sudo cp *.py /opt/abhikarta/
+sudo cp configs/*.json /opt/abhikarta/configs/
+
+# Set permissions
+sudo chmod 755 /opt/abhikarta
+sudo chmod 644 /opt/abhikarta/*.py
+sudo chmod 755 /opt/abhikarta/data
+sudo chmod 755 /opt/abhikarta/logs
+
+# Initialize database
+cd /opt/abhikarta
+python3 << EOF
+from model_registry_db import ModelRegistryDB
+registry = ModelRegistryDB.get_instance('/opt/abhikarta/data/models.db')
+registry.load_json_directory('/opt/abhikarta/configs')
+summary = registry.get_registry_summary()
+print(f'Initialized: {summary["provider_count"]} providers, {summary["total_model_count"]} models')
+EOF
+```
+
+### Health Check Implementation
+
+```python
+def health_check():
+    """Health check endpoint for monitoring."""
+    try:
+        summary = registry.get_registry_summary()
+        
+        # Check basic functionality
+        providers = registry.get_all_providers()
+        models = registry.get_total_model_count()
+        
+        return {
+            'status': 'healthy',
+            'timestamp': datetime.now().isoformat(),
+            'providers': summary['provider_count'],
+            'models': summary['total_model_count'],
+            'enabled_providers': summary['enabled_provider_count'],
+            'enabled_models': summary['enabled_model_count']
+        }
+    except Exception as e:
+        return {
+            'status': 'unhealthy',
+            'timestamp': datetime.now().isoformat(),
+            'error': str(e)
+        }
+
+# Use in Flask/FastAPI
+@app.get("/health")
+def health():
+    return health_check()
+```
+
+### Logging Configuration
+
+```python
+import logging
+from logging.handlers import RotatingFileHandler
+
+# Configure logging
+log_file = '/opt/abhikarta/logs/registry.log'
+handler = RotatingFileHandler(
+    log_file,
+    maxBytes=10*1024*1024,  # 10MB
+    backupCount=5
+)
+handler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+))
+
+logger = logging.getLogger('abhikarta_registry')
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
+
+# Log operations
+logger.info("Registry initialized")
+logger.info(f"Loaded {provider_count} providers")
+```
+
+### Backup Script
 
 ```bash
 #!/bin/bash
-# setup_production.sh
+# backup_registry.sh
 
-# Create data directory
-mkdir -p /var/lib/abhikarta
-chmod 700 /var/lib/abhikarta
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/opt/abhikarta/backups"
+DATA_DIR="/opt/abhikarta/data"
+CONFIG_DIR="/opt/abhikarta/configs"
 
-# Initialize database
-python3 << EOF
-from model_registry_db import ModelRegistryDB
+# Backup database
+cp $DATA_DIR/models.db $BACKUP_DIR/models_${DATE}.db
+echo "✓ Database backed up"
 
-registry = ModelRegistryDB.get_instance("/var/lib/abhikarta/models.db")
-registry.load_json_directory("/etc/abhikarta/configs")
-print("Database initialized successfully")
-EOF
+# Backup configurations
+tar -czf $BACKUP_DIR/configs_${DATE}.tar.gz $CONFIG_DIR/*.json
+echo "✓ Configurations backed up"
 
-# Set proper permissions
-chown appuser:appuser /var/lib/abhikarta/models.db
-chmod 600 /var/lib/abhikarta/models.db
+# Cleanup old backups (keep last 30 days)
+find $BACKUP_DIR -name "models_*.db" -mtime +30 -delete
+find $BACKUP_DIR -name "configs_*.tar.gz" -mtime +30 -delete
+echo "✓ Old backups cleaned up"
+
+echo "Backup completed: ${DATE}"
 ```
 
-#### 2. Application Integration
+Make executable and schedule:
+```bash
+chmod +x backup_registry.sh
+# Add to crontab: daily at 2 AM
+echo "0 2 * * * /opt/abhikarta/backup_registry.sh" | crontab -
+```
+
+### Monitoring
 
 ```python
-# config.py
-import os
-
-# Database path from environment
-DB_PATH = os.getenv('ABHIKARTA_DB_PATH', '/var/lib/abhikarta/models.db')
-
-# Initialize on app startup
-from model_registry_db import ModelRegistryDB
-
-def init_model_registry():
-    """Initialize model registry on application startup."""
-    registry = ModelRegistryDB.get_instance(db_path=DB_PATH)
-    return registry
-
-# Use in your application
-registry = init_model_registry()
+def collect_metrics():
+    """Collect metrics for monitoring system."""
+    summary = registry.get_registry_summary()
+    
+    metrics = {
+        'registry.providers.total': summary['total_provider_count'],
+        'registry.providers.enabled': summary['provider_count'],
+        'registry.models.total': summary['total_model_count'],
+        'registry.models.enabled': summary['enabled_model_count'],
+    }
+    
+    # Add to your monitoring system (Prometheus, CloudWatch, etc.)
+    return metrics
 ```
 
-#### 3. Docker Deployment
+### Docker Deployment
 
 ```dockerfile
+# Dockerfile
 FROM python:3.11-slim
 
-# Create app user
-RUN useradd -r -s /bin/false -u 1000 appuser
-
-# Set working directory
 WORKDIR /app
 
 # Copy application files
 COPY *.py /app/
-COPY json_configs/ /app/json_configs/
+COPY configs/ /app/configs/
 
 # Create data directory
-RUN mkdir -p /app/data && \
-    chown -R appuser:appuser /app && \
-    chmod 700 /app/data
+RUN mkdir -p /app/data
 
-# Switch to app user
-USER appuser
-
-# Environment variables
-ENV ABHIKARTA_DB_PATH=/app/data/models.db
-ENV PYTHONUNBUFFERED=1
-
-# Volume for persistent data
-VOLUME /app/data
-
-# Initialize database on first run
+# Initialize database
 RUN python3 -c "from model_registry_db import ModelRegistryDB; \
-    registry = ModelRegistryDB.get_instance('/app/data/models.db'); \
-    registry.load_json_directory('/app/json_configs')"
+                registry = ModelRegistryDB.get_instance('/app/data/models.db'); \
+                registry.load_json_directory('/app/configs'); \
+                print('Database initialized')"
 
-# Run your application
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV REGISTRY_DB_PATH=/app/data/models.db
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD python3 -c "from model_registry_db import ModelRegistryDB; \
+                  r = ModelRegistryDB.get_instance('/app/data/models.db'); \
+                  print('OK' if r.get_provider_count() > 0 else 'FAIL')"
+
+# Your application entry point
 CMD ["python3", "your_app.py"]
 ```
 
 Build and run:
 ```bash
-docker build -t abhikarta-app .
-docker run -v abhikarta_data:/app/data abhikarta-app
-```
-
-#### 4. Kubernetes Deployment
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: abhikarta-configs
-data:
-  anthropic.json: |
-    {
-      "provider": "anthropic",
-      ...
-    }
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: abhikarta-data
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: abhikarta-app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: abhikarta
-  template:
-    metadata:
-      labels:
-        app: abhikarta
-    spec:
-      containers:
-      - name: app
-        image: abhikarta-app:latest
-        env:
-        - name: ABHIKARTA_DB_PATH
-          value: /data/models.db
-        volumeMounts:
-        - name: data
-          mountPath: /data
-        - name: configs
-          mountPath: /app/json_configs
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: abhikarta-data
-      - name: configs
-        configMap:
-          name: abhikarta-configs
-```
-
-### Development Deployment
-
-#### 1. JSON Setup
-
-```bash
-#!/bin/bash
-# setup_development.sh
-
-# Create config directory
-mkdir -p ./json_configs
-
-# Copy example configs
-cp examples/*.json ./json_configs/
-
-# Start with auto-reload
-python3 << EOF
-from model_registry_json import ModelRegistryJSON
-
-registry = ModelRegistryJSON.get_instance("./json_configs")
-registry.start_auto_reload(interval_seconds=60)  # Check every minute
-print("Development environment ready with auto-reload")
-EOF
-```
-
-#### 2. Hot Reload Example
-
-```python
-# dev_server.py
-from model_registry_json import ModelRegistryJSON
-import time
-
-def main():
-    # Initialize with auto-reload
-    registry = ModelRegistryJSON.get_instance("./json_configs")
-    registry.start_auto_reload(interval_seconds=30)
-    
-    print("Development server running with hot reload...")
-    print("Modify JSON files in ./json_configs/ to see changes")
-    
-    try:
-        while True:
-            # Your application logic here
-            summary = registry.get_registry_summary()
-            print(f"\rProviders: {summary['provider_count']}, "
-                  f"Models: {summary['total_model_count']}", end='')
-            time.sleep(5)
-    except KeyboardInterrupt:
-        registry.stop_auto_reload()
-        print("\nShutdown complete")
-
-if __name__ == "__main__":
-    main()
-```
-
-### Backup and Restore
-
-#### Database Backup
-
-```python
-import shutil
-from datetime import datetime
-from pathlib import Path
-
-def backup_database(db_path: str, backup_dir: str):
-    """Backup the database with timestamp."""
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = Path(backup_dir) / f"models_backup_{timestamp}.db"
-    
-    shutil.copy2(db_path, backup_path)
-    print(f"Backup created: {backup_path}")
-    return backup_path
-
-# Use it
-backup_path = backup_database(
-    "/var/lib/abhikarta/models.db",
-    "/var/backups/abhikarta"
-)
-```
-
-#### JSON Backup
-
-```bash
-#!/bin/bash
-# backup_configs.sh
-
-BACKUP_DIR="/var/backups/abhikarta"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-
-# Create backup directory
-mkdir -p "$BACKUP_DIR"
-
-# Tar the configs
-tar -czf "$BACKUP_DIR/configs_$TIMESTAMP.tar.gz" json_configs/
-
-echo "Backup created: $BACKUP_DIR/configs_$TIMESTAMP.tar.gz"
+docker build -t abhikarta-registry .
+docker run -d \
+  -v /path/to/data:/app/data \
+  -v /path/to/configs:/app/configs \
+  --name registry \
+  abhikarta-registry
 ```
 
 ---
 
 ## Best Practices
 
-### 1. Use Singleton Pattern
+### 1. Use Batch Updates
 
+**Bad:**
 ```python
-# ✓ Good
-registry = ModelRegistryDB.get_instance()
-
-# ✗ Bad
-registry = ModelRegistryDB("/path/to/db")  # Don't instantiate directly
+# Multiple individual updates (slow, multiple transactions)
+registry.update_model_version('provider', 'model', '2.0')
+registry.update_model_description('provider', 'model', 'New description')
+registry.update_model_context_window('provider', 'model', 16384)
+registry.update_model_max_output('provider', 'model', 8192)
 ```
 
-### 2. Handle Exceptions
-
+**Good:**
 ```python
-from exceptions import (
-    ProviderNotFoundException,
-    ModelNotFoundException,
-    NoModelsAvailableException
-)
+# Single batch update (fast, single transaction)
+updates = {
+    'version': '2.0',
+    'description': 'New description',
+    'context_window': 16384,
+    'max_output': 8192
+}
+registry.update_model('provider', 'model', updates)
+```
+
+### 2. Validate Before Creating
+
+**Good:**
+```python
+try:
+    # Try to get existing model
+    model = registry.get_model_from_provider_by_name('provider', 'model')
+    print("Model exists, updating...")
+    registry.update_model('provider', 'model', model_data)
+except ModelNotFoundException:
+    print("Creating new model...")
+    registry.create_model('provider', model_data)
+```
+
+### 3. Soft Delete Before Hard Delete
+
+**Good:**
+```python
+# Step 1: Soft delete (reversible)
+registry.disable_model('provider', 'model')
+print("Model disabled - can be re-enabled if needed")
+
+# Test system without the model...
+
+# Step 2: Hard delete only if truly not needed
+confirm = input("Permanently delete? (yes/no): ")
+if confirm.lower() == 'yes':
+    registry.delete_model('provider', 'model')
+    print("Model permanently deleted")
+```
+
+### 4. Use Appropriate Implementation
+
+**Development:**
+```python
+# JSON implementation with auto-reload
+registry = ModelRegistryJSON.get_instance("./configs")
+registry.start_auto_reload(interval_minutes=2)
+# Changes detected automatically
+```
+
+**Production:**
+```python
+# Database implementation for performance
+registry = ModelRegistryDB.get_instance("/opt/app/data/models.db")
+# No polling overhead
+```
+
+### 5. Handle All Exceptions
+
+**Good:**
+```python
+from exceptions import *
 
 try:
-    model = registry.get_model_from_provider_by_name("anthropic", "claude-opus-4")
-except ProviderNotFoundException as e:
-    print(f"Provider not found: {e.provider_name}")
-except ModelNotFoundException as e:
-    print(f"Model not found: {e.model_name}")
-except Exception as e:
-    print(f"Unexpected error: {e}")
-```
-
-### 3. Cache Registry Instance
-
-```python
-# application.py
-from model_registry_db import ModelRegistryDB
-
-# Initialize once at module level
-_registry = None
-
-def get_registry():
-    """Get or create registry instance."""
-    global _registry
-    if _registry is None:
-        _registry = ModelRegistryDB.get_instance()
-    return _registry
-
-# Use throughout application
-registry = get_registry()
-```
-
-### 4. Use Enums for Capabilities
-
-```python
-from model_management import ModelCapability
-
-# ✓ Good - Type safe
-models = registry.get_all_models_for_capability(ModelCapability.VISION.value)
-
-# ✗ Bad - Prone to typos
-models = registry.get_all_models_for_capability("vison")  # Typo!
-```
-
-### 5. Batch Operations
-
-```python
-# ✓ Good - Single query
-all_models = registry.get_all_models_for_capability("chat")
-
-# ✗ Bad - Multiple queries
-for provider_name in ["anthropic", "openai", "google"]:
-    models = registry.get_all_models_from_provider(provider_name)
-```
-
-### 6. Calculate Costs with Real Tokens
-
-```python
-# ✓ Good - Use actual token counts
-actual_input = count_tokens(user_message)
-actual_output = count_tokens(assistant_response)
-cost = model.calculate_cost(actual_input, actual_output)
-
-# ✗ Bad - Hardcoded estimates
-cost = model.calculate_cost(1000, 500)  # Inaccurate!
-```
-
-### 7. Enable Only Required Models
-
-```python
-# Disable expensive models if not needed
-registry.disable_model("anthropic", "claude-opus-4")
-
-# Enable only when required
-if require_advanced_reasoning:
-    registry.enable_model("anthropic", "claude-opus-4")
-```
-
-### 8. Regular Backups
-
-```python
-import schedule
-import time
-
-def backup_job():
-    backup_database(
-        "/var/lib/abhikarta/models.db",
-        "/var/backups/abhikarta"
+    model = registry.get_model_from_provider_by_name_capability(
+        provider, model_name, capability
     )
+    # Use model
+    result = process_with_model(model, data)
+    
+except ModelNotFoundException:
+    logger.error(f"Model not found: {model_name}")
+    model = get_fallback_model()
+    
+except NoModelsAvailableException:
+    logger.error(f"Model lacks capability: {capability}")
+    model = get_alternative_model()
+    
+except ProviderNotFoundException:
+    logger.error(f"Provider not found: {provider}")
+    raise  # Re-raise critical errors
+    
+except Exception as e:
+    logger.exception("Unexpected error")
+    raise
+```
 
-# Schedule daily backups
-schedule.every().day.at("02:00").do(backup_job)
+### 6. Keep Configurations in Version Control
 
-while True:
-    schedule.run_pending()
-    time.sleep(60)
+**Good:**
+```bash
+# Track configuration changes
+git add json_configs/*.json
+git commit -m "Updated GPT-4 pricing for November 2025"
+git push
+
+# Tag releases
+git tag -a v1.2.3 -m "Production configuration 2025-11"
+git push --tags
+```
+
+### 7. Validate Before Deployment
+
+**Good:**
+```python
+def validate_config(config_file: str) -> bool:
+    """Validate provider configuration."""
+    import json
+    
+    try:
+        with open(config_file) as f:
+            data = json.load(f)
+        
+        # Check required fields
+        required = ['provider', 'api_base_url', 'enabled', 'models']
+        for field in required:
+            if field not in data:
+                raise ValueError(f"Missing required field: {field}")
+        
+        # Validate each model
+        for model in data['models']:
+            required_model = [
+                'name', 'description', 'version', 'enabled',
+                'context_window', 'max_output', 'cost'
+            ]
+            for field in required_model:
+                if field not in model:
+                    raise ValueError(f"Model missing field: {field}")
+            
+            # Validate cost structure
+            if 'input_per_1m' not in model['cost']:
+                raise ValueError("Cost missing input_per_1m")
+            if 'output_per_1m' not in model['cost']:
+                raise ValueError("Cost missing output_per_1m")
+        
+        print(f"✓ {config_file} is valid")
+        return True
+        
+    except Exception as e:
+        print(f"✗ {config_file} validation failed: {e}")
+        return False
+
+# Validate before loading
+if validate_config('new_provider.json'):
+    registry.load_json_file('new_provider.json')
+else:
+    print("Fix configuration errors before deploying")
 ```
 
 ---
 
-## Troubleshooting
+## Troubleshooting Guide
 
 ### Common Issues
 
-#### 1. Provider Not Found
+#### 1. ModuleNotFoundError
 
 **Error:**
 ```
-ProviderNotFoundException: Provider 'anthropic' not found in registry
+ModuleNotFoundError: No module named 'model_registry'
 ```
 
 **Solutions:**
 ```python
-# Check available providers
+# Add to Python path
+import sys
+sys.path.append('/path/to/abhikarta-registry')
+
+# Or ensure all .py files in same directory as your script
+```
+
+#### 2. ProviderNotFoundException
+
+**Error:**
+```
+ProviderNotFoundException: Provider 'openai' not found in registry
+```
+
+**Solutions:**
+```python
+# Check provider name spelling
 providers = registry.get_all_providers(include_disabled=True)
 print("Available providers:", list(providers.keys()))
 
-# For database: Import JSON
-registry.load_json_file("./json_configs/anthropic.json")
+# Check if provider is disabled
+registry.enable_provider('openai')
 
-# For JSON: Check file exists
-import os
-if not os.path.exists("./json_configs/anthropic.json"):
-    print("File not found!")
+# Reload configurations
+registry.reload_from_storage()
+
+# For JSON implementation: check file exists
+# ls json_configs/openai.json
 ```
 
-#### 2. Model Not Found
+#### 3. ModelNotFoundException
 
 **Error:**
 ```
-ModelNotFoundException: Model 'claude-opus-4' not found in provider 'anthropic'
+ModelNotFoundException: Model 'gpt-5' not found in provider 'openai'
 ```
 
 **Solutions:**
 ```python
-# List available models
-provider = registry.get_provider_by_name("anthropic")
-models = provider.get_all_models(include_disabled=True)
-print("Available models:")
-for model in models:
-    print(f"  - {model.name} (enabled: {model.enabled})")
+# Check model name spelling
+models = registry.get_all_models_from_provider('openai', include_disabled=True)
+print("Available models:", list(models.keys()))
+
+# Check if model is disabled
+registry.enable_model('openai', 'gpt-5')
+
+# Create model if it doesn't exist
+if needed:
+    registry.create_model('openai', model_data)
 ```
 
-#### 3. Database Locked
+#### 4. NoModelsAvailableException
+
+**Error:**
+```
+NoModelsAvailableException: No models available for criteria: capability vision
+```
+
+**Solutions:**
+```python
+# Check which models have the capability
+all_models = registry.get_all_models_for_capability('vision')
+print(f"Found {len(all_models)} vision models")
+
+# Add capability to existing model
+registry.add_model_capability('provider', 'model', 'vision', True)
+
+# Use different capability
+models = registry.get_all_models_for_capability('chat')
+```
+
+#### 5. Database Locked
 
 **Error:**
 ```
@@ -1372,362 +1589,335 @@ sqlite3.OperationalError: database is locked
 
 **Solutions:**
 ```python
-# Close other connections
+# Close and reinitialize
+registry = None
 ModelRegistryDB.reset_instance()
+registry = ModelRegistryDB.get_instance(db_path)
 
-# Increase timeout
-# (Edit model_management_db_handler.py)
-sqlite3.connect(db_path, timeout=30.0)
-
-# Check for zombie processes
-# $ lsof models.db
+# Or increase timeout
+import sqlite3
+conn = sqlite3.connect('models.db', timeout=30.0)
 ```
 
-#### 4. No Models Available
+#### 6. Invalid JSON Configuration
 
 **Error:**
 ```
-NoModelsAvailableException: No models available for capability: vision
+json.JSONDecodeError: Expecting property name enclosed in double quotes
 ```
 
 **Solutions:**
-```python
-# Check if models are disabled
-models = registry.get_all_models_for_capability("vision")
-if not models:
-    # Enable vision-capable models
-    registry.enable_model("anthropic", "claude-opus-4")
-    
-# Check provider is enabled
-providers = registry.get_all_providers()
-if "anthropic" not in providers:
-    registry.enable_provider("anthropic")
+```bash
+# Validate JSON syntax
+python3 -m json.tool config.json
+
+# Common issues:
+# - Trailing commas
+# - Single quotes instead of double quotes
+# - Missing commas between items
+# - Unescaped special characters
 ```
 
-#### 5. Auto-Reload Not Working
+#### 7. Auto-Reload Not Working
 
-**Problem:** JSON changes not detected
+**Problem:** File changes not detected
 
 **Solutions:**
 ```python
-# Check if auto-reload is running
+# Only works with JSON implementation, not database
+from model_registry_json import ModelRegistryJSON
+
+registry = ModelRegistryJSON.get_instance("./configs")
+registry.start_auto_reload(interval_minutes=5)
+
+# Check status
 summary = registry.get_registry_summary()
-print(f"Auto-reload enabled: {summary['auto_reload_enabled']}")
+print(f"Auto-reload enabled: {summary.get('auto_reload_enabled', False)}")
 
-# Manually reload
+# Manually trigger reload
 registry.reload_from_storage()
-
-# Check interval
-print(f"Reload interval: {summary['auto_reload_interval']} seconds")
-
-# Restart auto-reload
-registry.stop_auto_reload()
-registry.start_auto_reload(interval_seconds=60)
 ```
 
-### Debugging
+#### 8. Permission Denied
 
-#### Enable Logging
+**Error:**
+```
+PermissionError: [Errno 13] Permission denied: '/opt/app/data/models.db'
+```
+
+**Solutions:**
+```bash
+# Fix file permissions
+chmod 644 /opt/app/data/models.db
+chmod 755 /opt/app/data
+
+# Or run with appropriate user
+sudo -u appuser python3 app.py
+
+# Check ownership
+ls -l /opt/app/data/models.db
+```
+
+### Debug Mode
+
+Enable detailed logging:
 
 ```python
 import logging
 
+# Enable debug logging
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-# Now you'll see detailed logs
-registry = ModelRegistryDB.get_instance()
+# Now operations will log detailed information
+model = registry.get_model_from_provider_by_name('openai', 'gpt-4o')
 ```
 
-#### Check Registry State
+### Performance Issues
+
+**Slow Queries:**
 
 ```python
-def debug_registry():
-    """Print comprehensive registry state."""
-    registry = ModelRegistryDB.get_instance()
-    
-    summary = registry.get_registry_summary()
-    print("=== Registry State ===")
-    print(f"Providers: {summary['provider_count']}")
-    print(f"Total models: {summary['total_model_count']}")
-    
-    print("\n=== Provider Details ===")
-    for p in summary['providers']:
-        print(f"\n{p['name']}:")
-        print(f"  Enabled: {p['enabled']}")
-        print(f"  Models: {p['model_count']}")
-        print(f"  API: {p['api_version']}")
-        
-        # Get models
-        try:
-            provider = registry.get_provider_by_name(p['name'])
-            models = provider.get_all_models(include_disabled=True)
-            print(f"  Model list:")
-            for model in models:
-                status = "✓" if model.enabled else "✗"
-                print(f"    {status} {model.name}")
-        except Exception as e:
-            print(f"  Error loading models: {e}")
+import time
 
-# Run it
-debug_registry()
+# Profile query performance
+start = time.time()
+models = registry.get_all_models_for_capability("chat")
+elapsed = time.time() - start
+print(f"Query took {elapsed:.3f} seconds")
+
+# If slow with database:
+# - Ensure indexes are created (automatic on init)
+# - Check database size
+# - Consider VACUUM operation
+# - Use connection pooling
+
+# If slow with JSON:
+# - Reduce number of JSON files (combine providers)
+# - Consider switching to database for 100+ models
+# - Disable auto-reload in production
 ```
+
+### Getting Help
+
+If issues persist:
+
+1. **Check documentation** - Architecture Guide for design details
+2. **Review test files** - `quick_test.py` and `test_model_crud.py` for examples
+3. **Enable debug logging** - See detailed operation info
+4. **Contact support** - ajsinha@gmail.com
 
 ---
 
-## Performance Tuning
+## Configuration Reference
 
-### Database Optimization
+### Provider Configuration Format
 
-```python
-# Use get_database_handler for bulk operations
-db_handler = registry.get_database_handler()
-
-# Batch enable/disable
-models_to_enable = ["model1", "model2", "model3"]
-for model_name in models_to_enable:
-    registry.enable_model("anthropic", model_name)
-
-# Or use database directly for bulk updates
-# (Advanced - requires SQL knowledge)
+```json
+{
+  "provider": "provider_name",
+  "api_base_url": "https://api.provider.com/v1",
+  "authentication_type": "bearer_token",
+  "enabled": true,
+  "models": [
+    {
+      "name": "model-name",
+      "description": "Model description",
+      "version": "1.0",
+      "enabled": true,
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 2.50,
+        "output_per_1m": 10.00
+      },
+      "capabilities": {
+        "chat": true,
+        "vision": false,
+        "streaming": true,
+        "function_calling": true
+      },
+      "strengths": [
+        "Fast inference",
+        "Good reasoning"
+      ],
+      "release_date": "2024-01-01"
+    }
+  ]
+}
 ```
 
-### Caching Results
+### Required Fields
 
-```python
-from functools import lru_cache
+**Provider Level:**
+- `provider` - Provider identifier (string)
+- `api_base_url` - API endpoint (string)
+- `enabled` - Enabled status (boolean)
+- `models` - Array of model configurations
 
-class CachedRegistry:
-    def __init__(self):
-        self.registry = ModelRegistryDB.get_instance()
-    
-    @lru_cache(maxsize=128)
-    def get_cheapest_cached(self, capability: str):
-        """Cached version of get_cheapest_model."""
-        return self.registry.get_cheapest_model_for_capability(capability)
-    
-    def clear_cache(self):
-        """Clear cache when data changes."""
-        self.get_cheapest_cached.cache_clear()
+**Model Level:**
+- `name` - Model name (string)
+- `description` - Model description (string)
+- `version` - Version string (string)
+- `enabled` - Enabled status (boolean)
+- `context_window` - Context window size (integer)
+- `max_output` - Maximum output tokens (integer)
+- `cost` - Cost dictionary with `input_per_1m` and `output_per_1m` (floats)
+- `capabilities` - Capabilities dictionary
+- `release_date` - ISO date string
 
-# Use it
-cached = CachedRegistry()
-provider, model, cost = cached.get_cheapest_cached("chat")
-```
+### Optional Fields
 
-### Minimize Queries
-
-```python
-# ✓ Good - Single query
-all_models = registry.get_all_models_for_capability("chat")
-for provider_name, model in all_models:
-    process(provider_name, model)
-
-# ✗ Bad - Multiple queries
-for provider_name in provider_names:
-    provider = registry.get_provider_by_name(provider_name)
-    models = provider.get_models_for_capability("chat")
-    for model in models:
-        process(provider_name, model)
-```
+**Model Level:**
+- `strengths` - Array of strength descriptions
+- `supports_streaming` - Streaming support (boolean)
+- `supports_function_calling` - Function calling support (boolean)
+- `parameters` - Model parameter count (string)
+- `license` - License type (string)
 
 ---
 
-## Migration Guide
+## Code Examples
 
-### From Old Code to Refactored Architecture
+### Example 1: Basic Usage
 
-#### Old Code (Single Implementation)
-```python
-from model_registry import ModelRegistry
-
-registry = ModelRegistry.get_instance("/path/to/configs")
-```
-
-#### New Code (Choose Implementation)
-
-**Option 1: Database**
 ```python
 from model_registry_db import ModelRegistryDB
 
-registry = ModelRegistryDB.get_instance(db_path="./models.db")
-registry.load_json_directory("/path/to/configs")  # One-time
+# Initialize
+registry = ModelRegistryDB.get_instance("./models.db")
+
+# Load configurations
+registry.load_json_directory("./configs")
+
+# Get summary
+summary = registry.get_registry_summary()
+print(f"Providers: {summary['provider_count']}")
+print(f"Models: {summary['total_model_count']}")
+
+# Query specific model
+model = registry.get_model_from_provider_by_name("openai", "gpt-4o")
+print(f"\nModel: {model.name}")
+print(f"Context: {model.context_window:,} tokens")
+print(f"Max output: {model.max_output:,} tokens")
+
+# Calculate cost
+cost = model.calculate_cost(10000, 1000)
+print(f"Cost for 10k input + 1k output: ${cost:.4f}")
+
+# Find cheapest
+provider, model, cost = registry.get_cheapest_model_for_capability(
+    "chat", 10000, 1000
+)
+print(f"\nCheapest: {provider}/{model.name} - ${cost:.4f}")
 ```
 
-**Option 2: JSON**
+### Example 2: Cost Comparison
+
 ```python
-from model_registry_json import ModelRegistryJSON
+# Compare costs across providers
+workload = (10000, 1000)  # input, output tokens
 
-registry = ModelRegistryJSON.get_instance("/path/to/configs")
-registry.start_auto_reload()
+chat_models = registry.get_all_models_for_capability("chat")
+print(f"Comparing {len(chat_models)} chat models:\n")
+
+costs = []
+for provider, model in chat_models:
+    cost = model.calculate_cost(*workload)
+    costs.append((provider, model.name, cost))
+
+costs.sort(key=lambda x: x[2])
+
+print(f"{'Provider':<15} {'Model':<30} {'Cost':>10}")
+print("-" * 57)
+for provider, model_name, cost in costs[:10]:
+    print(f"{provider:<15} {model_name:<30} ${cost:>9.4f}")
 ```
 
-### API Changes
-
-All APIs remain the same! The refactoring is backward compatible:
+### Example 3: Dynamic Model Management
 
 ```python
-# These work with BOTH implementations
-provider = registry.get_provider_by_name("anthropic")
-model = registry.get_model_from_provider_by_name("anthropic", "claude-opus-4")
-provider, model, cost = registry.get_cheapest_model_for_capability("chat")
+# Monitor usage and adjust
+usage_data = load_usage_statistics()
+
+for (provider, model_name), count in usage_data.items():
+    if count < 10:  # Low usage
+        print(f"Disabling low-usage model: {provider}/{model_name}")
+        registry.disable_model(provider, model_name)
+    elif count > 1000:  # High usage
+        print(f"Ensuring high-usage model is enabled: {provider}/{model_name}")
+        registry.enable_model(provider, model_name)
 ```
 
-### Migration Steps
+### Example 4: Capability-Based Selection
 
-1. **Choose Implementation**
-   - Production → Database
-   - Development → JSON
+```python
+def select_model_for_task(task_type: str, requires_vision: bool = False):
+    """Select best model for task."""
+    
+    # Determine required capability
+    capability = "chat"
+    if requires_vision:
+        capability = "vision"
+    
+    # Get models with capability
+    models = registry.get_all_models_for_capability(capability)
+    
+    if not models:
+        raise Exception(f"No models available for {capability}")
+    
+    # Find cheapest for typical workload
+    provider, model, cost = registry.get_cheapest_model_for_capability(
+        capability, 10000, 1000
+    )
+    
+    print(f"Selected: {provider}/{model.name} (${cost:.4f})")
+    return model
 
-2. **Update Imports**
-   ```python
-   # Old
-   from model_registry import ModelRegistry
-   
-   # New (Database)
-   from model_registry_db import ModelRegistryDB as ModelRegistry
-   
-   # OR New (JSON)
-   from model_registry_json import ModelRegistryJSON as ModelRegistry
-   ```
+# Use
+model = select_model_for_task("chat", requires_vision=True)
+result = process_with_model(model, data)
+```
 
-3. **Update Initialization**
-   ```python
-   # Old
-   registry = ModelRegistry.get_instance(config_dir)
-   
-   # New (Database)
-   registry = ModelRegistry.get_instance(db_path="./models.db")
-   registry.load_json_directory(config_dir)
-   
-   # New (JSON)
-   registry = ModelRegistry.get_instance(config_dir)
-   registry.start_auto_reload()
-   ```
+### Example 5: Batch Processing
 
-4. **Test**
-   - All other code remains unchanged
-   - Test thoroughly before deployment
+```python
+def process_batch(items: List[str]):
+    """Process batch with cost optimization."""
+    
+    # Find cheapest model
+    provider, model, _ = registry.get_cheapest_model_for_capability(
+        "chat", 5000, 500
+    )
+    
+    print(f"Using: {provider}/{model.name}")
+    
+    total_cost = 0
+    results = []
+    
+    for item in items:
+        # Process item
+        result = process_item(model, item)
+        results.append(result)
+        
+        # Track cost
+        cost = model.calculate_cost(5000, 500)
+        total_cost += cost
+    
+    print(f"Processed {len(items)} items")
+    print(f"Total cost: ${total_cost:.4f}")
+    
+    return results
+```
 
 ---
 
-## Support
+**Abhikarta Model Registry System v2.4**  
+**Professional • Production-Ready • Comprehensively Documented**
 
-For questions, issues, or support:
-
+**Copyright © 2025-2030 Ashutosh Sinha - All Rights Reserved**  
 **Email:** ajsinha@gmail.com
 
-**Topics:**
-- API usage questions
-- Deployment assistance
-- Performance optimization
-- Bug reports
-- Feature requests
-
----
-
-## Appendix: Complete Example
-
-Here's a complete working example:
-
-```python
-"""
-Complete example of Abhikarta Model Registry usage.
-"""
-
-from model_registry_db import ModelRegistryDB
-from model_management import ModelCapability
-from exceptions import (
-    ProviderNotFoundException,
-    ModelNotFoundException,
-    NoModelsAvailableException
-)
-
-def main():
-    # 1. Initialize registry
-    print("Initializing registry...")
-    registry = ModelRegistryDB.get_instance(db_path="./models.db")
-    
-    # 2. Import configurations (first time only)
-    print("Loading configurations...")
-    loaded = registry.load_json_directory("./json_configs")
-    print(f"Loaded {len(loaded)} providers")
-    
-    # 3. Get registry summary
-    summary = registry.get_registry_summary()
-    print(f"\nRegistry summary:")
-    print(f"  Providers: {summary['provider_count']}")
-    print(f"  Total models: {summary['total_model_count']}")
-    
-    # 4. List all providers
-    print("\nAvailable providers:")
-    providers = registry.get_all_providers()
-    for name, provider in providers.items():
-        print(f"  - {name}: {provider.get_model_count()} models")
-    
-    # 5. Get specific model
-    try:
-        model = registry.get_model_from_provider_by_name(
-            "anthropic",
-            "claude-opus-4"
-        )
-        print(f"\nModel details:")
-        print(f"  Name: {model.name}")
-        print(f"  Context: {model.context_window:,} tokens")
-        print(f"  Output: {model.max_output:,} tokens")
-    except (ProviderNotFoundException, ModelNotFoundException) as e:
-        print(f"Error: {e}")
-    
-    # 6. Find cheapest chat model
-    try:
-        provider_name, model, cost = registry.get_cheapest_model_for_capability(
-            ModelCapability.CHAT.value,
-            input_tokens=100000,
-            output_tokens=1000
-        )
-        print(f"\nCheapest chat model:")
-        print(f"  Provider: {provider_name}")
-        print(f"  Model: {model.name}")
-        print(f"  Cost: ${cost:.4f} per 100k input + 1k output")
-    except NoModelsAvailableException as e:
-        print(f"Error: {e}")
-    
-    # 7. Find all vision models
-    vision_models = registry.get_all_models_for_capability("vision")
-    print(f"\nVision-capable models: {len(vision_models)}")
-    for provider_name, model in vision_models[:5]:  # Show first 5
-        cost = model.calculate_cost(10000, 1000)
-        print(f"  {provider_name:15} {model.name:30} ${cost:.4f}")
-    
-    # 8. Compare costs
-    print("\nCost comparison for 50k input, 2k output:")
-    models_to_compare = [
-        ("anthropic", "claude-opus-4"),
-        ("anthropic", "claude-sonnet-4"),
-        ("openai", "gpt-4o"),
-    ]
-    
-    for provider_name, model_name in models_to_compare:
-        try:
-            model = registry.get_model_from_provider_by_name(
-                provider_name,
-                model_name
-            )
-            cost = model.calculate_cost(50000, 2000)
-            print(f"  {provider_name:12} {model_name:25} ${cost:.4f}")
-        except Exception as e:
-            print(f"  {provider_name:12} {model_name:25} Error: {e}")
-    
-    print("\nDone!")
-
-if __name__ == "__main__":
-    main()
-```
-
----
-
-**Copyright © 2025-2030 Ashutosh Sinha - All Rights Reserved**
-
-**End of Quick Reference Guide**
+**Last Updated: November 8, 2025**
