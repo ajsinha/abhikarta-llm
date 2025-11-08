@@ -1,0 +1,287 @@
+{
+  "users": [
+    {
+      "userid": "admin",
+      "fullname": "System Administrator",
+      "emailaddress": "admin@abhikarta.local",
+      "password_hash": "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIbRCvO.6i",
+      "roles": ["admin"],
+      "enabled": true,
+      "created_at": "2025-01-01T00:00:00",
+      "updated_at": "2025-01-01T00:00:00",
+      "last_login": null,
+      "metadata": {
+        "is_system_user": true
+      }
+    },
+    {
+      "userid": "john_developer",
+      "fullname": "John Smith",
+      "emailaddress": "john.smith@example.com",
+      "password_hash": "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIbRCvO.6i",
+      "roles": ["developer", "analyst"],
+      "enabled": true,
+      "created_at": "2025-01-15T10:30:00",
+      "updated_at": "2025-01-15T10:30:00",
+      "last_login": "2025-01-20T14:25:30",
+      "metadata": {
+        "department": "Engineering",
+        "location": "San Francisco"
+      }
+    },
+    {
+      "userid": "jane_analyst",
+      "fullname": "Jane Doe",
+      "emailaddress": "jane.doe@example.com",
+      "password_hash": "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIbRCvO.6i",
+      "roles": ["analyst"],
+      "enabled": true,
+      "created_at": "2025-01-16T09:00:00",
+      "updated_at": "2025-01-16T09:00:00",
+      "last_login": "2025-01-21T08:15:20",
+      "metadata": {
+        "department": "Data Science",
+        "location": "New York"
+      }
+    },
+    {
+      "userid": "external_user",
+      "fullname": "External Partner",
+      "emailaddress": "external@partner.com",
+      "password_hash": "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIbRCvO.6i",
+      "roles": ["external_api_user"],
+      "enabled": true,
+      "created_at": "2025-01-18T13:45:00",
+      "updated_at": "2025-01-18T13:45:00",
+      "last_login": "2025-01-21T16:30:00",
+      "metadata": {
+        "organization": "Partner Corp",
+        "contract_expiry": "2025-12-31"
+      }
+    }
+  ],
+  "roles": [
+    {
+      "name": "admin",
+      "description": "Administrator role with full system access",
+      "resources": {
+        "*": {
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": true,
+          "execute": true
+        }
+      },
+      "enabled": true,
+      "created_at": "2025-01-01T00:00:00",
+      "metadata": {
+        "is_system_role": true
+      }
+    },
+    {
+      "name": "developer",
+      "description": "Developer role with API and model access",
+      "resources": {
+        "model_api": {
+          "create": false,
+          "read": true,
+          "update": false,
+          "delete": false,
+          "execute": true
+        },
+        "training_data": {
+          "create": false,
+          "read": true,
+          "update": false,
+          "delete": false,
+          "execute": false
+        },
+        "model_management": {
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false,
+          "execute": true
+        }
+      },
+      "enabled": true,
+      "created_at": "2025-01-05T00:00:00",
+      "metadata": {
+        "max_api_calls_per_day": 10000
+      }
+    },
+    {
+      "name": "analyst",
+      "description": "Data analyst role with read-only access to data and models",
+      "resources": {
+        "model_api": {
+          "create": false,
+          "read": true,
+          "update": false,
+          "delete": false,
+          "execute": true
+        },
+        "training_data": {
+          "create": false,
+          "read": true,
+          "update": false,
+          "delete": false,
+          "execute": false
+        },
+        "analytics_dashboard": {
+          "create": false,
+          "read": true,
+          "update": false,
+          "delete": false,
+          "execute": false
+        }
+      },
+      "enabled": true,
+      "created_at": "2025-01-05T00:00:00",
+      "metadata": {
+        "max_api_calls_per_day": 5000
+      }
+    },
+    {
+      "name": "external_api_user",
+      "description": "External API user with limited access",
+      "resources": {
+        "public_model_api": {
+          "create": false,
+          "read": true,
+          "update": false,
+          "delete": false,
+          "execute": true
+        }
+      },
+      "enabled": true,
+      "created_at": "2025-01-10T00:00:00",
+      "metadata": {
+        "max_api_calls_per_day": 1000,
+        "rate_limit_per_minute": 10
+      }
+    },
+    {
+      "name": "yahoo_services_user",
+      "description": "User with access to all Yahoo-related services",
+      "resources": {
+        "yahoo*": {
+          "create": true,
+          "read": true,
+          "update": true,
+          "delete": false,
+          "execute": true
+        }
+      },
+      "enabled": true,
+      "created_at": "2025-01-12T00:00:00",
+      "metadata": {
+        "pattern_based": true
+      }
+    }
+  ],
+  "resources": [
+    {
+      "name": "model_api",
+      "resource_type": "api",
+      "description": "Core LLM model API endpoint",
+      "enabled": true,
+      "created_at": "2025-01-01T00:00:00",
+      "metadata": {
+        "endpoint": "/api/v1/model",
+        "version": "1.0"
+      }
+    },
+    {
+      "name": "public_model_api",
+      "resource_type": "api",
+      "description": "Public LLM model API with rate limiting",
+      "enabled": true,
+      "created_at": "2025-01-01T00:00:00",
+      "metadata": {
+        "endpoint": "/api/v1/public/model",
+        "version": "1.0"
+      }
+    },
+    {
+      "name": "training_data",
+      "resource_type": "data",
+      "description": "Training datasets for model fine-tuning",
+      "enabled": true,
+      "created_at": "2025-01-01T00:00:00",
+      "metadata": {
+        "storage_location": "s3://abhikarta-training-data"
+      }
+    },
+    {
+      "name": "model_management",
+      "resource_type": "admin",
+      "description": "Model management and configuration system",
+      "enabled": true,
+      "created_at": "2025-01-01T00:00:00",
+      "metadata": {
+        "allows_deployment": true
+      }
+    },
+    {
+      "name": "analytics_dashboard",
+      "resource_type": "dashboard",
+      "description": "Analytics and monitoring dashboard",
+      "enabled": true,
+      "created_at": "2025-01-01T00:00:00",
+      "metadata": {
+        "url": "https://analytics.abhikarta.local"
+      }
+    },
+    {
+      "name": "user_management",
+      "resource_type": "admin",
+      "description": "User and role management system",
+      "enabled": true,
+      "created_at": "2025-01-01T00:00:00",
+      "metadata": {
+        "sensitive": true
+      }
+    },
+    {
+      "name": "yahoo_finance",
+      "resource_type": "external",
+      "description": "Yahoo Finance API integration",
+      "enabled": true,
+      "created_at": "2025-01-10T00:00:00",
+      "metadata": {
+        "external_service": true,
+        "api_key_required": true
+      }
+    },
+    {
+      "name": "yahoo_news",
+      "resource_type": "external",
+      "description": "Yahoo News API integration",
+      "enabled": true,
+      "created_at": "2025-01-10T00:00:00",
+      "metadata": {
+        "external_service": true,
+        "api_key_required": true
+      }
+    },
+    {
+      "name": "yahoo_weather",
+      "resource_type": "external",
+      "description": "Yahoo Weather API integration",
+      "enabled": false,
+      "created_at": "2025-01-10T00:00:00",
+      "metadata": {
+        "external_service": true,
+        "api_key_required": true,
+        "disabled_reason": "Service deprecated"
+      }
+    }
+  ],
+  "metadata": {
+    "last_updated": "2025-01-21T18:00:00",
+    "version": "1.0",
+    "schema_version": "1.0.0"
+  }
+}
