@@ -36,11 +36,11 @@ def test_singleton_pattern():
     print_section("Testing Singleton Pattern")
 
     # First initialization
-    registry1 = ModelRegistry.get_instance("/home/claude/config", auto_reload_interval=600)
+    registry1 = ModelRegistryJSON.get_instance("/home/claude/config", auto_reload_interval_minutes=10)
     print(f"First instance: {registry1}")
 
     # Second call should return same instance
-    registry2 = ModelRegistry.get_instance()
+    registry2 = ModelRegistryJSON.get_instance()
     print(f"Second instance: {registry2}")
 
     print(f"Same instance? {registry1 is registry2}")
