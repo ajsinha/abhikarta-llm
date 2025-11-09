@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Roles - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(155, 89, 182, 0.3);
+    }
+    
+    .role-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-action {
+        padding: 5px 10px;
+        font-size: 0.875rem;
+    }
+    
+    .table-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .rows-per-page {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .rows-per-page label {
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    .rows-per-page select {
+        width: auto;
+        padding: 5px 10px;
+    }
+    
+    .pagination-controls {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .pagination {
+        margin: 0;
+    }
+    
+    .pagination .page-link {
+        color: #9b59b6;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #9b59b6;
+        border-color: #9b59b6;
+    }
+    
+    .pagination .page-link:hover {
+        color: #8e44ad;
+    }
+    
+    .resource-badge {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        margin: 2px;
+    }
+    
+    .resource-count {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-user-shield"></i> Manage Roles</h2>
+                <p class="mb-0">Create, update, and manage role definitions and permissions</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('create_role') }}'">
+                    <i class="fas fa-plus-circle"></i> Create New Role
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-purple" style="color: #9b59b6;">{{ total_roles }}</h3>
+                    <p class="text-muted mb-0">Total Roles</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-success">{{ role_list|selectattr('enabled')|list|length }}</h3>
+                    <p class="text-muted mb-0">Active Roles</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    {% set total_permissions = namespace(count=0) %}
+                    {% for role in role_list %}
+                        {% set total_permissions.count = total_permissions.count + (role.resources|length) %}
+                    {% endfor %}
+                    <h3 class="text-info">{{ total_permissions.count }}</h3>
+                    <p class="text-muted mb-0">Total Permissions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roles Table -->
+    <div class="card role-table">
+        <div class="card-header bg-purple text-white" style="background-color: #9b59b6 !important;">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Role List</h5>
+        </div>
+
+        <!-- Table Controls -->
+        <div class="table-controls">
+            <div class="rows-per-page">
+                <label for="perPageSelect">Show:</label>
+                <select id="perPageSelect" class="form-select" onchange="changePerPage(this.value)">
+                    <option value="5" {% if per_page == '5' %}selected{% endif %}>5</option>
+                    <option value="10" {% if per_page == '10' %}selected{% endif %}>10</option>
+                    <option value="50" {% if per_page == '50' %}selected{% endif %}>50</option>
+                    <option value="all" {% if per_page == 'all' %}selected{% endif %}>All</option>
+                </select>
+                <span class="text-muted">entries</span>
+            </div>
+            <div>
+                <span class="text-muted">
+                    {% if per_page == 'all' %}
+                        Showing all {{ total_roles }} roles
+                    {% else %}
+                        Showing {{ ((current_page - 1) * per_page|int) + 1 }} to
+                        {{ [current_page * per_page|int, total_roles]|min }} of {{ total_roles }} roles
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="rolesTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="20%">Role Name</th>
+                            <th width="30%">Description</th>
+                            <th width="25%">Resources</th>
+                            <th width="10%">Status</th>
+                            <th width="15%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if role_list %}
+                            {% for role in role_list %}
+                            <tr>
+                                <td><strong>{{ role.name }}</strong></td>
+                                <td>
+                                    {% if role.description %}
+                                        {{ role.description[:80] }}{% if role.description|length > 80 %}...{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">No description</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if role.resources %}
+                                        <span class="resource-count">
+                                            <i class="fas fa-key"></i> {{ role.resources|length }} resource(s)
+                                        </span>
+                                        <div class="mt-1">
+                                            {% for resource_name in role.resources.keys()|list|slice(3) %}
+                                                <span class="badge bg-secondary resource-badge">{{ resource_name }}</span>
+                                            {% endfor %}
+                                            {% if role.resources|length > 3 %}
+                                                <span class="badge bg-light text-dark resource-badge">+{{ role.resources|length - 3 }} more</span>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">No resources assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if role.enabled %}
+                                    <span class="status-badge bg-success text-white">
+                                        <i class="fas fa-check-circle"></i> Active
+                                    </span>
+                                    {% else %}
+                                    <span class="status-badge bg-danger text-white">
+                                        <i class="fas fa-times-circle"></i> Inactive
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if role.name == 'admin' %}
+                                        <button class="btn btn-sm btn-secondary btn-action" disabled title="Admin role cannot be modified">
+                                            <i class="fas fa-lock"></i> Protected
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-primary btn-action"
+                                                onclick="window.location.href='{{ url_for('edit_role', role_name=role.name) }}'">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-danger btn-action"
+                                                onclick="confirmDelete('{{ role.name }}')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    <i class="fas fa-info-circle"></i> No roles found. Create your first role to get started.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if per_page != 'all' and total_pages > 1 %}
+        <div class="pagination-controls">
+            <nav aria-label="Role pagination">
+                <ul class="pagination">
+                    <!-- Previous Button -->
+                    <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ current_page - 1 }}&per_page={{ per_page }}"
+                           {% if current_page == 1 %}tabindex="-1" aria-disabled="true"{% endif %}>
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    {% set start_page = [1, current_page - 2]|max %}
+                    {% set end_page = [total_pages, current_page + 2]|min %}
+
+                    {% if start_page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1&per_page={{ per_page }}">1</a>
+                        </li>
+                        {% if start_page > 2 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+
+                    {% for page_num in range(start_page, end_page + 1) %}
+                        <li class="page-item {% if page_num == current_page %}active{% endif %}">
+                            <a class="page-link" href="?page={{ page_num }}&per_page={{ per_page }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                    {% if end_page < total_pages %}
+                        {% if end_page < total_pages - 1 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ total_pages }}&per_page={{ per_page }}">{{ total_pages }}</a>
+                        </li>
+                    {% endif %}
+
+                    <!-- Next Button -->
+                    <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ current_page + 1 }}&per_page={{ per_page }}"
+                           {% if current_page == total_pages %}tabindex="-1" aria-disabled="true"{% endif %}>
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changePerPage(value) {
+    window.location.href = '?page=1&per_page=' + value;
+}
+
+function confirmDelete(roleName) {
+    if (confirm('Are you sure you want to delete the role "' + roleName + '"?\n\nThis action cannot be undone.')) {
+        // TODO: Implement delete functionality
+        alert('Delete functionality to be implemented');
+    }
+}
+
+$(document).ready(function() {
+    // Initialize tooltips
+    $('[data-bs-toggle="tooltip"]').tooltip();
+
+    console.log('Manage Roles page loaded');
+});
+</script>
+{% endblock %}

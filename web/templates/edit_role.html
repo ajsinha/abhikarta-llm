@@ -1,0 +1,565 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Role - {{ role.name }} - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(155, 89, 182, 0.3);
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+    
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .info-value {
+        color: #333;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #9b59b6;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #9b59b6;
+    }
+    
+    .resource-item {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .resource-item:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .resource-item.selected {
+        border-color: #9b59b6;
+        background-color: #f8f4fc;
+    }
+    
+    .resource-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .resource-name {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .resource-type {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .permission-checks {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .permission-check {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .form-check-input {
+        cursor: pointer;
+    }
+    
+    .btn-group-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    .users-list {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    
+    .user-badge {
+        display: inline-block;
+        margin: 3px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-edit"></i> Edit Role: {{ role.name }}</h2>
+                <p class="mb-0">Modify role permissions and settings</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('manage_roles') }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Roles
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    {% if role.name == 'admin' %}
+    <!-- Protection Warning for Admin Role -->
+    <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading"><i class="fas fa-shield-alt"></i> Protected System Role</h5>
+        <p>The <strong>admin</strong> role is a system-protected role and cannot be modified or deleted. This role has full system access and is essential for platform administration.</p>
+        <hr>
+        <p class="mb-0"><i class="fas fa-info-circle"></i> You can view the configuration below, but editing is disabled.</p>
+    </div>
+    {% endif %}
+
+    <!-- Role Information Card -->
+    <div class="info-card">
+        <h5 class="mb-3"><i class="fas fa-info-circle"></i> Role Information</h5>
+        <div class="info-row">
+            <span class="info-label">Created At:</span>
+            <span class="info-value">
+                {% if role.created_at %}
+                    {% if role.created_at is string %}
+                        {{ role.created_at }}
+                    {% else %}
+                        {{ role.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    {% endif %}
+                {% else %}
+                    N/A
+                {% endif %}
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Current Status:</span>
+            <span class="info-value">
+                {% if role.enabled %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Users with this Role:</span>
+            <span class="info-value">
+                {% if users_with_role %}
+                    <span class="badge bg-primary">{{ users_with_role|length }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#usersModal">
+                        <i class="fas fa-users"></i> View Users
+                    </button>
+                {% else %}
+                    <span class="text-muted">No users assigned</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Resources Assigned:</span>
+            <span class="info-value">
+                <span class="badge bg-info">{{ role.resources|length }}</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        <form id="editRoleForm" onsubmit="return handleSubmit(event)">
+            <!-- Basic Information Section -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-info-circle"></i> Basic Information
+                </h5>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="roleName" class="form-label required-field">Role Name</label>
+                        <input type="text"
+                               class="form-control"
+                               id="roleName"
+                               name="roleName"
+                               value="{{ role.name }}"
+                               readonly
+                               disabled>
+                        <div class="form-text">Role name cannot be changed</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="roleEnabled" class="form-label">Status</label>
+                        <select class="form-select" id="roleEnabled" name="roleEnabled" {% if role.name == 'admin' %}disabled{% endif %}>
+                            <option value="true" {% if role.enabled %}selected{% endif %}>Active</option>
+                            <option value="false" {% if not role.enabled %}selected{% endif %}>Inactive</option>
+                        </select>
+                        <div class="form-text">Active roles can be assigned to users</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="roleDescription" class="form-label">Description</label>
+                    <textarea class="form-control"
+                              id="roleDescription"
+                              name="roleDescription"
+                              rows="3"
+                              placeholder="Describe the purpose and scope of this role"
+                              {% if role.name == 'admin' %}disabled{% endif %}>{{ role.description }}</textarea>
+                    <div class="form-text">Provide a clear description of what this role is for</div>
+                </div>
+            </div>
+
+            <!-- Resources and Permissions Section -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-key"></i> Resources and Permissions
+                </h5>
+
+                {% if resources %}
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAllPermissions()" {% if role.name == 'admin' %}disabled{% endif %}>
+                            <i class="fas fa-check-double"></i> Select All
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllPermissions()" {% if role.name == 'admin' %}disabled{% endif %}>
+                            <i class="fas fa-times"></i> Deselect All
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info" onclick="highlightAssigned()">
+                            <i class="fas fa-highlighter"></i> Highlight Assigned
+                        </button>
+                    </div>
+
+                    <div id="resourcesContainer">
+                        {% for resource in resources %}
+                        {% set resource_perms = role.resources.get(resource.name) %}
+                        <div class="resource-item {% if resource_perms %}selected{% endif %}" data-resource="{{ resource.name }}">
+                            <div class="resource-header">
+                                <div>
+                                    <div class="resource-name">{{ resource.name }}</div>
+                                    <div class="resource-type">
+                                        <i class="fas fa-tag"></i> {{ resource.resource_type }}
+                                        {% if resource.description %}
+                                        - {{ resource.description[:50] }}{% if resource.description|length > 50 %}...{% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div>
+                                    {% if resource.enabled %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="permission-checks">
+                                <div class="permission-check">
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           id="resource_{{ loop.index0 }}_create"
+                                           name="resource_{{ resource.name }}_create"
+                                           value="true"
+                                           {% if resource_perms and resource_perms.create %}checked{% endif %}
+                                           {% if role.name == 'admin' %}disabled{% endif %}>
+                                    <label class="form-check-label" for="resource_{{ loop.index0 }}_create">
+                                        <i class="fas fa-plus-circle text-success"></i> Create
+                                    </label>
+                                </div>
+
+                                <div class="permission-check">
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           id="resource_{{ loop.index0 }}_read"
+                                           name="resource_{{ resource.name }}_read"
+                                           value="true"
+                                           {% if resource_perms and resource_perms.read %}checked{% endif %}
+                                           {% if role.name == 'admin' %}disabled{% endif %}>
+                                    <label class="form-check-label" for="resource_{{ loop.index0 }}_read">
+                                        <i class="fas fa-eye text-info"></i> Read
+                                    </label>
+                                </div>
+
+                                <div class="permission-check">
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           id="resource_{{ loop.index0 }}_update"
+                                           name="resource_{{ resource.name }}_update"
+                                           value="true"
+                                           {% if resource_perms and resource_perms.update %}checked{% endif %}
+                                           {% if role.name == 'admin' %}disabled{% endif %}>
+                                    <label class="form-check-label" for="resource_{{ loop.index0 }}_update">
+                                        <i class="fas fa-edit text-warning"></i> Update
+                                    </label>
+                                </div>
+
+                                <div class="permission-check">
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           id="resource_{{ loop.index0 }}_delete"
+                                           name="resource_{{ resource.name }}_delete"
+                                           value="true"
+                                           {% if resource_perms and resource_perms.delete %}checked{% endif %}
+                                           {% if role.name == 'admin' %}disabled{% endif %}>
+                                    <label class="form-check-label" for="resource_{{ loop.index0 }}_delete">
+                                        <i class="fas fa-trash text-danger"></i> Delete
+                                    </label>
+                                </div>
+
+                                <div class="permission-check">
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           id="resource_{{ loop.index0 }}_execute"
+                                           name="resource_{{ resource.name }}_execute"
+                                           value="true"
+                                           {% if resource_perms and resource_perms.execute %}checked{% endif %}
+                                           {% if role.name == 'admin' %}disabled{% endif %}>
+                                    <label class="form-check-label" for="resource_{{ loop.index0 }}_execute">
+                                        <i class="fas fa-play-circle text-primary"></i> Execute
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No resources available.
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Metadata Section (Optional) -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-tags"></i> Additional Metadata (Optional)
+                </h5>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="roleMetadata" class="form-label">Metadata (JSON)</label>
+                        <textarea class="form-control font-monospace"
+                                  id="roleMetadata"
+                                  name="roleMetadata"
+                                  rows="4"
+                                  placeholder='{"department": "engineering", "priority": "high"}'
+                                  {% if role.name == 'admin' %}disabled{% endif %}>{% if role.metadata %}{{ role.metadata|tojson }}{% endif %}</textarea>
+                        <div class="form-text">Optional metadata in JSON format</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="btn-group-actions">
+                <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('manage_roles') }}'">
+                    <i class="fas fa-times"></i> {% if role.name == 'admin' %}Close{% else %}Cancel{% endif %}
+                </button>
+                {% if role.name != 'admin' %}
+                <button type="reset" class="btn btn-outline-warning">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                {% else %}
+                <button type="button" class="btn btn-secondary" disabled title="Admin role is protected">
+                    <i class="fas fa-lock"></i> Protected - Cannot Save
+                </button>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Users Modal -->
+<div class="modal fade" id="usersModal" tabindex="-1" aria-labelledby="usersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="usersModalLabel">
+                    <i class="fas fa-users"></i> Users with Role: {{ role.name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if users_with_role %}
+                    <div class="users-list">
+                        {% for user_id in users_with_role %}
+                            <span class="badge bg-primary user-badge">
+                                <i class="fas fa-user"></i> {{ user_id }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-info-circle"></i>
+                            Total {{ users_with_role|length }} user(s) have this role assigned
+                        </p>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No users currently have this role assigned.</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectAllPermissions() {
+    document.querySelectorAll('.permission-checks input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+    });
+    highlightAssigned();
+}
+
+function deselectAllPermissions() {
+    document.querySelectorAll('.permission-checks input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+    });
+    highlightAssigned();
+}
+
+function highlightAssigned() {
+    document.querySelectorAll('.resource-item').forEach(item => {
+        const checkboxes = item.querySelectorAll('input[type="checkbox"]:checked');
+        if (checkboxes.length > 0) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+function handleSubmit(event) {
+    event.preventDefault();
+
+    // Validate metadata JSON if provided
+    const metadataField = document.getElementById('roleMetadata').value.trim();
+    if (metadataField) {
+        try {
+            JSON.parse(metadataField);
+        } catch (e) {
+            alert('Invalid JSON in metadata field');
+            return false;
+        }
+    }
+
+    // Collect form data
+    const formData = {
+        name: '{{ role.name }}',
+        description: document.getElementById('roleDescription').value.trim(),
+        enabled: document.getElementById('roleEnabled').value === 'true',
+        resources: {},
+        metadata: metadataField ? JSON.parse(metadataField) : {}
+    };
+
+    // Collect resource permissions
+    const checkboxes = document.querySelectorAll('.permission-checks input[type="checkbox"]:checked');
+    checkboxes.forEach(cb => {
+        const parts = cb.name.split('_');
+        const resourceName = parts.slice(1, -1).join('_');
+        const permission = parts[parts.length - 1];
+
+        if (!formData.resources[resourceName]) {
+            formData.resources[resourceName] = {
+                create: false,
+                read: false,
+                update: false,
+                delete: false,
+                execute: false
+            };
+        }
+        formData.resources[resourceName][permission] = true;
+    });
+
+    // Display collected data (TODO: Replace with actual API call)
+    console.log('Role data to be submitted:', formData);
+    alert('Role update form submitted!\n\nData logged to console.\n\nTODO: Implement backend API call.');
+
+    // Uncomment below when backend API is ready
+    /*
+    fetch('/api/admin/roles/{{ role.name }}', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Role updated successfully!');
+            window.location.href = '{{ url_for('manage_roles') }}';
+        } else {
+            alert('Error updating role: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating role');
+    });
+    */
+
+    return false;
+}
+
+// Listen for checkbox changes to update highlighting
+$(document).ready(function() {
+    $('.permission-checks input[type="checkbox"]').on('change', function() {
+        highlightAssigned();
+    });
+
+    console.log('Edit Role page loaded');
+});
+</script>
+{% endblock %}

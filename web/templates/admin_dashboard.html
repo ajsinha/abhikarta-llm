@@ -45,6 +45,10 @@
     .card-models:hover { background: linear-gradient(135deg, #e74c3c22 0%, #e74c3c11 100%); }
     .card-models .card-icon { color: #e74c3c; }
     
+    .card-roles { border-top: 5px solid #9b59b6; }
+    .card-roles:hover { background: linear-gradient(135deg, #9b59b622 0%, #9b59b611 100%); }
+    .card-roles .card-icon { color: #9b59b6; }
+    
     .card-activities { border-top: 5px solid #2ecc71; }
     .card-activities:hover { background: linear-gradient(135deg, #2ecc7122 0%, #2ecc7111 100%); }
     .card-activities .card-icon { color: #2ecc71; }
@@ -74,6 +78,11 @@
     .stat-label {
         color: #6c757d;
         font-size: 0.9rem;
+    }
+    
+    .bg-purple {
+        background-color: #9b59b6 !important;
+        color: white;
     }
 </style>
 {% endblock %}
@@ -138,6 +147,25 @@
                     <div class="mt-3">
                         <span class="badge bg-primary">{{ stats.users.total }} Users</span>
                         <span class="badge bg-success">{{ stats.users.enabled }} Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Manage Roles Card -->
+        <div class="col-md-6">
+            <div class="card management-card card-roles" onclick="window.location.href='{{ url_for('manage_roles') }}'">
+                <div class="card-body text-center p-5">
+                    <div class="card-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3 class="card-title">Manage Roles</h3>
+                    <p class="card-text text-muted">
+                        Create and manage roles, assign resources and permissions to roles.
+                    </p>
+                    <div class="mt-3">
+                        <span class="badge bg-purple">{{ stats.roles.total }} Roles</span>
+                        <span class="badge bg-success">{{ stats.roles.enabled }} Active</span>
                     </div>
                 </div>
             </div>

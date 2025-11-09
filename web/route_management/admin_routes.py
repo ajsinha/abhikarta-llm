@@ -110,4 +110,78 @@ class AdminRoutes:
                                  roles=session.get('roles', []),
                                  stats=stats)
         
+        @self.app.route('/admin/roles')
+        @admin_required
+        def manage_roles():
+            """Manage roles page with pagination."""
+            from flask import request
+            
+            # Get pagination parameters
+            page = request.args.get('page', 1, type=int)
+            per_page = request.args.get('per_page', '10')
+            
+            # Get all roles
+            all_roles = self.user_manager.list_roles()
+            total_roles = len(all_roles)
+            
+            # Handle pagination
+            if per_page == 'all':
+                paginated_roles = all_roles
+                total_pages = 1
+                page = 1
+            else:
+                per_page = int(per_page)
+                start_idx = (page - 1) * per_page
+                end_idx = start_idx + per_page
+                paginated_roles = all_roles[start_idx:end_idx]
+                total_pages = (total_roles + per_page - 1) // per_page
+            
+            return render_template('manage_roles.html',
+                                 fullname=session.get('fullname'),
+                                 userid=session.get('userid'),
+                                 roles=session.get('roles', []),
+                                 role_list=paginated_roles,
+                                 total_roles=total_roles,
+                                 current_page=page,
+                                 total_pages=total_pages,
+                                 per_page=str(per_page))
+        
+        @self.app.route('/admin/roles/create')
+        @admin_required
+        def create_role():
+            """Create new role page."""
+            # Get all resources for selection
+            resources = self.user_manager.list_resources()
+            
+            return render_template('create_role.html',
+                                 fullname=session.get('fullname'),
+                                 userid=session.get('userid'),
+                                 roles=session.get('roles', []),
+                                 resources=resources)
+        
+        @self.app.route('/admin/roles/edit/<role_name>')
+        @admin_required
+        def edit_role(role_name):
+            """Edit existing role page."""
+            # Load the role
+            role = self.user_manager.load_role(role_name)
+            
+            if not role:
+                flash(f'Role "{role_name}" not found', 'error')
+                return redirect(url_for('manage_roles'))
+            
+            # Get all resources
+            resources = self.user_manager.list_resources()
+            
+            # Get users with this role
+            users_with_role = self.user_manager.get_users_with_role(role_name)
+            
+            return render_template('edit_role.html',
+                                 fullname=session.get('fullname'),
+                                 userid=session.get('userid'),
+                                 roles=session.get('roles', []),
+                                 role=role,
+                                 resources=resources,
+                                 users_with_role=users_with_role)
+        
         logger.info("Admin routes registered")
