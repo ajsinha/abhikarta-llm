@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .welcome-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .management-card {
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        height: 100%;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .management-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .card-users { border-top: 5px solid #3498db; }
+    .card-users:hover { background: linear-gradient(135deg, #3498db22 0%, #3498db11 100%); }
+    .card-users .card-icon { color: #3498db; }
+    
+    .card-models { border-top: 5px solid #e74c3c; }
+    .card-models:hover { background: linear-gradient(135deg, #e74c3c22 0%, #e74c3c11 100%); }
+    .card-models .card-icon { color: #e74c3c; }
+    
+    .card-activities { border-top: 5px solid #2ecc71; }
+    .card-activities:hover { background: linear-gradient(135deg, #2ecc7122 0%, #2ecc7111 100%); }
+    .card-activities .card-icon { color: #2ecc71; }
+    
+    .card-monitor { border-top: 5px solid #f39c12; }
+    .card-monitor:hover { background: linear-gradient(135deg, #f39c1222 0%, #f39c1211 100%); }
+    .card-monitor .card-icon { color: #f39c12; }
+    
+    .stats-row {
+        margin-top: 20px;
+    }
+    
+    .stat-card {
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-card">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-user-shield"></i> Welcome, {{ fullname }}!</h2>
+                <p class="mb-0">Administrator Dashboard - Abhikarta LLM Platform</p>
+                <small>User ID: {{ userid }} | Role: Admin</small>
+            </div>
+            <div class="col-md-4 text-end">
+                <i class="fas fa-chart-line" style="font-size: 4rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="row stats-row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number text-primary">{{ stats.users.total }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number text-success">{{ stats.users.enabled }}</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number text-info">{{ stats.roles.total }}</div>
+                <div class="stat-label">Roles</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number text-warning">{{ stats.resources.total }}</div>
+                <div class="stat-label">Resources</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Management Cards -->
+    <div class="row g-4">
+        <!-- Manage Users Card -->
+        <div class="col-md-6">
+            <div class="card management-card card-users" onclick="window.location.href='{{ url_for('manage_users') }}'">
+                <div class="card-body text-center p-5">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="card-title">Manage Users</h3>
+                    <p class="card-text text-muted">
+                        Create, update, and manage user accounts. Assign roles and permissions.
+                    </p>
+                    <div class="mt-3">
+                        <span class="badge bg-primary">{{ stats.users.total }} Users</span>
+                        <span class="badge bg-success">{{ stats.users.enabled }} Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Manage Models Card -->
+        <div class="col-md-6">
+            <div class="card management-card card-models" onclick="window.location.href='{{ url_for('manage_models') }}'">
+                <div class="card-body text-center p-5">
+                    <div class="card-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="card-title">Manage Models</h3>
+                    <p class="card-text text-muted">
+                        Configure and manage LLM models, parameters, and model availability.
+                    </p>
+                    <div class="mt-3">
+                        <span class="badge bg-danger">Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Manage Activities Card -->
+        <div class="col-md-6">
+            <div class="card management-card card-activities" onclick="window.location.href='{{ url_for('manage_activities') }}'">
+                <div class="card-body text-center p-5">
+                    <div class="card-icon">
+                        <i class="fas fa-list-check"></i>
+                    </div>
+                    <h3 class="card-title">Manage Activities</h3>
+                    <p class="card-text text-muted">
+                        View and manage system activities, audit logs, and user actions.
+                    </p>
+                    <div class="mt-3">
+                        <span class="badge bg-success">Audit Enabled</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Monitor System Card -->
+        <div class="col-md-6">
+            <div class="card management-card card-monitor" onclick="window.location.href='{{ url_for('monitor_system') }}'">
+                <div class="card-body text-center p-5">
+                    <div class="card-icon">
+                        <i class="fas fa-monitor-waveform"></i>
+                    </div>
+                    <h3 class="card-title">Monitor System</h3>
+                    <p class="card-text text-muted">
+                        Monitor system health, performance metrics, and resource usage.
+                    </p>
+                    <div class="mt-3">
+                        <span class="badge bg-success"><i class="fas fa-circle-check"></i> System Healthy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted text-center py-3">
+                        <i class="fas fa-info-circle"></i> Activity monitoring will be displayed here
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Add animation on page load
+    $('.management-card').each(function(index) {
+        $(this).css('opacity', '0').delay(index * 100).animate({opacity: 1}, 500);
+    });
+});
+</script>
+{% endblock %}

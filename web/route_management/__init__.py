@@ -1,0 +1,23 @@
+"""
+Route Manager Module - Manages all routes for Abhikarta LLM Web Application
+
+Copyright © 2025-2030, All Rights Reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+
+Legal Notice:
+This document and the associated software architecture are proprietary and confidential.
+Unauthorized copying, distribution, modification, or use of this document or the software
+system it describes is strictly prohibited without explicit written permission from the
+copyright holder. This document is provided "as is" without warranty of any kind, either
+expressed or implied. The copyright holder shall not be liable for any damages arising
+from the use of this document or the software system it describes.
+
+Patent Pending: Certain architectural patterns and implementations described in this
+document may be subject to patent applications.
+"""
+
+from web.route_management.auth_routes import AuthRoutes
+from web.route_management.admin_routes import AdminRoutes
+
+__all__ = ['AuthRoutes', 'AdminRoutes']

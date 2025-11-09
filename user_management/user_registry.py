@@ -24,6 +24,7 @@ import jwt
 from typing import Dict, List, Optional, Set, Tuple, Any
 from datetime import datetime, timedelta
 from user import User, Role, Resource, Permission, PasswordEncryption
+from user_manager import UserManager
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +78,7 @@ class UserRegistry:
             logger.info("Initializing UserRegistry")
             
             # Storage
+            self.user_manager = None
             self._users: Dict[str, User] = {}
             self._roles: Dict[str, Role] = {}
             self._resources: Dict[str, Resource] = {}
@@ -94,7 +96,10 @@ class UserRegistry:
             
             UserRegistry._initialized = True
             logger.info("UserRegistry initialized successfully")
-    
+
+    def set_user_manager(self, user_manager: UserManager):
+        self.user_manager = user_manager
+
     def _initialize_admin(self):
         """Initialize the admin role and admin user."""
         # Create admin role with full permissions

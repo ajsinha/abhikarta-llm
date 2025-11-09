@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .login-card {
+        width: 100%;
+        max-width: 450px;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .login-header i {
+        font-size: 3rem;
+        margin-bottom: 10px;
+    }
+    
+    .login-body {
+        padding: 30px;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        transition: transform 0.2s;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card card">
+        <div class="login-header">
+            <i class="fas fa-robot"></i>
+            <h2 class="mb-0">Abhikarta LLM</h2>
+            <p class="mb-0">Large Language Model Platform</p>
+        </div>
+        <div class="login-body">
+            <h4 class="mb-4 text-center">Sign In</h4>
+            
+            <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+                <div class="mb-3">
+                    <label for="userid" class="form-label">User ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control" 
+                               id="userid" 
+                               name="userid" 
+                               placeholder="Enter your User ID" 
+                               required 
+                               autofocus>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password" 
+                               placeholder="Enter your password" 
+                               required>
+                        <button class="btn btn-outline-secondary" 
+                                type="button" 
+                                id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">
+                        Remember me
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-login w-100">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </form>
+            
+            <hr class="my-4">
+            
+            <div class="text-center">
+                <small class="text-muted">
+                    <i class="fas fa-shield-alt"></i> Secure Authentication
+                </small>
+            </div>
+        </div>
+        
+        <div class="card-footer text-center bg-light">
+            <small class="text-muted">
+                &copy; 2025-2030 Ashutosh Sinha. All Rights Reserved.
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Toggle password visibility
+    $('#togglePassword').click(function() {
+        const passwordInput = $('#password');
+        const icon = $(this).find('i');
+        
+        if (passwordInput.attr('type') === 'password') {
+            passwordInput.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            passwordInput.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+    
+    // Form validation
+    $('#loginForm').submit(function(e) {
+        const userid = $('#userid').val().trim();
+        const password = $('#password').val();
+        
+        if (!userid || !password) {
+            e.preventDefault();
+            alert('Please enter both User ID and password');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,5 +1,12 @@
 from db_management.pool_manager import get_pool_manager
 from db_management.pool_config import SQLitePoolConfig
+from user_management.user_manager_db import UserManagerDB
+from user_management.user_manager import UserManager
+from web.abhikarta_llm_web import AbhikartaLLMWeb
+
+def main(user_manager_object: UserManager):
+    aweb = AbhikartaLLMWeb(user_manager_object)
+    aweb.run()
 
 
 if __name__ == '__main__':
@@ -23,22 +30,12 @@ if __name__ == '__main__':
 
 
 
+
     # Create pool
     manager.create_pool(config)
     print(f"Created pool: {config.pool_name}")
 
-    # Create a test table
-    with manager.get_connection_context(pool_name) as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-                CREATE TABLE IF NOT EXISTS test_users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    email TEXT NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
-        conn.commit()
-        print("Created users table")
+    user_manager_object = UserManagerDB(db_connection_pool_name=pool_name)
+    main(user_manager_object)
 
     manager.shutdown_all()

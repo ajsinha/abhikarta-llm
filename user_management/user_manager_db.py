@@ -24,8 +24,8 @@ from contextlib import contextmanager
 from typing import List, Optional, Dict, Any
 
 from db_management.pool_manager import get_pool_manager
-from user import User, Role, Resource, Permission
-from user_manager import UserManager
+from user_management.user import User, Role, Resource, Permission
+from user_management.user_manager import UserManager
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,10 @@ class UserManagerDB(UserManager):
         self._connection_pool_manager =  get_pool_manager()
         self._lock = threading.RLock()
         logger.info(f"UserManagerDB initialized with {db_connection_pool_name} connection pool")
-    
+
+    def initialize(self) -> bool:
+        return True
+
     @contextmanager
     def _get_connection(self):
         """Context manager for database connections."""
@@ -583,17 +586,3 @@ class UserManagerDB(UserManager):
         except Exception as e:
             logger.error(f"Failed to save all data: {e}")
             return False
-
-
-# Example usage
-if __name__ == "__main__":
-    import logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    
-    # This example requires a database connection pool
-    # See the example_usage.py file for complete examples
-    print("UserManagerDB implementation ready")
-    print("Please see example_usage.py for complete examples")

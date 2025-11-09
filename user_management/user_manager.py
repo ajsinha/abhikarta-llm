@@ -19,7 +19,7 @@ document may be subject to patent applications.
 
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
-from user import User, Role, Resource, Permission
+from user_management.user import User, Role, Resource, Permission
 import logging
 
 logger = logging.getLogger(__name__)

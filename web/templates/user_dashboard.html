@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .welcome-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .feature-card {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+    
+    .info-card {
+        border-radius: 10px;
+        padding: 20px;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-card">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-user"></i> Welcome, {{ fullname }}!</h2>
+                <p class="mb-0">Abhikarta LLM Platform - User Dashboard</p>
+                <small>User ID: {{ userid }}</small>
+            </div>
+            <div class="col-md-4 text-end">
+                <i class="fas fa-robot" style="font-size: 4rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- User Information -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="info-card">
+                <h5><i class="fas fa-id-badge"></i> Your Profile Information</h5>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>User ID:</strong>
+                        <p class="text-muted">{{ userid }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Full Name:</strong>
+                        <p class="text-muted">{{ fullname }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Assigned Roles:</strong>
+                        <p class="text-muted">
+                            {% for role in roles %}
+                                <span class="badge bg-info">{{ role }}</span>
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Features Section -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon text-primary">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h5 class="card-title">LLM Chat</h5>
+                    <p class="card-text text-muted">
+                        Interact with large language models for various tasks
+                    </p>
+                    <button class="btn btn-outline-primary" disabled>
+                        <i class="fas fa-lock"></i> Coming Soon
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon text-success">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h5 class="card-title">My Documents</h5>
+                    <p class="card-text text-muted">
+                        Access and manage your documents and conversations
+                    </p>
+                    <button class="btn btn-outline-success" disabled>
+                        <i class="fas fa-lock"></i> Coming Soon
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon text-warning">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h5 class="card-title">Activity History</h5>
+                    <p class="card-text text-muted">
+                        View your activity history and usage statistics
+                    </p>
+                    <button class="btn btn-outline-warning" disabled>
+                        <i class="fas fa-lock"></i> Coming Soon
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Getting Started -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-rocket"></i> Getting Started</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Welcome to Abhikarta LLM Platform!</strong>
+                    </div>
+                    <p>This platform provides access to advanced large language model capabilities. Features are currently under development and will be available soon.</p>
+                    
+                    <h6 class="mt-4"><i class="fas fa-question-circle"></i> Need Help?</h6>
+                    <p class="mb-0">Contact your administrator for assistance or feature requests.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Add animation on page load
+    $('.feature-card').each(function(index) {
+        $(this).css('opacity', '0').delay(index * 150).animate({opacity: 1}, 500);
+    });
+});
+</script>
+{% endblock %}
