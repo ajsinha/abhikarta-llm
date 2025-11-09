@@ -111,7 +111,10 @@ class User:
         Returns:
             True if password matches, False otherwise
         """
-        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+        print(self.password_hash)
+        xp=PasswordEncryption.encrypt_password_md5(password)
+        print(xp)
+        return PasswordEncryption.verify_password(password, self.password_hash)
     
     def update_password(self, new_password: str) -> None:
         """
@@ -205,9 +208,27 @@ class PasswordEncryption:
     
     # Bcrypt work factor (cost factor) - higher is more secure but slower
     BCRYPT_ROUNDS = 12
-    
+
+
     @staticmethod
-    def encrypt_password(password: str) -> str:
+    def encrypt_password_md5(password: str):
+        """
+        Hashes a password using the MD5 algorithm.
+        """
+        # Convert the string password to bytes
+        password_bytes = password.encode('utf-8')
+
+        # Create the MD5 hash object
+        m = hashlib.md5()
+
+        # Update the hash object with the password bytes
+        m.update(password_bytes)
+
+        # Get the hexadecimal representation of the hash
+        return m.hexdigest()
+
+    @staticmethod
+    def encrypt_password_bcrypt(password: str) -> str:
         """
         Encrypt a plain text password using bcrypt.
         
@@ -229,9 +250,27 @@ class PasswordEncryption:
         
         # Return hash as string
         return password_hash.decode('utf-8')
-    
+
     @staticmethod
     def verify_password(password: str, password_hash: str) -> bool:
+        """
+        Verify a password against a hash.
+
+        Args:
+            password: Plain text password to verify
+            password_hash: Bcrypt hash to verify against
+
+        Returns:
+            True if password matches, False otherwise
+        """
+        if not password or not password_hash:
+            return False
+
+        md5hash = PasswordEncryption.encrypt_password_md5(password)
+        return  md5hash == password_hash
+
+    @staticmethod
+    def verify_password_bcrypt(password: str, password_hash: str) -> bool:
         """
         Verify a password against a hash.
         

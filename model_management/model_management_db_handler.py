@@ -98,17 +98,15 @@ class ModelManagementDBHandler:
 
     @contextmanager
     def _get_connection(self):
-        """Context manager for database connections."""
-        conn = self._connection_pool_manager.get_connection_context(self._db_connection_pool_name)
-        try:
-            yield conn
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            logger.error(f"Database error: {e}")
-            raise
-        finally:
-            conn.close()
+        """Context manager for database connections with auto-commit."""
+        with self._connection_pool_manager.get_connection_context(self._db_connection_pool_name) as conn:
+            try:
+                yield conn  # Now this yields the actual connection
+                conn.commit()  # Auto-commit on success
+            except Exception as e:
+                conn.rollback()  # Auto-rollback on error
+                print(f"Database error: {e}")
+                raise
 
     @contextmanager
     def _get_cursor(self, conn):

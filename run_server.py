@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from db_management.pool_manager import get_pool_manager
 from db_management.pool_config import SQLitePoolConfig
 from user_management.user_manager_db import UserManagerDB
@@ -35,6 +37,27 @@ if __name__ == '__main__':
     manager.create_pool(config)
     print(f"Created pool: {config.pool_name}")
 
+    '''
+    @contextmanager
+    def _get_connection():
+        """Context manager for database connections with auto-commit."""
+        with manager.get_connection_context(pool_name) as conn:
+            try:
+                yield conn  # Now this yields the actual connection
+                conn.commit()  # Auto-commit on success
+            except Exception as e:
+                conn.rollback()  # Auto-rollback on error
+                print(f"Database error: {e}")
+                raise
+
+    with _get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users")
+        rows = cursor.fetchall()  # Fetch all results
+        print("\nFetched data:")
+        for row in rows:
+            print(row)
+    '''
     user_manager_object = UserManagerDB(db_connection_pool_name=pool_name)
     main(user_manager_object)
 

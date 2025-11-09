@@ -63,17 +63,15 @@ class UserManagerDB(UserManager):
 
     @contextmanager
     def _get_connection(self):
-        """Context manager for database connections."""
-        conn = self._connection_pool_manager.get_connection_context(self._db_connection_pool_name)
-        try:
-            yield conn
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            logger.error(f"Database error: {e}")
-            raise
-        finally:
-            conn.close()
+        """Context manager for database connections with auto-commit."""
+        with self._connection_pool_manager.get_connection_context(self._db_connection_pool_name) as conn:
+            try:
+                yield conn  # Now this yields the actual connection
+                conn.commit()  # Auto-commit on success
+            except Exception as e:
+                conn.rollback()  # Auto-rollback on error
+                print(f"Database error: {e}")
+                raise
 
     @contextmanager
     def _get_cursor(self, conn):
@@ -106,9 +104,9 @@ class UserManagerDB(UserManager):
                             # Update existing user
                             cursor.execute("""
                                 UPDATE users 
-                                SET fullname = %s, emailaddress = %s, password_hash = %s,
-                                    enabled = %s, updated_at = %s, last_login = %s, metadata = %s
-                                WHERE userid = %s
+                                SET fullname = ?, emailaddress = ?, password_hash = ?,
+                                    enabled = ?, updated_at = ?, last_login = ?, metadata = ?
+                                WHERE userid = ?
                             """, (
                                 user.fullname, user.emailaddress, user.password_hash,
                                 user.enabled, user.updated_at, user.last_login,
@@ -116,11 +114,11 @@ class UserManagerDB(UserManager):
                             ))
 
                             # Update roles - delete old and insert new
-                            cursor.execute("DELETE FROM user_roles WHERE userid = %s", (user.userid,))
+                            cursor.execute("DELETE FROM user_roles WHERE userid = ?", (user.userid,))
                             for role in user.roles:
                                 cursor.execute("""
                                     INSERT INTO user_roles (userid, role_name)
-                                    VALUES (%s, %s)
+                                    VALUES (?, ?)
                                 """, (user.userid, role))
                         else:
                             # Insert new user
@@ -128,7 +126,7 @@ class UserManagerDB(UserManager):
                                 INSERT INTO users 
                                 (userid, fullname, emailaddress, password_hash, enabled, 
                                  created_at, updated_at, last_login, metadata)
-                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                             """, (
                                 user.userid, user.fullname, user.emailaddress, user.password_hash,
                                 user.enabled, user.created_at, user.updated_at, user.last_login,
@@ -139,7 +137,7 @@ class UserManagerDB(UserManager):
                             for role in user.roles:
                                 cursor.execute("""
                                     INSERT INTO user_roles (userid, role_name)
-                                    VALUES (%s, %s)
+                                    VALUES (?, ?)
                                 """, (user.userid, role))
 
                         logger.info(f"Saved user '{user.userid}'")
@@ -147,8 +145,51 @@ class UserManagerDB(UserManager):
             except Exception as e:
                 logger.error(f"Failed to save user '{user.userid}': {e}")
                 return False
-    
+
     def load_user(self, userid: str) -> Optional[User]:
+        """Load a user from the database."""
+        with self._lock:
+            try:
+                with self._get_connection() as conn:
+                    cursor = conn.cursor()
+                    # Load user
+                    cursor.execute("""
+                        SELECT userid, fullname, emailaddress, password_hash, enabled,
+                               created_at, updated_at, last_login, metadata
+                        FROM users WHERE userid = ?
+                    """, (userid,))
+
+                    row = cursor.fetchone()
+                    if not row:
+                        cursor.close()
+                        return None
+
+                    # Load roles
+                    cursor.execute("""
+                        SELECT role_name FROM user_roles WHERE userid = ?
+                    """, (userid,))
+
+                    roles = [r[0] for r in cursor.fetchall()]
+
+                    # Create user object
+                    user = User(
+                        userid=row[0],
+                        fullname=row[1],
+                        emailaddress=row[2],
+                        password_hash=row[3],
+                        roles=roles,
+                        enabled=row[4],
+                        created_at=row[5],
+                        updated_at=row[6],
+                        last_login=row[7],
+                        metadata=json.loads(row[8]) if row[8] else {}
+                    )
+                    cursor.close()
+                    return user
+            except Exception as e:
+                logger.error(f"Failed to load user '{userid}': {e}")
+                return None
+    def load_user_bad(self, userid: str) -> Optional[User]:
         """Load a user from the database."""
         with self._lock:
             try:
@@ -159,7 +200,7 @@ class UserManagerDB(UserManager):
                         cursor.execute("""
                             SELECT userid, fullname, emailaddress, password_hash, enabled,
                                    created_at, updated_at, last_login, metadata
-                            FROM users WHERE userid = %s
+                            FROM users WHERE userid = ?
                         """, (userid,))
 
                         row = cursor.fetchone()
@@ -169,7 +210,7 @@ class UserManagerDB(UserManager):
 
                         # Load roles
                         cursor.execute("""
-                            SELECT role_name FROM user_roles WHERE userid = %s
+                            SELECT role_name FROM user_roles WHERE userid = ?
                         """, (userid,))
 
                         roles = [r[0] for r in cursor.fetchall()]
@@ -201,10 +242,10 @@ class UserManagerDB(UserManager):
                     with self._get_cursor(conn) as cursor:
                     
                         # Delete user roles first (foreign key constraint)
-                        cursor.execute("DELETE FROM user_roles WHERE userid = %s", (userid,))
+                        cursor.execute("DELETE FROM user_roles WHERE userid = ?", (userid,))
 
                         # Delete user
-                        cursor.execute("DELETE FROM users WHERE userid = %s", (userid,))
+                        cursor.execute("DELETE FROM users WHERE userid = ?", (userid,))
 
                         deleted = cursor.rowcount > 0
 
@@ -244,7 +285,7 @@ class UserManagerDB(UserManager):
         try:
             with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
-                    cursor.execute("SELECT 1 FROM users WHERE userid = %s", (userid,))
+                    cursor.execute("SELECT 1 FROM users WHERE userid = ?", (userid,))
                     exists = cursor.fetchone() is not None
                     return exists
         except Exception as e:
@@ -267,21 +308,21 @@ class UserManagerDB(UserManager):
                             # Update existing role
                             cursor.execute("""
                                 UPDATE roles 
-                                SET description = %s, enabled = %s, metadata = %s
-                                WHERE role_name = %s
+                                SET description = ?, enabled = ?, metadata = ?
+                                WHERE role_name = ?
                             """, (
                                 role.description, role.enabled,
                                 json.dumps(role.metadata), role.name
                             ))
 
                             # Update resources
-                            cursor.execute("DELETE FROM role_resources WHERE role_name = %s", (role.name,))
+                            cursor.execute("DELETE FROM role_resources WHERE role_name = ?", (role.name,))
                             for resource_name, permission in role.resources.items():
                                 cursor.execute("""
                                     INSERT INTO role_resources 
                                     (role_name, resource_name, can_create, can_read, 
                                      can_update, can_delete, can_execute)
-                                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?)
                                 """, (
                                     role.name, resource_name, permission.create, permission.read,
                                     permission.update, permission.delete, permission.execute
@@ -290,7 +331,7 @@ class UserManagerDB(UserManager):
                             # Insert new role
                             cursor.execute("""
                                 INSERT INTO roles (role_name, description, enabled, created_at, metadata)
-                                VALUES (%s, %s, %s, %s, %s)
+                                VALUES (?, ?, ?, ?, ?)
                             """, (
                                 role.name, role.description, role.enabled,
                                 role.created_at, json.dumps(role.metadata)
@@ -302,7 +343,7 @@ class UserManagerDB(UserManager):
                                     INSERT INTO role_resources 
                                     (role_name, resource_name, can_create, can_read, 
                                      can_update, can_delete, can_execute)
-                                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?)
                                 """, (
                                     role.name, resource_name, permission.create, permission.read,
                                     permission.update, permission.delete, permission.execute
@@ -324,7 +365,7 @@ class UserManagerDB(UserManager):
                         # Load role
                         cursor.execute("""
                             SELECT role_name, description, enabled, created_at, metadata
-                            FROM roles WHERE role_name = %s
+                            FROM roles WHERE role_name = ?
                         """, (role_name,))
 
                         row = cursor.fetchone()
@@ -336,7 +377,7 @@ class UserManagerDB(UserManager):
                         cursor.execute("""
                             SELECT resource_name, can_create, can_read, can_update, 
                                    can_delete, can_execute
-                            FROM role_resources WHERE role_name = %s
+                            FROM role_resources WHERE role_name = ?
                         """, (role_name,))
 
                         resources = {}
@@ -369,13 +410,13 @@ class UserManagerDB(UserManager):
                     with self._get_cursor(conn) as cursor:
                     
                         # Delete role resources first
-                        cursor.execute("DELETE FROM role_resources WHERE role_name = %s", (role_name,))
+                        cursor.execute("DELETE FROM role_resources WHERE role_name = ?", (role_name,))
 
                         # Delete user roles
-                        cursor.execute("DELETE FROM user_roles WHERE role_name = %s", (role_name,))
+                        cursor.execute("DELETE FROM user_roles WHERE role_name = ?", (role_name,))
 
                         # Delete role
-                        cursor.execute("DELETE FROM roles WHERE role_name = %s", (role_name,))
+                        cursor.execute("DELETE FROM roles WHERE role_name = ?", (role_name,))
 
                         deleted = cursor.rowcount > 0
 
@@ -415,7 +456,7 @@ class UserManagerDB(UserManager):
         try:
             with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
-                    cursor.execute("SELECT 1 FROM roles WHERE role_name = %s", (role_name,))
+                    cursor.execute("SELECT 1 FROM roles WHERE role_name = ?", (role_name,))
                     exists = cursor.fetchone() is not None
                     return exists
         except Exception as e:
@@ -438,8 +479,8 @@ class UserManagerDB(UserManager):
                             # Update existing resource
                             cursor.execute("""
                                 UPDATE resources 
-                                SET resource_type = %s, description = %s, enabled = %s, metadata = %s
-                                WHERE resource_name = %s
+                                SET resource_type = ?, description = ?, enabled = ?, metadata = ?
+                                WHERE resource_name = ?
                             """, (
                                 resource.resource_type, resource.description,
                                 resource.enabled, json.dumps(resource.metadata), resource.name
@@ -449,7 +490,7 @@ class UserManagerDB(UserManager):
                             cursor.execute("""
                                 INSERT INTO resources 
                                 (resource_name, resource_type, description, enabled, created_at, metadata)
-                                VALUES (%s, %s, %s, %s, %s, %s)
+                                VALUES (?, ?, ?, ?, ?, ?)
                             """, (
                                 resource.name, resource.resource_type, resource.description,
                                 resource.enabled, resource.created_at, json.dumps(resource.metadata)
@@ -471,7 +512,7 @@ class UserManagerDB(UserManager):
                         cursor.execute("""
                             SELECT resource_name, resource_type, description, enabled, 
                                    created_at, metadata
-                            FROM resources WHERE resource_name = %s
+                            FROM resources WHERE resource_name = ?
                         """, (resource_name,))
 
                         row = cursor.fetchone()
@@ -501,10 +542,10 @@ class UserManagerDB(UserManager):
                     with self._get_cursor(conn) as cursor:
                     
                         # Delete from role_resources first
-                        cursor.execute("DELETE FROM role_resources WHERE resource_name = %s", (resource_name,))
+                        cursor.execute("DELETE FROM role_resources WHERE resource_name = ?", (resource_name,))
 
                         # Delete resource
-                        cursor.execute("DELETE FROM resources WHERE resource_name = %s", (resource_name,))
+                        cursor.execute("DELETE FROM resources WHERE resource_name = ?", (resource_name,))
 
                         deleted = cursor.rowcount > 0
 
@@ -525,7 +566,7 @@ class UserManagerDB(UserManager):
                         if resource_type:
                             cursor.execute("""
                                 SELECT resource_name FROM resources 
-                                WHERE resource_type = %s ORDER BY resource_name
+                                WHERE resource_type = ? ORDER BY resource_name
                             """, (resource_type,))
                         else:
                             cursor.execute("""
@@ -550,7 +591,7 @@ class UserManagerDB(UserManager):
         try:
             with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
-                    cursor.execute("SELECT 1 FROM resources WHERE resource_name = %s", (resource_name,))
+                    cursor.execute("SELECT 1 FROM resources WHERE resource_name = ?", (resource_name,))
                     exists = cursor.fetchone() is not None
                     return exists
         except Exception as e:
