@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Resource to Role - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #16a085 0%, #138d75 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(22, 160, 133, 0.3);
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #16a085;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #16a085;
+    }
+    
+    .selection-card {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .selection-card:hover {
+        border-color: #16a085;
+        box-shadow: 0 2px 10px rgba(22, 160, 133, 0.2);
+    }
+    
+    .selection-card.selected {
+        border-color: #16a085;
+        background-color: #f0f9f8;
+    }
+    
+    .permission-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .permission-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        transition: all 0.2s ease;
+    }
+    
+    .permission-check:hover {
+        background: #e9ecef;
+    }
+    
+    .permission-check input:checked + label {
+        font-weight: 600;
+    }
+    
+    .btn-group-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    .info-box {
+        background: #e7f6f2;
+        border-left: 4px solid #16a085;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    
+    .select2-container {
+        width: 100% !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-link"></i> Assign Resource to Role</h2>
+                <p class="mb-0">Grant resource access to a role with specific permissions</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('manage_resources') }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Resources
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Information Box -->
+    <div class="info-box">
+        <h6><i class="fas fa-info-circle"></i> How Resource Assignment Works</h6>
+        <p class="mb-0">
+            Select a role and a resource, then choose which permissions the role should have for that resource.
+            This allows fine-grained control over what each role can do with each resource.
+        </p>
+    </div>
+    
+    <!-- Form Card -->
+    <div class="form-card">
+        <form id="assignResourceForm" onsubmit="return handleSubmit(event)">
+            <!-- Role Selection Section -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-user-shield"></i> Step 1: Select Role
+                </h5>
+                
+                <div class="mb-3">
+                    <label for="selectedRole" class="form-label required-field">Choose Role</label>
+                    <select class="form-select" id="selectedRole" name="selectedRole" required onchange="updateRoleInfo()">
+                        <option value="">-- Select a Role --</option>
+                        {% for role in all_roles %}
+                            <option value="{{ role.name }}" 
+                                    data-description="{{ role.description }}"
+                                    data-resources="{{ role.resources|length }}">
+                                {{ role.name }} 
+                                {% if not role.enabled %}(Inactive){% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Select the role that will receive access to the resource</div>
+                </div>
+                
+                <div id="roleInfo" class="alert alert-secondary d-none">
+                    <strong>Role:</strong> <span id="roleInfoName"></span><br>
+                    <strong>Description:</strong> <span id="roleInfoDescription"></span><br>
+                    <strong>Current Resources:</strong> <span id="roleInfoResourceCount"></span>
+                </div>
+            </div>
+            
+            <!-- Resource Selection Section -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-key"></i> Step 2: Select Resource
+                </h5>
+                
+                <div class="mb-3">
+                    <label for="selectedResource" class="form-label required-field">Choose Resource</label>
+                    <select class="form-select" id="selectedResource" name="selectedResource" required onchange="updateResourceInfo()">
+                        <option value="">-- Select a Resource --</option>
+                        {% for resource in all_resources %}
+                            <option value="{{ resource.name }}"
+                                    data-type="{{ resource.resource_type }}"
+                                    data-description="{{ resource.description }}">
+                                {{ resource.name }} ({{ resource.resource_type }})
+                                {% if not resource.enabled %}(Inactive){% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Select the resource to grant access to</div>
+                </div>
+                
+                <div id="resourceInfo" class="alert alert-secondary d-none">
+                    <strong>Resource:</strong> <span id="resourceInfoName"></span><br>
+                    <strong>Type:</strong> <span id="resourceInfoType"></span><br>
+                    <strong>Description:</strong> <span id="resourceInfoDescription"></span>
+                </div>
+            </div>
+            
+            <!-- Permissions Section -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-lock"></i> Step 3: Set Permissions
+                </h5>
+                
+                <div class="mb-3">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-2" onclick="selectAllPermissions()">
+                        <i class="fas fa-check-double"></i> Select All
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllPermissions()">
+                        <i class="fas fa-times"></i> Deselect All
+                    </button>
+                </div>
+                
+                <div class="permission-grid">
+                    <div class="permission-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="permCreate"
+                               name="permCreate"
+                               value="true">
+                        <label class="form-check-label" for="permCreate">
+                            <i class="fas fa-plus-circle text-success"></i> <strong>Create</strong><br>
+                            <small>Allow creating new instances</small>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="permRead"
+                               name="permRead"
+                               value="true">
+                        <label class="form-check-label" for="permRead">
+                            <i class="fas fa-eye text-info"></i> <strong>Read</strong><br>
+                            <small>Allow viewing/accessing</small>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="permUpdate"
+                               name="permUpdate"
+                               value="true">
+                        <label class="form-check-label" for="permUpdate">
+                            <i class="fas fa-edit text-warning"></i> <strong>Update</strong><br>
+                            <small>Allow modifying existing</small>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="permDelete"
+                               name="permDelete"
+                               value="true">
+                        <label class="form-check-label" for="permDelete">
+                            <i class="fas fa-trash text-danger"></i> <strong>Delete</strong><br>
+                            <small>Allow removing/deleting</small>
+                        </label>
+                    </div>
+                    
+                    <div class="permission-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="permExecute"
+                               name="permExecute"
+                               value="true">
+                        <label class="form-check-label" for="permExecute">
+                            <i class="fas fa-play-circle text-primary"></i> <strong>Execute</strong><br>
+                            <small>Allow running/invoking</small>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        <strong>Note:</strong> At least one permission must be selected to grant access.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="btn-group-actions">
+                <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('manage_resources') }}'">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="reset" class="btn btn-outline-warning" onclick="resetForm()">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-link"></i> Assign Resource
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateRoleInfo() {
+    const select = document.getElementById('selectedRole');
+    const option = select.options[select.selectedIndex];
+    
+    if (select.value) {
+        document.getElementById('roleInfoName').textContent = select.value;
+        document.getElementById('roleInfoDescription').textContent = option.dataset.description || 'No description';
+        document.getElementById('roleInfoResourceCount').textContent = option.dataset.resources + ' resource(s)';
+        document.getElementById('roleInfo').classList.remove('d-none');
+    } else {
+        document.getElementById('roleInfo').classList.add('d-none');
+    }
+}
+
+function updateResourceInfo() {
+    const select = document.getElementById('selectedResource');
+    const option = select.options[select.selectedIndex];
+    
+    if (select.value) {
+        document.getElementById('resourceInfoName').textContent = select.value;
+        document.getElementById('resourceInfoType').textContent = option.dataset.type;
+        document.getElementById('resourceInfoDescription').textContent = option.dataset.description || 'No description';
+        document.getElementById('resourceInfo').classList.remove('d-none');
+    } else {
+        document.getElementById('resourceInfo').classList.add('d-none');
+    }
+}
+
+function selectAllPermissions() {
+    document.querySelectorAll('.permission-check input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+    });
+}
+
+function deselectAllPermissions() {
+    document.querySelectorAll('.permission-check input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+    });
+}
+
+function resetForm() {
+    document.getElementById('roleInfo').classList.add('d-none');
+    document.getElementById('resourceInfo').classList.add('d-none');
+    deselectAllPermissions();
+}
+
+function handleSubmit(event) {
+    event.preventDefault();
+    
+    // Get selected values
+    const roleName = document.getElementById('selectedRole').value;
+    const resourceName = document.getElementById('selectedResource').value;
+    
+    // Validate selections
+    if (!roleName) {
+        alert('Please select a role');
+        return false;
+    }
+    
+    if (!resourceName) {
+        alert('Please select a resource');
+        return false;
+    }
+    
+    // Collect permissions
+    const permissions = {
+        create: document.getElementById('permCreate').checked,
+        read: document.getElementById('permRead').checked,
+        update: document.getElementById('permUpdate').checked,
+        delete: document.getElementById('permDelete').checked,
+        execute: document.getElementById('permExecute').checked
+    };
+    
+    // Validate at least one permission is selected
+    if (!Object.values(permissions).some(p => p)) {
+        alert('Please select at least one permission');
+        return false;
+    }
+    
+    // Prepare data for submission
+    const formData = {
+        role_name: roleName,
+        resource_name: resourceName,
+        permissions: permissions
+    };
+    
+    // Display collected data (TODO: Replace with actual API call)
+    console.log('Assignment data to be submitted:', formData);
+    
+    const permList = Object.keys(permissions).filter(k => permissions[k]).join(', ');
+    alert('Resource assignment prepared!\n\n' +
+          'Role: ' + roleName + '\n' +
+          'Resource: ' + resourceName + '\n' +
+          'Permissions: ' + permList + '\n\n' +
+          'Data logged to console.\nTODO: Implement backend API call.');
+    
+    // Uncomment below when backend API is ready
+    /*
+    fetch('/api/admin/roles/' + roleName + '/resources', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            resource_name: resourceName,
+            permissions: permissions
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Resource assigned successfully!');
+            window.location.href = '{{ url_for('manage_resources') }}';
+        } else {
+            alert('Error assigning resource: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error assigning resource');
+    });
+    */
+    
+    return false;
+}
+
+$(document).ready(function() {
+    console.log('Assign Resource page loaded');
+});
+</script>
+{% endblock %}

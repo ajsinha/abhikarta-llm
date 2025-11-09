@@ -184,4 +184,92 @@ class AdminRoutes:
                                  resources=resources,
                                  users_with_role=users_with_role)
         
+        @self.app.route('/admin/resources')
+        @admin_required
+        def manage_resources():
+            """Manage resources page with pagination."""
+            from flask import request
+
+            # Get pagination parameters
+            page = request.args.get('page', 1, type=int)
+            per_page = request.args.get('per_page', '10')
+            resource_type = request.args.get('type', None)
+
+            # Get all resources
+            all_resources = self.user_manager.list_resources(resource_type=resource_type)
+            total_resources = len(all_resources)
+
+            # Handle pagination
+            if per_page == 'all':
+                paginated_resources = all_resources
+                total_pages = 1
+                page = 1
+            else:
+                per_page = int(per_page)
+                start_idx = (page - 1) * per_page
+                end_idx = start_idx + per_page
+                paginated_resources = all_resources[start_idx:end_idx]
+                total_pages = (total_resources + per_page - 1) // per_page
+
+            # Get unique resource types for filter
+            all_resources_for_types = self.user_manager.list_resources()
+            resource_types = list(set([r.resource_type for r in all_resources_for_types]))
+
+            return render_template('manage_resources.html',
+                                 fullname=session.get('fullname'),
+                                 userid=session.get('userid'),
+                                 roles=session.get('roles', []),
+                                 resource_list=paginated_resources,
+                                 total_resources=total_resources,
+                                 current_page=page,
+                                 total_pages=total_pages,
+                                 per_page=str(per_page),
+                                 resource_types=resource_types,
+                                 selected_type=resource_type)
+
+        @self.app.route('/admin/resources/create')
+        @admin_required
+        def create_resource():
+            """Create new resource page."""
+            return render_template('create_resource.html',
+                                 fullname=session.get('fullname'),
+                                 userid=session.get('userid'),
+                                 roles=session.get('roles', []))
+
+        @self.app.route('/admin/resources/edit/<resource_name>')
+        @admin_required
+        def edit_resource(resource_name):
+            """Edit existing resource page."""
+            # Load the resource
+            resource = self.user_manager.load_resource(resource_name)
+
+            if not resource:
+                flash(f'Resource "{resource_name}" not found', 'error')
+                return redirect(url_for('manage_resources'))
+
+            # Get roles that have this resource
+            roles_with_resource = self.user_manager.get_roles_with_resource(resource_name)
+
+            return render_template('edit_resource.html',
+                                 fullname=session.get('fullname'),
+                                 userid=session.get('userid'),
+                                 roles=session.get('roles', []),
+                                 resource=resource,
+                                 roles_with_resource=roles_with_resource)
+
+        @self.app.route('/admin/resources/assign')
+        @admin_required
+        def assign_resource_to_role():
+            """Assign resource to role page."""
+            # Get all roles and resources
+            all_roles = self.user_manager.list_roles()
+            all_resources = self.user_manager.list_resources()
+
+            return render_template('assign_resource.html',
+                                 fullname=session.get('fullname'),
+                                 userid=session.get('userid'),
+                                 roles=session.get('roles', []),
+                                 all_roles=all_roles,
+                                 all_resources=all_resources)
+
         logger.info("Admin routes registered")

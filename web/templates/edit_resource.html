@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Resource - {{ resource.name }} - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #16a085 0%, #138d75 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(22, 160, 133, 0.3);
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+    
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .info-value {
+        color: #333;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #16a085;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #16a085;
+    }
+    
+    .btn-group-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    .roles-list {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        margin: 3px;
+    }
+    
+    .permission-summary {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-left: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-edit"></i> Edit Resource: {{ resource.name }}</h2>
+                <p class="mb-0">Modify resource properties and settings</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('manage_resources') }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Resources
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resource Information Card -->
+    <div class="info-card">
+        <h5 class="mb-3"><i class="fas fa-info-circle"></i> Resource Information</h5>
+        <div class="info-row">
+            <span class="info-label">Created At:</span>
+            <span class="info-value">
+                {% if resource.created_at %}
+                    {% if resource.created_at is string %}
+                        {{ resource.created_at }}
+                    {% else %}
+                        {{ resource.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    {% endif %}
+                {% else %}
+                    N/A
+                {% endif %}
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Current Status:</span>
+            <span class="info-value">
+                {% if resource.enabled %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Resource Type:</span>
+            <span class="info-value">
+                <span class="badge bg-secondary">{{ resource.resource_type }}</span>
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Used in Roles:</span>
+            <span class="info-value">
+                {% if roles_with_resource %}
+                    <span class="badge bg-purple">{{ roles_with_resource|length }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-info ms-2" data-bs-toggle="modal" data-bs-target="#rolesModal">
+                        <i class="fas fa-user-shield"></i> View Roles
+                    </button>
+                {% else %}
+                    <span class="text-muted">Not assigned to any roles</span>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    
+    <!-- Form Card -->
+    <div class="form-card">
+        <form id="editResourceForm" onsubmit="return handleSubmit(event)">
+            <!-- Basic Information Section -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-info-circle"></i> Basic Information
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="resourceName" class="form-label required-field">Resource Name</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="resourceName" 
+                               name="resourceName" 
+                               value="{{ resource.name }}"
+                               readonly
+                               disabled>
+                        <div class="form-text">Resource name cannot be changed</div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="resourceType" class="form-label required-field">Resource Type</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="resourceType" 
+                               name="resourceType" 
+                               value="{{ resource.resource_type }}"
+                               required>
+                        <div class="form-text">Category or type of this resource</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="resourceDescription" class="form-label">Description</label>
+                        <textarea class="form-control" 
+                                  id="resourceDescription" 
+                                  name="resourceDescription" 
+                                  rows="3" 
+                                  placeholder="Describe what this resource represents and its purpose">{{ resource.description }}</textarea>
+                        <div class="form-text">Provide a clear description of what this resource is for</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="resourceEnabled" class="form-label">Status</label>
+                        <select class="form-select" id="resourceEnabled" name="resourceEnabled">
+                            <option value="true" {% if resource.enabled %}selected{% endif %}>Active</option>
+                            <option value="false" {% if not resource.enabled %}selected{% endif %}>Inactive</option>
+                        </select>
+                        <div class="form-text">Active resources can be assigned to roles</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Metadata Section (Optional) -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-tags"></i> Additional Metadata (Optional)
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="resourceMetadata" class="form-label">Metadata (JSON)</label>
+                        <textarea class="form-control font-monospace" 
+                                  id="resourceMetadata" 
+                                  name="resourceMetadata" 
+                                  rows="4" 
+                                  placeholder='{"endpoint": "/api/v1/models", "method": "POST", "rate_limit": 1000}'>{% if resource.metadata %}{{ resource.metadata|tojson }}{% endif %}</textarea>
+                        <div class="form-text">Optional metadata in JSON format</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="btn-group-actions">
+                <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('manage_resources') }}'">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="reset" class="btn btn-outline-warning">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Roles Modal -->
+<div class="modal fade" id="rolesModal" tabindex="-1" aria-labelledby="rolesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rolesModalLabel">
+                    <i class="fas fa-user-shield"></i> Roles Using Resource: {{ resource.name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if roles_with_resource %}
+                    <div class="roles-list">
+                        {% for role_name in roles_with_resource %}
+                            <span class="badge bg-purple role-badge">
+                                <i class="fas fa-user-shield"></i> {{ role_name }}
+                                <span class="permission-summary">(permissions vary)</span>
+                            </span>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-info-circle"></i> 
+                            Total {{ roles_with_resource|length }} role(s) have access to this resource
+                        </p>
+                    </div>
+                {% else %}
+                    <p class="text-muted">This resource is not currently assigned to any roles.</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('assign_resource_to_role') }}'">
+                    <i class="fas fa-link"></i> Assign to Role
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function handleSubmit(event) {
+    event.preventDefault();
+    
+    // Validate resource type
+    const resourceType = document.getElementById('resourceType').value.trim();
+    if (!resourceType) {
+        alert('Resource type is required');
+        return false;
+    }
+    
+    // Validate metadata JSON if provided
+    const metadataField = document.getElementById('resourceMetadata').value.trim();
+    if (metadataField) {
+        try {
+            JSON.parse(metadataField);
+        } catch (e) {
+            alert('Invalid JSON in metadata field');
+            return false;
+        }
+    }
+    
+    // Collect form data
+    const formData = {
+        name: '{{ resource.name }}',
+        resource_type: resourceType,
+        description: document.getElementById('resourceDescription').value.trim(),
+        enabled: document.getElementById('resourceEnabled').value === 'true',
+        metadata: metadataField ? JSON.parse(metadataField) : {}
+    };
+    
+    // Display collected data (TODO: Replace with actual API call)
+    console.log('Resource data to be submitted:', formData);
+    alert('Resource update form submitted!\n\nData logged to console.\n\nTODO: Implement backend API call.');
+    
+    // Uncomment below when backend API is ready
+    /*
+    fetch('/api/admin/resources/{{ resource.name }}', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Resource updated successfully!');
+            window.location.href = '{{ url_for('manage_resources') }}';
+        } else {
+            alert('Error updating resource: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating resource');
+    });
+    */
+    
+    return false;
+}
+
+$(document).ready(function() {
+    console.log('Edit Resource page loaded');
+});
+</script>
+{% endblock %}

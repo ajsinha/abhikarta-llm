@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Create Resource - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #16a085 0%, #138d75 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(22, 160, 133, 0.3);
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #16a085;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #16a085;
+    }
+    
+    .btn-group-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    .example-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-plus-circle"></i> Create New Resource</h2>
+                <p class="mb-0">Define a new system resource with its type and properties</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('manage_resources') }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Resources
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Form Card -->
+    <div class="form-card">
+        <form id="createResourceForm" onsubmit="return handleSubmit(event)">
+            <!-- Basic Information Section -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-info-circle"></i> Basic Information
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="resourceName" class="form-label required-field">Resource Name</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="resourceName" 
+                               name="resourceName" 
+                               placeholder="e.g., model_api, user_data, system_config"
+                               required>
+                        <div class="form-text">Unique identifier for the resource (lowercase, underscores allowed)</div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="resourceType" class="form-label required-field">Resource Type</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="resourceType" 
+                               name="resourceType" 
+                               placeholder="e.g., api, database, file, service"
+                               required>
+                        <div class="form-text">Category or type of this resource</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="resourceDescription" class="form-label">Description</label>
+                        <textarea class="form-control" 
+                                  id="resourceDescription" 
+                                  name="resourceDescription" 
+                                  rows="3" 
+                                  placeholder="Describe what this resource represents and its purpose"></textarea>
+                        <div class="form-text">Provide a clear description of what this resource is for</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="resourceEnabled" class="form-label">Status</label>
+                        <select class="form-select" id="resourceEnabled" name="resourceEnabled">
+                            <option value="true" selected>Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                        <div class="form-text">Active resources can be assigned to roles</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Examples Section -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-lightbulb"></i> Resource Examples
+                </h5>
+                
+                <div class="alert alert-info">
+                    <h6 class="alert-heading">Common Resource Types:</h6>
+                    <ul class="mb-0">
+                        <li><strong>API Resources:</strong> model_api, inference_api, training_api</li>
+                        <li><strong>Database Resources:</strong> user_database, model_database, logs_database</li>
+                        <li><strong>File Resources:</strong> training_data, model_files, user_uploads</li>
+                        <li><strong>Service Resources:</strong> email_service, notification_service, auth_service</li>
+                        <li><strong>System Resources:</strong> system_config, admin_panel, monitoring_dashboard</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Metadata Section (Optional) -->
+            <div class="mb-5">
+                <h5 class="section-title">
+                    <i class="fas fa-tags"></i> Additional Metadata (Optional)
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="resourceMetadata" class="form-label">Metadata (JSON)</label>
+                        <textarea class="form-control font-monospace" 
+                                  id="resourceMetadata" 
+                                  name="resourceMetadata" 
+                                  rows="4" 
+                                  placeholder='{"endpoint": "/api/v1/models", "method": "POST", "rate_limit": 1000}'></textarea>
+                        <div class="form-text">Optional metadata in JSON format (e.g., endpoint URLs, configuration)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="btn-group-actions">
+                <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('manage_resources') }}'">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="reset" class="btn btn-outline-warning">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Create Resource
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function handleSubmit(event) {
+    event.preventDefault();
+    
+    // Validate resource name
+    const resourceName = document.getElementById('resourceName').value.trim();
+    if (!resourceName) {
+        alert('Resource name is required');
+        return false;
+    }
+    
+    // Validate resource name format (lowercase, underscores allowed)
+    if (!/^[a-z0-9_]+$/.test(resourceName)) {
+        alert('Resource name must be lowercase with no spaces (use underscores instead)');
+        return false;
+    }
+    
+    // Validate resource type
+    const resourceType = document.getElementById('resourceType').value.trim();
+    if (!resourceType) {
+        alert('Resource type is required');
+        return false;
+    }
+    
+    // Validate metadata JSON if provided
+    const metadataField = document.getElementById('resourceMetadata').value.trim();
+    if (metadataField) {
+        try {
+            JSON.parse(metadataField);
+        } catch (e) {
+            alert('Invalid JSON in metadata field');
+            return false;
+        }
+    }
+    
+    // Collect form data
+    const formData = {
+        name: resourceName,
+        resource_type: resourceType,
+        description: document.getElementById('resourceDescription').value.trim(),
+        enabled: document.getElementById('resourceEnabled').value === 'true',
+        metadata: metadataField ? JSON.parse(metadataField) : {}
+    };
+    
+    // Display collected data (TODO: Replace with actual API call)
+    console.log('Resource data to be submitted:', formData);
+    alert('Resource creation form submitted!\n\nData logged to console.\n\nTODO: Implement backend API call.');
+    
+    // Uncomment below when backend API is ready
+    /*
+    fetch('/api/admin/resources', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Resource created successfully!');
+            window.location.href = '{{ url_for('manage_resources') }}';
+        } else {
+            alert('Error creating resource: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error creating resource');
+    });
+    */
+    
+    return false;
+}
+
+$(document).ready(function() {
+    console.log('Create Resource page loaded');
+});
+</script>
+{% endblock %}

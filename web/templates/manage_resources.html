@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Resources - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #16a085 0%, #138d75 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(22, 160, 133, 0.3);
+    }
+    
+    .resource-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+    
+    .type-badge {
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .btn-action {
+        padding: 5px 10px;
+        font-size: 0.875rem;
+    }
+    
+    .table-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .rows-per-page {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .rows-per-page label {
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    .rows-per-page select {
+        width: auto;
+        padding: 5px 10px;
+    }
+    
+    .pagination-controls {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .pagination {
+        margin: 0;
+    }
+    
+    .pagination .page-link {
+        color: #16a085;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #16a085;
+        border-color: #16a085;
+    }
+    
+    .pagination .page-link:hover {
+        color: #138d75;
+    }
+    
+    .roles-count {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .bg-teal {
+        background-color: #16a085 !important;
+        color: white;
+    }
+    
+    .text-teal {
+        color: #16a085 !important;
+    }
+    
+    .filter-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-key"></i> Manage Resources</h2>
+                <p class="mb-0">Create, update, and manage system resources and their types</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light me-2" onclick="window.location.href='{{ url_for('assign_resource_to_role') }}'">
+                    <i class="fas fa-link"></i> Assign to Role
+                </button>
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('create_resource') }}'">
+                    <i class="fas fa-plus-circle"></i> Create Resource
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-teal">{{ total_resources }}</h3>
+                    <p class="text-muted mb-0">Total Resources</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-success">{{ resource_list|selectattr('enabled')|list|length }}</h3>
+                    <p class="text-muted mb-0">Active Resources</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-info">{{ resource_types|length }}</h3>
+                    <p class="text-muted mb-0">Resource Types</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-warning">
+                        {% set total_assignments = namespace(count=0) %}
+                        {% for resource in resource_list %}
+                            {% set roles = [] %}
+                            {% for role in [] %}
+                                {% if resource.name in role.resources %}
+                                    {% set _ = roles.append(role.name) %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                        <i class="fas fa-link"></i>
+                    </h3>
+                    <p class="text-muted mb-0">Quick Actions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resources Table -->
+    <div class="card resource-table">
+        <div class="card-header bg-teal text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Resource List</h5>
+        </div>
+        
+        <!-- Table Controls -->
+        <div class="table-controls">
+            <div class="rows-per-page">
+                <label for="perPageSelect">Show:</label>
+                <select id="perPageSelect" class="form-select" onchange="changePerPage(this.value)">
+                    <option value="5" {% if per_page == '5' %}selected{% endif %}>5</option>
+                    <option value="10" {% if per_page == '10' %}selected{% endif %}>10</option>
+                    <option value="50" {% if per_page == '50' %}selected{% endif %}>50</option>
+                    <option value="all" {% if per_page == 'all' %}selected{% endif %}>All</option>
+                </select>
+                <span class="text-muted">entries</span>
+            </div>
+            
+            <div class="filter-section">
+                <label for="typeFilter">Filter by Type:</label>
+                <select id="typeFilter" class="form-select" onchange="filterByType(this.value)">
+                    <option value="">All Types</option>
+                    {% for type in resource_types|sort %}
+                        <option value="{{ type }}" {% if selected_type == type %}selected{% endif %}>{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <span class="text-muted">
+                    {% if per_page == 'all' %}
+                        Showing all {{ total_resources }} resources
+                    {% else %}
+                        Showing {{ ((current_page - 1) * per_page|int) + 1 }} to 
+                        {{ [current_page * per_page|int, total_resources]|min }} of {{ total_resources }} resources
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="resourcesTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="20%">Resource Name</th>
+                            <th width="15%">Type</th>
+                            <th width="35%">Description</th>
+                            <th width="10%">Status</th>
+                            <th width="10%">Used in Roles</th>
+                            <th width="10%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if resource_list %}
+                            {% for resource in resource_list %}
+                            <tr>
+                                <td><strong>{{ resource.name }}</strong></td>
+                                <td>
+                                    <span class="badge type-badge bg-secondary">
+                                        <i class="fas fa-tag"></i> {{ resource.resource_type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if resource.description %}
+                                        {{ resource.description[:80] }}{% if resource.description|length > 80 %}...{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">No description</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if resource.enabled %}
+                                    <span class="status-badge bg-success text-white">
+                                        <i class="fas fa-check-circle"></i> Active
+                                    </span>
+                                    {% else %}
+                                    <span class="status-badge bg-danger text-white">
+                                        <i class="fas fa-times-circle"></i> Inactive
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="roles-count">
+                                        <i class="fas fa-user-shield"></i> <span id="roles-count-{{ loop.index0 }}">-</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary btn-action" 
+                                            onclick="window.location.href='{{ url_for('edit_resource', resource_name=resource.name) }}'">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-danger btn-action" 
+                                            onclick="confirmDelete('{{ resource.name }}')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="fas fa-info-circle"></i> No resources found. Create your first resource to get started.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pagination Controls -->
+        {% if per_page != 'all' and total_pages > 1 %}
+        <div class="pagination-controls">
+            <nav aria-label="Resource pagination">
+                <ul class="pagination">
+                    <!-- Previous Button -->
+                    <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ current_page - 1 }}&per_page={{ per_page }}{% if selected_type %}&type={{ selected_type }}{% endif %}" 
+                           {% if current_page == 1 %}tabindex="-1" aria-disabled="true"{% endif %}>
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    </li>
+                    
+                    <!-- Page Numbers -->
+                    {% set start_page = [1, current_page - 2]|max %}
+                    {% set end_page = [total_pages, current_page + 2]|min %}
+                    
+                    {% if start_page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1&per_page={{ per_page }}{% if selected_type %}&type={{ selected_type }}{% endif %}">1</a>
+                        </li>
+                        {% if start_page > 2 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% for page_num in range(start_page, end_page + 1) %}
+                        <li class="page-item {% if page_num == current_page %}active{% endif %}">
+                            <a class="page-link" href="?page={{ page_num }}&per_page={{ per_page }}{% if selected_type %}&type={{ selected_type }}{% endif %}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                    
+                    {% if end_page < total_pages %}
+                        {% if end_page < total_pages - 1 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ total_pages }}&per_page={{ per_page }}{% if selected_type %}&type={{ selected_type }}{% endif %}">{{ total_pages }}</a>
+                        </li>
+                    {% endif %}
+                    
+                    <!-- Next Button -->
+                    <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ current_page + 1 }}&per_page={{ per_page }}{% if selected_type %}&type={{ selected_type }}{% endif %}"
+                           {% if current_page == total_pages %}tabindex="-1" aria-disabled="true"{% endif %}>
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changePerPage(value) {
+    const typeParam = new URLSearchParams(window.location.search).get('type');
+    let url = '?page=1&per_page=' + value;
+    if (typeParam) {
+        url += '&type=' + typeParam;
+    }
+    window.location.href = url;
+}
+
+function filterByType(type) {
+    const perPage = document.getElementById('perPageSelect').value;
+    let url = '?page=1&per_page=' + perPage;
+    if (type) {
+        url += '&type=' + type;
+    }
+    window.location.href = url;
+}
+
+function confirmDelete(resourceName) {
+    if (confirm('Are you sure you want to delete the resource "' + resourceName + '"?\n\nThis action cannot be undone and may affect roles using this resource.')) {
+        // TODO: Implement delete functionality
+        alert('Delete functionality to be implemented');
+    }
+}
+
+$(document).ready(function() {
+    // Initialize tooltips
+    $('[data-bs-toggle="tooltip"]').tooltip();
+    
+    console.log('Manage Resources page loaded');
+});
+</script>
+{% endblock %}
