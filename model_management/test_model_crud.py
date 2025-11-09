@@ -30,7 +30,7 @@ def test_create_operations():
     # Create a temporary database
     print("\n1. Testing Database Implementation...")
     ModelRegistryDB.reset_instance()
-    db_registry = ModelRegistryDB.get_instance(db_path=":memory:")
+    db_registry = ModelRegistryDB.get_instance(db_connection_pool_name=":memory:")
     
     # Create a test provider first
     provider_data = {
@@ -117,7 +117,7 @@ def test_update_operations():
     
     # Setup
     ModelRegistryDB.reset_instance()
-    registry = ModelRegistryDB.get_instance(db_path=":memory:")
+    registry = ModelRegistryDB.get_instance(db_connection_pool_name=":memory:")
     
     provider_data = {
         "provider": "test_provider",
@@ -257,7 +257,7 @@ def test_delete_operations():
     
     # Setup
     ModelRegistryDB.reset_instance()
-    registry = ModelRegistryDB.get_instance(db_path=":memory:")
+    registry = ModelRegistryDB.get_instance(db_connection_pool_name=":memory:")
     
     provider_data = {
         "provider": "test_provider",

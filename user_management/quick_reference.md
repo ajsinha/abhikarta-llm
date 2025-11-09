@@ -549,7 +549,7 @@ if manager.validate_user(user):
 createdb abhikarta
 
 # Run schema
-psql abhikarta < user_management_schema_postgres.sql
+psql abhikarta < schema.sql
 ```
 
 ### MySQL
@@ -559,14 +559,14 @@ psql abhikarta < user_management_schema_postgres.sql
 mysql -u root -p -e "CREATE DATABASE abhikarta;"
 
 # Run schema (after converting to MySQL syntax)
-mysql -u root -p abhikarta < user_management_schema_postgres.sql
+mysql -u root -p abhikarta < schema.sql
 ```
 
 ### SQLite
 
 ```bash
 # Create database and run schema
-sqlite3 abhikarta.db_management < user_management_schema_postgres.sql
+sqlite3 abhikarta.db_management < schema.sql
 ```
 
 ---

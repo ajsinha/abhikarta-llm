@@ -123,7 +123,7 @@ def load_providers(
         Dictionary mapping provider names to ModelProviderDB instances
 
     Example:
-        >>> handler = ModelManagementDBHandler.get_instance("/path/to/db.sqlite")
+        >>> handler = ModelManagementDBHandler.get_instance("/path/to/db_management.sqlite")
         >>> providers = load_providers(handler, ["anthropic", "openai"])
         >>> anthropic = providers["anthropic"]
     """

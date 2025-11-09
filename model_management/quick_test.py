@@ -29,7 +29,7 @@ def test_database_implementation():
         # Use in-memory database for testing
         print("\n1. Initializing in-memory database...")
         ModelRegistryDB.reset_instance()
-        registry = ModelRegistryDB.get_instance(db_path=":memory:")
+        registry = ModelRegistryDB.get_instance(db_connection_pool_name=":memory:")
         print("   ✓ Database initialized")
         
         # Test auto-reload API
@@ -200,7 +200,7 @@ def test_api_consistency():
         ]
         
         ModelRegistryDB.reset_instance()
-        db_registry = ModelRegistryDB.get_instance(db_path=":memory:")
+        db_registry = ModelRegistryDB.get_instance(db_connection_pool_name=":memory:")
         
         missing_db = []
         for method in db_methods:

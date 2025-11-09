@@ -295,7 +295,7 @@ def process_models(registry: ModelRegistry):
             print(f"{provider_name}/{model_name}: ${cost:.4f}")
 
 # Both work identically
-db_registry = ModelRegistryDB.get_instance("./models.db")
+db_registry = ModelRegistryDB.get_instance("./models.db_management")
 process_models(db_registry)  # ✓
 
 json_registry = ModelRegistryJSON.get_instance("./configs")
@@ -323,7 +323,7 @@ def get_cheapest_model(registry: ModelRegistry):  # Not concrete class
     return registry.get_cheapest_model_for_capability("chat", 10000, 1000)
 
 # Dependency injection
-db_registry = ModelRegistryDB.get_instance("./models.db")
+db_registry = ModelRegistryDB.get_instance("./models.db_management")
 json_registry = ModelRegistryJSON.get_instance("./configs")
 ```
 
@@ -953,7 +953,7 @@ def test_create_update_delete_cycle():
 from model_registry_db import ModelRegistryDB
 
 # Initialize
-registry = ModelRegistryDB.get_instance("./models.db")
+registry = ModelRegistryDB.get_instance("./models.db_management")
 
 # Query models
 model = registry.get_model_from_provider_by_name("openai", "gpt-4o")

@@ -44,6 +44,7 @@ The Abhikarta LLM User Management System is a comprehensive, enterprise-grade Ro
 ```
 abhikarta_user_management/
 ├── README.md                          # This file
+├── PROJECT_SUMMARY.md                 # Executive summary
 ├── architecture_documentation.md      # Detailed architecture documentation
 ├── quick_reference.md                 # Quick reference guide
 ├── user.py                           # User, Role, Resource, Permission classes
@@ -51,6 +52,7 @@ abhikarta_user_management/
 ├── user_manager.py                   # Abstract UserManager base class
 ├── user_manager_db.py                # Database-backed implementation
 ├── user_manager_json.py              # JSON file-backed implementation
+├── create_sqlite_db.py               # SQLite database creation utility
 ├── example_usage.py                  # Comprehensive usage examples
 ├── schema.sql                        # Database schema (PostgreSQL)
 └── config/
@@ -173,6 +175,30 @@ role.add_resource("google*", Permission.all_permissions())
 
 ## Database Setup
 
+### SQLite (Easiest - Recommended for Development)
+
+Use the included utility script to automatically create a SQLite database:
+
+```bash
+# Create database with default name (abhikarta.db_management)
+python create_sqlite_db.py
+
+# Create database with custom name
+python create_sqlite_db.py --database my_database.db_management
+
+# Overwrite existing database
+python create_sqlite_db.py --overwrite
+
+# Verbose output
+python create_sqlite_db.py --verbose
+```
+
+The script automatically:
+- Reads and adapts the PostgreSQL schema for SQLite
+- Creates all tables with proper constraints
+- Inserts the admin user and sample data
+- Verifies the schema was created correctly
+
 ### PostgreSQL
 
 ```bash
@@ -180,7 +206,7 @@ role.add_resource("google*", Permission.all_permissions())
 createdb abhikarta
 
 # Run schema
-psql abhikarta < user_management_schema_postgres.sql
+psql abhikarta < schema.sql
 ```
 
 ### MySQL
@@ -189,15 +215,8 @@ psql abhikarta < user_management_schema_postgres.sql
 # Create database
 mysql -u root -p -e "CREATE DATABASE abhikarta;"
 
-# Note: Convert user_management_schema_postgres.sql for MySQL syntax first
+# Note: Convert schema.sql for MySQL syntax first
 # Then run: mysql -u root -p abhikarta < schema_mysql.sql
-```
-
-### SQLite
-
-```bash
-# Create database and run schema
-sqlite3 abhikarta.db_management < schema_sqlite.sql
 ```
 
 ---
@@ -344,6 +363,7 @@ manager.save_user(user)
 | `user_manager.py` | Abstract base class for persistence layer |
 | `user_manager_db.py` | Database-backed persistence implementation |
 | `user_manager_json.py` | JSON file-backed persistence implementation |
+| `create_sqlite_db.py` | Utility to create SQLite database from schema.sql |
 | `example_usage.py` | Comprehensive usage examples |
 | `schema.sql` | PostgreSQL database schema |
 | `config/users.json` | Sample JSON configuration with example data |

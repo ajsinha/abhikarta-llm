@@ -21,7 +21,7 @@ class Database:
         self.connection = None
         
         if db_type == 'sqlite':
-            db_path = kwargs.get('db_path', 'data/abhikarta.db')
+            db_path = kwargs.get('db_path', 'data/abhikarta.db_management')
             os.makedirs(os.path.dirname(db_path), exist_ok=True)
             self.db_path = db_path
         elif db_type == 'postgresql':
@@ -125,7 +125,7 @@ def get_db() -> Database:
     global _db_instance
     if _db_instance is None:
         # Default to SQLite, can be configured
-        _db_instance = Database(db_type='sqlite', db_path='data/abhikarta.db')
+        _db_instance = Database(db_type='sqlite', db_path='data/abhikarta.db_management')
         _db_instance.initialize_schema()
     return _db_instance
 

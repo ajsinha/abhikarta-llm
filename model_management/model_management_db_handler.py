@@ -13,14 +13,16 @@ explicit written permission from the copyright holder.
 Patent Pending: Certain architectural patterns and implementations described in this
 module may be subject to patent applications.
 """
-
+import logging
 import json
 import sqlite3
 import threading
 from pathlib import Path
 from typing import Optional, List, Dict, Any, Tuple
 from contextlib import contextmanager
+from db_management.pool_manager import get_pool_manager
 
+logger = logging.getLogger(__name__)
 
 class ModelManagementDBHandler:
     """
@@ -40,7 +42,7 @@ class ModelManagementDBHandler:
         All public methods are thread-safe using RLock for reentrant locking.
     
     Usage:
-        >>> handler = ModelManagementDBHandler.get_instance("/path/to/db.sqlite")
+        >>> handler = ModelManagementDBHandler.get_instance("/path/to/db_management.sqlite")
         >>> handler.initialize_schema()
         >>> handler.insert_provider_from_json("/path/to/provider.json")
         >>> models = handler.get_models_by_provider("anthropic")
@@ -49,101 +51,19 @@ class ModelManagementDBHandler:
     _instance: Optional['ModelManagementDBHandler'] = None
     _instance_lock = threading.RLock()
     
-    # SQL Schema Definitions
-    SCHEMA_SQL = """
-    -- Providers Table
-    CREATE TABLE IF NOT EXISTS providers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        provider TEXT NOT NULL UNIQUE,
-        api_version TEXT NOT NULL,
-        base_url TEXT,
-        notes TEXT,
-        enabled BOOLEAN NOT NULL DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+
     
-    -- Models Table
-    CREATE TABLE IF NOT EXISTS models (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        provider_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        version TEXT NOT NULL,
-        description TEXT NOT NULL,
-        model_id TEXT,
-        replicate_model TEXT,
-        context_window INTEGER NOT NULL,
-        max_output INTEGER NOT NULL,
-        parameters TEXT,
-        license TEXT,
-        enabled BOOLEAN NOT NULL DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (provider_id) REFERENCES providers(id) ON DELETE CASCADE,
-        UNIQUE(provider_id, name)
-    );
-    
-    -- Model Strengths Table
-    CREATE TABLE IF NOT EXISTS model_strengths (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        model_id INTEGER NOT NULL,
-        strength TEXT NOT NULL,
-        FOREIGN KEY (model_id) REFERENCES models(id) ON DELETE CASCADE,
-        UNIQUE(model_id, strength)
-    );
-    
-    -- Model Capabilities Table
-    CREATE TABLE IF NOT EXISTS model_capabilities (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        model_id INTEGER NOT NULL,
-        capability_name TEXT NOT NULL,
-        capability_value TEXT NOT NULL,
-        FOREIGN KEY (model_id) REFERENCES models(id) ON DELETE CASCADE,
-        UNIQUE(model_id, capability_name)
-    );
-    
-    -- Model Cost Table
-    CREATE TABLE IF NOT EXISTS model_costs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        model_id INTEGER NOT NULL UNIQUE,
-        input_per_1k REAL,
-        output_per_1k REAL,
-        input_per_1m REAL,
-        output_per_1m REAL,
-        input_per_1m_0_128k REAL,
-        input_per_1m_128k_plus REAL,
-        cost_json TEXT,
-        FOREIGN KEY (model_id) REFERENCES models(id) ON DELETE CASCADE
-    );
-    
-    -- Model Performance Table
-    CREATE TABLE IF NOT EXISTS model_performance (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        model_id INTEGER NOT NULL UNIQUE,
-        performance_json TEXT,
-        FOREIGN KEY (model_id) REFERENCES models(id) ON DELETE CASCADE
-    );
-    
-    -- Indexes for performance
-    CREATE INDEX IF NOT EXISTS idx_models_provider_id ON models(provider_id);
-    CREATE INDEX IF NOT EXISTS idx_models_enabled ON models(enabled);
-    CREATE INDEX IF NOT EXISTS idx_models_name ON models(name);
-    CREATE INDEX IF NOT EXISTS idx_providers_provider ON providers(provider);
-    CREATE INDEX IF NOT EXISTS idx_providers_enabled ON providers(enabled);
-    CREATE INDEX IF NOT EXISTS idx_model_capabilities_name ON model_capabilities(capability_name);
-    CREATE INDEX IF NOT EXISTS idx_model_strengths_strength ON model_strengths(strength);
-    """
-    
-    def __init__(self, db_path: str):
+    def __init__(self, db_connection_pool_name: str):
         """
         Initialize the database handler.
         
         Note: Use get_instance() instead of direct initialization to ensure singleton.
         
         Args:
-            db_path: Path to the SQLite database file
+            db_connection_pool_name: Name of database connection pool
         """
-        self._db_path = db_path
+        self._db_connection_pool_name = db_connection_pool_name
+        self._connection_pool_manager = get_pool_manager()
         self._lock = threading.RLock()
         self._local = threading.local()
         
@@ -175,43 +95,29 @@ class ModelManagementDBHandler:
             if cls._instance is not None:
                 cls._instance.close_all_connections()
                 cls._instance = None
-    
-    def _get_connection(self) -> sqlite3.Connection:
-        """
-        Get a thread-local database connection.
-        
-        Returns:
-            SQLite connection for the current thread
-        """
-        if not hasattr(self._local, 'connection') or self._local.connection is None:
-            self._local.connection = sqlite3.connect(
-                self._db_path,
-                check_same_thread=False,
-                timeout=30.0
-            )
-            self._local.connection.row_factory = sqlite3.Row
-            # Enable foreign keys
-            self._local.connection.execute("PRAGMA foreign_keys = ON")
-        return self._local.connection
-    
+
     @contextmanager
-    def _get_cursor(self):
-        """
-        Context manager for database cursor with automatic commit/rollback.
-        
-        Yields:
-            Database cursor
-        """
-        conn = self._get_connection()
+    def _get_connection(self):
+        """Context manager for database connections."""
+        conn = self._connection_pool_manager.get_connection_context(self._db_connection_pool_name)
+        try:
+            yield conn
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            logger.error(f"Database error: {e}")
+            raise
+        finally:
+            conn.close()
+
+    @contextmanager
+    def _get_cursor(self, conn):
         cursor = conn.cursor()
         try:
             yield cursor
-            conn.commit()
-        except Exception:
-            conn.rollback()
-            raise
         finally:
             cursor.close()
+
     
     def close_all_connections(self) -> None:
         """Close all thread-local connections."""
@@ -226,9 +132,7 @@ class ModelManagementDBHandler:
         Creates all tables, indexes, and constraints if they don't exist.
         This method is idempotent and safe to call multiple times.
         """
-        with self._lock:
-            with self._get_cursor() as cursor:
-                cursor.executescript(self.SCHEMA_SQL)
+        pass
     
     def clear_all_data(self) -> None:
         """
@@ -237,13 +141,14 @@ class ModelManagementDBHandler:
         Warning: This will delete all providers, models, and related data.
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                cursor.execute("DELETE FROM model_performance")
-                cursor.execute("DELETE FROM model_costs")
-                cursor.execute("DELETE FROM model_capabilities")
-                cursor.execute("DELETE FROM model_strengths")
-                cursor.execute("DELETE FROM models")
-                cursor.execute("DELETE FROM providers")
+            with self._get_connection() as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("DELETE FROM model_performance")
+                    cursor.execute("DELETE FROM model_costs")
+                    cursor.execute("DELETE FROM model_capabilities")
+                    cursor.execute("DELETE FROM model_strengths")
+                    cursor.execute("DELETE FROM models")
+                    cursor.execute("DELETE FROM providers")
     
     # ==================================================================================
     # PROVIDER OPERATIONS
@@ -271,13 +176,14 @@ class ModelManagementDBHandler:
             Provider ID
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                notes_json = json.dumps(notes) if notes else None
-                cursor.execute("""
-                    INSERT INTO providers (provider, api_version, base_url, notes, enabled)
-                    VALUES (?, ?, ?, ?, ?)
-                """, (provider, api_version, base_url, notes_json, enabled))
-                return cursor.lastrowid
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    notes_json = json.dumps(notes) if notes else None
+                    cursor.execute("""
+                        INSERT INTO providers (provider, api_version, base_url, notes, enabled)
+                        VALUES (?, ?, ?, ?, ?)
+                    """, (provider, api_version, base_url, notes_json, enabled))
+                    return cursor.lastrowid
     
     def update_provider(
         self,
@@ -301,32 +207,33 @@ class ModelManagementDBHandler:
             True if provider was updated, False if not found
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                updates = []
-                params = []
-                
-                if api_version is not None:
-                    updates.append("api_version = ?")
-                    params.append(api_version)
-                if base_url is not None:
-                    updates.append("base_url = ?")
-                    params.append(base_url)
-                if notes is not None:
-                    updates.append("notes = ?")
-                    params.append(json.dumps(notes))
-                if enabled is not None:
-                    updates.append("enabled = ?")
-                    params.append(enabled)
-                
-                if not updates:
-                    return False
-                
-                updates.append("updated_at = CURRENT_TIMESTAMP")
-                params.append(provider_name)
-                
-                sql = f"UPDATE providers SET {', '.join(updates)} WHERE provider = ?"
-                cursor.execute(sql, params)
-                return cursor.rowcount > 0
+            with self._get_connection() as conn:
+                with self._get_cursor(conn) as cursor:
+                    updates = []
+                    params = []
+
+                    if api_version is not None:
+                        updates.append("api_version = ?")
+                        params.append(api_version)
+                    if base_url is not None:
+                        updates.append("base_url = ?")
+                        params.append(base_url)
+                    if notes is not None:
+                        updates.append("notes = ?")
+                        params.append(json.dumps(notes))
+                    if enabled is not None:
+                        updates.append("enabled = ?")
+                        params.append(enabled)
+
+                    if not updates:
+                        return False
+
+                    updates.append("updated_at = CURRENT_TIMESTAMP")
+                    params.append(provider_name)
+
+                    sql = f"UPDATE providers SET {', '.join(updates)} WHERE provider = ?"
+                    cursor.execute(sql, params)
+                    return cursor.rowcount > 0
     
     def get_provider_by_name(self, provider_name: str) -> Optional[Dict[str, Any]]:
         """
@@ -339,14 +246,15 @@ class ModelManagementDBHandler:
             Provider dictionary or None if not found
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                cursor.execute("""
-                    SELECT * FROM providers WHERE provider = ?
-                """, (provider_name,))
-                row = cursor.fetchone()
-                if row:
-                    return self._row_to_dict(row)
-                return None
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("""
+                        SELECT * FROM providers WHERE provider = ?
+                    """, (provider_name,))
+                    row = cursor.fetchone()
+                    if row:
+                        return self._row_to_dict(row)
+                    return None
     
     def get_all_providers(self, include_disabled: bool = False) -> List[Dict[str, Any]]:
         """
@@ -359,12 +267,13 @@ class ModelManagementDBHandler:
             List of provider dictionaries
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                if include_disabled:
-                    cursor.execute("SELECT * FROM providers ORDER BY provider")
-                else:
-                    cursor.execute("SELECT * FROM providers WHERE enabled = 1 ORDER BY provider")
-                return [self._row_to_dict(row) for row in cursor.fetchall()]
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    if include_disabled:
+                        cursor.execute("SELECT * FROM providers ORDER BY provider")
+                    else:
+                        cursor.execute("SELECT * FROM providers WHERE enabled = 1 ORDER BY provider")
+                    return [self._row_to_dict(row) for row in cursor.fetchall()]
     
     def delete_provider(self, provider_name: str) -> bool:
         """
@@ -377,9 +286,10 @@ class ModelManagementDBHandler:
             True if provider was deleted, False if not found
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                cursor.execute("DELETE FROM providers WHERE provider = ?", (provider_name,))
-                return cursor.rowcount > 0
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("DELETE FROM providers WHERE provider = ?", (provider_name,))
+                    return cursor.rowcount > 0
     
     # ==================================================================================
     # MODEL OPERATIONS
@@ -425,18 +335,19 @@ class ModelManagementDBHandler:
             provider = self.get_provider_by_name(provider_name)
             if not provider:
                 raise ValueError(f"Provider '{provider_name}' not found")
-            
-            with self._get_cursor() as cursor:
-                cursor.execute("""
-                    INSERT INTO models (
-                        provider_id, name, version, description, model_id, replicate_model,
+
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("""
+                        INSERT INTO models (
+                            provider_id, name, version, description, model_id, replicate_model,
+                            context_window, max_output, parameters, license, enabled
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        provider['id'], name, version, description, model_id, replicate_model,
                         context_window, max_output, parameters, license, enabled
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    provider['id'], name, version, description, model_id, replicate_model,
-                    context_window, max_output, parameters, license, enabled
-                ))
-                return cursor.lastrowid
+                    ))
+                    return cursor.lastrowid
     
     def update_model(
         self,
@@ -459,26 +370,27 @@ class ModelManagementDBHandler:
             provider = self.get_provider_by_name(provider_name)
             if not provider:
                 return False
-            
-            with self._get_cursor() as cursor:
-                updates = []
-                params = []
-                
-                for key, value in kwargs.items():
-                    if key in ['version', 'description', 'model_id', 'replicate_model',
-                               'context_window', 'max_output', 'parameters', 'license', 'enabled']:
-                        updates.append(f"{key} = ?")
-                        params.append(value)
-                
-                if not updates:
-                    return False
-                
-                updates.append("updated_at = CURRENT_TIMESTAMP")
-                params.extend([provider['id'], model_name])
-                
-                sql = f"UPDATE models SET {', '.join(updates)} WHERE provider_id = ? AND name = ?"
-                cursor.execute(sql, params)
-                return cursor.rowcount > 0
+
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    updates = []
+                    params = []
+
+                    for key, value in kwargs.items():
+                        if key in ['version', 'description', 'model_id', 'replicate_model',
+                                   'context_window', 'max_output', 'parameters', 'license', 'enabled']:
+                            updates.append(f"{key} = ?")
+                            params.append(value)
+
+                    if not updates:
+                        return False
+
+                    updates.append("updated_at = CURRENT_TIMESTAMP")
+                    params.extend([provider['id'], model_name])
+
+                    sql = f"UPDATE models SET {', '.join(updates)} WHERE provider_id = ? AND name = ?"
+                    cursor.execute(sql, params)
+                    return cursor.rowcount > 0
     
     def get_model_by_name(
         self,
@@ -499,32 +411,33 @@ class ModelManagementDBHandler:
             provider = self.get_provider_by_name(provider_name)
             if not provider:
                 return None
-            
-            with self._get_cursor() as cursor:
-                cursor.execute("""
-                    SELECT * FROM models 
-                    WHERE provider_id = ? AND name = ?
-                """, (provider['id'], model_name))
-                row = cursor.fetchone()
-                if not row:
-                    return None
-                
-                model = self._row_to_dict(row)
-                model['provider'] = provider_name
-                
-                # Get strengths
-                model['strengths'] = self._get_model_strengths(model['id'])
-                
-                # Get capabilities
-                model['capabilities'] = self._get_model_capabilities(model['id'])
-                
-                # Get cost
-                model['cost'] = self._get_model_cost(model['id'])
-                
-                # Get performance
-                model['performance'] = self._get_model_performance(model['id'])
-                
-                return model
+
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("""
+                        SELECT * FROM models 
+                        WHERE provider_id = ? AND name = ?
+                    """, (provider['id'], model_name))
+                    row = cursor.fetchone()
+                    if not row:
+                        return None
+
+                    model = self._row_to_dict(row)
+                    model['provider'] = provider_name
+
+                    # Get strengths
+                    model['strengths'] = self._get_model_strengths(model['id'])
+
+                    # Get capabilities
+                    model['capabilities'] = self._get_model_capabilities(model['id'])
+
+                    # Get cost
+                    model['cost'] = self._get_model_cost(model['id'])
+
+                    # Get performance
+                    model['performance'] = self._get_model_performance(model['id'])
+
+                    return model
     
     def get_models_by_provider(
         self,
@@ -545,28 +458,29 @@ class ModelManagementDBHandler:
             provider = self.get_provider_by_name(provider_name)
             if not provider:
                 return []
-            
-            with self._get_cursor() as cursor:
-                if include_disabled:
-                    cursor.execute("""
-                        SELECT * FROM models WHERE provider_id = ? ORDER BY name
-                    """, (provider['id'],))
-                else:
-                    cursor.execute("""
-                        SELECT * FROM models WHERE provider_id = ? AND enabled = 1 ORDER BY name
-                    """, (provider['id'],))
-                
-                models = []
-                for row in cursor.fetchall():
-                    model = self._row_to_dict(row)
-                    model['provider'] = provider_name
-                    model['strengths'] = self._get_model_strengths(model['id'])
-                    model['capabilities'] = self._get_model_capabilities(model['id'])
-                    model['cost'] = self._get_model_cost(model['id'])
-                    model['performance'] = self._get_model_performance(model['id'])
-                    models.append(model)
-                
-                return models
+
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    if include_disabled:
+                        cursor.execute("""
+                            SELECT * FROM models WHERE provider_id = ? ORDER BY name
+                        """, (provider['id'],))
+                    else:
+                        cursor.execute("""
+                            SELECT * FROM models WHERE provider_id = ? AND enabled = 1 ORDER BY name
+                        """, (provider['id'],))
+
+                    models = []
+                    for row in cursor.fetchall():
+                        model = self._row_to_dict(row)
+                        model['provider'] = provider_name
+                        model['strengths'] = self._get_model_strengths(model['id'])
+                        model['capabilities'] = self._get_model_capabilities(model['id'])
+                        model['cost'] = self._get_model_cost(model['id'])
+                        model['performance'] = self._get_model_performance(model['id'])
+                        models.append(model)
+
+                    return models
     
     def get_all_models(self, include_disabled: bool = False) -> List[Dict[str, Any]]:
         """
@@ -608,12 +522,13 @@ class ModelManagementDBHandler:
             provider = self.get_provider_by_name(provider_name)
             if not provider:
                 return False
-            
-            with self._get_cursor() as cursor:
-                cursor.execute("""
-                    DELETE FROM models WHERE provider_id = ? AND name = ?
-                """, (provider['id'], model_name))
-                return cursor.rowcount > 0
+
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("""
+                        DELETE FROM models WHERE provider_id = ? AND name = ?
+                    """, (provider['id'], model_name))
+                    return cursor.rowcount > 0
     
     # ==================================================================================
     # MODEL STRENGTHS OPERATIONS
@@ -628,20 +543,22 @@ class ModelManagementDBHandler:
             strengths: List of strength strings
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                for strength in strengths:
-                    cursor.execute("""
-                        INSERT OR IGNORE INTO model_strengths (model_id, strength)
-                        VALUES (?, ?)
-                    """, (model_id, strength))
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    for strength in strengths:
+                        cursor.execute("""
+                            INSERT OR IGNORE INTO model_strengths (model_id, strength)
+                            VALUES (?, ?)
+                        """, (model_id, strength))
     
     def _get_model_strengths(self, model_id: int) -> List[str]:
         """Get all strengths for a model."""
-        with self._get_cursor() as cursor:
-            cursor.execute("""
-                SELECT strength FROM model_strengths WHERE model_id = ?
-            """, (model_id,))
-            return [row['strength'] for row in cursor.fetchall()]
+        with self._get_connection as conn:
+            with self._get_cursor(conn) as cursor:
+                cursor.execute("""
+                    SELECT strength FROM model_strengths WHERE model_id = ?
+                """, (model_id,))
+                return [row['strength'] for row in cursor.fetchall()]
     
     # ==================================================================================
     # MODEL CAPABILITIES OPERATIONS
@@ -660,36 +577,38 @@ class ModelManagementDBHandler:
             capabilities: Dictionary of capabilities
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                for key, value in capabilities.items():
-                    value_str = json.dumps(value) if not isinstance(value, (str, int, float, bool)) else str(value)
-                    cursor.execute("""
-                        INSERT OR REPLACE INTO model_capabilities (model_id, capability_name, capability_value)
-                        VALUES (?, ?, ?)
-                    """, (model_id, key, value_str))
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    for key, value in capabilities.items():
+                        value_str = json.dumps(value) if not isinstance(value, (str, int, float, bool)) else str(value)
+                        cursor.execute("""
+                            INSERT OR REPLACE INTO model_capabilities (model_id, capability_name, capability_value)
+                            VALUES (?, ?, ?)
+                        """, (model_id, key, value_str))
     
     def _get_model_capabilities(self, model_id: int) -> Dict[str, Any]:
         """Get all capabilities for a model."""
-        with self._get_cursor() as cursor:
-            cursor.execute("""
-                SELECT capability_name, capability_value FROM model_capabilities WHERE model_id = ?
-            """, (model_id,))
-            capabilities = {}
-            for row in cursor.fetchall():
-                name = row['capability_name']
-                value = row['capability_value']
-                # Try to parse as JSON, fallback to string
-                try:
-                    capabilities[name] = json.loads(value)
-                except (json.JSONDecodeError, TypeError):
-                    # Try to parse as boolean
-                    if value.lower() in ('true', '1'):
-                        capabilities[name] = True
-                    elif value.lower() in ('false', '0'):
-                        capabilities[name] = False
-                    else:
-                        capabilities[name] = value
-            return capabilities
+        with self._get_connection as conn:
+            with self._get_cursor(conn) as cursor:
+                cursor.execute("""
+                    SELECT capability_name, capability_value FROM model_capabilities WHERE model_id = ?
+                """, (model_id,))
+                capabilities = {}
+                for row in cursor.fetchall():
+                    name = row['capability_name']
+                    value = row['capability_value']
+                    # Try to parse as JSON, fallback to string
+                    try:
+                        capabilities[name] = json.loads(value)
+                    except (json.JSONDecodeError, TypeError):
+                        # Try to parse as boolean
+                        if value.lower() in ('true', '1'):
+                            capabilities[name] = True
+                        elif value.lower() in ('false', '0'):
+                            capabilities[name] = False
+                        else:
+                            capabilities[name] = value
+                return capabilities
     
     def get_models_by_capability(
         self,
@@ -708,29 +627,30 @@ class ModelManagementDBHandler:
         """
         with self._lock:
             value_str = json.dumps(capability_value) if not isinstance(capability_value, (str, int, float, bool)) else str(capability_value)
-            
-            with self._get_cursor() as cursor:
-                cursor.execute("""
-                    SELECT DISTINCT m.* 
-                    FROM models m
-                    INNER JOIN model_capabilities mc ON m.id = mc.model_id
-                    WHERE mc.capability_name = ? AND mc.capability_value = ? AND m.enabled = 1
-                """, (capability_name, value_str))
-                
-                models = []
-                for row in cursor.fetchall():
-                    model = self._row_to_dict(row)
-                    # Get provider name
-                    cursor.execute("SELECT provider FROM providers WHERE id = ?", (model['provider_id'],))
-                    provider_row = cursor.fetchone()
-                    model['provider'] = provider_row['provider'] if provider_row else None
-                    model['strengths'] = self._get_model_strengths(model['id'])
-                    model['capabilities'] = self._get_model_capabilities(model['id'])
-                    model['cost'] = self._get_model_cost(model['id'])
-                    model['performance'] = self._get_model_performance(model['id'])
-                    models.append(model)
-                
-                return models
+
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("""
+                        SELECT DISTINCT m.* 
+                        FROM models m
+                        INNER JOIN model_capabilities mc ON m.id = mc.model_id
+                        WHERE mc.capability_name = ? AND mc.capability_value = ? AND m.enabled = 1
+                    """, (capability_name, value_str))
+
+                    models = []
+                    for row in cursor.fetchall():
+                        model = self._row_to_dict(row)
+                        # Get provider name
+                        cursor.execute("SELECT provider FROM providers WHERE id = ?", (model['provider_id'],))
+                        provider_row = cursor.fetchone()
+                        model['provider'] = provider_row['provider'] if provider_row else None
+                        model['strengths'] = self._get_model_strengths(model['id'])
+                        model['capabilities'] = self._get_model_capabilities(model['id'])
+                        model['cost'] = self._get_model_cost(model['id'])
+                        model['performance'] = self._get_model_performance(model['id'])
+                        models.append(model)
+
+                    return models
     
     # ==================================================================================
     # MODEL COST OPERATIONS
@@ -745,35 +665,37 @@ class ModelManagementDBHandler:
             cost: Cost dictionary
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                cursor.execute("""
-                    INSERT OR REPLACE INTO model_costs (
-                        model_id, input_per_1k, output_per_1k,
-                        input_per_1m, output_per_1m,
-                        input_per_1m_0_128k, input_per_1m_128k_plus,
-                        cost_json
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    model_id,
-                    cost.get('input_per_1k'),
-                    cost.get('output_per_1k'),
-                    cost.get('input_per_1m'),
-                    cost.get('output_per_1m'),
-                    cost.get('input_per_1m_0_128k'),
-                    cost.get('input_per_1m_128k_plus'),
-                    json.dumps(cost)
-                ))
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("""
+                        INSERT OR REPLACE INTO model_costs (
+                            model_id, input_per_1k, output_per_1k,
+                            input_per_1m, output_per_1m,
+                            input_per_1m_0_128k, input_per_1m_128k_plus,
+                            cost_json
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        model_id,
+                        cost.get('input_per_1k'),
+                        cost.get('output_per_1k'),
+                        cost.get('input_per_1m'),
+                        cost.get('output_per_1m'),
+                        cost.get('input_per_1m_0_128k'),
+                        cost.get('input_per_1m_128k_plus'),
+                        json.dumps(cost)
+                    ))
     
     def _get_model_cost(self, model_id: int) -> Dict[str, Any]:
         """Get cost information for a model."""
-        with self._get_cursor() as cursor:
-            cursor.execute("""
-                SELECT cost_json FROM model_costs WHERE model_id = ?
-            """, (model_id,))
-            row = cursor.fetchone()
-            if row and row['cost_json']:
-                return json.loads(row['cost_json'])
-            return {}
+        with self._get_connection as conn:
+            with self._get_cursor(conn) as cursor:
+                cursor.execute("""
+                    SELECT cost_json FROM model_costs WHERE model_id = ?
+                """, (model_id,))
+                row = cursor.fetchone()
+                if row and row['cost_json']:
+                    return json.loads(row['cost_json'])
+                return {}
     
     def get_cheapest_model_for_capability(
         self,
@@ -883,22 +805,24 @@ class ModelManagementDBHandler:
             performance: Performance dictionary
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                cursor.execute("""
-                    INSERT OR REPLACE INTO model_performance (model_id, performance_json)
-                    VALUES (?, ?)
-                """, (model_id, json.dumps(performance)))
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("""
+                        INSERT OR REPLACE INTO model_performance (model_id, performance_json)
+                        VALUES (?, ?)
+                    """, (model_id, json.dumps(performance)))
     
     def _get_model_performance(self, model_id: int) -> Dict[str, Any]:
         """Get performance information for a model."""
-        with self._get_cursor() as cursor:
-            cursor.execute("""
-                SELECT performance_json FROM model_performance WHERE model_id = ?
-            """, (model_id,))
-            row = cursor.fetchone()
-            if row and row['performance_json']:
-                return json.loads(row['performance_json'])
-            return {}
+        with self._get_connection as conn:
+            with self._get_cursor(conn) as cursor:
+                cursor.execute("""
+                    SELECT performance_json FROM model_performance WHERE model_id = ?
+                """, (model_id,))
+                row = cursor.fetchone()
+                if row and row['performance_json']:
+                    return json.loads(row['performance_json'])
+                return {}
     
     # ==================================================================================
     # BULK OPERATIONS - JSON IMPORT
@@ -1048,26 +972,27 @@ class ModelManagementDBHandler:
             Dictionary with statistics
         """
         with self._lock:
-            with self._get_cursor() as cursor:
-                cursor.execute("SELECT COUNT(*) as count FROM providers WHERE enabled = 1")
-                provider_count = cursor.fetchone()['count']
-                
-                cursor.execute("SELECT COUNT(*) as count FROM providers")
-                total_provider_count = cursor.fetchone()['count']
-                
-                cursor.execute("SELECT COUNT(*) as count FROM models WHERE enabled = 1")
-                model_count = cursor.fetchone()['count']
-                
-                cursor.execute("SELECT COUNT(*) as count FROM models")
-                total_model_count = cursor.fetchone()['count']
-                
-                return {
-                    'enabled_providers': provider_count,
-                    'total_providers': total_provider_count,
-                    'enabled_models': model_count,
-                    'total_models': total_model_count,
-                    'database_path': self._db_path
-                }
+            with self._get_connection as conn:
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute("SELECT COUNT(*) as count FROM providers WHERE enabled = 1")
+                    provider_count = cursor.fetchone()['count']
+
+                    cursor.execute("SELECT COUNT(*) as count FROM providers")
+                    total_provider_count = cursor.fetchone()['count']
+
+                    cursor.execute("SELECT COUNT(*) as count FROM models WHERE enabled = 1")
+                    model_count = cursor.fetchone()['count']
+
+                    cursor.execute("SELECT COUNT(*) as count FROM models")
+                    total_model_count = cursor.fetchone()['count']
+
+                    return {
+                        'enabled_providers': provider_count,
+                        'total_providers': total_provider_count,
+                        'enabled_models': model_count,
+                        'total_models': total_model_count,
+                        'db_connection_pool_name': self._db_connection_pool_name
+                    }
 
 
 __all__ = ['ModelManagementDBHandler']

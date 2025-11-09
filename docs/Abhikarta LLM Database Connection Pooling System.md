@@ -266,7 +266,7 @@ class Database:
 
 ```python
 # SQLite
-db = Database(db_type='sqlite', db_path='data/app.db')
+db = Database(db_type='sqlite', db_path='data/app.db_management')
 
 # PostgreSQL
 db = Database(
@@ -1051,7 +1051,7 @@ high_traffic_config = PoolConfig(
 from abhikarta.database import Database
 
 # Initialize database
-db = Database(db_type='sqlite', db_path='data/app.db')
+db = Database(db_type='sqlite', db_path='data/app.db_management')
 
 # Insert data
 user_id = db.insert('users', {
@@ -1204,28 +1204,28 @@ class MultiDatabaseApp:
         self.dbs = {
             'users': ConnectionConfig(
                 db_type=DatabaseType.POSTGRESQL,
-                host='users-db.company.com',
+                host='users-db_management.company.com',
                 database='users',
                 user='app',
                 password='secret'
             ),
             'products': ConnectionConfig(
                 db_type=DatabaseType.MYSQL,
-                host='products-db.company.com',
+                host='products-db_management.company.com',
                 database='products',
                 user='app',
                 password='secret'
             ),
             'analytics': ConnectionConfig(
                 db_type=DatabaseType.POSTGRESQL,
-                host='analytics-db.company.com',
+                host='analytics-db_management.company.com',
                 database='analytics',
                 user='analyst',
                 password='secret'
             ),
             'cache': ConnectionConfig(
                 db_type=DatabaseType.SQLITE,
-                database='cache/local.db'
+                database='cache/local.db_management'
             )
         }
     
@@ -2375,7 +2375,7 @@ mysql_pool_config = PoolConfig(
 ```python
 sqlite_config = ConnectionConfig(
     db_type=DatabaseType.SQLITE,
-    database='data/app.db',
+    database='data/app.db_management',
     connection_timeout=10
 )
 

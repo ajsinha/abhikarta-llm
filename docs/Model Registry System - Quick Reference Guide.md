@@ -98,10 +98,11 @@ cp example_provider_config.json json_configs/my_provider.json
 ### Step 1: Choose Implementation (1 minute)
 
 **For Production - Database:**
+
 ```python
 from model_registry_db import ModelRegistryDB
 
-registry = ModelRegistryDB.get_instance(db_path="./data/models.db")
+registry = ModelRegistryDB.get_instance(db_connection_pool_name="./data/models.db_management")
 ```
 
 **For Development - JSON:**
@@ -901,7 +902,7 @@ if 'auto_reload_enabled' in summary:
 from model_registry_db import ModelRegistryDB
 from exceptions import *
 
-registry = ModelRegistryDB.get_instance(db_path="./models.db")
+registry = ModelRegistryDB.get_instance(db_connection_pool_name="./models.db_management")
 
 # 1. CREATE
 model_data = {
@@ -1242,7 +1243,7 @@ DATA_DIR="/opt/abhikarta/data"
 CONFIG_DIR="/opt/abhikarta/configs"
 
 # Backup database
-cp $DATA_DIR/models.db $BACKUP_DIR/models_${DATE}.db
+cp $DATA_DIR/models.db_management $BACKUP_DIR/models_${DATE}.db_management
 echo "✓ Database backed up"
 
 # Backup configurations
@@ -1398,7 +1399,7 @@ registry.start_auto_reload(interval_minutes=2)
 **Production:**
 ```python
 # Database implementation for performance
-registry = ModelRegistryDB.get_instance("/opt/app/data/models.db")
+registry = ModelRegistryDB.get_instance("/opt/app/data/models.db_management")
 # No polling overhead
 ```
 
@@ -1596,7 +1597,7 @@ registry = ModelRegistryDB.get_instance(db_path)
 
 # Or increase timeout
 import sqlite3
-conn = sqlite3.connect('models.db', timeout=30.0)
+conn = sqlite3.connect('models.db_management', timeout=30.0)
 ```
 
 #### 6. Invalid JSON Configuration
@@ -1648,14 +1649,14 @@ PermissionError: [Errno 13] Permission denied: '/opt/app/data/models.db'
 **Solutions:**
 ```bash
 # Fix file permissions
-chmod 644 /opt/app/data/models.db
+chmod 644 /opt/app/data/models.db_management
 chmod 755 /opt/app/data
 
 # Or run with appropriate user
 sudo -u appuser python3 app.py
 
 # Check ownership
-ls -l /opt/app/data/models.db
+ls -l /opt/app/data/models.db_management
 ```
 
 ### Debug Mode
@@ -1787,7 +1788,7 @@ If issues persist:
 from model_registry_db import ModelRegistryDB
 
 # Initialize
-registry = ModelRegistryDB.get_instance("./models.db")
+registry = ModelRegistryDB.get_instance("./models.db_management")
 
 # Load configurations
 registry.load_json_directory("./configs")

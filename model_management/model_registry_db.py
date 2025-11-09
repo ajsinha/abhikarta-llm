@@ -45,7 +45,7 @@ class ModelRegistryDB(ModelRegistry):
         Safe for concurrent access from multiple threads.
 
     Usage:
-        >>> registry = ModelRegistryDB.get_instance(db_path="/path/to/db.sqlite")
+        >>> registry = ModelRegistryDB.get_instance(db_connection_pool_name="sqllitepool")
         >>>
         >>> # Load JSON files into database (one-time operation)
         >>> registry.load_json_directory("/path/to/configs")
@@ -63,14 +63,14 @@ class ModelRegistryDB(ModelRegistry):
     _instance: Optional['ModelRegistryDB'] = None
     _instance_lock = threading.RLock()
 
-    def __init__(self, db_path: str):
+    def __init__(self, db_connection_pool_name: str):
         """
         Initialize the ModelRegistryDB with database backend.
 
         Note: Use get_instance() instead of direct initialization to ensure singleton.
 
         Args:
-            db_path: Path to SQLite database file
+            db_connection_pool_name: Name of database connection pool
 
         Raises:
             ConfigurationError: If there are errors initializing database
@@ -79,8 +79,8 @@ class ModelRegistryDB(ModelRegistry):
 
         # Initialize database handler
         try:
-            self._db_handler = ModelManagementDBHandler.get_instance(db_path)
-            self._db_handler.initialize_schema()
+            self._db_handler = ModelManagementDBHandler.get_instance(db_connection_pool_name)
+
         except Exception as e:
             raise ConfigurationError(f"Failed to initialize database: {e}")
 
@@ -88,12 +88,12 @@ class ModelRegistryDB(ModelRegistry):
         self._load_all_providers()
 
     @classmethod
-    def get_instance(cls, db_path: str = None) -> 'ModelRegistryDB':
+    def get_instance(cls, db_connection_pool_name: str = None) -> 'ModelRegistryDB':
         """
         Get the singleton instance of ModelRegistryDB.
 
         Args:
-            db_path: Path to SQLite database (required on first call)
+            db_connection_pool_name: Path to SQLite database (required on first call)
 
         Returns:
             The singleton ModelRegistryDB instance
@@ -103,16 +103,16 @@ class ModelRegistryDB(ModelRegistry):
 
         Example:
             >>> # First initialization
-            >>> registry = ModelRegistryDB.get_instance(db_path="/path/to/db.sqlite")
+            >>> registry = ModelRegistryDB.get_instance(db_connection_pool_name="sqlitepool")
             >>>
             >>> # Subsequent calls
             >>> registry = ModelRegistryDB.get_instance()  # Uses existing instance
         """
         with cls._instance_lock:
             if cls._instance is None:
-                if db_path is None:
+                if db_connection_pool_name is None:
                     raise ValueError("db_path must be provided on first call to get_instance()")
-                cls._instance = cls(db_path)
+                cls._instance = cls(db_connection_pool_name)
             return cls._instance
 
     @classmethod

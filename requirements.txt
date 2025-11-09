@@ -6,7 +6,7 @@
 
 # Core dependencies
 httpx>=0.24.0  # Required for HTTP transport in MCP client
-pydantic>=2.0.0
+pydantic>=2.12.4
 
 # Optional: MCP and LLM integrations
 # Uncomment if needed:
@@ -21,3 +21,8 @@ pydantic>=2.0.0
 # black>=23.0.0
 # mypy>=1.0.0
 # flake8>=6.0.0
+
+bcrypt==4.3.0
+psycopg==3.2.12
+PyMySQL==1.1.2
+typing-extensions>=4.0.0

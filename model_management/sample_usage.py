@@ -35,7 +35,7 @@ def demo_database_implementation(db_path: str, json_dir: str = None):
     
     # 1. Initialize registry
     print(f"\n1. Initializing database at: {db_path}")
-    registry = ModelRegistryDB.get_instance(db_path=db_path)
+    registry = ModelRegistryDB.get_instance(db_connection_pool_name=db_path)
     print("   ✓ Database initialized")
     
     # 2. Import JSON files if directory provided
@@ -274,7 +274,7 @@ def demo_capability_validation():
     try:
         # Use database for this demo
         ModelRegistryDB.reset_instance()
-        registry = ModelRegistryDB.get_instance(db_path=":memory:")
+        registry = ModelRegistryDB.get_instance(db_connection_pool_name=":memory:")
         
         # Try to load configs
         if os.path.exists(json_dir):
@@ -369,7 +369,7 @@ def main():
     print("=" * 70)
     
     # Configuration
-    DB_PATH = "./demo_models.db"
+    DB_PATH = "./demo_models.db_management"
     JSON_DIR = "./json_configs"
     
     print("\nConfiguration:")
