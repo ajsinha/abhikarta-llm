@@ -23,11 +23,12 @@ import logging
 from typing import Optional
 from user_management.user_manager import UserManager
 from user_management.user import User
+from web.route_management.abstract_routes import AbstractRoutes
 
 logger = logging.getLogger(__name__)
 
 
-class AuthRoutes:
+class AuthRoutes(AbstractRoutes):
     """
     Handles authentication-related routes for the application.
     
@@ -38,7 +39,7 @@ class AuthRoutes:
         user_manager: UserManager instance for user operations
     """
     
-    def __init__(self, app, user_manager: UserManager):
+    def __init__(self, app):
         """
         Initialize AuthRoutes.
         
@@ -46,8 +47,9 @@ class AuthRoutes:
             app: Flask application instance
             user_manager: UserManager instance for database operations
         """
-        self.app = app
-        self.user_manager = user_manager
+        super().__init__(app)
+
+
         logger.info("AuthRoutes initialized")
     
     def register_routes(self):

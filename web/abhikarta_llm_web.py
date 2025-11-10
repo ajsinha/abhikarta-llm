@@ -22,7 +22,7 @@ from flask_session import Session
 import logging
 import os
 from typing import Optional
-from user_management.user_manager import UserManager
+from web.route_management.abstract_routes import AbstractRoutes
 
 # Configure logging
 logging.basicConfig(
@@ -44,7 +44,7 @@ class AbhikartaLLMWeb:
         user_manager: UserManager instance for user operations
     """
     
-    def __init__(self, user_manager: UserManager, secret_key: Optional[str] = None):
+    def __init__(self, secret_key: Optional[str] = None):
         """
         Initialize the Abhikarta LLM Web Application.
         
@@ -55,7 +55,11 @@ class AbhikartaLLMWeb:
         self.app = Flask(__name__, 
                         template_folder='templates',
                         static_folder='static')
-        
+
+        self.user_manager = None
+        self.role_manager = None
+        self.resource_manager = None
+
         # Configure application
         self.app.config['SECRET_KEY'] = secret_key or os.urandom(24).hex()
         self.app.config['SESSION_TYPE'] = 'filesystem'
@@ -66,32 +70,44 @@ class AbhikartaLLMWeb:
         # Initialize session
         Session(self.app)
         
-        # Store user manager
+
+        logger.info("Abhikarta LLM Web Application initialized")
+
+    def set_user_manager(self, user_manager):
         self.user_manager = user_manager
-        
         # Initialize user manager
         if not self.user_manager._initialized:
             if not self.user_manager.initialize():
                 raise RuntimeError("Failed to initialize UserManager")
-        
-        logger.info("Abhikarta LLM Web Application initialized")
-        
+    def set_role_manager(self,role_manager):
+        self.role_manager = role_manager
+
+    def set_resource_manager(self, resource_manager):
+        self.resource_manager = resource_manager
+
+    def prepare_routes(self):
         # Register routes
         self._register_routes()
         self._register_error_handlers()
-    
+
+    def _prepare_a_route(self, routes_object: AbstractRoutes):
+        routes_object.set_role_manager(self.role_manager)
+        routes_object.set_user_manager(self.user_manager)
+        routes_object.set_resource_manager(self.resource_manager)
+        routes_object.register_routes()
+
     def _register_routes(self):
         """Register all route modules."""
         from web.route_management.auth_routes import AuthRoutes
         from web.route_management.admin_routes import AdminRoutes
         
         # Register authentication routes
-        auth_routes = AuthRoutes(self.app, self.user_manager)
-        auth_routes.register_routes()
-        
+        auth_routes = AuthRoutes(self.app)
+        self._prepare_a_route(auth_routes)
+
         # Register admin routes
-        admin_routes = AdminRoutes(self.app, self.user_manager)
-        admin_routes.register_routes()
+        admin_routes = AdminRoutes(self.app)
+        self._prepare_a_route(admin_routes)
         
         # Register home route
         @self.app.route('/')

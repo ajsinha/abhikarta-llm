@@ -21,11 +21,12 @@ from flask import render_template, session, redirect, url_for, flash
 from web.route_management.auth_routes import admin_required
 import logging
 from user_management.user_manager import UserManager
+from web.route_management.abstract_routes import AbstractRoutes
 
 logger = logging.getLogger(__name__)
 
 
-class AdminRoutes:
+class AdminRoutes(AbstractRoutes):
     """
     Handles admin-specific routes for the application.
     
@@ -36,7 +37,7 @@ class AdminRoutes:
         user_manager: UserManager instance for user operations
     """
     
-    def __init__(self, app, user_manager: UserManager):
+    def __init__(self, app):
         """
         Initialize AdminRoutes.
         
@@ -44,8 +45,9 @@ class AdminRoutes:
             app: Flask application instance
             user_manager: UserManager instance for database operations
         """
+        super().__init__(app)
         self.app = app
-        self.user_manager = user_manager
+
         logger.info("AdminRoutes initialized")
     
     def register_routes(self):

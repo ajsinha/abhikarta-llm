@@ -4,10 +4,24 @@ from db_management.pool_manager import get_pool_manager
 from db_management.pool_config import SQLitePoolConfig
 from user_management.user_manager_db import UserManagerDB
 from user_management.user_manager import UserManager
+from user_management.role_management_db import RoleManagementDB
+from user_management.resource_management_db import ResourceManagementDB
 from web.abhikarta_llm_web import AbhikartaLLMWeb
 
-def main(user_manager_object: UserManager):
-    aweb = AbhikartaLLMWeb(user_manager_object)
+def main(pool_name):
+    user_manager = UserManagerDB(db_connection_pool_name=pool_name)
+    role_manager = RoleManagementDB(db_connection_pool_name=pool_name)
+    resource_manager = ResourceManagementDB(db_connection_pool_name=pool_name)
+
+    aweb = AbhikartaLLMWeb()
+
+
+    aweb.set_user_manager(user_manager)
+    aweb.set_role_manager(role_manager)
+    aweb.set_resource_manager(resource_manager)
+
+    aweb.prepare_routes()
+
     aweb.run()
 
 
@@ -42,35 +56,12 @@ if __name__ == '__main__':
         check_same_thread=False  # Required for pooling
     )
 
-
-
-
     # Create pool
     manager.create_pool(config)
     print(f"Created pool: {config.pool_name}")
 
-    '''
-    @contextmanager
-    def _get_connection():
-        """Context manager for database connections with auto-commit."""
-        with manager.get_connection_context(pool_name) as conn:
-            try:
-                yield conn  # Now this yields the actual connection
-                conn.commit()  # Auto-commit on success
-            except Exception as e:
-                conn.rollback()  # Auto-rollback on error
-                print(f"Database error: {e}")
-                raise
 
-    with _get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users")
-        rows = cursor.fetchall()  # Fetch all results
-        print("\nFetched data:")
-        for row in rows:
-            print(row)
-    '''
-    user_manager_object = UserManagerDB(db_connection_pool_name=pool_name)
-    main(user_manager_object)
+
+    main(pool_name)
 
     manager.shutdown_all()
