@@ -228,7 +228,7 @@ class ModelRoutes(AbstractRoutes):
 
                 # Process models
                 models_created = 0
-                models_skipped = 0
+                models_updated = 0
                 models_failed = []
 
                 for model_data in json_data['models']:
@@ -243,62 +243,116 @@ class ModelRoutes(AbstractRoutes):
 
                         model_name = model_data['name']
 
-                        # Check if model already exists
-                        existing_model = self.db_handler.get_model_by_name(provider_name, model_name)
-
-                        if existing_model:
-                            logger.info(f'Model "{model_name}" already exists, skipping')
-                            models_skipped += 1
-                            continue
-
-                        # Extract model information
+                        # Extract model information with reasonable defaults
                         version = model_data.get('version', '1.0')
-                        description = model_data.get('description', '')
+                        description = model_data.get('description', f'Model {model_name}')
                         model_id = model_data.get('model_id')
-                        context_window = model_data.get('context_window')
-                        max_output = model_data.get('max_output')
+
+                        # Required fields with defaults (if not provided)
+                        context_window = model_data.get('context_window', 8192)  # Default: 8K context
+                        max_output = model_data.get('max_output', 4096)  # Default: 4K max output
+
+                        # Optional fields
                         parameters = model_data.get('parameters')
                         license_info = model_data.get('license')
                         model_enabled = model_data.get('enabled', True)
 
-                        # Insert model
-                        new_model_id = self.db_handler.insert_model(
-                            provider=provider_name,
-                            name=model_name,
-                            version=version,
-                            description=description,
-                            model_id=model_id,
-                            context_window=context_window,
-                            max_output=max_output,
-                            parameters=parameters,
-                            license=license_info,
-                            enabled=model_enabled
-                        )
+                        # Check if model already exists
+                        existing_model = self.db_handler.get_model_by_name(provider_name, model_name)
 
-                        if not new_model_id:
-                            models_failed.append({
-                                'model': model_name,
-                                'reason': 'Failed to insert model'
-                            })
-                            continue
+                        if existing_model:
+                            # UPDATE existing model
+                            logger.info(f'Model "{model_name}" already exists, updating')
 
-                        # Insert capabilities
-                        capabilities = model_data.get('capabilities', {})
-                        if capabilities:
-                            self.db_handler.insert_model_capabilities(new_model_id, capabilities)
+                            # Update model basic info
+                            update_success = self.db_handler.update_model(
+                                provider_name=provider_name,
+                                model_name=model_name,
+                                version=version,
+                                description=description,
+                                model_id=model_id,
+                                context_window=context_window,
+                                max_output=max_output,
+                                parameters=parameters,
+                                license=license_info,
+                                enabled=model_enabled
+                            )
 
-                        # Insert strengths
-                        strengths = model_data.get('strengths', [])
-                        if strengths:
-                            self.db_handler.insert_model_strengths(new_model_id, strengths)
+                            if not update_success:
+                                models_failed.append({
+                                    'model': model_name,
+                                    'reason': 'Failed to update model'
+                                })
+                                continue
 
-                        # Insert costs
-                        cost = model_data.get('cost', {})
-                        if cost:
-                            self.db_handler.insert_model_cost(new_model_id, cost)
+                            db_model_id = existing_model['id']
 
-                        models_created += 1
-                        logger.info(f'Model "{model_name}" created successfully')
+                            # Delete and re-insert capabilities, strengths, and costs
+                            # This ensures they're always up to date
+                            with self.db_handler._get_connection() as conn:
+                                with self.db_handler._get_cursor(conn) as cursor:
+                                    cursor.execute("DELETE FROM model_capabilities WHERE model_id = ?", (db_model_id,))
+                                    cursor.execute("DELETE FROM model_strengths WHERE model_id = ?", (db_model_id,))
+                                    cursor.execute("DELETE FROM model_costs WHERE model_id = ?", (db_model_id,))
+
+                            # Insert updated capabilities
+                            capabilities = model_data.get('capabilities', {})
+                            if capabilities:
+                                self.db_handler.insert_model_capabilities(db_model_id, capabilities)
+
+                            # Insert updated strengths
+                            strengths = model_data.get('strengths', [])
+                            if strengths:
+                                self.db_handler.insert_model_strengths(db_model_id, strengths)
+
+                            # Insert updated costs
+                            cost = model_data.get('cost', {})
+                            if cost:
+                                self.db_handler.insert_model_cost(db_model_id, cost)
+
+                            models_updated += 1
+                            logger.info(f'Model "{model_name}" updated successfully')
+                        else:
+                            # CREATE new model
+                            logger.info(f'Creating new model: {model_name}')
+
+                            new_model_id = self.db_handler.insert_model(
+                                provider_name=provider_name,
+                                name=model_name,
+                                version=version,
+                                description=description,
+                                model_id=model_id,
+                                context_window=context_window,
+                                max_output=max_output,
+                                parameters=parameters,
+                                license=license_info,
+                                enabled=model_enabled
+                            )
+
+                            if not new_model_id:
+                                models_failed.append({
+                                    'model': model_name,
+                                    'reason': 'Failed to insert model'
+                                })
+                                continue
+
+                            # Insert capabilities
+                            capabilities = model_data.get('capabilities', {})
+                            if capabilities:
+                                self.db_handler.insert_model_capabilities(new_model_id, capabilities)
+
+                            # Insert strengths
+                            strengths = model_data.get('strengths', [])
+                            if strengths:
+                                self.db_handler.insert_model_strengths(new_model_id, strengths)
+
+                            # Insert costs
+                            cost = model_data.get('cost', {})
+                            if cost:
+                                self.db_handler.insert_model_cost(new_model_id, cost)
+
+                            models_created += 1
+                            logger.info(f'Model "{model_name}" created successfully')
 
                     except Exception as model_error:
                         logger.error(f'Error processing model {model_data.get("name", "unknown")}: {model_error}')
@@ -317,14 +371,14 @@ class ModelRoutes(AbstractRoutes):
                     'provider': provider_name,
                     'provider_action': provider_action,
                     'models_created': models_created,
-                    'models_skipped': models_skipped,
+                    'models_updated': models_updated,
                     'models_failed': len(models_failed)
                 }
 
                 if models_failed:
                     response_data['failed_models'] = models_failed
 
-                logger.info(f'JSON upload completed: {provider_name} - {models_created} models created, {models_skipped} skipped, {len(models_failed)} failed')
+                logger.info(f'JSON upload completed: {provider_name} - {models_created} models created, {models_updated} updated, {len(models_failed)} failed')
 
                 return jsonify(response_data), 200
 
@@ -650,15 +704,15 @@ class ModelRoutes(AbstractRoutes):
                                          provider=provider)
 
                 try:
-                    # Insert model
+                    # Insert model with defaults for required fields
                     new_model_id = self.db_handler.insert_model(
-                        provider=provider_name,
+                        provider_name=provider_name,
                         name=model_name,
-                        version=version if version else None,
-                        description=description if description else None,
+                        version=version if version else '1.0',
+                        description=description if description else f'Model {model_name}',
                         model_id=model_id if model_id else None,
-                        context_window=context_window if context_window else None,
-                        max_output=max_output if max_output else None,
+                        context_window=context_window if context_window else 8192,
+                        max_output=max_output if max_output else 4096,
                         parameters=parameters if parameters else None,
                         license=license_info if license_info else None,
                         enabled=enabled
