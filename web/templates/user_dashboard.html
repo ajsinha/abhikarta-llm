@@ -130,6 +130,23 @@
             <div class="card feature-card">
                 <div class="card-body text-center p-4">
                     <div class="feature-icon text-warning">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h5 class="card-title">Reset Password</h5>
+                    <p class="card-text text-muted">
+                        Change your account password for security
+                    </p>
+                    <button class="btn btn-outline-warning" onclick="window.location.href='{{ url_for('reset_password') }}'">
+                        <i class="fas fa-key"></i> Reset Password
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon text-warning">
                         <i class="fas fa-history"></i>
                     </div>
                     <h5 class="card-title">Activity History</h5>
@@ -143,7 +160,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Getting Started -->
     <div class="row">
         <div class="col-md-12">
@@ -157,7 +174,7 @@
                         <strong>Welcome to Abhikarta LLM Platform!</strong>
                     </div>
                     <p>This platform provides access to advanced large language model capabilities. Features are currently under development and will be available soon.</p>
-                    
+
                     <h6 class="mt-4"><i class="fas fa-question-circle"></i> Need Help?</h6>
                     <p class="mb-0">Contact your administrator for assistance or feature requests.</p>
                 </div>

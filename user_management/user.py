@@ -209,6 +209,9 @@ class PasswordEncryption:
     # Bcrypt work factor (cost factor) - higher is more secure but slower
     BCRYPT_ROUNDS = 12
 
+    @staticmethod
+    def encrypt_password(password: str):
+        return PasswordEncryption.encrypt_password_md5(password)
 
     @staticmethod
     def encrypt_password_md5(password: str):

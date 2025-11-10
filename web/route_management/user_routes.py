@@ -95,6 +95,8 @@ class UserRoutes(AbstractRoutes):
         @self.app.route('/api/admin/users', methods=['POST'])
         @admin_required
         def create_user():
+            from user_management.user import PasswordEncryption
+
             """
             Create a new user.
 
@@ -138,15 +140,17 @@ class UserRoutes(AbstractRoutes):
                         'message': f'User "{userid}" already exists'
                     }), 409
 
-                # Create new user
+                # Create new user with hashed password
                 user = User(
                     userid=userid,
                     fullname=fullname,
                     emailaddress=emailaddress,
+                    password_hash=PasswordEncryption.encrypt_password(password),  # Temporary, will be set below
                     roles=roles,
                     enabled=enabled
                 )
-                user.set_password(password)
+                # Set the actual password (this hashes it)
+                #user.set_password(password)
 
                 # Save user
                 if self.user_manager.save_user(user):
