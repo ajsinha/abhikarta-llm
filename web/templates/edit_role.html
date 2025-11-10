@@ -522,12 +522,17 @@ function handleSubmit(event) {
         formData.resources[resourceName][permission] = true;
     });
 
-    // Display collected data (TODO: Replace with actual API call)
+    // Display collected data for debugging
     console.log('Role data to be submitted:', formData);
-    alert('Role update form submitted!\n\nData logged to console.\n\nTODO: Implement backend API call.');
 
-    // Uncomment below when backend API is ready
-    /*
+    // Disable submit button to prevent double-click
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    }
+
+    // Make API call to update role
     fetch('/api/admin/roles/{{ role.name }}', {
         method: 'PUT',
         headers: {
@@ -538,17 +543,24 @@ function handleSubmit(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Role updated successfully!');
+            alert('Role "{{ role.name }}" updated successfully!');
             window.location.href = '{{ url_for('manage_roles') }}';
         } else {
             alert('Error updating role: ' + data.message);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+            }
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error updating role');
+        alert('Error updating role. Please try again.');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        }
     });
-    */
 
     return false;
 }

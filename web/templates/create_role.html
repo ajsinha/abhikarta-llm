@@ -282,7 +282,7 @@
                 <button type="reset" class="btn btn-outline-warning">
                     <i class="fas fa-undo"></i> Reset
                 </button>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
                     <i class="fas fa-save"></i> Create Role
                 </button>
             </div>
@@ -307,20 +307,20 @@ function deselectAllPermissions() {
 
 function handleSubmit(event) {
     event.preventDefault();
-    
+
     // Validate role name
     const roleName = document.getElementById('roleName').value.trim();
     if (!roleName) {
         alert('Role name is required');
         return false;
     }
-    
+
     // Validate role name format (lowercase, no spaces)
     if (!/^[a-z0-9_]+$/.test(roleName)) {
         alert('Role name must be lowercase with no spaces (use underscores instead)');
         return false;
     }
-    
+
     // Validate metadata JSON if provided
     const metadataField = document.getElementById('roleMetadata').value.trim();
     if (metadataField) {
@@ -331,7 +331,7 @@ function handleSubmit(event) {
             return false;
         }
     }
-    
+
     // Collect form data
     const formData = {
         name: roleName,
@@ -340,14 +340,14 @@ function handleSubmit(event) {
         resources: {},
         metadata: metadataField ? JSON.parse(metadataField) : {}
     };
-    
+
     // Collect resource permissions
     const checkboxes = document.querySelectorAll('.permission-checks input[type="checkbox"]:checked');
     checkboxes.forEach(cb => {
         const parts = cb.name.split('_');
         const resourceName = parts.slice(1, -1).join('_');
         const permission = parts[parts.length - 1];
-        
+
         if (!formData.resources[resourceName]) {
             formData.resources[resourceName] = {
                 create: false,
@@ -359,13 +359,16 @@ function handleSubmit(event) {
         }
         formData.resources[resourceName][permission] = true;
     });
-    
-    // Display collected data (TODO: Replace with actual API call)
+
+    // Display collected data for debugging
     console.log('Role data to be submitted:', formData);
-    alert('Role creation form submitted!\n\nData logged to console.\n\nTODO: Implement backend API call.');
-    
-    // Uncomment below when backend API is ready
-    /*
+
+    // Disable submit button to prevent double-click
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+    // Make API call to create role
     fetch('/api/admin/roles', {
         method: 'POST',
         headers: {
@@ -376,18 +379,21 @@ function handleSubmit(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Role created successfully!');
+            alert('Role "' + roleName + '" created successfully!');
             window.location.href = '{{ url_for('manage_roles') }}';
         } else {
             alert('Error creating role: ' + data.message);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Role';
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error creating role');
+        alert('Error creating role. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Role';
     });
-    */
-    
+
     return false;
 }
 

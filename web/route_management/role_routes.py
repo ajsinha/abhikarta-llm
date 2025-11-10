@@ -786,11 +786,21 @@ class RoleRoutes(AbstractRoutes):
         Returns:
             Dictionary representation of the role
         """
+        # Handle created_at - could be datetime object or string from database
+        created_at_str = None
+        if role.created_at:
+            if hasattr(role.created_at, 'isoformat'):
+                # It's a datetime object
+                created_at_str = role.created_at.isoformat()
+            elif isinstance(role.created_at, str):
+                # It's already a string
+                created_at_str = role.created_at
+
         result = {
             'name': role.name,
             'description': role.description,
             'enabled': role.enabled,
-            'created_at': role.created_at.isoformat() if role.created_at else None,
+            'created_at': created_at_str,
             'metadata': role.metadata,
             'resource_count': len(role.resources)
         }

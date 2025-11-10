@@ -331,8 +331,52 @@ function changePerPage(value) {
 
 function confirmDelete(roleName) {
     if (confirm('Are you sure you want to delete the role "' + roleName + '"?\n\nThis action cannot be undone.')) {
-        // TODO: Implement delete functionality
-        alert('Delete functionality to be implemented');
+        // Call the delete API
+        fetch('/api/admin/roles/' + encodeURIComponent(roleName), {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Role "' + roleName + '" deleted successfully!');
+                window.location.reload();
+            } else {
+                // If there are users with this role, ask for confirmation
+                if (data.users && data.users.length > 0) {
+                    if (confirm(data.message + '\n\nDo you want to force delete? This will remove the role from all users.')) {
+                        // Force delete
+                        fetch('/api/admin/roles/' + encodeURIComponent(roleName) + '?force=true', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Role "' + roleName + '" deleted successfully!');
+                                window.location.reload();
+                            } else {
+                                alert('Error deleting role: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error deleting role. Please try again.');
+                        });
+                    }
+                } else {
+                    alert('Error deleting role: ' + data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting role. Please try again.');
+        });
     }
 }
 
