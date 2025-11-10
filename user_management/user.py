@@ -111,9 +111,9 @@ class User:
         Returns:
             True if password matches, False otherwise
         """
-        print(self.password_hash)
+        #print(self.password_hash)
         xp=PasswordEncryption.encrypt_password_md5(password)
-        print(xp)
+        #print(xp)
         return PasswordEncryption.verify_password(password, self.password_hash)
     
     def update_password(self, new_password: str) -> None:

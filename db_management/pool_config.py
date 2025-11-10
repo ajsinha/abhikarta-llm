@@ -65,13 +65,22 @@ class PoolConfiguration(ABC):
 
 @dataclass
 class SQLitePoolConfig(PoolConfiguration):
-    """Configuration for SQLite connection pools."""
-    
+    """
+    Configuration for SQLite connection pools.
+
+    Enhanced with settings for better concurrency and connection pooling.
+    """
+
     database_path: str = ":memory:"
     check_same_thread: bool = False
-    timeout: float = 5.0
-    isolation_level: Optional[str] = None
-    
+    timeout: float = 30.0  # Increased default timeout for busy database
+    isolation_level: Optional[str] = "DEFERRED"  # Changed from None to DEFERRED
+    enable_wal_mode: bool = True  # Enable Write-Ahead Logging for better concurrency
+    busy_timeout: int = 30000  # Busy timeout in milliseconds (30 seconds)
+    cache_size: int = -2000  # Cache size in KB (negative means KB, 2MB default)
+    synchronous: str = "NORMAL"  # NORMAL is faster than FULL but still safe with WAL
+    journal_mode: str = "WAL"  # Write-Ahead Logging mode
+
     def get_connection_params(self) -> Dict[str, Any]:
         """Return SQLite connection parameters."""
         return {
@@ -85,7 +94,7 @@ class SQLitePoolConfig(PoolConfiguration):
 @dataclass
 class PostgreSQLPoolConfig(PoolConfiguration):
     """Configuration for PostgreSQL connection pools."""
-    
+
     host: str = "localhost"
     port: int = 5432
     database: str = "postgres"
@@ -93,7 +102,7 @@ class PostgreSQLPoolConfig(PoolConfiguration):
     password: str = ""
     sslmode: str = "prefer"
     connect_timeout: int = 10
-    
+
     def get_connection_params(self) -> Dict[str, Any]:
         """Return PostgreSQL connection parameters."""
         return {
@@ -110,7 +119,7 @@ class PostgreSQLPoolConfig(PoolConfiguration):
 @dataclass
 class MySQLPoolConfig(PoolConfiguration):
     """Configuration for MySQL connection pools."""
-    
+
     host: str = "localhost"
     port: int = 3306
     database: str = "mysql"
@@ -119,7 +128,7 @@ class MySQLPoolConfig(PoolConfiguration):
     charset: str = "utf8mb4"
     connect_timeout: int = 10
     autocommit: bool = False
-    
+
     def get_connection_params(self) -> Dict[str, Any]:
         """Return MySQL connection parameters."""
         return {

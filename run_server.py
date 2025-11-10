@@ -23,11 +23,23 @@ if __name__ == '__main__':
     config = SQLitePoolConfig(
         pool_name=pool_name,
         database_path='/home/ashutosh/PycharmProjects/abhikarta-llm/data/abhikarta-llm.db',
-        min_connections=2,
-        max_connections=10,
-        max_idle_connections=5,
+
+        # Pool settings
+        min_connections=1,
+        max_connections=5,
+        max_idle_connections=2,
         connection_timeout=30.0,
-        idle_timeout=300.0
+        idle_timeout=300.0,
+
+        # ⭐ Critical fixes
+        timeout=30.0,  # 6x longer timeout
+        busy_timeout=30000,  # 30 seconds in milliseconds
+        enable_wal_mode=True,  # 🌟 KEY FIX - enables concurrency
+        journal_mode="WAL",  # Write-Ahead Logging
+        synchronous="NORMAL",  # Safe with WAL
+        cache_size=-2000,  # 2MB cache
+        isolation_level="DEFERRED",  # Better than None
+        check_same_thread=False  # Required for pooling
     )
 
 
