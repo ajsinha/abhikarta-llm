@@ -50,14 +50,14 @@ class RoleRoutes(AbstractRoutes):
         user_manager: UserManager instance for user operations
     """
 
-    def __init__(self, app):
+    def __init__(self, app, db_connection_pool_name: str):
         """
         Initialize RoleRoutes.
 
         Args:
             app: Flask application instance
         """
-        super().__init__(app)
+        super().__init__(app, db_connection_pool_name)
         logger.info("RoleRoutes initialized")
 
     def register_routes(self):

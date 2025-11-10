@@ -48,14 +48,14 @@ class ResourceRoutes(AbstractRoutes):
         resource_manager: ResourceManager instance for database operations
     """
 
-    def __init__(self, app):
+    def __init__(self, app, db_connection_pool_name: str):
         """
         Initialize ResourceRoutes.
 
         Args:
             app: Flask application instance
         """
-        super().__init__(app)
+        super().__init__(app, db_connection_pool_name)
         logger.info("ResourceRoutes initialized")
 
     def register_routes(self):

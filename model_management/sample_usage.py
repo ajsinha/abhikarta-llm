@@ -11,10 +11,10 @@ with both Database and JSON implementations, including the new auto-reload API.
 
 import os
 import time
-from model_registry_db import ModelRegistryDB
-from model_registry_json import ModelRegistryJSON
-from model_management import ModelCapability
-from exceptions import (
+from model_management.model_registry_db import ModelRegistryDB
+from model_management.model_registry_json import ModelRegistryJSON
+from model_management.model_management import ModelCapability
+from model_management.exceptions import (
     ProviderNotFoundException,
     ModelNotFoundException,
     NoModelsAvailableException

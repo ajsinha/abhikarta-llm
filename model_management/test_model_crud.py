@@ -12,9 +12,9 @@ import sys
 import os
 import tempfile
 import json
-from model_registry_db import ModelRegistryDB
-from model_registry_json import ModelRegistryJSON
-from exceptions import (
+from model_management.model_registry_db import ModelRegistryDB
+from model_management.model_registry_json import ModelRegistryJSON
+from model_management.exceptions import (
     ModelAlreadyExistsException,
     ModelNotFoundException,
     ProviderNotFoundException

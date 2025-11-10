@@ -19,6 +19,7 @@ def main(pool_name):
     aweb.set_user_manager(user_manager)
     aweb.set_role_manager(role_manager)
     aweb.set_resource_manager(resource_manager)
+    aweb.set_db_connection_pool_name(pool_name)
 
     aweb.prepare_routes()
 

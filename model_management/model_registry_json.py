@@ -24,10 +24,10 @@ import threading
 import time
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from model_registry import ModelRegistry
-from model_provider_json import ModelProviderJSON
-from model_provider import Model
-from exceptions import ConfigurationError, ModelNotFoundException
+from model_management.model_registry import ModelRegistry
+from model_management.model_provider_json import ModelProviderJSON
+from model_management.model_provider import Model
+from model_management.exceptions import ConfigurationError, ModelNotFoundException
 
 
 class ModelRegistryJSON(ModelRegistry):

@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}{{ provider.provider }} - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3);
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 1rem;
+    }
+    
+    .info-value {
+        color: #333;
+        font-size: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #e74c3c;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e74c3c;
+    }
+    
+    .btn-group-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    
+    .model-card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+        cursor: pointer;
+    }
+    
+    .model-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-server"></i> {{ provider.provider }}</h2>
+                <p class="mb-0">Provider Details and Models</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('list_providers') }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Providers
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Basic Information Card -->
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-info-circle"></i> Provider Information
+        </h5>
+        
+        <div class="info-row">
+            <span class="info-label">Provider Name:</span>
+            <span class="info-value"><strong>{{ provider.provider }}</strong></span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">API Version:</span>
+            <span class="info-value">{{ provider.api_version }}</span>
+        </div>
+        
+        {% if provider.base_url %}
+        <div class="info-row">
+            <span class="info-label">Base URL:</span>
+            <span class="info-value">
+                <a href="{{ provider.base_url }}" target="_blank">{{ provider.base_url }}</a>
+            </span>
+        </div>
+        {% endif %}
+        
+        <div class="info-row">
+            <span class="info-label">Status:</span>
+            <span class="info-value">
+                {% if provider.enabled %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Total Models:</span>
+            <span class="info-value">
+                <span class="badge bg-info">{{ models|length }} Models</span>
+                <span class="badge bg-success">{{ models|selectattr('enabled')|list|length }} Enabled</span>
+            </span>
+        </div>
+    </div>
+    
+    <!-- Notes Card (if present) -->
+    {% if provider.notes_dict %}
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-sticky-note"></i> Additional Information
+        </h5>
+        
+        {% if provider.notes_dict.description %}
+        <div class="info-row">
+            <span class="info-label">Description:</span>
+            <span class="info-value">{{ provider.notes_dict.description }}</span>
+        </div>
+        {% endif %}
+        
+        {% if provider.notes_dict.api_key_required %}
+        <div class="info-row">
+            <span class="info-label">API Key Required:</span>
+            <span class="info-value">{{ provider.notes_dict.api_key_required }}</span>
+        </div>
+        {% endif %}
+        
+        {% if provider.notes_dict.rate_limits %}
+        <div class="info-row">
+            <span class="info-label">Rate Limits:</span>
+            <span class="info-value">{{ provider.notes_dict.rate_limits }}</span>
+        </div>
+        {% endif %}
+        
+        {% if provider.notes_dict.documentation_url %}
+        <div class="info-row">
+            <span class="info-label">Documentation:</span>
+            <span class="info-value">
+                <a href="{{ provider.notes_dict.documentation_url }}" target="_blank">
+                    {{ provider.notes_dict.documentation_url }}
+                </a>
+            </span>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Models List -->
+    <div class="info-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="section-title mb-0">
+                <i class="fas fa-brain"></i> Available Models ({{ models|length }})
+            </h5>
+            {% if is_admin %}
+            <button class="btn btn-danger btn-sm" onclick="window.location.href='{{ url_for('create_model', provider_name=provider.provider) }}'">
+                <i class="fas fa-plus"></i> Add Model
+            </button>
+            {% endif %}
+        </div>
+        
+        {% if models %}
+            <div class="row">
+                {% for model in models %}
+                <div class="col-md-6">
+                    <div class="card model-card" onclick="window.location.href='{{ url_for('view_model', provider_name=provider.provider, model_name=model.name) }}'">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                {{ model.name }}
+                                {% if model.enabled %}
+                                <span class="badge bg-success float-end">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary float-end">Inactive</span>
+                                {% endif %}
+                            </h6>
+                            <p class="card-text text-muted small mb-2">
+                                {{ model.description|default('No description available', true) }}
+                            </p>
+                            <div>
+                                <span class="badge bg-info">v{{ model.version }}</span>
+                                <span class="badge bg-secondary">{{ model.context_window|default(0) }} ctx</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No models available for this provider.
+                {% if is_admin %}
+                <a href="{{ url_for('create_model', provider_name=provider.provider) }}">Add your first model</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="btn-group-actions">
+        <button class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('list_providers') }}'">
+            <i class="fas fa-arrow-left"></i> Back to Providers
+        </button>
+        {% if is_admin %}
+        <button class="btn btn-primary" onclick="window.location.href='{{ url_for('edit_provider', provider_name=provider.provider) }}'">
+            <i class="fas fa-edit"></i> Edit Provider
+        </button>
+        <button class="btn btn-danger" onclick="confirmDelete()">
+            <i class="fas fa-trash"></i> Delete Provider
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete() {
+    if (confirm('Are you sure you want to delete provider "{{ provider.provider }}"? This will also delete all associated models. This action cannot be undone.')) {
+        fetch('/api/admin/provider/{{ provider.provider }}', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Provider "{{ provider.provider }}" deleted successfully!');
+                window.location.href = '{{ url_for('list_providers') }}';
+            } else {
+                alert('Error deleting provider: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting provider. Please try again.');
+        });
+    }
+}
+
+$(document).ready(function() {
+    console.log('View Provider page loaded');
+});
+</script>
+{% endblock %}

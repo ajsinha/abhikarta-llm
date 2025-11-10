@@ -7,8 +7,9 @@ logger = logging.getLogger(__name__)
 
 class AbstractRoutes(ABC):
 
-    def __init__(self, app):
+    def __init__(self, app, db_connection_pool_name: str):
         self.app = app
+        self.db_connection_pool_name = db_connection_pool_name
         self.user_manager = None
         self.role_manager = None
         self.resource_manager = None

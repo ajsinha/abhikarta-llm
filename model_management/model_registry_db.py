@@ -22,11 +22,11 @@ document may be subject to patent applications.
 import threading
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from model_registry import ModelRegistry
-from model_provider_db import ModelProviderDB
-from model_provider import Model
-from model_management_db_handler import ModelManagementDBHandler
-from exceptions import ConfigurationError, ModelNotFoundException
+from model_management.model_registry import ModelRegistry
+from model_management.model_provider_db import ModelProviderDB
+from model_management.model_provider import Model
+from model_management.model_management_db_handler import ModelManagementDBHandler
+from model_management.exceptions import ConfigurationError, ModelNotFoundException
 
 
 class ModelRegistryDB(ModelRegistry):

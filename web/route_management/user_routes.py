@@ -43,14 +43,14 @@ class UserRoutes(AbstractRoutes):
         user_manager: UserManager instance for database operations
     """
 
-    def __init__(self, app):
+    def __init__(self, app, db_connection_pool_name: str):
         """
         Initialize UserRoutes.
 
         Args:
             app: Flask application instance
         """
-        super().__init__(app)
+        super().__init__(app, db_connection_pool_name)
         logger.info("UserRoutes initialized")
 
     def register_routes(self):

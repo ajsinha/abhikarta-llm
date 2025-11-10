@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Search Models - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container { padding: 30px 0; min-height: calc(100vh - 200px); }
+    .page-header { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(52, 152, 219, 0.3); }
+    .search-card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 30px; margin-bottom: 30px; }
+    .model-result { border-radius: 10px; border: none; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; margin-bottom: 15px; cursor: pointer; }
+    .model-result:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-search"></i> Search Models</h2>
+                <p class="mb-0">Search and filter LLM models by capability or provider</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('list_providers') }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Providers
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="search-card">
+        <form method="GET" id="searchForm">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="capability" class="form-label">Capability</label>
+                    <select class="form-select" id="capability" name="capability">
+                        <option value="">All Capabilities</option>
+                        <option value="chat" {% if capability == 'chat' %}selected{% endif %}>Chat</option>
+                        <option value="completion" {% if capability == 'completion' %}selected{% endif %}>Completion</option>
+                        <option value="streaming" {% if capability == 'streaming' %}selected{% endif %}>Streaming</option>
+                        <option value="vision" {% if capability == 'vision' %}selected{% endif %}>Vision</option>
+                        <option value="function_calling" {% if capability == 'function_calling' %}selected{% endif %}>Function Calling</option>
+                        <option value="tool_use" {% if capability == 'tool_use' %}selected{% endif %}>Tool Use</option>
+                        <option value="json_mode" {% if capability == 'json_mode' %}selected{% endif %}>JSON Mode</option>
+                        <option value="embedding" {% if capability == 'embedding' %}selected{% endif %}>Embedding</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="provider" class="form-label">Provider</label>
+                    <input type="text" class="form-control" id="provider" name="provider" value="{{ provider_filter or '' }}" placeholder="e.g., anthropic">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="enabled_only" class="form-label">Status</label>
+                    <select class="form-select" id="enabled_only" name="enabled_only">
+                        <option value="true" {% if enabled_only %}selected{% endif %}>Active Only</option>
+                        <option value="false" {% if not enabled_only %}selected{% endif %}>All</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Search Results ({{ results|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if results %}
+                <div class="row">
+                    {% for model in results %}
+                    <div class="col-md-6">
+                        <div class="card model-result" onclick="window.location.href='{{ url_for('view_model', provider_name=model.provider, model_name=model.name) }}'">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ model.name }}</h6>
+                                <p class="text-muted small mb-2">{{ model.description|default('No description', true) }}</p>
+                                <div>
+                                    <span class="badge bg-secondary">{{ model.provider }}</span>
+                                    <span class="badge bg-info">v{{ model.version }}</span>
+                                    {% if model.enabled %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle"></i> No models found matching your criteria. Try adjusting your filters.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

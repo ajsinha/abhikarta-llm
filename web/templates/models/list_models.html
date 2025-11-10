@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Models - {{ provider.provider }} - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3);
+    }
+    
+    .model-card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        cursor: pointer;
+    }
+    
+    .model-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-brain"></i> {{ provider.provider }} Models</h2>
+                <p class="mb-0">View and manage models for this provider</p>
+            </div>
+            <div class="col-md-4 text-end">
+                {% if is_admin %}
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('create_model', provider_name=provider.provider) }}'">
+                    <i class="fas fa-plus"></i> Add New Model
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-danger">{{ models|length }}</h3>
+                    <p class="text-muted mb-0">Total Models</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-success">{{ models|selectattr('enabled')|list|length }}</h3>
+                    <p class="text-muted mb-0">Active Models</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <button class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('view_provider', provider_name=provider.provider) }}'">
+                        <i class="fas fa-arrow-left"></i> Back to Provider
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Models Grid -->
+    <div class="row g-4">
+        {% for model in models %}
+        <div class="col-md-6">
+            <div class="card model-card" onclick="window.location.href='{{ url_for('view_model', provider_name=provider.provider, model_name=model.name) }}'">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ model.name }}</h5>
+                        {% if model.enabled %}
+                        <span class="status-badge bg-success text-white">
+                            <i class="fas fa-check-circle"></i> Active
+                        </span>
+                        {% else %}
+                        <span class="status-badge bg-danger text-white">
+                            <i class="fas fa-times-circle"></i> Inactive
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted mb-3">
+                        {{ model.description|default('No description available', true) }}
+                    </p>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Version:</small><br>
+                            <span class="badge bg-info">v{{ model.version }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Context Window:</small><br>
+                            <span class="badge bg-secondary">{{ model.context_window|default(0)|int }} tokens</span>
+                        </div>
+                    </div>
+                    {% if model.model_id %}
+                    <div class="mt-2">
+                        <small class="text-muted">Model ID: {{ model.model_id }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> No models found for this provider. 
+                {% if is_admin %}
+                <a href="{{ url_for('create_model', provider_name=provider.provider) }}">Create your first model</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Add animation on page load
+    $('.model-card').each(function(index) {
+        $(this).css('opacity', '0').delay(index * 100).animate({opacity: 1}, 500);
+    });
+});
+</script>
+{% endblock %}

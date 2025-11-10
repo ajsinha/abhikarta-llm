@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}{{ model.name }} - {{ provider.provider }} - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3);
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 1rem;
+    }
+    
+    .info-value {
+        color: #333;
+        font-size: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #e74c3c;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e74c3c;
+    }
+    
+    .btn-group-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    
+    .capability-badge {
+        display: inline-block;
+        margin: 3px;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-brain"></i> {{ model.name }}</h2>
+                <p class="mb-0">{{ provider.provider }} Model Details</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('list_models', provider_name=provider.provider) }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Models
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Basic Information Card -->
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-info-circle"></i> Basic Information
+        </h5>
+        
+        <div class="info-row">
+            <span class="info-label">Model Name:</span>
+            <span class="info-value"><strong>{{ model.name }}</strong></span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Version:</span>
+            <span class="info-value">{{ model.version }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Provider:</span>
+            <span class="info-value">
+                <a href="{{ url_for('view_provider', provider_name=provider.provider) }}">{{ provider.provider }}</a>
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Description:</span>
+            <span class="info-value">{{ model.description|default('No description available', true) }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Status:</span>
+            <span class="info-value">
+                {% if model.enabled %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+            </span>
+        </div>
+        
+        {% if model.model_id %}
+        <div class="info-row">
+            <span class="info-label">Model ID:</span>
+            <span class="info-value"><code>{{ model.model_id }}</code></span>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Technical Specifications Card -->
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-cog"></i> Technical Specifications
+        </h5>
+        
+        <div class="info-row">
+            <span class="info-label">Context Window:</span>
+            <span class="info-value">{{ model.context_window|default(0)|int|abs|string|replace('.0', '')|int|default(0) }} tokens</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Max Output:</span>
+            <span class="info-value">{{ model.max_output|default(0)|int|abs|string|replace('.0', '')|int|default(0) }} tokens</span>
+        </div>
+        
+        {% if model.parameters %}
+        <div class="info-row">
+            <span class="info-label">Parameters:</span>
+            <span class="info-value">{{ model.parameters }}</span>
+        </div>
+        {% endif %}
+        
+        {% if model.license %}
+        <div class="info-row">
+            <span class="info-label">License:</span>
+            <span class="info-value">{{ model.license }}</span>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Capabilities Card -->
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-star"></i> Capabilities
+        </h5>
+        
+        {% if model.capabilities %}
+            <div class="mb-3">
+                {% for capability, value in model.capabilities.items() %}
+                    {% if value %}
+                    <span class="badge bg-primary capability-badge">
+                        <i class="fas fa-check"></i> {{ capability }}
+                    </span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <p class="text-muted mb-0">
+                <i class="fas fa-info-circle"></i> 
+                This model supports {{ model.capabilities|selectattr()|list|length }} capabilities
+            </p>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No capability information available
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Strengths Card -->
+    {% if model.strengths %}
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-trophy"></i> Strengths
+        </h5>
+        
+        <ul class="mb-0">
+            {% for strength in model.strengths %}
+            <li>{{ strength }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    <!-- Cost Information Card -->
+    {% if model.cost %}
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-dollar-sign"></i> Cost Information
+        </h5>
+        
+        {% if model.cost.get('input_per_1m') %}
+        <div class="info-row">
+            <span class="info-label">Input Cost (per 1M tokens):</span>
+            <span class="info-value">${{ "%.2f"|format(model.cost.get('input_per_1m', 0)) }}</span>
+        </div>
+        {% endif %}
+        
+        {% if model.cost.get('output_per_1m') %}
+        <div class="info-row">
+            <span class="info-label">Output Cost (per 1M tokens):</span>
+            <span class="info-value">${{ "%.2f"|format(model.cost.get('output_per_1m', 0)) }}</span>
+        </div>
+        {% endif %}
+        
+        {% if not (model.cost.get('input_per_1m') or model.cost.get('output_per_1m')) %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No cost information available
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Action Buttons -->
+    <div class="btn-group-actions">
+        <button class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('list_models', provider_name=provider.provider) }}'">
+            <i class="fas fa-arrow-left"></i> Back to Models
+        </button>
+        {% if is_admin %}
+        <button class="btn btn-primary" onclick="window.location.href='{{ url_for('edit_model', provider_name=provider.provider, model_name=model.name) }}'">
+            <i class="fas fa-edit"></i> Edit Model
+        </button>
+        <button class="btn btn-danger" onclick="confirmDelete()">
+            <i class="fas fa-trash"></i> Delete Model
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete() {
+    if (confirm('Are you sure you want to delete model "{{ model.name }}"? This action cannot be undone.')) {
+        fetch('/api/admin/provider/{{ provider.provider }}/model/{{ model.name }}', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Model "{{ model.name }}" deleted successfully!');
+                window.location.href = '{{ url_for('list_models', provider_name=provider.provider) }}';
+            } else {
+                alert('Error deleting model: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting model. Please try again.');
+        });
+    }
+}
+
+$(document).ready(function() {
+    console.log('View Model page loaded');
+});
+</script>
+{% endblock %}

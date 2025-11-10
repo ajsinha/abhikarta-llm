@@ -22,8 +22,8 @@ document may be subject to patent applications.
 import threading
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Any, Tuple
-from model_provider import ModelProvider, Model
-from exceptions import (
+from model_management.model_provider import ModelProvider, Model
+from model_management.exceptions import (
     ProviderNotFoundException,
     ProviderDisabledException,
     ModelNotFoundException,

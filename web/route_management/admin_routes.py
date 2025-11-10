@@ -37,7 +37,7 @@ class AdminRoutes(AbstractRoutes):
         user_manager: UserManager instance for user operations
     """
     
-    def __init__(self, app):
+    def __init__(self, app, db_connection_pool_name: str):
         """
         Initialize AdminRoutes.
         
@@ -45,7 +45,7 @@ class AdminRoutes(AbstractRoutes):
             app: Flask application instance
             user_manager: UserManager instance for database operations
         """
-        super().__init__(app)
+        super().__init__(app, db_connection_pool_name)
         self.app = app
 
         logger.info("AdminRoutes initialized")

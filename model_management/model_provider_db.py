@@ -16,8 +16,8 @@ module may be subject to patent applications.
 
 import json
 from typing import Optional, List, Dict, Any
-from model_provider import ModelProvider, Model
-from model_management_db_handler import ModelManagementDBHandler
+from model_management.model_provider import ModelProvider, Model
+from model_management.model_management_db_handler import ModelManagementDBHandler
 
 
 class ModelProviderDB(ModelProvider):

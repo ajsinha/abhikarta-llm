@@ -265,7 +265,7 @@ class ModelManagementDBHandler:
             List of provider dictionaries
         """
         with self._lock:
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     if include_disabled:
                         cursor.execute("SELECT * FROM providers ORDER BY provider")

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Providers - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3);
+    }
+    
+    .provider-card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        cursor: pointer;
+    }
+    
+    .provider-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .provider-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-server"></i> Model Providers</h2>
+                <p class="mb-0">View and manage LLM model providers</p>
+            </div>
+            <div class="col-md-4 text-end">
+                {% if is_admin %}
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('create_provider') }}'">
+                    <i class="fas fa-plus"></i> Add New Provider
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-danger">{{ providers|length }}</h3>
+                    <p class="text-muted mb-0">Total Providers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-success">{{ providers|selectattr('enabled')|list|length }}</h3>
+                    <p class="text-muted mb-0">Active Providers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-info">{{ providers|sum(attribute='model_count') }}</h3>
+                    <p class="text-muted mb-0">Total Models</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Providers Grid -->
+    <div class="row g-4">
+        {% for provider in providers %}
+        <div class="col-md-6">
+            <div class="card provider-card" onclick="window.location.href='{{ url_for('view_provider', provider_name=provider.provider) }}'">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <div class="provider-icon text-danger">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h5 class="card-title">
+                                {{ provider.provider }}
+                                {% if provider.enabled %}
+                                <span class="status-badge bg-success text-white float-end">
+                                    <i class="fas fa-check-circle"></i> Active
+                                </span>
+                                {% else %}
+                                <span class="status-badge bg-danger text-white float-end">
+                                    <i class="fas fa-times-circle"></i> Inactive
+                                </span>
+                                {% endif %}
+                            </h5>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-code-branch"></i> API Version: {{ provider.api_version }}
+                            </p>
+                            {% if provider.base_url %}
+                            <p class="text-muted mb-2 small">
+                                <i class="fas fa-link"></i> {{ provider.base_url }}
+                            </p>
+                            {% endif %}
+                            <div class="mt-3">
+                                <span class="badge bg-info">
+                                    <i class="fas fa-brain"></i> {{ provider.model_count }} Models
+                                </span>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> {{ provider.enabled_model_count }} Enabled
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i> No providers found. 
+                {% if is_admin %}
+                <a href="{{ url_for('create_provider') }}">Create your first provider</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Add animation on page load
+    $('.provider-card').each(function(index) {
+        $(this).css('opacity', '0').delay(index * 100).animate({opacity: 1}, 500);
+    });
+});
+</script>
+{% endblock %}

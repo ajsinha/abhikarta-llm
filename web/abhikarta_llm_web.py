@@ -58,6 +58,7 @@ class AbhikartaLLMWeb:
         self.user_manager = None
         self.role_manager = None
         self.resource_manager = None
+        self.db_connection_pool_name = None
 
         # Configure application
         self.app.config['SECRET_KEY'] = secret_key or os.urandom(24).hex()
@@ -71,6 +72,9 @@ class AbhikartaLLMWeb:
         
 
         logger.info("Abhikarta LLM Web Application initialized")
+
+    def set_db_connection_pool_name(self, db_connection_pool_name):
+        self.db_connection_pool_name = db_connection_pool_name
 
     def set_user_manager(self, user_manager):
         self.user_manager = user_manager
@@ -102,11 +106,12 @@ class AbhikartaLLMWeb:
         from web.route_management.resource_routes import ResourceRoutes
         from web.route_management.role_routes import RoleRoutes
         from web.route_management.user_routes import UserRoutes
+        from web.route_management.model_routes import ModelRoutes
 
-        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes, UserRoutes]:
+        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes, UserRoutes, ModelRoutes]:
             # Register route handler
             logger.info(f'registering route using {rt}')
-            r_rt = rt(self.app)
+            r_rt = rt(self.app, self.db_connection_pool_name)
             self._prepare_a_route(r_rt)
 
 

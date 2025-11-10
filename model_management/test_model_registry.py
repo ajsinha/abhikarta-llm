@@ -14,8 +14,8 @@ import time
 import threading
 
 from model_management.model_registry_json import ModelRegistryJSON
-from model_registry import ModelRegistry
-from exceptions import (
+from model_management.model_registry import ModelRegistry
+from model_management.exceptions import (
     ProviderNotFoundException,
     ProviderDisabledException,
     ModelNotFoundException,

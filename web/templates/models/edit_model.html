@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Model - {{ model.name }} - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container { padding: 30px 0; min-height: calc(100vh - 200px); }
+    .page-header { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3); }
+    .form-card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); padding: 30px; }
+    .info-card { background: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 30px; }
+    .section-title { font-size: 1.2rem; font-weight: 600; color: #e74c3c; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e74c3c; }
+    .btn-group-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .required-field::after { content: " *"; color: #dc3545; }
+    .capability-checkbox { padding: 10px; border: 1px solid #dee2e6; border-radius: 5px; margin-bottom: 10px; transition: background-color 0.2s; }
+    .capability-checkbox:hover { background-color: #f8f9fa; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-edit"></i> Edit Model: {{ model.name }}</h2>
+                <p class="mb-0">Modify model information and settings</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('view_model', provider_name=provider.provider, model_name=model.name) }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Model
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-card">
+        <form method="POST" id="editModelForm">
+            <div class="mb-5">
+                <h5 class="section-title"><i class="fas fa-info-circle"></i> Basic Information</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Model Name</label>
+                        <input type="text" class="form-control" id="name" value="{{ model.name }}" readonly disabled>
+                        <div class="form-text">Model name cannot be changed</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="version" class="form-label required-field">Version</label>
+                        <input type="text" class="form-control" id="version" name="version" value="{{ model.version }}" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ model.description or '' }}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="model_id" class="form-label">Model ID</label>
+                        <input type="text" class="form-control" id="model_id" name="model_id" value="{{ model.model_id or '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="enabled" class="form-label">Status</label>
+                        <select class="form-select" id="enabled" name="enabled">
+                            <option value="true" {% if model.enabled %}selected{% endif %}>Active</option>
+                            <option value="false" {% if not model.enabled %}selected{% endif %}>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-5">
+                <h5 class="section-title"><i class="fas fa-cog"></i> Technical Specifications</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="context_window" class="form-label required-field">Context Window</label>
+                        <input type="number" class="form-control" id="context_window" name="context_window" value="{{ model.context_window|default(4096)|int }}" min="1" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="max_output" class="form-label required-field">Max Output</label>
+                        <input type="number" class="form-control" id="max_output" name="max_output" value="{{ model.max_output|default(2048)|int }}" min="1" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="parameters" class="form-label">Parameters</label>
+                        <input type="text" class="form-control" id="parameters" name="parameters" value="{{ model.parameters or '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="license" class="form-label">License</label>
+                        <input type="text" class="form-control" id="license" name="license" value="{{ model.license or '' }}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-5">
+                <h5 class="section-title"><i class="fas fa-star"></i> Capabilities</h5>
+                <div class="row">
+                    {% for cap in ['chat', 'completion', 'streaming', 'vision', 'function_calling', 'tool_use', 'json_mode', 'embedding'] %}
+                    <div class="col-md-6">
+                        <div class="capability-checkbox">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="cap_{{ cap }}" name="cap_{{ cap }}" 
+                                {% if model.capabilities.get(cap) %}checked{% endif %}>
+                                <label class="form-check-label" for="cap_{{ cap }}"><strong>{{ cap|title|replace('_', ' ') }}</strong></label>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="mb-5">
+                <h5 class="section-title"><i class="fas fa-trophy"></i> Strengths</h5>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="strengths" class="form-label">Model Strengths</label>
+                        <textarea class="form-control" id="strengths" name="strengths" rows="5">{% if model.strengths %}{{ model.strengths|join('\n') }}{% endif %}</textarea>
+                        <div class="form-text">Enter one strength per line</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-5">
+                <h5 class="section-title"><i class="fas fa-dollar-sign"></i> Cost Information</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="input_cost" class="form-label">Input Cost (per 1M tokens)</label>
+                        <input type="number" class="form-control" id="input_cost" name="input_cost" step="0.01" min="0" value="{{ model.cost.get('input_per_1m', '') if model.cost else '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="output_cost" class="form-label">Output Cost (per 1M tokens)</label>
+                        <input type="number" class="form-control" id="output_cost" name="output_cost" step="0.01" min="0" value="{{ model.cost.get('output_per_1m', '') if model.cost else '' }}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group-actions">
+                <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('view_model', provider_name=provider.provider, model_name=model.name) }}'">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="reset" class="btn btn-outline-warning"><i class="fas fa-undo"></i> Reset</button>
+                <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

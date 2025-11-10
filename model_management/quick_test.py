@@ -9,8 +9,8 @@ This script performs quick validation tests on the registry implementations.
 """
 
 import sys
-from model_registry_db import ModelRegistryDB
-from model_registry_json import ModelRegistryJSON
+from model_management.model_registry_db import ModelRegistryDB
+from model_management.model_registry_json import ModelRegistryJSON
 from model_management import ModelCapability
 from exceptions import (
     ProviderNotFoundException,
