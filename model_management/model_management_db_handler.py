@@ -174,7 +174,7 @@ class ModelManagementDBHandler:
             Provider ID
         """
         with self._lock:
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     notes_json = json.dumps(notes) if notes else None
                     cursor.execute("""
@@ -244,7 +244,7 @@ class ModelManagementDBHandler:
             Provider dictionary or None if not found
         """
         with self._lock:
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     cursor.execute("""
                         SELECT * FROM providers WHERE provider = ?
@@ -284,7 +284,7 @@ class ModelManagementDBHandler:
             True if provider was deleted, False if not found
         """
         with self._lock:
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     cursor.execute("DELETE FROM providers WHERE provider = ?", (provider_name,))
                     return cursor.rowcount > 0
@@ -334,7 +334,7 @@ class ModelManagementDBHandler:
             if not provider:
                 raise ValueError(f"Provider '{provider_name}' not found")
 
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     cursor.execute("""
                         INSERT INTO models (
@@ -369,7 +369,7 @@ class ModelManagementDBHandler:
             if not provider:
                 return False
 
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     updates = []
                     params = []
@@ -410,7 +410,7 @@ class ModelManagementDBHandler:
             if not provider:
                 return None
 
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     cursor.execute("""
                         SELECT * FROM models 
@@ -457,7 +457,7 @@ class ModelManagementDBHandler:
             if not provider:
                 return []
 
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     if include_disabled:
                         cursor.execute("""
@@ -521,7 +521,7 @@ class ModelManagementDBHandler:
             if not provider:
                 return False
 
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     cursor.execute("""
                         DELETE FROM models WHERE provider_id = ? AND name = ?
@@ -541,7 +541,7 @@ class ModelManagementDBHandler:
             strengths: List of strength strings
         """
         with self._lock:
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     for strength in strengths:
                         cursor.execute("""
@@ -551,7 +551,7 @@ class ModelManagementDBHandler:
     
     def _get_model_strengths(self, model_id: int) -> List[str]:
         """Get all strengths for a model."""
-        with self._get_connection as conn:
+        with self._get_connection() as conn:
             with self._get_cursor(conn) as cursor:
                 cursor.execute("""
                     SELECT strength FROM model_strengths WHERE model_id = ?
@@ -575,7 +575,7 @@ class ModelManagementDBHandler:
             capabilities: Dictionary of capabilities
         """
         with self._lock:
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     for key, value in capabilities.items():
                         value_str = json.dumps(value) if not isinstance(value, (str, int, float, bool)) else str(value)
@@ -586,7 +586,7 @@ class ModelManagementDBHandler:
     
     def _get_model_capabilities(self, model_id: int) -> Dict[str, Any]:
         """Get all capabilities for a model."""
-        with self._get_connection as conn:
+        with self._get_connection() as conn:
             with self._get_cursor(conn) as cursor:
                 cursor.execute("""
                     SELECT capability_name, capability_value FROM model_capabilities WHERE model_id = ?
@@ -626,7 +626,7 @@ class ModelManagementDBHandler:
         with self._lock:
             value_str = json.dumps(capability_value) if not isinstance(capability_value, (str, int, float, bool)) else str(capability_value)
 
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     cursor.execute("""
                         SELECT DISTINCT m.* 
@@ -663,7 +663,7 @@ class ModelManagementDBHandler:
             cost: Cost dictionary
         """
         with self._lock:
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     cursor.execute("""
                         INSERT OR REPLACE INTO model_costs (
@@ -685,7 +685,7 @@ class ModelManagementDBHandler:
     
     def _get_model_cost(self, model_id: int) -> Dict[str, Any]:
         """Get cost information for a model."""
-        with self._get_connection as conn:
+        with self._get_connection() as conn:
             with self._get_cursor(conn) as cursor:
                 cursor.execute("""
                     SELECT cost_json FROM model_costs WHERE model_id = ?
@@ -803,7 +803,7 @@ class ModelManagementDBHandler:
             performance: Performance dictionary
         """
         with self._lock:
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     cursor.execute("""
                         INSERT OR REPLACE INTO model_performance (model_id, performance_json)
@@ -812,7 +812,7 @@ class ModelManagementDBHandler:
     
     def _get_model_performance(self, model_id: int) -> Dict[str, Any]:
         """Get performance information for a model."""
-        with self._get_connection as conn:
+        with self._get_connection() as conn:
             with self._get_cursor(conn) as cursor:
                 cursor.execute("""
                     SELECT performance_json FROM model_performance WHERE model_id = ?
@@ -970,7 +970,7 @@ class ModelManagementDBHandler:
             Dictionary with statistics
         """
         with self._lock:
-            with self._get_connection as conn:
+            with self._get_connection() as conn:
                 with self._get_cursor(conn) as cursor:
                     cursor.execute("SELECT COUNT(*) as count FROM providers WHERE enabled = 1")
                     provider_count = cursor.fetchone()['count']
