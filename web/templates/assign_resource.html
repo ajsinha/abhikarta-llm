@@ -379,19 +379,18 @@ function handleSubmit(event) {
         permissions: permissions
     };
     
-    // Display collected data (TODO: Replace with actual API call)
+    // Display collected data for debugging
     console.log('Assignment data to be submitted:', formData);
-    
-    const permList = Object.keys(permissions).filter(k => permissions[k]).join(', ');
-    alert('Resource assignment prepared!\n\n' +
-          'Role: ' + roleName + '\n' +
-          'Resource: ' + resourceName + '\n' +
-          'Permissions: ' + permList + '\n\n' +
-          'Data logged to console.\nTODO: Implement backend API call.');
-    
-    // Uncomment below when backend API is ready
-    /*
-    fetch('/api/admin/roles/' + roleName + '/resources', {
+
+    // Disable submit button to prevent double-click
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Assigning...';
+    }
+
+    // Make API call to assign resource to role
+    fetch('/api/admin/roles/' + encodeURIComponent(roleName) + '/resources', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -404,17 +403,25 @@ function handleSubmit(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Resource assigned successfully!');
+            const permList = Object.keys(permissions).filter(k => permissions[k]).join(', ');
+            alert('Resource "' + resourceName + '" successfully assigned to role "' + roleName + '"!\n\nPermissions: ' + permList);
             window.location.href = '{{ url_for('manage_resources') }}';
         } else {
             alert('Error assigning resource: ' + data.message);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-link"></i> Assign Resource';
+            }
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error assigning resource');
+        alert('Error assigning resource. Please try again.');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-link"></i> Assign Resource';
+        }
     });
-    */
     
     return false;
 }

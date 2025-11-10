@@ -217,7 +217,7 @@ function handleSubmit(event) {
         }
     }
     
-    // Collect form data
+    // Prepare data for submission
     const formData = {
         name: resourceName,
         resource_type: resourceType,
@@ -225,13 +225,18 @@ function handleSubmit(event) {
         enabled: document.getElementById('resourceEnabled').value === 'true',
         metadata: metadataField ? JSON.parse(metadataField) : {}
     };
-    
-    // Display collected data (TODO: Replace with actual API call)
+
+    // Display collected data for debugging
     console.log('Resource data to be submitted:', formData);
-    alert('Resource creation form submitted!\n\nData logged to console.\n\nTODO: Implement backend API call.');
-    
-    // Uncomment below when backend API is ready
-    /*
+
+    // Disable submit button to prevent double-click
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+    }
+
+    // Make API call to create resource
     fetch('/api/admin/resources', {
         method: 'POST',
         headers: {
@@ -242,17 +247,24 @@ function handleSubmit(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Resource created successfully!');
+            alert('Resource "' + resourceName + '" created successfully!');
             window.location.href = '{{ url_for('manage_resources') }}';
         } else {
             alert('Error creating resource: ' + data.message);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Resource';
+            }
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error creating resource');
+        alert('Error creating resource. Please try again.');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Resource';
+        }
     });
-    */
     
     return false;
 }

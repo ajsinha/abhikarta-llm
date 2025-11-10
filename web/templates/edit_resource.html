@@ -283,7 +283,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('assign_resource_to_role') }}'">
+                <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('admin_assign_resource_to_role') }}'">
                     <i class="fas fa-link"></i> Assign to Role
                 </button>
             </div>
@@ -324,12 +324,17 @@ function handleSubmit(event) {
         metadata: metadataField ? JSON.parse(metadataField) : {}
     };
     
-    // Display collected data (TODO: Replace with actual API call)
+    // Display collected data for debugging
     console.log('Resource data to be submitted:', formData);
-    alert('Resource update form submitted!\n\nData logged to console.\n\nTODO: Implement backend API call.');
-    
-    // Uncomment below when backend API is ready
-    /*
+
+    // Disable submit button to prevent double-click
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    }
+
+    // Make API call to update resource
     fetch('/api/admin/resources/{{ resource.name }}', {
         method: 'PUT',
         headers: {
@@ -340,17 +345,24 @@ function handleSubmit(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Resource updated successfully!');
+            alert('Resource "{{ resource.name }}" updated successfully!');
             window.location.href = '{{ url_for('manage_resources') }}';
         } else {
             alert('Error updating resource: ' + data.message);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+            }
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error updating resource');
+        alert('Error updating resource. Please try again.');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        }
     });
-    */
     
     return false;
 }

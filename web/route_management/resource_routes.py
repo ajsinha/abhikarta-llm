@@ -622,11 +622,21 @@ class ResourceRoutes(AbstractRoutes):
         Returns:
             Dictionary representation of the resource
         """
+        # Handle created_at - could be datetime object or string from database
+        created_at_str = None
+        if resource.created_at:
+            if hasattr(resource.created_at, 'isoformat'):
+                # It's a datetime object
+                created_at_str = resource.created_at.isoformat()
+            elif isinstance(resource.created_at, str):
+                # It's already a string
+                created_at_str = resource.created_at
+
         return {
             'name': resource.name,
             'resource_type': resource.resource_type,
             'description': resource.description,
             'enabled': resource.enabled,
-            'created_at': resource.created_at.isoformat() if resource.created_at else None,
+            'created_at': created_at_str,
             'metadata': resource.metadata
         }

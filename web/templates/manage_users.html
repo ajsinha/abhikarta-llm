@@ -126,9 +126,13 @@
                             </td>
                             <td>
                                 {% if user.last_login %}
-                                {{ user.last_login.strftime('%Y-%m-%d %H:%M') }}
+                                    {% if user.last_login is string %}
+                                        {{ user.last_login }}
+                                    {% else %}
+                                        {{ user.last_login.strftime('%Y-%m-%d %H:%M') }}
+                                    {% endif %}
                                 {% else %}
-                                <span class="text-muted">Never</span>
+                                    <span class="text-muted">Never</span>
                                 {% endif %}
                             </td>
                             <td>
@@ -154,7 +158,7 @@
 $(document).ready(function() {
     // Placeholder for future functionality
     console.log('Manage Users page loaded');
-    
+
     // Initialize tooltips
     $('[data-bs-toggle="tooltip"]').tooltip();
 });
