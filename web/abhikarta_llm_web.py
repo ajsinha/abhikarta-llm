@@ -49,7 +49,6 @@ class AbhikartaLLMWeb:
         Initialize the Abhikarta LLM Web Application.
         
         Args:
-            user_manager: UserManager instance for database operations
             secret_key: Secret key for session management (generated if not provided)
         """
         self.app = Flask(__name__, 
@@ -100,15 +99,17 @@ class AbhikartaLLMWeb:
         """Register all route modules."""
         from web.route_management.auth_routes import AuthRoutes
         from web.route_management.admin_routes import AdminRoutes
-        
-        # Register authentication routes
-        auth_routes = AuthRoutes(self.app)
-        self._prepare_a_route(auth_routes)
+        from web.route_management.resource_routes import ResourceRoutes
+        from web.route_management.role_routes import RoleRoutes
 
-        # Register admin routes
-        admin_routes = AdminRoutes(self.app)
-        self._prepare_a_route(admin_routes)
-        
+        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes]:
+            # Register route handler
+            logger.info(f'registering route using {rt}')
+            r_rt = rt(self.app)
+            self._prepare_a_route(r_rt)
+
+
+
         # Register home route
         @self.app.route('/')
         def index():

@@ -18,7 +18,7 @@ document may be subject to patent applications.
 """
 
 from flask import render_template, request, redirect, url_for, session, flash
-from functools import wraps
+from web.route_management.abstract_routes import admin_required,login_required
 import logging
 from typing import Optional
 from user_management.user_manager import UserManager
@@ -112,6 +112,7 @@ class AuthRoutes(AbstractRoutes):
             return redirect(url_for('login'))
         
         @self.app.route('/user/dashboard')
+        @login_required
         def user_dashboard():
             """User dashboard for non-admin users."""
             if 'userid' not in session:
@@ -160,46 +161,3 @@ class AuthRoutes(AbstractRoutes):
             logger.error(f"Error authenticating user {userid}: {e}")
             return None
 
-
-def login_required(f):
-    """
-    Decorator to require login for a route.
-    
-    Args:
-        f: Function to wrap
-        
-    Returns:
-        Wrapped function
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'userid' not in session:
-            flash('Please login to access this page', 'warning')
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def admin_required(f):
-    """
-    Decorator to require admin role for a route.
-    
-    Args:
-        f: Function to wrap
-        
-    Returns:
-        Wrapped function
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'userid' not in session:
-            flash('Please login to access this page', 'warning')
-            return redirect(url_for('login'))
-        
-        if not session.get('is_admin', False):
-            flash('You do not have permission to access this page', 'error')
-            logger.warning(f"User {session.get('userid')} attempted to access admin page without permission")
-            return redirect(url_for('user_dashboard'))
-        
-        return f(*args, **kwargs)
-    return decorated_function
