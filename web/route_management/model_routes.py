@@ -629,16 +629,30 @@ class ModelRoutes(AbstractRoutes):
                 flash(f'Provider "{provider_name}" not found', 'error')
                 return redirect(url_for('list_providers'))
 
+            # get_model_by_name already includes capabilities, strengths, cost, and performance
             model = self.db_handler.get_model_by_name(provider_name, model_name)
             if not model:
                 flash(f'Model "{model_name}" not found', 'error')
                 return redirect(url_for('view_provider', provider_name=provider_name))
 
-            # Get additional model data
-            model_id = model['id']
-            model['capabilities'] = self.db_handler.get_model_capabilities(model_id)
-            model['strengths'] = self.db_handler.get_model_strengths(model_id)
-            model['cost'] = self.db_handler.get_model_cost(model_id)
+            # Process capabilities for template
+            capabilities_dict = model.get('capabilities', {})
+            if capabilities_dict:
+                # Create list of enabled capabilities for easy template iteration
+                enabled_capabilities = [cap for cap, enabled in capabilities_dict.items() if enabled]
+                model['enabled_capabilities'] = enabled_capabilities
+                model['capabilities_count'] = len(enabled_capabilities)
+            else:
+                model['enabled_capabilities'] = []
+                model['capabilities_count'] = 0
+
+            # Ensure strengths is a list
+            if not model.get('strengths'):
+                model['strengths'] = []
+
+            # Ensure cost is a dict
+            if not model.get('cost'):
+                model['cost'] = {}
 
             return render_template('models/view_model.html',
                                  fullname=session.get('fullname'),
@@ -763,16 +777,31 @@ class ModelRoutes(AbstractRoutes):
                 flash(f'Provider "{provider_name}" not found', 'error')
                 return redirect(url_for('list_providers'))
 
+            # get_model_by_name already includes capabilities, strengths, cost, and performance
             model = self.db_handler.get_model_by_name(provider_name, model_name)
             if not model:
                 flash(f'Model "{model_name}" not found', 'error')
                 return redirect(url_for('list_models', provider_name=provider_name))
 
-            # Get additional model data
             model_id = model['id']
-            model['capabilities'] = self.db_handler.get_model_capabilities(model_id)
-            model['strengths'] = self.db_handler.get_model_strengths(model_id)
-            model['cost'] = self.db_handler.get_model_cost(model_id)
+
+            # Process capabilities for template
+            capabilities_dict = model.get('capabilities', {})
+            if capabilities_dict:
+                enabled_capabilities = [cap for cap, enabled in capabilities_dict.items() if enabled]
+                model['enabled_capabilities'] = enabled_capabilities
+                model['capabilities_count'] = len(enabled_capabilities)
+            else:
+                model['enabled_capabilities'] = []
+                model['capabilities_count'] = 0
+
+            # Ensure strengths is a list
+            if not model.get('strengths'):
+                model['strengths'] = []
+
+            # Ensure cost is a dict
+            if not model.get('cost'):
+                model['cost'] = {}
 
             if request.method == 'POST':
                 version = request.form.get('version', '').strip()
@@ -816,17 +845,23 @@ class ModelRoutes(AbstractRoutes):
                     )
 
                     if success:
-                        # Update capabilities
-                        self.db_handler.delete_model_capabilities(model_id)
+                        # Delete and re-insert capabilities, strengths, and costs
+                        # This ensures they're always up to date
+                        with self.db_handler._get_connection() as conn:
+                            with self.db_handler._get_cursor(conn) as cursor:
+                                cursor.execute("DELETE FROM model_capabilities WHERE model_id = ?", (model_id,))
+                                cursor.execute("DELETE FROM model_strengths WHERE model_id = ?", (model_id,))
+                                cursor.execute("DELETE FROM model_costs WHERE model_id = ?", (model_id,))
+
+                        # Insert updated capabilities
                         if capabilities:
                             self.db_handler.insert_model_capabilities(model_id, capabilities)
 
-                        # Update strengths
-                        self.db_handler.delete_model_strengths(model_id)
+                        # Insert updated strengths
                         if strengths:
                             self.db_handler.insert_model_strengths(model_id, strengths)
 
-                        # Update costs
+                        # Insert updated costs
                         if input_cost is not None or output_cost is not None:
                             cost_data = {}
                             if input_cost is not None:
