@@ -101,8 +101,9 @@ class AbhikartaLLMWeb:
         from web.route_management.admin_routes import AdminRoutes
         from web.route_management.resource_routes import ResourceRoutes
         from web.route_management.role_routes import RoleRoutes
+        from web.route_management.user_routes import UserRoutes
 
-        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes]:
+        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes, UserRoutes]:
             # Register route handler
             logger.info(f'registering route using {rt}')
             r_rt = rt(self.app)

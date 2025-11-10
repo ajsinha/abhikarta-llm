@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}View User - {{ user.userid }} - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(52, 152, 219, 0.3);
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 1rem;
+    }
+    
+    .info-value {
+        color: #333;
+        font-size: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #3498db;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #3498db;
+    }
+    
+    .btn-group-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        margin: 3px;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-user"></i> User Details: {{ user.userid }}</h2>
+                <p class="mb-0">View user information and settings</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{{ url_for('manage_users') }}'">
+                    <i class="fas fa-arrow-left"></i> Back to Users
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Basic Information Card -->
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-id-card"></i> Basic Information
+        </h5>
+        
+        <div class="info-row">
+            <span class="info-label">User ID:</span>
+            <span class="info-value"><strong>{{ user.userid }}</strong></span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Full Name:</span>
+            <span class="info-value">{{ user.fullname }}</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Email Address:</span>
+            <span class="info-value">
+                <a href="mailto:{{ user.emailaddress }}">{{ user.emailaddress }}</a>
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Account Status:</span>
+            <span class="info-value">
+                {% if user.enabled %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Created At:</span>
+            <span class="info-value">
+                {% if user.created_at %}
+                    {% if user.created_at is string %}
+                        {{ user.created_at }}
+                    {% else %}
+                        {{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    {% endif %}
+                {% else %}
+                    N/A
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Last Updated:</span>
+            <span class="info-value">
+                {% if user.updated_at %}
+                    {% if user.updated_at is string %}
+                        {{ user.updated_at }}
+                    {% else %}
+                        {{ user.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    {% endif %}
+                {% else %}
+                    N/A
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="info-label">Last Login:</span>
+            <span class="info-value">
+                {% if user.last_login %}
+                    {% if user.last_login is string %}
+                        {{ user.last_login }}
+                    {% else %}
+                        {{ user.last_login.strftime('%Y-%m-%d %H:%M:%S') }}
+                    {% endif %}
+                {% else %}
+                    <span class="text-muted">Never</span>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    
+    <!-- Roles Card -->
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-user-shield"></i> Assigned Roles
+        </h5>
+        
+        {% if user.roles %}
+            <div class="mb-3">
+                {% for role in user.roles %}
+                    <span class="badge bg-info role-badge">
+                        <i class="fas fa-user-tag"></i> {{ role }}
+                    </span>
+                {% endfor %}
+            </div>
+            <p class="text-muted mb-0">
+                <i class="fas fa-info-circle"></i> 
+                This user has {{ user.roles|length }} role(s) assigned
+            </p>
+        {% else %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> No roles assigned to this user
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Metadata Card (if present) -->
+    {% if user.metadata %}
+    <div class="info-card">
+        <h5 class="section-title">
+            <i class="fas fa-tags"></i> Additional Metadata
+        </h5>
+        
+        <div class="info-row">
+            <span class="info-label">Metadata:</span>
+            <span class="info-value">
+                <pre class="mb-0">{{ user.metadata|tojson(indent=2) }}</pre>
+            </span>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Action Buttons -->
+    <div class="btn-group-actions">
+        <button class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('manage_users') }}'">
+            <i class="fas fa-arrow-left"></i> Back to Users
+        </button>
+        {% if user.userid.lower() != 'admin' %}
+        <button class="btn btn-primary" onclick="window.location.href='{{ url_for('edit_user', userid=user.userid) }}'">
+            <i class="fas fa-edit"></i> Edit User
+        </button>
+        <button class="btn btn-danger" onclick="confirmDelete()">
+            <i class="fas fa-trash"></i> Delete User
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete() {
+    if (confirm('Are you sure you want to delete user "{{ user.userid }}"? This action cannot be undone.')) {
+        // Make API call to delete user
+        fetch('/api/admin/users/{{ user.userid }}', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('User "{{ user.userid }}" deleted successfully!');
+                window.location.href = '{{ url_for('manage_users') }}';
+            } else {
+                alert('Error deleting user: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting user. Please try again.');
+        });
+    }
+}
+
+$(document).ready(function() {
+    console.log('View User page loaded');
+});
+</script>
+{% endblock %}
