@@ -1,0 +1,1086 @@
+{
+  "provider": "openai",
+  "api_version": "v1",
+  "base_url": "https://api.openai.com",
+  "notes": {
+    "authentication": "All models require OPENAI_API_KEY environment variable or Authorization header",
+    "pricing": "Prices shown are per 1K tokens for text models. Image, audio, and embedding models have different pricing units",
+    "streaming": "All chat and completion models support streaming via stream parameter",
+    "rate_limits": "Rate limits vary by model and account tier. Tier 1: 500 RPM, higher tiers have increased limits",
+    "context_windows": "Context windows range from 4K to 128K tokens depending on model",
+    "fine_tuning": "Fine-tuning available for GPT-4o mini, GPT-4o, GPT-3.5-turbo. Custom model training available",
+    "function_calling": "Supported on GPT-4, GPT-4 Turbo, GPT-4o, and GPT-3.5-turbo models via tools parameter",
+    "vision": "GPT-4o, GPT-4 Turbo, and GPT-4 Vision models support image inputs in messages",
+    "json_mode": "Structured output via response_format parameter for JSON object or JSON schema",
+    "batch_api": "Batch API available for asynchronous processing at 50% discount",
+    "assistants_api": "Stateful assistant API with tools, file search, and code interpreter",
+    "realtime_api": "WebSocket API for real-time audio and text interactions (GPT-4o realtime models)",
+    "moderation": "Free content moderation API for detecting harmful content",
+    "embeddings": "Multiple embedding models available for semantic search and RAG applications",
+    "audio": "Whisper for speech-to-text, TTS for text-to-speech, realtime for bidirectional audio",
+    "images": "DALL-E 3 and DALL-E 2 for image generation and editing",
+    "legacy_models": "Older models like GPT-3.5 base models are being deprecated. Check documentation",
+    "reasoning_models": "O1 and O1-mini use extended reasoning for complex problem-solving tasks",
+    "sdk_support": "Official SDKs for Python, Node.js, and community SDKs for other languages"
+  },
+  "models": [
+    {
+      "name": "gpt-4o",
+      "version": "2024-11-20",
+      "description": "Latest GPT-4o model with vision, text, and audio capabilities",
+      "strengths": ["multimodal", "vision", "reasoning", "coding", "general-purpose"],
+      "context_window": 128000,
+      "max_output": 16384,
+      "cost": {
+        "input_per_1k": 0.0025,
+        "output_per_1k": 0.01,
+        "cached_input_per_1k": 0.00125
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": true
+      }
+    },
+    {
+      "name": "gpt-4o-2024-11-20",
+      "version": "2024-11-20",
+      "description": "Specific snapshot of GPT-4o from November 2024",
+      "strengths": ["multimodal", "vision", "reasoning", "coding", "stability"],
+      "context_window": 128000,
+      "max_output": 16384,
+      "cost": {
+        "input_per_1k": 0.0025,
+        "output_per_1k": 0.01,
+        "cached_input_per_1k": 0.00125
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": true
+      }
+    },
+    {
+      "name": "gpt-4o-2024-08-06",
+      "version": "2024-08-06",
+      "description": "GPT-4o snapshot from August 2024 with structured outputs",
+      "strengths": ["multimodal", "vision", "structured-outputs", "reasoning"],
+      "context_window": 128000,
+      "max_output": 16384,
+      "cost": {
+        "input_per_1k": 0.0025,
+        "output_per_1k": 0.01,
+        "cached_input_per_1k": 0.00125
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4o-2024-05-13",
+      "version": "2024-05-13",
+      "description": "Original GPT-4o release from May 2024",
+      "strengths": ["multimodal", "vision", "speed", "efficiency"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.005,
+        "output_per_1k": 0.015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4o-mini",
+      "version": "2024-07-18",
+      "description": "Fast and affordable GPT-4o variant",
+      "strengths": ["efficiency", "cost-effective", "speed", "vision", "multimodal"],
+      "context_window": 128000,
+      "max_output": 16384,
+      "cost": {
+        "input_per_1k": 0.00015,
+        "output_per_1k": 0.0006,
+        "cached_input_per_1k": 0.000075
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4o-mini-2024-07-18",
+      "version": "2024-07-18",
+      "description": "Specific snapshot of GPT-4o mini from July 2024",
+      "strengths": ["efficiency", "cost-effective", "speed", "vision"],
+      "context_window": 128000,
+      "max_output": 16384,
+      "cost": {
+        "input_per_1k": 0.00015,
+        "output_per_1k": 0.0006,
+        "cached_input_per_1k": 0.000075
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4o-realtime-preview",
+      "version": "2024-10-01",
+      "description": "Real-time audio and text interaction model (WebSocket API)",
+      "strengths": ["realtime", "audio", "low-latency", "conversational"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "text_input_per_1k": 0.005,
+        "text_output_per_1k": 0.02,
+        "audio_input_per_1m": 0.1,
+        "audio_output_per_1m": 0.2
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": true,
+        "audio_output": true
+      }
+    },
+    {
+      "name": "gpt-4o-realtime-preview-2024-10-01",
+      "version": "2024-10-01",
+      "description": "Specific snapshot of realtime model from October 2024",
+      "strengths": ["realtime", "audio", "low-latency", "conversational"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "text_input_per_1k": 0.005,
+        "text_output_per_1k": 0.02,
+        "audio_input_per_1m": 0.1,
+        "audio_output_per_1m": 0.2
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": true,
+        "audio_output": true
+      }
+    },
+    {
+      "name": "gpt-4o-audio-preview",
+      "version": "2024-10-01",
+      "description": "GPT-4o with audio input and output capabilities",
+      "strengths": ["audio", "multimodal", "speech", "vision"],
+      "context_window": 128000,
+      "max_output": 16384,
+      "cost": {
+        "text_input_per_1k": 0.0025,
+        "text_output_per_1k": 0.01,
+        "audio_input_per_1m": 0.1,
+        "audio_output_per_1m": 0.2
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": true
+      }
+    },
+    {
+      "name": "gpt-4o-audio-preview-2024-10-01",
+      "version": "2024-10-01",
+      "description": "Specific snapshot of audio model from October 2024",
+      "strengths": ["audio", "multimodal", "speech", "vision"],
+      "context_window": 128000,
+      "max_output": 16384,
+      "cost": {
+        "text_input_per_1k": 0.0025,
+        "text_output_per_1k": 0.01,
+        "audio_input_per_1m": 0.1,
+        "audio_output_per_1m": 0.2
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": true
+      }
+    },
+    {
+      "name": "chatgpt-4o-latest",
+      "version": "dynamic",
+      "description": "Latest ChatGPT-4o model (auto-updates to newest version)",
+      "strengths": ["latest-features", "multimodal", "vision", "general-purpose"],
+      "context_window": 128000,
+      "max_output": 16384,
+      "cost": {
+        "input_per_1k": 0.005,
+        "output_per_1k": 0.015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "o1",
+      "version": "2024-12-17",
+      "description": "Advanced reasoning model for complex problem-solving",
+      "strengths": ["reasoning", "mathematics", "coding", "science", "problem-solving"],
+      "context_window": 200000,
+      "max_output": 100000,
+      "cost": {
+        "input_per_1k": 0.015,
+        "output_per_1k": 0.06,
+        "cached_input_per_1k": 0.0075
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "o1-2024-12-17",
+      "version": "2024-12-17",
+      "description": "Specific snapshot of O1 reasoning model from December 2024",
+      "strengths": ["reasoning", "mathematics", "coding", "science", "problem-solving"],
+      "context_window": 200000,
+      "max_output": 100000,
+      "cost": {
+        "input_per_1k": 0.015,
+        "output_per_1k": 0.06,
+        "cached_input_per_1k": 0.0075
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "o1-preview",
+      "version": "2024-09-12",
+      "description": "Preview version of O1 reasoning model",
+      "strengths": ["reasoning", "mathematics", "coding", "problem-solving"],
+      "context_window": 128000,
+      "max_output": 32768,
+      "cost": {
+        "input_per_1k": 0.015,
+        "output_per_1k": 0.06
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "o1-preview-2024-09-12",
+      "version": "2024-09-12",
+      "description": "Specific snapshot of O1 preview from September 2024",
+      "strengths": ["reasoning", "mathematics", "coding", "problem-solving"],
+      "context_window": 128000,
+      "max_output": 32768,
+      "cost": {
+        "input_per_1k": 0.015,
+        "output_per_1k": 0.06
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "o1-mini",
+      "version": "2024-09-12",
+      "description": "Faster and cheaper O1 reasoning model for STEM tasks",
+      "strengths": ["reasoning", "mathematics", "coding", "efficiency", "cost-effective"],
+      "context_window": 128000,
+      "max_output": 65536,
+      "cost": {
+        "input_per_1k": 0.003,
+        "output_per_1k": 0.012
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "o1-mini-2024-09-12",
+      "version": "2024-09-12",
+      "description": "Specific snapshot of O1 mini from September 2024",
+      "strengths": ["reasoning", "mathematics", "coding", "efficiency"],
+      "context_window": 128000,
+      "max_output": 65536,
+      "cost": {
+        "input_per_1k": 0.003,
+        "output_per_1k": 0.012
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-turbo",
+      "version": "2024-04-09",
+      "description": "Most capable GPT-4 Turbo with vision",
+      "strengths": ["reasoning", "coding", "vision", "general-purpose"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.01,
+        "output_per_1k": 0.03
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-turbo-2024-04-09",
+      "version": "2024-04-09",
+      "description": "Specific snapshot of GPT-4 Turbo from April 2024",
+      "strengths": ["reasoning", "coding", "vision", "general-purpose"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.01,
+        "output_per_1k": 0.03
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-turbo-preview",
+      "version": "2024-01-25",
+      "description": "Preview version of GPT-4 Turbo",
+      "strengths": ["reasoning", "coding", "general-purpose"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.01,
+        "output_per_1k": 0.03
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-0125-preview",
+      "version": "2024-01-25",
+      "description": "GPT-4 Turbo preview snapshot from January 2024",
+      "strengths": ["reasoning", "coding", "consistency"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.01,
+        "output_per_1k": 0.03
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-1106-preview",
+      "version": "2023-11-06",
+      "description": "GPT-4 Turbo preview snapshot from November 2023",
+      "strengths": ["reasoning", "coding", "json-mode"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.01,
+        "output_per_1k": 0.03
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-vision-preview",
+      "version": "2023-11-06",
+      "description": "GPT-4 Turbo with vision capabilities (preview)",
+      "strengths": ["vision", "image-understanding", "reasoning"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.01,
+        "output_per_1k": 0.03
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4",
+      "version": "2023-06-13",
+      "description": "Original GPT-4 model with 8K context",
+      "strengths": ["reasoning", "creativity", "instruction-following"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.03,
+        "output_per_1k": 0.06
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-0613",
+      "version": "2023-06-13",
+      "description": "Specific snapshot of GPT-4 from June 2023",
+      "strengths": ["reasoning", "creativity", "instruction-following"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.03,
+        "output_per_1k": 0.06
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-32k",
+      "version": "2023-06-13",
+      "description": "GPT-4 with extended 32K context window",
+      "strengths": ["long-context", "reasoning", "creativity"],
+      "context_window": 32768,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.06,
+        "output_per_1k": 0.12
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-32k-0613",
+      "version": "2023-06-13",
+      "description": "Specific snapshot of GPT-4 32K from June 2023",
+      "strengths": ["long-context", "reasoning", "creativity"],
+      "context_window": 32768,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.06,
+        "output_per_1k": 0.12
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo",
+      "version": "2024-01-25",
+      "description": "Latest GPT-3.5 Turbo model",
+      "strengths": ["speed", "efficiency", "cost-effective", "general-purpose"],
+      "context_window": 16385,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0005,
+        "output_per_1k": 0.0015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo-0125",
+      "version": "2024-01-25",
+      "description": "Specific snapshot of GPT-3.5 Turbo from January 2024",
+      "strengths": ["speed", "efficiency", "cost-effective"],
+      "context_window": 16385,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0005,
+        "output_per_1k": 0.0015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo-1106",
+      "version": "2023-11-06",
+      "description": "GPT-3.5 Turbo snapshot from November 2023",
+      "strengths": ["speed", "efficiency", "json-mode"],
+      "context_window": 16385,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.001,
+        "output_per_1k": 0.002
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo-16k",
+      "version": "2023-06-13",
+      "description": "GPT-3.5 Turbo with 16K context window",
+      "strengths": ["speed", "efficiency", "longer-context"],
+      "context_window": 16385,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.003,
+        "output_per_1k": 0.004
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo-instruct",
+      "version": "2023-09-01",
+      "description": "Instruction-following GPT-3.5 model (completion endpoint)",
+      "strengths": ["instruction-following", "completion", "legacy-compatibility"],
+      "context_window": 4096,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0015,
+        "output_per_1k": 0.002
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "dall-e-3",
+      "version": "3.0",
+      "description": "Latest DALL-E model for high-quality image generation",
+      "strengths": ["image-generation", "creativity", "prompt-following", "quality"],
+      "context_window": 4000,
+      "max_output": 1,
+      "cost": {
+        "standard_1024x1024": 0.04,
+        "standard_1024x1792": 0.08,
+        "standard_1792x1024": 0.08,
+        "hd_1024x1024": 0.08,
+        "hd_1024x1792": 0.12,
+        "hd_1792x1024": 0.12
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "dall-e-2",
+      "version": "2.0",
+      "description": "Previous generation DALL-E for image generation",
+      "strengths": ["image-generation", "cost-effective", "variations"],
+      "context_window": 1000,
+      "max_output": 1,
+      "cost": {
+        "1024x1024": 0.02,
+        "512x512": 0.018,
+        "256x256": 0.016
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true,
+        "image_editing": true,
+        "image_variations": true
+      }
+    },
+    {
+      "name": "whisper-1",
+      "version": "1.0",
+      "description": "Speech-to-text model for audio transcription and translation",
+      "strengths": ["transcription", "translation", "multilingual", "audio"],
+      "context_window": null,
+      "max_output": null,
+      "cost": {
+        "per_minute": 0.006
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "transcription": true,
+        "translation": true
+      }
+    },
+    {
+      "name": "tts-1",
+      "version": "1.0",
+      "description": "Text-to-speech model for natural voice synthesis",
+      "strengths": ["speech-synthesis", "speed", "real-time"],
+      "context_window": 4096,
+      "max_output": null,
+      "cost": {
+        "per_1k_chars": 0.015
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "text_to_speech": true,
+        "voices": ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
+      }
+    },
+    {
+      "name": "tts-1-hd",
+      "version": "1.0",
+      "description": "High-definition text-to-speech model for highest quality",
+      "strengths": ["speech-synthesis", "quality", "natural-sounding"],
+      "context_window": 4096,
+      "max_output": null,
+      "cost": {
+        "per_1k_chars": 0.03
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "text_to_speech": true,
+        "voices": ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
+      }
+    },
+    {
+      "name": "text-embedding-3-large",
+      "version": "3.0",
+      "description": "Most capable embedding model with 3072 dimensions",
+      "strengths": ["embeddings", "semantic-search", "RAG", "high-performance"],
+      "context_window": 8191,
+      "max_output": 3072,
+      "cost": {
+        "per_1k": 0.00013
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "embeddings": true,
+        "dimensions": 3072
+      }
+    },
+    {
+      "name": "text-embedding-3-small",
+      "version": "3.0",
+      "description": "Efficient embedding model with 1536 dimensions",
+      "strengths": ["embeddings", "efficiency", "cost-effective", "semantic-search"],
+      "context_window": 8191,
+      "max_output": 1536,
+      "cost": {
+        "per_1k": 0.00002
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "embeddings": true,
+        "dimensions": 1536
+      }
+    },
+    {
+      "name": "text-embedding-ada-002",
+      "version": "2.0",
+      "description": "Previous generation embedding model (legacy)",
+      "strengths": ["embeddings", "legacy-compatibility"],
+      "context_window": 8191,
+      "max_output": 1536,
+      "cost": {
+        "per_1k": 0.0001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "embeddings": true,
+        "dimensions": 1536
+      }
+    },
+    {
+      "name": "text-moderation-latest",
+      "version": "latest",
+      "description": "Latest content moderation model (auto-updates)",
+      "strengths": ["moderation", "safety", "content-filtering"],
+      "context_window": 32768,
+      "max_output": null,
+      "cost": {
+        "per_1k": 0.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "moderation": true
+      }
+    },
+    {
+      "name": "text-moderation-stable",
+      "version": "stable",
+      "description": "Stable content moderation model (static version)",
+      "strengths": ["moderation", "safety", "consistency"],
+      "context_window": 32768,
+      "max_output": null,
+      "cost": {
+        "per_1k": 0.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "moderation": true
+      }
+    },
+    {
+      "name": "text-moderation-007",
+      "version": "007",
+      "description": "Specific version of moderation model",
+      "strengths": ["moderation", "safety", "versioned"],
+      "context_window": 32768,
+      "max_output": null,
+      "cost": {
+        "per_1k": 0.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "moderation": true
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo-0613",
+      "version": "2023-06-13",
+      "description": "GPT-3.5 Turbo snapshot from June 2023 (legacy)",
+      "strengths": ["speed", "efficiency", "legacy-compatibility"],
+      "context_window": 4096,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0015,
+        "output_per_1k": 0.002
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo-16k-0613",
+      "version": "2023-06-13",
+      "description": "GPT-3.5 Turbo 16K snapshot from June 2023 (legacy)",
+      "strengths": ["speed", "efficiency", "longer-context", "legacy"],
+      "context_window": 16385,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.003,
+        "output_per_1k": 0.004
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-0314",
+      "version": "2023-03-14",
+      "description": "Early GPT-4 snapshot from March 2023 (legacy)",
+      "strengths": ["reasoning", "creativity", "legacy"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.03,
+        "output_per_1k": 0.06
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-4-32k-0314",
+      "version": "2023-03-14",
+      "description": "Early GPT-4 32K snapshot from March 2023 (legacy)",
+      "strengths": ["long-context", "reasoning", "legacy"],
+      "context_window": 32768,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.06,
+        "output_per_1k": 0.12
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "babbage-002",
+      "version": "002",
+      "description": "Replacement for legacy Babbage base model",
+      "strengths": ["efficiency", "cost-effective", "fine-tuning"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0004,
+        "output_per_1k": 0.0004
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "davinci-002",
+      "version": "002",
+      "description": "Replacement for legacy Davinci base model",
+      "strengths": ["instruction-following", "fine-tuning", "legacy-replacement"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.002,
+        "output_per_1k": 0.002
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo-instruct-0914",
+      "version": "2023-09-14",
+      "description": "Specific snapshot of GPT-3.5 Turbo Instruct",
+      "strengths": ["instruction-following", "completion", "versioned"],
+      "context_window": 4096,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0015,
+        "output_per_1k": 0.002
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false
+      }
+    }
+  ]
+}

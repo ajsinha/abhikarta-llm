@@ -1,0 +1,1261 @@
+{
+  "provider": "aws-bedrock",
+  "api_version": "2023-09-30",
+  "base_url": "https://bedrock-runtime.{region}.amazonaws.com",
+  "notes": {
+    "authentication": "Requires AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY) and IAM permissions for bedrock:InvokeModel",
+    "pricing": "Prices vary by region and model. On-demand pricing shown per 1K tokens. Provisioned throughput available for guaranteed capacity",
+    "streaming": "All text models support streaming via InvokeModelWithResponseStream API",
+    "rate_limits": "Default quotas vary by model and region. Can request quota increases through AWS Service Quotas",
+    "regions": "Model availability varies by region. Check AWS documentation for regional availability",
+    "provisioned_throughput": "Purchase model units for guaranteed capacity and reduced per-token costs",
+    "model_invocation": "Use InvokeModel API for synchronous requests, InvokeModelWithResponseStream for streaming",
+    "guardrails": "AWS Bedrock Guardrails for content filtering, PII detection, and safety policies",
+    "knowledge_bases": "Integrate with Bedrock Knowledge Bases for RAG applications",
+    "agents": "Build autonomous agents with Bedrock Agents for complex workflows",
+    "model_evaluation": "Bedrock Model Evaluation for comparing model performance",
+    "fine_tuning": "Custom model fine-tuning available for select models (Titan, Cohere)",
+    "embedding_models": "Multiple embedding models for semantic search and RAG",
+    "image_generation": "Stability AI models for image generation and editing",
+    "cross_region_inference": "Automatically route requests across regions for high availability",
+    "cloudwatch_integration": "Metrics and logs available in CloudWatch",
+    "kms_encryption": "Encrypt model inputs/outputs with AWS KMS",
+    "vpc_endpoints": "Private connectivity via VPC endpoints",
+    "iam_policies": "Fine-grained access control with IAM policies",
+    "compliance": "SOC, HIPAA, GDPR compliant. BAA available for healthcare workloads"
+  },
+  "models": [
+    {
+      "name": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+      "model_id": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+      "provider": "anthropic",
+      "version": "3.5",
+      "description": "Latest Claude 3.5 Sonnet with improved coding and agentic capabilities",
+      "strengths": ["coding", "reasoning", "agentic-tasks", "visual-analysis", "general-purpose"],
+      "context_window": 200000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.003,
+        "output_per_1k": 0.015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "model_id": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "provider": "anthropic",
+      "version": "3.5",
+      "description": "Original Claude 3.5 Sonnet from June 2024",
+      "strengths": ["coding", "reasoning", "analysis", "visual-understanding", "writing"],
+      "context_window": 200000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.003,
+        "output_per_1k": 0.015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "anthropic.claude-3-5-haiku-20241022-v1:0",
+      "model_id": "anthropic.claude-3-5-haiku-20241022-v1:0",
+      "provider": "anthropic",
+      "version": "3.5",
+      "description": "Fast and cost-effective Claude 3.5 model",
+      "strengths": ["speed", "efficiency", "cost-effective", "coding", "vision"],
+      "context_window": 200000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.001,
+        "output_per_1k": 0.005
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "anthropic.claude-3-opus-20240229-v1:0",
+      "model_id": "anthropic.claude-3-opus-20240229-v1:0",
+      "provider": "anthropic",
+      "version": "3.0",
+      "description": "Most capable Claude 3 model for complex tasks",
+      "strengths": ["reasoning", "analysis", "mathematics", "coding", "creative-writing"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.015,
+        "output_per_1k": 0.075
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "anthropic.claude-3-sonnet-20240229-v1:0",
+      "model_id": "anthropic.claude-3-sonnet-20240229-v1:0",
+      "provider": "anthropic",
+      "version": "3.0",
+      "description": "Balanced Claude 3 model for most tasks",
+      "strengths": ["reasoning", "coding", "analysis", "general-purpose", "balance"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.003,
+        "output_per_1k": 0.015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "anthropic.claude-3-haiku-20240307-v1:0",
+      "model_id": "anthropic.claude-3-haiku-20240307-v1:0",
+      "provider": "anthropic",
+      "version": "3.0",
+      "description": "Fast and compact Claude 3 model",
+      "strengths": ["speed", "efficiency", "cost-effective", "quick-responses"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00025,
+        "output_per_1k": 0.00125
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "anthropic.claude-v2:1",
+      "model_id": "anthropic.claude-v2:1",
+      "provider": "anthropic",
+      "version": "2.1",
+      "description": "Claude 2.1 with reduced hallucinations",
+      "strengths": ["long-context", "accuracy", "reasoning", "legacy"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.008,
+        "output_per_1k": 0.024
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "anthropic.claude-v2",
+      "model_id": "anthropic.claude-v2",
+      "provider": "anthropic",
+      "version": "2.0",
+      "description": "Original Claude 2 model",
+      "strengths": ["long-context", "reasoning", "legacy"],
+      "context_window": 100000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.008,
+        "output_per_1k": 0.024
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "anthropic.claude-instant-v1",
+      "model_id": "anthropic.claude-instant-v1",
+      "provider": "anthropic",
+      "version": "1.2",
+      "description": "Fast and lightweight Claude model",
+      "strengths": ["speed", "cost-effective", "efficiency", "legacy"],
+      "context_window": 100000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0008,
+        "output_per_1k": 0.0024
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-3-70b-instruct-v1:0",
+      "model_id": "meta.llama3-3-70b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.3",
+      "description": "Latest Llama 3.3 70B instruction model",
+      "strengths": ["reasoning", "instruction-following", "coding", "multilingual"],
+      "context_window": 128000,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.00065
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-2-90b-instruct-v1:0",
+      "model_id": "meta.llama3-2-90b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Large Llama 3.2 model for complex reasoning",
+      "strengths": ["reasoning", "coding", "instruction-following", "long-context"],
+      "context_window": 128000,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00080,
+        "output_per_1k": 0.00080
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-2-11b-instruct-v1:0",
+      "model_id": "meta.llama3-2-11b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Mid-size Llama 3.2 instruction model with vision",
+      "strengths": ["vision", "multimodal", "efficiency", "instruction-following"],
+      "context_window": 128000,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00016,
+        "output_per_1k": 0.00016
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": true,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-2-3b-instruct-v1:0",
+      "model_id": "meta.llama3-2-3b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Compact Llama 3.2 model for efficient inference",
+      "strengths": ["efficiency", "speed", "cost-effective", "edge-deployment"],
+      "context_window": 128000,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00015,
+        "output_per_1k": 0.00015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-2-1b-instruct-v1:0",
+      "model_id": "meta.llama3-2-1b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Ultra-compact Llama 3.2 for edge devices",
+      "strengths": ["efficiency", "edge-deployment", "low-latency", "mobile"],
+      "context_window": 128000,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00010,
+        "output_per_1k": 0.00010
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-1-405b-instruct-v1:0",
+      "model_id": "meta.llama3-1-405b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Largest Llama 3.1 model with exceptional capabilities",
+      "strengths": ["reasoning", "coding", "mathematics", "multilingual", "general-purpose"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00532,
+        "output_per_1k": 0.016
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-1-70b-instruct-v1:0",
+      "model_id": "meta.llama3-1-70b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Balanced Llama 3.1 70B model",
+      "strengths": ["reasoning", "coding", "multilingual", "instruction-following"],
+      "context_window": 128000,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00099,
+        "output_per_1k": 0.00099
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-1-8b-instruct-v1:0",
+      "model_id": "meta.llama3-1-8b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Efficient Llama 3.1 8B model",
+      "strengths": ["efficiency", "speed", "cost-effective", "general-purpose"],
+      "context_window": 128000,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0003,
+        "output_per_1k": 0.0006
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-70b-instruct-v1:0",
+      "model_id": "meta.llama3-70b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.0",
+      "description": "Original Llama 3 70B instruction model",
+      "strengths": ["reasoning", "instruction-following", "general-purpose"],
+      "context_window": 8192,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00265,
+        "output_per_1k": 0.0035
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama3-8b-instruct-v1:0",
+      "model_id": "meta.llama3-8b-instruct-v1:0",
+      "provider": "meta",
+      "version": "3.0",
+      "description": "Compact Llama 3 8B instruction model",
+      "strengths": ["efficiency", "speed", "cost-effective"],
+      "context_window": 8192,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0004,
+        "output_per_1k": 0.0006
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama2-70b-chat-v1",
+      "model_id": "meta.llama2-70b-chat-v1",
+      "provider": "meta",
+      "version": "2.0",
+      "description": "Llama 2 70B chat model",
+      "strengths": ["conversation", "reasoning", "legacy"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00195,
+        "output_per_1k": 0.00256
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "meta.llama2-13b-chat-v1",
+      "model_id": "meta.llama2-13b-chat-v1",
+      "provider": "meta",
+      "version": "2.0",
+      "description": "Llama 2 13B chat model",
+      "strengths": ["efficiency", "conversation", "cost-effective"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00075,
+        "output_per_1k": 0.001
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "amazon.titan-text-premier-v1:0",
+      "model_id": "amazon.titan-text-premier-v1:0",
+      "provider": "amazon",
+      "version": "1.0",
+      "description": "Amazon's most advanced text generation model",
+      "strengths": ["reasoning", "instruction-following", "summarization", "rag"],
+      "context_window": 32000,
+      "max_output": 3000,
+      "cost": {
+        "input_per_1k": 0.0005,
+        "output_per_1k": 0.0015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "amazon.titan-text-express-v1",
+      "model_id": "amazon.titan-text-express-v1",
+      "provider": "amazon",
+      "version": "1.0",
+      "description": "Fast and cost-effective Amazon Titan model",
+      "strengths": ["speed", "efficiency", "summarization", "classification"],
+      "context_window": 8000,
+      "max_output": 8000,
+      "cost": {
+        "input_per_1k": 0.0002,
+        "output_per_1k": 0.0006
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "amazon.titan-text-lite-v1",
+      "model_id": "amazon.titan-text-lite-v1",
+      "provider": "amazon",
+      "version": "1.0",
+      "description": "Lightweight Amazon Titan for simple tasks",
+      "strengths": ["efficiency", "cost-effective", "speed", "simple-tasks"],
+      "context_window": 4000,
+      "max_output": 4000,
+      "cost": {
+        "input_per_1k": 0.00015,
+        "output_per_1k": 0.0002
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "amazon.titan-embed-text-v2:0",
+      "model_id": "amazon.titan-embed-text-v2:0",
+      "provider": "amazon",
+      "version": "2.0",
+      "description": "Latest Amazon Titan embedding model",
+      "strengths": ["embeddings", "semantic-search", "rag", "multilingual"],
+      "context_window": 8192,
+      "max_output": 1024,
+      "cost": {
+        "per_1k": 0.0001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "embeddings": true,
+        "dimensions": 1024
+      }
+    },
+    {
+      "name": "amazon.titan-embed-text-v1",
+      "model_id": "amazon.titan-embed-text-v1",
+      "provider": "amazon",
+      "version": "1.0",
+      "description": "Amazon Titan embedding model for semantic search",
+      "strengths": ["embeddings", "semantic-search", "rag"],
+      "context_window": 8192,
+      "max_output": 1536,
+      "cost": {
+        "per_1k": 0.0001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "embeddings": true,
+        "dimensions": 1536
+      }
+    },
+    {
+      "name": "amazon.titan-embed-image-v1",
+      "model_id": "amazon.titan-embed-image-v1",
+      "provider": "amazon",
+      "version": "1.0",
+      "description": "Multimodal embedding model for images and text",
+      "strengths": ["multimodal-embeddings", "image-search", "visual-similarity"],
+      "context_window": 128,
+      "max_output": 1024,
+      "cost": {
+        "per_image": 0.00006,
+        "per_1k_text": 0.0001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": true,
+        "embeddings": true,
+        "dimensions": 1024
+      }
+    },
+    {
+      "name": "amazon.titan-image-generator-v2:0",
+      "model_id": "amazon.titan-image-generator-v2:0",
+      "provider": "amazon",
+      "version": "2.0",
+      "description": "Latest Amazon Titan image generation model",
+      "strengths": ["image-generation", "customization", "conditioning", "background-removal"],
+      "context_window": 512,
+      "max_output": 1,
+      "cost": {
+        "standard_512x512": 0.004,
+        "standard_1024x1024": 0.010,
+        "premium_1024x1024": 0.020
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "image_generation": true,
+        "image_editing": true,
+        "background_removal": true
+      }
+    },
+    {
+      "name": "amazon.titan-image-generator-v1",
+      "model_id": "amazon.titan-image-generator-v1",
+      "provider": "amazon",
+      "version": "1.0",
+      "description": "Amazon Titan image generation model",
+      "strengths": ["image-generation", "text-to-image"],
+      "context_window": 512,
+      "max_output": 1,
+      "cost": {
+        "per_image": 0.008
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "image_generation": true,
+        "image_editing": false
+      }
+    },
+    {
+      "name": "mistral.mistral-large-2407-v1:0",
+      "model_id": "mistral.mistral-large-2407-v1:0",
+      "provider": "mistral",
+      "version": "2.0",
+      "description": "Mistral's most capable model for complex reasoning",
+      "strengths": ["reasoning", "coding", "multilingual", "function-calling"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.004,
+        "output_per_1k": 0.012
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "mistral.mistral-large-2402-v1:0",
+      "model_id": "mistral.mistral-large-2402-v1:0",
+      "provider": "mistral",
+      "version": "1.0",
+      "description": "Previous generation Mistral Large model",
+      "strengths": ["reasoning", "coding", "multilingual"],
+      "context_window": 32000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.008,
+        "output_per_1k": 0.024
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "mistral.mixtral-8x7b-instruct-v0:1",
+      "model_id": "mistral.mixtral-8x7b-instruct-v0:1",
+      "provider": "mistral",
+      "version": "0.1",
+      "description": "Efficient Mixture-of-Experts model",
+      "strengths": ["efficiency", "multilingual", "reasoning", "cost-effective"],
+      "context_window": 32000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00045,
+        "output_per_1k": 0.0007
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "mistral.mistral-7b-instruct-v0:2",
+      "model_id": "mistral.mistral-7b-instruct-v0:2",
+      "provider": "mistral",
+      "version": "0.2",
+      "description": "Compact and efficient Mistral 7B model",
+      "strengths": ["efficiency", "speed", "cost-effective", "multilingual"],
+      "context_window": 32000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.00015,
+        "output_per_1k": 0.0002
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "mistral.mistral-small-2402-v1:0",
+      "model_id": "mistral.mistral-small-2402-v1:0",
+      "provider": "mistral",
+      "version": "1.0",
+      "description": "Balanced Mistral model for general tasks",
+      "strengths": ["efficiency", "reasoning", "cost-effective"],
+      "context_window": 32000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.001,
+        "output_per_1k": 0.003
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "cohere.command-r-plus-v1:0",
+      "model_id": "cohere.command-r-plus-v1:0",
+      "provider": "cohere",
+      "version": "1.0",
+      "description": "Cohere's most powerful model for complex tasks",
+      "strengths": ["reasoning", "rag", "multilingual", "tool-use"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.003,
+        "output_per_1k": 0.015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "guardrails": true,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "cohere.command-r-v1:0",
+      "model_id": "cohere.command-r-v1:0",
+      "provider": "cohere",
+      "version": "1.0",
+      "description": "Balanced Cohere model for RAG and generation",
+      "strengths": ["rag", "reasoning", "multilingual", "efficiency"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0005,
+        "output_per_1k": 0.0015
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "guardrails": true,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "cohere.command-text-v14",
+      "model_id": "cohere.command-text-v14",
+      "provider": "cohere",
+      "version": "14",
+      "description": "Cohere Command model for text generation",
+      "strengths": ["generation", "summarization", "classification"],
+      "context_window": 4096,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0015,
+        "output_per_1k": 0.002
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "cohere.command-light-text-v14",
+      "model_id": "cohere.command-light-text-v14",
+      "provider": "cohere",
+      "version": "14",
+      "description": "Lightweight Cohere model for simple tasks",
+      "strengths": ["efficiency", "speed", "cost-effective"],
+      "context_window": 4096,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0003,
+        "output_per_1k": 0.0006
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "cohere.embed-english-v3",
+      "model_id": "cohere.embed-english-v3",
+      "provider": "cohere",
+      "version": "3",
+      "description": "English-optimized embedding model",
+      "strengths": ["embeddings", "semantic-search", "english", "rag"],
+      "context_window": 512,
+      "max_output": 1024,
+      "cost": {
+        "per_1k": 0.0001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "embeddings": true,
+        "dimensions": 1024
+      }
+    },
+    {
+      "name": "cohere.embed-multilingual-v3",
+      "model_id": "cohere.embed-multilingual-v3",
+      "provider": "cohere",
+      "version": "3",
+      "description": "Multilingual embedding model for 100+ languages",
+      "strengths": ["embeddings", "multilingual", "semantic-search", "rag"],
+      "context_window": 512,
+      "max_output": 1024,
+      "cost": {
+        "per_1k": 0.0001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "embeddings": true,
+        "dimensions": 1024
+      }
+    },
+    {
+      "name": "ai21.jamba-1-5-large-v1:0",
+      "model_id": "ai21.jamba-1-5-large-v1:0",
+      "provider": "ai21",
+      "version": "1.5",
+      "description": "AI21's hybrid SSM-Transformer model with long context",
+      "strengths": ["long-context", "efficiency", "reasoning", "multilingual"],
+      "context_window": 256000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.002,
+        "output_per_1k": 0.008
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "ai21.jamba-1-5-mini-v1:0",
+      "model_id": "ai21.jamba-1-5-mini-v1:0",
+      "provider": "ai21",
+      "version": "1.5",
+      "description": "Compact Jamba model with long context support",
+      "strengths": ["long-context", "efficiency", "cost-effective"],
+      "context_window": 256000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0002,
+        "output_per_1k": 0.0004
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "ai21.j2-ultra-v1",
+      "model_id": "ai21.j2-ultra-v1",
+      "provider": "ai21",
+      "version": "1.0",
+      "description": "AI21's Jurassic-2 Ultra for complex tasks",
+      "strengths": ["reasoning", "generation", "summarization"],
+      "context_window": 8192,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.0188,
+        "output_per_1k": 0.0188
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "ai21.j2-mid-v1",
+      "model_id": "ai21.j2-mid-v1",
+      "provider": "ai21",
+      "version": "1.0",
+      "description": "Balanced Jurassic-2 model",
+      "strengths": ["reasoning", "generation", "balance"],
+      "context_window": 8192,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.0125,
+        "output_per_1k": 0.0125
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "guardrails": true
+      }
+    },
+    {
+      "name": "stability.stable-diffusion-xl-v1",
+      "model_id": "stability.stable-diffusion-xl-v1",
+      "provider": "stability",
+      "version": "1.0",
+      "description": "Stable Diffusion XL for high-quality image generation",
+      "strengths": ["image-generation", "quality", "customization"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "standard_1024x1024": 0.040,
+        "standard_other": 0.036
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "image_generation": true,
+        "image_editing": false
+      }
+    },
+    {
+      "name": "stability.stable-image-ultra-v1:0",
+      "model_id": "stability.stable-image-ultra-v1:0",
+      "provider": "stability",
+      "version": "1.0",
+      "description": "Latest Stable Image model with enhanced quality",
+      "strengths": ["image-generation", "photorealism", "quality", "detail"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "per_image": 0.080
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "image_generation": true,
+        "image_editing": false
+      }
+    },
+    {
+      "name": "stability.stable-image-core-v1:0",
+      "model_id": "stability.stable-image-core-v1:0",
+      "provider": "stability",
+      "version": "1.0",
+      "description": "Balanced Stable Image model",
+      "strengths": ["image-generation", "balance", "quality"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "per_image": 0.030
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "image_generation": true,
+        "image_editing": false
+      }
+    },
+    {
+      "name": "stability.sd3-large-v1:0",
+      "model_id": "stability.sd3-large-v1:0",
+      "provider": "stability",
+      "version": "3.0",
+      "description": "Stable Diffusion 3 Large model",
+      "strengths": ["image-generation", "text-rendering", "quality"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "per_image": 0.065
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "image_generation": true,
+        "image_editing": false
+      }
+    }
+  ],
+  "model_providers": {
+    "anthropic": {
+      "description": "Claude models from Anthropic with Constitutional AI",
+      "total_models": 9,
+      "features": ["vision", "tool-use", "long-context", "guardrails"]
+    },
+    "meta": {
+      "description": "Open-source Llama models from Meta",
+      "total_models": 14,
+      "features": ["multilingual", "long-context", "open-source"]
+    },
+    "amazon": {
+      "description": "Amazon Titan models for text, embeddings, and images",
+      "total_models": 8,
+      "features": ["fine-tuning", "embeddings", "image-generation", "multimodal"]
+    },
+    "mistral": {
+      "description": "European AI models with strong multilingual capabilities",
+      "total_models": 5,
+      "features": ["multilingual", "moe", "function-calling", "efficiency"]
+    },
+    "cohere": {
+      "description": "Enterprise-focused models optimized for RAG",
+      "total_models": 6,
+      "features": ["rag", "embeddings", "multilingual", "fine-tuning"]
+    },
+    "ai21": {
+      "description": "Jurassic and Jamba models with long context",
+      "total_models": 4,
+      "features": ["long-context", "hybrid-architecture", "efficiency"]
+    },
+    "stability": {
+      "description": "Stable Diffusion image generation models",
+      "total_models": 4,
+      "features": ["image-generation", "photorealism", "customization"]
+    }
+  },
+  "bedrock_features": {
+    "guardrails": {
+      "description": "Content filtering, PII detection, and custom policies",
+      "capabilities": ["content-filters", "pii-detection", "topic-denial", "word-filters", "sensitive-info-filters"],
+      "pricing": "Per 1000 content units processed"
+    },
+    "knowledge_bases": {
+      "description": "Managed RAG with vector databases",
+      "capabilities": ["document-ingestion", "chunking", "embeddings", "retrieval", "citations"],
+      "supported_databases": ["Amazon OpenSearch", "Pinecone", "Redis", "Amazon Aurora"],
+      "pricing": "Based on document storage and queries"
+    },
+    "agents": {
+      "description": "Autonomous agents with tool orchestration",
+      "capabilities": ["action-groups", "api-integration", "multi-step-reasoning", "memory"],
+      "pricing": "Per agent invocation"
+    },
+    "model_evaluation": {
+      "description": "Compare model performance on custom datasets",
+      "capabilities": ["automatic-evaluation", "human-evaluation", "custom-metrics"],
+      "metrics": ["accuracy", "robustness", "toxicity"]
+    },
+    "provisioned_throughput": {
+      "description": "Purchase dedicated capacity for consistent performance",
+      "benefits": ["guaranteed-capacity", "lower-latency", "predictable-costs"],
+      "commitment": "1 month or 6 month commitments"
+    },
+    "cross_region_inference": {
+      "description": "Automatic routing across regions for high availability",
+      "benefits": ["high-availability", "burst-capacity", "disaster-recovery"]
+    },
+    "model_customization": {
+      "description": "Fine-tune models on custom data",
+      "supported_models": ["Amazon Titan", "Cohere Command"],
+      "methods": ["continued-pretraining", "fine-tuning"],
+      "pricing": "Based on training data and compute"
+    },
+    "batch_inference": {
+      "description": "Process large batches at reduced cost",
+      "discount": "Up to 50% off on-demand pricing",
+      "max_batch_size": "Varies by model",
+      "processing_time": "24 hours"
+    }
+  },
+  "aws_integration": {
+    "iam": "Fine-grained access control with IAM policies",
+    "cloudwatch": "Metrics, logs, and alarms",
+    "cloudtrail": "API call auditing and compliance",
+    "kms": "Encrypt model inputs/outputs",
+    "vpc": "Private connectivity via VPC endpoints",
+    "s3": "Store training data and outputs",
+    "lambda": "Serverless model invocations",
+    "sagemaker": "Integration with ML workflows",
+    "eventbridge": "Event-driven architectures"
+  },
+  "regional_availability": {
+    "us_east_1": "US East (N. Virginia) - Most models available",
+    "us_west_2": "US West (Oregon) - Most models available",
+    "eu_west_1": "Europe (Ireland) - Most models available",
+    "ap_southeast_1": "Asia Pacific (Singapore) - Select models",
+    "ap_northeast_1": "Asia Pacific (Tokyo) - Select models",
+    "note": "Model availability varies by region. Check AWS documentation for current availability"
+  },
+  "pricing_notes": {
+    "on_demand": "Pay per token/image with no commitments",
+    "provisioned": "Purchase model units for guaranteed capacity",
+    "batch": "Up to 50% discount for batch processing",
+    "data_transfer": "Standard AWS data transfer charges apply",
+    "free_tier": "Limited free tier available for select models"
+  },
+  "best_practices": {
+    "model_selection": "Choose appropriate model for task complexity and budget",
+    "guardrails": "Implement content filtering for production applications",
+    "prompt_engineering": "Optimize prompts for token efficiency",
+    "caching": "Use application-level caching to reduce API calls",
+    "error_handling": "Implement exponential backoff for throttling",
+    "monitoring": "Set up CloudWatch alarms for usage and errors",
+    "security": "Use VPC endpoints and encryption for sensitive data",
+    "cost_optimization": "Consider provisioned throughput for consistent workloads",
+    "regional_deployment": "Deploy in regions closest to users for lower latency"
+  }
+}

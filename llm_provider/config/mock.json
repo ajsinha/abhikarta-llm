@@ -1,0 +1,45 @@
+{
+  "provider": "mock",
+  "api_version": "1.0",
+  "base_url": null,
+  "models": [
+    {
+      "name": "mock-model",
+      "version": "1.0",
+      "description": "Basic mock model for testing",
+      "strengths": ["testing", "development"],
+      "context_window": 4096,
+      "max_output": 1024,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_1k": 0.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "mock-advanced",
+      "version": "2.0",
+      "description": "Advanced mock model with all features",
+      "strengths": ["testing", "development", "advanced-features"],
+      "context_window": 8192,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_1k": 0.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true
+      }
+    }
+  ]
+}

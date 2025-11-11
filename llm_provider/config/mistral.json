@@ -1,0 +1,1107 @@
+{
+  "provider": "mistral",
+  "api_version": "v1",
+  "base_url": "https://api.mistral.ai",
+  "notes": {
+    "authentication": "All endpoints require Authorization header with Bearer token (MISTRAL_API_KEY)",
+    "pricing": "Prices shown per 1M tokens. Tiered pricing based on usage volume",
+    "streaming": "All chat models support server-sent events (SSE) streaming",
+    "rate_limits": "Vary by subscription tier. Free trial available. Enterprise plans with custom limits",
+    "context_windows": "Context windows range from 8K to 128K tokens depending on model",
+    "european_ai": "European AI company focused on frontier AI models",
+    "open_source": "Some models available open-source (Mistral 7B, Mixtral 8x7B)",
+    "function_calling": "Native function calling supported on all instruction models",
+    "json_mode": "Structured JSON output via response_format parameter",
+    "multilingual": "Strong multilingual support across European and global languages",
+    "la_plateforme": "La Plateforme - Mistral's AI deployment platform",
+    "fine_tuning": "Fine-tuning available for select models",
+    "embeddings": "Mistral Embed for semantic search and RAG",
+    "moderation": "Content moderation capabilities built into models",
+    "vision": "Pixtral models for multimodal image understanding",
+    "coding": "Codestral specialized for code generation",
+    "sdk_support": "Official SDKs for Python, TypeScript, JavaScript",
+    "openai_compatible": "API compatible with OpenAI SDK format",
+    "enterprise": "Enterprise plans with SLA, dedicated support, and custom deployment",
+    "azure": "Available on Azure AI Studio",
+    "gcp": "Available on Google Cloud Vertex AI",
+    "aws": "Available on AWS Bedrock"
+  },
+  "models": [
+    {
+      "name": "mistral-large-latest",
+      "model_id": "mistral-large-latest",
+      "version": "latest",
+      "description": "Latest Mistral Large model (auto-updates)",
+      "strengths": ["reasoning", "coding", "multilingual", "complex-tasks", "function-calling"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 2.0,
+        "output_per_1m": 6.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "mistral-large-2411",
+      "model_id": "mistral-large-2411",
+      "version": "2024-11",
+      "description": "Mistral Large from November 2024 with 128K context",
+      "strengths": ["reasoning", "coding", "multilingual", "long-context", "function-calling"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 2.0,
+        "output_per_1m": 6.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "mistral-large-2407",
+      "model_id": "mistral-large-2407",
+      "version": "2024-07",
+      "description": "Mistral Large from July 2024",
+      "strengths": ["reasoning", "coding", "multilingual", "function-calling"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 2.0,
+        "output_per_1m": 6.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "mistral-large-2402",
+      "model_id": "mistral-large-2402",
+      "version": "2024-02",
+      "description": "Original Mistral Large from February 2024",
+      "strengths": ["reasoning", "coding", "multilingual"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 2.0,
+        "output_per_1m": 6.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "pixtral-large-latest",
+      "model_id": "pixtral-large-latest",
+      "version": "latest",
+      "description": "Latest Pixtral Large with vision capabilities (124B)",
+      "strengths": ["vision", "multimodal", "reasoning", "image-understanding", "document-analysis"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 2.0,
+        "output_per_1m": 6.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "pixtral-large-2411",
+      "model_id": "pixtral-large-2411",
+      "version": "2024-11",
+      "description": "Pixtral Large from November 2024 (124B parameters)",
+      "strengths": ["vision", "multimodal", "reasoning", "charts", "documents"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 2.0,
+        "output_per_1m": 6.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "pixtral-12b-2409",
+      "model_id": "pixtral-12b-2409",
+      "version": "2024-09",
+      "description": "Efficient Pixtral 12B with vision (open-weights)",
+      "strengths": ["vision", "efficiency", "multimodal", "cost-effective"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.15,
+        "output_per_1m": 0.15
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "mistral-small-latest",
+      "model_id": "mistral-small-latest",
+      "version": "latest",
+      "description": "Latest Mistral Small model (auto-updates)",
+      "strengths": ["efficiency", "cost-effective", "multilingual", "speed"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.2,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "mistral-small-2409",
+      "model_id": "mistral-small-2409",
+      "version": "2024-09",
+      "description": "Mistral Small from September 2024 (22B)",
+      "strengths": ["efficiency", "cost-effective", "multilingual", "reasoning"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.2,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "mistral-small-2402",
+      "model_id": "mistral-small-2402",
+      "version": "2024-02",
+      "description": "Original Mistral Small from February 2024",
+      "strengths": ["efficiency", "cost-effective", "multilingual"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.2,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "ministral-8b-latest",
+      "model_id": "ministral-8b-latest",
+      "version": "latest",
+      "description": "Latest Ministral 8B for edge deployment",
+      "strengths": ["efficiency", "edge-deployment", "low-latency", "cost-effective"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.1,
+        "output_per_1m": 0.1
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "ministral-8b-2410",
+      "model_id": "ministral-8b-2410",
+      "version": "2024-10",
+      "description": "Ministral 8B from October 2024",
+      "strengths": ["efficiency", "edge-deployment", "low-latency", "speed"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.1,
+        "output_per_1m": 0.1
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "ministral-3b-latest",
+      "model_id": "ministral-3b-latest",
+      "version": "latest",
+      "description": "Ultra-compact Ministral 3B for edge/mobile",
+      "strengths": ["efficiency", "mobile", "edge-deployment", "ultra-low-latency"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.04,
+        "output_per_1m": 0.04
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "ministral-3b-2410",
+      "model_id": "ministral-3b-2410",
+      "version": "2024-10",
+      "description": "Ministral 3B from October 2024",
+      "strengths": ["efficiency", "mobile", "edge-deployment", "cost-effective"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.04,
+        "output_per_1m": 0.04
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "mistral-nemo-latest",
+      "model_id": "mistral-nemo-latest",
+      "version": "latest",
+      "description": "Latest Mistral NeMo 12B (co-developed with NVIDIA)",
+      "strengths": ["efficiency", "reasoning", "multilingual", "long-context"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.15,
+        "output_per_1m": 0.15
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "mistral-nemo-2407",
+      "model_id": "open-mistral-nemo-2407",
+      "version": "2024-07",
+      "description": "Mistral NeMo from July 2024 (12B, open-weights)",
+      "strengths": ["efficiency", "reasoning", "multilingual", "open-source"],
+      "context_window": 128000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.15,
+        "output_per_1m": 0.15
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "codestral-latest",
+      "model_id": "codestral-latest",
+      "version": "latest",
+      "description": "Latest Codestral model for code generation",
+      "strengths": ["coding", "code-generation", "debugging", "code-completion"],
+      "context_window": 256000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.2,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false,
+        "fill_in_middle": true
+      }
+    },
+    {
+      "name": "codestral-2405",
+      "model_id": "codestral-2405",
+      "version": "2024-05",
+      "description": "Codestral from May 2024 (22B)",
+      "strengths": ["coding", "code-generation", "80-languages", "fill-in-middle"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.2,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false,
+        "fill_in_middle": true
+      }
+    },
+    {
+      "name": "codestral-mamba-latest",
+      "model_id": "codestral-mamba-latest",
+      "version": "latest",
+      "description": "Codestral Mamba with Mamba architecture (7B)",
+      "strengths": ["coding", "efficiency", "linear-attention", "fast-inference"],
+      "context_window": 256000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.25,
+        "output_per_1m": 0.25
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "json_mode": false,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "open-codestral-mamba",
+      "model_id": "open-codestral-mamba",
+      "version": "2024-07",
+      "description": "Open-weights Codestral Mamba (7B)",
+      "strengths": ["coding", "efficiency", "open-source", "mamba-architecture"],
+      "context_window": 256000,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.25,
+        "output_per_1m": 0.25
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "json_mode": false,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "open-mixtral-8x22b",
+      "model_id": "open-mixtral-8x22b",
+      "version": "2024-04",
+      "description": "Large Mixtral 8x22B MoE (open-weights)",
+      "strengths": ["reasoning", "coding", "mathematics", "multilingual", "moe"],
+      "context_window": 65536,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 2.0,
+        "output_per_1m": 6.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "open-mixtral-8x22b-2404",
+      "model_id": "open-mixtral-8x22b-2404",
+      "version": "2024-04",
+      "description": "Mixtral 8x22B from April 2024 (141B total)",
+      "strengths": ["reasoning", "coding", "mathematics", "multilingual"],
+      "context_window": 65536,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 2.0,
+        "output_per_1m": 6.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "open-mixtral-8x7b",
+      "model_id": "open-mixtral-8x7b",
+      "version": "2023-12",
+      "description": "Mixtral 8x7B MoE (open-weights)",
+      "strengths": ["efficiency", "multilingual", "reasoning", "cost-effective", "moe"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.7,
+        "output_per_1m": 0.7
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "open-mistral-7b",
+      "model_id": "open-mistral-7b",
+      "version": "2023-09",
+      "description": "Original Mistral 7B (open-weights)",
+      "strengths": ["efficiency", "open-source", "general-purpose"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.25,
+        "output_per_1m": 0.25
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "json_mode": false,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "mistral-embed",
+      "model_id": "mistral-embed",
+      "version": "2023-12",
+      "description": "Mistral embedding model for semantic search",
+      "strengths": ["embeddings", "semantic-search", "rag", "retrieval"],
+      "context_window": 8192,
+      "max_output": 1024,
+      "cost": {
+        "per_1m_tokens": 0.1
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 1024
+      }
+    },
+    {
+      "name": "mistral-moderation-latest",
+      "model_id": "mistral-moderation-latest",
+      "version": "latest",
+      "description": "Latest content moderation model",
+      "strengths": ["moderation", "safety", "content-filtering"],
+      "context_window": 8192,
+      "max_output": 1024,
+      "cost": {
+        "per_1m_tokens": 0.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "moderation": true,
+        "categories": [
+          "sexual",
+          "hate_and_discrimination",
+          "violence_and_threats",
+          "dangerous_and_criminal_content",
+          "selfharm",
+          "health",
+          "financial",
+          "law",
+          "pii"
+        ]
+      }
+    },
+    {
+      "name": "mistral-moderation-2411",
+      "model_id": "mistral-moderation-2411",
+      "version": "2024-11",
+      "description": "Content moderation model from November 2024",
+      "strengths": ["moderation", "safety", "content-filtering", "policy-enforcement"],
+      "context_window": 8192,
+      "max_output": 1024,
+      "cost": {
+        "per_1m_tokens": 0.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "moderation": true,
+        "categories": [
+          "sexual",
+          "hate_and_discrimination",
+          "violence_and_threats",
+          "dangerous_and_criminal_content",
+          "selfharm",
+          "health",
+          "financial",
+          "law",
+          "pii"
+        ]
+      }
+    }
+  ],
+  "model_families": {
+    "mistral_large": {
+      "description": "Flagship models for complex reasoning and coding",
+      "models": [
+        "mistral-large-latest",
+        "mistral-large-2411",
+        "mistral-large-2407",
+        "mistral-large-2402"
+      ],
+      "parameters": "123B",
+      "features": ["128k-context", "function-calling", "multilingual", "json-mode"],
+      "use_cases": ["complex-reasoning", "coding", "agentic-workflows", "enterprise"]
+    },
+    "pixtral": {
+      "description": "Multimodal models with vision capabilities",
+      "models": [
+        "pixtral-large-latest",
+        "pixtral-large-2411",
+        "pixtral-12b-2409"
+      ],
+      "parameters": "124B (large), 12B (12b)",
+      "features": ["vision", "multimodal", "document-analysis", "128k-context"],
+      "use_cases": ["image-understanding", "document-qa", "chart-analysis", "ocr"]
+    },
+    "mistral_small": {
+      "description": "Efficient models for cost-effective deployment",
+      "models": [
+        "mistral-small-latest",
+        "mistral-small-2409",
+        "mistral-small-2402"
+      ],
+      "parameters": "22B",
+      "features": ["128k-context", "function-calling", "efficiency"],
+      "use_cases": ["cost-optimization", "high-throughput", "general-purpose"]
+    },
+    "ministral": {
+      "description": "Compact models for edge and mobile deployment",
+      "models": [
+        "ministral-8b-latest",
+        "ministral-8b-2410",
+        "ministral-3b-latest",
+        "ministral-3b-2410"
+      ],
+      "parameters": "8B, 3B",
+      "features": ["128k-context", "edge-deployment", "low-latency"],
+      "use_cases": ["edge-devices", "mobile", "real-time", "cost-sensitive"]
+    },
+    "mistral_nemo": {
+      "description": "12B model co-developed with NVIDIA",
+      "models": [
+        "mistral-nemo-latest",
+        "mistral-nemo-2407"
+      ],
+      "parameters": "12B",
+      "features": ["128k-context", "fine-tuning", "efficiency"],
+      "use_cases": ["general-purpose", "custom-training", "enterprise"]
+    },
+    "codestral": {
+      "description": "Specialized coding models",
+      "models": [
+        "codestral-latest",
+        "codestral-2405",
+        "codestral-mamba-latest",
+        "open-codestral-mamba"
+      ],
+      "parameters": "22B (codestral), 7B (mamba)",
+      "features": ["256k-context", "fill-in-middle", "80-languages"],
+      "use_cases": ["code-generation", "code-completion", "debugging", "ide-integration"]
+    },
+    "mixtral": {
+      "description": "Mixture-of-Experts models (open-weights)",
+      "models": [
+        "open-mixtral-8x22b",
+        "open-mixtral-8x22b-2404",
+        "open-mixtral-8x7b"
+      ],
+      "parameters": "141B (8x22b), 47B (8x7b)",
+      "features": ["moe-architecture", "open-weights", "sparse-activation"],
+      "use_cases": ["reasoning", "coding", "multilingual", "self-hosting"]
+    },
+    "open_models": {
+      "description": "Open-weights models for self-hosting",
+      "models": [
+        "open-mistral-7b",
+        "open-mixtral-8x7b",
+        "open-mixtral-8x22b",
+        "open-codestral-mamba",
+        "mistral-nemo-2407",
+        "pixtral-12b-2409"
+      ],
+      "license": "Apache 2.0 or Mistral AI Non-Production License",
+      "features": ["downloadable", "self-hostable", "customizable"]
+    }
+  },
+  "function_calling": {
+    "description": "Native tool use for connecting models to external APIs",
+    "supported_models": [
+      "mistral-large-*",
+      "pixtral-large-*",
+      "pixtral-12b-*",
+      "mistral-small-*",
+      "ministral-*",
+      "mistral-nemo-*",
+      "open-mixtral-*"
+    ],
+    "features": {
+      "parallel_calling": "Execute multiple tools simultaneously",
+      "forced_calling": "Force model to use specific tool",
+      "any_mode": "Let model decide whether to use tools",
+      "auto_mode": "Default mode with automatic tool selection",
+      "json_schema": "Define tools using JSON schema"
+    },
+    "use_cases": ["api-integration", "data-retrieval", "agentic-workflows", "automation"]
+  },
+  "json_mode": {
+    "description": "Structured JSON output generation",
+    "supported_models": "All instruction models except Codestral Mamba",
+    "usage": {
+      "parameter": "response_format",
+      "type": "json_object",
+      "enforcement": "Model outputs valid JSON"
+    },
+    "use_cases": ["api-responses", "structured-data", "integration", "parsing"]
+  },
+  "vision_capabilities": {
+    "description": "Multimodal image understanding",
+    "supported_models": [
+      "pixtral-large-latest",
+      "pixtral-large-2411",
+      "pixtral-12b-2409"
+    ],
+    "features": {
+      "image_understanding": "Analyze and describe images",
+      "document_analysis": "Extract information from documents",
+      "chart_interpretation": "Understand charts and graphs",
+      "ocr": "Extract text from images",
+      "multi_image": "Process multiple images in single request"
+    },
+    "supported_formats": ["JPEG", "PNG", "GIF", "WEBP"],
+    "max_size": "Image size limits apply per model",
+    "use_cases": ["document-qa", "visual-analysis", "chart-understanding", "receipt-processing"]
+  },
+  "embeddings": {
+    "description": "Text embeddings for semantic search and RAG",
+    "model": "mistral-embed",
+    "dimensions": 1024,
+    "max_tokens": 8192,
+    "features": {
+      "semantic_search": "Find similar documents",
+      "rag": "Retrieval Augmented Generation",
+      "clustering": "Group similar texts",
+      "classification": "Text classification tasks"
+    },
+    "pricing": {
+      "per_1m_tokens": 0.1
+    },
+    "use_cases": ["semantic-search", "rag", "recommendation", "clustering"]
+  },
+  "moderation": {
+    "description": "Content moderation for safety filtering",
+    "models": [
+      "mistral-moderation-latest",
+      "mistral-moderation-2411"
+    ],
+    "categories": [
+      {
+        "name": "sexual",
+        "description": "Sexual content including adult content"
+      },
+      {
+        "name": "hate_and_discrimination",
+        "description": "Hateful, harassing, or discriminatory content"
+      },
+      {
+        "name": "violence_and_threats",
+        "description": "Violent or threatening content"
+      },
+      {
+        "name": "dangerous_and_criminal_content",
+        "description": "Content promoting dangerous or illegal activities"
+      },
+      {
+        "name": "selfharm",
+        "description": "Content related to self-harm or suicide"
+      },
+      {
+        "name": "health",
+        "description": "Medical advice or health misinformation"
+      },
+      {
+        "name": "financial",
+        "description": "Financial advice or scams"
+      },
+      {
+        "name": "law",
+        "description": "Legal advice"
+      },
+      {
+        "name": "pii",
+        "description": "Personally identifiable information"
+      }
+    ],
+    "pricing": "Free",
+    "use_cases": ["content-filtering", "safety", "compliance", "chat-moderation"]
+  },
+  "fine_tuning": {
+    "description": "Custom model training on your data",
+    "supported_models": [
+      "open-mistral-7b",
+      "mistral-nemo-latest",
+      "mistral-nemo-2407"
+    ],
+    "methods": {
+      "full_fine_tuning": "Update all parameters",
+      "lora": "Parameter-efficient training"
+    },
+    "dataset_requirements": {
+      "min_examples": "Recommended 100+",
+      "format": "JSONL with prompt-completion pairs"
+    },
+    "features": {
+      "weights_download": "Download fine-tuned weights",
+      "deployment": "Deploy directly on La Plateforme",
+      "validation": "Built-in validation metrics"
+    },
+    "pricing": "Based on training time and model size"
+  },
+  "fill_in_middle": {
+    "description": "Code completion with context before and after cursor",
+    "supported_models": [
+      "codestral-latest",
+      "codestral-2405"
+    ],
+    "use_cases": ["ide-integration", "code-completion", "snippet-generation"],
+    "format": {
+      "prefix": "Code before cursor",
+      "suffix": "Code after cursor",
+      "output": "Completion to insert"
+    }
+  },
+  "la_plateforme": {
+    "description": "Mistral's AI deployment platform",
+    "url": "https://console.mistral.ai",
+    "features": {
+      "api_keys": "Manage API keys",
+      "usage_tracking": "Monitor API usage and costs",
+      "fine_tuning": "Train custom models",
+      "billing": "Usage-based billing",
+      "rate_limits": "View and request limit increases",
+      "playground": "Test models interactively",
+      "logs": "Request logging and debugging"
+    }
+  },
+  "deployment_options": {
+    "mistral_api": {
+      "description": "Direct API access via api.mistral.ai",
+      "pricing": "Pay-per-token",
+      "features": ["all-models", "streaming", "function-calling"],
+      "best_for": ["general-use", "production", "startups"]
+    },
+    "azure": {
+      "description": "Mistral models on Azure AI Studio",
+      "url": "https://azure.microsoft.com/products/ai-studio",
+      "features": ["enterprise-integration", "azure-security", "private-networking"],
+      "best_for": ["enterprise", "azure-customers", "compliance"]
+    },
+    "gcp": {
+      "description": "Mistral models on Google Cloud Vertex AI",
+      "url": "https://cloud.google.com/vertex-ai",
+      "features": ["gcp-integration", "enterprise-security"],
+      "best_for": ["enterprise", "gcp-customers"]
+    },
+    "aws": {
+      "description": "Mistral models on AWS Bedrock",
+      "url": "https://aws.amazon.com/bedrock",
+      "features": ["aws-integration", "enterprise-security"],
+      "best_for": ["enterprise", "aws-customers"]
+    },
+    "self_hosted": {
+      "description": "Deploy open-weights models on your infrastructure",
+      "models": ["open-mistral-7b", "open-mixtral-*", "mistral-nemo", "pixtral-12b"],
+      "tools": ["vLLM", "TGI", "llama.cpp", "Ollama"],
+      "best_for": ["on-premises", "data-sovereignty", "custom-requirements"]
+    }
+  },
+  "pricing_tiers": {
+    "free_trial": {
+      "description": "Try Mistral API for free",
+      "credits": "$5 free credits",
+      "rate_limits": "Lower limits than paid tier",
+      "features": "Access to all models"
+    },
+    "pay_as_you_go": {
+      "description": "Usage-based pricing",
+      "billing": "Per million tokens",
+      "rate_limits": "Standard limits",
+      "features": "Full API access"
+    },
+    "enterprise": {
+      "description": "Custom plans for large deployments",
+      "features": ["custom-limits", "sla", "priority-support", "volume-discounts"],
+      "contact": "Contact sales for pricing"
+    }
+  },
+  "rate_limits": {
+    "description": "Default rate limits by tier",
+    "free_tier": {
+      "requests_per_month": "1M tokens",
+      "requests_per_minute": "Varies by model"
+    },
+    "paid_tier": {
+      "requests_per_month": "Based on usage",
+      "requests_per_minute": "Higher limits"
+    },
+    "enterprise": {
+      "requests_per_minute": "Custom limits",
+      "requests_per_month": "Unlimited"
+    }
+  },
+  "multilingual_support": {
+    "description": "Strong multilingual capabilities across models",
+    "languages": [
+      "English", "French", "German", "Spanish", "Italian",
+      "Portuguese", "Dutch", "Russian", "Chinese", "Japanese",
+      "Korean", "Arabic", "Hindi", "and many more"
+    ],
+    "features": {
+      "european_focus": "Exceptional performance on European languages",
+      "code_multilingual": "Support for 80+ programming languages in Codestral",
+      "translation": "Cross-lingual understanding"
+    }
+  },
+  "sdk_support": {
+    "python": {
+      "install": "pip install mistralai",
+      "docs": "https://docs.mistral.ai/api/#python-client"
+    },
+    "typescript": {
+      "install": "npm install @mistralai/mistralai",
+      "docs": "https://docs.mistral.ai/api/#typescript-client"
+    },
+    "javascript": {
+      "install": "npm install @mistralai/mistralai",
+      "docs": "https://docs.mistral.ai/api/#javascript-client"
+    },
+    "openai_compatible": {
+      "description": "Use OpenAI SDK with base_url change",
+      "base_url": "https://api.mistral.ai/v1"
+    }
+  },
+  "api_features": {
+    "chat_completion": {
+      "endpoint": "/v1/chat/completions",
+      "features": ["streaming", "function-calling", "json-mode", "system-prompts"]
+    },
+    "fim_completion": {
+      "endpoint": "/v1/fim/completions",
+      "features": ["fill-in-middle", "code-completion"],
+      "models": ["codestral"]
+    },
+    "embeddings": {
+      "endpoint": "/v1/embeddings",
+      "features": ["batch-embedding", "1024-dimensions"]
+    },
+    "moderation": {
+      "endpoint": "/v1/moderations",
+      "features": ["category-scores", "free-to-use"]
+    },
+    "fine_tuning": {
+      "endpoints": ["/v1/fine_tuning/jobs", "/v1/files"],
+      "features": ["job-management", "weights-download"]
+    }
+  },
+  "best_practices": {
+    "model_selection": "Use Large for complex tasks, Small for efficiency, Ministral for edge",
+    "context_management": "Leverage 128K context window for long documents",
+    "function_calling": "Use for agentic workflows and API integration",
+    "streaming": "Enable streaming for better user experience",
+    "error_handling": "Implement exponential backoff for rate limits",
+    "prompt_engineering": "Be specific and provide examples",
+    "json_mode": "Use for structured outputs and API integration",
+    "cost_optimization": "Use smaller models for simple tasks",
+    "monitoring": "Track usage and costs via La Plateforme",
+    "fine_tuning": "Fine-tune on domain-specific data for best results",
+    "moderation": "Use moderation API for content filtering",
+    "vision": "Use Pixtral for document and image understanding"
+  },
+  "use_cases": {
+    "complex_reasoning": {
+      "recommended_models": ["mistral-large-latest", "open-mixtral-8x22b"],
+      "examples": ["analysis", "problem-solving", "research"]
+    },
+    "coding": {
+      "recommended_models": ["codestral-latest", "mistral-large-latest"],
+      "examples": ["code-generation", "debugging", "code-review", "ide-integration"]
+    },
+    "cost_optimization": {
+      "recommended_models": ["mistral-small-latest", "ministral-8b", "ministral-3b"],
+      "examples": ["high-volume", "simple-tasks", "classification"]
+    },
+    "edge_deployment": {
+      "recommended_models": ["ministral-8b", "ministral-3b"],
+      "examples": ["mobile-apps", "iot", "real-time", "offline"]
+    },
+    "multimodal": {
+      "recommended_models": ["pixtral-large-latest", "pixtral-12b-2409"],
+      "examples": ["document-qa", "image-analysis", "chart-understanding"]
+    },
+    "embeddings": {
+      "recommended_models": ["mistral-embed"],
+      "examples": ["semantic-search", "rag", "clustering", "recommendation"]
+    },
+    "moderation": {
+      "recommended_models": ["mistral-moderation-latest"],
+      "examples": ["content-filtering", "chat-safety", "compliance"]
+    }
+  },
+  "competitive_advantages": {
+    "european": "European AI company with data sovereignty",
+    "open_source": "Many models available as open-weights",
+    "multilingual": "Exceptional multilingual performance",
+    "efficiency": "MoE architecture for cost-effective inference",
+    "vision": "Native multimodal capabilities with Pixtral",
+    "coding": "Specialized Codestral models for development",
+    "context": "Up to 256K context window for coding",
+    "function_calling": "Native tool use across all models",
+    "deployment": "Available on major cloud platforms"
+  },
+  "limitations": {
+    "regional_availability": "Some features may have regional restrictions",
+    "rate_limits": "Apply based on subscription tier",
+    "model_availability": "Not all models available on all platforms",
+    "fine_tuning": "Limited to select models"
+  },
+  "getting_started": {
+    "step_1": "Sign up at console.mistral.ai",
+    "step_2": "Get API key from API Keys section",
+    "step_3": "Install SDK: pip install mistralai",
+    "step_4": "Start making requests",
+    "step_5": "Monitor usage on La Plateforme"
+  },
+  "example_code": {
+    "python": "from mistralai.client import MistralClient\nclient = MistralClient(api_key='your-api-key')",
+    "curl": "curl https://api.mistral.ai/v1/chat/completions -H 'Authorization: Bearer YOUR_KEY'"
+  }
+}

@@ -1,0 +1,1065 @@
+{
+  "provider": "replicate",
+  "api_version": "v1",
+  "base_url": "https://api.replicate.com/v1",
+  "authentication": {
+    "type": "token",
+    "env_variable": "REPLICATE_API_TOKEN",
+    "header": "Authorization: Token {token}"
+  },
+  "models": [
+    {
+      "name": "llama-3.2-90b-vision",
+      "version": "3.2",
+      "description": "Meta Llama 3.2 90B Vision - Advanced multimodal understanding",
+      "replicate_model": "meta/llama-3.2-90b-vision-instruct",
+      "category": "text-generation",
+      "modality": ["text", "image"],
+      "strengths": ["vision", "reasoning", "multimodal"],
+      "context_window": 131072,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0007,
+        "output_per_1k": 0.0028
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": true
+      }
+    },
+    {
+      "name": "llama-3.1-405b",
+      "version": "3.1",
+      "description": "Meta Llama 3.1 405B - Flagship model with exceptional capabilities",
+      "replicate_model": "meta/llama-3.1-405b-instruct",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["reasoning", "tool-use", "complex-tasks", "multilingual"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.00275,
+        "output_per_1k": 0.011
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "llama-3.1-70b",
+      "version": "3.1",
+      "description": "Meta Llama 3.1 70B - High-performance with tool use",
+      "replicate_model": "meta/llama-3.1-70b-instruct",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["reasoning", "tool-use", "function-calling"],
+      "context_window": 131072,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.0026
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "mistral-7b-instruct",
+      "version": "0.3",
+      "description": "Mistral 7B Instruct v0.3 - Efficient instruction model",
+      "replicate_model": "mistralai/mistral-7b-instruct-v0.3",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["efficiency", "instruction-following", "speed"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "mixtral-8x7b",
+      "version": "0.1",
+      "description": "Mixtral 8x7B - Mixture of Experts for enhanced performance",
+      "replicate_model": "mistralai/mixtral-8x7b-instruct-v0.1",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["reasoning", "multilingual", "code", "efficiency"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.0003,
+        "output_per_1k": 0.001
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "mixtral-8x22b",
+      "version": "0.1",
+      "description": "Mixtral 8x22B - Larger MoE with superior capabilities",
+      "replicate_model": "mistralai/mixtral-8x22b-instruct-v0.1",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["reasoning", "complex-tasks", "multilingual", "code"],
+      "context_window": 65536,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.0009,
+        "output_per_1k": 0.0027
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "stable-diffusion-3",
+      "version": "3.0",
+      "description": "Stable Diffusion 3 - Latest image generation model",
+      "replicate_model": "stability-ai/stable-diffusion-3",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["image-quality", "prompt-adherence", "detail"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.035
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "sdxl",
+      "version": "1.0",
+      "description": "Stable Diffusion XL - High-quality image generation",
+      "replicate_model": "stability-ai/sdxl",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["quality", "detail", "photorealism"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.008
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "sdxl-lightning",
+      "version": "1.0",
+      "description": "SDXL Lightning - Fast 4-step image generation",
+      "replicate_model": "bytedance/sdxl-lightning-4step",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["speed", "efficiency", "quality"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.004
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "flux-schnell",
+      "version": "1.0",
+      "description": "FLUX.1 Schnell - Ultra-fast image generation",
+      "replicate_model": "black-forest-labs/flux-schnell",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["speed", "quality", "efficiency"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.003
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "flux-dev",
+      "version": "1.0",
+      "description": "FLUX.1 Dev - High-quality image generation",
+      "replicate_model": "black-forest-labs/flux-dev",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["quality", "detail", "prompt-adherence"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.025
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "flux-pro",
+      "version": "1.0",
+      "description": "FLUX.1 Pro - Premium image generation",
+      "replicate_model": "black-forest-labs/flux-pro",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["quality", "photorealism", "detail"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.055
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "playground-v2.5",
+      "version": "2.5",
+      "description": "Playground v2.5 - Aesthetic image generation",
+      "replicate_model": "playgroundai/playground-v2.5-1024px-aesthetic",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["aesthetics", "color", "composition"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.012
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "proteus",
+      "version": "1.0",
+      "description": "Proteus - Advanced SDXL-based model",
+      "replicate_model": "dataautogpt3/proteus",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["versatility", "quality", "style-range"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.008
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "recraft-v3",
+      "version": "3.0",
+      "description": "Recraft V3 - Vector and raster image generation",
+      "replicate_model": "recraft-ai/recraft-v3",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["vectors", "icons", "design", "flexibility"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.04
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "ideogram-v2",
+      "version": "2.0",
+      "description": "Ideogram v2 - Text rendering and design",
+      "replicate_model": "ideogram-ai/ideogram-v2",
+      "category": "image-generation",
+      "modality": ["text-to-image"],
+      "strengths": ["text-rendering", "typography", "design"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.08
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "clarity-upscaler",
+      "version": "1.0",
+      "description": "Clarity Upscaler - AI image enhancement and upscaling",
+      "replicate_model": "philz1337x/clarity-upscaler",
+      "category": "image-enhancement",
+      "modality": ["image-to-image"],
+      "strengths": ["upscaling", "enhancement", "detail"],
+      "context_window": 1,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.032
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_enhancement": true
+      }
+    },
+    {
+      "name": "real-esrgan",
+      "version": "1.0",
+      "description": "Real-ESRGAN - Image upscaling and restoration",
+      "replicate_model": "nightmareai/real-esrgan",
+      "category": "image-enhancement",
+      "modality": ["image-to-image"],
+      "strengths": ["upscaling", "restoration", "detail-recovery"],
+      "context_window": 1,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.005
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_enhancement": true
+      }
+    },
+    {
+      "name": "controlnet",
+      "version": "1.0",
+      "description": "ControlNet - Guided image generation with structure",
+      "replicate_model": "jagilley/controlnet-hough",
+      "category": "image-generation",
+      "modality": ["image-to-image"],
+      "strengths": ["control", "structure", "guided-generation"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_image": 0.01
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "image_generation": true
+      }
+    },
+    {
+      "name": "blip",
+      "version": "2.0",
+      "description": "BLIP-2 - Image captioning and visual question answering",
+      "replicate_model": "salesforce/blip-2",
+      "category": "vision",
+      "modality": ["image-to-text"],
+      "strengths": ["captioning", "vqa", "image-understanding"],
+      "context_window": 1,
+      "max_output": 512,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_query": 0.001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": true,
+        "image_captioning": true
+      }
+    },
+    {
+      "name": "clip-interrogator",
+      "version": "1.0",
+      "description": "CLIP Interrogator - Generate prompts from images",
+      "replicate_model": "pharmapsychotic/clip-interrogator",
+      "category": "vision",
+      "modality": ["image-to-text"],
+      "strengths": ["prompt-generation", "image-analysis"],
+      "context_window": 1,
+      "max_output": 256,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_query": 0.002
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": true,
+        "prompt_generation": true
+      }
+    },
+    {
+      "name": "llava-13b",
+      "version": "13B",
+      "description": "LLaVA 13B - Visual instruction following",
+      "replicate_model": "yorickvp/llava-13b",
+      "category": "vision",
+      "modality": ["text", "image"],
+      "strengths": ["visual-reasoning", "image-understanding", "chat"],
+      "context_window": 2048,
+      "max_output": 1024,
+      "cost": {
+        "input_per_1k": 0.0001,
+        "output_per_1k": 0.0005
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": false,
+        "function_calling": false,
+        "vision": true
+      }
+    },
+    {
+      "name": "cogvlm",
+      "version": "1.0",
+      "description": "CogVLM - Visual language model for complex reasoning",
+      "replicate_model": "cjwbw/cogvlm",
+      "category": "vision",
+      "modality": ["text", "image"],
+      "strengths": ["visual-reasoning", "ocr", "detailed-analysis"],
+      "context_window": 2048,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0002,
+        "output_per_1k": 0.001
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": false,
+        "function_calling": false,
+        "vision": true
+      }
+    },
+    {
+      "name": "musicgen",
+      "version": "1.0",
+      "description": "MusicGen - Text-to-music generation",
+      "replicate_model": "meta/musicgen",
+      "category": "audio-generation",
+      "modality": ["text-to-audio"],
+      "strengths": ["music-generation", "various-genres", "control"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_generation": 0.06
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "audio_generation": true
+      }
+    },
+    {
+      "name": "audiocraft",
+      "version": "1.0",
+      "description": "AudioCraft - Audio and sound generation",
+      "replicate_model": "meta/audiocraft",
+      "category": "audio-generation",
+      "modality": ["text-to-audio"],
+      "strengths": ["sound-effects", "audio-generation", "flexibility"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_generation": 0.04
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "audio_generation": true
+      }
+    },
+    {
+      "name": "riffusion",
+      "version": "1.0",
+      "description": "Riffusion - Real-time music generation",
+      "replicate_model": "riffusion/riffusion",
+      "category": "audio-generation",
+      "modality": ["text-to-audio"],
+      "strengths": ["real-time", "music", "interactive"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_generation": 0.05
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "audio_generation": true
+      }
+    },
+    {
+      "name": "whisper",
+      "version": "3.0",
+      "description": "Whisper Large v3 - Speech recognition and transcription",
+      "replicate_model": "openai/whisper",
+      "category": "audio-processing",
+      "modality": ["audio-to-text"],
+      "strengths": ["transcription", "multilingual", "accuracy"],
+      "context_window": 1,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_minute": 0.006
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "audio_transcription": true
+      }
+    },
+    {
+      "name": "seamless-m4t",
+      "version": "1.0",
+      "description": "SeamlessM4T - Multilingual speech translation",
+      "replicate_model": "meta/seamless-m4t",
+      "category": "audio-processing",
+      "modality": ["audio-to-audio", "audio-to-text", "text-to-audio"],
+      "strengths": ["translation", "multilingual", "speech"],
+      "context_window": 1,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_minute": 0.02
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "audio_translation": true
+      }
+    },
+    {
+      "name": "svd",
+      "version": "1.0",
+      "description": "Stable Video Diffusion - Image to video generation",
+      "replicate_model": "stability-ai/stable-video-diffusion",
+      "category": "video-generation",
+      "modality": ["image-to-video"],
+      "strengths": ["video-generation", "motion", "consistency"],
+      "context_window": 1,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_video": 0.08
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "video_generation": true
+      }
+    },
+    {
+      "name": "runway-gen2",
+      "version": "2.0",
+      "description": "Runway Gen-2 - Text and image to video",
+      "replicate_model": "runwayml/gen-2",
+      "category": "video-generation",
+      "modality": ["text-to-video", "image-to-video"],
+      "strengths": ["video-generation", "quality", "control"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_second": 0.05
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "video_generation": true
+      }
+    },
+    {
+      "name": "animate-diff",
+      "version": "1.0",
+      "description": "AnimateDiff - Animate images with motion",
+      "replicate_model": "lucataco/animate-diff",
+      "category": "video-generation",
+      "modality": ["image-to-video"],
+      "strengths": ["animation", "motion", "consistency"],
+      "context_window": 1,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_video": 0.04
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "video_generation": true
+      }
+    },
+    {
+      "name": "zeroscope-v2",
+      "version": "2.0",
+      "description": "Zeroscope V2 - Text to video generation",
+      "replicate_model": "anotherjesse/zeroscope-v2-xl",
+      "category": "video-generation",
+      "modality": ["text-to-video"],
+      "strengths": ["text-to-video", "quality", "length"],
+      "context_window": 77,
+      "max_output": 1,
+      "cost": {
+        "input_per_1k": 0.0,
+        "output_per_video": 0.06
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "video_generation": true
+      }
+    },
+    {
+      "name": "codellama-70b",
+      "version": "1.0",
+      "description": "Code Llama 70B - Advanced code generation",
+      "replicate_model": "meta/codellama-70b-instruct",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["code", "programming", "debugging"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00065,
+        "output_per_1k": 0.00275
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "phi-3-mini",
+      "version": "3.0",
+      "description": "Phi-3 Mini - Microsoft's efficient small model",
+      "replicate_model": "microsoft/phi-3-mini-4k-instruct",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["efficiency", "reasoning", "speed"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.00004,
+        "output_per_1k": 0.00016
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "gemma-7b",
+      "version": "2.0",
+      "description": "Gemma 7B - Google's open model",
+      "replicate_model": "google-deepmind/gemma-7b-it",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["efficiency", "reasoning", "multilingual"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "falcon-40b",
+      "version": "1.0",
+      "description": "Falcon 40B - TII's powerful open model",
+      "replicate_model": "joehoover/falcon-40b-instruct",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["reasoning", "multilingual", "performance"],
+      "context_window": 2048,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0004,
+        "output_per_1k": 0.0016
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "vicuna-13b",
+      "version": "1.5",
+      "description": "Vicuna 13B - Community-trained chat model",
+      "replicate_model": "replicate/vicuna-13b",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["chat", "instruction-following", "helpfulness"],
+      "context_window": 2048,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0001,
+        "output_per_1k": 0.0005
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "openchat",
+      "version": "3.5",
+      "description": "OpenChat 3.5 - Fine-tuned conversational model",
+      "replicate_model": "openchat/openchat-3.5-0106",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["conversation", "helpfulness", "safety"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "zephyr-7b",
+      "version": "beta",
+      "description": "Zephyr 7B - Alignment-focused model",
+      "replicate_model": "huggingface/zephyr-7b-beta",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["alignment", "helpfulness", "safety"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.00005,
+        "output_per_1k": 0.00025
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "yi-34b-chat",
+      "version": "1.0",
+      "description": "Yi 34B Chat - Bilingual high-performance model",
+      "replicate_model": "01-ai/yi-34b-chat",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["multilingual", "reasoning", "long-context"],
+      "context_window": 200000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0002,
+        "output_per_1k": 0.001
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "deepseek-coder-33b",
+      "version": "1.0",
+      "description": "DeepSeek Coder 33B - Specialized coding model",
+      "replicate_model": "deepseek-ai/deepseek-coder-33b-instruct",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["code", "programming", "debugging", "explanation"],
+      "context_window": 16384,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0002,
+        "output_per_1k": 0.001
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "wizardcoder-34b",
+      "version": "1.0",
+      "description": "WizardCoder 34B - Enhanced code generation",
+      "replicate_model": "wizardlm/wizardcoder-python-34b-v1.0",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["python", "code", "algorithms"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1k": 0.0002,
+        "output_per_1k": 0.001
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "qwen-72b-chat",
+      "version": "1.5",
+      "description": "Qwen 72B Chat - Alibaba's multilingual model",
+      "replicate_model": "qwen/qwen-72b-chat",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["multilingual", "reasoning", "long-context"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.0007,
+        "output_per_1k": 0.0028
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "nous-hermes-2-mixtral",
+      "version": "2.0",
+      "description": "Nous Hermes 2 Mixtral - Fine-tuned MoE model",
+      "replicate_model": "nousresearch/nous-hermes-2-mixtral-8x7b-dpo",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["reasoning", "helpfulness", "accuracy"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1k": 0.0003,
+        "output_per_1k": 0.001
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false
+      }
+    },
+    {
+      "name": "solar-10.7b",
+      "version": "1.0",
+      "description": "SOLAR 10.7B - Upstage's efficient model",
+      "replicate_model": "upstage/solar-10.7b-instruct",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["efficiency", "reasoning", "multilingual"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0001,
+        "output_per_1k": 0.0005
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    },
+    {
+      "name": "stable-lm-2-12b",
+      "version": "2.0",
+      "description": "StableLM 2 12B - Stability AI's chat model",
+      "replicate_model": "stability-ai/stablelm-2-12b-chat",
+      "category": "text-generation",
+      "modality": ["text"],
+      "strengths": ["chat", "helpfulness", "efficiency"],
+      "context_window": 4096,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1k": 0.0001,
+        "output_per_1k": 0.0005
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": true,
+        "streaming": true,
+        "function_calling": false,
+        "vision": false
+      }
+    }
+  ],
+  "categories": {
+    "text-generation": "Language models for chat, completion, and reasoning",
+    "image-generation": "Text-to-image and image-to-image generation",
+    "image-enhancement": "Image upscaling, restoration, and enhancement",
+    "vision": "Image understanding, captioning, and visual QA",
+    "audio-generation": "Music and sound generation from text",
+    "audio-processing": "Speech recognition, transcription, and translation",
+    "video-generation": "Video generation from text or images"
+  },
+  "notes": {
+    "authentication": "All models require REPLICATE_API_TOKEN environment variable",
+    "pricing": "Prices are approximate and vary by model. Check Replicate for current rates",
+    "streaming": "Text generation models support streaming. Other modalities do not",
+    "predictions": "Use Replicate's prediction API to run models asynchronously",
+    "webhooks": "Replicate supports webhooks for async prediction completion",
+    "hardware": "Models run on optimized GPU infrastructure managed by Replicate"
+  }
+}

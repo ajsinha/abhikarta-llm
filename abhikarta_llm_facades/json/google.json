@@ -1,0 +1,1055 @@
+{
+  "provider": "google",
+  "api_version": "v1",
+  "base_url": "https://generativelanguage.googleapis.com",
+  "vertex_base_url": "https://{region}-aiplatform.googleapis.com",
+  "notes": {
+    "authentication": "Google AI Studio requires API key. Vertex AI requires Google Cloud authentication (service account, OAuth2, ADC)",
+    "pricing": "Prices vary between Google AI Studio (pay-per-use) and Vertex AI (volume pricing). Shown are AI Studio prices per 1M tokens",
+    "streaming": "All text models support server-sent events (SSE) streaming via streamGenerateContent",
+    "rate_limits": "AI Studio: 2 requests/min (free tier), 1000 requests/min (paid). Vertex AI: Higher limits based on quota",
+    "context_windows": "Context windows range from 32K to 2M tokens depending on model",
+    "multimodal": "Gemini models support text, images, audio, video, and PDF inputs in a single request",
+    "grounding": "Vertex AI supports grounding with Google Search and custom data sources",
+    "function_calling": "Supported via function declarations with automatic parallel execution",
+    "code_execution": "Built-in Python code interpreter for Gemini models",
+    "thinking_mode": "Gemini 2.0 Flash Thinking supports extended reasoning for complex problems",
+    "json_mode": "Structured output via response_mime_type and response_schema",
+    "safety_settings": "Configurable content filtering for harassment, hate speech, sexually explicit, and dangerous content",
+    "system_instructions": "Support for system prompts to set model behavior and context",
+    "caching": "Context caching available on Gemini 1.5 Pro and Flash to reduce costs",
+    "tuning": "Fine-tuning available for select models via supervised tuning",
+    "batch_api": "Batch prediction API available on Vertex AI for asynchronous processing",
+    "embedding_models": "Text, image, and multimodal embedding models for semantic search",
+    "imagen": "Image generation models available on Vertex AI",
+    "speech_models": "Chirp speech-to-text models for audio transcription",
+    "model_garden": "Access to 100+ open-source models via Vertex AI Model Garden",
+    "ai_studio": "Web-based IDE for prompt development and testing",
+    "vertex_ai": "Enterprise platform with VPC, encryption, audit logs, and SLA"
+  },
+  "models": [
+    {
+      "name": "gemini-2.0-flash-exp",
+      "model_id": "gemini-2.0-flash-exp",
+      "version": "2.0",
+      "description": "Experimental Gemini 2.0 Flash with multimodal live API",
+      "strengths": ["multimodal", "real-time", "speed", "audio-streaming", "experimental"],
+      "context_window": 1048576,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during experimental period"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": true,
+        "video_input": true,
+        "code_execution": true,
+        "json_mode": true,
+        "grounding": false,
+        "caching": false
+      }
+    },
+    {
+      "name": "gemini-2.0-flash-thinking-exp",
+      "model_id": "gemini-2.0-flash-thinking-exp",
+      "version": "2.0",
+      "description": "Gemini 2.0 Flash with extended thinking for complex reasoning",
+      "strengths": ["reasoning", "problem-solving", "mathematics", "coding", "analysis"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during experimental period"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false,
+        "video_input": false,
+        "code_execution": false,
+        "json_mode": false,
+        "grounding": false,
+        "caching": false,
+        "thinking_mode": true
+      }
+    },
+    {
+      "name": "gemini-exp-1206",
+      "model_id": "gemini-exp-1206",
+      "version": "experimental",
+      "description": "Experimental Gemini model from December 2024",
+      "strengths": ["experimental", "latest-features", "multimodal"],
+      "context_window": 1048576,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during experimental period"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": false,
+        "video_input": true,
+        "code_execution": true,
+        "json_mode": true,
+        "grounding": false,
+        "caching": false
+      }
+    },
+    {
+      "name": "gemini-1.5-pro",
+      "model_id": "gemini-1.5-pro-latest",
+      "version": "1.5",
+      "description": "Most capable Gemini 1.5 model with 2M token context",
+      "strengths": ["reasoning", "long-context", "multimodal", "code-generation", "analysis"],
+      "context_window": 2097152,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m_0_128k": 1.25,
+        "input_per_1m_128k_plus": 2.5,
+        "output_per_1m": 5.0,
+        "cached_input_per_1m_0_128k": 0.3125,
+        "cached_input_per_1m_128k_plus": 0.625
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": false,
+        "video_input": true,
+        "code_execution": true,
+        "json_mode": true,
+        "grounding": true,
+        "caching": true,
+        "tuning": false
+      }
+    },
+    {
+      "name": "gemini-1.5-pro-002",
+      "model_id": "gemini-1.5-pro-002",
+      "version": "1.5",
+      "description": "Stable Gemini 1.5 Pro version (002)",
+      "strengths": ["reasoning", "long-context", "multimodal", "stability"],
+      "context_window": 2097152,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m_0_128k": 1.25,
+        "input_per_1m_128k_plus": 2.5,
+        "output_per_1m": 5.0,
+        "cached_input_per_1m_0_128k": 0.3125,
+        "cached_input_per_1m_128k_plus": 0.625
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": false,
+        "video_input": true,
+        "code_execution": true,
+        "json_mode": true,
+        "grounding": true,
+        "caching": true,
+        "tuning": false
+      }
+    },
+    {
+      "name": "gemini-1.5-pro-001",
+      "model_id": "gemini-1.5-pro-001",
+      "version": "1.5",
+      "description": "Previous stable Gemini 1.5 Pro version (001)",
+      "strengths": ["reasoning", "long-context", "multimodal"],
+      "context_window": 2097152,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m_0_128k": 1.25,
+        "input_per_1m_128k_plus": 2.5,
+        "output_per_1m": 5.0,
+        "cached_input_per_1m_0_128k": 0.3125,
+        "cached_input_per_1m_128k_plus": 0.625
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": false,
+        "video_input": true,
+        "code_execution": true,
+        "json_mode": true,
+        "grounding": true,
+        "caching": true,
+        "tuning": false
+      }
+    },
+    {
+      "name": "gemini-1.5-flash",
+      "model_id": "gemini-1.5-flash-latest",
+      "version": "1.5",
+      "description": "Fast and efficient Gemini 1.5 model",
+      "strengths": ["speed", "efficiency", "multimodal", "cost-effective"],
+      "context_window": 1048576,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m_0_128k": 0.075,
+        "input_per_1m_128k_plus": 0.15,
+        "output_per_1m": 0.3,
+        "cached_input_per_1m_0_128k": 0.01875,
+        "cached_input_per_1m_128k_plus": 0.0375
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": false,
+        "video_input": true,
+        "code_execution": true,
+        "json_mode": true,
+        "grounding": true,
+        "caching": true,
+        "tuning": true
+      }
+    },
+    {
+      "name": "gemini-1.5-flash-002",
+      "model_id": "gemini-1.5-flash-002",
+      "version": "1.5",
+      "description": "Stable Gemini 1.5 Flash version (002)",
+      "strengths": ["speed", "efficiency", "multimodal", "stability"],
+      "context_window": 1048576,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m_0_128k": 0.075,
+        "input_per_1m_128k_plus": 0.15,
+        "output_per_1m": 0.3,
+        "cached_input_per_1m_0_128k": 0.01875,
+        "cached_input_per_1m_128k_plus": 0.0375
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": false,
+        "video_input": true,
+        "code_execution": true,
+        "json_mode": true,
+        "grounding": true,
+        "caching": true,
+        "tuning": true
+      }
+    },
+    {
+      "name": "gemini-1.5-flash-001",
+      "model_id": "gemini-1.5-flash-001",
+      "version": "1.5",
+      "description": "Previous stable Gemini 1.5 Flash version (001)",
+      "strengths": ["speed", "efficiency", "multimodal"],
+      "context_window": 1048576,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m_0_128k": 0.075,
+        "input_per_1m_128k_plus": 0.15,
+        "output_per_1m": 0.3,
+        "cached_input_per_1m_0_128k": 0.01875,
+        "cached_input_per_1m_128k_plus": 0.0375
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": true,
+        "audio_output": false,
+        "video_input": true,
+        "code_execution": true,
+        "json_mode": true,
+        "grounding": true,
+        "caching": true,
+        "tuning": true
+      }
+    },
+    {
+      "name": "gemini-1.5-flash-8b",
+      "model_id": "gemini-1.5-flash-8b-latest",
+      "version": "1.5",
+      "description": "Ultra-fast 8B parameter Gemini Flash model",
+      "strengths": ["speed", "efficiency", "low-latency", "cost-effective"],
+      "context_window": 1048576,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m_0_128k": 0.0375,
+        "input_per_1m_128k_plus": 0.075,
+        "output_per_1m": 0.15,
+        "cached_input_per_1m_0_128k": 0.009375,
+        "cached_input_per_1m_128k_plus": 0.01875
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false,
+        "video_input": true,
+        "code_execution": true,
+        "json_mode": true,
+        "grounding": true,
+        "caching": true,
+        "tuning": false
+      }
+    },
+    {
+      "name": "gemini-1.0-pro",
+      "model_id": "gemini-1.0-pro-latest",
+      "version": "1.0",
+      "description": "Original Gemini Pro model",
+      "strengths": ["reasoning", "general-purpose", "legacy"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.5,
+        "output_per_1m": 1.5
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false,
+        "video_input": false,
+        "code_execution": false,
+        "json_mode": false,
+        "grounding": false,
+        "caching": false,
+        "tuning": true
+      }
+    },
+    {
+      "name": "gemini-1.0-pro-001",
+      "model_id": "gemini-1.0-pro-001",
+      "version": "1.0",
+      "description": "Stable Gemini 1.0 Pro version (001)",
+      "strengths": ["reasoning", "general-purpose", "stability"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.5,
+        "output_per_1m": 1.5
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false,
+        "video_input": false,
+        "code_execution": false,
+        "json_mode": false,
+        "grounding": false,
+        "caching": false,
+        "tuning": true
+      }
+    },
+    {
+      "name": "gemini-1.0-pro-vision",
+      "model_id": "gemini-pro-vision",
+      "version": "1.0",
+      "description": "Gemini 1.0 Pro with vision capabilities",
+      "strengths": ["vision", "image-understanding", "multimodal"],
+      "context_window": 16384,
+      "max_output": 2048,
+      "cost": {
+        "input_per_1m": 0.25,
+        "output_per_1m": 0.5,
+        "images": "Fixed cost per image"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "vision": true,
+        "audio_input": false,
+        "audio_output": false,
+        "video_input": false,
+        "code_execution": false,
+        "json_mode": false,
+        "grounding": false,
+        "caching": false,
+        "tuning": false
+      }
+    },
+    {
+      "name": "gemini-pro",
+      "model_id": "gemini-pro",
+      "version": "1.0",
+      "description": "Alias for latest Gemini Pro model",
+      "strengths": ["reasoning", "general-purpose"],
+      "context_window": 32768,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.5,
+        "output_per_1m": 1.5
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "vision": false,
+        "audio_input": false,
+        "audio_output": false,
+        "video_input": false,
+        "code_execution": false,
+        "json_mode": false,
+        "grounding": false,
+        "caching": false,
+        "tuning": true
+      }
+    },
+    {
+      "name": "text-embedding-004",
+      "model_id": "text-embedding-004",
+      "version": "004",
+      "description": "Latest text embedding model with high quality",
+      "strengths": ["embeddings", "semantic-search", "retrieval", "quality"],
+      "context_window": 2048,
+      "max_output": 768,
+      "cost": {
+        "per_1m": 0.00001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 768,
+        "task_types": ["retrieval_query", "retrieval_document", "semantic_similarity", "classification", "clustering"]
+      }
+    },
+    {
+      "name": "text-multilingual-embedding-002",
+      "model_id": "text-multilingual-embedding-002",
+      "version": "002",
+      "description": "Multilingual text embedding model",
+      "strengths": ["embeddings", "multilingual", "semantic-search"],
+      "context_window": 2048,
+      "max_output": 768,
+      "cost": {
+        "per_1m": 0.00001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 768,
+        "task_types": ["retrieval_query", "retrieval_document", "semantic_similarity", "classification", "clustering"]
+      }
+    },
+    {
+      "name": "embedding-001",
+      "model_id": "embedding-001",
+      "version": "001",
+      "description": "Legacy embedding model",
+      "strengths": ["embeddings", "legacy"],
+      "context_window": 2048,
+      "max_output": 768,
+      "cost": {
+        "per_1m": 0.00001
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 768,
+        "task_types": ["retrieval_query", "retrieval_document", "semantic_similarity"]
+      }
+    },
+    {
+      "name": "textembedding-gecko",
+      "model_id": "textembedding-gecko@003",
+      "version": "003",
+      "description": "Gecko embedding model via Vertex AI",
+      "strengths": ["embeddings", "semantic-search", "vertex-ai"],
+      "context_window": 3072,
+      "max_output": 768,
+      "cost": {
+        "per_1m": 0.025
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 768,
+        "task_types": ["retrieval_query", "retrieval_document", "semantic_similarity"]
+      }
+    },
+    {
+      "name": "textembedding-gecko-multilingual",
+      "model_id": "textembedding-gecko-multilingual@001",
+      "version": "001",
+      "description": "Multilingual Gecko embedding model",
+      "strengths": ["embeddings", "multilingual", "vertex-ai"],
+      "context_window": 3072,
+      "max_output": 768,
+      "cost": {
+        "per_1m": 0.025
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 768,
+        "task_types": ["retrieval_query", "retrieval_document", "semantic_similarity"]
+      }
+    },
+    {
+      "name": "multimodalembedding",
+      "model_id": "multimodalembedding@001",
+      "version": "001",
+      "description": "Multimodal embedding for text and images",
+      "strengths": ["multimodal-embeddings", "image-text-search", "cross-modal"],
+      "context_window": 2048,
+      "max_output": 1408,
+      "cost": {
+        "per_1m_text": 0.025,
+        "per_1k_images": 2.5
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 1408,
+        "multimodal": true,
+        "task_types": ["retrieval_query", "retrieval_document", "semantic_similarity"]
+      }
+    },
+    {
+      "name": "aqa",
+      "model_id": "aqa",
+      "version": "1.0",
+      "description": "Attributed Question Answering model",
+      "strengths": ["qa", "attribution", "grounding", "citations"],
+      "context_window": 7168,
+      "max_output": 1024,
+      "cost": {
+        "per_1k": 0.0035
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "question_answering": true,
+        "attribution": true,
+        "grounding": true
+      }
+    },
+    {
+      "name": "imagen-3.0-generate-001",
+      "model_id": "imagen-3.0-generate-001",
+      "provider": "vertex-ai",
+      "version": "3.0",
+      "description": "Latest Imagen 3 for photorealistic image generation",
+      "strengths": ["image-generation", "photorealism", "quality", "prompt-following"],
+      "context_window": 2048,
+      "max_output": 1,
+      "cost": {
+        "per_image": 0.04
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "image_generation": true,
+        "image_editing": false,
+        "aspect_ratios": ["1:1", "3:4", "4:3", "9:16", "16:9"]
+      }
+    },
+    {
+      "name": "imagen-3.0-fast-generate-001",
+      "model_id": "imagen-3.0-fast-generate-001",
+      "provider": "vertex-ai",
+      "version": "3.0",
+      "description": "Fast Imagen 3 for quick image generation",
+      "strengths": ["image-generation", "speed", "efficiency"],
+      "context_window": 2048,
+      "max_output": 1,
+      "cost": {
+        "per_image": 0.02
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "image_generation": true,
+        "image_editing": false,
+        "aspect_ratios": ["1:1", "3:4", "4:3", "9:16", "16:9"]
+      }
+    },
+    {
+      "name": "imagen-2",
+      "model_id": "imagegeneration@006",
+      "provider": "vertex-ai",
+      "version": "2.0",
+      "description": "Imagen 2 for image generation and editing",
+      "strengths": ["image-generation", "image-editing", "versatility"],
+      "context_window": 2048,
+      "max_output": 1,
+      "cost": {
+        "per_image": 0.02
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "image_generation": true,
+        "image_editing": true,
+        "inpainting": true,
+        "outpainting": true,
+        "upscaling": true
+      }
+    },
+    {
+      "name": "chirp-2",
+      "model_id": "chirp@002",
+      "provider": "vertex-ai",
+      "version": "2.0",
+      "description": "Speech-to-text model with multilingual support",
+      "strengths": ["speech-to-text", "multilingual", "transcription"],
+      "context_window": null,
+      "max_output": null,
+      "cost": {
+        "per_hour_0_to_1m": 0.0144,
+        "per_hour_1m_to_10m": 0.0096,
+        "per_hour_10m_plus": 0.0048
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": true,
+        "speech_to_text": true,
+        "languages": "100+",
+        "diarization": true,
+        "word_timestamps": true
+      }
+    },
+    {
+      "name": "palm-2",
+      "model_id": "text-bison@002",
+      "provider": "vertex-ai",
+      "version": "2.0",
+      "description": "Legacy PaLM 2 text model (deprecated)",
+      "strengths": ["text-generation", "legacy"],
+      "context_window": 8192,
+      "max_output": 1024,
+      "cost": {
+        "input_per_1m": 0.125,
+        "output_per_1m": 0.25
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": true,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "deprecated": true
+      }
+    },
+    {
+      "name": "palm-2-chat",
+      "model_id": "chat-bison@002",
+      "provider": "vertex-ai",
+      "version": "2.0",
+      "description": "Legacy PaLM 2 chat model (deprecated)",
+      "strengths": ["conversation", "legacy"],
+      "context_window": 8192,
+      "max_output": 1024,
+      "cost": {
+        "input_per_1m": 0.125,
+        "output_per_1m": 0.25
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "deprecated": true
+      }
+    },
+    {
+      "name": "palm-2-codechat",
+      "model_id": "codechat-bison@002",
+      "provider": "vertex-ai",
+      "version": "2.0",
+      "description": "Legacy PaLM 2 code chat model (deprecated)",
+      "strengths": ["coding", "legacy"],
+      "context_window": 8192,
+      "max_output": 1024,
+      "cost": {
+        "input_per_1m": 0.125,
+        "output_per_1m": 0.25
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": false,
+        "function_calling": false,
+        "vision": false,
+        "deprecated": true
+      }
+    }
+  ],
+  "model_families": {
+    "gemini_2_0": {
+      "description": "Latest generation with real-time multimodal capabilities",
+      "models": [
+        "gemini-2.0-flash-exp",
+        "gemini-2.0-flash-thinking-exp"
+      ],
+      "features": ["real-time-audio", "thinking-mode", "multimodal", "experimental"],
+      "use_cases": ["real-time-ai", "complex-reasoning", "multimodal-understanding"]
+    },
+    "gemini_1_5_pro": {
+      "description": "Most capable with 2M token context window",
+      "models": [
+        "gemini-1.5-pro",
+        "gemini-1.5-pro-002",
+        "gemini-1.5-pro-001"
+      ],
+      "features": ["2m-context", "multimodal", "function-calling", "code-execution", "grounding"],
+      "use_cases": ["long-document-analysis", "video-understanding", "complex-reasoning"]
+    },
+    "gemini_1_5_flash": {
+      "description": "Fast and efficient with excellent performance",
+      "models": [
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-002",
+        "gemini-1.5-flash-001",
+        "gemini-1.5-flash-8b"
+      ],
+      "features": ["1m-context", "multimodal", "speed", "cost-effective", "tuning"],
+      "use_cases": ["high-volume", "real-time", "cost-sensitive", "general-purpose"]
+    },
+    "gemini_1_0": {
+      "description": "Original Gemini generation (legacy)",
+      "models": [
+        "gemini-1.0-pro",
+        "gemini-1.0-pro-001",
+        "gemini-1.0-pro-vision"
+      ],
+      "features": ["text-only", "vision-optional", "legacy"],
+      "use_cases": ["legacy-support", "simple-tasks"]
+    },
+    "embeddings": {
+      "description": "Text and multimodal embedding models",
+      "models": [
+        "text-embedding-004",
+        "text-multilingual-embedding-002",
+        "textembedding-gecko",
+        "multimodalembedding"
+      ],
+      "features": ["semantic-search", "retrieval", "classification", "multimodal"],
+      "use_cases": ["rag", "search", "recommendation", "clustering"]
+    },
+    "imagen": {
+      "description": "Image generation and editing models",
+      "models": [
+        "imagen-3.0-generate-001",
+        "imagen-3.0-fast-generate-001",
+        "imagen-2"
+      ],
+      "features": ["photorealism", "editing", "multiple-aspect-ratios"],
+      "use_cases": ["image-creation", "creative-work", "marketing"]
+    },
+    "speech": {
+      "description": "Speech-to-text models",
+      "models": ["chirp-2"],
+      "features": ["multilingual", "diarization", "timestamps"],
+      "use_cases": ["transcription", "voice-interfaces", "accessibility"]
+    }
+  },
+  "multimodal_capabilities": {
+    "text": {
+      "description": "Natural language processing and generation",
+      "supported_models": "All Gemini models"
+    },
+    "images": {
+      "description": "Process and understand images",
+      "supported_models": "Gemini 1.5 Pro, Flash, 1.0 Pro Vision",
+      "formats": ["PNG", "JPEG", "WEBP", "HEIC", "HEIF"],
+      "max_size": "20MB per image",
+      "max_images": "3000+ images in single request"
+    },
+    "audio": {
+      "description": "Process audio inputs",
+      "supported_models": "Gemini 1.5 Pro, Flash, 2.0 Flash",
+      "formats": ["WAV", "MP3", "AIFF", "AAC", "OGG", "FLAC"],
+      "max_duration": "9.5 hours",
+      "streaming": "Supported on Gemini 2.0 Flash"
+    },
+    "video": {
+      "description": "Understand video content",
+      "supported_models": "Gemini 1.5 Pro, Flash",
+      "formats": ["MP4", "MPEG", "MOV", "AVI", "FLV", "MPG", "WEBM", "WMV", "3GPP"],
+      "max_duration": "1 hour",
+      "max_size": "2GB"
+    },
+    "pdf": {
+      "description": "Extract and understand PDF documents",
+      "supported_models": "Gemini 1.5 Pro, Flash",
+      "max_pages": "3000+ pages",
+      "features": ["text-extraction", "table-understanding", "layout-analysis"]
+    }
+  },
+  "function_calling": {
+    "description": "Connect models to external tools and APIs",
+    "supported_models": ["Gemini 1.5 Pro", "Gemini 1.5 Flash", "Gemini 1.0 Pro"],
+    "features": {
+      "parallel_execution": "Call multiple functions simultaneously",
+      "automatic_invocation": "Model decides when to call functions",
+      "any_mode": "Force function calling",
+      "none_mode": "Disable function calling",
+      "json_schema": "Define functions using JSON schema"
+    },
+    "use_cases": ["api-integration", "data-retrieval", "actions", "agentic-workflows"]
+  },
+  "code_execution": {
+    "description": "Built-in Python code interpreter",
+    "supported_models": ["Gemini 1.5 Pro", "Gemini 1.5 Flash"],
+    "features": {
+      "python": "Execute Python code in sandbox",
+      "data_analysis": "Process and analyze data",
+      "visualization": "Generate charts and plots",
+      "iterative": "Multi-turn code development"
+    },
+    "use_cases": ["data-analysis", "calculations", "prototyping", "education"]
+  },
+  "grounding": {
+    "description": "Connect model to real-time information and sources",
+    "platform": "Vertex AI only",
+    "supported_models": ["Gemini 1.5 Pro", "Gemini 1.5 Flash"],
+    "sources": {
+      "google_search": "Ground responses with Google Search results",
+      "vertex_search": "Ground with custom data in Vertex AI Search",
+      "inline_context": "Provide documents directly in request"
+    },
+    "features": {
+      "citations": "Source attribution and references",
+      "fact_checking": "Verify information against sources",
+      "up_to_date": "Access current information"
+    }
+  },
+  "context_caching": {
+    "description": "Cache frequently used context to reduce costs and latency",
+    "supported_models": ["Gemini 1.5 Pro", "Gemini 1.5 Flash"],
+    "features": {
+      "ttl": "Time-to-live: 5 minutes to 1 hour",
+      "min_tokens": "Minimum 32,768 tokens to cache",
+      "discount": "75% cost reduction for cached tokens",
+      "automatic": "Automatic cache management"
+    },
+    "pricing": {
+      "cache_write": "Full token price",
+      "cache_read": "75% discount on input tokens",
+      "storage": "Included in cache read price"
+    },
+    "use_cases": ["long-documents", "repeated-context", "chat-history", "rag"]
+  },
+  "json_mode": {
+    "description": "Structured output generation",
+    "supported_models": ["Gemini 1.5 Pro", "Gemini 1.5 Flash"],
+    "features": {
+      "json_object": "Generate valid JSON objects",
+      "json_schema": "Conform to specific schema",
+      "enum_support": "Constrained value generation",
+      "nested_objects": "Complex structured data"
+    },
+    "use_cases": ["api-responses", "data-extraction", "structured-output"]
+  },
+  "safety_settings": {
+    "description": "Configurable content filtering",
+    "categories": [
+      "HARM_CATEGORY_HARASSMENT",
+      "HARM_CATEGORY_HATE_SPEECH",
+      "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+      "HARM_CATEGORY_DANGEROUS_CONTENT"
+    ],
+    "thresholds": [
+      "BLOCK_NONE",
+      "BLOCK_ONLY_HIGH",
+      "BLOCK_MEDIUM_AND_ABOVE",
+      "BLOCK_LOW_AND_ABOVE"
+    ],
+    "features": {
+      "per_category": "Configure each category independently",
+      "probability_scores": "Get probability scores in response",
+      "blocked_reasons": "Understand why content was blocked"
+    }
+  },
+  "tuning": {
+    "description": "Fine-tune models on custom data",
+    "supported_models": ["Gemini 1.5 Flash", "Gemini 1.0 Pro"],
+    "methods": {
+      "supervised": "Tune on input-output pairs",
+      "distillation": "Learn from larger model outputs"
+    },
+    "dataset_requirements": {
+      "min_examples": 100,
+      "recommended_examples": "500-10,000",
+      "format": "JSONL with examples"
+    },
+    "pricing": {
+      "training": "Per training hour",
+      "inference": "Per 1M tokens (varies by model)"
+    }
+  },
+  "ai_studio": {
+    "description": "Web-based development environment",
+    "url": "https://aistudio.google.com",
+    "features": {
+      "playground": "Interactive model testing",
+      "prompt_gallery": "Pre-built prompt templates",
+      "structured_prompts": "Multi-turn conversation design",
+      "system_instructions": "Configure model behavior",
+      "safety_settings": "Configure content filters",
+      "api_key_management": "Generate and manage API keys",
+      "code_export": "Export to Python, JavaScript, cURL",
+      "free_tier": "Generous free tier for development"
+    }
+  },
+  "vertex_ai": {
+    "description": "Enterprise AI platform on Google Cloud",
+    "features": {
+      "vpc": "Private network connectivity",
+      "cmek": "Customer-managed encryption keys",
+      "audit_logs": "Cloud Audit Logs integration",
+      "iam": "Fine-grained access control",
+      "regions": "Multi-region deployment",
+      "sla": "99.9% uptime SLA",
+      "model_garden": "Access to 100+ models",
+      "pipelines": "ML workflow orchestration",
+      "endpoints": "Managed model deployment",
+      "monitoring": "Cloud Monitoring integration"
+    },
+    "additional_models": {
+      "open_source": "Llama, Mistral, Falcon, MPT, and more",
+      "specialized": "Code models, embedding models, domain-specific models"
+    }
+  },
+  "pricing_comparison": {
+    "google_ai_studio": {
+      "description": "Direct API access with simple pricing",
+      "free_tier": "60 requests/minute, 1M tokens/day",
+      "paid_tier": "Pay-per-use, no commitments",
+      "best_for": "Development, prototyping, small applications"
+    },
+    "vertex_ai": {
+      "description": "Enterprise platform with volume pricing",
+      "pricing": "Lower per-token costs at scale",
+      "commitments": "Sustained use discounts, committed use discounts",
+      "best_for": "Production, enterprise, high-volume applications"
+    }
+  },
+  "regional_availability": {
+    "ai_studio": "Global API access",
+    "vertex_ai_regions": [
+      "us-central1",
+      "us-east4",
+      "us-west1",
+      "europe-west1",
+      "europe-west4",
+      "asia-northeast1",
+      "asia-southeast1"
+    ],
+    "note": "Model availability varies by region. Check documentation for current availability"
+  },
+  "rate_limits": {
+    "ai_studio_free": {
+      "rpm": 2,
+      "tpm": 32000,
+      "rpd": 50
+    },
+    "ai_studio_paid": {
+      "rpm": 1000,
+      "tpm": 4000000,
+      "rpd": 1500
+    },
+    "vertex_ai": {
+      "rpm": "Based on quota",
+      "tpm": "Based on quota",
+      "note": "Request quota increases through Cloud Console"
+    }
+  },
+  "best_practices": {
+    "model_selection": "Use Flash for most tasks, Pro for complex reasoning or long context",
+    "multimodal": "Combine text, image, video, and audio in single request for best results",
+    "context_caching": "Cache large static context (documents, code) to reduce costs",
+    "grounding": "Use grounding for factual accuracy and up-to-date information",
+    "function_calling": "Define clear function descriptions and schemas",
+    "code_execution": "Enable for mathematical and data analysis tasks",
+    "json_mode": "Use for structured output and API integration",
+    "safety_settings": "Configure based on application requirements",
+    "prompt_engineering": "Be specific, provide examples, use system instructions",
+    "error_handling": "Implement retry logic with exponential backoff",
+    "monitoring": "Track usage, latency, and error rates",
+    "cost_optimization": "Use Flash 8B for simple tasks, cache when possible",
+    "security": "Use Vertex AI for production with VPC and CMEK"
+  },
+  "use_case_recommendations": {
+    "chatbots": "Gemini 1.5 Flash with function calling",
+    "content_generation": "Gemini 1.5 Flash or Pro depending on complexity",
+    "code_assistance": "Gemini 1.5 Pro with code execution",
+    "data_analysis": "Gemini 1.5 Pro with code execution and long context",
+    "document_understanding": "Gemini 1.5 Pro with 2M context",
+    "video_analysis": "Gemini 1.5 Pro or Flash",
+    "semantic_search": "Text Embedding 004 or Multimodal Embedding",
+    "image_generation": "Imagen 3 or Imagen 2",
+    "speech_transcription": "Chirp 2",
+    "real_time_ai": "Gemini 2.0 Flash with live API",
+    "complex_reasoning": "Gemini 2.0 Flash Thinking or 1.5 Pro",
+    "high_volume": "Gemini 1.5 Flash 8B",
+    "enterprise": "Vertex AI with Gemini 1.5 models"
+  }
+}

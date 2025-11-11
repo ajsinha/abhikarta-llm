@@ -1,0 +1,852 @@
+{
+  "provider": "groq",
+  "api_version": "v1",
+  "base_url": "https://api.groq.com/openai/v1",
+  "notes": {
+    "authentication": "All endpoints require Authorization header with Bearer token (GROQ_API_KEY)",
+    "pricing": "Prices shown per 1M tokens. All models currently free during beta with rate limits",
+    "streaming": "All chat models support server-sent events (SSE) streaming",
+    "rate_limits": "Free tier: 30 requests/min, 14,400 tokens/min. Paid tier has higher limits",
+    "context_windows": "Context windows range from 8K to 128K tokens depending on model",
+    "lpu_technology": "Lightning-fast inference powered by Groq LPU (Language Processing Unit)",
+    "speed": "Industry-leading inference speeds - up to 10x faster than GPU-based solutions",
+    "openai_compatible": "API is fully compatible with OpenAI SDK - just change base URL",
+    "function_calling": "Tool use (function calling) supported on select models",
+    "json_mode": "Structured JSON output via response_format parameter",
+    "model_selection": "Wide variety of open-source models optimized for LPU inference",
+    "whisper": "Whisper models for speech-to-text with extremely fast processing",
+    "token_counting": "Use tiktoken for token counting before API calls",
+    "no_fine_tuning": "Fine-tuning not currently available",
+    "open_source_models": "All models are open-source, optimized for Groq hardware",
+    "latency": "Sub-second response times for most queries",
+    "throughput": "Extremely high tokens-per-second generation",
+    "playground": "Web-based playground for testing at console.groq.com",
+    "enterprise": "Enterprise plans available with higher limits and SLA"
+  },
+  "models": [
+    {
+      "name": "llama-3.3-70b-versatile",
+      "model_id": "llama-3.3-70b-versatile",
+      "provider": "meta",
+      "version": "3.3",
+      "description": "Latest Llama 3.3 70B model optimized for versatile tasks",
+      "strengths": ["reasoning", "instruction-following", "coding", "general-purpose", "speed"],
+      "context_window": 128000,
+      "max_output": 8000,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~300-500",
+        "time_to_first_token": "~50-100ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "llama-3.3-70b-specdec",
+      "model_id": "llama-3.3-70b-specdec",
+      "provider": "meta",
+      "version": "3.3",
+      "description": "Llama 3.3 70B with speculative decoding for even faster inference",
+      "strengths": ["speed", "reasoning", "low-latency", "real-time"],
+      "context_window": 8192,
+      "max_output": 8000,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~600-800",
+        "time_to_first_token": "~30-50ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "llama-3.2-90b-vision-preview",
+      "model_id": "llama-3.2-90b-vision-preview",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Llama 3.2 90B with vision capabilities (preview)",
+      "strengths": ["vision", "multimodal", "reasoning", "image-understanding"],
+      "context_window": 128000,
+      "max_output": 8000,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during preview"
+      },
+      "performance": {
+        "tokens_per_second": "~250-400",
+        "time_to_first_token": "~100-150ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "llama-3.2-11b-vision-preview",
+      "model_id": "llama-3.2-11b-vision-preview",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Compact Llama 3.2 11B with vision capabilities",
+      "strengths": ["vision", "efficiency", "speed", "cost-effective"],
+      "context_window": 128000,
+      "max_output": 8000,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during preview"
+      },
+      "performance": {
+        "tokens_per_second": "~500-700",
+        "time_to_first_token": "~50-80ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": true,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "llama-3.2-3b-preview",
+      "model_id": "llama-3.2-3b-preview",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Ultra-fast Llama 3.2 3B model for simple tasks",
+      "strengths": ["speed", "efficiency", "low-latency", "simple-tasks"],
+      "context_window": 128000,
+      "max_output": 8000,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during preview"
+      },
+      "performance": {
+        "tokens_per_second": "~800-1000",
+        "time_to_first_token": "~20-40ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "llama-3.2-1b-preview",
+      "model_id": "llama-3.2-1b-preview",
+      "provider": "meta",
+      "version": "3.2",
+      "description": "Smallest and fastest Llama 3.2 model for ultra-low latency",
+      "strengths": ["speed", "ultra-low-latency", "efficiency", "edge-deployment"],
+      "context_window": 128000,
+      "max_output": 8000,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during preview"
+      },
+      "performance": {
+        "tokens_per_second": "~1000+",
+        "time_to_first_token": "~10-30ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "llama-3.1-70b-versatile",
+      "model_id": "llama-3.1-70b-versatile",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Llama 3.1 70B optimized for diverse tasks",
+      "strengths": ["reasoning", "coding", "long-context", "versatile"],
+      "context_window": 128000,
+      "max_output": 8000,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~300-500",
+        "time_to_first_token": "~50-100ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "llama-3.1-8b-instant",
+      "model_id": "llama-3.1-8b-instant",
+      "provider": "meta",
+      "version": "3.1",
+      "description": "Lightning-fast Llama 3.1 8B model for instant responses",
+      "strengths": ["speed", "efficiency", "instant-responses", "cost-effective"],
+      "context_window": 128000,
+      "max_output": 8000,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~600-800",
+        "time_to_first_token": "~30-50ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "llama-guard-3-8b",
+      "model_id": "llama-guard-3-8b",
+      "provider": "meta",
+      "version": "3.0",
+      "description": "Content moderation model for safety filtering",
+      "strengths": ["safety", "moderation", "content-filtering", "policy-enforcement"],
+      "context_window": 8192,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~600-800",
+        "time_to_first_token": "~30-50ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "moderation": true
+      }
+    },
+    {
+      "name": "llama3-70b-8192",
+      "model_id": "llama3-70b-8192",
+      "provider": "meta",
+      "version": "3.0",
+      "description": "Llama 3 70B with 8K context window",
+      "strengths": ["reasoning", "instruction-following", "general-purpose"],
+      "context_window": 8192,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~300-500",
+        "time_to_first_token": "~50-100ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "llama3-8b-8192",
+      "model_id": "llama3-8b-8192",
+      "provider": "meta",
+      "version": "3.0",
+      "description": "Fast Llama 3 8B model with 8K context",
+      "strengths": ["speed", "efficiency", "general-purpose"],
+      "context_window": 8192,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~600-800",
+        "time_to_first_token": "~30-50ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "mixtral-8x7b-32768",
+      "model_id": "mixtral-8x7b-32768",
+      "provider": "mistral",
+      "version": "0.1",
+      "description": "Mixtral 8x7B MoE model with 32K context",
+      "strengths": ["efficiency", "multilingual", "reasoning", "long-context"],
+      "context_window": 32768,
+      "max_output": 32768,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~400-600",
+        "time_to_first_token": "~40-80ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "gemma2-9b-it",
+      "model_id": "gemma2-9b-it",
+      "provider": "google",
+      "version": "2.0",
+      "description": "Google Gemma 2 9B instruction-tuned model",
+      "strengths": ["efficiency", "instruction-following", "reasoning"],
+      "context_window": 8192,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~500-700",
+        "time_to_first_token": "~40-70ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "gemma-7b-it",
+      "model_id": "gemma-7b-it",
+      "provider": "google",
+      "version": "1.0",
+      "description": "Google Gemma 7B instruction-tuned model",
+      "strengths": ["efficiency", "instruction-following", "speed"],
+      "context_window": 8192,
+      "max_output": 8192,
+      "cost": {
+        "input_per_1m": 0.0,
+        "output_per_1m": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "tokens_per_second": "~600-800",
+        "time_to_first_token": "~30-60ms"
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "vision": false,
+        "json_mode": true
+      }
+    },
+    {
+      "name": "whisper-large-v3",
+      "model_id": "whisper-large-v3",
+      "provider": "openai",
+      "version": "3.0",
+      "description": "OpenAI Whisper Large V3 for speech-to-text",
+      "strengths": ["speech-to-text", "multilingual", "transcription", "speed"],
+      "context_window": null,
+      "max_output": null,
+      "cost": {
+        "per_minute": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "processing_speed": "Real-time or faster",
+        "latency": "~100-300ms for short audio"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "speech_to_text": true,
+        "translation": true,
+        "timestamp": true,
+        "word_level_timestamps": true,
+        "languages": "99+"
+      }
+    },
+    {
+      "name": "whisper-large-v3-turbo",
+      "model_id": "whisper-large-v3-turbo",
+      "provider": "openai",
+      "version": "3.0",
+      "description": "Faster Whisper Large V3 with optimized performance",
+      "strengths": ["speech-to-text", "speed", "low-latency", "real-time"],
+      "context_window": null,
+      "max_output": null,
+      "cost": {
+        "per_minute": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "processing_speed": "Faster than real-time",
+        "latency": "~50-150ms for short audio"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "speech_to_text": true,
+        "translation": true,
+        "timestamp": true,
+        "word_level_timestamps": true,
+        "languages": "99+"
+      }
+    },
+    {
+      "name": "distil-whisper-large-v3-en",
+      "model_id": "distil-whisper-large-v3-en",
+      "provider": "huggingface",
+      "version": "3.0",
+      "description": "Distilled Whisper for ultra-fast English transcription",
+      "strengths": ["speed", "efficiency", "english-only", "ultra-low-latency"],
+      "context_window": null,
+      "max_output": null,
+      "cost": {
+        "per_minute": 0.0,
+        "note": "Free during beta"
+      },
+      "performance": {
+        "processing_speed": "Much faster than real-time",
+        "latency": "~30-100ms for short audio"
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "speech_to_text": true,
+        "translation": false,
+        "timestamp": true,
+        "word_level_timestamps": true,
+        "languages": "English only"
+      }
+    }
+  ],
+  "model_families": {
+    "llama_3_3": {
+      "description": "Latest Llama 3.3 models with 128K context",
+      "models": [
+        "llama-3.3-70b-versatile",
+        "llama-3.3-70b-specdec"
+      ],
+      "features": ["128k-context", "function-calling", "speculative-decoding"],
+      "use_cases": ["complex-reasoning", "long-documents", "agentic-workflows"]
+    },
+    "llama_3_2": {
+      "description": "Llama 3.2 with vision and lightweight variants",
+      "models": [
+        "llama-3.2-90b-vision-preview",
+        "llama-3.2-11b-vision-preview",
+        "llama-3.2-3b-preview",
+        "llama-3.2-1b-preview"
+      ],
+      "features": ["vision", "efficiency", "128k-context", "ultra-fast"],
+      "use_cases": ["multimodal", "edge-deployment", "real-time-applications"]
+    },
+    "llama_3_1": {
+      "description": "Llama 3.1 models with long context support",
+      "models": [
+        "llama-3.1-70b-versatile",
+        "llama-3.1-8b-instant"
+      ],
+      "features": ["128k-context", "function-calling", "instant-responses"],
+      "use_cases": ["general-purpose", "coding", "reasoning"]
+    },
+    "llama_3": {
+      "description": "Original Llama 3 models with 8K context",
+      "models": [
+        "llama3-70b-8192",
+        "llama3-8b-8192"
+      ],
+      "features": ["8k-context", "function-calling", "proven-performance"],
+      "use_cases": ["general-purpose", "production-ready"]
+    },
+    "mixtral": {
+      "description": "Mistral AI Mixture-of-Experts models",
+      "models": ["mixtral-8x7b-32768"],
+      "features": ["moe-architecture", "32k-context", "multilingual", "efficient"],
+      "use_cases": ["multilingual", "reasoning", "cost-effective"]
+    },
+    "gemma": {
+      "description": "Google Gemma instruction-tuned models",
+      "models": ["gemma2-9b-it", "gemma-7b-it"],
+      "features": ["efficiency", "instruction-following", "open-source"],
+      "use_cases": ["general-purpose", "fast-inference"]
+    },
+    "whisper": {
+      "description": "Speech-to-text models optimized for Groq LPU",
+      "models": [
+        "whisper-large-v3",
+        "whisper-large-v3-turbo",
+        "distil-whisper-large-v3-en"
+      ],
+      "features": ["ultra-fast-transcription", "multilingual", "real-time"],
+      "use_cases": ["transcription", "voice-interfaces", "real-time-captioning"]
+    }
+  },
+  "lpu_technology": {
+    "description": "Groq's proprietary Language Processing Unit for ultra-fast inference",
+    "advantages": {
+      "speed": "10x faster than traditional GPU inference",
+      "latency": "Sub-second time-to-first-token",
+      "throughput": "Extremely high tokens-per-second",
+      "consistency": "Predictable performance without batching delays",
+      "efficiency": "Lower energy consumption per inference"
+    },
+    "architecture": {
+      "deterministic": "Deterministic execution for consistent latency",
+      "memory_architecture": "Optimized memory bandwidth for LLM workloads",
+      "compiler": "Purpose-built compiler for LLM optimization"
+    }
+  },
+  "speculative_decoding": {
+    "description": "Advanced technique for even faster inference on select models",
+    "models": ["llama-3.3-70b-specdec"],
+    "benefits": {
+      "speed": "Up to 2x faster than standard inference",
+      "quality": "Same output quality as standard models",
+      "use_cases": "Real-time applications requiring lowest latency"
+    },
+    "tradeoff": {
+      "context_window": "Reduced context window (8K vs 128K)",
+      "best_for": "Short-context, latency-critical applications"
+    }
+  },
+  "function_calling": {
+    "description": "Tool use for connecting models to external APIs",
+    "supported_models": [
+      "llama-3.3-70b-versatile",
+      "llama-3.3-70b-specdec",
+      "llama-3.2-90b-vision-preview",
+      "llama-3.2-11b-vision-preview",
+      "llama-3.1-70b-versatile",
+      "llama-3.1-8b-instant",
+      "llama3-70b-8192",
+      "llama3-8b-8192",
+      "mixtral-8x7b-32768",
+      "gemma2-9b-it"
+    ],
+    "features": {
+      "parallel_calls": "Execute multiple functions simultaneously",
+      "auto_invocation": "Model determines when to call functions",
+      "json_schema": "Define functions using JSON schema"
+    },
+    "use_cases": ["api-integration", "data-retrieval", "agentic-workflows"]
+  },
+  "json_mode": {
+    "description": "Structured JSON output generation",
+    "supported_models": "Most text generation models",
+    "usage": {
+      "parameter": "response_format",
+      "type": "json_object",
+      "enforcement": "Model outputs valid JSON"
+    },
+    "use_cases": ["api-responses", "structured-data", "integration"]
+  },
+  "vision_capabilities": {
+    "description": "Process and understand images alongside text",
+    "supported_models": [
+      "llama-3.2-90b-vision-preview",
+      "llama-3.2-11b-vision-preview"
+    ],
+    "features": {
+      "image_understanding": "Analyze and describe images",
+      "ocr": "Extract text from images",
+      "visual_qa": "Answer questions about images",
+      "multi_image": "Process multiple images in single request"
+    },
+    "supported_formats": ["JPEG", "PNG", "WEBP", "GIF"],
+    "max_size": "20MB per image"
+  },
+  "audio_capabilities": {
+    "description": "Ultra-fast speech-to-text transcription",
+    "models": [
+      "whisper-large-v3",
+      "whisper-large-v3-turbo",
+      "distil-whisper-large-v3-en"
+    ],
+    "features": {
+      "transcription": "Convert speech to text",
+      "translation": "Translate to English",
+      "timestamps": "Word and segment timestamps",
+      "multilingual": "Support for 99+ languages (except distil)",
+      "real_time": "Process faster than real-time"
+    },
+    "supported_formats": [
+      "flac", "mp3", "mp4", "mpeg", "mpga", "m4a", "ogg", "wav", "webm"
+    ],
+    "max_file_size": "25MB"
+  },
+  "rate_limits": {
+    "free_tier": {
+      "requests_per_minute": 30,
+      "requests_per_day": 14400,
+      "tokens_per_minute": 14400,
+      "note": "Generous free tier for development and testing"
+    },
+    "paid_tier": {
+      "requests_per_minute": "Higher limits based on plan",
+      "requests_per_day": "Higher limits based on plan",
+      "tokens_per_minute": "Higher limits based on plan",
+      "note": "Contact sales for custom limits"
+    }
+  },
+  "performance_metrics": {
+    "time_to_first_token": {
+      "description": "Time until first token is generated",
+      "range": "10-150ms depending on model",
+      "llama_1b": "~10-30ms",
+      "llama_3b": "~20-40ms",
+      "llama_8b": "~30-50ms",
+      "llama_70b": "~50-100ms",
+      "llama_90b": "~100-150ms"
+    },
+    "tokens_per_second": {
+      "description": "Output generation speed",
+      "range": "300-1000+ TPS depending on model",
+      "llama_1b": "~1000+ TPS",
+      "llama_3b": "~800-1000 TPS",
+      "llama_8b": "~600-800 TPS",
+      "llama_70b": "~300-500 TPS",
+      "llama_90b": "~250-400 TPS"
+    },
+    "consistency": {
+      "description": "Low variance in performance",
+      "benefit": "Predictable latency for production applications"
+    }
+  },
+  "api_compatibility": {
+    "openai": {
+      "description": "Fully compatible with OpenAI Python SDK",
+      "usage": "Just change base_url to https://api.groq.com/openai/v1",
+      "endpoints": ["/chat/completions", "/audio/transcriptions", "/audio/translations"]
+    },
+    "langchain": "Native LangChain integration",
+    "llamaindex": "LlamaIndex support",
+    "other_frameworks": "Compatible with most OpenAI-compatible frameworks"
+  },
+  "playground": {
+    "description": "Web-based interface for testing models",
+    "url": "https://console.groq.com",
+    "features": {
+      "model_comparison": "Compare outputs from different models",
+      "streaming": "Real-time streaming responses",
+      "system_prompts": "Configure system instructions",
+      "temperature": "Adjust randomness",
+      "max_tokens": "Control output length",
+      "function_calling": "Test tool use",
+      "json_mode": "Test structured output",
+      "code_export": "Export to Python, TypeScript, cURL"
+    }
+  },
+  "use_cases": {
+    "real_time_applications": {
+      "description": "Applications requiring instant responses",
+      "recommended_models": [
+        "llama-3.3-70b-specdec",
+        "llama-3.2-1b-preview",
+        "llama-3.1-8b-instant"
+      ],
+      "examples": ["chatbots", "live-assistants", "gaming-npcs"]
+    },
+    "high_throughput": {
+      "description": "Processing large volumes of requests",
+      "recommended_models": [
+        "llama-3.1-8b-instant",
+        "llama-3.2-3b-preview",
+        "gemma2-9b-it"
+      ],
+      "examples": ["content-moderation", "classification", "batch-processing"]
+    },
+    "complex_reasoning": {
+      "description": "Tasks requiring deep reasoning",
+      "recommended_models": [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-70b-versatile",
+        "mixtral-8x7b-32768"
+      ],
+      "examples": ["analysis", "problem-solving", "code-generation"]
+    },
+    "multimodal": {
+      "description": "Image and text understanding",
+      "recommended_models": [
+        "llama-3.2-90b-vision-preview",
+        "llama-3.2-11b-vision-preview"
+      ],
+      "examples": ["document-analysis", "image-qa", "visual-assistance"]
+    },
+    "speech_to_text": {
+      "description": "Audio transcription and translation",
+      "recommended_models": [
+        "whisper-large-v3-turbo",
+        "distil-whisper-large-v3-en"
+      ],
+      "examples": ["transcription", "captions", "voice-interfaces"]
+    },
+    "content_moderation": {
+      "description": "Safety filtering and policy enforcement",
+      "recommended_models": ["llama-guard-3-8b"],
+      "examples": ["chat-moderation", "content-filtering", "safety-checks"]
+    }
+  },
+  "best_practices": {
+    "model_selection": "Choose smallest model that meets requirements for best speed",
+    "speculative_decoding": "Use specdec models for lowest latency with short context",
+    "streaming": "Always use streaming for better user experience",
+    "error_handling": "Implement retry logic with exponential backoff",
+    "rate_limits": "Monitor usage and implement client-side rate limiting",
+    "prompt_engineering": "Keep prompts concise for faster processing",
+    "batch_requests": "Send multiple requests in parallel for high throughput",
+    "function_calling": "Use clear function descriptions and schemas",
+    "json_mode": "Use for structured output needs",
+    "monitoring": "Track latency and throughput metrics",
+    "cost_optimization": "Use smaller models for simple tasks",
+    "vision": "Optimize image sizes before sending",
+    "audio": "Use distil-whisper for English-only transcription"
+  },
+  "pricing": {
+    "current": {
+      "all_models": "Free during beta",
+      "rate_limits": "Apply to free tier"
+    },
+    "future": {
+      "note": "Pricing will be introduced post-beta",
+      "expectation": "Competitive pricing with industry-leading speed"
+    },
+    "enterprise": {
+      "custom_pricing": "Available for high-volume users",
+      "features": ["higher-limits", "sla", "priority-support"]
+    }
+  },
+  "enterprise_features": {
+    "custom_limits": "Higher rate limits based on needs",
+    "sla": "Service level agreements for uptime",
+    "priority_support": "Dedicated support team",
+    "private_deployment": "Contact for on-premises options",
+    "billing": "Custom invoicing and contracts"
+  },
+  "roadmap": {
+    "upcoming_models": "More open-source models being added",
+    "fine_tuning": "Custom model training planned",
+    "embeddings": "Embedding models coming soon",
+    "additional_modalities": "More multimodal capabilities"
+  },
+  "comparison_to_competitors": {
+    "vs_gpu_inference": {
+      "speed": "10x faster than typical GPU-based inference",
+      "latency": "Sub-100ms time-to-first-token vs 500ms+",
+      "consistency": "Deterministic performance vs variable batching delays"
+    },
+    "vs_other_providers": {
+      "openai": "Similar quality, 10x faster, currently free",
+      "anthropic": "Competitive quality, much faster inference",
+      "google": "Similar speed to Gemini Flash, more model variety"
+    }
+  },
+  "limitations": {
+    "model_selection": "Limited to open-source models (no proprietary models)",
+    "fine_tuning": "Not currently available",
+    "embeddings": "Not yet available",
+    "batch_api": "No dedicated batch API",
+    "prompt_caching": "Not available",
+    "multi_region": "Single region deployment"
+  },
+  "getting_started": {
+    "step_1": "Sign up at console.groq.com",
+    "step_2": "Get API key from API Keys section",
+    "step_3": "Install OpenAI SDK: pip install openai",
+    "step_4": "Change base_url to https://api.groq.com/openai/v1",
+    "step_5": "Start making requests with lightning-fast inference"
+  },
+  "sdk_example": {
+    "python": "from openai import OpenAI\nclient = OpenAI(base_url='https://api.groq.com/openai/v1', api_key='your-api-key')",
+    "node": "import OpenAI from 'openai';\nconst client = new OpenAI({baseURL: 'https://api.groq.com/openai/v1', apiKey: 'your-api-key'});"
+  },
+  "key_differentiators": {
+    "speed": "Industry-leading inference speeds with LPU technology",
+    "cost": "Free during beta, competitive pricing post-beta",
+    "open_source": "All models are open-source",
+    "compatibility": "OpenAI-compatible API for easy migration",
+    "consistency": "Deterministic performance for production reliability",
+    "variety": "Wide selection of models from Meta, Mistral, Google, OpenAI"
+  }
+}

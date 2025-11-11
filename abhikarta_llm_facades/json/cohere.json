@@ -1,0 +1,869 @@
+{
+  "provider": "cohere",
+  "api_version": "v1",
+  "base_url": "https://api.cohere.com",
+  "notes": {
+    "authentication": "All endpoints require Authorization header with Bearer token (CO_API_KEY)",
+    "pricing": "Prices shown per 1M tokens for generation, per 1K tokens for embeddings, per 1K searches for rerank",
+    "streaming": "All generation models support server-sent events (SSE) streaming",
+    "rate_limits": "Vary by plan: Trial (100 calls/min), Production (10K calls/min). Custom limits for enterprise",
+    "context_windows": "Context windows range from 4K to 128K tokens depending on model",
+    "embedding_types": "Embeddings support search, classification, and clustering use cases with different embedding types",
+    "rerank": "Rerank models improve search relevance by reordering results based on query relevance",
+    "rag_optimization": "Models specifically optimized for Retrieval Augmented Generation workflows",
+    "multilingual": "Support for 100+ languages across generation and embedding models",
+    "function_calling": "Tool use (function calling) supported via tools parameter on Command R models",
+    "chat_mode": "Conversational mode with message history support",
+    "grounded_generation": "Citations and source attribution in responses",
+    "connectors": "Built-in web search connectors for real-time information retrieval",
+    "prompt_truncation": "Automatic prompt truncation options: AUTO, OFF, START, END",
+    "safety": "Content moderation and safety features built into models",
+    "fine_tuning": "Custom model fine-tuning available for Command and Embed models",
+    "sdk_support": "Official SDKs for Python, TypeScript, Go, Java",
+    "api_compatibility": "RESTful API with OpenAI-compatible endpoints available",
+    "token_counting": "Tokenize endpoint for counting tokens before API calls",
+    "model_playground": "Web-based playground for testing and prompt engineering",
+    "semantic_search": "Optimized embedding models for semantic search applications"
+  },
+  "models": [
+    {
+      "name": "command-r-plus-08-2024",
+      "model_id": "command-r-plus-08-2024",
+      "version": "2024-08",
+      "description": "Latest Command R+ with enhanced reasoning and tool use",
+      "strengths": ["reasoning", "tool-use", "rag", "multilingual", "long-context"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 2.5,
+        "output_per_1m": 10.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "grounded_generation": true,
+        "web_search": true,
+        "citations": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "command-r-plus-04-2024",
+      "model_id": "command-r-plus-04-2024",
+      "version": "2024-04",
+      "description": "Command R+ from April 2024",
+      "strengths": ["reasoning", "tool-use", "rag", "multilingual", "long-context"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 2.5,
+        "output_per_1m": 10.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "grounded_generation": true,
+        "web_search": true,
+        "citations": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "command-r-plus",
+      "model_id": "command-r-plus",
+      "version": "latest",
+      "description": "Latest Command R+ (auto-updates to newest version)",
+      "strengths": ["reasoning", "tool-use", "rag", "multilingual", "long-context"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 2.5,
+        "output_per_1m": 10.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "grounded_generation": true,
+        "web_search": true,
+        "citations": true,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "command-r-08-2024",
+      "model_id": "command-r-08-2024",
+      "version": "2024-08",
+      "description": "Latest Command R optimized for RAG and tool use",
+      "strengths": ["rag", "tool-use", "efficiency", "multilingual", "cost-effective"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 0.15,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "grounded_generation": true,
+        "web_search": true,
+        "citations": true,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "command-r-03-2024",
+      "model_id": "command-r-03-2024",
+      "version": "2024-03",
+      "description": "Command R from March 2024",
+      "strengths": ["rag", "tool-use", "efficiency", "multilingual"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 0.15,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "grounded_generation": true,
+        "web_search": true,
+        "citations": true,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "command-r",
+      "model_id": "command-r",
+      "version": "latest",
+      "description": "Latest Command R (auto-updates to newest version)",
+      "strengths": ["rag", "tool-use", "efficiency", "multilingual", "cost-effective"],
+      "context_window": 128000,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 0.15,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": true,
+        "tool_use": true,
+        "grounded_generation": true,
+        "web_search": true,
+        "citations": true,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "command",
+      "model_id": "command",
+      "version": "latest",
+      "description": "General purpose conversational model",
+      "strengths": ["conversation", "general-purpose", "instruction-following"],
+      "context_window": 4096,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 1.0,
+        "output_per_1m": 2.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "grounded_generation": false,
+        "web_search": false,
+        "citations": false,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "command-nightly",
+      "model_id": "command-nightly",
+      "version": "nightly",
+      "description": "Experimental Command model with latest features",
+      "strengths": ["experimental", "latest-features", "conversation"],
+      "context_window": 4096,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 1.0,
+        "output_per_1m": 2.0
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "grounded_generation": false,
+        "web_search": false,
+        "citations": false,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "command-light",
+      "model_id": "command-light",
+      "version": "latest",
+      "description": "Lightweight and fast Command model",
+      "strengths": ["speed", "efficiency", "cost-effective", "simple-tasks"],
+      "context_window": 4096,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 0.3,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "grounded_generation": false,
+        "web_search": false,
+        "citations": false,
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "command-light-nightly",
+      "model_id": "command-light-nightly",
+      "version": "nightly",
+      "description": "Experimental lightweight Command model",
+      "strengths": ["speed", "efficiency", "experimental"],
+      "context_window": 4096,
+      "max_output": 4096,
+      "cost": {
+        "input_per_1m": 0.3,
+        "output_per_1m": 0.6
+      },
+      "capabilities": {
+        "chat": true,
+        "completion": false,
+        "streaming": true,
+        "function_calling": false,
+        "tool_use": false,
+        "grounded_generation": false,
+        "web_search": false,
+        "citations": false,
+        "fine_tuning": false
+      }
+    },
+    {
+      "name": "embed-v3",
+      "model_id": "embed-english-v3.0",
+      "version": "3.0",
+      "description": "Latest English embedding model with highest quality",
+      "strengths": ["embeddings", "semantic-search", "english", "quality"],
+      "context_window": 512,
+      "max_output": 1024,
+      "cost": {
+        "per_1k": 0.1
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 1024,
+        "embedding_types": ["search_document", "search_query", "classification", "clustering"]
+      }
+    },
+    {
+      "name": "embed-english-v3.0",
+      "model_id": "embed-english-v3.0",
+      "version": "3.0",
+      "description": "English-optimized embedding model v3",
+      "strengths": ["embeddings", "semantic-search", "english", "rag"],
+      "context_window": 512,
+      "max_output": 1024,
+      "cost": {
+        "per_1k": 0.1
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 1024,
+        "embedding_types": ["search_document", "search_query", "classification", "clustering"],
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "embed-multilingual-v3.0",
+      "model_id": "embed-multilingual-v3.0",
+      "version": "3.0",
+      "description": "Multilingual embedding model supporting 100+ languages",
+      "strengths": ["embeddings", "multilingual", "semantic-search", "100-languages"],
+      "context_window": 512,
+      "max_output": 1024,
+      "cost": {
+        "per_1k": 0.1
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 1024,
+        "embedding_types": ["search_document", "search_query", "classification", "clustering"],
+        "fine_tuning": true
+      }
+    },
+    {
+      "name": "embed-english-light-v3.0",
+      "model_id": "embed-english-light-v3.0",
+      "version": "3.0",
+      "description": "Lightweight English embedding model for faster inference",
+      "strengths": ["embeddings", "speed", "efficiency", "cost-effective"],
+      "context_window": 512,
+      "max_output": 384,
+      "cost": {
+        "per_1k": 0.1
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 384,
+        "embedding_types": ["search_document", "search_query", "classification", "clustering"]
+      }
+    },
+    {
+      "name": "embed-multilingual-light-v3.0",
+      "model_id": "embed-multilingual-light-v3.0",
+      "version": "3.0",
+      "description": "Lightweight multilingual embedding model",
+      "strengths": ["embeddings", "multilingual", "speed", "efficiency"],
+      "context_window": 512,
+      "max_output": 384,
+      "cost": {
+        "per_1k": 0.1
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 384,
+        "embedding_types": ["search_document", "search_query", "classification", "clustering"]
+      }
+    },
+    {
+      "name": "embed-english-v2.0",
+      "model_id": "embed-english-v2.0",
+      "version": "2.0",
+      "description": "Previous generation English embedding model",
+      "strengths": ["embeddings", "semantic-search", "legacy"],
+      "context_window": 512,
+      "max_output": 4096,
+      "cost": {
+        "per_1k": 0.1
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 4096,
+        "embedding_types": ["search_document", "search_query", "classification", "clustering"]
+      }
+    },
+    {
+      "name": "embed-english-light-v2.0",
+      "model_id": "embed-english-light-v2.0",
+      "version": "2.0",
+      "description": "Lightweight v2 English embedding model",
+      "strengths": ["embeddings", "efficiency", "legacy"],
+      "context_window": 512,
+      "max_output": 1024,
+      "cost": {
+        "per_1k": 0.1
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 1024,
+        "embedding_types": ["search_document", "search_query", "classification", "clustering"]
+      }
+    },
+    {
+      "name": "embed-multilingual-v2.0",
+      "model_id": "embed-multilingual-v2.0",
+      "version": "2.0",
+      "description": "Previous generation multilingual embedding model",
+      "strengths": ["embeddings", "multilingual", "legacy"],
+      "context_window": 512,
+      "max_output": 768,
+      "cost": {
+        "per_1k": 0.1
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "embeddings": true,
+        "dimensions": 768,
+        "embedding_types": ["search_document", "search_query", "classification", "clustering"]
+      }
+    },
+    {
+      "name": "rerank-v3.5",
+      "model_id": "rerank-english-v3.5",
+      "version": "3.5",
+      "description": "Latest English reranking model for search relevance",
+      "strengths": ["reranking", "search-relevance", "english", "accuracy"],
+      "context_window": 4096,
+      "max_output": null,
+      "cost": {
+        "per_1k_searches": 2.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "reranking": true,
+        "max_documents": 1000,
+        "relevance_scoring": true
+      }
+    },
+    {
+      "name": "rerank-english-v3.5",
+      "model_id": "rerank-english-v3.5",
+      "version": "3.5",
+      "description": "English reranking model v3.5",
+      "strengths": ["reranking", "search-relevance", "english"],
+      "context_window": 4096,
+      "max_output": null,
+      "cost": {
+        "per_1k_searches": 2.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "reranking": true,
+        "max_documents": 1000,
+        "relevance_scoring": true
+      }
+    },
+    {
+      "name": "rerank-multilingual-v3.5",
+      "model_id": "rerank-multilingual-v3.5",
+      "version": "3.5",
+      "description": "Multilingual reranking model supporting 100+ languages",
+      "strengths": ["reranking", "multilingual", "search-relevance", "100-languages"],
+      "context_window": 4096,
+      "max_output": null,
+      "cost": {
+        "per_1k_searches": 2.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "reranking": true,
+        "max_documents": 1000,
+        "relevance_scoring": true
+      }
+    },
+    {
+      "name": "rerank-english-v3.0",
+      "model_id": "rerank-english-v3.0",
+      "version": "3.0",
+      "description": "Previous generation English reranking model",
+      "strengths": ["reranking", "search-relevance", "english"],
+      "context_window": 4096,
+      "max_output": null,
+      "cost": {
+        "per_1k_searches": 2.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "reranking": true,
+        "max_documents": 1000,
+        "relevance_scoring": true
+      }
+    },
+    {
+      "name": "rerank-multilingual-v3.0",
+      "model_id": "rerank-multilingual-v3.0",
+      "version": "3.0",
+      "description": "Previous generation multilingual reranking model",
+      "strengths": ["reranking", "multilingual", "search-relevance"],
+      "context_window": 4096,
+      "max_output": null,
+      "cost": {
+        "per_1k_searches": 2.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "reranking": true,
+        "max_documents": 1000,
+        "relevance_scoring": true
+      }
+    },
+    {
+      "name": "rerank-english-v2.0",
+      "model_id": "rerank-english-v2.0",
+      "version": "2.0",
+      "description": "Legacy English reranking model",
+      "strengths": ["reranking", "search-relevance", "legacy"],
+      "context_window": 512,
+      "max_output": null,
+      "cost": {
+        "per_1k_searches": 2.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "reranking": true,
+        "max_documents": 100,
+        "relevance_scoring": true
+      }
+    },
+    {
+      "name": "rerank-multilingual-v2.0",
+      "model_id": "rerank-multilingual-v2.0",
+      "version": "2.0",
+      "description": "Legacy multilingual reranking model",
+      "strengths": ["reranking", "multilingual", "legacy"],
+      "context_window": 512,
+      "max_output": null,
+      "cost": {
+        "per_1k_searches": 2.0
+      },
+      "capabilities": {
+        "chat": false,
+        "completion": false,
+        "streaming": false,
+        "reranking": true,
+        "max_documents": 100,
+        "relevance_scoring": true
+      }
+    }
+  ],
+  "model_families": {
+    "command_r_plus": {
+      "description": "Most powerful models for complex reasoning and tool use",
+      "models": ["command-r-plus-08-2024", "command-r-plus-04-2024", "command-r-plus"],
+      "use_cases": ["complex-reasoning", "multi-step-tasks", "agentic-workflows", "rag"],
+      "features": ["128k-context", "tool-use", "citations", "web-search"]
+    },
+    "command_r": {
+      "description": "Optimized for RAG and tool use with excellent cost-performance",
+      "models": ["command-r-08-2024", "command-r-03-2024", "command-r"],
+      "use_cases": ["rag", "tool-use", "enterprise-search", "customer-support"],
+      "features": ["128k-context", "tool-use", "citations", "fine-tuning"]
+    },
+    "command": {
+      "description": "General purpose conversational models",
+      "models": ["command", "command-nightly"],
+      "use_cases": ["conversation", "general-purpose", "chatbots"],
+      "features": ["chat", "fine-tuning"]
+    },
+    "command_light": {
+      "description": "Fast and efficient models for simple tasks",
+      "models": ["command-light", "command-light-nightly"],
+      "use_cases": ["simple-tasks", "high-throughput", "cost-optimization"],
+      "features": ["speed", "efficiency", "fine-tuning"]
+    },
+    "embed_v3": {
+      "description": "Latest generation embedding models",
+      "models": [
+        "embed-english-v3.0",
+        "embed-multilingual-v3.0",
+        "embed-english-light-v3.0",
+        "embed-multilingual-light-v3.0"
+      ],
+      "use_cases": ["semantic-search", "rag", "clustering", "classification"],
+      "features": ["1024-dimensions", "multiple-types", "fine-tuning"]
+    },
+    "embed_v2": {
+      "description": "Previous generation embedding models",
+      "models": [
+        "embed-english-v2.0",
+        "embed-english-light-v2.0",
+        "embed-multilingual-v2.0"
+      ],
+      "use_cases": ["semantic-search", "legacy-support"],
+      "features": ["legacy-compatibility"]
+    },
+    "rerank_v3": {
+      "description": "Latest reranking models for search relevance",
+      "models": [
+        "rerank-english-v3.5",
+        "rerank-multilingual-v3.5",
+        "rerank-english-v3.0",
+        "rerank-multilingual-v3.0"
+      ],
+      "use_cases": ["search-improvement", "rag-optimization", "relevance-scoring"],
+      "features": ["4k-context", "1000-documents", "high-accuracy"]
+    }
+  },
+  "embedding_types": {
+    "search_document": {
+      "description": "Use when embedding documents for search indexing",
+      "use_case": "Indexing documents in a vector database"
+    },
+    "search_query": {
+      "description": "Use when embedding user search queries",
+      "use_case": "Converting user queries to embeddings for semantic search"
+    },
+    "classification": {
+      "description": "Use for text classification tasks",
+      "use_case": "Training classifiers, sentiment analysis"
+    },
+    "clustering": {
+      "description": "Use for clustering and topic modeling",
+      "use_case": "Grouping similar documents, topic discovery"
+    }
+  },
+  "tool_use": {
+    "description": "Function calling for connecting models to external tools and APIs",
+    "supported_models": ["command-r-plus", "command-r"],
+    "features": {
+      "multi_step": "Chain multiple tool calls together",
+      "parallel_calls": "Execute multiple tools simultaneously",
+      "citations": "Get citations showing which tools were used",
+      "auto_invoke": "Automatic tool execution without confirmation"
+    },
+    "tool_definition": {
+      "name": "Tool name",
+      "description": "What the tool does",
+      "parameter_definitions": "JSON schema for parameters"
+    }
+  },
+  "grounded_generation": {
+    "description": "Generate responses with source citations and fact-checking",
+    "supported_models": ["command-r-plus", "command-r"],
+    "features": {
+      "citations": "Inline citations with source references",
+      "documents": "Provide documents for context",
+      "web_search": "Built-in web search connector",
+      "fact_verification": "Verify facts against provided documents"
+    }
+  },
+  "connectors": {
+    "web_search": {
+      "description": "Built-in web search for real-time information",
+      "models": ["command-r-plus", "command-r"],
+      "providers": ["Multiple search engines integrated"]
+    },
+    "custom": {
+      "description": "Define custom connectors for your data sources",
+      "use_cases": ["enterprise-search", "knowledge-bases", "databases"]
+    }
+  },
+  "rag_capabilities": {
+    "description": "Retrieval Augmented Generation optimizations",
+    "features": {
+      "document_mode": "Optimized for working with retrieved documents",
+      "citations": "Automatic citation generation",
+      "context_stuffing": "Handle multiple documents efficiently",
+      "relevance_filtering": "Filter out irrelevant context"
+    },
+    "best_practices": {
+      "chunk_size": "Keep chunks under 512 tokens for embeddings",
+      "reranking": "Use rerank models to improve retrieval quality",
+      "hybrid_search": "Combine keyword and semantic search",
+      "context_window": "Use full 128K context for Command R models"
+    }
+  },
+  "fine_tuning": {
+    "description": "Custom model training on your data",
+    "supported_models": ["command", "command-light", "command-r", "embed-english-v3.0", "embed-multilingual-v3.0"],
+    "dataset_requirements": {
+      "min_examples": 32,
+      "recommended_examples": "250-10,000",
+      "format": "JSONL with prompt-completion pairs"
+    },
+    "hyperparameters": {
+      "train_epochs": "1-10 epochs",
+      "learning_rate": "Auto-tuned or custom",
+      "train_batch_size": "Auto or manual"
+    },
+    "pricing": {
+      "training": "Per training hour",
+      "inference": "Same as base model pricing"
+    }
+  },
+  "classification": {
+    "description": "Zero-shot and few-shot text classification",
+    "endpoint": "/classify",
+    "features": {
+      "zero_shot": "Classify without training examples",
+      "few_shot": "Improve accuracy with examples",
+      "multi_class": "Assign to one of many classes",
+      "multi_label": "Assign multiple labels"
+    },
+    "use_cases": ["sentiment-analysis", "intent-detection", "content-moderation", "topic-classification"]
+  },
+  "tokenization": {
+    "description": "Count tokens before making API calls",
+    "endpoint": "/tokenize",
+    "features": {
+      "token_counting": "Count tokens in text",
+      "detokenization": "Convert tokens back to text",
+      "multiple_models": "Different tokenizers per model"
+    }
+  },
+  "summarization": {
+    "description": "Text summarization capabilities",
+    "endpoint": "/summarize",
+    "features": {
+      "extractive": "Extract key sentences",
+      "abstractive": "Generate new summary text",
+      "length_control": "Control summary length",
+      "format": "Paragraph or bullet points"
+    },
+    "supported_models": ["command", "command-light"]
+  },
+  "api_features": {
+    "chat": {
+      "endpoint": "/chat",
+      "features": ["message-history", "streaming", "tool-use", "citations", "web-search"]
+    },
+    "generate": {
+      "endpoint": "/generate",
+      "features": ["completion", "streaming", "likelihood", "multiple-generations"]
+    },
+    "embed": {
+      "endpoint": "/embed",
+      "features": ["batch-embedding", "multiple-types", "truncation"]
+    },
+    "rerank": {
+      "endpoint": "/rerank",
+      "features": ["relevance-scoring", "batch-reranking", "top-n-selection"]
+    },
+    "classify": {
+      "endpoint": "/classify",
+      "features": ["zero-shot", "few-shot", "confidence-scores"]
+    },
+    "tokenize": {
+      "endpoint": "/tokenize",
+      "features": ["token-counting", "model-specific"]
+    },
+    "detect_language": {
+      "endpoint": "/detect-language",
+      "features": ["100-languages", "confidence-scores"]
+    }
+  },
+  "prompt_truncation": {
+    "AUTO": "Automatically truncate to fit context window",
+    "OFF": "Return error if prompt exceeds context",
+    "START": "Truncate from start of prompt",
+    "END": "Truncate from end of prompt"
+  },
+  "safety_features": {
+    "content_moderation": "Built-in detection of harmful content",
+    "pii_detection": "Identify personally identifiable information",
+    "bias_mitigation": "Reduced bias in model outputs",
+    "toxicity_filtering": "Filter toxic or offensive content"
+  },
+  "enterprise_features": {
+    "sso": "Single sign-on integration",
+    "vpc": "Virtual private cloud deployment",
+    "data_retention": "Configurable data retention policies",
+    "audit_logs": "Comprehensive audit logging",
+    "sla": "Service level agreements for uptime",
+    "dedicated_instances": "Isolated model instances",
+    "custom_models": "Private fine-tuned models",
+    "priority_support": "24/7 enterprise support"
+  },
+  "pricing_tiers": {
+    "trial": {
+      "cost": "Free",
+      "rate_limits": "100 calls/min",
+      "features": ["Basic models", "Limited tokens"],
+      "duration": "Time-limited trial"
+    },
+    "production": {
+      "cost": "Pay-as-you-go",
+      "rate_limits": "10,000 calls/min",
+      "features": ["All models", "Standard support"],
+      "minimum": "Usage-based billing"
+    },
+    "enterprise": {
+      "cost": "Custom pricing",
+      "rate_limits": "Custom limits",
+      "features": ["All features", "Priority support", "SLA", "Custom models"],
+      "minimum": "Annual commitment"
+    }
+  },
+  "regional_availability": {
+    "us": "United States (primary region)",
+    "eu": "European Union (available)",
+    "global": "Global API access",
+    "data_residency": "Configurable for enterprise"
+  },
+  "integrations": {
+    "langchain": "Native LangChain integration",
+    "llamaindex": "LlamaIndex support",
+    "haystack": "Haystack integration",
+    "semantic_kernel": "Microsoft Semantic Kernel",
+    "aws_bedrock": "Available on AWS Bedrock",
+    "azure": "Available on Azure",
+    "oracle": "Available on Oracle Cloud"
+  },
+  "best_practices": {
+    "chat_vs_generate": "Use /chat for conversations, /generate for completions",
+    "embedding_types": "Always specify appropriate embedding_type for your use case",
+    "reranking": "Rerank top-k results from initial search for better accuracy",
+    "prompt_engineering": "Use clear instructions and examples for best results",
+    "context_management": "Use conversation_id for multi-turn conversations",
+    "tool_use": "Provide clear tool descriptions and parameter schemas",
+    "citations": "Enable citations for fact-checking and transparency",
+    "cost_optimization": "Use Command R instead of R+ for most RAG use cases",
+    "error_handling": "Implement exponential backoff for rate limits",
+    "monitoring": "Track token usage and latency metrics",
+    "security": "Never log or store API keys in code",
+    "data_privacy": "Review data retention policies for compliance"
+  },
+  "sdk_examples": {
+    "python": "pip install cohere",
+    "typescript": "npm install cohere-ai",
+    "go": "go get github.com/cohere-ai/cohere-go/v2",
+    "java": "Maven/Gradle dependency available"
+  },
+  "response_formats": {
+    "json": "Standard JSON responses",
+    "streaming": "Server-sent events for streaming",
+    "batch": "Batch API for multiple requests"
+  },
+  "model_selection_guide": {
+    "complex_reasoning": "Use Command R+ for multi-step reasoning and complex tasks",
+    "rag_applications": "Use Command R for best cost-performance in RAG",
+    "high_throughput": "Use Command Light for simple, high-volume tasks",
+    "semantic_search": "Use Embed v3 with appropriate embedding type",
+    "search_improvement": "Use Rerank v3.5 to improve search relevance",
+    "multilingual": "Use multilingual variants for non-English content",
+    "custom_domain": "Fine-tune Command or Embed models for domain-specific tasks"
+  }
+}
