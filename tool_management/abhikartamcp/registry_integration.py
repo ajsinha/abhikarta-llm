@@ -26,25 +26,7 @@ from .abhikarta_mcp_tool_builder import AbhikartaMCPToolBuilder, MCPToolSchema
 from .abhikarta_base_tool import AbhikartaBaseTool
 
 # Import from tool management framework
-try:
-    from tool_management.registry.registry import ToolRegistry
-except ImportError:
-    # Fallback for demonstration
-    class ToolRegistry:
-        def __init__(self):
-            self._tools = {}
-        
-        def register(self, tool, group=None, tags=None):
-            self._tools[tool.name] = tool
-            return self
-        
-        def unregister(self, tool_name):
-            if tool_name in self._tools:
-                del self._tools[tool_name]
-            return self
-        
-        def get(self, tool_name):
-            return self._tools.get(tool_name)
+from tool_management import ToolRegistry
 
 
 logger = logging.getLogger(__name__)

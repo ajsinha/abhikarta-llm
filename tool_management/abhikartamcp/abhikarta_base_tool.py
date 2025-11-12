@@ -26,42 +26,10 @@ from typing import Any, Dict, Optional
 import httpx
 
 # Import from the tool management framework
-try:
-    from tool_management.core.base import BaseTool
-    from tool_management.core.types import ToolType, ExecutionMode
-    from tool_management.core.parameters import ToolParameter, ParameterType
-    from tool_management.core.results import ToolResult, ResultStatus
-except ImportError:
-    # Fallback for demonstration
-    class BaseTool:
-        def __init__(self, name, description, tool_type, execution_mode, version="1.0.0"):
-            self.name = name
-            self.description = description
-            self.tool_type = tool_type
-            self.execution_mode = execution_mode
-            self.version = version
-            self._parameters = None
-
-        def add_parameter(self, param):
-            pass
-
-        def execute(self, **kwargs):
-            raise NotImplementedError()
-
-    class ToolType:
-        ABHIKARTAMCP = "abhikartamcp"
-
-    class ExecutionMode:
-        ASYNC = "async"
-
-    class ToolResult:
-        @staticmethod
-        def success_result(data, tool_name=None):
-            return {"status": "success", "data": data}
-
-        @staticmethod
-        def failure_result(error, error_type, tool_name=None):
-            return {"status": "failure", "error": error, "error_type": error_type}
+from tool_management import BaseTool
+from tool_management import ToolType, ExecutionMode
+from tool_management import ToolParameter, ParameterType
+from tool_management import ToolResult, ResultStatus
 
 
 logger = logging.getLogger(__name__)
