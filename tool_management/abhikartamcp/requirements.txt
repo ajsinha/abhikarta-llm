@@ -1,0 +1,20 @@
+# Abhikarta MCP Integration - Requirements
+# Copyright © 2025-2030, Ashutosh Sinha (ajsinha@gmail.com)
+
+# Core Dependencies
+httpx>=0.27.0
+asyncio-mqtt>=0.16.0
+
+# Optional Dependencies (for enhanced features)
+# pytest>=7.4.0          # For testing
+# pytest-asyncio>=0.21.0 # For async tests
+# black>=23.0.0          # For code formatting
+# mypy>=1.5.0            # For type checking
+
+# Note: The tool management framework must be installed separately
+# This module requires:
+# - tool_management.core.base
+# - tool_management.core.types
+# - tool_management.core.parameters
+# - tool_management.core.results
+# - tool_management.registry.registry

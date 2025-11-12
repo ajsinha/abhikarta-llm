@@ -12,6 +12,7 @@ import asyncio
 from tool_management import ToolRegistry
 from tool_management.mcp import MCPClient, MCPTool, discover_mcp_tools
 
+server_url = "http://localhost:3002"
 
 async def example_mcp_connection():
     """
@@ -32,8 +33,8 @@ async def example_mcp_connection():
         # Example 1: Connect to MCP server
         print("1. Connecting to MCP server...")
         client = MCPClient(
-            server_url="http://localhost:3000",
-            transport="stdio"  # or "sse"
+            server_url=server_url,
+            transport="http"  # or "sse"
         )
         
         server_info = await client.connect()

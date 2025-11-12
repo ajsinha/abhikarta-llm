@@ -30,6 +30,7 @@ class ToolType(Enum):
     DATABASE = "database"                    # Database operations
     WEB_SCRAPING = "web_scraping"           # Web content extraction
     CUSTOM = "custom"                        # User-defined custom tools
+    ABHIKARTAMCP = "abhikartamcp"           # Model Context Protocol tools
 
 
 class ExecutionMode(Enum):
