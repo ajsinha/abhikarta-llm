@@ -100,6 +100,11 @@ async def example_1_search_symbols():
         
         if result:
             data = extract_data(result)
+            if type(data) == str:
+                import json
+                print(data)
+                data = json.loads(data)
+
             print(f"Query: {data.get('query')}")
             print(f"Results: {data.get('result_count')}")
             

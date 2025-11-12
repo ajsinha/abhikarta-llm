@@ -18,7 +18,9 @@ Patent Pending: Certain architectural patterns and implementations described in 
 document may be subject to patent applications.
 """
 
+import ast
 import asyncio
+import json
 import logging
 from typing import Any, Dict, Optional
 import httpx
@@ -39,24 +41,24 @@ except ImportError:
             self.execution_mode = execution_mode
             self.version = version
             self._parameters = None
-        
+
         def add_parameter(self, param):
             pass
-        
+
         def execute(self, **kwargs):
             raise NotImplementedError()
-    
+
     class ToolType:
         ABHIKARTAMCP = "abhikartamcp"
-    
+
     class ExecutionMode:
         ASYNC = "async"
-    
+
     class ToolResult:
         @staticmethod
         def success_result(data, tool_name=None):
             return {"status": "success", "data": data}
-        
+
         @staticmethod
         def failure_result(error, error_type, tool_name=None):
             return {"status": "failure", "error": error, "error_type": error_type}
@@ -68,10 +70,10 @@ logger = logging.getLogger(__name__)
 class AbhikartaBaseTool(BaseTool):
     """
     Base tool class for Abhikarta MCP tools.
-    
+
     This class wraps tools from the Abhikarta MCP server and provides
     seamless integration with the tool management framework.
-    
+
     Features:
     - Automatic tool type (ABHIKARTAMCP)
     - JSON-RPC communication with MCP server
@@ -79,7 +81,7 @@ class AbhikartaBaseTool(BaseTool):
     - Schema-based parameter validation
     - Async execution support
     """
-    
+
     def __init__(
         self,
         name: str,
@@ -94,7 +96,7 @@ class AbhikartaBaseTool(BaseTool):
     ):
         """
         Initialize an Abhikarta MCP tool.
-        
+
         Args:
             name: Tool name (should include :abhikartamcp suffix)
             description: Tool description
@@ -110,7 +112,7 @@ class AbhikartaBaseTool(BaseTool):
         self.original_tool_name = name
         if name.endswith(":abhikartamcp"):
             self.original_tool_name = name[:-13]  # Remove ":abhikartamcp" (13 chars)
-        
+
         # Initialize base tool with ABHIKARTAMCP type
         super().__init__(
             name=name,
@@ -119,59 +121,59 @@ class AbhikartaBaseTool(BaseTool):
             execution_mode=ExecutionMode.ASYNC,
             version=version
         )
-        
+
         # MCP configuration
         self.mcp_base_url = mcp_base_url
         self.mcp_endpoint = mcp_endpoint
         self.mcp_url = f"{mcp_base_url}{mcp_endpoint}"
         self.auth_token = auth_token
         self.timeout = timeout
-        
+
         # Schema information
         self.input_schema = input_schema or {}
         self.output_schema = output_schema or {}
-        
+
         # HTTP client (lazy initialization)
         self._http_client: Optional[httpx.AsyncClient] = None
         self._request_id = 0
-        
+
         # Parse input schema to create parameters
         if input_schema and "properties" in input_schema:
             self._parse_input_schema(input_schema)
-        
+
         logger.debug(f"Initialized AbhikartaBaseTool: {name}")
-    
+
     def _next_id(self) -> int:
         """Generate next request ID"""
         self._request_id += 1
         return self._request_id
-    
+
     async def _ensure_http_client(self):
         """Ensure HTTP client is initialized"""
         if self._http_client is None:
             headers = {"Content-Type": "application/json"}
             if self.auth_token:
                 headers["Authorization"] = f"Bearer {self.auth_token}"
-            
+
             self._http_client = httpx.AsyncClient(
                 timeout=self.timeout,
                 headers=headers
             )
-    
+
     def _parse_input_schema(self, schema: Dict[str, Any]):
         """
         Parse JSON schema and create ToolParameters.
-        
+
         Args:
             schema: JSON schema for input parameters
         """
         properties = schema.get("properties", {})
         required = schema.get("required", [])
-        
+
         for param_name, param_def in properties.items():
             # Determine parameter type
             param_type = param_def.get("type", "string")
-            
+
             # Create parameter
             try:
                 param = ToolParameter(
@@ -180,7 +182,7 @@ class AbhikartaBaseTool(BaseTool):
                     description=param_def.get("description", ""),
                     required=param_name in required
                 )
-                
+
                 # Add constraints
                 if "enum" in param_def:
                     param.enum = param_def["enum"]
@@ -196,27 +198,27 @@ class AbhikartaBaseTool(BaseTool):
                     param.max_length = param_def["maxLength"]
                 if "pattern" in param_def:
                     param.pattern = param_def["pattern"]
-                
+
                 self.add_parameter(param)
-                
+
             except Exception as e:
                 logger.warning(
                     f"Failed to create parameter '{param_name}' for tool '{self.name}': {e}"
                 )
-    
+
     def set_auth_token(self, token: str):
         """
         Update the authentication token.
-        
+
         Args:
             token: New authentication token
         """
         self.auth_token = token
-        
+
         # Update HTTP client headers if already initialized
         if self._http_client is not None:
             self._http_client.headers["Authorization"] = f"Bearer {token}"
-    
+
     async def _send_mcp_request(
         self,
         method: str,
@@ -224,35 +226,35 @@ class AbhikartaBaseTool(BaseTool):
     ) -> Dict[str, Any]:
         """
         Send a JSON-RPC request to the MCP server.
-        
+
         Args:
             method: JSON-RPC method name
             params: Method parameters
-            
+
         Returns:
             Response result
-            
+
         Raises:
             Exception: If request fails
         """
         await self._ensure_http_client()
-        
+
         payload = {
             "jsonrpc": "2.0",
             "id": self._next_id(),
             "method": method,
             "params": params
         }
-        
+
         try:
             response = await self._http_client.post(
                 self.mcp_url,
                 json=payload
             )
             response.raise_for_status()
-            
+
             data = response.json()
-            
+
             # Check for JSON-RPC errors
             if "error" in data:
                 error = data["error"]
@@ -260,20 +262,20 @@ class AbhikartaBaseTool(BaseTool):
                     f"MCP Error {error.get('code', 'unknown')}: "
                     f"{error.get('message', 'Unknown error')}"
                 )
-            
+
             return data.get("result", {})
-            
+
         except httpx.HTTPError as e:
             logger.error(f"HTTP error in MCP request: {e}")
             raise
         except Exception as e:
             logger.error(f"MCP request failed: {e}")
             raise
-    
+
     async def ping(self) -> bool:
         """
         Ping the MCP server to check connectivity.
-        
+
         Returns:
             True if server is responsive
         """
@@ -283,16 +285,16 @@ class AbhikartaBaseTool(BaseTool):
         except Exception as e:
             logger.warning(f"Ping failed for tool '{self.name}': {e}")
             return False
-    
+
     def execute(self, **kwargs) -> ToolResult:
         """
         Execute the tool synchronously.
-        
+
         This wraps the async execution in a synchronous context.
-        
+
         Args:
             **kwargs: Tool parameters
-            
+
         Returns:
             ToolResult with execution results
         """
@@ -303,17 +305,17 @@ class AbhikartaBaseTool(BaseTool):
             return result
         finally:
             loop.close()
-    
+
     async def execute_async(self, **kwargs) -> ToolResult:
         """
         Execute the tool asynchronously.
-        
+
         This sends a tools/call request to the MCP server with the
         original tool name (without suffix).
-        
+
         Args:
             **kwargs: Tool parameters
-            
+
         Returns:
             ToolResult with execution results
         """
@@ -326,16 +328,32 @@ class AbhikartaBaseTool(BaseTool):
                     "arguments": kwargs
                 }
             )
-            
+
             # Extract content from MCP response
             content = result.get("content", [])
-            
+
             # Process content based on type
             result_data = []
             for item in content:
                 if isinstance(item, dict):
                     if item.get("type") == "text":
-                        result_data.append(item.get("text", ""))
+                        text_content = item.get("text", "")
+                        # Try to parse as JSON or Python dict if it looks like structured data
+                        if text_content.strip().startswith(("{", "[")):
+                            try:
+                                # First try JSON (proper format with double quotes)
+                                parsed_content = json.loads(text_content)
+                                result_data.append(parsed_content)
+                            except (json.JSONDecodeError, ValueError):
+                                # If JSON fails, try Python literal (single quotes, None, etc.)
+                                try:
+                                    parsed_content = ast.literal_eval(text_content)
+                                    result_data.append(parsed_content)
+                                except (ValueError, SyntaxError):
+                                    # Not valid JSON or Python literal, keep as string
+                                    result_data.append(text_content)
+                        else:
+                            result_data.append(text_content)
                     elif item.get("type") == "image":
                         result_data.append({
                             "type": "image",
@@ -345,18 +363,18 @@ class AbhikartaBaseTool(BaseTool):
                         result_data.append(item)
                 else:
                     result_data.append(str(item))
-            
+
             # Create success result
-            if len(result_data) == 1 and isinstance(result_data[0], str):
+            if len(result_data) == 1:
                 output = result_data[0]
             else:
                 output = result_data
-            
+
             return ToolResult.success_result(
                 data=output,
                 tool_name=self.name
             )
-            
+
         except Exception as e:
             logger.error(f"Error executing tool '{self.name}': {e}", exc_info=True)
             return ToolResult.failure_result(
@@ -364,13 +382,13 @@ class AbhikartaBaseTool(BaseTool):
                 error_type=type(e).__name__,
                 tool_name=self.name
             )
-    
+
     async def cleanup(self):
         """Cleanup resources"""
         if self._http_client is not None:
             await self._http_client.aclose()
             self._http_client = None
-    
+
     def __del__(self):
         """Cleanup on deletion"""
         if self._http_client is not None:
@@ -382,7 +400,7 @@ class AbhikartaBaseTool(BaseTool):
                     loop.run_until_complete(self.cleanup())
             except Exception:
                 pass
-    
+
     def __repr__(self) -> str:
         return (
             f"<AbhikartaBaseTool name='{self.name}' "
