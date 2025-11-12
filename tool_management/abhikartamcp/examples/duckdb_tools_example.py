@@ -10,6 +10,7 @@ This example demonstrates how to use DuckDB tools through the MCP integration.
 import asyncio
 import logging
 from typing import Dict, Any
+from tool_management import ToolRegistry
 
 # Configure logging
 logging.basicConfig(
@@ -45,20 +46,7 @@ def extract_data(result):
     return result
 
 
-# Mock registry for demonstration
-class ToolRegistry:
-    def __init__(self):
-        self._tools = {}
-    
-    def register(self, tool, group=None, tags=None):
-        self._tools[tool.name] = tool
-        return self
-    
-    def get(self, tool_name):
-        return self._tools.get(tool_name)
-    
-    def list_by_group(self, group):
-        return [t for t in self._tools.values() if hasattr(t, 'group') and t.group == group]
+
 
 
 async def example_1_list_duckdb_files():
