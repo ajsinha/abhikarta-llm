@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 import logging
 
@@ -34,6 +34,7 @@ class MCPServerConfig:
 class MCPServerProxy:
     def __init__(self, config: MCPServerConfig):
         self._config = config
+        self._tool_cache: Dict[str, MCPToolSchema] = {}
         self._health_status = 'UNKNOWN'
         self._last_check_time = 'UNKNOWN'
 
@@ -92,6 +93,15 @@ class MCPServerProxy:
     @abstractmethod
     def force_refresh(self):
         pass
+
+    def base_url(self):
+        return self._config.base_url
+
+    def server_config_dict(self):
+        config_dict = asdict(self._config)
+        if 'password' in config_dict.keys():
+            config_dict.pop('password')
+        return config_dict
 
     def short_name(self):
         name = self._config.tool_name_suffix

@@ -80,7 +80,6 @@ class AbhikartaMCPServerProxy(MCPServerProxy):
         
         self._initialized = True
 
-        self._tool_cache: Dict[str, MCPToolSchema] = {}
         self._auth_token: Optional[str] = None
         self._token_expires_at: Optional[datetime] = None
         self._refresh_task: Optional[asyncio.Task] = None

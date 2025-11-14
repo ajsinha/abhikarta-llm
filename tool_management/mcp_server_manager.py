@@ -10,7 +10,15 @@ class MCPServerManager(metaclass=SingletonMeta):
         self._lock = threading.RLock()
         self._registered_servers: Dict[str, MCPServerProxy] = {}
 
-
+    def mcp_server_by_name(self, name):
+        with self._lock:
+            return self._registered_servers[name]
+    def mcp_tool_list(self, name):
+        mcp_server_proxy = self.mcp_server_by_name(name)
+        if mcp_server_proxy is None:
+            return []
+        else:
+            pass
     def add_mcp_server(self, server_proxy: MCPServerProxy):
         with self._lock:
             self._registered_servers[server_proxy.short_name()] = server_proxy

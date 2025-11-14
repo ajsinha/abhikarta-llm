@@ -175,6 +175,139 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+
+    /* iOS Style Toggle Switch - Positioned inside welcome card */
+    .auto-refresh-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 12px 18px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .auto-refresh-container:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .refresh-label {
+        font-weight: 600;
+        color: white;
+        font-size: 0.85rem;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .countdown-display {
+        font-weight: 700;
+        color: white;
+        font-size: 0.95rem;
+        min-width: 65px;
+        text-align: center;
+        font-family: 'Courier New', monospace;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 8px;
+        border-radius: 20px;
+    }
+
+    .countdown-display.warning {
+        background: rgba(255, 193, 7, 0.3);
+        animation: pulse 1s ease-in-out infinite;
+    }
+
+    .countdown-display.critical {
+        background: rgba(220, 53, 69, 0.3);
+        animation: pulse 0.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+
+    /* iOS Style Switch */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 28px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.3);
+        transition: .4s;
+        border-radius: 34px;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    input:checked + .slider {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+
+    /* Refresh icon rotation animation */
+    .refresh-icon {
+        transition: transform 0.3s ease;
+        color: white;
+    }
+
+    .refresh-icon.spinning {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .welcome-card-content {
+            margin-bottom: 15px;
+        }
+
+        .auto-refresh-container {
+            margin-top: 15px;
+            justify-content: center;
+            width: 100%;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -183,13 +316,22 @@
     <!-- Welcome Section -->
     <div class="welcome-card">
         <div class="row align-items-center">
-            <div class="col-md-8">
+            <div class="col-md-8 welcome-card-content">
                 <h2><i class="fas fa-user-shield"></i> Welcome, {{ fullname }}!</h2>
                 <p class="mb-0">Administrator Dashboard - Abhikarta LLM Platform</p>
                 <small>User ID: {{ userid }} | Role: Admin</small>
             </div>
             <div class="col-md-4 text-end">
-                <i class="fas fa-chart-line" style="font-size: 4rem; opacity: 0.3;"></i>
+                <!-- Auto-Refresh Toggle - Inside welcome card -->
+                <div class="auto-refresh-container">
+                    <i class="fas fa-sync-alt refresh-icon" id="refreshIcon"></i>
+                    <span class="refresh-label">Auto-Refresh</span>
+                    <label class="switch">
+                        <input type="checkbox" id="autoRefreshToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="countdown-display" id="countdownDisplay">--:--</span>
+                </div>
             </div>
         </div>
     </div>
@@ -441,6 +583,248 @@ $(document).ready(function() {
     // Prevent card click when clicking details button
     $('.btn-details').on('click', function(e) {
         e.stopPropagation();
+    });
+
+    // Auto-Refresh Functionality
+    const REFRESH_INTERVAL = 30; // 30 seconds (changed from 300)
+    const STORAGE_KEY = 'adminDashboardAutoRefresh';
+    const COUNTDOWN_KEY = 'adminDashboardCountdown';
+
+    let countdownInterval = null;
+    let remainingSeconds = REFRESH_INTERVAL;
+
+    const toggle = $('#autoRefreshToggle');
+    const countdownDisplay = $('#countdownDisplay');
+    const refreshIcon = $('#refreshIcon');
+
+    /**
+     * Format seconds to MM:SS
+     */
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    /**
+     * Update countdown display with color coding
+     */
+    function updateCountdownDisplay() {
+        countdownDisplay.text(formatTime(remainingSeconds));
+
+        // Remove all warning classes
+        countdownDisplay.removeClass('warning critical');
+
+        // Add warning classes based on time remaining
+        // For 30 second interval: warning at 15s, critical at 5s
+        if (remainingSeconds <= 5) {
+            countdownDisplay.addClass('critical');
+        } else if (remainingSeconds <= 15) {
+            countdownDisplay.addClass('warning');
+        }
+    }
+
+    /**
+     * Start the countdown timer
+     */
+    function startCountdown() {
+        // Clear any existing interval
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
+
+        // Update display immediately
+        updateCountdownDisplay();
+
+        // Start countdown
+        countdownInterval = setInterval(function() {
+            remainingSeconds--;
+
+            // Update display
+            updateCountdownDisplay();
+
+            // Save countdown state
+            localStorage.setItem(COUNTDOWN_KEY, remainingSeconds.toString());
+
+            // Check if countdown reached zero
+            if (remainingSeconds <= 0) {
+                // Add spinning animation to icon
+                refreshIcon.addClass('spinning');
+
+                // Refresh the page
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            }
+        }, 1000);
+    }
+
+    /**
+     * Stop the countdown timer
+     */
+    function stopCountdown() {
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+        countdownDisplay.text('--:--');
+        countdownDisplay.removeClass('warning critical');
+    }
+
+    /**
+     * Reset countdown to initial value
+     */
+    function resetCountdown() {
+        remainingSeconds = REFRESH_INTERVAL;
+        localStorage.setItem(COUNTDOWN_KEY, remainingSeconds.toString());
+        updateCountdownDisplay();
+    }
+
+    /**
+     * Save toggle state to localStorage
+     */
+    function saveToggleState(enabled) {
+        localStorage.setItem(STORAGE_KEY, enabled ? 'true' : 'false');
+    }
+
+    /**
+     * Load toggle state from localStorage
+     */
+    function loadToggleState() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved === 'true';
+    }
+
+    /**
+     * Load countdown from localStorage
+     */
+    function loadCountdown() {
+        const saved = localStorage.getItem(COUNTDOWN_KEY);
+        if (saved) {
+            const savedSeconds = parseInt(saved, 10);
+            // Only use saved value if it's valid and less than the interval
+            if (savedSeconds > 0 && savedSeconds <= REFRESH_INTERVAL) {
+                remainingSeconds = savedSeconds;
+                return;
+            }
+        }
+        remainingSeconds = REFRESH_INTERVAL;
+    }
+
+    /**
+     * Initialize auto-refresh functionality
+     */
+    function initAutoRefresh() {
+        // Load saved state
+        const isEnabled = loadToggleState();
+        toggle.prop('checked', isEnabled);
+
+        if (isEnabled) {
+            loadCountdown();
+            startCountdown();
+        } else {
+            countdownDisplay.text('--:--');
+        }
+    }
+
+    /**
+     * Handle toggle change
+     */
+    toggle.on('change', function() {
+        const isEnabled = $(this).is(':checked');
+        saveToggleState(isEnabled);
+
+        if (isEnabled) {
+            // Reset and start countdown
+            resetCountdown();
+            startCountdown();
+
+            // Show notification
+            showToast('Auto-refresh enabled. Dashboard will refresh in ' + REFRESH_INTERVAL + ' seconds.', 'success');
+        } else {
+            // Stop countdown
+            stopCountdown();
+
+            // Clear saved countdown
+            localStorage.removeItem(COUNTDOWN_KEY);
+
+            // Show notification
+            showToast('Auto-refresh disabled.', 'info');
+        }
+    });
+
+    /**
+     * Show toast notification
+     */
+    function showToast(message, type) {
+        // Check if toast container exists
+        let toastContainer = $('#toastContainer');
+        if (toastContainer.length === 0) {
+            $('body').append('<div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>');
+            toastContainer = $('#toastContainer');
+        }
+
+        // Create toast
+        const toastId = 'toast-' + Date.now();
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+        toastContainer.append(toastHtml);
+
+        // Show toast
+        const toastElement = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastElement, {
+            autohide: true,
+            delay: 3000
+        });
+        toast.show();
+
+        // Remove toast after it's hidden
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            $(this).remove();
+        });
+    }
+
+    // Initialize on page load
+    initAutoRefresh();
+
+    // Reset countdown when user interacts with the page (optional - can be disabled)
+    let inactivityTimeout;
+    $(document).on('click keypress scroll', function() {
+        if (toggle.is(':checked')) {
+            // Clear existing timeout
+            if (inactivityTimeout) {
+                clearTimeout(inactivityTimeout);
+            }
+
+            // Don't reset if countdown is below 5 seconds (let it complete)
+            if (remainingSeconds > 5) {
+                // Set new timeout to reset countdown after 2 seconds of inactivity
+                inactivityTimeout = setTimeout(function() {
+                    // Only reset if enough time has passed (more than 10 seconds elapsed)
+                    if (remainingSeconds < REFRESH_INTERVAL - 10) {
+                        resetCountdown();
+                        console.log('Countdown reset due to user activity');
+                    }
+                }, 2000);
+            }
+        }
+    });
+
+    // Clean up on page unload
+    $(window).on('beforeunload', function() {
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
     });
 });
 </script>
