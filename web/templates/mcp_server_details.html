@@ -1,0 +1,546 @@
+{% extends "base.html" %}
+
+{% block title %}MCP Server Details - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .details-container {
+        padding: 30px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(155, 89, 182, 0.3);
+    }
+    
+    .info-card {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .info-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+        border: none;
+        font-weight: 600;
+    }
+    
+    .status-badge-large {
+        font-size: 1.2rem;
+        padding: 10px 20px;
+        border-radius: 50px;
+    }
+    
+    .status-ok {
+        background: #28a745;
+        color: white;
+    }
+    
+    .status-unknown {
+        background: #ffc107;
+        color: #000;
+    }
+    
+    .status-not-ok {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .detail-row {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s ease;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-row:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+    
+    .detail-value {
+        color: #212529;
+        font-size: 1.1rem;
+    }
+    
+    .detail-value code {
+        background: #f8f9fa;
+        padding: 2px 8px;
+        border-radius: 4px;
+        color: #e74c3c;
+        font-size: 0.9rem;
+    }
+    
+    .tools-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .tool-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        transition: all 0.2s ease;
+    }
+    
+    .tool-item:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+    
+    .tool-name {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 5px;
+    }
+    
+    .tool-description {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+    
+    .tool-schema {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .prompts-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .prompt-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border-left: 4px solid #9b59b6;
+        transition: all 0.2s ease;
+    }
+    
+    .prompt-item:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+    
+    .prompt-name {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 5px;
+    }
+    
+    .prompt-description {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .resources-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .resource-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border-left: 4px solid #16a085;
+        transition: all 0.2s ease;
+    }
+    
+    .resource-item:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+    
+    .resource-uri {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 5px;
+        word-break: break-all;
+    }
+    
+    .resource-name {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .resource-description {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        opacity: 0.3;
+        margin-bottom: 15px;
+    }
+    
+    .btn-back {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 10px 25px;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .btn-refresh {
+        background: #28a745;
+        border: none;
+        color: white;
+        padding: 10px 25px;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-refresh:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        color: white;
+        background: #218838;
+    }
+    
+    .json-display {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        max-height: 300px;
+        overflow-y: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+    
+    .scrollable-list::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .scrollable-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    
+    .scrollable-list::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+    
+    .scrollable-list::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container details-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="fas fa-server"></i> MCP Server Details</h2>
+                <p class="mb-0">{{ server_info.name }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="status-badge-large 
+                    {% if server_info.status == 'OK' %}status-ok
+                    {% elif server_info.status == 'UNKNOWN' %}status-unknown
+                    {% else %}status-not-ok{% endif %}">
+                    {% if server_info.status == 'OK' %}
+                        <i class="fas fa-circle-check"></i> OK
+                    {% elif server_info.status == 'UNKNOWN' %}
+                        <i class="fas fa-circle-question"></i> UNKNOWN
+                    {% else %}
+                        <i class="fas fa-circle-xmark"></i> NOT OK
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <button class="btn btn-refresh ms-2" onclick="location.reload()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+    
+    <!-- Server Information -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> Server Information
+                </div>
+                <div class="card-body p-0">
+                    <div class="detail-row">
+                        <div class="detail-label">Server Name</div>
+                        <div class="detail-value">{{ server_info.name }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Server Key</div>
+                        <div class="detail-value"><code>{{ server_key }}</code></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value">
+                            {% if server_info.status == 'OK' %}
+                                <span class="badge bg-success"><i class="fas fa-circle-check"></i> OK</span>
+                            {% elif server_info.status == 'UNKNOWN' %}
+                                <span class="badge bg-warning text-dark"><i class="fas fa-circle-question"></i> UNKNOWN</span>
+                            {% else %}
+                                <span class="badge bg-danger"><i class="fas fa-circle-xmark"></i> NOT OK</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Last Check Time</div>
+                        <div class="detail-value">
+                            {% if server_info.last_check_time %}
+                                {{ server_info.last_check_time }}
+                            {% else %}
+                                <span class="text-muted">Never Checked</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </div>
+                <div class="card-body p-0">
+                    <div class="detail-row">
+                        <div class="detail-label">Total Tools</div>
+                        <div class="detail-value">
+                            <span class="badge bg-primary">{{ server_info.tools|length if server_info.tools else 0 }}</span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Total Prompts</div>
+                        <div class="detail-value">
+                            <span class="badge bg-info">{{ server_info.prompts|length if server_info.prompts else 0 }}</span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Total Resources</div>
+                        <div class="detail-value">
+                            <span class="badge bg-success">{{ server_info.resources|length if server_info.resources else 0 }}</span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Server Version</div>
+                        <div class="detail-value">
+                            {% if server_info.version %}
+                                <code>{{ server_info.version }}</code>
+                            {% else %}
+                                <span class="text-muted">Not Available</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tools Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-tools"></i> Available Tools
+                    <span class="badge bg-light text-dark float-end">{{ server_info.tools|length if server_info.tools else 0 }}</span>
+                </div>
+                <div class="card-body">
+                    {% if server_info.tools and server_info.tools|length > 0 %}
+                    <div class="tools-list scrollable-list">
+                        {% for tool in server_info.tools %}
+                        <div class="tool-item">
+                            <div class="tool-name">
+                                <i class="fas fa-wrench"></i> {{ tool.name }}
+                            </div>
+                            {% if tool.description %}
+                            <div class="tool-description">{{ tool.description }}</div>
+                            {% endif %}
+                            {% if tool.inputSchema %}
+                            <div class="tool-schema">
+                                <strong>Input Schema:</strong> 
+                                <code>{{ tool.inputSchema.type if tool.inputSchema.type else 'object' }}</code>
+                                {% if tool.inputSchema.properties %}
+                                    - {{ tool.inputSchema.properties|length }} properties
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-tools"></i>
+                        <p>No tools available for this server</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Prompts Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-comments"></i> Available Prompts
+                    <span class="badge bg-light text-dark float-end">{{ server_info.prompts|length if server_info.prompts else 0 }}</span>
+                </div>
+                <div class="card-body">
+                    {% if server_info.prompts and server_info.prompts|length > 0 %}
+                    <div class="prompts-list scrollable-list">
+                        {% for prompt in server_info.prompts %}
+                        <div class="prompt-item">
+                            <div class="prompt-name">
+                                <i class="fas fa-comment"></i> {{ prompt.name }}
+                            </div>
+                            {% if prompt.description %}
+                            <div class="prompt-description">{{ prompt.description }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>No prompts available for this server</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resources Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-folder"></i> Available Resources
+                    <span class="badge bg-light text-dark float-end">{{ server_info.resources|length if server_info.resources else 0 }}</span>
+                </div>
+                <div class="card-body">
+                    {% if server_info.resources and server_info.resources|length > 0 %}
+                    <div class="resources-list scrollable-list">
+                        {% for resource in server_info.resources %}
+                        <div class="resource-item">
+                            <div class="resource-uri">
+                                <i class="fas fa-link"></i> {{ resource.uri }}
+                            </div>
+                            {% if resource.name %}
+                            <div class="resource-name"><strong>Name:</strong> {{ resource.name }}</div>
+                            {% endif %}
+                            {% if resource.description %}
+                            <div class="resource-description">{{ resource.description }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-folder"></i>
+                        <p>No resources available for this server</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Raw Data Section (Collapsible) -->
+    <div class="row mt-4 mb-5">
+        <div class="col-12">
+            <div class="info-card card">
+                <div class="card-header">
+                    <a data-bs-toggle="collapse" href="#rawDataCollapse" role="button" aria-expanded="false" aria-controls="rawDataCollapse" class="text-white text-decoration-none">
+                        <i class="fas fa-code"></i> Raw Server Data
+                        <i class="fas fa-chevron-down float-end"></i>
+                    </a>
+                </div>
+                <div class="collapse" id="rawDataCollapse">
+                    <div class="card-body">
+                        <div class="json-display">
+                            <pre>{{ server_info_json }}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Add animation on page load
+    $('.info-card').each(function(index) {
+        $(this).css('opacity', '0').delay(index * 100).animate({opacity: 1}, 500);
+    });
+    
+    // Copy to clipboard functionality for code elements
+    $('code').on('click', function() {
+        var text = $(this).text();
+        navigator.clipboard.writeText(text).then(function() {
+            showToast('Copied to clipboard!', 'success');
+        });
+    });
+    
+    // Add cursor pointer to code elements
+    $('code').css('cursor', 'pointer').attr('title', 'Click to copy');
+});
+</script>
+{% endblock %}

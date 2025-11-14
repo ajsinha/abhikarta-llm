@@ -166,6 +166,15 @@
     .mcp-server-list::-webkit-scrollbar-thumb:hover {
         background: #555;
     }
+
+    .btn-details {
+        transition: all 0.2s ease;
+    }
+
+    .btn-details:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
 </style>
 {% endblock %}
 
@@ -235,12 +244,12 @@
                         {% for server_key, server in mcp_servers.items() %}
                         <div class="mcp-server-item">
                             <div class="row align-items-center">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="server-name">
                                         <i class="fas fa-server me-2"></i>{{ server.name }}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="server-details">
                                         Status:
                                         {% if server.status == 'OK' %}
@@ -258,15 +267,21 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="server-details text-end">
+                                <div class="col-md-3">
+                                    <div class="server-details">
                                         <i class="fas fa-clock me-1"></i>
                                         {% if server.last_check_time %}
-                                        Last Check: {{ server.last_check_time }}
+                                        {{ server.last_check_time }}
                                         {% else %}
                                         Never Checked
                                         {% endif %}
                                     </div>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <a href="{{ url_for('mcp_server_details', server_key=server_key) }}"
+                                       class="btn btn-sm btn-primary btn-details">
+                                        <i class="fas fa-info-circle"></i> Show Details
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -421,6 +436,11 @@ $(document).ready(function() {
     // Add animation on page load
     $('.management-card').each(function(index) {
         $(this).css('opacity', '0').delay(index * 100).animate({opacity: 1}, 500);
+    });
+
+    // Prevent card click when clicking details button
+    $('.btn-details').on('click', function(e) {
+        e.stopPropagation();
     });
 });
 </script>
