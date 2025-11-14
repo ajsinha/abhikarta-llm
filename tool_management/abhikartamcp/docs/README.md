@@ -165,7 +165,7 @@ config = MCPServerConfig(
 )
 
 builder = AbhikartaMCPToolBuilder()
-builder.config = config
+builder._config = config
 ```
 
 ### Builder Configuration

@@ -22,7 +22,9 @@ import logging
 from typing import Dict, List, Optional, Set
 import asyncio
 
-from .abhikarta_mcp_tool_builder import AbhikartaMCPToolBuilder, MCPToolSchema
+from tool_management.mcp_server_proxy import MCPToolSchema
+from .abhikarta_mcp_server_proxy import AbhikartaMCPServerProxy
+
 from .abhikarta_base_tool import AbhikartaBaseTool
 
 # Import from tool management framework
@@ -49,7 +51,7 @@ class MCPRegistryIntegration:
     def __init__(
         self,
         registry: ToolRegistry,
-        builder: Optional[AbhikartaMCPToolBuilder] = None,
+        mcp_server_proxy: AbhikartaMCPServerProxy,
         group_name: str = "abhikarta_mcp",
         tags: Optional[List[str]] = None
     ):
@@ -58,12 +60,12 @@ class MCPRegistryIntegration:
         
         Args:
             registry: ToolRegistry instance to manage tools
-            builder: AbhikartaMCPToolBuilder instance (or None to use singleton)
+            mcp_server_proxy: AbhikartaMCPToolBuilder instance (or None to use singleton)
             group_name: Group name for registered tools
             tags: Optional tags to apply to all registered tools
         """
         self.registry = registry
-        self.builder = builder or AbhikartaMCPToolBuilder()
+        self.mcp_server_proxy = mcp_server_proxy
         self.group_name = group_name
         self.tags = tags or ["mcp", "abhikarta"]
         
@@ -90,12 +92,12 @@ class MCPRegistryIntegration:
         return AbhikartaBaseTool(
             name=schema.name,
             description=schema.description,
-            mcp_base_url=self.builder.config.base_url,
-            mcp_endpoint=self.builder.config.mcp_endpoint,
+            mcp_base_url=self.mcp_server_proxy._config.base_url,
+            mcp_endpoint=self.mcp_server_proxy._config.mcp_endpoint,
             input_schema=schema.input_schema,
             output_schema=schema.output_schema,
-            auth_token=auth_token or self.builder._auth_token,
-            timeout=self.builder.config.timeout_seconds
+            auth_token=auth_token or self.mcp_server_proxy._auth_token,
+            timeout=self.mcp_server_proxy._config.timeout_seconds
         )
     
     def sync_tools(self):
@@ -109,7 +111,7 @@ class MCPRegistryIntegration:
         4. Removes tools that are no longer in the cache
         """
         # Get current cached tools
-        cached_tools = self.builder.get_all_schemas()
+        cached_tools = self.mcp_server_proxy.get_all_schemas()
         cached_tool_names = set(cached_tools.keys())
         
         # Find tools to add
@@ -189,7 +191,7 @@ class MCPRegistryIntegration:
         Returns:
             Dictionary with integration statistics
         """
-        builder_stats = self.builder.get_cache_stats()
+        builder_stats = self.mcp_server_proxy.get_cache_stats()
         
         return {
             "registered_tools": len(self._registered_tools),
@@ -262,8 +264,8 @@ class MCPAutoSync:
         logger.info("Starting auto-sync service...")
         
         # Ensure builder is started
-        if not self.integration.builder._running:
-            await self.integration.builder.start()
+        if not self.integration.mcp_server_proxy._running:
+            await self.integration.mcp_server_proxy.start()
         
         # Perform initial sync
         self.integration.sync_tools()

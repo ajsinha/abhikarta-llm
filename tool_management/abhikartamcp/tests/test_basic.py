@@ -70,9 +70,9 @@ class TestAbhikartaMCPToolBuilder:
         )
         
         assert result is builder  # Method chaining
-        assert builder.config.base_url == "https://test.com"
-        assert builder.config.username == "user"
-        assert builder.config.refresh_interval_seconds == 120
+        assert builder._config.base_url == "https://test.com"
+        assert builder._config.username == "user"
+        assert builder._config.refresh_interval_seconds == 120
     
     def test_initial_state(self):
         """Test initial builder state"""
@@ -142,7 +142,7 @@ class TestMCPRegistryIntegration:
         )
         
         assert integration.registry is mock_registry
-        assert integration.builder is builder
+        assert integration.mcp_server_proxy is builder
         assert integration.group_name == "test_group"
         assert integration.tags == ["test", "mcp"]
     

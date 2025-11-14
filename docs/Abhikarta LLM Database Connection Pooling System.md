@@ -1490,32 +1490,33 @@ def warmup_pool(pool: DatabaseConnectionPool, target_connections: int = None):
         target_connections: Target number of connections (default: min_idle)
     """
     if target_connections is None:
-        target_connections = pool.config.min_idle
-    
+        target_connections = pool._config.min_idle
+
     status = pool.get_pool_status()
     current = status['total_connections']
     needed = target_connections - current
-    
+
     if needed <= 0:
         print(f"Pool already has {current} connections")
         return
-    
+
     print(f"Warming up pool: creating {needed} connections...")
-    
+
     connections = []
     try:
         # Borrow connections to force creation
         for i in range(needed):
             wrapper = pool.borrow_connection()
             connections.append(wrapper)
-            print(f"Created connection {i+1}/{needed}")
-        
+            print(f"Created connection {i + 1}/{needed}")
+
         print("Warmup complete!")
-        
+
     finally:
         # Return all connections
         for wrapper in connections:
             pool.return_connection(wrapper)
+
 
 # Usage
 warmup_pool(pool, target_connections=10)

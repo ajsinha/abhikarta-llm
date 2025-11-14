@@ -8,12 +8,12 @@ from user_management.role_management_db import RoleManagementDB
 from user_management.resource_management_db import ResourceManagementDB
 from web.abhikarta_llm_web import AbhikartaLLMWeb
 
-def main(pool_name):
+def run_webserver(pool_name, mcp_server_manager):
     user_manager = UserManagerDB(db_connection_pool_name=pool_name)
     role_manager = RoleManagementDB(db_connection_pool_name=pool_name)
     resource_manager = ResourceManagementDB(db_connection_pool_name=pool_name)
 
-    aweb = AbhikartaLLMWeb()
+    aweb = AbhikartaLLMWeb("my very very secret key")
 
 
     aweb.set_user_manager(user_manager)
@@ -25,14 +25,11 @@ def main(pool_name):
 
     aweb.run()
 
-
-if __name__ == '__main__':
-
-
-    pool_name = 'abhikarta-llm.db_management'
-
+def prepare_database_pools():
     # Get pool manager singleton
     manager = get_pool_manager()
+
+    pool_name = 'abhikarta-llm.db_management'
 
     # Create SQLite pool configuration
     config = SQLitePoolConfig(
@@ -61,8 +58,40 @@ if __name__ == '__main__':
     manager.create_pool(config)
     print(f"Created pool: {config.pool_name}")
 
+    return pool_name,manager
+def create_mcp_servers():
+    from tool_management.mcp_server_manager import MCPServerManager
+    from tool_management.mcp_server_factory import build_mcp_server_proxy
+    from core.config.properties_configurator import PropertiesConfigurator
+
+    prop_conf = PropertiesConfigurator()
+    mcp_server_manager = MCPServerManager()
+
+    mcp_server_names = prop_conf.get_list('mcp.server.names', delim=',')
+    for mcp_server_name in mcp_server_names:
+        server_proxy = build_mcp_server_proxy(mcp_server_name)
+        mcp_server_manager.add_mcp_server(server_proxy)
+
+    return mcp_server_manager
 
 
-    main(pool_name)
+def prepare_prop_conf():
+    from core.config.properties_configurator import PropertiesConfigurator
+    prop_files = [
+        '/home/ashutosh/PycharmProjects/abhikarta-llm/config/mcp_server.properties',
+        '/home/ashutosh/PycharmProjects/abhikarta-llm/config/llm.properties',
+        '/home/ashutosh/PycharmProjects/abhikarta-llm/config/application.properties'
+    ]
+    prop_conf = PropertiesConfigurator(properties_files=prop_files)
 
-    manager.shutdown_all()
+    return prop_conf
+
+if __name__ == '__main__':
+    prepare_prop_conf()
+    pool_name,pool_manager = prepare_database_pools()
+    mcp_server_manager = create_mcp_servers()
+
+    run_webserver(pool_name, mcp_server_manager)
+
+    pool_manager.shutdown_all()
+

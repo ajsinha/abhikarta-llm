@@ -18,33 +18,13 @@ logging.basicConfig(
 
 # Import the MCP integration components
 from tool_management.abhikartamcp import (
-    AbhikartaMCPToolBuilder,
+    AbhikartaMCPServerProxy,
     MCPRegistryIntegration,
     MCPAutoSync
 )
 
-# Import tool registry (you'll need to replace this with your actual import)
-# from tool_management.registry import ToolRegistry
-class ToolRegistry:  # Mock for demonstration
-    def __init__(self):
-        self._tools = {}
-    
-    def register(self, tool, group=None, tags=None):
-        self._tools[tool.name] = tool
-        print(f"Registered: {tool.name}")
-        return self
-    
-    def unregister(self, tool_name):
-        if tool_name in self._tools:
-            del self._tools[tool_name]
-            print(f"Unregistered: {tool_name}")
-        return self
-    
-    def get(self, tool_name):
-        return self._tools.get(tool_name)
-    
-    def list_by_group(self, group):
-        return list(self._tools.values())
+from tool_management.registry import ToolRegistry
+
 
 
 async def main():
@@ -57,7 +37,7 @@ async def main():
     
     # Step 1: Create and configure the MCP tool builder
     print("Step 1: Configuring MCP Tool Builder...")
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",
@@ -93,7 +73,7 @@ async def main():
     print("Step 5: Setting up Registry Integration...")
     integration = MCPRegistryIntegration(
         registry=registry,
-        builder=builder,
+        mcp_server_proxy=builder,
         group_name="mcp_tools",
         tags=["mcp", "abhikarta", "dynamic"]
     )

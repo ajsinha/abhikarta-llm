@@ -18,6 +18,8 @@ document may be subject to patent applications.
 """
 
 from flask import render_template, session, redirect, url_for, flash
+
+from tool_management.mcp_server_manager import MCPServerManager
 from web.route_management.abstract_routes import admin_required
 import logging
 from user_management.user_manager import UserManager
@@ -48,23 +50,33 @@ class AdminRoutes(AbstractRoutes):
         super().__init__(app, db_connection_pool_name)
         self.app = app
 
+
         logger.info("AdminRoutes initialized")
-    
+
     def register_routes(self):
         """Register all admin routes."""
-        
+
         @self.app.route('/admin/dashboard')
         @admin_required
         def admin_dashboard():
             """Admin dashboard with management cards."""
             # Get statistics
             stats = self.user_manager.get_statistics()
-            
+
+            # Get MCP server status
+            mcp_status = {}
+            mcp_count = 0
+            if self.mcp_server_manager is not None:
+                mcp_status = self.mcp_server_manager.status_all()
+                mcp_count = len(mcp_status)
+
             return render_template('admin_dashboard.html',
                                  fullname=session.get('fullname'),
                                  userid=session.get('userid'),
                                  roles=session.get('roles', []),
-                                 stats=stats)
+                                 stats=stats,
+                                 mcp_servers=mcp_status,
+                                 mcp_count=mcp_count)
         
         @self.app.route('/admin/users')
         @admin_required

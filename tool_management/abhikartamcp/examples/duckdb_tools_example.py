@@ -19,7 +19,7 @@ logging.basicConfig(
 )
 
 from tool_management.abhikartamcp import (
-    AbhikartaMCPToolBuilder,
+    AbhikartaMCPServerProxy,
     MCPRegistryIntegration
 )
 
@@ -61,7 +61,7 @@ async def example_1_list_duckdb_files():
     print("="*70)
     
     # Setup
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",
@@ -147,7 +147,7 @@ async def example_2_describe_table():
     print("Example 2: Describe Table Schema")
     print("="*70)
     
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",
@@ -226,7 +226,7 @@ async def example_3_get_statistics():
     print("Example 3: Get Column Statistics")
     print("="*70)
     
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",
@@ -325,7 +325,7 @@ async def example_4_aggregate_data():
     print("Example 4: Aggregate Data")
     print("="*70)
     
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",
@@ -457,7 +457,7 @@ async def example_5_complete_workflow():
     print("Example 5: Complete DuckDB Analysis Workflow")
     print("="*70)
     
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",

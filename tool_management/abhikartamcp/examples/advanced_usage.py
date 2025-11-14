@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 
 from tool_management.abhikartamcp import (
-    AbhikartaMCPToolBuilder,
+    AbhikartaMCPServerProxy,
     AbhikartaBaseTool,
     MCPRegistryIntegration
 )
@@ -94,7 +94,7 @@ async def execute_tool_example(tool: AbhikartaBaseTool):
         print(f"\n❌ Execution failed: {e}")
 
 
-async def monitor_cache_changes(builder: AbhikartaMCPToolBuilder, duration: int = 60):
+async def monitor_cache_changes(builder: AbhikartaMCPServerProxy, duration: int = 60):
     """
     Monitor the tool cache for changes over time.
     
@@ -186,7 +186,7 @@ async def full_lifecycle_example():
     
     # Setup
     print("\n1. Setup Phase")
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",
@@ -235,7 +235,7 @@ async def error_handling_example():
     print("Error Handling Example")
     print("=" * 70)
     
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     
     # Test with invalid credentials
     print("\nTesting with invalid credentials...")

@@ -23,6 +23,8 @@ import logging
 import os
 from typing import Optional
 from web.route_management.abstract_routes import AbstractRoutes
+from tool_management.mcp_server_manager import MCPServerManager
+from core.config.properties_configurator import PropertiesConfigurator
 
 # Configure logging
 logging.basicConfig(
@@ -54,11 +56,13 @@ class AbhikartaLLMWeb:
         self.app = Flask(__name__, 
                         template_folder='templates',
                         static_folder='static')
-
+        self.prop_conf = PropertiesConfigurator()
+        self.flask_session_folder = self.prop_conf.get('flask.session.dir','/tmp/flask_session')
         self.user_manager = None
         self.role_manager = None
         self.resource_manager = None
         self.db_connection_pool_name = None
+        self.mcp_server_manager = MCPServerManager()
 
         # Configure application
         self.app.config['SECRET_KEY'] = secret_key or os.urandom(24).hex()
@@ -66,12 +70,46 @@ class AbhikartaLLMWeb:
         self.app.config['SESSION_PERMANENT'] = False
         self.app.config['SESSION_USE_SIGNER'] = True
         self.app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
-        
+
+        # Core session configuration
+        self.app.config['SESSION_FILE_DIR'] =  self.flask_session_folder # Where to store session files
+        self.app.config['SESSION_FILE_THRESHOLD'] = 5000  # Max number of sessions before cleanup
+        self.app.config['SESSION_FILE_MODE'] = 0o600  # File permissions (default)
+
         # Initialize session
         Session(self.app)
         
-
+        self.cleanup_sessions()
         logger.info("Abhikarta LLM Web Application initialized")
+
+    def cleanup_sessions(self):
+        """
+        Clean up Flask session files.
+
+        Args:
+            session_dir: Directory containing Flask session files
+        """
+        session_path = os.path.join(os.getcwd(), self.flask_session_folder)
+
+        if not os.path.exists(session_path):
+            logger.info(f"Session directory {session_path} does not exist. Nothing to clean.")
+            return
+
+        try:
+            # Remove all files in the session directory
+            file_count = 0
+            for filename in os.listdir(session_path):
+                file_path = os.path.join(session_path, filename)
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                    file_count += 1
+                    logger.debug(f"Removed session file: {filename}")
+
+            logger.info(f"Successfully cleaned up {file_count} session file(s) from {session_path}")
+
+        except Exception as e:
+            logger.error(f"Error cleaning up session files: {e}")
+            raise
 
     def set_db_connection_pool_name(self, db_connection_pool_name):
         self.db_connection_pool_name = db_connection_pool_name

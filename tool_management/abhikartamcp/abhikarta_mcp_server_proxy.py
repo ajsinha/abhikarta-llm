@@ -21,28 +21,17 @@ document may be subject to patent applications.
 import asyncio
 import logging
 import threading
-import time
 from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 import httpx
 
+from tool_management.mcp_server_proxy import MCPServerProxy, MCPToolSchema, MCPServerConfig
 
 logger = logging.getLogger(__name__)
 
-
+'''
 @dataclass
-class MCPToolSchema:
-    """Schema information for an MCP tool"""
-    name: str
-    description: str
-    input_schema: Dict[str, Any]
-    output_schema: Optional[Dict[str, Any]] = None
-    last_updated: datetime = field(default_factory=datetime.now)
-
-
-@dataclass
-class MCPServerConfig:
+class AbhikartaMCPServerConfig(MCPServerConfig):
     """Configuration for MCP server connection"""
     base_url: str = "http://localhost:3002"
     mcp_endpoint: str = "/mcp"
@@ -54,9 +43,9 @@ class MCPServerConfig:
     refresh_interval_seconds: int = 600  # 10 minutes
     timeout_seconds: float = 30.0
     tool_name_suffix: str = ":abhikartamcp"
+'''
 
-
-class AbhikartaMCPToolBuilder:
+class AbhikartaMCPServerProxy(MCPServerProxy):
     """
     Singleton class for managing MCP tool discovery and caching.
     
@@ -74,7 +63,7 @@ class AbhikartaMCPToolBuilder:
     _instance = None
     _lock = threading.Lock()
     
-    def __new__(cls):
+    def __new__(cls, config: MCPServerConfig):
         """Singleton pattern implementation"""
         if cls._instance is None:
             with cls._lock:
@@ -83,13 +72,14 @@ class AbhikartaMCPToolBuilder:
                     cls._instance._initialized = False
         return cls._instance
     
-    def __init__(self):
+    def __init__(self, config: MCPServerConfig):
         """Initialize the builder (only once)"""
+        super().__init__(config)
         if self._initialized:
             return
         
         self._initialized = True
-        self.config = MCPServerConfig()
+
         self._tool_cache: Dict[str, MCPToolSchema] = {}
         self._auth_token: Optional[str] = None
         self._token_expires_at: Optional[datetime] = None
@@ -99,42 +89,7 @@ class AbhikartaMCPToolBuilder:
         self._request_id = 0
         
         logger.info("AbhikartaMCPToolBuilder initialized")
-    
-    def configure(
-        self,
-        base_url: Optional[str] = None,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
-        refresh_interval_seconds: Optional[int] = None,
-        timeout_seconds: Optional[float] = None
-    ) -> 'AbhikartaMCPToolBuilder':
-        """
-        Configure the MCP server connection.
-        
-        Args:
-            base_url: Base URL of the MCP server
-            username: Username for authentication
-            password: Password for authentication
-            refresh_interval_seconds: How often to refresh tool cache
-            timeout_seconds: HTTP request timeout
-            
-        Returns:
-            Self for method chaining
-        """
-        if base_url:
-            self.config.base_url = base_url
-        if username:
-            self.config.username = username
-        if password:
-            self.config.password = password
-        if refresh_interval_seconds:
-            self.config.refresh_interval_seconds = refresh_interval_seconds
-        if timeout_seconds:
-            self.config.timeout_seconds = timeout_seconds
-        
-        logger.info(f"Configured MCP builder: {self.config.base_url}")
-        return self
-    
+
     def _next_id(self) -> int:
         """Generate next request ID"""
         self._request_id += 1
@@ -144,7 +99,7 @@ class AbhikartaMCPToolBuilder:
         """Ensure HTTP client is initialized"""
         if self._http_client is None:
             self._http_client = httpx.AsyncClient(
-                timeout=self.config.timeout_seconds,
+                timeout=self._config.timeout_seconds,
                 headers={"Content-Type": "application/json"}
             )
     
@@ -155,19 +110,19 @@ class AbhikartaMCPToolBuilder:
         Returns:
             True if authentication successful
         """
-        if not self.config.username or not self.config.password:
+        if not self._config.username or not self._config.password:
             logger.warning("No credentials configured for authentication")
             return False
         
         await self._ensure_http_client()
         
         try:
-            url = f"{self.config.base_url}{self.config.login_endpoint}"
+            url = f"{self._config.base_url}{self._config.login_endpoint}"
             response = await self._http_client.post(
                 url,
                 json={
-                    "user_id": self.config.username,
-                    "password": self.config.password
+                    "user_id": self._config.username,
+                    "password": self._config.password
                 }
             )
             response.raise_for_status()
@@ -225,7 +180,7 @@ class AbhikartaMCPToolBuilder:
             "params": params
         }
         
-        url = f"{self.config.base_url}{self.config.mcp_endpoint}"
+        url = f"{self._config.base_url}{self._config.mcp_endpoint}"
         headers = {
             **self._http_client.headers,
             **self._get_auth_headers()
@@ -280,7 +235,7 @@ class AbhikartaMCPToolBuilder:
             List of tool names
         """
         try:
-            result = await self._send_mcp_request("tools/list", {})
+            result = await self._send_mcp_request(self._config.tool_list_endpoint, {}) #"tools/list"
             tools = result.get("tools", [])
             
             # Extract tool names
@@ -340,7 +295,7 @@ class AbhikartaMCPToolBuilder:
                 continue
             
             # Create cache key with suffix
-            cache_key = f"{tool_name}{self.config.tool_name_suffix}"
+            cache_key = self.tool_cache_key(tool_name)
             current_tools.add(cache_key)
             
             # Extract schemas
@@ -381,7 +336,7 @@ class AbhikartaMCPToolBuilder:
         """Background task for periodic cache refresh"""
         logger.info(
             f"Starting periodic refresh (interval: "
-            f"{self.config.refresh_interval_seconds}s)"
+            f"{self._config.refresh_interval_seconds}s)"
         )
         
         while self._running:
@@ -391,7 +346,7 @@ class AbhikartaMCPToolBuilder:
                 logger.error(f"Error in periodic refresh: {e}", exc_info=True)
             
             # Wait for next refresh
-            await asyncio.sleep(self.config.refresh_interval_seconds)
+            await asyncio.sleep(self._config.refresh_interval_seconds)
         
         logger.info("Periodic refresh loop stopped")
     
@@ -411,7 +366,7 @@ class AbhikartaMCPToolBuilder:
         logger.info("Starting AbhikartaMCPToolBuilder...")
         
         # Authenticate
-        if self.config.username and self.config.password:
+        if self._config.username and self._config.password:
             await self._authenticate()
         
         # Initial cache refresh
@@ -459,8 +414,8 @@ class AbhikartaMCPToolBuilder:
             MCPToolSchema or None if not found
         """
         # Try with suffix
-        if not tool_name.endswith(self.config.tool_name_suffix):
-            tool_name = f"{tool_name}{self.config.tool_name_suffix}"
+        if not tool_name.endswith(self._config.tool_name_suffix):
+            tool_name = self.tool_cache_key(tool_name)
         
         return self._tool_cache.get(tool_name)
     
@@ -494,7 +449,7 @@ class AbhikartaMCPToolBuilder:
             "tool_names": self.list_cached_tools(),
             "running": self._running,
             "authenticated": self._auth_token is not None,
-            "refresh_interval_seconds": self.config.refresh_interval_seconds,
+            "refresh_interval_seconds": self._config.refresh_interval_seconds,
             "last_refresh": max(
                 (schema.last_updated for schema in self._tool_cache.values()),
                 default=None

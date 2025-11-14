@@ -93,6 +93,79 @@
         background-color: #16a085 !important;
         color: white;
     }
+
+    .text-purple {
+        color: #9b59b6;
+    }
+
+    .mcp-servers-section {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .mcp-server-list {
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 15px;
+    }
+
+    .mcp-server-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.2s ease;
+    }
+
+    .mcp-server-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-ok {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .status-unknown {
+        color: #ffc107;
+        font-weight: bold;
+    }
+
+    .status-not-ok {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .server-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+
+    .server-details {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .mcp-server-list::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .mcp-server-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .mcp-server-list::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .mcp-server-list::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
 </style>
 {% endblock %}
 
@@ -114,28 +187,98 @@
 
     <!-- Quick Stats -->
     <div class="row stats-row mb-4">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="stat-card">
                 <div class="stat-number text-primary">{{ stats.users.total }}</div>
                 <div class="stat-label">Total Users</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="stat-card">
                 <div class="stat-number text-success">{{ stats.users.enabled }}</div>
                 <div class="stat-label">Active Users</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="stat-card">
                 <div class="stat-number text-info">{{ stats.roles.total }}</div>
                 <div class="stat-label">Roles</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="stat-card">
                 <div class="stat-number text-warning">{{ stats.resources.total }}</div>
                 <div class="stat-label">Resources</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number text-purple">{{ mcp_count }}</div>
+                <div class="stat-label">MCP Servers</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MCP Servers Section -->
+    <div class="row mcp-servers-section">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); color: white;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-server"></i> MCP Servers Status
+                        <span class="badge bg-light text-dark float-end">{{ mcp_count }} Server{{ 's' if mcp_count != 1 else '' }}</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if mcp_count > 0 %}
+                    <div class="mcp-server-list">
+                        {% for server_key, server in mcp_servers.items() %}
+                        <div class="mcp-server-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="server-name">
+                                        <i class="fas fa-server me-2"></i>{{ server.name }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="server-details">
+                                        Status:
+                                        {% if server.status == 'OK' %}
+                                        <span class="status-ok">
+                                            <i class="fas fa-circle-check"></i> OK
+                                        </span>
+                                        {% elif server.status == 'UNKNOWN' %}
+                                        <span class="status-unknown">
+                                            <i class="fas fa-circle-question"></i> UNKNOWN
+                                        </span>
+                                        {% else %}
+                                        <span class="status-not-ok">
+                                            <i class="fas fa-circle-xmark"></i> NOT OK
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="server-details text-end">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {% if server.last_check_time %}
+                                        Last Check: {{ server.last_check_time }}
+                                        {% else %}
+                                        Never Checked
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-server" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <p class="mt-3">No MCP servers configured</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

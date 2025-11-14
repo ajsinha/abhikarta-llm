@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from functools import wraps
 from flask import render_template, request, redirect, url_for, session, flash
 import logging
-
+from tool_management.mcp_server_manager import MCPServerManager
 logger = logging.getLogger(__name__)
 
 class AbstractRoutes(ABC):
@@ -13,6 +13,7 @@ class AbstractRoutes(ABC):
         self.user_manager = None
         self.role_manager = None
         self.resource_manager = None
+        self.mcp_server_manager = MCPServerManager()
 
     def set_user_manager(self, user_manager):
         self.user_manager = user_manager

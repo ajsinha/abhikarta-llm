@@ -10,6 +10,8 @@ This example demonstrates how to use Yahoo Finance tools through the MCP integra
 import asyncio
 import logging
 from datetime import datetime, timedelta
+from  tool_management.mcp_server_proxy import MCPServerConfig
+from tool_management.mcp_server_factory import build_mcp_server_proxy
 
 # Configure logging
 logging.basicConfig(
@@ -18,10 +20,11 @@ logging.basicConfig(
 )
 
 from tool_management.abhikartamcp import (
-    AbhikartaMCPToolBuilder,
+    AbhikartaMCPServerProxy,
     MCPRegistryIntegration
 )
 
+from tool_management.registry import ToolRegistry
 
 def extract_data(result):
     """
@@ -45,18 +48,6 @@ def extract_data(result):
     return result
 
 
-# Mock registry for demonstration
-class ToolRegistry:
-    def __init__(self):
-        self._tools = {}
-    
-    def register(self, tool, group=None, tags=None):
-        self._tools[tool.name] = tool
-        return self
-    
-    def get(self, tool_name):
-        return self._tools.get(tool_name)
-
 
 async def example_1_search_symbols():
     """
@@ -67,19 +58,28 @@ async def example_1_search_symbols():
     print("\n" + "="*70)
     print("Example 1: Search for Stock Symbols")
     print("="*70)
-    
-    builder = AbhikartaMCPToolBuilder()
-    builder.configure(
-        base_url="http://localhost:3002",
-        username="admin",
-        password="admin123"
-    )
+
+    config = MCPServerConfig()
+    config.base_url = "http://localhost:3002"
+    config.mcp_endpoint = "/mcp"
+    config.login_endpoint = "/api/auth/login"
+    config.tool_list_endpoint = "/api/tools/list"
+    config.tool_schema_endpoint_template = "/api/tools/{tool_name}/schema"
+    config.username = 'admin'
+    config.password = 'admin123'
+    config.refresh_interval_seconds = 600  # 10 minutes
+    config.timeout_seconds = 30.0
+    config.tool_name_suffix = ':abhikartamcp'
+
+
+    mcp_server_proxy = build_mcp_server_proxy('abhikarta', config)
+
     
     registry = ToolRegistry()
-    integration = MCPRegistryIntegration(registry, builder)
-    
+    integration = MCPRegistryIntegration(registry, mcp_server_proxy)
+
     try:
-        await builder.start()
+        await mcp_server_proxy.start()
         integration.sync_tools()
         
         tool = registry.get("yahoo_search_symbols:abhikartamcp")
@@ -151,7 +151,7 @@ async def example_1_search_symbols():
                     print(f"         Market Cap: ${stock.get('market_cap'):,.0f}")
         
     finally:
-        await builder.stop()
+        await mcp_server_proxy.stop()
     
     print("\n✓ Example 1 completed")
 
@@ -166,7 +166,7 @@ async def example_2_get_stock_quotes():
     print("Example 2: Get Real-Time Stock Quotes")
     print("="*70)
     
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",
@@ -272,7 +272,7 @@ async def example_3_get_historical_data():
     print("Example 3: Get Historical Price Data")
     print("="*70)
     
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",
@@ -446,7 +446,7 @@ async def example_4_portfolio_monitoring():
         "TSLA": {"shares": 15, "cost_basis": 700.00},
     }
     
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",
@@ -550,7 +550,7 @@ async def example_5_market_research():
     print("Example 5: Market Research Workflow")
     print("="*70)
     
-    builder = AbhikartaMCPToolBuilder()
+    builder = AbhikartaMCPServerProxy()
     builder.configure(
         base_url="http://localhost:3002",
         username="admin",

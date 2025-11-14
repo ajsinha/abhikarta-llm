@@ -31,11 +31,8 @@ __version__ = "1.0.2"
 __author__ = "Ashutosh Sinha"
 __email__ = "ajsinha@gmail.com"
 
-from .abhikarta_mcp_tool_builder import (
-    AbhikartaMCPToolBuilder,
-    MCPToolSchema,
-    MCPServerConfig
-)
+from tool_management.mcp_server_proxy import MCPToolSchema,MCPServerConfig
+from .abhikarta_mcp_server_proxy import AbhikartaMCPServerProxy
 
 from .abhikarta_base_tool import AbhikartaBaseTool
 
@@ -45,7 +42,7 @@ from .registry_integration import (
 )
 
 __all__ = [
-    "AbhikartaMCPToolBuilder",
+    "AbhikartaMCPServerProxy",
     "MCPToolSchema",
     "MCPServerConfig",
     "AbhikartaBaseTool",
