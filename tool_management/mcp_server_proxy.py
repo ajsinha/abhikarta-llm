@@ -3,6 +3,7 @@ from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 import logging
+from tool_management.registry import ToolRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +15,8 @@ class MCPToolSchema:
     input_schema: Dict[str, Any]
     output_schema: Optional[Dict[str, Any]] = None
     last_updated: datetime = field(default_factory=datetime.now)
+
+
 
 @dataclass
 class MCPServerConfig:
@@ -37,6 +40,7 @@ class MCPServerProxy:
         self._tool_cache: Dict[str, MCPToolSchema] = {}
         self._health_status = 'UNKNOWN'
         self._last_check_time = 'UNKNOWN'
+        self.tool_registry = ToolRegistry()
 
     @abstractmethod
     async def _authenticate(self) -> bool:
@@ -67,11 +71,11 @@ class MCPServerProxy:
         pass
 
     @abstractmethod
-    def start(self):
+    async def start(self):
         pass
 
     @abstractmethod
-    def stop(self):
+    async def stop(self):
         pass
 
     @abstractmethod
@@ -96,6 +100,9 @@ class MCPServerProxy:
 
     def base_url(self):
         return self._config.base_url
+
+    def mcp_endpoint(self):
+        return self._config.mcp_endpoint
 
     def server_config_dict(self):
         config_dict = asdict(self._config)

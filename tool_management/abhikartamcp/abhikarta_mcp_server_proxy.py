@@ -86,6 +86,7 @@ class AbhikartaMCPServerProxy(MCPServerProxy):
         self._running = False
         self._http_client: Optional[httpx.AsyncClient] = None
         self._request_id = 0
+
         
         logger.info("AbhikartaMCPToolBuilder initialized")
 
@@ -224,7 +225,8 @@ class AbhikartaMCPServerProxy(MCPServerProxy):
         try:
             result = await self._send_mcp_request("ping", {})
             self.set_health_status("OK")
-            return result.get("status") == "OK"
+            status = str(result.get("status")).upper()
+            return status == "OK"
         except Exception as e:
             self.set_health_status("error")
             logger.warning(f"Ping failed: {e}")
@@ -278,7 +280,8 @@ class AbhikartaMCPServerProxy(MCPServerProxy):
         logger.info("Refreshing tool cache...")
         
         # Check server connectivity
-        if not await self._ping_server():
+        ping_return = await self._ping_server()
+        if not ping_return:
             logger.warning("Server ping failed, skipping cache refresh")
             return
         
@@ -288,7 +291,8 @@ class AbhikartaMCPServerProxy(MCPServerProxy):
         
         # Track which tools are still available
         current_tools = set()
-        
+        new_tools = {}
+        updated_tools = {}
         # Update cache for each tool
         for tool_name in tool_names:
             # Get schema
@@ -306,15 +310,22 @@ class AbhikartaMCPServerProxy(MCPServerProxy):
             output_schema = schema.get("output_schema")
             
             # Get description from input schema or use default
-            description = input_schema.get("description", f"Tool: {tool_name}")
+            description = schema.get("description", f"Tool: {tool_name}")
             
             # Update or create cache entry
             if cache_key in self._tool_cache:
                 # Update existing entry
-                self._tool_cache[cache_key].input_schema = input_schema
-                self._tool_cache[cache_key].output_schema = output_schema
-                self._tool_cache[cache_key].last_updated = datetime.now()
-                logger.debug(f"Updated cached tool: {cache_key}")
+                current_input_schema = self._tool_cache[cache_key].input_schema
+                current_output_schema = self._tool_cache[cache_key].output_schema
+                current_description = self._tool_cache[cache_key].description
+                if current_input_schema != input_schema or current_output_schema != output_schema or current_description != description:
+                    self._tool_cache[cache_key].input_schema = input_schema
+                    self._tool_cache[cache_key].output_schema = output_schema
+                    self._tool_cache[cache_key].last_updated = datetime.now()
+                    updated_tools[cache_key] = self._tool_cache[cache_key]
+                    logger.debug(f"Updated cached tool: {cache_key}")
+                else:
+                    logger.debug(f'Skipped cached tool: {cache_key}')
             else:
                 # Create new entry
                 self._tool_cache[cache_key] = MCPToolSchema(
@@ -323,18 +334,42 @@ class AbhikartaMCPServerProxy(MCPServerProxy):
                     input_schema=input_schema,
                     output_schema=output_schema
                 )
-                logger.info(f"Added new tool to cache: {cache_key}")
+                new_tools[cache_key] = self._tool_cache[cache_key]
+                logger.info(f"Added new tool: {cache_key}")
         
         # Remove tools that are no longer available
         tools_to_remove = set(self._tool_cache.keys()) - current_tools
         for tool_name in tools_to_remove:
             del self._tool_cache[tool_name]
+            self.tool_registry.unregister(tool_name)
             logger.info(f"Removed tool from cache: {tool_name}")
         
         logger.info(
             f"Cache refresh complete. Total tools: {len(self._tool_cache)}"
         )
-    
+
+        #create and add new tools
+        from tool_management.abhikartamcp.abhikarta_base_tool import AbhikartaBaseTool
+        for new_tool_key in new_tools.keys():
+            tool_schema = new_tools[new_tool_key]
+            base_tool = AbhikartaBaseTool(name=tool_schema.name,
+                              description=tool_schema.description,
+                              mcp_base_url=self.base_url(),
+                              mcp_endpoint=self.mcp_endpoint()
+                              )
+            self.tool_registry.register(base_tool)
+
+        #unregister and then create new tools
+        for upd_tool_key in updated_tools.keys():
+            tool_schema = updated_tools[upd_tool_key]
+            base_tool = AbhikartaBaseTool(name=tool_schema.name,
+                                          description=tool_schema.description,
+                                          mcp_base_url=self.base_url(),
+                                          mcp_endpoint=self.mcp_endpoint()
+                                          )
+            self.tool_registry.unregister(base_tool.name)
+            self.tool_registry.register(base_tool)
+
     async def _periodic_refresh_loop(self):
         """Background task for periodic cache refresh"""
         logger.info(

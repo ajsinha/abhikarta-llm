@@ -18,7 +18,7 @@ class MCPServerManager(metaclass=SingletonMeta):
         if mcp_server_proxy is None:
             return []
         else:
-            pass
+            return mcp_server_proxy.list_cached_tools()
     def add_mcp_server(self, server_proxy: MCPServerProxy):
         with self._lock:
             self._registered_servers[server_proxy.short_name()] = server_proxy
@@ -34,11 +34,14 @@ class MCPServerManager(metaclass=SingletonMeta):
         return status_dict
 
     def start_all(self):
+        import asyncio
         for x in self._registered_servers.keys():
             server_proxy = self._registered_servers[x]
-            server_proxy.start()
+            asyncio.run(server_proxy.start())
+
 
     def stop_all(self):
+        import asyncio
         for x in self._registered_servers.keys():
             server_proxy = self._registered_servers[x]
-            server_proxy.stop()
+            asyncio.run(server_proxy.stop())

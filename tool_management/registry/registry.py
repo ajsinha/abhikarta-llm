@@ -10,6 +10,7 @@ This module provides the central registry for managing all tools in the system.
 
 from typing import Dict, List, Optional, Set, Callable
 from collections import defaultdict
+from core import SingletonMeta
 import logging
 
 from ..core import (
@@ -26,7 +27,7 @@ from ..core import (
 logger = logging.getLogger(__name__)
 
 
-class ToolRegistry:
+class ToolRegistry(metaclass=SingletonMeta):
     """
     Central registry for managing all tools in the Abhikarta framework.
     
