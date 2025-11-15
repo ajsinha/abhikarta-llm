@@ -1,4 +1,4 @@
-from tool_management.mcp_server_proxy import MCPServerConfig
+from tool_management.mcp_server_proxy import MCPServerConfig,MCPServerProxy
 from core.config.properties_configurator import PropertiesConfigurator
 from importlib import import_module
 
@@ -40,7 +40,7 @@ def build_config_using_key(key: str):
     #
     return server_module, config
 
-def build_mcp_server_proxy(server_key: str):
+def build_mcp_server_proxy(server_key: str) -> MCPServerProxy:
     server_module, config = build_config_using_key(server_key)
 
     proxy = instantiate_from_path(server_module, config=config)

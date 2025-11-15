@@ -249,7 +249,7 @@ class AbhikartaBaseTool(BaseTool):
         """
         try:
             result = await self._send_mcp_request("ping", {})
-            return result.get("status") == "ok"
+            return result.get("status") == "OK"
         except Exception as e:
             logger.warning(f"Ping failed for tool '{self.name}': {e}")
             return False

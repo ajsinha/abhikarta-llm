@@ -370,7 +370,7 @@ All communication uses JSON-RPC 2.0 format.
     "jsonrpc": "2.0",
     "id": 5,
     "result": {
-        "status": "ok",
+        "status": "OK",
         "timestamp": "2025-01-01T00:00:00.000Z"
     }
 }

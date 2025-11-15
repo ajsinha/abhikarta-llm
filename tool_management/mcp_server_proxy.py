@@ -39,19 +39,19 @@ class MCPServerProxy:
         self._last_check_time = 'UNKNOWN'
 
     @abstractmethod
-    def _authenticate(self) -> bool:
+    async def _authenticate(self) -> bool:
         pass
 
     @abstractmethod
-    def _send_mcp_request(self, method: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def _send_mcp_request(self, method: str, params: Dict[str, Any]) -> Dict[str, Any]:
         pass
 
     @abstractmethod
-    def _ping_server(self) -> bool:
+    async def _ping_server(self) -> bool:
         pass
 
     @abstractmethod
-    def _list_tools(self) -> List[str]:
+    async def _list_tools(self) -> List[str]:
         pass
 
     @abstractmethod
@@ -59,7 +59,7 @@ class MCPServerProxy:
         pass
 
     @abstractmethod
-    def _refresh_tool_cache(self):
+    async def _refresh_tool_cache(self):
         pass
 
     @abstractmethod
@@ -118,8 +118,16 @@ class MCPServerProxy:
     def last_check_time(self):
         return self._last_check_time
 
-    def set_last_check_time(self, last_check_time):
-        self._last_check_time = last_check_time
+    def set_last_check_time(self):
+        from datetime import datetime
+
+        # Get the current datetime object
+        now = datetime.now()
+
+        # Format the datetime object into the desired string format
+        formatted_time = now.strftime("%Y:%m:%d %H:%M:%S")
+
+        self._last_check_time = formatted_time
 
     def mcp_endpoint_url(self):
         url = f"{self._config.base_url}{self._config.mcp_endpoint}"

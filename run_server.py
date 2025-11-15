@@ -60,6 +60,7 @@ def prepare_database_pools():
 
     return pool_name,manager
 def create_mcp_servers():
+    import asyncio
     from tool_management.mcp_server_manager import MCPServerManager
     from tool_management.mcp_server_factory import build_mcp_server_proxy
     from core.config.properties_configurator import PropertiesConfigurator
@@ -70,6 +71,7 @@ def create_mcp_servers():
     mcp_server_names = prop_conf.get_list('mcp.server.names', delim=',')
     for mcp_server_name in mcp_server_names:
         server_proxy = build_mcp_server_proxy(mcp_server_name)
+        asyncio.run(server_proxy._refresh_tool_cache())
         mcp_server_manager.add_mcp_server(server_proxy)
 
     return mcp_server_manager
@@ -89,9 +91,12 @@ def prepare_prop_conf():
 if __name__ == '__main__':
     prepare_prop_conf()
     pool_name,pool_manager = prepare_database_pools()
+
     mcp_server_manager = create_mcp_servers()
+    mcp_server_manager.start_all()
 
     run_webserver(pool_name, mcp_server_manager)
 
+    mcp_server_manager.stop_all()
     pool_manager.shutdown_all()
 

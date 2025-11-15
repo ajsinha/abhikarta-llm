@@ -219,10 +219,14 @@ class AbhikartaMCPServerProxy(MCPServerProxy):
         Returns:
             True if server is responsive
         """
+        self.set_last_check_time()
+
         try:
             result = await self._send_mcp_request("ping", {})
-            return result.get("status") == "ok"
+            self.set_health_status("OK")
+            return result.get("status") == "OK"
         except Exception as e:
+            self.set_health_status("error")
             logger.warning(f"Ping failed: {e}")
             return False
     
