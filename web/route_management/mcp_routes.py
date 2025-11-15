@@ -108,7 +108,7 @@ class MCPRoutes(AbstractRoutes):
 
                 logger.info(f"Admin {session.get('userid')} viewed details for MCP server: {server_key}")
 
-                return render_template('mcp_server_details.html',
+                return render_template('mcp/mcp_server_details.html',
                                        fullname=session.get('fullname'),
                                        userid=session.get('userid'),
                                        roles=session.get('roles', []),
@@ -182,7 +182,7 @@ class MCPRoutes(AbstractRoutes):
 
                 logger.info(f"Admin {session.get('userid')} viewed details for tool: {tool_name} in server: {server_key}")
 
-                return render_template('mcp_tool_details.html',
+                return render_template('mcp/mcp_tool_details.html',
                                        fullname=session.get('fullname'),
                                        userid=session.get('userid'),
                                        roles=session.get('roles', []),
