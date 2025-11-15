@@ -16,6 +16,14 @@ class MCPToolSchema:
     output_schema: Optional[Dict[str, Any]] = None
     last_updated: datetime = field(default_factory=datetime.now)
 
+    def to_dict(self):
+        return {
+            'name' : self.name,
+            'description': self.description,
+            'input_schema': self.input_schema,
+            'ouput_schema': self.output_schema
+        }
+
 
 
 @dataclass

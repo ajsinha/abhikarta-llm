@@ -93,47 +93,221 @@
         font-size: 0.9rem;
     }
     
-    .tools-list {
-        max-height: 400px;
-        overflow-y: auto;
+    /* Tools Table Styles */
+    .table-controls {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
     }
-    
-    .tool-item {
-        padding: 15px;
-        margin-bottom: 10px;
+
+    .table-controls .left-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-controls .right-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+    .search-box input {
+        padding: 8px 35px 8px 12px;
+        border: 1px solid #ddd;
         border-radius: 8px;
-        background: #f8f9fa;
-        border-left: 4px solid #667eea;
+        width: 250px;
+        transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: none;
+    }
+
+    .search-box i {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    .rows-select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .rows-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: none;
+    }
+
+    .tools-table {
+        width: 100%;
+        margin-bottom: 20px;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .tools-table thead th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        border: none;
+    }
+
+    .tools-table thead th:first-child {
+        border-radius: 8px 0 0 0;
+    }
+
+    .tools-table thead th:last-child {
+        border-radius: 0 8px 0 0;
+    }
+
+    .tools-table thead th:hover {
+        background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+    }
+
+    .tools-table thead th .sort-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.5;
+        font-size: 0.8rem;
+    }
+
+    .tools-table thead th.sorted .sort-icon {
+        opacity: 1;
+    }
+
+    .tools-table tbody tr {
+        border-bottom: 1px solid #f0f0f0;
         transition: all 0.2s ease;
     }
-    
-    .tool-item:hover {
-        background: #e9ecef;
-        transform: translateX(5px);
+
+    .tools-table tbody tr:hover {
+        background-color: #f8f9fa;
     }
-    
-    .tool-name {
+
+    .tools-table tbody td {
+        padding: 15px;
+        vertical-align: top;
+    }
+
+    .tool-name-cell {
         font-weight: 600;
         color: #495057;
-        margin-bottom: 5px;
     }
-    
-    .tool-description {
+
+    .tool-description-cell {
         color: #6c757d;
         font-size: 0.9rem;
-        margin-bottom: 8px;
+        max-width: 400px;
     }
-    
-    .tool-schema {
+
+    .tool-schema-cell {
         font-size: 0.85rem;
         color: #6c757d;
     }
-    
+
+    .btn-view-tool {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-view-tool:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .pagination-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .pagination-info {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .pagination {
+        margin: 0;
+        display: flex;
+        gap: 5px;
+    }
+
+    .pagination .page-item .page-link {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        color: #667eea;
+        padding: 8px 12px;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+    }
+
+    .pagination .page-item:not(.disabled) .page-link:hover {
+        background: #f8f9fa;
+        border-color: #667eea;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        opacity: 0.5;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        opacity: 0.3;
+        margin-bottom: 15px;
+    }
+
     .prompts-list {
         max-height: 400px;
         overflow-y: auto;
     }
-    
+
     .prompt-item {
         padding: 15px;
         margin-bottom: 10px;
@@ -142,28 +316,28 @@
         border-left: 4px solid #9b59b6;
         transition: all 0.2s ease;
     }
-    
+
     .prompt-item:hover {
         background: #e9ecef;
         transform: translateX(5px);
     }
-    
+
     .prompt-name {
         font-weight: 600;
         color: #495057;
         margin-bottom: 5px;
     }
-    
+
     .prompt-description {
         color: #6c757d;
         font-size: 0.9rem;
     }
-    
+
     .resources-list {
         max-height: 400px;
         overflow-y: auto;
     }
-    
+
     .resource-item {
         padding: 15px;
         margin-bottom: 10px;
@@ -172,42 +346,30 @@
         border-left: 4px solid #16a085;
         transition: all 0.2s ease;
     }
-    
+
     .resource-item:hover {
         background: #e9ecef;
         transform: translateX(5px);
     }
-    
+
     .resource-uri {
         font-weight: 600;
         color: #495057;
         margin-bottom: 5px;
         word-break: break-all;
     }
-    
+
     .resource-name {
         color: #6c757d;
         font-size: 0.9rem;
         margin-bottom: 5px;
     }
-    
+
     .resource-description {
         color: #6c757d;
         font-size: 0.9rem;
     }
-    
-    .empty-state {
-        text-align: center;
-        padding: 40px 20px;
-        color: #6c757d;
-    }
-    
-    .empty-state i {
-        font-size: 3rem;
-        opacity: 0.3;
-        margin-bottom: 15px;
-    }
-    
+
     .btn-back {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border: none;
@@ -216,13 +378,13 @@
         border-radius: 50px;
         transition: all 0.3s ease;
     }
-    
+
     .btn-back:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         color: white;
     }
-    
+
     .btn-refresh {
         background: #28a745;
         border: none;
@@ -231,41 +393,27 @@
         border-radius: 50px;
         transition: all 0.3s ease;
     }
-    
+
     .btn-refresh:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
         color: white;
         background: #218838;
     }
-    
+
     .json-display {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
+        background: #2d2d2d;
         border-radius: 8px;
-        padding: 15px;
-        max-height: 300px;
-        overflow-y: auto;
+        padding: 20px;
+        overflow-x: auto;
+    }
+
+    .json-display pre {
+        color: #f8f8f2;
+        margin: 0;
         font-family: 'Courier New', monospace;
         font-size: 0.9rem;
-    }
-    
-    .scrollable-list::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    .scrollable-list::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
-    }
-    
-    .scrollable-list::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-    }
-    
-    .scrollable-list::-webkit-scrollbar-thumb:hover {
-        background: #555;
+        line-height: 1.5;
     }
 </style>
 {% endblock %}
@@ -274,40 +422,26 @@
 <div class="container details-container">
     <!-- Page Header -->
     <div class="page-header">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h2><i class="fas fa-server"></i> MCP Server Details</h2>
-                <p class="mb-0">{{ server_info.name }}</p>
-            </div>
-            <div class="col-md-4 text-end">
-                <span class="status-badge-large 
-                    {% if server_info.status == 'OK' %}status-ok
-                    {% elif server_info.status == 'UNKNOWN' %}status-unknown
-                    {% else %}status-not-ok{% endif %}">
-                    {% if server_info.status == 'OK' %}
-                        <i class="fas fa-circle-check"></i> OK
-                    {% elif server_info.status == 'UNKNOWN' %}
-                        <i class="fas fa-circle-question"></i> UNKNOWN
-                    {% else %}
-                        <i class="fas fa-circle-xmark"></i> NOT OK
-                    {% endif %}
-                </span>
-            </div>
-        </div>
+        <h2 class="mb-3">
+            <i class="fas fa-server"></i> MCP Server Details
+        </h2>
+        <p class="mb-0">
+            Detailed information and statistics for <strong>{{ server_info.name }}</strong>
+        </p>
     </div>
-    
+
     <!-- Action Buttons -->
     <div class="row mb-4">
         <div class="col-12">
             <a href="{{ url_for('admin_dashboard') }}" class="btn btn-back">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
-            <button class="btn btn-refresh ms-2" onclick="location.reload()">
+            <button class="btn btn-refresh" onclick="location.reload();">
                 <i class="fas fa-sync-alt"></i> Refresh
             </button>
         </div>
     </div>
-    
+
     <!-- Server Information -->
     <div class="row">
         <div class="col-md-6">
@@ -349,7 +483,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-6">
             <div class="info-card card">
                 <div class="card-header">
@@ -359,7 +493,7 @@
                     <div class="detail-row">
                         <div class="detail-label">Total Tools</div>
                         <div class="detail-value">
-                            <span class="badge bg-primary">{{ server_info.tools|length if server_info.tools else 0 }}</span>
+                            <span class="badge bg-primary">{{ tools|length if tools else 0 }}</span>
                         </div>
                     </div>
                     <div class="detail-row">
@@ -388,37 +522,92 @@
             </div>
         </div>
     </div>
-    
-    <!-- Tools Section -->
+
+    <!-- Tools Section with Custom Table -->
     <div class="row mt-4">
         <div class="col-12">
             <div class="info-card card">
                 <div class="card-header">
                     <i class="fas fa-tools"></i> Available Tools
-                    <span class="badge bg-light text-dark float-end">{{ server_info.tools|length if server_info.tools else 0 }}</span>
+                    <span class="badge bg-light text-dark float-end">{{ tools|length if tools else 0 }}</span>
                 </div>
                 <div class="card-body">
-                    {% if server_info.tools and server_info.tools|length > 0 %}
-                    <div class="tools-list scrollable-list">
-                        {% for tool in server_info.tools %}
-                        <div class="tool-item">
-                            <div class="tool-name">
-                                <i class="fas fa-wrench"></i> {{ tool.name }}
-                            </div>
-                            {% if tool.description %}
-                            <div class="tool-description">{{ tool.description }}</div>
-                            {% endif %}
-                            {% if tool.inputSchema %}
-                            <div class="tool-schema">
-                                <strong>Input Schema:</strong> 
-                                <code>{{ tool.inputSchema.type if tool.inputSchema.type else 'object' }}</code>
-                                {% if tool.inputSchema.properties %}
-                                    - {{ tool.inputSchema.properties|length }} properties
-                                {% endif %}
-                            </div>
-                            {% endif %}
+                    {% if tools and tools|length > 0 %}
+                    <!-- Table Controls -->
+                    <div class="table-controls">
+                        <div class="left-controls">
+                            <label for="rowsPerPage" style="margin-right: 5px;">Show:</label>
+                            <select id="rowsPerPage" class="rows-select">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="50">50</option>
+                                <option value="all">All</option>
+                            </select>
+                            <span style="margin-left: 5px;">entries</span>
                         </div>
-                        {% endfor %}
+                        <div class="right-controls">
+                            <div class="search-box">
+                                <input type="text" id="tableSearch" placeholder="Search tools...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tools Table -->
+                    <div class="table-responsive">
+                        <table class="tools-table" id="toolsTable">
+                            <thead>
+                                <tr>
+                                    <th data-column="name" style="width: 25%;">
+                                        Tool Name
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th data-column="description" style="width: 40%;">
+                                        Description
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th data-column="schema" style="width: 20%;">
+                                        Input Schema
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th style="width: 15%; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="toolsTableBody">
+                                {% for tool in tools %}
+                                <tr>
+                                    <td class="tool-name-cell">
+                                        <i class="fas fa-wrench"></i> {{ tool.name }}
+                                    </td>
+                                    <td class="tool-description-cell">
+                                        {{ tool.description if tool.description else 'No description available' }}
+                                    </td>
+                                    <td class="tool-schema-cell">
+                                        {% if tool.inputSchema %}
+                                            <code>{{ tool.inputSchema.type if tool.inputSchema.type else 'object' }}</code>
+                                            {% if tool.inputSchema.properties %}
+                                                <br><small>{{ tool.inputSchema.properties|length }} properties</small>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <a href="{{ url_for('mcp_tool_details', server_key=server_key, tool_name=tool.name) }}"
+                                           class="btn-view-tool">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-wrapper">
+                        <div class="pagination-info" id="paginationInfo"></div>
+                        <ul class="pagination" id="pagination"></ul>
                     </div>
                     {% else %}
                     <div class="empty-state">
@@ -430,7 +619,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Prompts Section -->
     <div class="row mt-4">
         <div class="col-12">
@@ -463,7 +652,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Resources Section -->
     <div class="row mt-4">
         <div class="col-12">
@@ -499,7 +688,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Raw Data Section (Collapsible) -->
     <div class="row mt-4 mb-5">
         <div class="col-12">
@@ -530,7 +719,7 @@ $(document).ready(function() {
     $('.info-card').each(function(index) {
         $(this).css('opacity', '0').delay(index * 100).animate({opacity: 1}, 500);
     });
-    
+
     // Copy to clipboard functionality for code elements
     $('code').on('click', function() {
         var text = $(this).text();
@@ -538,9 +727,199 @@ $(document).ready(function() {
             showToast('Copied to clipboard!', 'success');
         });
     });
-    
+
     // Add cursor pointer to code elements
     $('code').css('cursor', 'pointer').attr('title', 'Click to copy');
+
+    // Custom table functionality
+    {% if tools and tools|length > 0 %}
+    initializeToolsTable();
+    {% endif %}
 });
+
+function initializeToolsTable() {
+    const table = document.getElementById('toolsTable');
+    const tbody = document.getElementById('toolsTableBody');
+    const searchInput = document.getElementById('tableSearch');
+    const rowsPerPageSelect = document.getElementById('rowsPerPage');
+    const paginationInfo = document.getElementById('paginationInfo');
+    const pagination = document.getElementById('pagination');
+
+    let allRows = Array.from(tbody.querySelectorAll('tr'));
+    let filteredRows = [...allRows];
+    let currentPage = 1;
+    let rowsPerPage = 10;
+    let sortColumn = null;
+    let sortDirection = 'asc';
+
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filteredRows = allRows.filter(row => {
+            const text = row.textContent.toLowerCase();
+            return text.includes(searchTerm);
+        });
+        currentPage = 1;
+        renderTable();
+    });
+
+    // Rows per page change
+    rowsPerPageSelect.addEventListener('change', function() {
+        rowsPerPage = this.value === 'all' ? filteredRows.length : parseInt(this.value);
+        currentPage = 1;
+        renderTable();
+    });
+
+    // Column sorting
+    const headers = table.querySelectorAll('thead th[data-column]');
+    headers.forEach(header => {
+        header.addEventListener('click', function() {
+            const column = this.dataset.column;
+
+            // Toggle sort direction
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            // Update header classes
+            headers.forEach(h => {
+                h.classList.remove('sorted');
+                const icon = h.querySelector('.sort-icon');
+                icon.className = 'fas fa-sort sort-icon';
+            });
+
+            this.classList.add('sorted');
+            const icon = this.querySelector('.sort-icon');
+            icon.className = sortDirection === 'asc' ?
+                'fas fa-sort-up sort-icon' : 'fas fa-sort-down sort-icon';
+
+            // Sort rows
+            filteredRows.sort((a, b) => {
+                let aVal, bVal;
+                const columnIndex = Array.from(this.parentElement.children).indexOf(this);
+
+                aVal = a.cells[columnIndex].textContent.trim();
+                bVal = b.cells[columnIndex].textContent.trim();
+
+                if (sortDirection === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+
+            currentPage = 1;
+            renderTable();
+        });
+    });
+
+    function renderTable() {
+        // Clear tbody
+        tbody.innerHTML = '';
+
+        // Calculate pagination
+        const totalRows = filteredRows.length;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = Math.min(startIndex + rowsPerPage, totalRows);
+
+        // Display rows for current page
+        const rowsToDisplay = filteredRows.slice(startIndex, endIndex);
+        rowsToDisplay.forEach(row => tbody.appendChild(row.cloneNode(true)));
+
+        // Update pagination info
+        if (totalRows === 0) {
+            paginationInfo.textContent = 'No entries found';
+        } else {
+            paginationInfo.textContent = `Showing ${startIndex + 1} to ${endIndex} of ${totalRows} entries`;
+        }
+
+        // Render pagination controls
+        renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+        pagination.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        // Previous button
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `<a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>`;
+        if (currentPage > 1) {
+            prevLi.querySelector('a').addEventListener('click', (e) => {
+                e.preventDefault();
+                currentPage--;
+                renderTable();
+            });
+        }
+        pagination.appendChild(prevLi);
+
+        // Page numbers
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage < maxVisiblePages - 1) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        if (startPage > 1) {
+            addPageButton(1);
+            if (startPage > 2) {
+                const ellipsisLi = document.createElement('li');
+                ellipsisLi.className = 'page-item disabled';
+                ellipsisLi.innerHTML = '<a class="page-link">...</a>';
+                pagination.appendChild(ellipsisLi);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            addPageButton(i);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const ellipsisLi = document.createElement('li');
+                ellipsisLi.className = 'page-item disabled';
+                ellipsisLi.innerHTML = '<a class="page-link">...</a>';
+                pagination.appendChild(ellipsisLi);
+            }
+            addPageButton(totalPages);
+        }
+
+        // Next button
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        nextLi.innerHTML = `<a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>`;
+        if (currentPage < totalPages) {
+            nextLi.querySelector('a').addEventListener('click', (e) => {
+                e.preventDefault();
+                currentPage++;
+                renderTable();
+            });
+        }
+        pagination.appendChild(nextLi);
+    }
+
+    function addPageButton(pageNum) {
+        const li = document.createElement('li');
+        li.className = `page-item ${currentPage === pageNum ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#">${pageNum}</a>`;
+        li.querySelector('a').addEventListener('click', (e) => {
+            e.preventDefault();
+            currentPage = pageNum;
+            renderTable();
+        });
+        pagination.appendChild(li);
+    }
+
+    // Initial render
+    renderTable();
+}
 </script>
 {% endblock %}

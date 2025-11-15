@@ -34,18 +34,24 @@ class MCPServerManager(metaclass=SingletonMeta):
         return status_dict
 
     def start_all(self):
-        import asyncio
         for x in self._registered_servers.keys():
-            server_proxy = self._registered_servers[x]
-            asyncio.run(server_proxy.start())
+            self.start(x)
 
 
     def stop_all(self):
-        import asyncio
         for x in self._registered_servers.keys():
-            server_proxy = self._registered_servers[x]
-            asyncio.run(server_proxy.stop())
+            self.stop(x)
 
     def get_tools_for_server_proxy(self, server_proxy_name: str):
         server_proxy = self._registered_servers[server_proxy_name]
         return server_proxy.get_all_schemas()
+
+    def start(self, server_proxy_name: str):
+        import asyncio
+        server_proxy = self._registered_servers[server_proxy_name]
+        asyncio.run( server_proxy.start())
+
+    def stop(self, server_proxy_name: str):
+        import asyncio
+        server_proxy = self._registered_servers[server_proxy_name]
+        asyncio.run(server_proxy.stop())
