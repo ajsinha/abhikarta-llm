@@ -145,8 +145,9 @@ class AbhikartaLLMWeb:
         from web.route_management.role_routes import RoleRoutes
         from web.route_management.user_routes import UserRoutes
         from web.route_management.model_routes import ModelRoutes
+        from web.route_management.mcp_routes import MCPRoutes
 
-        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes, UserRoutes, ModelRoutes]:
+        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes, UserRoutes, ModelRoutes, MCPRoutes]:
             # Register route handler
             logger.info(f'registering route using {rt}')
             r_rt = rt(self.app, self.db_connection_pool_name)

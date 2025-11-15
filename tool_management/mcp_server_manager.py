@@ -45,3 +45,7 @@ class MCPServerManager(metaclass=SingletonMeta):
         for x in self._registered_servers.keys():
             server_proxy = self._registered_servers[x]
             asyncio.run(server_proxy.stop())
+
+    def get_tools_for_server_proxy(self, server_proxy_name: str):
+        server_proxy = self._registered_servers[server_proxy_name]
+        return server_proxy.get_all_schemas()

@@ -77,52 +77,7 @@ class AdminRoutes(AbstractRoutes):
                                  mcp_servers=mcp_status,
                                  mcp_count=mcp_count)
 
-        @self.app.route('/admin/mcp/server/<server_key>')
-        @admin_required
-        def mcp_server_details(server_key):
-            """
-            Display detailed information about a specific MCP server.
 
-            Args:
-                server_key: The unique key identifying the MCP server
-
-            Returns:
-                Rendered template with server details
-            """
-            try:
-                # Get all server statuses
-                if self.mcp_server_manager is None:
-                    flash('MCP Server Manager not initialized', 'error')
-                    return redirect(url_for('admin_dashboard'))
-
-                mcp_status = self.mcp_server_manager.status_all()
-
-                # Check if server exists
-                if server_key not in mcp_status:
-                    flash(f'MCP Server "{server_key}" not found', 'error')
-                    logger.warning(f"Attempted to access non-existent MCP server: {server_key}")
-                    return redirect(url_for('admin_dashboard'))
-
-                # Get server information
-                server_info = mcp_status[server_key]
-
-                # Convert server info to JSON for raw data display
-                server_info_json = json.dumps(server_info, indent=2, default=str)
-
-                logger.info(f"Admin {session.get('userid')} viewed details for MCP server: {server_key}")
-
-                return render_template('mcp_server_details.html',
-                                     fullname=session.get('fullname'),
-                                     userid=session.get('userid'),
-                                     roles=session.get('roles', []),
-                                     server_key=server_key,
-                                     server_info=server_info,
-                                     server_info_json=server_info_json)
-
-            except Exception as e:
-                logger.error(f"Error retrieving MCP server details for {server_key}: {e}", exc_info=True)
-                flash(f'Error retrieving server details: {str(e)}', 'error')
-                return redirect(url_for('admin_dashboard'))
 
         @self.app.route('/admin/users')
         @admin_required
