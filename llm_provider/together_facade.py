@@ -1,5 +1,5 @@
 """
-Abhikarta Mistral Facade - Dynamic Configuration Implementation
+Abhikarta Together AI Facade
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
@@ -7,34 +7,31 @@ Email: ajsinha@gmail.com
 """
 
 import os
-import json
-from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator, Tuple
+from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
 
 from base_provider_facade import BaseProviderFacade
 from llm_facade import *
 
 
-class MistralFacade(BaseProviderFacade):
-    """Mistral AI facade supporting Mixtral and Mistral models."""
+class TogetherFacade(BaseProviderFacade):
+    """Together AI facade for open-source models."""
     
     def _initialize_client(self):
-        """Initialize Mistral client."""
+        """Initialize Together client."""
         try:
-            from mistralai.client import MistralClient
-            from mistralai.async_client import MistralAsyncClient
+            from together import Together, AsyncTogether
         except ImportError:
-            raise ImportError("Mistral SDK not installed. Install with: pip install mistralai")
+            raise ImportError("Together SDK not installed. Install with: pip install together")
         
-        api_key = self.api_key or os.getenv("MISTRAL_API_KEY")
+        api_key = self.api_key or os.getenv("TOGETHER_API_KEY")
         if not api_key:
-            raise AuthenticationException("Mistral API key required")
+            raise AuthenticationException("Together API key required")
         
-        self.client = MistralClient(api_key=api_key)
-        self.async_client = MistralAsyncClient(api_key=api_key)
+        self.client = Together(api_key=api_key)
+        self.async_client = AsyncTogether(api_key=api_key)
     
     def chat_completion(self, messages: Messages, temperature: Optional[float] = None,
-                       max_tokens: Optional[int] = None, tools: Optional[List[ToolDefinition]] = None,
-                       **kwargs) -> Dict[str, Any]:
+                       max_tokens: Optional[int] = None, **kwargs) -> Dict[str, Any]:
         if not self.supports_capability(ModelCapability.CHAT_COMPLETION):
             raise CapabilityNotSupportedException("chat", self.model_name)
         
@@ -47,36 +44,35 @@ class MistralFacade(BaseProviderFacade):
             params['temperature'] = temperature
         if max_tokens:
             params['max_tokens'] = max_tokens
-        if tools:
-            params['tools'] = tools
         
         params.update(kwargs)
         
         try:
-            response = self.client.chat(**params)
+            response = self.client.chat.completions.create(**params)
             return self._convert_response(response)
         except Exception as e:
-            raise InvalidResponseException(f"Mistral API error: {str(e)}")
+            raise InvalidResponseException(f"Together API error: {str(e)}")
     
     async def achat_completion(self, messages: Messages, **kwargs) -> Dict[str, Any]:
         try:
-            response = await self.async_client.chat(
+            response = await self.async_client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
                 **kwargs
             )
             return self._convert_response(response)
         except Exception as e:
-            raise InvalidResponseException(f"Mistral API error: {str(e)}")
+            raise InvalidResponseException(f"Together API error: {str(e)}")
     
     def stream_chat_completion(self, messages: Messages, **kwargs) -> Iterator[str]:
         if not self.supports_capability(ModelCapability.STREAMING):
             raise CapabilityNotSupportedException("streaming", self.model_name)
         
         try:
-            stream = self.client.chat_stream(
+            stream = self.client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
+                stream=True,
                 **kwargs
             )
             
@@ -84,13 +80,14 @@ class MistralFacade(BaseProviderFacade):
                 if chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
         except Exception as e:
-            raise InvalidResponseException(f"Mistral streaming error: {str(e)}")
+            raise InvalidResponseException(f"Together streaming error: {str(e)}")
     
     async def astream_chat_completion(self, messages: Messages, **kwargs) -> AsyncIterator[str]:
         try:
-            stream = await self.async_client.chat_stream(
+            stream = await self.async_client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
+                stream=True,
                 **kwargs
             )
             
@@ -98,56 +95,11 @@ class MistralFacade(BaseProviderFacade):
                 if chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
         except Exception as e:
-            raise InvalidResponseException(f"Mistral streaming error: {str(e)}")
-    
-    def generate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
-        if not self.supports_capability(ModelCapability.EMBEDDINGS):
-            raise CapabilityNotSupportedException("embeddings", self.model_name)
-        
-        is_single = isinstance(texts, str)
-        if is_single:
-            texts = [texts]
-        
-        try:
-            response = self.client.embeddings(
-                model=self.model_name,
-                input=texts
-            )
-            embeddings = [item.embedding for item in response.data]
-            return embeddings[0] if is_single else embeddings
-        except Exception as e:
-            raise InvalidResponseException(f"Mistral embeddings error: {str(e)}")
-    
-    async def agenerate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
-        is_single = isinstance(texts, str)
-        if is_single:
-            texts = [texts]
-        
-        try:
-            response = await self.async_client.embeddings(
-                model=self.model_name,
-                input=texts
-            )
-            embeddings = [item.embedding for item in response.data]
-            return embeddings[0] if is_single else embeddings
-        except Exception as e:
-            raise InvalidResponseException(f"Mistral embeddings error: {str(e)}")
+            raise InvalidResponseException(f"Together streaming error: {str(e)}")
     
     def _convert_response(self, response) -> Dict[str, Any]:
         choice = response.choices[0]
         content = choice.message.content or ""
-        
-        tool_calls = []
-        if hasattr(choice.message, 'tool_calls') and choice.message.tool_calls:
-            for tc in choice.message.tool_calls:
-                tool_calls.append({
-                    "id": tc.id,
-                    "type": tc.type,
-                    "function": {
-                        "name": tc.function.name,
-                        "arguments": tc.function.arguments
-                    }
-                })
         
         usage = TokenUsage(
             prompt_tokens=response.usage.prompt_tokens,
@@ -157,14 +109,11 @@ class MistralFacade(BaseProviderFacade):
         
         return {
             "content": content,
-            "tool_calls": tool_calls if tool_calls else None,
+            "tool_calls": None,
             "usage": usage,
             "metadata": CompletionMetadata(model=response.model, usage=usage),
             "raw_response": response
         }
-    
-    def chat_completion_with_vision(self, messages: Messages, images: List[ImageInput], **kwargs) -> Dict[str, Any]:
-        raise CapabilityNotSupportedException("vision", self.model_name)
     
     def text_completion(self, prompt: str, **kwargs) -> str:
         messages = [{"role": "user", "content": prompt}]
@@ -185,11 +134,20 @@ class MistralFacade(BaseProviderFacade):
         async for chunk in self.astream_chat_completion(messages, **kwargs):
             yield chunk
     
+    def chat_completion_with_vision(self, messages: Messages, images: List[ImageInput], **kwargs) -> Dict[str, Any]:
+        raise CapabilityNotSupportedException("vision", self.model_name)
+    
     def parse_tool_calls(self, response: Dict[str, Any], **kwargs) -> List[ToolCall]:
-        return response.get("tool_calls", [])
+        return []
     
     def count_tokens(self, text: str, **kwargs) -> int:
         return len(text) // 4
+    
+    def generate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
+        raise CapabilityNotSupportedException("embeddings", self.model_name)
+    
+    async def agenerate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
+        raise CapabilityNotSupportedException("embeddings", self.model_name)
     
     def generate_image(self, prompt: str, **kwargs) -> ImageOutput:
         raise CapabilityNotSupportedException("image_generation", self.model_name)
@@ -210,4 +168,4 @@ class MistralFacade(BaseProviderFacade):
         return {"message": "Usage stats not implemented"}
 
 
-__all__ = ['MistralFacade']
+__all__ = ['TogetherFacade']
