@@ -1,0 +1,50 @@
+SYSTEM VERIFICATION REPORT
+=
+
+Abhikarta LLM Execution Platform
+Copyright © 2025-2030, Ashutosh Sinha
+
+COMPONENTS CREATED:
+-----------------
+Python modules: 59
+Documentation files: 6
+SQL schema files: 1
+
+EXECUTION MODES:
+--------------
+autonomous
+background
+base
+chat
+cot
+dag
+hitl
+hybrid
+listening
+multi_agent
+planning
+rag
+react
+tool
+
+DATABASE TABLES:
+--------------
+execution_sessions
+interactions
+execution_state
+dag_definitions
+dag_executions
+execution_plans
+react_cycles
+tool_executions
+agent_definitions
+agent_interactions
+approval_requests
+background_jobs
+rag_collections
+rag_retrievals
+event_subscriptions
+event_processing_log
+thought_chains
+execution_metrics
+audit_log
