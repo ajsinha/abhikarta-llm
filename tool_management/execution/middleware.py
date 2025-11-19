@@ -10,7 +10,7 @@ This module provides middleware infrastructure and common middleware implementat
 
 import time
 import logging
-from typing import Dict, Any, Callable
+from typing import Dict, Any, Callable, Optional
 from functools import wraps
 from collections import defaultdict
 from datetime import datetime, timedelta

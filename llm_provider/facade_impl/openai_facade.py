@@ -31,7 +31,7 @@ from llm_provider.llm_facade import (
     ImageOutput,
     AuthenticationException,
     CapabilityNotSupportedException,
-    InvalidResponseException
+    InvalidResponseException, ModerationResult
 )
 
 
@@ -383,7 +383,6 @@ class OpenAIFacade(BaseProviderFacade):
                 "prompt_tokens": response.usage.prompt_tokens,
                 "completion_tokens": response.usage.completion_tokens,
                 "total_tokens": response.usage.total_tokens
-            
             },
             "metadata": {
                 "model": response.model,
