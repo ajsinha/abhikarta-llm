@@ -110,19 +110,19 @@ class GroqFacade(BaseProviderFacade):
                 tool_calls.append({
                     "id": tc.id,
                     "type": tc.type,
-                    "function": {
-                        "name": tc.function.name,
-                        "arguments": tc.function.arguments
-                    }
-                })
-        
+                "function": {
+                    "name": tc.function.name,
+                    "arguments": tc.function.arguments
+                }
+            })
+
         usage = {
                 "prompt_tokens": response.usage.prompt_tokens,
                 "completion_tokens": response.usage.completion_tokens,
                 "total_tokens": response.usage.total_tokens
-        
+
             }
-        
+
         return {
             "content": content,
             "tool_calls": tool_calls if tool_calls else None,
@@ -133,25 +133,25 @@ class GroqFacade(BaseProviderFacade):
             },
             "raw_response": response
         }
-    
+
     def chat_completion_with_vision(self, messages: Messages, images: List[ImageInput], **kwargs) -> Dict[str, Any]:
         if not self.supports_capability(ModelCapability.VISION):
             raise CapabilityNotSupportedException("vision", self.model_name)
         # Groq supports vision for some models - process images and add to messages
         processed_messages = self._add_images_to_messages(messages, images)
         return self.chat_completion(processed_messages, **kwargs)
-    
+
     def _add_images_to_messages(self, messages: Messages, images: List[ImageInput]) -> Messages:
         """Add images to messages in OpenAI-compatible format."""
         import base64
         processed_messages = messages.copy()
-        
+
         for i in range(len(processed_messages) - 1, -1, -1):
             if processed_messages[i].get('role') == 'user':
                 msg = processed_messages[i]
                 if isinstance(msg['content'], str):
                     msg['content'] = [{"type": "text", "text": msg['content']}]
-                
+
                 for img in images:
                     if isinstance(img, str):
                         if img.startswith('http'):
@@ -167,58 +167,58 @@ class GroqFacade(BaseProviderFacade):
                             img.save(buffer, format='PNG')
                             img_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
                         image_content = {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_b64}"}}
-                    
+
                     msg['content'].append(image_content)
                 break
-        
+
         return processed_messages
-    
+
     def text_completion(self, prompt: str, **kwargs) -> str:
         messages = [{"role": "user", "content": prompt}]
         response = self.chat_completion(messages, **kwargs)
         return response["content"]
-    
+
     async def atext_completion(self, prompt: str, **kwargs) -> str:
         messages = [{"role": "user", "content": prompt}]
         response = await self.achat_completion(messages, **kwargs)
         return response["content"]
-    
+
     def stream_text_completion(self, prompt: str, **kwargs) -> TextStream:
         messages = [{"role": "user", "content": prompt}]
         return self.stream_chat_completion(messages, **kwargs)
-    
+
     async def astream_text_completion(self, prompt: str, **kwargs) -> TextStream:
         messages = [{"role": "user", "content": prompt}]
         async for chunk in self.astream_chat_completion(messages, **kwargs):
             yield chunk
-    
+
     def parse_tool_calls(self, response: Dict[str, Any], **kwargs) -> List[ToolCall]:
         return response.get("tool_calls", [])
-    
+
     def count_tokens(self, text: str, **kwargs) -> int:
         return len(text) // 4
-    
+
     def generate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
         raise CapabilityNotSupportedException("embeddings", self.model_name)
-    
+
     async def agenerate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
         raise CapabilityNotSupportedException("embeddings", self.model_name)
-    
+
     def generate_image(self, prompt: str, **kwargs) -> ImageOutput:
         raise CapabilityNotSupportedException("image_generation", self.model_name)
-    
+
     async def agenerate_image(self, prompt: str, **kwargs) -> ImageOutput:
         raise CapabilityNotSupportedException("image_generation", self.model_name)
-    
+
     def moderate_content(self, content: str, **kwargs) -> ModerationResult:
         raise CapabilityNotSupportedException("moderation", self.model_name)
-    
+
     async def amoderate_content(self, content: str, **kwargs) -> ModerationResult:
         raise CapabilityNotSupportedException("moderation", self.model_name)
-    
+
     def log_request(self, method: str, input_data: Any, response: Any, latency_ms: float, metadata: Optional[Dict[str, Any]] = None, **kwargs) -> None:
         pass
-    
+
     def get_usage_stats(self, period: str = "day", **kwargs) -> Dict[str, Any]:
         return {"message": "Usage stats not implemented"}
 

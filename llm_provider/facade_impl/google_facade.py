@@ -1,310 +1,212 @@
 """
-Abhikarta Google/Gemini Facade - Dynamic Configuration Implementation
+Abhikarta Google AI (Gemini) Facade - Dynamic Configuration Implementation
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
-
-Legal Notice:
-This module and the associated software architecture are proprietary and confidential.
-Unauthorized copying, distribution, modification, or use is strictly prohibited without
-explicit written permission from the copyright holder.
-
-Patent Pending: Certain architectural patterns and implementations described in this
-module may be subject to patent applications.
 """
 
 import os
 import json
-import base64
 from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
-from PIL import Image
-import io
 
 from llm_provider.base_provider_facade import BaseProviderFacade
 from llm_provider.llm_facade import *
 
 
 class GoogleFacade(BaseProviderFacade):
-    """
-    Google/Gemini facade with dynamic configuration loading.
-    
-    Features:
-    - Gemini 1.5 and 2.0 models
-    - Multimodal (text, images, audio, video)
-    - Function calling
-    - Code execution
-    - JSON mode
-    - Context caching
-    - Thinking mode (Gemini 2.0)
-    """
-    
+    """Google AI (Gemini) facade with dynamic configuration."""
+
     def _initialize_client(self):
         """Initialize Google Generative AI client."""
         try:
             import google.generativeai as genai
         except ImportError:
-            raise ImportError(
-                "Google Generative AI SDK not installed. Install with: pip install google-generativeai"
-            )
-        
-        # Get API key
+            raise ImportError("Google Generative AI SDK not installed. Install with: pip install google-generativeai")
+
         api_key = self.api_key or os.getenv("GOOGLE_API_KEY")
         if not api_key:
-            raise AuthenticationException(
-                "Google API key required. Provide via api_key parameter or GOOGLE_API_KEY environment variable."
-            )
-        
+            raise AuthenticationException("Google API key required")
+
         genai.configure(api_key=api_key)
         self.genai = genai
-        
-        # Create generative model
-        generation_config = {}
-        if hasattr(self, 'kwargs'):
-            if 'temperature' in self.kwargs:
-                generation_config['temperature'] = self.kwargs['temperature']
-            if 'top_p' in self.kwargs:
-                generation_config['top_p'] = self.kwargs['top_p']
-            if 'top_k' in self.kwargs:
-                generation_config['top_k'] = self.kwargs['top_k']
-        
-        self.model = genai.GenerativeModel(
-            model_name=self.model_name,
-            generation_config=generation_config if generation_config else None
-        )
-    
-    def chat_completion(
-        self,
-        messages: Messages,
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        tools: Optional[List[ToolDefinition]] = None,
-        **kwargs
-    ) -> Dict[str, Any]:
-        """Generate chat completion using Google Gemini API."""
+        self.model_client = genai.GenerativeModel(self.model_name)
+
+    def chat_completion(self, messages: Messages, temperature: Optional[float] = None,
+                       max_tokens: Optional[int] = None, tools: Optional[List[ToolDefinition]] = None,
+                       **kwargs) -> Dict[str, Any]:
         if not self.supports_capability(ModelCapability.CHAT_COMPLETION):
             raise CapabilityNotSupportedException("chat", self.model_name)
-        
+
         # Convert messages to Gemini format
-        gemini_messages = self._convert_messages_to_gemini(messages)
-        
-        # Build generation config
-        generation_config = {}
+        gemini_messages = self._convert_messages(messages)
+
+        # Generation config
+        gen_config = {}
         if temperature is not None:
-            generation_config['temperature'] = temperature
+            gen_config['temperature'] = temperature
         if max_tokens:
-            generation_config['max_output_tokens'] = max_tokens
-        
-        # Handle tools
+            gen_config['max_output_tokens'] = max_tokens
+
+        # Tools
+        gemini_tools = None
         if tools:
-            gemini_tools = self._convert_tools_to_gemini(tools)
-            kwargs['tools'] = gemini_tools
-        
+            gemini_tools = self._convert_tools(tools)
+
         try:
-            # Start chat
-            chat = self.model.start_chat(history=gemini_messages[:-1])
-            
-            # Generate response
-            response = chat.send_message(
-                gemini_messages[-1]['parts'],
-                generation_config=generation_config if generation_config else None,
+            response = self.model_client.generate_content(
+                gemini_messages,
+                generation_config=self.genai.GenerationConfig(**gen_config) if gen_config else None,
+                tools=gemini_tools,
                 **kwargs
             )
-            
+
             return self._convert_response(response)
-        
         except Exception as e:
-            raise InvalidResponseException(f"Google API error: {str(e)}")
-    
-    async def achat_completion(
-        self,
-        messages: Messages,
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        **kwargs
-    ) -> Dict[str, Any]:
-        """Async chat completion."""
-        # Google SDK doesn't have native async, use sync in executor
+            raise InvalidResponseException(f"Google AI API error: {str(e)}")
+
+    async def achat_completion(self, messages: Messages, **kwargs) -> Dict[str, Any]:
         import asyncio
         return await asyncio.get_event_loop().run_in_executor(
-            None, 
-            lambda: self.chat_completion(messages, temperature, max_tokens, **kwargs)
+            None, lambda: self.chat_completion(messages, **kwargs)
         )
-    
-    def stream_chat_completion(
-        self,
-        messages: Messages,
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        **kwargs
-    ) -> Iterator[str]:
-        """Stream chat completion."""
+
+    def stream_chat_completion(self, messages: Messages, **kwargs) -> Iterator[str]:
         if not self.supports_capability(ModelCapability.STREAMING):
             raise CapabilityNotSupportedException("streaming", self.model_name)
-        
-        gemini_messages = self._convert_messages_to_gemini(messages)
-        
-        generation_config = {}
-        if temperature is not None:
-            generation_config['temperature'] = temperature
-        if max_tokens:
-            generation_config['max_output_tokens'] = max_tokens
-        
+
+        gemini_messages = self._convert_messages(messages)
+
         try:
-            chat = self.model.start_chat(history=gemini_messages[:-1])
-            
-            response_stream = chat.send_message(
-                gemini_messages[-1]['parts'],
-                generation_config=generation_config if generation_config else None,
+            response = self.model_client.generate_content(
+                gemini_messages,
                 stream=True,
                 **kwargs
             )
-            
-            for chunk in response_stream:
-                if chunk.text:
+
+            for chunk in response:
+                if hasattr(chunk, 'text'):
                     yield chunk.text
-        
         except Exception as e:
-            raise InvalidResponseException(f"Google streaming error: {str(e)}")
-    
-    async def astream_chat_completion(
-        self,
-        messages: Messages,
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        **kwargs
-    ) -> AsyncIterator[str]:
-        """Async stream chat completion."""
+            raise InvalidResponseException(f"Google AI streaming error: {str(e)}")
+
+    async def astream_chat_completion(self, messages: Messages, **kwargs) -> AsyncIterator[str]:
         import asyncio
-        for chunk in self.stream_chat_completion(messages, temperature, max_tokens, **kwargs):
+        for chunk in self.stream_chat_completion(messages, **kwargs):
             yield chunk
             await asyncio.sleep(0)
-    
-    def chat_completion_with_vision(
-        self,
-        messages: Messages,
-        images: List[ImageInput],
-        **kwargs
-    ) -> Dict[str, Any]:
-        """Chat with vision."""
+
+    def chat_completion_with_vision(self, messages: Messages, images: List[ImageInput], **kwargs) -> Dict[str, Any]:
         if not self.supports_capability(ModelCapability.VISION):
             raise CapabilityNotSupportedException("vision", self.model_name)
-        
+
         # Process images
-        processed_messages = self._add_images_to_messages(messages, images)
-        return self.chat_completion(processed_messages, **kwargs)
-    
-    def _convert_messages_to_gemini(self, messages: Messages) -> List[Dict[str, Any]]:
+        processed_images = []
+        for img in images:
+            if isinstance(img, str):
+                if img.startswith('http'):
+                    # URL - Gemini can handle directly
+                    processed_images.append(img)
+                else:
+                    # Base64
+                    import base64
+                    from PIL import Image
+                    import io
+                    img_data = base64.b64decode(img)
+                    pil_img = Image.open(io.BytesIO(img_data))
+                    processed_images.append(pil_img)
+            elif isinstance(img, bytes):
+                from PIL import Image
+                import io
+                pil_img = Image.open(io.BytesIO(img))
+                processed_images.append(pil_img)
+            else:
+                # Assume PIL Image
+                processed_images.append(img)
+
+        # Create content with images
+        content = []
+
+        # Add last user message text
+        for msg in reversed(messages):
+            if msg.get('role') == 'user':
+                content.append(msg.get('content', ''))
+                break
+
+        # Add images
+        content.extend(processed_images)
+
+        try:
+            response = self.model_client.generate_content(content, **kwargs)
+            return self._convert_response(response)
+        except Exception as e:
+            raise InvalidResponseException(f"Google AI vision error: {str(e)}")
+
+    def _convert_messages(self, messages: Messages) -> List[Dict[str, Any]]:
         """Convert standard messages to Gemini format."""
         gemini_messages = []
-        
+
         for msg in messages:
-            role = msg.get('role', 'user')
+            role = msg.get('role')
             content = msg.get('content', '')
-            
+
             # Map roles
             if role == 'system':
                 # Gemini doesn't have system role, prepend to first user message
-                continue
+                gemini_messages.append({
+                    "role": "user",
+                    "parts": [{"text": f"System: {content}"}]
+                })
+            elif role == 'user':
+                gemini_messages.append({
+                    "role": "user",
+                    "parts": [{"text": content}]
+                })
             elif role == 'assistant':
-                gemini_role = 'model'
-            else:
-                gemini_role = 'user'
-            
-            # Handle content
-            if isinstance(content, str):
-                parts = [content]
-            elif isinstance(content, list):
-                parts = []
-                for item in content:
-                    if item.get('type') == 'text':
-                        parts.append(item['text'])
-                    elif item.get('type') == 'image_url':
-                        # Handle image
-                        parts.append(self._process_image_url(item['image_url']['url']))
-            else:
-                parts = [str(content)]
-            
-            gemini_messages.append({
-                'role': gemini_role,
-                'parts': parts
-            })
-        
+                gemini_messages.append({
+                    "role": "model",
+                    "parts": [{"text": content}]
+                })
+
         return gemini_messages
-    
-    def _process_image_url(self, url: str):
-        """Process image URL for Gemini."""
-        if url.startswith('data:'):
-            # Base64 encoded
-            import base64
-            header, data = url.split(',', 1)
-            image_data = base64.b64decode(data)
-            return Image.open(io.BytesIO(image_data))
-        else:
-            # URL
-            return url
-    
-    def _add_images_to_messages(
-        self,
-        messages: Messages,
-        images: List[ImageInput]
-    ) -> Messages:
-        """Add images to messages."""
-        processed_messages = messages.copy()
-        
-        # Find last user message
-        for i in range(len(processed_messages) - 1, -1, -1):
-            if processed_messages[i].get('role') == 'user':
-                msg = processed_messages[i]
-                if isinstance(msg['content'], str):
-                    msg['content'] = [{"type": "text", "text": msg['content']}]
-                
-                for img in images:
-                    if isinstance(img, str):
-                        msg['content'].append({
-                            "type": "image_url",
-                            "image_url": {"url": img}
-                        })
-                    else:
-                        # Convert to base64
-                        if isinstance(img, bytes):
-                            img_b64 = base64.b64encode(img).decode('utf-8')
-                        else:
-                            buffer = io.BytesIO()
-                            img.save(buffer, format='PNG')
-                            img_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-                        
-                        msg['content'].append({
-                            "type": "image_url",
-                            "image_url": {"url": f"data:image/png;base64,{img_b64}"}
-                        })
-                break
-        
-        return processed_messages
-    
-    def _convert_tools_to_gemini(self, tools: List[ToolDefinition]) -> List:
-        """Convert tools to Gemini format."""
+
+    def _convert_tools(self, tools: List[ToolDefinition]) -> List[Any]:
+        """Convert standard tool definitions to Gemini format."""
         gemini_tools = []
+
         for tool in tools:
             if tool.get('type') == 'function':
                 func = tool['function']
-                gemini_tools.append(self.genai.protos.Tool(
-                    function_declarations=[
-                        self.genai.protos.FunctionDeclaration(
-                            name=func['name'],
-                            description=func.get('description', ''),
-                            parameters=func.get('parameters', {})
-                        )
-                    ]
-                ))
-        return gemini_tools
-    
+                gemini_tools.append(
+                    self.genai.Tool(
+                        function_declarations=[
+                            self.genai.FunctionDeclaration(
+                                name=func['name'],
+                                description=func.get('description', ''),
+                                parameters=func.get('parameters', {})
+                            )
+                        ]
+                    )
+                )
+
+        return gemini_tools if gemini_tools else None
+
     def _convert_response(self, response) -> Dict[str, Any]:
         """Convert Gemini response to standard format."""
-        content = response.text if hasattr(response, 'text') else ""
-        
-        # Extract tool calls if present
+        content = ""
         tool_calls = []
+
+        # Extract content
+        if hasattr(response, 'text'):
+            content = response.text
+        elif hasattr(response, 'candidates') and response.candidates:
+            candidate = response.candidates[0]
+            if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                for part in candidate.content.parts:
+                    if hasattr(part, 'text'):
+                        content += part.text
+
+        # Extract tool calls
         if hasattr(response, 'candidates') and response.candidates:
             candidate = response.candidates[0]
             if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
@@ -319,7 +221,7 @@ class GoogleFacade(BaseProviderFacade):
                                 "arguments": json.dumps(dict(fc.args))
                             }
                         })
-        
+
         # Token usage
         usage = None
         if hasattr(response, 'usage_metadata'):
@@ -327,113 +229,104 @@ class GoogleFacade(BaseProviderFacade):
                 "prompt_tokens": response.usage_metadata.prompt_token_count,
                 "completion_tokens": response.usage_metadata.candidates_token_count,
                 "total_tokens": response.usage_metadata.total_token_count
-            
             }
-        
+
+        # Metadata
+        metadata = {
+            "model": self.model_name
+        }
+
+        # Add finish_reason if available
+        if hasattr(response, 'candidates') and response.candidates:
+            finish_reason = str(response.candidates[0].finish_reason)
+            metadata["finish_reason"] = finish_reason
+
         return {
             "content": content,
             "tool_calls": tool_calls if tool_calls else None,
             "usage": usage,
-            "metadata": {
-                "model": self.model_name,
-                "finish_reason": str(response.candidates[0].finish_reason
-            } if hasattr(response, 'candidates') else None,
-                usage=usage
-            ),
+            "metadata": metadata,
             "raw_response": response
         }
-    
+
     def generate_embeddings(
         self,
         texts: Union[str, List[str]],
         **kwargs
     ) -> Union[Embedding, List[Embedding]]:
-        """Generate embeddings."""
         if not self.supports_capability(ModelCapability.EMBEDDINGS):
             raise CapabilityNotSupportedException("embeddings", self.model_name)
-        
+
         is_single = isinstance(texts, str)
         if is_single:
             texts = [texts]
-        
+
         try:
             result = self.genai.embed_content(
                 model=self.model_name,
                 content=texts,
                 **kwargs
             )
-            
-            embeddings = result['embedding'] if is_single else [e for e in result['embeddings']]
-            return embeddings
-        
+
+            embeddings = result['embedding'] if is_single else result['embeddings']
+            return embeddings[0] if is_single else embeddings
         except Exception as e:
-            raise InvalidResponseException(f"Google embeddings error: {str(e)}")
-    
+            raise InvalidResponseException(f"Google AI embeddings error: {str(e)}")
+
     async def agenerate_embeddings(
         self,
         texts: Union[str, List[str]],
         **kwargs
     ) -> Union[Embedding, List[Embedding]]:
-        """Async embeddings."""
         import asyncio
         return await asyncio.get_event_loop().run_in_executor(
-            None,
-            lambda: self.generate_embeddings(texts, **kwargs)
+            None, lambda: self.generate_embeddings(texts, **kwargs)
         )
-    
-    def parse_tool_calls(
-        self,
-        response: Dict[str, Any],
-        **kwargs
-    ) -> List[ToolCall]:
-        """Extract tool calls."""
-        if "tool_calls" in response and response["tool_calls"]:
-            return response["tool_calls"]
-        return []
-    
-    def count_tokens(self, text: str, **kwargs) -> int:
-        """Count tokens."""
-        try:
-            result = self.model.count_tokens(text)
-            return result.total_tokens
-        except:
-            return len(text) // 4
-    
-    # Required implementations
+
     def text_completion(self, prompt: str, **kwargs) -> str:
         messages = [{"role": "user", "content": prompt}]
         response = self.chat_completion(messages, **kwargs)
         return response["content"]
-    
+
     async def atext_completion(self, prompt: str, **kwargs) -> str:
         messages = [{"role": "user", "content": prompt}]
         response = await self.achat_completion(messages, **kwargs)
         return response["content"]
-    
+
     def stream_text_completion(self, prompt: str, **kwargs) -> TextStream:
         messages = [{"role": "user", "content": prompt}]
         return self.stream_chat_completion(messages, **kwargs)
-    
+
     async def astream_text_completion(self, prompt: str, **kwargs) -> TextStream:
         messages = [{"role": "user", "content": prompt}]
         async for chunk in self.astream_chat_completion(messages, **kwargs):
             yield chunk
-    
+
+    def parse_tool_calls(self, response: Dict[str, Any], **kwargs) -> List[ToolCall]:
+        return response.get("tool_calls", [])
+
+    def count_tokens(self, text: str, **kwargs) -> int:
+        try:
+            result = self.model_client.count_tokens(text)
+            return result.total_tokens
+        except:
+            return len(text) // 4
+
     def generate_image(self, prompt: str, **kwargs) -> ImageOutput:
         raise CapabilityNotSupportedException("image_generation", self.model_name)
-    
+
     async def agenerate_image(self, prompt: str, **kwargs) -> ImageOutput:
         raise CapabilityNotSupportedException("image_generation", self.model_name)
-    
+
     def moderate_content(self, content: str, **kwargs) -> ModerationResult:
         raise CapabilityNotSupportedException("moderation", self.model_name)
-    
+
     async def amoderate_content(self, content: str, **kwargs) -> ModerationResult:
         raise CapabilityNotSupportedException("moderation", self.model_name)
-    
+
     def log_request(self, method: str, input_data: Any, response: Any, latency_ms: float, metadata: Optional[Dict[str, Any]] = None, **kwargs) -> None:
         pass
-    
+
     def get_usage_stats(self, period: str = "day", **kwargs) -> Dict[str, Any]:
         return {"message": "Usage stats not implemented"}
 
