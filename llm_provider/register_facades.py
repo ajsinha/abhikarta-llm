@@ -18,21 +18,21 @@ This module registers all provider-specific facades with the FacadeFactory.
 Import this module to automatically register all available facades.
 """
 
-from facade_factory import FacadeFactory
+from llm_provider.facade_factory import FacadeFactory
 
 # Import all facade implementations
-from anthropic_facade import AnthropicFacade
-from openai_facade import OpenAIFacade
-from google_facade import GoogleFacade
-from cohere_facade import CohereFacade
-from mistral_facade import MistralFacade
-from groq_facade import GroqFacade
-from meta_facade import MetaFacade
-from huggingface_facade import HuggingFaceFacade
-from together_facade import TogetherFacade
-from ollama_facade import OllamaFacade
-from awsbedrock_facade import AWSBedrockFacade
-from mock_facade import MockFacade
+from llm_provider.facade_impl.anthropic_facade import AnthropicFacade
+from llm_provider.facade_impl.openai_facade import OpenAIFacade
+from llm_provider.facade_impl.google_facade import GoogleFacade
+from llm_provider.facade_impl.cohere_facade import CohereFacade
+from llm_provider.facade_impl.mistral_facade import MistralFacade
+from llm_provider.facade_impl.groq_facade import GroqFacade
+from llm_provider.facade_impl.meta_facade import MetaFacade
+from llm_provider.facade_impl.huggingface_facade import HuggingFaceFacade
+from llm_provider.facade_impl.together_facade import TogetherFacade
+from llm_provider.facade_impl.ollama_facade import OllamaFacade
+from llm_provider.facade_impl.awsbedrock_facade import AWSBedrockFacade
+from llm_provider.facade_impl.mock_facade import MockFacade
 
 # Register all provider facades
 FacadeFactory.register_facade("anthropic", AnthropicFacade)

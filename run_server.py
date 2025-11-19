@@ -76,6 +76,10 @@ def create_mcp_servers():
 
     return mcp_server_manager
 
+def set_llm_provider_facade_factory(pool_name: str):
+    import llm_provider.register_facades
+    from llm_provider.facade_factory import FacadeFactory
+    FacadeFactory(config_source="db", db_connection_pool_name=pool_name)
 
 def prepare_prop_conf():
     from core.config.properties_configurator import PropertiesConfigurator

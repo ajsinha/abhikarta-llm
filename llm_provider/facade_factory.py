@@ -19,18 +19,17 @@ either JSON or Database configurations. The factory automatically detects the
 configuration source and creates the appropriate facade instance.
 """
 
-import os
-from typing import Dict, Optional, Union, Type
+from typing import Dict, Optional, Type, Any, List, Tuple
 from pathlib import Path
 
-from llm_facade import LLMFacade, AuthenticationException
-from base_provider_facade import BaseProviderFacade
+from llm_facade import LLMFacade
 from model_management.model_provider import ModelProvider
-from model_management.model_provider_json import ModelProviderJSON, load_providers as load_json_providers
-from model_management.model_provider_db import ModelProviderDB, load_providers as load_db_providers
+from model_management.model_provider_json import load_providers as load_json_providers
+from model_management.model_provider_db import load_providers as load_db_providers
+from core import SingletonMeta
+from model_management.model_management_db_handler import ModelManagementDBHandler
 
-
-class FacadeFactory:
+class FacadeFactory(metaclass=SingletonMeta):
     """
     Universal factory for creating provider facades with dynamic configuration.
     
@@ -62,7 +61,7 @@ class FacadeFactory:
         self,
         config_source: str = "json",
         config_path: Optional[str] = None,
-        db_handler: Optional[Any] = None,
+        db_connection_pool_name: Optional[Any] = None,
         **kwargs
     ):
         """
@@ -71,12 +70,13 @@ class FacadeFactory:
         Args:
             config_source: Configuration source ("json" or "db")
             config_path: Path to JSON configuration directory (for JSON source)
-            db_handler: Database handler instance (for DB source)
+            db_connection_pool_name: Database connection pool name (for DB source)
             **kwargs: Additional configuration options
         """
         self.config_source = config_source.lower()
         self.config_path = config_path
-        self.db_handler = db_handler
+        self.db_connection_pool_name = db_connection_pool_name
+        self.db_handler = None
         self.kwargs = kwargs
         
         # Cache for loaded providers
@@ -89,8 +89,9 @@ class FacadeFactory:
             if not Path(self.config_path).exists():
                 raise ValueError(f"Configuration path does not exist: {self.config_path}")
         elif self.config_source == "db":
-            if not self.db_handler:
+            if not self.db_connection_pool_name:
                 raise ValueError("db_handler is required for DB configuration")
+            self.db_handler = ModelManagementDBHandler.get_instance(self.db_connection_pool_name)
         else:
             raise ValueError(f"Invalid config_source: {self.config_source}")
         
@@ -196,7 +197,7 @@ class FacadeFactory:
             AuthenticationException: If API key invalid or missing
             
         Example:
-            >>> factory = FacadeFactory(config_source="json", config_path="./config")
+            >>> factory = FacadeFactory(config_source="json", config_path="config")
             >>> facade = factory.create_facade("anthropic", "claude-3-5-sonnet-20241022")
             >>> response = facade.chat_completion([{"role": "user", "content": "Hello!"}])
         """
@@ -281,7 +282,7 @@ class FacadeFactory:
             Tuple of (facade instance, estimated cost)
             
         Example:
-            >>> factory = FacadeFactory(config_source="json", config_path="./config")
+            >>> factory = FacadeFactory(config_source="json", config_path="config")
             >>> facade, cost = factory.create_cheapest_facade("chat")
             >>> print(f"Using cheapest model at ${cost:.4f}")
         """
@@ -388,7 +389,7 @@ def create_facade_from_db(
     Returns:
         Configured facade instance
     """
-    factory = FacadeFactory(config_source="db", db_handler=db_handler)
+    factory = FacadeFactory(config_source="db", db_connection_pool_name=db_handler)
     return factory.create_facade(provider_name, model_name, **kwargs)
 
 

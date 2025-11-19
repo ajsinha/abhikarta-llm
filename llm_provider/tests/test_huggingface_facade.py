@@ -13,13 +13,12 @@ import unittest
 import os
 import sys
 import asyncio
-from typing import List, Dict, Any
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from llm_provider.huggingface_facade import (
+from llm_provider.facade_impl.huggingface_facade import (
     HuggingFaceLLMFacade,
     create_huggingface_llm,
     GenerationConfig,

@@ -9,7 +9,7 @@ Email: ajsinha@gmail.com
 import os
 from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
 
-from base_provider_facade import BaseProviderFacade
+from llm_provider.facade_impl.base_provider_facade import BaseProviderFacade
 from llm_facade import *
 
 

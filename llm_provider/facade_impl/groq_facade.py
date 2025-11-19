@@ -1,5 +1,5 @@
 """
-Abhikarta Mistral Facade - Dynamic Configuration Implementation
+Abhikarta Groq Facade - Dynamic Configuration Implementation
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
@@ -7,30 +7,28 @@ Email: ajsinha@gmail.com
 """
 
 import os
-import json
-from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator, Tuple
+from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
 
-from base_provider_facade import BaseProviderFacade
+from llm_provider.facade_impl.base_provider_facade import BaseProviderFacade
 from llm_facade import *
 
 
-class MistralFacade(BaseProviderFacade):
-    """Mistral AI facade supporting Mixtral and Mistral models."""
+class GroqFacade(BaseProviderFacade):
+    """Groq facade for ultra-fast inference with Llama, Mixtral, and Gemma models."""
     
     def _initialize_client(self):
-        """Initialize Mistral client."""
+        """Initialize Groq client."""
         try:
-            from mistralai.client import MistralClient
-            from mistralai.async_client import MistralAsyncClient
+            from groq import Groq, AsyncGroq
         except ImportError:
-            raise ImportError("Mistral SDK not installed. Install with: pip install mistralai")
+            raise ImportError("Groq SDK not installed. Install with: pip install groq")
         
-        api_key = self.api_key or os.getenv("MISTRAL_API_KEY")
+        api_key = self.api_key or os.getenv("GROQ_API_KEY")
         if not api_key:
-            raise AuthenticationException("Mistral API key required")
+            raise AuthenticationException("Groq API key required")
         
-        self.client = MistralClient(api_key=api_key)
-        self.async_client = MistralAsyncClient(api_key=api_key)
+        self.client = Groq(api_key=api_key)
+        self.async_client = AsyncGroq(api_key=api_key)
     
     def chat_completion(self, messages: Messages, temperature: Optional[float] = None,
                        max_tokens: Optional[int] = None, tools: Optional[List[ToolDefinition]] = None,
@@ -53,30 +51,31 @@ class MistralFacade(BaseProviderFacade):
         params.update(kwargs)
         
         try:
-            response = self.client.chat(**params)
+            response = self.client.chat.completions.create(**params)
             return self._convert_response(response)
         except Exception as e:
-            raise InvalidResponseException(f"Mistral API error: {str(e)}")
+            raise InvalidResponseException(f"Groq API error: {str(e)}")
     
     async def achat_completion(self, messages: Messages, **kwargs) -> Dict[str, Any]:
         try:
-            response = await self.async_client.chat(
+            response = await self.async_client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
                 **kwargs
             )
             return self._convert_response(response)
         except Exception as e:
-            raise InvalidResponseException(f"Mistral API error: {str(e)}")
+            raise InvalidResponseException(f"Groq API error: {str(e)}")
     
     def stream_chat_completion(self, messages: Messages, **kwargs) -> Iterator[str]:
         if not self.supports_capability(ModelCapability.STREAMING):
             raise CapabilityNotSupportedException("streaming", self.model_name)
         
         try:
-            stream = self.client.chat_stream(
+            stream = self.client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
+                stream=True,
                 **kwargs
             )
             
@@ -84,13 +83,14 @@ class MistralFacade(BaseProviderFacade):
                 if chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
         except Exception as e:
-            raise InvalidResponseException(f"Mistral streaming error: {str(e)}")
+            raise InvalidResponseException(f"Groq streaming error: {str(e)}")
     
     async def astream_chat_completion(self, messages: Messages, **kwargs) -> AsyncIterator[str]:
         try:
-            stream = await self.async_client.chat_stream(
+            stream = await self.async_client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
+                stream=True,
                 **kwargs
             )
             
@@ -98,40 +98,7 @@ class MistralFacade(BaseProviderFacade):
                 if chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
         except Exception as e:
-            raise InvalidResponseException(f"Mistral streaming error: {str(e)}")
-    
-    def generate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
-        if not self.supports_capability(ModelCapability.EMBEDDINGS):
-            raise CapabilityNotSupportedException("embeddings", self.model_name)
-        
-        is_single = isinstance(texts, str)
-        if is_single:
-            texts = [texts]
-        
-        try:
-            response = self.client.embeddings(
-                model=self.model_name,
-                input=texts
-            )
-            embeddings = [item.embedding for item in response.data]
-            return embeddings[0] if is_single else embeddings
-        except Exception as e:
-            raise InvalidResponseException(f"Mistral embeddings error: {str(e)}")
-    
-    async def agenerate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
-        is_single = isinstance(texts, str)
-        if is_single:
-            texts = [texts]
-        
-        try:
-            response = await self.async_client.embeddings(
-                model=self.model_name,
-                input=texts
-            )
-            embeddings = [item.embedding for item in response.data]
-            return embeddings[0] if is_single else embeddings
-        except Exception as e:
-            raise InvalidResponseException(f"Mistral embeddings error: {str(e)}")
+            raise InvalidResponseException(f"Groq streaming error: {str(e)}")
     
     def _convert_response(self, response) -> Dict[str, Any]:
         choice = response.choices[0]
@@ -159,12 +126,48 @@ class MistralFacade(BaseProviderFacade):
             "content": content,
             "tool_calls": tool_calls if tool_calls else None,
             "usage": usage,
-            "metadata": CompletionMetadata(model=response.model, usage=usage),
+            "metadata": CompletionMetadata(model=response.model, finish_reason=choice.finish_reason, usage=usage),
             "raw_response": response
         }
     
     def chat_completion_with_vision(self, messages: Messages, images: List[ImageInput], **kwargs) -> Dict[str, Any]:
-        raise CapabilityNotSupportedException("vision", self.model_name)
+        if not self.supports_capability(ModelCapability.VISION):
+            raise CapabilityNotSupportedException("vision", self.model_name)
+        # Groq supports vision for some models - process images and add to messages
+        processed_messages = self._add_images_to_messages(messages, images)
+        return self.chat_completion(processed_messages, **kwargs)
+    
+    def _add_images_to_messages(self, messages: Messages, images: List[ImageInput]) -> Messages:
+        """Add images to messages in OpenAI-compatible format."""
+        import base64
+        processed_messages = messages.copy()
+        
+        for i in range(len(processed_messages) - 1, -1, -1):
+            if processed_messages[i].get('role') == 'user':
+                msg = processed_messages[i]
+                if isinstance(msg['content'], str):
+                    msg['content'] = [{"type": "text", "text": msg['content']}]
+                
+                for img in images:
+                    if isinstance(img, str):
+                        if img.startswith('http'):
+                            image_content = {"type": "image_url", "image_url": {"url": img}}
+                        else:
+                            image_content = {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img}"}}
+                    else:
+                        if isinstance(img, bytes):
+                            img_b64 = base64.b64encode(img).decode('utf-8')
+                        else:
+                            import io
+                            buffer = io.BytesIO()
+                            img.save(buffer, format='PNG')
+                            img_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                        image_content = {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img_b64}"}}
+                    
+                    msg['content'].append(image_content)
+                break
+        
+        return processed_messages
     
     def text_completion(self, prompt: str, **kwargs) -> str:
         messages = [{"role": "user", "content": prompt}]
@@ -191,6 +194,12 @@ class MistralFacade(BaseProviderFacade):
     def count_tokens(self, text: str, **kwargs) -> int:
         return len(text) // 4
     
+    def generate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
+        raise CapabilityNotSupportedException("embeddings", self.model_name)
+    
+    async def agenerate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
+        raise CapabilityNotSupportedException("embeddings", self.model_name)
+    
     def generate_image(self, prompt: str, **kwargs) -> ImageOutput:
         raise CapabilityNotSupportedException("image_generation", self.model_name)
     
@@ -210,4 +219,4 @@ class MistralFacade(BaseProviderFacade):
         return {"message": "Usage stats not implemented"}
 
 
-__all__ = ['MistralFacade']
+__all__ = ['GroqFacade']

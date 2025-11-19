@@ -8,9 +8,9 @@ Email: ajsinha@gmail.com
 
 import os
 import json
-from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator, Tuple
+from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
 
-from base_provider_facade import BaseProviderFacade
+from llm_provider.facade_impl.base_provider_facade import BaseProviderFacade
 from llm_facade import *
 
 

@@ -1,5 +1,5 @@
 """
-Abhikarta Meta/Replicate Facade - Llama models via Replicate
+Abhikarta HuggingFace Facade
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
@@ -7,72 +7,56 @@ Email: ajsinha@gmail.com
 """
 
 import os
-import json
-from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator, Tuple
+from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
 
-from base_provider_facade import BaseProviderFacade
+from llm_provider.facade_impl.base_provider_facade import BaseProviderFacade
 from llm_facade import *
 
 
-class MetaFacade(BaseProviderFacade):
-    """Meta Llama models via Replicate API."""
+class HuggingFaceFacade(BaseProviderFacade):
+    """HuggingFace Inference API facade."""
     
     def _initialize_client(self):
-        """Initialize Replicate client."""
+        """Initialize HuggingFace client."""
         try:
-            import replicate
+            from huggingface_hub import InferenceClient, AsyncInferenceClient
         except ImportError:
-            raise ImportError("Replicate SDK not installed. Install with: pip install replicate")
+            raise ImportError("HuggingFace Hub not installed. Install with: pip install huggingface_hub")
         
-        api_key = self.api_key or os.getenv("REPLICATE_API_TOKEN")
+        api_key = self.api_key or os.getenv("HUGGINGFACE_API_KEY")
         if not api_key:
-            raise AuthenticationException("Replicate API token required")
+            raise AuthenticationException("HuggingFace API key required")
         
-        os.environ["REPLICATE_API_TOKEN"] = api_key
-        self.replicate = replicate
+        self.client = InferenceClient(token=api_key)
+        self.async_client = AsyncInferenceClient(token=api_key)
     
     def chat_completion(self, messages: Messages, temperature: Optional[float] = None,
                        max_tokens: Optional[int] = None, **kwargs) -> Dict[str, Any]:
         if not self.supports_capability(ModelCapability.CHAT_COMPLETION):
             raise CapabilityNotSupportedException("chat", self.model_name)
         
-        # Get replicate model path from model metadata
-        replicate_model = self.model.get_custom_field('replicate_model')
-        if not replicate_model:
-            replicate_model = f"meta/{self.model_name}"
-        
-        # Format prompt
-        prompt = self._format_messages_for_llama(messages)
-        
-        input_params = {
-            "prompt": prompt,
-            "max_new_tokens": max_tokens or 512,
+        params = {
+            "model": self.model_name,
+            "messages": messages,
+            "max_tokens": max_tokens or 500
         }
         
         if temperature is not None:
-            input_params['temperature'] = temperature
-        
-        input_params.update(kwargs)
+            params['temperature'] = temperature
         
         try:
-            output = self.replicate.run(replicate_model, input=input_params)
-            
-            # Collect output
-            content = "".join(output) if isinstance(output, Iterator) else str(output)
+            response = self.client.chat_completion(**params)
+            content = response.choices[0].message.content
             
             return {
                 "content": content,
                 "tool_calls": None,
-                "usage": TokenUsage(
-                    prompt_tokens=len(prompt) // 4,
-                    completion_tokens=len(content) // 4,
-                    total_tokens=(len(prompt) + len(content)) // 4
-                ),
+                "usage": TokenUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0),
                 "metadata": CompletionMetadata(model=self.model_name),
-                "raw_response": output
+                "raw_response": response
             }
         except Exception as e:
-            raise InvalidResponseException(f"Replicate API error: {str(e)}")
+            raise InvalidResponseException(f"HuggingFace API error: {str(e)}")
     
     async def achat_completion(self, messages: Messages, **kwargs) -> Dict[str, Any]:
         import asyncio
@@ -84,45 +68,23 @@ class MetaFacade(BaseProviderFacade):
         if not self.supports_capability(ModelCapability.STREAMING):
             raise CapabilityNotSupportedException("streaming", self.model_name)
         
-        replicate_model = self.model.get_custom_field('replicate_model') or f"meta/{self.model_name}"
-        prompt = self._format_messages_for_llama(messages)
-        
-        input_params = {"prompt": prompt}
-        input_params.update(kwargs)
-        
         try:
-            for output in self.replicate.stream(replicate_model, input=input_params):
-                yield str(output)
+            for token in self.client.chat_completion(
+                model=self.model_name,
+                messages=messages,
+                stream=True,
+                **kwargs
+            ):
+                if hasattr(token.choices[0].delta, 'content') and token.choices[0].delta.content:
+                    yield token.choices[0].delta.content
         except Exception as e:
-            raise InvalidResponseException(f"Replicate streaming error: {str(e)}")
+            raise InvalidResponseException(f"HuggingFace streaming error: {str(e)}")
     
     async def astream_chat_completion(self, messages: Messages, **kwargs) -> AsyncIterator[str]:
         import asyncio
         for chunk in self.stream_chat_completion(messages, **kwargs):
             yield chunk
             await asyncio.sleep(0)
-    
-    def _format_messages_for_llama(self, messages: Messages) -> str:
-        """Format messages for Llama models."""
-        parts = []
-        for msg in messages:
-            role = msg.get('role', 'user')
-            content = msg.get('content', '')
-            
-            if role == 'system':
-                parts.append(f"<<SYS>>\n{content}\n<</SYS>>")
-            elif role == 'user':
-                parts.append(f"[INST] {content} [/INST]")
-            elif role == 'assistant':
-                parts.append(content)
-        
-        return "\n\n".join(parts)
-    
-    def chat_completion_with_vision(self, messages: Messages, images: List[ImageInput], **kwargs) -> Dict[str, Any]:
-        if not self.supports_capability(ModelCapability.VISION):
-            raise CapabilityNotSupportedException("vision", self.model_name)
-        # Vision models would need special handling
-        raise NotImplementedError("Vision support for Llama models via Replicate needs model-specific implementation")
     
     def text_completion(self, prompt: str, **kwargs) -> str:
         messages = [{"role": "user", "content": prompt}]
@@ -142,6 +104,9 @@ class MetaFacade(BaseProviderFacade):
         messages = [{"role": "user", "content": prompt}]
         async for chunk in self.astream_chat_completion(messages, **kwargs):
             yield chunk
+    
+    def chat_completion_with_vision(self, messages: Messages, images: List[ImageInput], **kwargs) -> Dict[str, Any]:
+        raise CapabilityNotSupportedException("vision", self.model_name)
     
     def parse_tool_calls(self, response: Dict[str, Any], **kwargs) -> List[ToolCall]:
         return []
@@ -174,4 +139,4 @@ class MetaFacade(BaseProviderFacade):
         return {"message": "Usage stats not implemented"}
 
 
-__all__ = ['MetaFacade']
+__all__ = ['HuggingFaceFacade']
