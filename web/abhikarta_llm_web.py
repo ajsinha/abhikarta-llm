@@ -25,6 +25,8 @@ from typing import Optional
 from web.route_management.abstract_routes import AbstractRoutes
 from tool_management.mcp_server_manager import MCPServerManager
 from core.config.properties_configurator import PropertiesConfigurator
+from model_management.model_registry import ModelRegistry
+from llm_provider.llm_facade_factory import LLMFacadeFactory
 
 # Configure logging
 logging.basicConfig(
@@ -63,6 +65,8 @@ class AbhikartaLLMWeb:
         self.resource_manager = None
         self.db_connection_pool_name = None
         self.mcp_server_manager = MCPServerManager()
+        self.model_registry:ModelRegistry = None
+        self.llm_facade_factory: LLMFacadeFactory = None
 
         # Configure application
         self.app.config['SECRET_KEY'] = secret_key or os.urandom(24).hex()
@@ -111,6 +115,12 @@ class AbhikartaLLMWeb:
             logger.error(f"Error cleaning up session files: {e}")
             raise
 
+    def set_model_registry(self, model_registry: ModelRegistry):
+        self.model_registry = model_registry
+
+    def set_llm_facade_factory(self, llm_facade_factory: LLMFacadeFactory):
+        self.llm_facade_factory = llm_facade_factory
+
     def set_db_connection_pool_name(self, db_connection_pool_name):
         self.db_connection_pool_name = db_connection_pool_name
 
@@ -135,6 +145,9 @@ class AbhikartaLLMWeb:
         routes_object.set_role_manager(self.role_manager)
         routes_object.set_user_manager(self.user_manager)
         routes_object.set_resource_manager(self.resource_manager)
+        routes_object.set_llm_facade_factory(self.llm_facade_factory)
+        routes_object.set_model_registry(self.model_registry)
+
         routes_object.register_routes()
 
     def _register_routes(self):
@@ -146,11 +159,28 @@ class AbhikartaLLMWeb:
         from web.route_management.user_routes import UserRoutes
         from web.route_management.model_routes import ModelRoutes
         from web.route_management.mcp_routes import MCPRoutes
+        from web.route_management.llm_routes import LLMRoutes
 
-        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes, UserRoutes, ModelRoutes, MCPRoutes]:
+        def check_and_run_a_method(obj, method_name, method_arg):
+            if hasattr(obj, method_name):
+
+                # 2. Get the method object
+                method = getattr(obj, method_name)
+
+                # 3. Check if it's callable (i.e., it's a method/function)
+                if callable(method):
+
+                    # 4. Invoke the method
+                    result = method(method_arg)
+                    print(result)
+                else:
+                    print(f"'{method_name}' exists but is not callable.")
+
+        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes, UserRoutes, ModelRoutes, MCPRoutes, LLMRoutes]:
             # Register route handler
             logger.info(f'registering route using {rt}')
             r_rt = rt(self.app, self.db_connection_pool_name)
+
             self._prepare_a_route(r_rt)
 
 

@@ -379,16 +379,20 @@ class OpenAIFacade(BaseProviderFacade):
         return {
             "content": choice.message.content or "",
             "tool_calls": tool_calls,
-            "usage": {
-                "prompt_tokens": response.usage.prompt_tokens,
-                "completion_tokens": response.usage.completion_tokens,
-                "total_tokens": response.usage.total_tokens
-            
-            },
-            "metadata": {
-                "model": response.model,
-                "finish_reason": choice.finish_reason
-            },
+            "usage": TokenUsage(
+                prompt_tokens=response.usage.prompt_tokens,
+                completion_tokens=response.usage.completion_tokens,
+                total_tokens=response.usage.total_tokens
+            ),
+            "metadata": CompletionMetadata(
+                model=response.model,
+                finish_reason=choice.finish_reason,
+                usage=TokenUsage(
+                    prompt_tokens=response.usage.prompt_tokens,
+                    completion_tokens=response.usage.completion_tokens,
+                    total_tokens=response.usage.total_tokens
+                )
+            ),
             "raw_response": response
         }
     

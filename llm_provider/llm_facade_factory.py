@@ -22,14 +22,14 @@ configuration source and creates the appropriate facade instance.
 from typing import Dict, Optional, Type, Any, List, Tuple
 from pathlib import Path
 
-from llm_facade import LLMFacade
+from llm_provider.llm_facade import LLMFacade
 from model_management.model_provider import ModelProvider
 from model_management.model_provider_json import load_providers as load_json_providers
 from model_management.model_provider_db import load_providers as load_db_providers
 from core import SingletonMeta
 from model_management.model_management_db_handler import ModelManagementDBHandler
 
-class FacadeFactory(metaclass=SingletonMeta):
+class LLMFacadeFactory(metaclass=SingletonMeta):
     """
     Universal factory for creating provider facades with dynamic configuration.
     
@@ -197,7 +197,7 @@ class FacadeFactory(metaclass=SingletonMeta):
             AuthenticationException: If API key invalid or missing
             
         Example:
-            >>> factory = FacadeFactory(config_source="json", config_path="config")
+            >>> factory = LLMFacadeFactory(config_source="json", config_path="config")
             >>> facade = factory.create_facade("anthropic", "claude-3-5-sonnet-20241022")
             >>> response = facade.chat_completion([{"role": "user", "content": "Hello!"}])
         """
@@ -252,8 +252,8 @@ class FacadeFactory(metaclass=SingletonMeta):
             facade_class: Facade class to use for this provider
             
         Example:
-            >>> FacadeFactory.register_facade("anthropic", AnthropicFacade)
-            >>> FacadeFactory.register_facade("openai", OpenAIFacade)
+            >>> LLMFacadeFactory.register_facade("anthropic", AnthropicFacade)
+            >>> LLMFacadeFactory.register_facade("openai", OpenAIFacade)
         """
         cls._PROVIDER_FACADES[provider_name] = facade_class
     
@@ -282,7 +282,7 @@ class FacadeFactory(metaclass=SingletonMeta):
             Tuple of (facade instance, estimated cost)
             
         Example:
-            >>> factory = FacadeFactory(config_source="json", config_path="config")
+            >>> factory = LLMFacadeFactory(config_source="json", config_path="config")
             >>> facade, cost = factory.create_cheapest_facade("chat")
             >>> print(f"Using cheapest model at ${cost:.4f}")
         """
@@ -367,7 +367,7 @@ def create_facade_from_json(
     Returns:
         Configured facade instance
     """
-    factory = FacadeFactory(config_source="json", config_path=config_dir)
+    factory = LLMFacadeFactory(config_source="json", config_path=config_dir)
     return factory.create_facade(provider_name, model_name, **kwargs)
 
 
@@ -389,12 +389,12 @@ def create_facade_from_db(
     Returns:
         Configured facade instance
     """
-    factory = FacadeFactory(config_source="db", db_connection_pool_name=db_handler)
+    factory = LLMFacadeFactory(config_source="db", db_connection_pool_name=db_handler)
     return factory.create_facade(provider_name, model_name, **kwargs)
 
 
 __all__ = [
-    'FacadeFactory',
+    'LLMFacadeFactory',
     'create_facade_from_json',
     'create_facade_from_db'
 ]

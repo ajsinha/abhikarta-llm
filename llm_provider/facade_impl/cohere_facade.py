@@ -10,8 +10,8 @@ import os
 import json
 from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
 
-from llm_provider.facade_impl.base_provider_facade import BaseProviderFacade
-from llm_facade import *
+from llm_provider.base_provider_facade import BaseProviderFacade
+from llm_provider.llm_facade import *
 
 
 class CohereFacade(BaseProviderFacade):
@@ -193,17 +193,20 @@ class CohereFacade(BaseProviderFacade):
         
         usage = None
         if hasattr(response, 'meta') and hasattr(response.meta, 'tokens'):
-            usage = TokenUsage(
-                prompt_tokens=response.meta.tokens.input_tokens,
-                completion_tokens=response.meta.tokens.output_tokens,
-                total_tokens=response.meta.tokens.input_tokens + response.meta.tokens.output_tokens
-            )
+            usage = {
+                "prompt_tokens": response.meta.tokens.input_tokens,
+                "completion_tokens": response.meta.tokens.output_tokens,
+                "total_tokens": response.meta.tokens.input_tokens + response.meta.tokens.output_tokens
+            
+            }
         
         return {
             "content": content,
             "tool_calls": tool_calls if tool_calls else None,
             "usage": usage,
-            "metadata": CompletionMetadata(model=self.model_name, usage=usage),
+            "metadata": {
+                "model": self.model_name
+            },
             "raw_response": response
         }
     

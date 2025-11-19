@@ -7,14 +7,24 @@ from user_management.user_manager import UserManager
 from user_management.role_management_db import RoleManagementDB
 from user_management.resource_management_db import ResourceManagementDB
 from web.abhikarta_llm_web import AbhikartaLLMWeb
+from model_management.model_registry_db import ModelRegistryDB
+from llm_provider.llm_facade_factory import LLMFacadeFactory
 
 def run_webserver(pool_name, mcp_server_manager):
     user_manager = UserManagerDB(db_connection_pool_name=pool_name)
     role_manager = RoleManagementDB(db_connection_pool_name=pool_name)
     resource_manager = ResourceManagementDB(db_connection_pool_name=pool_name)
 
+    model_registry = ModelRegistryDB(pool_name)
+    model_registry.start_auto_reload(interval_minutes=5)
+
+    llm_facade_factory = LLMFacadeFactory(config_source="db", db_connection_pool_name=pool_name)
+
     aweb = AbhikartaLLMWeb("my very very secret key")
 
+
+    aweb.set_model_registry(model_registry)
+    aweb.set_llm_facade_factory(llm_facade_factory)
 
     aweb.set_user_manager(user_manager)
     aweb.set_role_manager(role_manager)
@@ -77,9 +87,9 @@ def create_mcp_servers():
     return mcp_server_manager
 
 def set_llm_provider_facade_factory(pool_name: str):
-    import llm_provider.register_facades
-    from llm_provider.facade_factory import FacadeFactory
-    FacadeFactory(config_source="db", db_connection_pool_name=pool_name)
+    import llm_provider.register_llm_facades
+    from llm_provider.llm_facade_factory import LLMFacadeFactory
+    LLMFacadeFactory(config_source="db", db_connection_pool_name=pool_name)
 
 def prepare_prop_conf():
     from core.config.properties_configurator import PropertiesConfigurator
@@ -95,6 +105,7 @@ def prepare_prop_conf():
 if __name__ == '__main__':
     prepare_prop_conf()
     pool_name,pool_manager = prepare_database_pools()
+    set_llm_provider_facade_factory(pool_name)
 
     mcp_server_manager = create_mcp_servers()
     mcp_server_manager.start_all()

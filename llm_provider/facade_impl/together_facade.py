@@ -9,8 +9,8 @@ Email: ajsinha@gmail.com
 import os
 from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
 
-from llm_provider.facade_impl.base_provider_facade import BaseProviderFacade
-from llm_facade import *
+from llm_provider.base_provider_facade import BaseProviderFacade
+from llm_provider.llm_facade import *
 
 
 class TogetherFacade(BaseProviderFacade):
@@ -101,17 +101,20 @@ class TogetherFacade(BaseProviderFacade):
         choice = response.choices[0]
         content = choice.message.content or ""
         
-        usage = TokenUsage(
-            prompt_tokens=response.usage.prompt_tokens,
-            completion_tokens=response.usage.completion_tokens,
-            total_tokens=response.usage.total_tokens
-        )
+        usage = {
+                "prompt_tokens": response.usage.prompt_tokens,
+                "completion_tokens": response.usage.completion_tokens,
+                "total_tokens": response.usage.total_tokens
+        
+            }
         
         return {
             "content": content,
             "tool_calls": None,
             "usage": usage,
-            "metadata": CompletionMetadata(model=response.model, usage=usage),
+            "metadata": {
+                "model": response.model
+            },
             "raw_response": response
         }
     

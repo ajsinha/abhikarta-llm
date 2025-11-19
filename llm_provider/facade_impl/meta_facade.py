@@ -9,8 +9,8 @@ Email: ajsinha@gmail.com
 import os
 from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
 
-from llm_provider.facade_impl.base_provider_facade import BaseProviderFacade
-from llm_facade import *
+from llm_provider.base_provider_facade import BaseProviderFacade
+from llm_provider.llm_facade import *
 
 
 class MetaFacade(BaseProviderFacade):
@@ -62,12 +62,15 @@ class MetaFacade(BaseProviderFacade):
             return {
                 "content": content,
                 "tool_calls": None,
-                "usage": TokenUsage(
-                    prompt_tokens=len(prompt) // 4,
-                    completion_tokens=len(content) // 4,
-                    total_tokens=(len(prompt) + len(content)) // 4
+                "usage": {
+                "prompt_tokens": len(prompt) // 4,
+                "completion_tokens": len(content) // 4,
+                "total_tokens": (len(prompt
+            } + len(content)) // 4
                 ),
-                "metadata": CompletionMetadata(model=self.model_name),
+                "metadata": {
+                "model": self.model_name
+            },
                 "raw_response": output
             }
         except Exception as e:

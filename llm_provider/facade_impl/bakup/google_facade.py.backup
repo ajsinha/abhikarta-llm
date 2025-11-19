@@ -323,21 +323,19 @@ class GoogleFacade(BaseProviderFacade):
         # Token usage
         usage = None
         if hasattr(response, 'usage_metadata'):
-            usage = {
-                "prompt_tokens": response.usage_metadata.prompt_token_count,
-                "completion_tokens": response.usage_metadata.candidates_token_count,
-                "total_tokens": response.usage_metadata.total_token_count
-            
-            }
+            usage = TokenUsage(
+                prompt_tokens=response.usage_metadata.prompt_token_count,
+                completion_tokens=response.usage_metadata.candidates_token_count,
+                total_tokens=response.usage_metadata.total_token_count
+            )
         
         return {
             "content": content,
             "tool_calls": tool_calls if tool_calls else None,
             "usage": usage,
-            "metadata": {
-                "model": self.model_name,
-                "finish_reason": str(response.candidates[0].finish_reason
-            } if hasattr(response, 'candidates') else None,
+            "metadata": CompletionMetadata(
+                model=self.model_name,
+                finish_reason=str(response.candidates[0].finish_reason) if hasattr(response, 'candidates') else None,
                 usage=usage
             ),
             "raw_response": response

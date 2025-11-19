@@ -18,7 +18,7 @@ This module registers all provider-specific facades with the FacadeFactory.
 Import this module to automatically register all available facades.
 """
 
-from llm_provider.facade_factory import FacadeFactory
+from llm_provider.llm_facade_factory import LLMFacadeFactory
 
 # Import all facade implementations
 from llm_provider.facade_impl.anthropic_facade import AnthropicFacade
@@ -35,21 +35,21 @@ from llm_provider.facade_impl.awsbedrock_facade import AWSBedrockFacade
 from llm_provider.facade_impl.mock_facade import MockFacade
 
 # Register all provider facades
-FacadeFactory.register_facade("anthropic", AnthropicFacade)
-FacadeFactory.register_facade("openai", OpenAIFacade)
-FacadeFactory.register_facade("google", GoogleFacade)
-FacadeFactory.register_facade("cohere", CohereFacade)
-FacadeFactory.register_facade("mistral", MistralFacade)
-FacadeFactory.register_facade("groq", GroqFacade)
-FacadeFactory.register_facade("meta", MetaFacade)
-FacadeFactory.register_facade("huggingface", HuggingFaceFacade)
-FacadeFactory.register_facade("together", TogetherFacade)
-FacadeFactory.register_facade("ollama", OllamaFacade)
-FacadeFactory.register_facade("awsbedrock", AWSBedrockFacade)
-FacadeFactory.register_facade("replicate", MetaFacade)  # Meta uses Replicate
-FacadeFactory.register_facade("mock", MockFacade)
+LLMFacadeFactory.register_facade("anthropic", AnthropicFacade)
+LLMFacadeFactory.register_facade("openai", OpenAIFacade)
+LLMFacadeFactory.register_facade("google", GoogleFacade)
+LLMFacadeFactory.register_facade("cohere", CohereFacade)
+LLMFacadeFactory.register_facade("mistral", MistralFacade)
+LLMFacadeFactory.register_facade("groq", GroqFacade)
+LLMFacadeFactory.register_facade("meta", MetaFacade)
+LLMFacadeFactory.register_facade("huggingface", HuggingFaceFacade)
+LLMFacadeFactory.register_facade("together", TogetherFacade)
+LLMFacadeFactory.register_facade("ollama", OllamaFacade)
+LLMFacadeFactory.register_facade("awsbedrock", AWSBedrockFacade)
+LLMFacadeFactory.register_facade("replicate", MetaFacade)  # Meta uses Replicate
+LLMFacadeFactory.register_facade("mock", MockFacade)
 
 # Total providers registered: 13
-print(f"✓ Registered {len(FacadeFactory.get_registered_providers())} provider facades")
+print(f"✓ Registered {len(LLMFacadeFactory.get_registered_providers())} provider facades")
 
 __all__ = []  # This is a registration-only module

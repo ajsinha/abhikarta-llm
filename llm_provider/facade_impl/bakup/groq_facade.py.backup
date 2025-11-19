@@ -116,21 +116,17 @@ class GroqFacade(BaseProviderFacade):
                     }
                 })
         
-        usage = {
-                "prompt_tokens": response.usage.prompt_tokens,
-                "completion_tokens": response.usage.completion_tokens,
-                "total_tokens": response.usage.total_tokens
-        
-            }
+        usage = TokenUsage(
+            prompt_tokens=response.usage.prompt_tokens,
+            completion_tokens=response.usage.completion_tokens,
+            total_tokens=response.usage.total_tokens
+        )
         
         return {
             "content": content,
             "tool_calls": tool_calls if tool_calls else None,
             "usage": usage,
-            "metadata": {
-                "model": response.model,
-                "finish_reason": choice.finish_reason
-            },
+            "metadata": CompletionMetadata(model=response.model, finish_reason=choice.finish_reason, usage=usage),
             "raw_response": response
         }
     

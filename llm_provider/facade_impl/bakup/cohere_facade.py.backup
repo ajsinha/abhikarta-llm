@@ -1,5 +1,5 @@
 """
-Abhikarta Mistral Facade - Dynamic Configuration Implementation
+Abhikarta Cohere Facade - Dynamic Configuration Implementation
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
@@ -7,29 +7,29 @@ Email: ajsinha@gmail.com
 """
 
 import os
+import json
 from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator
 
 from llm_provider.base_provider_facade import BaseProviderFacade
 from llm_provider.llm_facade import *
 
 
-class MistralFacade(BaseProviderFacade):
-    """Mistral AI facade supporting Mixtral and Mistral models."""
+class CohereFacade(BaseProviderFacade):
+    """Cohere facade with Command, Command-R, and embedding models."""
     
     def _initialize_client(self):
-        """Initialize Mistral client."""
+        """Initialize Cohere client."""
         try:
-            from mistralai.client import MistralClient
-            from mistralai.async_client import MistralAsyncClient
+            import cohere
         except ImportError:
-            raise ImportError("Mistral SDK not installed. Install with: pip install mistralai")
+            raise ImportError("Cohere SDK not installed. Install with: pip install cohere")
         
-        api_key = self.api_key or os.getenv("MISTRAL_API_KEY")
+        api_key = self.api_key or os.getenv("COHERE_API_KEY")
         if not api_key:
-            raise AuthenticationException("Mistral API key required")
+            raise AuthenticationException("Cohere API key required")
         
-        self.client = MistralClient(api_key=api_key)
-        self.async_client = MistralAsyncClient(api_key=api_key)
+        self.client = cohere.Client(api_key=api_key, timeout=self.timeout)
+        self.async_client = cohere.AsyncClient(api_key=api_key, timeout=self.timeout)
     
     def chat_completion(self, messages: Messages, temperature: Optional[float] = None,
                        max_tokens: Optional[int] = None, tools: Optional[List[ToolDefinition]] = None,
@@ -37,9 +37,23 @@ class MistralFacade(BaseProviderFacade):
         if not self.supports_capability(ModelCapability.CHAT_COMPLETION):
             raise CapabilityNotSupportedException("chat", self.model_name)
         
+        # Convert messages
+        chat_history = []
+        message_text = ""
+        for msg in messages:
+            role = msg.get('role')
+            content = msg.get('content', '')
+            if role == 'system':
+                kwargs['preamble'] = content
+            elif role == 'user':
+                message_text = content
+            elif role == 'assistant':
+                chat_history.append({"role": "CHATBOT", "message": content})
+        
         params = {
             "model": self.model_name,
-            "messages": messages
+            "message": message_text,
+            "chat_history": chat_history if chat_history else None
         }
         
         if temperature is not None:
@@ -47,7 +61,7 @@ class MistralFacade(BaseProviderFacade):
         if max_tokens:
             params['max_tokens'] = max_tokens
         if tools:
-            params['tools'] = tools
+            params['tools'] = self._convert_tools(tools)
         
         params.update(kwargs)
         
@@ -55,49 +69,65 @@ class MistralFacade(BaseProviderFacade):
             response = self.client.chat(**params)
             return self._convert_response(response)
         except Exception as e:
-            raise InvalidResponseException(f"Mistral API error: {str(e)}")
+            raise InvalidResponseException(f"Cohere API error: {str(e)}")
     
     async def achat_completion(self, messages: Messages, **kwargs) -> Dict[str, Any]:
+        chat_history = []
+        message_text = ""
+        for msg in messages:
+            role = msg.get('role')
+            content = msg.get('content', '')
+            if role == 'system':
+                kwargs['preamble'] = content
+            elif role == 'user':
+                message_text = content
+            elif role == 'assistant':
+                chat_history.append({"role": "CHATBOT", "message": content})
+        
         try:
             response = await self.async_client.chat(
                 model=self.model_name,
-                messages=messages,
+                message=message_text,
+                chat_history=chat_history if chat_history else None,
                 **kwargs
             )
             return self._convert_response(response)
         except Exception as e:
-            raise InvalidResponseException(f"Mistral API error: {str(e)}")
+            raise InvalidResponseException(f"Cohere API error: {str(e)}")
     
     def stream_chat_completion(self, messages: Messages, **kwargs) -> Iterator[str]:
         if not self.supports_capability(ModelCapability.STREAMING):
             raise CapabilityNotSupportedException("streaming", self.model_name)
         
+        chat_history = []
+        message_text = ""
+        for msg in messages:
+            role = msg.get('role')
+            content = msg.get('content', '')
+            if role == 'user':
+                message_text = content
+            elif role == 'assistant':
+                chat_history.append({"role": "CHATBOT", "message": content})
+        
         try:
             stream = self.client.chat_stream(
                 model=self.model_name,
-                messages=messages,
+                message=message_text,
+                chat_history=chat_history if chat_history else None,
                 **kwargs
             )
             
-            for chunk in stream:
-                if chunk.choices[0].delta.content:
-                    yield chunk.choices[0].delta.content
+            for event in stream:
+                if event.event_type == "text-generation":
+                    yield event.text
         except Exception as e:
-            raise InvalidResponseException(f"Mistral streaming error: {str(e)}")
+            raise InvalidResponseException(f"Cohere streaming error: {str(e)}")
     
     async def astream_chat_completion(self, messages: Messages, **kwargs) -> AsyncIterator[str]:
-        try:
-            stream = await self.async_client.chat_stream(
-                model=self.model_name,
-                messages=messages,
-                **kwargs
-            )
-            
-            async for chunk in stream:
-                if chunk.choices[0].delta.content:
-                    yield chunk.choices[0].delta.content
-        except Exception as e:
-            raise InvalidResponseException(f"Mistral streaming error: {str(e)}")
+        import asyncio
+        for chunk in self.stream_chat_completion(messages, **kwargs):
+            yield chunk
+            await asyncio.sleep(0)
     
     def generate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
         if not self.supports_capability(ModelCapability.EMBEDDINGS):
@@ -108,14 +138,15 @@ class MistralFacade(BaseProviderFacade):
             texts = [texts]
         
         try:
-            response = self.client.embeddings(
+            response = self.client.embed(
                 model=self.model_name,
-                input=texts
+                texts=texts,
+                **kwargs
             )
-            embeddings = [item.embedding for item in response.data]
+            embeddings = response.embeddings
             return embeddings[0] if is_single else embeddings
         except Exception as e:
-            raise InvalidResponseException(f"Mistral embeddings error: {str(e)}")
+            raise InvalidResponseException(f"Cohere embeddings error: {str(e)}")
     
     async def agenerate_embeddings(self, texts: Union[str, List[str]], **kwargs) -> Union[Embedding, List[Embedding]]:
         is_single = isinstance(texts, str)
@@ -123,45 +154,56 @@ class MistralFacade(BaseProviderFacade):
             texts = [texts]
         
         try:
-            response = await self.async_client.embeddings(
+            response = await self.async_client.embed(
                 model=self.model_name,
-                input=texts
+                texts=texts,
+                **kwargs
             )
-            embeddings = [item.embedding for item in response.data]
+            embeddings = response.embeddings
             return embeddings[0] if is_single else embeddings
         except Exception as e:
-            raise InvalidResponseException(f"Mistral embeddings error: {str(e)}")
+            raise InvalidResponseException(f"Cohere embeddings error: {str(e)}")
+    
+    def _convert_tools(self, tools: List[ToolDefinition]) -> List[Dict]:
+        cohere_tools = []
+        for tool in tools:
+            if tool.get('type') == 'function':
+                func = tool['function']
+                cohere_tools.append({
+                    "name": func['name'],
+                    "description": func.get('description', ''),
+                    "parameter_definitions": func.get('parameters', {}).get('properties', {})
+                })
+        return cohere_tools
     
     def _convert_response(self, response) -> Dict[str, Any]:
-        choice = response.choices[0]
-        content = choice.message.content or ""
+        content = response.text if hasattr(response, 'text') else ""
         
         tool_calls = []
-        if hasattr(choice.message, 'tool_calls') and choice.message.tool_calls:
-            for tc in choice.message.tool_calls:
+        if hasattr(response, 'tool_calls'):
+            for tc in response.tool_calls:
                 tool_calls.append({
-                    "id": tc.id,
-                    "type": tc.type,
+                    "id": tc.name,
+                    "type": "function",
                     "function": {
-                        "name": tc.function.name,
-                        "arguments": tc.function.arguments
+                        "name": tc.name,
+                        "arguments": json.dumps(tc.parameters)
                     }
                 })
         
-        usage = {
-                "prompt_tokens": response.usage.prompt_tokens,
-                "completion_tokens": response.usage.completion_tokens,
-                "total_tokens": response.usage.total_tokens
-        
-            }
+        usage = None
+        if hasattr(response, 'meta') and hasattr(response.meta, 'tokens'):
+            usage = TokenUsage(
+                prompt_tokens=response.meta.tokens.input_tokens,
+                completion_tokens=response.meta.tokens.output_tokens,
+                total_tokens=response.meta.tokens.input_tokens + response.meta.tokens.output_tokens
+            )
         
         return {
             "content": content,
             "tool_calls": tool_calls if tool_calls else None,
             "usage": usage,
-            "metadata": {
-                "model": response.model
-            },
+            "metadata": CompletionMetadata(model=self.model_name, usage=usage),
             "raw_response": response
         }
     
@@ -212,4 +254,4 @@ class MistralFacade(BaseProviderFacade):
         return {"message": "Usage stats not implemented"}
 
 
-__all__ = ['MistralFacade']
+__all__ = ['CohereFacade']

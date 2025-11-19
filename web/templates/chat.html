@@ -1,0 +1,756 @@
+{% extends "base.html" %}
+
+{% block title %}LLM Chat - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        padding: 20px 0;
+        min-height: calc(100vh - 200px);
+    }
+    
+    .chat-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .config-panel {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chat-panel {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: 600px;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .message {
+        margin-bottom: 15px;
+        display: flex;
+        animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message.user {
+        justify-content: flex-end;
+    }
+    
+    .message.assistant {
+        justify-content: flex-start;
+    }
+    
+    .message-content {
+        max-width: 70%;
+        padding: 12px 18px;
+        border-radius: 18px;
+        position: relative;
+        word-wrap: break-word;
+    }
+    
+    .message.user .message-content {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+    
+    .message.assistant .message-content {
+        background: white;
+        color: #333;
+        border: 1px solid #e0e0e0;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    
+    .message-role {
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+        opacity: 0.8;
+    }
+    
+    .message-text {
+        line-height: 1.5;
+        white-space: pre-wrap;
+    }
+    
+    .message-time {
+        font-size: 0.7rem;
+        opacity: 0.6;
+        margin-top: 4px;
+    }
+    
+    .chat-input-area {
+        padding: 20px;
+        background: white;
+        border-radius: 0 0 15px 15px;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .chat-input-wrapper {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .chat-input {
+        flex: 1;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    .chat-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .send-button {
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    }
+    
+    .send-button:hover:not(:disabled) {
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+    }
+    
+    .send-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .typing-indicator {
+        display: none;
+        padding: 10px 15px;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 18px;
+        max-width: 70px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    
+    .typing-indicator.active {
+        display: inline-block;
+    }
+    
+    .typing-indicator span {
+        height: 8px;
+        width: 8px;
+        background: #667eea;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 2px;
+        animation: typing 1.4s infinite;
+    }
+    
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+    }
+    
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #999;
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+    
+    .parameters-section {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .parameter-row {
+        margin-bottom: 10px;
+    }
+    
+    .badge-provider {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .model-info {
+        display: none;
+        margin-top: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .model-info.show {
+        display: block;
+    }
+    
+    .conversation-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid chat-container">
+    <div class="chat-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h3><i class="fas fa-comments"></i> LLM Chat Interface</h3>
+                <p class="mb-0">Interact with large language models</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <i class="fas fa-robot" style="font-size: 3rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Configuration Panel -->
+        <div class="col-lg-4 col-xl-3">
+            <div class="config-panel">
+                <h5 class="mb-3"><i class="fas fa-cog"></i> Configuration</h5>
+                
+                <!-- Reload Button -->
+                <div class="mb-3">
+                    <button id="reloadRegistry" class="btn btn-sm btn-outline-secondary w-100">
+                        <i class="fas fa-sync-alt"></i> Reload Providers
+                    </button>
+                </div>
+
+                <!-- Provider Selection -->
+                <div class="mb-3">
+                    <label for="providerSelect" class="form-label fw-bold">
+                        <i class="fas fa-server"></i> Provider
+                    </label>
+                    <select id="providerSelect" class="form-select">
+                        <option value="">Select Provider...</option>
+                    </select>
+                </div>
+
+                <!-- Model Selection -->
+                <div class="mb-3">
+                    <label for="modelSelect" class="form-label fw-bold">
+                        <i class="fas fa-brain"></i> Model
+                    </label>
+                    <select id="modelSelect" class="form-select" disabled>
+                        <option value="">Select Model...</option>
+                    </select>
+                </div>
+
+                <!-- Model Info -->
+                <div id="modelInfo" class="model-info">
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Context Window:</strong>
+                        <span id="modelContextWindow">-</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Max Output:</strong>
+                        <span id="modelMaxOutput">-</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Description:</strong>
+                        <p class="mb-0 text-muted small" id="modelDescription">-</p>
+                    </div>
+                </div>
+
+                <!-- Parameters -->
+                <div class="parameters-section">
+                    <h6 class="mb-3"><i class="fas fa-sliders-h"></i> Parameters</h6>
+
+                    <div class="parameter-row">
+                        <label for="temperature" class="form-label small">
+                            Temperature: <span id="temperatureValue">0.7</span>
+                        </label>
+                        <input type="range" class="form-range" id="temperature"
+                               min="0" max="2" step="0.1" value="0.7">
+                    </div>
+
+                    <div class="parameter-row">
+                        <label for="maxTokens" class="form-label small">Max Tokens</label>
+                        <input type="number" class="form-control form-control-sm"
+                               id="maxTokens" value="4096" min="1" max="100000">
+                    </div>
+
+                    <div class="parameter-row">
+                        <label for="topP" class="form-label small">
+                            Top P: <span id="topPValue">0.95</span>
+                        </label>
+                        <input type="range" class="form-range" id="topP"
+                               min="0" max="1" step="0.05" value="0.95">
+                    </div>
+                </div>
+
+                <!-- Conversation Actions -->
+                <div class="conversation-actions">
+                    <button id="clearChat" class="btn btn-sm btn-outline-danger flex-fill">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                    <button id="exportChat" class="btn btn-sm btn-outline-primary flex-fill">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="col-lg-8 col-xl-9">
+            <div class="chat-panel">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <h5>Select a provider and model to start chatting</h5>
+                        <p class="text-muted">Your conversation will appear here</p>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <div class="chat-input-wrapper">
+                        <input type="text"
+                               id="chatInput"
+                               class="chat-input"
+                               placeholder="Type your message..."
+                               disabled>
+                        <button id="sendButton" class="send-button" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2 text-center">
+                        <small class="text-muted" id="statusText">
+                            Select a provider and model to begin
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    let conversationHistory = [];
+    let selectedProvider = null;
+    let selectedModel = null;
+    let isSending = false;
+
+    // Load providers on page load
+    loadProviders();
+
+    // Reload registry button
+    $('#reloadRegistry').on('click', function() {
+        reloadRegistry();
+    });
+
+    // Provider selection handler
+    $('#providerSelect').on('change', function() {
+        const provider = $(this).val();
+        selectedProvider = provider;
+        selectedModel = null;
+
+        if (provider) {
+            loadModels(provider);
+        } else {
+            $('#modelSelect').prop('disabled', true).html('<option value="">Select Model...</option>');
+            updateChatState();
+        }
+    });
+
+    // Model selection handler
+    $('#modelSelect').on('change', function() {
+        const model = $(this).val();
+        selectedModel = model;
+
+        if (model) {
+            const modelData = $(this).find(':selected').data('model');
+            displayModelInfo(modelData);
+            updateChatState();
+        } else {
+            $('#modelInfo').removeClass('show');
+            updateChatState();
+        }
+    });
+
+    // Temperature slider
+    $('#temperature').on('input', function() {
+        $('#temperatureValue').text($(this).val());
+    });
+
+    // Top P slider
+    $('#topP').on('input', function() {
+        $('#topPValue').text($(this).val());
+    });
+
+    // Send button click
+    $('#sendButton').on('click', function() {
+        sendMessage();
+    });
+
+    // Enter key to send
+    $('#chatInput').on('keypress', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // Clear chat
+    $('#clearChat').on('click', function() {
+        if (confirm('Are you sure you want to clear the conversation?')) {
+            conversationHistory = [];
+            $('#chatMessages').html(`
+                <div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <h5>Conversation cleared</h5>
+                    <p class="text-muted">Start a new conversation</p>
+                </div>
+            `);
+        }
+    });
+
+    // Export chat
+    $('#exportChat').on('click', function() {
+        if (conversationHistory.length === 0) {
+            alert('No conversation to export');
+            return;
+        }
+
+        const exportData = {
+            provider: selectedProvider,
+            model: selectedModel,
+            timestamp: new Date().toISOString(),
+            conversation: conversationHistory
+        };
+
+        const blob = new Blob([JSON.stringify(exportData, null, 2)],
+                             {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `chat-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    // Load providers
+    function loadProviders() {
+        $.ajax({
+            url: '/api/llm/providers',
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    const select = $('#providerSelect');
+                    select.html('<option value="">Select Provider...</option>');
+
+                    response.providers.forEach(provider => {
+                        select.append(
+                            `<option value="${provider.name}">
+                                ${provider.display_name} (${provider.model_count} models)
+                            </option>`
+                        );
+                    });
+                } else {
+                    showError('Failed to load providers: ' + response.error);
+                }
+            },
+            error: function(xhr) {
+                showError('Error loading providers: ' + xhr.responseText);
+            }
+        });
+    }
+
+    // Reload registry from database
+    function reloadRegistry() {
+        const $btn = $('#reloadRegistry');
+        const originalHtml = $btn.html();
+
+        // Show loading state
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Reloading...');
+
+        $.ajax({
+            url: '/api/llm/registry/reload',
+            method: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    // Show success message
+                    const alert = `
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle"></i> Registry reloaded! Found ${response.provider_count} providers.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `;
+                    $('.chat-container').prepend(alert);
+
+                    // Reload providers dropdown
+                    loadProviders();
+
+                    // Auto-dismiss after 3 seconds
+                    setTimeout(function() {
+                        $('.alert-success').fadeOut(function() { $(this).remove(); });
+                    }, 3000);
+                } else {
+                    showError('Failed to reload registry: ' + response.error);
+                }
+            },
+            error: function(xhr) {
+                showError('Error reloading registry: ' + xhr.responseText);
+            },
+            complete: function() {
+                // Restore button state
+                $btn.prop('disabled', false).html(originalHtml);
+            }
+        });
+    }
+    
+    // Load models for provider
+    function loadModels(provider) {
+        $('#statusText').text('Loading models...');
+        
+        $.ajax({
+            url: `/api/llm/models/${provider}`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    const select = $('#modelSelect');
+                    select.html('<option value="">Select Model...</option>');
+                    select.prop('disabled', false);
+                    
+                    response.models.forEach(model => {
+                        const option = $('<option>')
+                            .val(model.name)
+                            .text(model.display_name)
+                            .data('model', model);
+                        select.append(option);
+                    });
+                    
+                    $('#statusText').text('Select a model to begin');
+                } else {
+                    showError('Failed to load models: ' + response.error);
+                }
+            },
+            error: function(xhr) {
+                showError('Error loading models: ' + xhr.responseText);
+            }
+        });
+    }
+    
+    // Display model info
+    function displayModelInfo(model) {
+        $('#modelContextWindow').text(model.context_window.toLocaleString());
+        $('#modelMaxOutput').text(model.max_output.toLocaleString());
+        $('#modelDescription').text(model.description);
+        $('#modelInfo').addClass('show');
+    }
+    
+    // Update chat state
+    function updateChatState() {
+        const ready = selectedProvider && selectedModel;
+        $('#chatInput').prop('disabled', !ready);
+        $('#sendButton').prop('disabled', !ready);
+        
+        if (ready) {
+            $('#statusText').text(`Ready - Using ${selectedProvider}/${selectedModel}`);
+            
+            // Clear empty state if present
+            if ($('.empty-state').length > 0) {
+                $('#chatMessages').empty();
+            }
+        } else {
+            $('#statusText').text('Select a provider and model to begin');
+        }
+    }
+    
+    // Send message
+    function sendMessage() {
+        if (isSending) return;
+        
+        const message = $('#chatInput').val().trim();
+        if (!message) return;
+        
+        if (!selectedProvider || !selectedModel) {
+            showError('Please select a provider and model');
+            return;
+        }
+        
+        isSending = true;
+        $('#chatInput').prop('disabled', true);
+        $('#sendButton').prop('disabled', true);
+        
+        // Add user message to UI
+        addMessage('user', message);
+        
+        // Clear input
+        $('#chatInput').val('');
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        // Get parameters
+        const parameters = {
+            temperature: parseFloat($('#temperature').val()),
+            max_tokens: parseInt($('#maxTokens').val()),
+            top_p: parseFloat($('#topP').val())
+        };
+        
+        // Send to API
+        $.ajax({
+            url: '/api/llm/chat/send',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                provider: selectedProvider,
+                model: selectedModel,
+                message: message,
+                conversation_history: conversationHistory,
+                parameters: parameters
+            }),
+            success: function(response) {
+                hideTypingIndicator();
+                
+                if (response.success) {
+                    // Add assistant message to UI
+                    addMessage('assistant', response.response, response.metadata);
+                    
+                    // Update conversation history
+                    conversationHistory.push({role: 'user', content: message});
+                    conversationHistory.push({role: 'assistant', content: response.response});
+                } else {
+                    showError('Error: ' + response.error);
+                }
+            },
+            error: function(xhr) {
+                hideTypingIndicator();
+                showError('Request failed: ' + xhr.responseText);
+            },
+            complete: function() {
+                isSending = false;
+                $('#chatInput').prop('disabled', false);
+                $('#sendButton').prop('disabled', false);
+                $('#chatInput').focus();
+            }
+        });
+    }
+    
+    // Add message to chat
+    function addMessage(role, content, metadata = null) {
+        const time = new Date().toLocaleTimeString();
+        const messageHtml = `
+            <div class="message ${role}">
+                <div class="message-content">
+                    <div class="message-role">${role === 'user' ? 'You' : 'Assistant'}</div>
+                    <div class="message-text">${escapeHtml(content)}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            </div>
+        `;
+        
+        $('#chatMessages').append(messageHtml);
+        scrollToBottom();
+    }
+    
+    // Show typing indicator
+    function showTypingIndicator() {
+        const indicatorHtml = `
+            <div class="message assistant" id="typingIndicator">
+                <div class="typing-indicator active">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `;
+        $('#chatMessages').append(indicatorHtml);
+        scrollToBottom();
+    }
+    
+    // Hide typing indicator
+    function hideTypingIndicator() {
+        $('#typingIndicator').remove();
+    }
+    
+    // Scroll to bottom
+    function scrollToBottom() {
+        const messages = $('#chatMessages');
+        messages.scrollTop(messages[0].scrollHeight);
+    }
+    
+    // Show error
+    function showError(message) {
+        const alertHtml = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        $('.chat-container').prepend(alertHtml);
+        
+        setTimeout(function() {
+            $('.alert').fadeOut(function() { $(this).remove(); });
+        }, 5000);
+    }
+    
+    // Escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+});
+</script>
+{% endblock %}

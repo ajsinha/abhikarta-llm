@@ -26,7 +26,7 @@ import asyncio
 from typing import List, Dict, Any, Optional, Union, Iterator, AsyncIterator, Callable, Tuple
 from abc import abstractmethod
 
-from llm_facade import (
+from llm_provider.llm_facade import (
     LLMFacade,
     ModelCapability,
     GenerationConfig,

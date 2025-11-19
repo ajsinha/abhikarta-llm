@@ -1959,7 +1959,7 @@ class NewProviderFacade(BaseProviderFacade):
 ### Step 3: Register Facade
 
 ```python
-# In register_facades.py
+# In register_llm_facades.py
 from newprovider_facade import NewProviderFacade
 
 FacadeFactory.register_facade("newprovider", NewProviderFacade)

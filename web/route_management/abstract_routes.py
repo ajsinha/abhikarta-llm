@@ -3,6 +3,9 @@ from functools import wraps
 from flask import render_template, request, redirect, url_for, session, flash
 import logging
 from tool_management.mcp_server_manager import MCPServerManager
+from model_management.model_registry import ModelRegistry
+from llm_provider.llm_facade_factory import LLMFacadeFactory
+
 logger = logging.getLogger(__name__)
 
 class AbstractRoutes(ABC):
@@ -13,6 +16,9 @@ class AbstractRoutes(ABC):
         self.user_manager = None
         self.role_manager = None
         self.resource_manager = None
+        self.llm_facade_factory: LLMFacadeFactory = None
+        self.model_provider_registry: ModelRegistry = None
+
         self.mcp_server_manager = MCPServerManager()
 
     def set_user_manager(self, user_manager):
@@ -23,6 +29,12 @@ class AbstractRoutes(ABC):
 
     def set_resource_manager(self, resource_manager):
         self.resource_manager = resource_manager
+
+    def set_model_registry(self, model_provider_registry: ModelRegistry):
+        self.model_provider_registry = model_provider_registry
+
+    def set_llm_facade_factory(self, llm_facade_factory: LLMFacadeFactory):
+        self.llm_facade_factory = llm_facade_factory
 
     @abstractmethod
     def register_routes(self):

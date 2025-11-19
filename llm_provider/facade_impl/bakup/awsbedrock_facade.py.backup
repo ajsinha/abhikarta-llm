@@ -172,34 +172,20 @@ class AWSBedrockFacade(BaseProviderFacade):
         elif 'generation' in response_body:
             # Llama format
             content = response_body['generation']
-            token_usage = {
-                "prompt_tokens": 0,
-                "completion_tokens": 0,
-                "total_tokens": 0
-            }
+            token_usage = TokenUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0)
         elif 'results' in response_body:
             # Generic format
             content = response_body['results'][0]['outputText']
-            token_usage = {
-                "prompt_tokens": 0,
-                "completion_tokens": 0,
-                "total_tokens": 0
-            }
+            token_usage = TokenUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0)
         else:
             content = str(response_body)
-            token_usage = {
-                "prompt_tokens": 0,
-                "completion_tokens": 0,
-                "total_tokens": 0
-            }
+            token_usage = TokenUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0)
         
         return {
             "content": content,
             "tool_calls": None,
             "usage": token_usage,
-            "metadata": {
-                "model": self.model_name
-            },
+            "metadata": CompletionMetadata(model=self.model_name, usage=token_usage),
             "raw_response": response_body
         }
     

@@ -55,9 +55,7 @@ class OllamaFacade(BaseProviderFacade):
                     completion_tokens=response.get('eval_count', 0),
                     total_tokens=response.get('prompt_eval_count', 0) + response.get('eval_count', 0)
                 ),
-                "metadata": {
-                "model": self.model_name
-            },
+                "metadata": CompletionMetadata(model=self.model_name),
                 "raw_response": response
             }
         except Exception as e:
@@ -79,9 +77,7 @@ class OllamaFacade(BaseProviderFacade):
                     completion_tokens=response.get('eval_count', 0),
                     total_tokens=response.get('prompt_eval_count', 0) + response.get('eval_count', 0)
                 ),
-                "metadata": {
-                "model": self.model_name
-            },
+                "metadata": CompletionMetadata(model=self.model_name),
                 "raw_response": response
             }
         except Exception as e:

@@ -382,16 +382,20 @@ class AnthropicFacade(BaseProviderFacade):
         return {
             "content": content,
             "tool_calls": tool_calls if tool_calls else None,
-            "usage": {
-                "prompt_tokens": response.usage.input_tokens,
-                "completion_tokens": response.usage.output_tokens,
-                "total_tokens": response.usage.input_tokens + response.usage.output_tokens
-            
-            },
-            "metadata": {
-                "model": response.model,
-                "finish_reason": response.stop_reason
-            },
+            "usage": TokenUsage(
+                prompt_tokens=response.usage.input_tokens,
+                completion_tokens=response.usage.output_tokens,
+                total_tokens=response.usage.input_tokens + response.usage.output_tokens
+            ),
+            "metadata": CompletionMetadata(
+                model=response.model,
+                finish_reason=response.stop_reason,
+                usage=TokenUsage(
+                    prompt_tokens=response.usage.input_tokens,
+                    completion_tokens=response.usage.output_tokens,
+                    total_tokens=response.usage.input_tokens + response.usage.output_tokens
+                )
+            ),
             "raw_response": response
         }
     
