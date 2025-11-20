@@ -24,6 +24,7 @@ from datetime import datetime
 import uuid
 
 from llm_provider.facade_cache_manager import FacadeCacheManager
+from llm_provider.llm_interaction_logger import LLMInteractionLogger
 
 logger = logging.getLogger(__name__)
 
@@ -61,15 +62,13 @@ class LLMRoutes(AbstractRoutes):
         # Initialize facade cache manager
         self.facade_cache = FacadeCacheManager(default_ttl_minutes=60)
 
+        # Initialize interaction logger
+        self.interaction_logger = None  # Will be initialized after db_pool is set
+
         # Store active chat sessions (in production, use Redis or database)
         self._active_chat_sessions: Dict[str, Dict[str, Any]] = {}
 
-        self.facade_cache: FacadeCacheManager = None
-
         logger.info("LLMRoutes initialized with facade caching")
-
-    def set_facade_cache(self, facade_cache):
-        self.facade_cache = facade_cache
 
     def _generate_chat_session_id(self) -> str:
         """
@@ -170,8 +169,31 @@ class LLMRoutes(AbstractRoutes):
             factory_func=create_facade
         )
 
+    def _initialize_interaction_logger(self):
+        """Initialize interaction logger if db_pool is available."""
+
+        if not self.interaction_logger:
+            try:
+                self.interaction_logger = LLMInteractionLogger(self.db_connection_pool_name)
+                logger.info("Interaction logger initialized")
+            except Exception as e:
+                logger.warning(f"Could not initialize interaction logger: {e}")
+
+    def set_facade_cache(self, facade_cache: FacadeCacheManager):
+        """
+        Set the facade cache manager.
+
+        Args:
+            facade_cache: FacadeCacheManager instance
+        """
+        self.facade_cache = facade_cache
+        logger.info("Facade cache set from external source")
+
     def register_routes(self):
         """Register all LLM-related routes."""
+
+        # Initialize interaction logger if db_pool is available
+        self._initialize_interaction_logger()
 
         @self.app.route('/llm/chat', methods=['GET'])
         @login_required
@@ -556,6 +578,37 @@ class LLMRoutes(AbstractRoutes):
                         f"Time: {elapsed_time:.2f}s"
                     )
 
+                    # Log interaction to database
+                    if self.interaction_logger:
+                        try:
+                            self.interaction_logger.log_interaction(
+                                user_id=session.get('userid', 'unknown'),
+                                session_id=session.get('session_id', 'unknown'),
+                                chat_session_id=chat_session_id,
+                                interaction_type='chat',
+                                provider_name=provider_name,
+                                model_name=model_name,
+                                user_data=user_message,
+                                llm_response=assistant_message,
+                                request_parameters={
+                                    'max_tokens': max_tokens,
+                                    'temperature': temperature,
+                                    'top_p': top_p
+                                },
+                                response_metadata=metadata,
+                                response_time_ms=int(elapsed_time * 1000),
+                                prompt_tokens=usage.get('prompt_tokens'),
+                                completion_tokens=usage.get('completion_tokens'),
+                                total_tokens=usage.get('total_tokens'),
+                                status='success',
+                                cached_facade=True,
+                                streaming=False,
+                                client_ip=request.remote_addr,
+                                user_agent=request.headers.get('User-Agent')
+                            )
+                        except Exception as log_error:
+                            logger.error(f"Error logging interaction: {log_error}")
+
                     return jsonify({
                         'success': True,
                         'response': assistant_message,
@@ -573,6 +626,36 @@ class LLMRoutes(AbstractRoutes):
 
                 except Exception as e:
                     logger.error(f"Error calling LLM: {e}", exc_info=True)
+
+                    # Log error interaction to database
+                    if self.interaction_logger:
+                        try:
+                            self.interaction_logger.log_interaction(
+                                user_id=session.get('userid', 'unknown'),
+                                session_id=session.get('session_id', 'unknown'),
+                                chat_session_id=chat_session_id,
+                                interaction_type='chat',
+                                provider_name=provider_name,
+                                model_name=model_name,
+                                user_data=user_message,
+                                llm_response='',  # Empty response on error
+                                request_parameters={
+                                    'max_tokens': parameters.get('max_tokens', 4096),
+                                    'temperature': parameters.get('temperature', 0.7),
+                                    'top_p': parameters.get('top_p')
+                                },
+                                response_metadata={},
+                                response_time_ms=int((time.time() - start_time) * 1000),
+                                status='error',
+                                error_message=str(e),
+                                cached_facade=False,
+                                streaming=False,
+                                client_ip=request.remote_addr,
+                                user_agent=request.headers.get('User-Agent')
+                            )
+                        except Exception as log_error:
+                            logger.error(f"Error logging failed interaction: {log_error}")
+
                     return jsonify({
                         'success': False,
                         'error': f'LLM call failed: {str(e)}'

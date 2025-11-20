@@ -57,7 +57,11 @@ class PooledConnection:
         self._created_at = time.time()
         self._last_used = time.time()
         self._use_count = 0
-    
+
+    @property
+    def cursor(self):
+        return self._connection.cursor()
+
     @property
     def connection(self) -> Any:
         """Get the underlying connection object."""

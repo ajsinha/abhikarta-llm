@@ -12,6 +12,7 @@ import logging
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Tuple
 from contextlib import contextmanager
+from db_management.pool_manager import get_pool_manager
 
 logger = logging.getLogger(__name__)
 
@@ -24,70 +25,40 @@ class LLMInteractionLogger:
     Provides methods for inserting and querying interaction logs.
     """
 
-    def __init__(self, db_connection_pool):
+    def __init__(self, _db_connection_pool_name):
         """
         Initialize the interaction logger.
 
         Args:
-            db_connection_pool: Database connection pool instance
+            _db_connection_pool_name: Database connection pool name
         """
-        self.db_pool = db_connection_pool
-        self.db_type = self._detect_db_type()
 
-        logger.info(f"LLMInteractionLogger initialized with {self.db_type} database")
 
-    def _detect_db_type(self) -> str:
-        """
-        Detect the database type from connection pool.
+        self._db_connection_pool_name = _db_connection_pool_name
+        self._connection_pool_manager = get_pool_manager()
 
-        Returns:
-            Database type: 'sqlite', 'postgresql', or 'mysql'
-        """
-        try:
-            # Try to detect from connection pool attributes or connection
-            with self._get_connection() as conn:
-                cursor = conn.cursor()
+        self.db_type ='sqlite'
 
-                # Try SQLite-specific query
-                try:
-                    cursor.execute("SELECT sqlite_version()")
-                    return 'sqlite'
-                except:
-                    pass
-
-                # Try PostgreSQL-specific query
-                try:
-                    cursor.execute("SELECT version()")
-                    result = cursor.fetchone()[0]
-                    if 'PostgreSQL' in result:
-                        return 'postgresql'
-                except:
-                    pass
-
-                # Try MySQL-specific query
-                try:
-                    cursor.execute("SELECT VERSION()")
-                    result = cursor.fetchone()[0]
-                    if 'MySQL' in result or 'MariaDB' in result:
-                        return 'mysql'
-                except:
-                    pass
-
-            # Default to SQLite
-            return 'sqlite'
-
-        except Exception as e:
-            logger.warning(f"Could not detect database type: {e}, defaulting to sqlite")
-            return 'sqlite'
 
     @contextmanager
     def _get_connection(self):
-        """Context manager for database connections."""
-        conn = self.db_pool.get_connection()
+        """Context manager for database connections with auto-commit."""
+        with self._connection_pool_manager.get_connection_context(self._db_connection_pool_name) as conn:
+            try:
+                yield conn  # Now this yields the actual connection
+                conn.commit()  # Auto-commit on success
+            except Exception as e:
+                conn.rollback()  # Auto-rollback on error
+                print(f"Database error: {e}")
+                raise
+
+    @contextmanager
+    def _get_cursor(self, conn):
+        cursor = conn.cursor()
         try:
-            yield conn
+            yield cursor
         finally:
-            conn.close()
+            cursor.close()
 
     def log_interaction(self,
                         user_id: str,
@@ -200,26 +171,26 @@ class LLMInteractionLogger:
             )
 
             with self._get_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute(sql, params)
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute(sql, params)
 
-                # Get the inserted ID
-                if self.db_type == 'postgresql':
-                    interaction_id = cursor.fetchone()[0]
-                elif self.db_type == 'mysql':
-                    interaction_id = cursor.lastrowid
-                else:  # sqlite
-                    interaction_id = cursor.lastrowid
+                    # Get the inserted ID
+                    if self.db_type == 'postgresql':
+                        interaction_id = cursor.fetchone()[0]
+                    elif self.db_type == 'mysql':
+                        interaction_id = cursor.lastrowid
+                    else:  # sqlite
+                        interaction_id = cursor.lastrowid
 
-                conn.commit()
+                    conn.commit()
 
-                logger.debug(
-                    f"Logged interaction {interaction_id}: "
-                    f"user={user_id}, session={chat_session_id}, "
-                    f"provider={provider_name}, model={model_name}"
-                )
+                    logger.debug(
+                        f"Logged interaction {interaction_id}: "
+                        f"user={user_id}, session={chat_session_id}, "
+                        f"provider={provider_name}, model={model_name}"
+                    )
 
-                return interaction_id
+                    return interaction_id
 
         except Exception as e:
             logger.error(f"Error logging interaction: {e}", exc_info=True)
@@ -266,31 +237,31 @@ class LLMInteractionLogger:
                 params = (user_id, limit, offset)
 
             with self._get_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute(sql, params)
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute(sql, params)
 
-                columns = [desc[0] for desc in cursor.description]
-                results = []
+                    columns = [desc[0] for desc in cursor.description]
+                    results = []
 
-                for row in cursor.fetchall():
-                    result = dict(zip(columns, row))
+                    for row in cursor.fetchall():
+                        result = dict(zip(columns, row))
 
-                    # Parse JSON fields
-                    if result.get('request_parameters'):
-                        try:
-                            result['request_parameters'] = json.loads(result['request_parameters'])
-                        except:
-                            pass
+                        # Parse JSON fields
+                        if result.get('request_parameters'):
+                            try:
+                                result['request_parameters'] = json.loads(result['request_parameters'])
+                            except:
+                                pass
 
-                    if result.get('response_metadata'):
-                        try:
-                            result['response_metadata'] = json.loads(result['response_metadata'])
-                        except:
-                            pass
+                        if result.get('response_metadata'):
+                            try:
+                                result['response_metadata'] = json.loads(result['response_metadata'])
+                            except:
+                                pass
 
-                    results.append(result)
+                        results.append(result)
 
-                return results
+                    return results
 
         except Exception as e:
             logger.error(f"Error getting user interactions: {e}", exc_info=True)
@@ -316,31 +287,31 @@ class LLMInteractionLogger:
             """
 
             with self._get_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute(sql, (chat_session_id,))
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute(sql, (chat_session_id,))
 
-                columns = [desc[0] for desc in cursor.description]
-                results = []
+                    columns = [desc[0] for desc in cursor.description]
+                    results = []
 
-                for row in cursor.fetchall():
-                    result = dict(zip(columns, row))
+                    for row in cursor.fetchall():
+                        result = dict(zip(columns, row))
 
-                    # Parse JSON fields
-                    if result.get('request_parameters'):
-                        try:
-                            result['request_parameters'] = json.loads(result['request_parameters'])
-                        except:
-                            pass
+                        # Parse JSON fields
+                        if result.get('request_parameters'):
+                            try:
+                                result['request_parameters'] = json.loads(result['request_parameters'])
+                            except:
+                                pass
 
-                    if result.get('response_metadata'):
-                        try:
-                            result['response_metadata'] = json.loads(result['response_metadata'])
-                        except:
-                            pass
+                        if result.get('response_metadata'):
+                            try:
+                                result['response_metadata'] = json.loads(result['response_metadata'])
+                            except:
+                                pass
 
-                    results.append(result)
+                        results.append(result)
 
-                return results
+                    return results
 
         except Exception as e:
             logger.error(f"Error getting session interactions: {e}", exc_info=True)
@@ -372,16 +343,16 @@ class LLMInteractionLogger:
             """
 
             with self._get_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute(sql, (user_id,))
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute(sql, (user_id,))
 
-                columns = [desc[0] for desc in cursor.description]
-                row = cursor.fetchone()
+                    columns = [desc[0] for desc in cursor.description]
+                    row = cursor.fetchone()
 
-                if row:
-                    return dict(zip(columns, row))
+                    if row:
+                        return dict(zip(columns, row))
 
-                return {}
+                    return {}
 
         except Exception as e:
             logger.error(f"Error getting user statistics: {e}", exc_info=True)
@@ -408,16 +379,16 @@ class LLMInteractionLogger:
             """
 
             with self._get_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute(sql)
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute(sql)
 
-                columns = [desc[0] for desc in cursor.description]
-                results = []
+                    columns = [desc[0] for desc in cursor.description]
+                    results = []
 
-                for row in cursor.fetchall():
-                    results.append(dict(zip(columns, row)))
+                    for row in cursor.fetchall():
+                        results.append(dict(zip(columns, row)))
 
-                return results
+                    return results
 
         except Exception as e:
             logger.error(f"Error getting provider statistics: {e}", exc_info=True)
@@ -454,13 +425,13 @@ class LLMInteractionLogger:
                 params = (days_old,)
 
             with self._get_connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute(sql, params)
-                deleted_count = cursor.rowcount
-                conn.commit()
+                with self._get_cursor(conn) as cursor:
+                    cursor.execute(sql, params)
+                    deleted_count = cursor.rowcount
+                    conn.commit()
 
-                logger.info(f"Deleted {deleted_count} interactions older than {days_old} days")
-                return deleted_count
+                    logger.info(f"Deleted {deleted_count} interactions older than {days_old} days")
+                    return deleted_count
 
         except Exception as e:
             logger.error(f"Error deleting old interactions: {e}", exc_info=True)
