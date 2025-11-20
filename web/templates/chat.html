@@ -18,6 +18,16 @@
         box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
     }
     
+    .session-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        display: inline-block;
+        margin-top: 8px;
+    }
+
     .config-panel {
         background: white;
         border-radius: 15px;
@@ -25,7 +35,7 @@
         margin-bottom: 20px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
-    
+
     .chat-panel {
         background: white;
         border-radius: 15px;
@@ -34,7 +44,7 @@
         flex-direction: column;
         height: 600px;
     }
-    
+
     .chat-messages {
         flex: 1;
         overflow-y: auto;
@@ -42,26 +52,26 @@
         background: #f8f9fa;
         border-radius: 15px 15px 0 0;
     }
-    
+
     .message {
         margin-bottom: 15px;
         display: flex;
         animation: fadeIn 0.3s ease-in;
     }
-    
+
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    
+
     .message.user {
         justify-content: flex-end;
     }
-    
+
     .message.assistant {
         justify-content: flex-start;
     }
-    
+
     .message-content {
         max-width: 70%;
         padding: 12px 18px;
@@ -69,13 +79,13 @@
         position: relative;
         word-wrap: break-word;
     }
-    
+
     .message.user .message-content {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border-bottom-right-radius: 4px;
     }
-    
+
     .message.assistant .message-content {
         background: white;
         color: #333;
@@ -83,37 +93,37 @@
         border-bottom-left-radius: 4px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
-    
+
     .message-role {
         font-size: 0.75rem;
         font-weight: 600;
         margin-bottom: 4px;
         opacity: 0.8;
     }
-    
+
     .message-text {
         line-height: 1.5;
         white-space: pre-wrap;
     }
-    
+
     .message-time {
         font-size: 0.7rem;
         opacity: 0.6;
         margin-top: 4px;
     }
-    
+
     .chat-input-area {
         padding: 20px;
         background: white;
         border-radius: 0 0 15px 15px;
         border-top: 1px solid #e0e0e0;
     }
-    
+
     .chat-input-wrapper {
         display: flex;
         gap: 10px;
     }
-    
+
     .chat-input {
         flex: 1;
         border: 2px solid #e0e0e0;
@@ -122,13 +132,13 @@
         font-size: 0.95rem;
         transition: all 0.3s ease;
     }
-    
+
     .chat-input:focus {
         outline: none;
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
-    
+
     .send-button {
         border-radius: 50%;
         width: 50px;
@@ -143,17 +153,17 @@
         transition: all 0.3s ease;
         box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
     }
-    
+
     .send-button:hover:not(:disabled) {
         transform: scale(1.1);
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
     }
-    
+
     .send-button:disabled {
         opacity: 0.5;
         cursor: not-allowed;
     }
-    
+
     .typing-indicator {
         display: none;
         padding: 10px 15px;
@@ -163,11 +173,11 @@
         max-width: 70px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
-    
+
     .typing-indicator.active {
         display: inline-block;
     }
-    
+
     .typing-indicator span {
         height: 8px;
         width: 8px;
@@ -177,20 +187,20 @@
         margin: 0 2px;
         animation: typing 1.4s infinite;
     }
-    
+
     .typing-indicator span:nth-child(2) {
         animation-delay: 0.2s;
     }
-    
+
     .typing-indicator span:nth-child(3) {
         animation-delay: 0.4s;
     }
-    
+
     @keyframes typing {
         0%, 60%, 100% { transform: translateY(0); }
         30% { transform: translateY(-10px); }
     }
-    
+
     .empty-state {
         display: flex;
         flex-direction: column;
@@ -201,23 +211,23 @@
         text-align: center;
         padding: 40px;
     }
-    
+
     .empty-state i {
         font-size: 4rem;
         margin-bottom: 20px;
         opacity: 0.3;
     }
-    
+
     .parameters-section {
         margin-top: 15px;
         padding-top: 15px;
         border-top: 1px solid #e0e0e0;
     }
-    
+
     .parameter-row {
         margin-bottom: 10px;
     }
-    
+
     .badge-provider {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -226,7 +236,7 @@
         font-size: 0.85rem;
         font-weight: 500;
     }
-    
+
     .model-info {
         display: none;
         margin-top: 15px;
@@ -235,15 +245,66 @@
         border-radius: 10px;
         font-size: 0.9rem;
     }
-    
+
     .model-info.show {
         display: block;
     }
-    
+
     .conversation-actions {
         display: flex;
         gap: 10px;
         margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .btn-end-chat {
+        background: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-end-chat:hover {
+        background: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-new-chat {
+        background: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-new-chat:hover {
+        background: #218838;
+        border-color: #1e7e34;
+    }
+
+    .cache-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #28a745;
+        margin-left: 5px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .session-info-panel {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 10px 15px;
+        margin-top: 15px;
+        font-size: 0.85rem;
+        border-left: 3px solid #667eea;
+    }
+
+    .session-info-panel .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 0;
     }
 </style>
 {% endblock %}
@@ -255,6 +316,9 @@
             <div class="col-md-8">
                 <h3><i class="fas fa-comments"></i> LLM Chat Interface</h3>
                 <p class="mb-0">Interact with large language models</p>
+                <div class="session-badge" id="sessionBadge">
+                    <i class="fas fa-circle-notch fa-spin"></i> Initializing session...
+                </div>
             </div>
             <div class="col-md-4 text-end">
                 <i class="fas fa-robot" style="font-size: 3rem; opacity: 0.3;"></i>
@@ -267,85 +331,105 @@
         <div class="col-lg-4 col-xl-3">
             <div class="config-panel">
                 <h5 class="mb-3"><i class="fas fa-cog"></i> Configuration</h5>
-                
+
                 <!-- Reload Button -->
                 <div class="mb-3">
-                    <button id="reloadRegistry" class="btn btn-sm btn-outline-secondary w-100">
-                        <i class="fas fa-sync-alt"></i> Reload Providers
+                    <button class="btn btn-outline-secondary btn-sm w-100" id="reloadRegistry">
+                        <i class="fas fa-sync-alt"></i> Reload Models
                     </button>
                 </div>
 
                 <!-- Provider Selection -->
                 <div class="mb-3">
-                    <label for="providerSelect" class="form-label fw-bold">
+                    <label for="providerSelect" class="form-label">
                         <i class="fas fa-server"></i> Provider
                     </label>
-                    <select id="providerSelect" class="form-select">
+                    <select class="form-select" id="providerSelect">
                         <option value="">Select Provider...</option>
                     </select>
                 </div>
 
                 <!-- Model Selection -->
                 <div class="mb-3">
-                    <label for="modelSelect" class="form-label fw-bold">
+                    <label for="modelSelect" class="form-label">
                         <i class="fas fa-brain"></i> Model
                     </label>
-                    <select id="modelSelect" class="form-select" disabled>
+                    <select class="form-select" id="modelSelect" disabled>
                         <option value="">Select Model...</option>
                     </select>
                 </div>
 
                 <!-- Model Info -->
-                <div id="modelInfo" class="model-info">
-                    <div class="d-flex justify-content-between mb-2">
-                        <strong>Context Window:</strong>
-                        <span id="modelContextWindow">-</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <strong>Max Output:</strong>
-                        <span id="modelMaxOutput">-</span>
+                <div class="model-info" id="modelInfo">
+                    <div class="mb-2">
+                        <strong>Context Window:</strong> <span id="modelContextWindow">-</span>
                     </div>
                     <div class="mb-2">
-                        <strong>Description:</strong>
-                        <p class="mb-0 text-muted small" id="modelDescription">-</p>
+                        <strong>Max Output:</strong> <span id="modelMaxOutput">-</span>
+                    </div>
+                    <div>
+                        <strong>Description:</strong><br>
+                        <span id="modelDescription">-</span>
                     </div>
                 </div>
 
-                <!-- Parameters -->
+                <!-- Generation Parameters -->
                 <div class="parameters-section">
-                    <h6 class="mb-3"><i class="fas fa-sliders-h"></i> Parameters</h6>
+                    <h6><i class="fas fa-sliders-h"></i> Parameters</h6>
 
                     <div class="parameter-row">
-                        <label for="temperature" class="form-label small">
-                            Temperature: <span id="temperatureValue">0.7</span>
+                        <label for="temperature" class="form-label">
+                            Temperature: <span id="tempValue">0.7</span>
                         </label>
                         <input type="range" class="form-range" id="temperature"
                                min="0" max="2" step="0.1" value="0.7">
                     </div>
 
                     <div class="parameter-row">
-                        <label for="maxTokens" class="form-label small">Max Tokens</label>
-                        <input type="number" class="form-control form-control-sm"
-                               id="maxTokens" value="4096" min="1" max="100000">
+                        <label for="maxTokens" class="form-label">
+                            Max Tokens: <span id="maxTokensValue">4096</span>
+                        </label>
+                        <input type="range" class="form-range" id="maxTokens"
+                               min="100" max="8192" step="100" value="4096">
                     </div>
 
                     <div class="parameter-row">
-                        <label for="topP" class="form-label small">
-                            Top P: <span id="topPValue">0.95</span>
+                        <label for="topP" class="form-label">
+                            Top P: <span id="topPValue">1.0</span>
                         </label>
                         <input type="range" class="form-range" id="topP"
-                               min="0" max="1" step="0.05" value="0.95">
+                               min="0" max="1" step="0.05" value="1.0">
+                    </div>
+                </div>
+
+                <!-- Session Info -->
+                <div class="session-info-panel" id="sessionInfo" style="display: none;">
+                    <strong><i class="fas fa-info-circle"></i> Session Info</strong>
+                    <div class="info-row">
+                        <span>Cached Models:</span>
+                        <span id="cachedModelsCount">0</span>
                     </div>
                 </div>
 
                 <!-- Conversation Actions -->
                 <div class="conversation-actions">
-                    <button id="clearChat" class="btn btn-sm btn-outline-danger flex-fill">
-                        <i class="fas fa-trash"></i> Clear
+                    <button class="btn btn-new-chat btn-sm flex-fill" id="newChatBtn">
+                        <i class="fas fa-plus"></i> New Chat
                     </button>
-                    <button id="exportChat" class="btn btn-sm btn-outline-primary flex-fill">
+                    <button class="btn btn-end-chat btn-sm flex-fill" id="endChatBtn">
+                        <i class="fas fa-stop-circle"></i> End Chat
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm flex-fill" id="clearHistoryBtn">
+                        <i class="fas fa-eraser"></i> Clear
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm flex-fill" id="exportBtn">
                         <i class="fas fa-download"></i> Export
                     </button>
+                </div>
+
+                <!-- Status -->
+                <div class="mt-3 text-center text-muted small" id="statusText">
+                    <i class="fas fa-circle-notch fa-spin"></i> Loading...
                 </div>
             </div>
         </div>
@@ -353,29 +437,26 @@
         <!-- Chat Panel -->
         <div class="col-lg-8 col-xl-9">
             <div class="chat-panel">
+                <!-- Messages Area -->
                 <div class="chat-messages" id="chatMessages">
                     <div class="empty-state">
                         <i class="fas fa-comments"></i>
-                        <h5>Select a provider and model to start chatting</h5>
-                        <p class="text-muted">Your conversation will appear here</p>
+                        <h5>Start a conversation</h5>
+                        <p>Select a provider and model to begin chatting</p>
                     </div>
                 </div>
 
+                <!-- Input Area -->
                 <div class="chat-input-area">
                     <div class="chat-input-wrapper">
                         <input type="text"
-                               id="chatInput"
                                class="chat-input"
+                               id="chatInput"
                                placeholder="Type your message..."
                                disabled>
-                        <button id="sendButton" class="send-button" disabled>
+                        <button class="send-button" id="sendButton" disabled>
                             <i class="fas fa-paper-plane"></i>
                         </button>
-                    </div>
-                    <div class="mt-2 text-center">
-                        <small class="text-muted" id="statusText">
-                            Select a provider and model to begin
-                        </small>
                     </div>
                 </div>
             </div>
@@ -387,105 +468,193 @@
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-    let conversationHistory = [];
     let selectedProvider = null;
     let selectedModel = null;
+    let conversationHistory = [];
     let isSending = false;
+    let chatSessionId = '{{ chat_session_id }}';
 
-    // Load providers on page load
+    // Initialize
     loadProviders();
+    updateSessionDisplay();
+    updateSessionInfo();
 
-    // Reload registry button
-    $('#reloadRegistry').on('click', function() {
-        reloadRegistry();
-    });
+    // Update session badge
+    function updateSessionDisplay() {
+        if (chatSessionId) {
+            const shortId = chatSessionId.split('_')[1].substring(0, 8);
+            $('#sessionBadge').html(
+                `<i class="fas fa-check-circle"></i> Session: ${shortId}<span class="cache-indicator"></span>`
+            );
+        }
+    }
 
-    // Provider selection handler
-    $('#providerSelect').on('change', function() {
+    // Update session info panel
+    function updateSessionInfo() {
+        $.ajax({
+            url: '/api/llm/chat/session/info',
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    $('#cachedModelsCount').text(response.cached_facades || 0);
+                    $('#sessionInfo').fadeIn();
+                }
+            },
+            error: function() {
+                // Silently fail - not critical
+            }
+        });
+    }
+
+    // Event listeners
+    $('#providerSelect').change(function() {
         const provider = $(this).val();
         selectedProvider = provider;
-        selectedModel = null;
 
         if (provider) {
             loadModels(provider);
         } else {
-            $('#modelSelect').prop('disabled', true).html('<option value="">Select Model...</option>');
-            updateChatState();
-        }
-    });
-
-    // Model selection handler
-    $('#modelSelect').on('change', function() {
-        const model = $(this).val();
-        selectedModel = model;
-
-        if (model) {
-            const modelData = $(this).find(':selected').data('model');
-            displayModelInfo(modelData);
-            updateChatState();
-        } else {
+            selectedModel = null;
+            $('#modelSelect').html('<option value="">Select Model...</option>').prop('disabled', true);
             $('#modelInfo').removeClass('show');
-            updateChatState();
         }
+
+        updateChatState();
     });
 
-    // Temperature slider
+    $('#modelSelect').change(function() {
+        selectedModel = $(this).val();
+
+        if (selectedModel) {
+            const modelData = $(this).find(':selected').data('model');
+            if (modelData) {
+                displayModelInfo(modelData);
+                updateSessionInfo();  // Update to show cached models
+            }
+        }
+
+        updateChatState();
+    });
+
+    // Parameter updates
     $('#temperature').on('input', function() {
-        $('#temperatureValue').text($(this).val());
+        $('#tempValue').text($(this).val());
     });
 
-    // Top P slider
+    $('#maxTokens').on('input', function() {
+        $('#maxTokensValue').text($(this).val());
+    });
+
     $('#topP').on('input', function() {
         $('#topPValue').text($(this).val());
     });
 
-    // Send button click
-    $('#sendButton').on('click', function() {
-        sendMessage();
-    });
-
-    // Enter key to send
-    $('#chatInput').on('keypress', function(e) {
+    // Send on Enter
+    $('#chatInput').keypress(function(e) {
         if (e.which === 13 && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
     });
 
-    // Clear chat
-    $('#clearChat').on('click', function() {
-        if (confirm('Are you sure you want to clear the conversation?')) {
-            conversationHistory = [];
-            $('#chatMessages').html(`
-                <div class="empty-state">
-                    <i class="fas fa-comments"></i>
-                    <h5>Conversation cleared</h5>
-                    <p class="text-muted">Start a new conversation</p>
-                </div>
-            `);
+    $('#sendButton').click(sendMessage);
+    $('#reloadRegistry').click(reloadRegistry);
+
+    // New Chat button
+    $('#newChatBtn').click(function() {
+        if (confirm('Start a new chat session? Current conversation will be cleared.')) {
+            $.ajax({
+                url: '/api/llm/chat/new',
+                method: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        chatSessionId = response.chat_session_id;
+                        conversationHistory = [];
+                        $('#chatMessages').html(
+                            `<div class="empty-state">
+                                <i class="fas fa-comments"></i>
+                                <h5>New chat session started</h5>
+                                <p>Your conversation history has been cleared</p>
+                            </div>`
+                        );
+                        updateSessionDisplay();
+                        updateSessionInfo();
+                        showSuccess('New chat session created!');
+                    } else {
+                        showError('Failed to create new session: ' + response.error);
+                    }
+                },
+                error: function(xhr) {
+                    showError('Error creating new session: ' + xhr.responseText);
+                }
+            });
         }
     });
 
-    // Export chat
-    $('#exportChat').on('click', function() {
-        if (conversationHistory.length === 0) {
-            alert('No conversation to export');
-            return;
+    // End Chat button
+    $('#endChatBtn').click(function() {
+        if (confirm('End this chat session? All cached models will be released.')) {
+            $.ajax({
+                url: '/api/llm/chat/end',
+                method: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        conversationHistory = [];
+                        $('#chatMessages').html(
+                            `<div class="empty-state">
+                                <i class="fas fa-power-off"></i>
+                                <h5>Chat session ended</h5>
+                                <p>Resources have been released. Reload the page to start a new session.</p>
+                            </div>`
+                        );
+                        $('#sessionBadge').html(
+                            '<i class="fas fa-times-circle"></i> Session ended'
+                        );
+                        $('#sessionInfo').fadeOut();
+                        $('#chatInput').prop('disabled', true);
+                        $('#sendButton').prop('disabled', true);
+                        showSuccess('Chat session ended successfully');
+                    } else {
+                        showError('Failed to end session: ' + response.error);
+                    }
+                },
+                error: function(xhr) {
+                    showError('Error ending session: ' + xhr.responseText);
+                }
+            });
         }
+    });
 
-        const exportData = {
+    // Clear History button
+    $('#clearHistoryBtn').click(function() {
+        if (confirm('Clear conversation history? This will not end your session.')) {
+            conversationHistory = [];
+            $('#chatMessages').html(
+                `<div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <h5>History cleared</h5>
+                    <p>Start a new conversation</p>
+                </div>`
+            );
+            showSuccess('Conversation history cleared');
+        }
+    });
+
+    // Export button
+    $('#exportBtn').click(function() {
+        const data = {
+            session_id: chatSessionId,
             provider: selectedProvider,
             model: selectedModel,
-            timestamp: new Date().toISOString(),
-            conversation: conversationHistory
+            conversation: conversationHistory,
+            exported_at: new Date().toISOString()
         };
 
-        const blob = new Blob([JSON.stringify(exportData, null, 2)],
-                             {type: 'application/json'});
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `chat-${Date.now()}.json`;
+        a.download = `chat-${chatSessionId}-${Date.now()}.json`;
         a.click();
         URL.revokeObjectURL(url);
     });
@@ -507,22 +676,24 @@ $(document).ready(function() {
                             </option>`
                         );
                     });
+
+                    $('#statusText').html('<i class="fas fa-check-circle"></i> Ready');
                 } else {
                     showError('Failed to load providers: ' + response.error);
                 }
             },
             error: function(xhr) {
                 showError('Error loading providers: ' + xhr.responseText);
+                $('#statusText').html('<i class="fas fa-exclamation-circle"></i> Error');
             }
         });
     }
 
-    // Reload registry from database
+    // Reload registry
     function reloadRegistry() {
         const $btn = $('#reloadRegistry');
         const originalHtml = $btn.html();
 
-        // Show loading state
         $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Reloading...');
 
         $.ajax({
@@ -530,7 +701,6 @@ $(document).ready(function() {
             method: 'POST',
             success: function(response) {
                 if (response.success) {
-                    // Show success message
                     const alert = `
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <i class="fas fa-check-circle"></i> Registry reloaded! Found ${response.provider_count} providers.
@@ -538,11 +708,7 @@ $(document).ready(function() {
                         </div>
                     `;
                     $('.chat-container').prepend(alert);
-
-                    // Reload providers dropdown
                     loadProviders();
-
-                    // Auto-dismiss after 3 seconds
                     setTimeout(function() {
                         $('.alert-success').fadeOut(function() { $(this).remove(); });
                     }, 3000);
@@ -554,16 +720,15 @@ $(document).ready(function() {
                 showError('Error reloading registry: ' + xhr.responseText);
             },
             complete: function() {
-                // Restore button state
                 $btn.prop('disabled', false).html(originalHtml);
             }
         });
     }
-    
+
     // Load models for provider
     function loadModels(provider) {
-        $('#statusText').text('Loading models...');
-        
+        $('#statusText').html('<i class="fas fa-circle-notch fa-spin"></i> Loading models...');
+
         $.ajax({
             url: `/api/llm/models/${provider}`,
             method: 'GET',
@@ -572,7 +737,7 @@ $(document).ready(function() {
                     const select = $('#modelSelect');
                     select.html('<option value="">Select Model...</option>');
                     select.prop('disabled', false);
-                    
+
                     response.models.forEach(model => {
                         const option = $('<option>')
                             .val(model.name)
@@ -580,8 +745,8 @@ $(document).ready(function() {
                             .data('model', model);
                         select.append(option);
                     });
-                    
-                    $('#statusText').text('Select a model to begin');
+
+                    $('#statusText').html('<i class="fas fa-check-circle"></i> Select a model');
                 } else {
                     showError('Failed to load models: ' + response.error);
                 }
@@ -591,7 +756,7 @@ $(document).ready(function() {
             }
         });
     }
-    
+
     // Display model info
     function displayModelInfo(model) {
         $('#modelContextWindow').text(model.context_window.toLocaleString());
@@ -599,57 +764,64 @@ $(document).ready(function() {
         $('#modelDescription').text(model.description);
         $('#modelInfo').addClass('show');
     }
-    
+
     // Update chat state
     function updateChatState() {
         const ready = selectedProvider && selectedModel;
         $('#chatInput').prop('disabled', !ready);
         $('#sendButton').prop('disabled', !ready);
-        
+
         if (ready) {
-            $('#statusText').text(`Ready - Using ${selectedProvider}/${selectedModel}`);
-            
-            // Clear empty state if present
-            if ($('.empty-state').length > 0) {
-                $('#chatMessages').empty();
+            $('#statusText').html(
+                `<i class="fas fa-check-circle"></i> Ready - ${selectedProvider}/${selectedModel}`
+            );
+
+            if ($('.empty-state').length > 0 && conversationHistory.length === 0) {
+                $('#chatMessages').html(
+                    `<div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <h5>Ready to chat</h5>
+                        <p>Type your message to start the conversation</p>
+                    </div>`
+                );
             }
         } else {
-            $('#statusText').text('Select a provider and model to begin');
+            $('#statusText').html('<i class="fas fa-info-circle"></i> Select provider and model');
         }
     }
-    
+
     // Send message
     function sendMessage() {
         if (isSending) return;
-        
+
         const message = $('#chatInput').val().trim();
         if (!message) return;
-        
+
         if (!selectedProvider || !selectedModel) {
             showError('Please select a provider and model');
             return;
         }
-        
+
         isSending = true;
         $('#chatInput').prop('disabled', true);
         $('#sendButton').prop('disabled', true);
-        
+
         // Add user message to UI
         addMessage('user', message);
-        
+
         // Clear input
         $('#chatInput').val('');
-        
+
         // Show typing indicator
         showTypingIndicator();
-        
+
         // Get parameters
         const parameters = {
             temperature: parseFloat($('#temperature').val()),
             max_tokens: parseInt($('#maxTokens').val()),
             top_p: parseFloat($('#topP').val())
         };
-        
+
         // Send to API
         $.ajax({
             url: '/api/llm/chat/send',
@@ -664,14 +836,17 @@ $(document).ready(function() {
             }),
             success: function(response) {
                 hideTypingIndicator();
-                
+
                 if (response.success) {
                     // Add assistant message to UI
                     addMessage('assistant', response.response, response.metadata);
-                    
+
                     // Update conversation history
                     conversationHistory.push({role: 'user', content: message});
                     conversationHistory.push({role: 'assistant', content: response.response});
+
+                    // Update session info
+                    updateSessionInfo();
                 } else {
                     showError('Error: ' + response.error);
                 }
@@ -688,24 +863,33 @@ $(document).ready(function() {
             }
         });
     }
-    
+
     // Add message to chat
     function addMessage(role, content, metadata = null) {
+        // Clear empty state
+        $('.empty-state').remove();
+
         const time = new Date().toLocaleTimeString();
+        let metadataHtml = '';
+
+        if (metadata && metadata.cached_facade) {
+            metadataHtml = '<span class="cache-indicator" title="Using cached model"></span>';
+        }
+
         const messageHtml = `
             <div class="message ${role}">
                 <div class="message-content">
-                    <div class="message-role">${role === 'user' ? 'You' : 'Assistant'}</div>
+                    <div class="message-role">${role === 'user' ? 'You' : 'Assistant'}${metadataHtml}</div>
                     <div class="message-text">${escapeHtml(content)}</div>
                     <div class="message-time">${time}</div>
                 </div>
             </div>
         `;
-        
+
         $('#chatMessages').append(messageHtml);
         scrollToBottom();
     }
-    
+
     // Show typing indicator
     function showTypingIndicator() {
         const indicatorHtml = `
@@ -718,18 +902,18 @@ $(document).ready(function() {
         $('#chatMessages').append(indicatorHtml);
         scrollToBottom();
     }
-    
+
     // Hide typing indicator
     function hideTypingIndicator() {
         $('#typingIndicator').remove();
     }
-    
+
     // Scroll to bottom
     function scrollToBottom() {
         const messages = $('#chatMessages');
         messages.scrollTop(messages[0].scrollHeight);
     }
-    
+
     // Show error
     function showError(message) {
         const alertHtml = `
@@ -739,10 +923,25 @@ $(document).ready(function() {
             </div>
         `;
         $('.chat-container').prepend(alertHtml);
-        
+
         setTimeout(function() {
-            $('.alert').fadeOut(function() { $(this).remove(); });
+            $('.alert-danger').fadeOut(function() { $(this).remove(); });
         }, 5000);
+    }
+
+    // Show success
+    function showSuccess(message) {
+        const alertHtml = `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        $('.chat-container').prepend(alertHtml);
+
+        setTimeout(function() {
+            $('.alert-success').fadeOut(function() { $(this).remove(); });
+        }, 3000);
     }
     
     // Escape HTML

@@ -11,6 +11,10 @@ from model_management.model_registry_db import ModelRegistryDB
 from llm_provider.llm_facade_factory import LLMFacadeFactory
 
 def run_webserver(pool_name, mcp_server_manager):
+    from core.config.properties_configurator import PropertiesConfigurator
+
+    prop_conf = PropertiesConfigurator()
+
     user_manager = UserManagerDB(db_connection_pool_name=pool_name)
     role_manager = RoleManagementDB(db_connection_pool_name=pool_name)
     resource_manager = ResourceManagementDB(db_connection_pool_name=pool_name)
@@ -33,7 +37,8 @@ def run_webserver(pool_name, mcp_server_manager):
 
     aweb.prepare_routes()
 
-    aweb.run()
+    port = prop_conf.get_int('server.port')
+    aweb.run(port=port)
 
 def prepare_database_pools():
     # Get pool manager singleton

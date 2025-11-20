@@ -27,6 +27,8 @@ from tool_management.mcp_server_manager import MCPServerManager
 from core.config.properties_configurator import PropertiesConfigurator
 from model_management.model_registry import ModelRegistry
 from llm_provider.llm_facade_factory import LLMFacadeFactory
+from llm_provider.facade_cache_manager import FacadeCacheManager
+from llm_provider.session_cleanup_task import create_cleanup_manager
 
 # Configure logging
 logging.basicConfig(
@@ -79,7 +81,19 @@ class AbhikartaLLMWeb:
         self.app.config['SESSION_FILE_DIR'] =  self.flask_session_folder # Where to store session files
         self.app.config['SESSION_FILE_THRESHOLD'] = 5000  # Max number of sessions before cleanup
         self.app.config['SESSION_FILE_MODE'] = 0o600  # File permissions (default)
-
+        #
+        # Initialize cache
+        self.facade_cache = FacadeCacheManager(default_ttl_minutes=60)
+        # Create cleanup manager
+        self.cleanup_manager = create_cleanup_manager(
+            facade_cache_manager=self.facade_cache,
+            active_sessions={},
+            app_config={
+                'cleanup_interval_seconds': 300,  # 5 minutes
+                'session_timeout_minutes': 30,  # 30 minutes
+                'auto_start': True
+            }
+        )
         # Initialize session
         Session(self.app)
         
@@ -180,7 +194,7 @@ class AbhikartaLLMWeb:
             # Register route handler
             logger.info(f'registering route using {rt}')
             r_rt = rt(self.app, self.db_connection_pool_name)
-
+            check_and_run_a_method(r_rt, 'set_facade_cache', self.facade_cache)
             self._prepare_a_route(r_rt)
 
 

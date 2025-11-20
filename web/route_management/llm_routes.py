@@ -1,5 +1,5 @@
 """
-LLM Routes Module - Handles LLM chat interactions
+LLM Routes Module - Handles LLM chat interactions with session management
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha | Email: ajsinha@gmail.com
@@ -21,14 +21,16 @@ import json
 from typing import Dict, Any, List, Optional
 import time
 from datetime import datetime
+import uuid
 
+from llm_provider.facade_cache_manager import FacadeCacheManager
 
 logger = logging.getLogger(__name__)
 
 
 class LLMRoutes(AbstractRoutes):
     """
-    Handles LLM chat interaction routes.
+    Handles LLM chat interaction routes with session-based facade caching.
 
     This class manages:
     - Chat interface rendering
@@ -36,11 +38,14 @@ class LLMRoutes(AbstractRoutes):
     - Chat message sending and receiving
     - Conversation history management
     - Streaming responses
+    - Session lifecycle and facade caching
+    - Automatic cleanup on session end
 
     Attributes:
         app: Flask application instance
         llm_facade_factory: Factory for creating LLM facade instances
         model_provider_registry: Registry of model providers
+        facade_cache: Cache manager for LLM facades
     """
 
     def __init__(self, app, db_connection_pool_name: str):
@@ -53,13 +58,117 @@ class LLMRoutes(AbstractRoutes):
         """
         super().__init__(app, db_connection_pool_name)
 
+        # Initialize facade cache manager
+        self.facade_cache = FacadeCacheManager(default_ttl_minutes=60)
 
-        # Store active LLM sessions (in production, use Redis or database)
-        self._active_sessions: Dict[str, Dict[str, Any]] = {}
+        # Store active chat sessions (in production, use Redis or database)
+        self._active_chat_sessions: Dict[str, Dict[str, Any]] = {}
 
-        logger.info("LLMRoutes initialized")
+        self.facade_cache: FacadeCacheManager = None
 
+        logger.info("LLMRoutes initialized with facade caching")
 
+    def set_facade_cache(self, facade_cache):
+        self.facade_cache = facade_cache
+
+    def _generate_chat_session_id(self) -> str:
+        """
+        Generate a unique chat session ID.
+
+        Returns:
+            Unique session identifier
+        """
+        return f"chat_{uuid.uuid4().hex[:16]}_{int(time.time())}"
+
+    def _get_or_create_chat_session(self) -> str:
+        """
+        Get current chat session ID or create new one.
+
+        Returns:
+            Chat session ID
+        """
+        chat_session_id = session.get('chat_session_id')
+
+        if not chat_session_id:
+            chat_session_id = self._generate_chat_session_id()
+            session['chat_session_id'] = chat_session_id
+            session['chat_session_created_at'] = datetime.now().isoformat()
+
+            # Track active session
+            self._active_chat_sessions[chat_session_id] = {
+                'user_id': session.get('userid'),
+                'created_at': datetime.now(),
+                'last_activity': datetime.now()
+            }
+
+            logger.info(f"Created new chat session: {chat_session_id} for user {session.get('userid')}")
+        else:
+            # Update last activity
+            if chat_session_id in self._active_chat_sessions:
+                self._active_chat_sessions[chat_session_id]['last_activity'] = datetime.now()
+
+        return chat_session_id
+
+    def _end_chat_session(self, chat_session_id: str) -> bool:
+        """
+        End a chat session and clean up resources.
+
+        Args:
+            chat_session_id: Chat session to end
+
+        Returns:
+            True if session was ended, False if not found
+        """
+        try:
+            # Evict all facades for this session
+            evicted = self.facade_cache.evict_session(chat_session_id)
+
+            # Remove from active sessions
+            if chat_session_id in self._active_chat_sessions:
+                del self._active_chat_sessions[chat_session_id]
+
+            # Clear from Flask session
+            if session.get('chat_session_id') == chat_session_id:
+                session.pop('chat_session_id', None)
+                session.pop('chat_session_created_at', None)
+
+            logger.info(
+                f"Ended chat session {chat_session_id}: "
+                f"Evicted {evicted} facade(s)"
+            )
+
+            return True
+
+        except Exception as e:
+            logger.error(f"Error ending chat session {chat_session_id}: {e}", exc_info=True)
+            return False
+
+    def _get_cached_facade(self, chat_session_id: str, provider_name: str,
+                          model_name: str):
+        """
+        Get or create cached LLM facade for session.
+
+        Args:
+            chat_session_id: Chat session identifier
+            provider_name: Provider name
+            model_name: Model name
+
+        Returns:
+            LLM facade instance
+        """
+        def create_facade():
+            """Factory function to create new facade."""
+            return self.llm_facade_factory.create_facade(
+                provider_name=provider_name,
+                model_name=model_name
+            )
+
+        return self.facade_cache.get_or_create(
+            chat_session_id=chat_session_id,
+            provider_name=provider_name,
+            model_name=model_name,
+            factory_func=create_facade
+        )
 
     def register_routes(self):
         """Register all LLM-related routes."""
@@ -69,12 +178,146 @@ class LLMRoutes(AbstractRoutes):
         def llm_chat():
             """Render the chat interface page."""
             userid = session.get('userid')
-            logger.info(f"User {userid} accessing chat interface")
+
+            # Get or create chat session
+            chat_session_id = self._get_or_create_chat_session()
+
+            logger.info(
+                f"User {userid} accessing chat interface "
+                f"(session: {chat_session_id})"
+            )
 
             return render_template('chat.html',
                                  fullname=session.get('fullname'),
                                  userid=userid,
-                                 roles=session.get('roles', []))
+                                 roles=session.get('roles', []),
+                                 chat_session_id=chat_session_id)
+
+        @self.app.route('/api/llm/chat/new', methods=['POST'])
+        @login_required
+        def new_chat_session():
+            """
+            Create a new chat session.
+
+            Returns:
+                JSON response with new session ID
+            """
+            try:
+                # End current session if exists
+                current_session_id = session.get('chat_session_id')
+                if current_session_id:
+                    self._end_chat_session(current_session_id)
+
+                # Create new session
+                chat_session_id = self._generate_chat_session_id()
+                session['chat_session_id'] = chat_session_id
+                session['chat_session_created_at'] = datetime.now().isoformat()
+
+                # Track active session
+                self._active_chat_sessions[chat_session_id] = {
+                    'user_id': session.get('userid'),
+                    'created_at': datetime.now(),
+                    'last_activity': datetime.now()
+                }
+
+                logger.info(f"New chat session created: {chat_session_id}")
+
+                return jsonify({
+                    'success': True,
+                    'chat_session_id': chat_session_id,
+                    'message': 'New chat session created'
+                })
+
+            except Exception as e:
+                logger.error(f"Error creating new chat session: {e}", exc_info=True)
+                return jsonify({
+                    'success': False,
+                    'error': str(e)
+                }), 500
+
+        @self.app.route('/api/llm/chat/end', methods=['POST'])
+        @login_required
+        def end_chat_session():
+            """
+            End current chat session and clean up resources.
+
+            Returns:
+                JSON response indicating success
+            """
+            try:
+                chat_session_id = session.get('chat_session_id')
+
+                if not chat_session_id:
+                    return jsonify({
+                        'success': False,
+                        'error': 'No active chat session'
+                    }), 400
+
+                # End the session
+                success = self._end_chat_session(chat_session_id)
+
+                if success:
+                    return jsonify({
+                        'success': True,
+                        'message': 'Chat session ended successfully'
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Failed to end chat session'
+                    }), 500
+
+            except Exception as e:
+                logger.error(f"Error ending chat session: {e}", exc_info=True)
+                return jsonify({
+                    'success': False,
+                    'error': str(e)
+                }), 500
+
+        @self.app.route('/api/llm/chat/session/info', methods=['GET'])
+        @login_required
+        def get_session_info():
+            """
+            Get information about current chat session.
+
+            Returns:
+                JSON with session info and cache statistics
+            """
+            try:
+                chat_session_id = session.get('chat_session_id')
+
+                if not chat_session_id:
+                    return jsonify({
+                        'success': False,
+                        'error': 'No active chat session'
+                    }), 400
+
+                # Get session info
+                session_info = self._active_chat_sessions.get(chat_session_id, {})
+
+                # Get cache stats
+                cache_stats = self.facade_cache.get_stats()
+
+                # Get facades for this session
+                session_facades = cache_stats.get('facades_by_session', {}).get(chat_session_id, 0)
+
+                return jsonify({
+                    'success': True,
+                    'chat_session_id': chat_session_id,
+                    'created_at': session.get('chat_session_created_at'),
+                    'cached_facades': session_facades,
+                    'cache_stats': {
+                        'total_cached_facades': cache_stats.get('total_cached_facades', 0),
+                        'active_sessions': cache_stats.get('active_sessions', 0)
+                    }
+                })
+
+            except Exception as e:
+                logger.error(f"Error getting session info: {e}", exc_info=True)
+                return jsonify({
+                    'success': False,
+                    'error': str(e)
+                }), 500
 
         @self.app.route('/api/llm/providers', methods=['GET'])
         @login_required
@@ -93,7 +336,6 @@ class LLMRoutes(AbstractRoutes):
                     }), 500
 
                 # Reload from database to get latest providers
-                # This ensures newly added providers are visible
                 try:
                     self.model_provider_registry.reload_from_storage()
                 except Exception as reload_error:
@@ -101,7 +343,7 @@ class LLMRoutes(AbstractRoutes):
 
                 # Get all enabled providers
                 providers = self.model_provider_registry.get_all_providers(
-                    include_disabled=False  # False = only enabled providers
+                    include_disabled=False
                 )
 
                 provider_list = []
@@ -149,11 +391,10 @@ class LLMRoutes(AbstractRoutes):
                         'error': 'Model provider registry not initialized'
                     }), 500
 
-                # Get provider - this raises exceptions if not found or disabled
+                # Get provider
                 try:
                     provider = self.model_provider_registry.get_provider_by_name(provider_name)
                 except Exception as e:
-                    # Handle ProviderNotFoundException or ProviderDisabledException
                     error_msg = str(e)
                     if 'not found' in error_msg.lower():
                         return jsonify({
@@ -176,7 +417,6 @@ class LLMRoutes(AbstractRoutes):
 
                 model_list = []
                 for model in models:
-                    # Build model info
                     model_info = {
                         'name': model.name,
                         'display_name': f"{model.name} ({model.version})",
@@ -212,25 +452,19 @@ class LLMRoutes(AbstractRoutes):
         @login_required
         def send_chat_message():
             """
-            Send a chat message to the LLM and get response.
+            Send a chat message and get response.
 
             Request JSON:
-                {
-                    "provider": "anthropic",
-                    "model": "claude-3-opus-20240229",
-                    "message": "Hello, world!",
-                    "conversation_history": [
-                        {"role": "user", "content": "..."},
-                        {"role": "assistant", "content": "..."}
-                    ],
-                    "parameters": {
-                        "temperature": 0.7,
-                        "max_tokens": 4096
-                    }
-                }
+            {
+                "provider": "provider_name",
+                "model": "model_name",
+                "message": "user message",
+                "conversation_history": [...],  # Optional
+                "parameters": {...}  # Optional generation parameters
+            }
 
             Returns:
-                JSON response with LLM response
+                JSON response with assistant reply and metadata
             """
             try:
                 data = request.get_json()
@@ -248,46 +482,42 @@ class LLMRoutes(AbstractRoutes):
                 parameters = data.get('parameters', {})
 
                 # Validate inputs
-                if not provider_name or not model_name:
+                if not provider_name or not model_name or not user_message:
                     return jsonify({
                         'success': False,
-                        'error': 'Provider and model are required'
+                        'error': 'Provider, model, and message are required'
                     }), 400
 
-                if not user_message:
-                    return jsonify({
-                        'success': False,
-                        'error': 'Message cannot be empty'
-                    }), 400
+                # Get or create chat session
+                chat_session_id = self._get_or_create_chat_session()
 
                 # Build messages array
                 messages = []
 
-                # Add conversation history
                 if conversation_history:
                     messages.extend(conversation_history)
 
-                # Add current user message
                 messages.append({
                     'role': 'user',
                     'content': user_message
                 })
 
-                # Get LLM facade instance
+                # Check if factory is initialized
                 if not self.llm_facade_factory:
                     return jsonify({
                         'success': False,
                         'error': 'LLM facade factory not initialized'
                     }), 500
 
-                # Create LLM facade for this provider and model
+                # Get or create cached facade
                 try:
-                    llm = self.llm_facade_factory.create_facade(
+                    llm = self._get_cached_facade(
+                        chat_session_id=chat_session_id,
                         provider_name=provider_name,
                         model_name=model_name
                     )
                 except Exception as e:
-                    logger.error(f"Error creating LLM facade: {e}", exc_info=True)
+                    logger.error(f"Error getting LLM facade: {e}", exc_info=True)
                     return jsonify({
                         'success': False,
                         'error': f'Failed to initialize LLM: {str(e)}'
@@ -322,6 +552,7 @@ class LLMRoutes(AbstractRoutes):
                     logger.info(
                         f"Chat completed for user {session.get('userid')} - "
                         f"Provider: {provider_name}, Model: {model_name}, "
+                        f"Session: {chat_session_id}, "
                         f"Time: {elapsed_time:.2f}s"
                     )
 
@@ -331,10 +562,12 @@ class LLMRoutes(AbstractRoutes):
                         'metadata': {
                             'model': model_name,
                             'provider': provider_name,
+                            'chat_session_id': chat_session_id,
                             'elapsed_time': elapsed_time,
                             'timestamp': datetime.now().isoformat(),
                             'usage': usage,
-                            'finish_reason': metadata.get('finish_reason')
+                            'finish_reason': metadata.get('finish_reason'),
+                            'cached_facade': True  # Indicates facade was reused
                         }
                     })
 
@@ -385,6 +618,9 @@ class LLMRoutes(AbstractRoutes):
                         'error': 'Provider, model, and message are required'
                     }), 400
 
+                # Get or create chat session
+                chat_session_id = self._get_or_create_chat_session()
+
                 def generate():
                     """Generator function for streaming response."""
                     try:
@@ -399,10 +635,11 @@ class LLMRoutes(AbstractRoutes):
                             'content': user_message
                         })
 
-                        # Get LLM facade instance
-                        llm = self.llm_facade_factory.create_llm(
-                            provider=provider_name,
-                            model=model_name
+                        # Get cached facade
+                        llm = self._get_cached_facade(
+                            chat_session_id=chat_session_id,
+                            provider_name=provider_name,
+                            model_name=model_name
                         )
 
                         # Extract parameters
@@ -411,7 +648,7 @@ class LLMRoutes(AbstractRoutes):
                         top_p = parameters.get('top_p')
 
                         # Call streaming chat completion
-                        stream = llm.chat_completion_stream(
+                        stream = llm.stream_chat_completion(
                             messages=messages,
                             max_tokens=max_tokens,
                             temperature=temperature,
@@ -421,7 +658,6 @@ class LLMRoutes(AbstractRoutes):
                         # Stream chunks
                         for chunk in stream:
                             if chunk:
-                                # Send as Server-Sent Event
                                 yield f"data: {json.dumps({'chunk': chunk})}\n\n"
 
                         # Send completion event
@@ -452,8 +688,6 @@ class LLMRoutes(AbstractRoutes):
         def reload_registry():
             """
             Manually reload the model registry from database.
-
-            This is useful after adding/updating providers or models in the database.
 
             Returns:
                 JSON response indicating success
@@ -486,7 +720,7 @@ class LLMRoutes(AbstractRoutes):
                     'error': str(e)
                 }), 500
 
-        logger.info("LLM routes registered")
+        logger.info("LLM routes registered with session management")
 
 
 __all__ = ['LLMRoutes']

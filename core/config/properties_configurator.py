@@ -10,9 +10,9 @@ import threading
 import time
 from typing import Optional, List, Union, Dict, Any
 from pathlib import Path
+from core import SingletonMeta
 
-
-class PropertiesConfigurator:
+class PropertiesConfigurator(metaclass=SingletonMeta):
     """
     Singleton thread-safe class for managing properties from configuration files.
     Supports property value resolution with ${...} patterns and auto-reload.
