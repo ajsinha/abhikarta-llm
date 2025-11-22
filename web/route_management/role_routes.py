@@ -89,7 +89,7 @@ class RoleRoutes(AbstractRoutes):
                 paginated_roles = all_roles[start_idx:end_idx]
                 total_pages = (total_roles + per_page - 1) // per_page
 
-            return render_template('manage_roles.html',
+            return render_template('rbac/manage_roles.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []),
@@ -106,7 +106,7 @@ class RoleRoutes(AbstractRoutes):
             # Get all resources for selection
             resources = self.user_manager.list_resources()
 
-            return render_template('create_role.html',
+            return render_template('rbac/create_role.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []),
@@ -129,7 +129,7 @@ class RoleRoutes(AbstractRoutes):
             # Get users with this role
             users_with_role = self.user_manager.get_users_with_role(role_name)
 
-            return render_template('edit_role.html',
+            return render_template('rbac/edit_role.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []),

@@ -61,6 +61,10 @@
     .card-monitor:hover { background: linear-gradient(135deg, #f39c1222 0%, #f39c1211 100%); }
     .card-monitor .card-icon { color: #f39c12; }
 
+    .card-workflows { border-top: 5px solid #6f42c1; }
+    .card-workflows:hover { background: linear-gradient(135deg, #6f42c122 0%, #6f42c111 100%); }
+    .card-workflows .card-icon { color: #6f42c1; }
+
     .stats-row {
         margin-top: 20px;
     }
@@ -536,7 +540,7 @@
         </div>
 
         <!-- Monitor System Card -->
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card management-card card-monitor" onclick="window.location.href='{{ url_for('monitor_system') }}'">
                 <div class="card-body text-center p-5">
                     <div class="card-icon">
@@ -548,6 +552,24 @@
                     </p>
                     <div class="mt-3">
                         <span class="badge bg-success"><i class="fas fa-circle-check"></i> System Healthy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflows Card -->
+        <div class="col-md-4">
+            <div class="card management-card card-workflows" onclick="window.location.href='{{ url_for('workflow_dashboard') }}'">
+                <div class="card-body text-center p-5">
+                    <div class="card-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3 class="card-title">Workflows</h3>
+                    <p class="card-text text-muted">
+                        Manage automated workflows, executions, and human tasks.
+                    </p>
+                    <div class="mt-3">
+                        <span class="badge bg-info"><i class="fas fa-tasks"></i> View All</span>
                     </div>
                 </div>
             </div>

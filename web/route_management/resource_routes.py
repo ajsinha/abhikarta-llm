@@ -93,7 +93,7 @@ class ResourceRoutes(AbstractRoutes):
             all_resources_for_types = self.user_manager.list_resources()
             resource_types = list(set([r.resource_type for r in all_resources_for_types]))
 
-            return render_template('manage_resources.html',
+            return render_template('rbac/manage_resources.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []),
@@ -109,7 +109,7 @@ class ResourceRoutes(AbstractRoutes):
         @admin_required
         def admin_create_resource():
             """Create new resource page."""
-            return render_template('create_resource.html',
+            return render_template('rbac/create_resource.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []))
@@ -128,7 +128,7 @@ class ResourceRoutes(AbstractRoutes):
             # Get roles that have this resource
             roles_with_resource = self.user_manager.get_roles_with_resource(resource_name)
 
-            return render_template('edit_resource.html',
+            return render_template('rbac/edit_resource.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []),
@@ -143,7 +143,7 @@ class ResourceRoutes(AbstractRoutes):
             all_roles = self.user_manager.list_roles()
             all_resources = self.user_manager.list_resources()
 
-            return render_template('assign_resource.html',
+            return render_template('rbac/assign_resource.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []),

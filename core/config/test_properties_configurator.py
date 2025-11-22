@@ -17,7 +17,7 @@ def create_test_files():
     """Create test property and content files"""
 
     # Create properties file
-    with open('/home/claude/test.properties', 'w') as f:
+    with open('/home/ashutosh/test.properties', 'w') as f:
         f.write("""# Test properties file
 app.name=MyApplication
 app.version=1.0.0
@@ -30,7 +30,7 @@ api.full_url=${api.endpoint}/v1/users?key=${api.key}
 """)
 
     # Create test text file with placeholders
-    with open('/home/claude/test_template.txt', 'w') as f:
+    with open('/home/ashutosh/test_template.txt', 'w') as f:
         f.write("""Application: ${app.name}
 Version: ${app.version}
 Database URL: ${database.url}
@@ -56,7 +56,7 @@ Nested: The app ${app.name} version ${app.version} is running.
         }
     }
 
-    with open('/home/claude/test_config.json', 'w') as f:
+    with open('/home/ashutosh/test_config.json', 'w') as f:
         json.dump(json_content, f, indent=2)
 
 
@@ -66,7 +66,7 @@ def test_resolve_string_content():
     print("TEST 1: resolve_string_content()")
     print("=" * 60)
 
-    config = PropertiesConfigurator('/home/claude/test.properties')
+    config = PropertiesConfigurator('/home/ashutosh/test.properties')
 
     test_strings = [
         "App: ${app.name} v${app.version}",
@@ -88,9 +88,9 @@ def test_load_and_resolve_file_content():
     print("TEST 2: load_and_resolve_file_content()")
     print("=" * 60)
 
-    config = PropertiesConfigurator('/home/claude/test.properties')
+    config = PropertiesConfigurator('/home/ashutosh/test.properties')
 
-    resolved_lines = config.load_and_resolve_file_content('/home/claude/test_template.txt')
+    resolved_lines = config.load_and_resolve_file_content('/home/ashutosh/test_template.txt')
 
     print("\nResolved file content:")
     print("-" * 60)
@@ -104,7 +104,7 @@ def test_resolve_string_json_content():
     print("TEST 3: resolve_string_json_content()")
     print("=" * 60)
 
-    config = PropertiesConfigurator('/home/claude/test.properties')
+    config = PropertiesConfigurator('/home/ashutosh/test.properties')
 
     json_string = '''{
     "app": "${app.name}",
@@ -128,9 +128,9 @@ def test_load_and_resolve_json_file_content():
     print("TEST 4: load_and_resolve_json_file_content()")
     print("=" * 60)
 
-    config = PropertiesConfigurator('/home/claude/test.properties')
+    config = PropertiesConfigurator('/home/ashutosh/test.properties')
 
-    resolved_dict = config.load_and_resolve_json_file_content('/home/claude/test_config.json')
+    resolved_dict = config.load_and_resolve_json_file_content('/home/ashutosh/test_config.json')
 
     print("\nResolved JSON from file:")
     print(json.dumps(resolved_dict, indent=2))
@@ -150,7 +150,7 @@ def test_with_env_and_commandline():
     sys.argv.append('--app.version=2.0.0-cli')
 
     # Create new configurator instance to pick up env and cli args
-    config = PropertiesConfigurator('/home/claude/test.properties')
+    config = PropertiesConfigurator('/home/ashutosh/test.properties')
 
     test_str = "App: ${app.name} v${app.version}, Host: ${database.host}"
     resolved = config.resolve_string_content(test_str)

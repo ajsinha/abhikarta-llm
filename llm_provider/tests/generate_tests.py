@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Dict, Any
 
 # Read provider configurations
-with open('/home/claude/llm_facades/providers_to_generate.json', 'r') as f:
+with open('/home/ashutosh/llm_facades/providers_to_generate.json', 'r') as f:
     providers_config = json.load(f)
 
 COPYRIGHT_NOTICE = '''"""
@@ -47,7 +47,7 @@ import pytest
 from typing import Dict, Any
 
 # Add paths
-sys.path.append('/home/claude/llm_facades')
+sys.path.append('/home/ashutosh/llm_facades')
 sys.path.append('/mnt/user-data/uploads')
 
 from {facade_module} import {class_name}, create_{provider_name}_llm
@@ -535,7 +535,7 @@ def generate_test(provider_config: Dict[str, Any]) -> str:
 
 
 # Generate all test files
-output_dir = Path('/home/claude/llm_facades/tests')
+output_dir = Path('/home/ashutosh/llm_facades/tests')
 output_dir.mkdir(exist_ok=True)
 
 for provider in providers_config:

@@ -29,6 +29,7 @@ from model_management.model_registry import ModelRegistry
 from llm_provider.llm_facade_factory import LLMFacadeFactory
 from llm_provider.facade_cache_manager import FacadeCacheManager
 from llm_provider.session_cleanup_task import create_cleanup_manager
+from workflow_management.template_filters import register_template_filters
 
 # Configure logging
 logging.basicConfig(
@@ -94,6 +95,8 @@ class AbhikartaLLMWeb:
                 'auto_start': True
             }
         )
+        #
+        register_template_filters(self.app)
         # Initialize session
         Session(self.app)
         
@@ -174,6 +177,7 @@ class AbhikartaLLMWeb:
         from web.route_management.model_routes import ModelRoutes
         from web.route_management.mcp_routes import MCPRoutes
         from web.route_management.llm_routes import LLMRoutes
+        from web.route_management.workflow_routes import WorkflowRoutes
 
         def check_and_run_a_method(obj, method_name, method_arg):
             if hasattr(obj, method_name):
@@ -190,7 +194,8 @@ class AbhikartaLLMWeb:
                 else:
                     print(f"'{method_name}' exists but is not callable.")
 
-        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes, UserRoutes, ModelRoutes, MCPRoutes, LLMRoutes]:
+        for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes,
+                   UserRoutes, ModelRoutes, MCPRoutes, LLMRoutes, WorkflowRoutes]:
             # Register route handler
             logger.info(f'registering route using {rt}')
             r_rt = rt(self.app, self.db_connection_pool_name)

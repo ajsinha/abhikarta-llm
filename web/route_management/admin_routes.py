@@ -87,7 +87,7 @@ class AdminRoutes(AbstractRoutes):
             users = self.user_manager.list_users()
             roles = self.user_manager.list_roles()
 
-            return render_template('manage_users.html',
+            return render_template('rbac/manage_users.html',
                                  fullname=session.get('fullname'),
                                  userid=session.get('userid'),
                                  roles=session.get('roles', []),
@@ -98,7 +98,7 @@ class AdminRoutes(AbstractRoutes):
         @admin_required
         def manage_models():
             """Manage models page."""
-            return render_template('manage_models.html',
+            return render_template('models/manage_models.html',
                                  fullname=session.get('fullname'),
                                  userid=session.get('userid'),
                                  roles=session.get('roles', []))

@@ -18,7 +18,7 @@ import os
 import sys
 import pytest
 
-sys.path.append('/home/claude/llm_facades')
+sys.path.append('/home/ashutosh/llm_facades')
 sys.path.append('/mnt/user-data/uploads')
 
 from anthropic_facade import AnthropicLLMFacade, create_anthropic_llm

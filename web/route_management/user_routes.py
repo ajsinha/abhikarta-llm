@@ -71,7 +71,7 @@ class UserRoutes(AbstractRoutes):
             # Get available roles
             all_roles = self.user_manager.list_roles()
 
-            return render_template('view_user.html',
+            return render_template('rbac/view_user.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []),
@@ -86,7 +86,7 @@ class UserRoutes(AbstractRoutes):
             # Get all roles for selection
             roles = self.user_manager.list_roles()
 
-            return render_template('create_user.html',
+            return render_template('rbac/create_user.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []),
@@ -193,7 +193,7 @@ class UserRoutes(AbstractRoutes):
             # Get all roles
             all_roles = self.user_manager.list_roles()
 
-            return render_template('edit_user.html',
+            return render_template('rbac/edit_user.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('userid'),
                                    roles=session.get('roles', []),

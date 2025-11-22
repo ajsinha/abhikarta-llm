@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Workflow Dashboard - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container { padding: 30px 0; min-height: calc(100vh - 200px); }
+    .stats-card { border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; margin-bottom: 20px; }
+    .stats-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
+    .stats-icon { font-size: 2.5rem; }
+    .feature-card { border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; height: 100%; }
+    .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
+    .feature-icon { font-size: 3rem; margin-bottom: 15px; }
+    .table-hover tbody tr:hover { background-color: #f8f9fa; cursor: pointer; }
+    .badge-status { padding: 0.5em 1em; font-size: 0.875rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="fas fa-project-diagram"></i> Workflow Dashboard</h2>
+            <p class="text-muted">Manage and monitor your workflow executions</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card">
+                <div class="card-body text-center p-4">
+                    <div class="stats-icon text-primary mb-2">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3 class="mb-0">{{ stats.total_executions }}</h3>
+                    <p class="text-muted mb-0">Total Executions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card">
+                <div class="card-body text-center p-4">
+                    <div class="stats-icon text-success mb-2">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 class="mb-0">{{ stats.completed }}</h3>
+                    <p class="text-muted mb-0">Completed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card">
+                <div class="card-body text-center p-4">
+                    <div class="stats-icon text-danger mb-2">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <h3 class="mb-0">{{ stats.failed }}</h3>
+                    <p class="text-muted mb-0">Failed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card">
+                <div class="card-body text-center p-4">
+                    <div class="stats-icon text-warning mb-2">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <h3 class="mb-0">{{ stats.running }}</h3>
+                    <p class="text-muted mb-0">Running</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon text-primary">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h5 class="card-title">Create Workflow</h5>
+                    <p class="card-text text-muted">
+                        Design a new workflow with visual editor
+                    </p>
+                    <a href="{{ url_for('create_workflow') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i> New Workflow
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon text-success">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <h5 class="card-title">My Workflows</h5>
+                    <p class="card-text text-muted">
+                        View and manage your workflows
+                    </p>
+                    <a href="{{ url_for('list_workflows') }}" class="btn btn-outline-success">
+                        <i class="fas fa-eye"></i> View Workflows
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon text-warning">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h5 class="card-title">My Tasks</h5>
+                    <p class="card-text text-muted">
+                        Review pending approval tasks
+                        {% if pending_tasks|length > 0 %}
+                        <span class="badge bg-warning text-dark">{{ pending_tasks|length }}</span>
+                        {% endif %}
+                    </p>
+                    <a href="{{ url_for('list_tasks') }}" class="btn btn-outline-warning">
+                        <i class="fas fa-clipboard-check"></i> View Tasks
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Executions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Recent Executions</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_executions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Execution ID</th>
+                                    <th>Workflow</th>
+                                    <th>Status</th>
+                                    <th>Started At</th>
+                                    <th>Duration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for execution in recent_executions %}
+                                <tr onclick="window.location='{{ url_for('view_execution', execution_id=execution.execution_id) }}'">
+                                    <td><code>{{ execution.execution_id[:8] }}...</code></td>
+                                    <td>{{ execution.execution_metadata.workflow_name if execution.execution_metadata else 'N/A' }}</td>
+                                    <td>
+                                        {% if execution.status == 'completed' %}
+                                        <span class="badge badge-status bg-success">
+                                            <i class="fas fa-check"></i> Completed
+                                        </span>
+                                        {% elif execution.status == 'running' %}
+                                        <span class="badge badge-status bg-primary">
+                                            <i class="fas fa-spinner fa-spin"></i> Running
+                                        </span>
+                                        {% elif execution.status == 'failed' %}
+                                        <span class="badge badge-status bg-danger">
+                                            <i class="fas fa-times"></i> Failed
+                                        </span>
+                                        {% elif execution.status == 'paused' %}
+                                        <span class="badge badge-status bg-warning">
+                                            <i class="fas fa-pause"></i> Paused
+                                        </span>
+                                        {% else %}
+                                        <span class="badge badge-status bg-secondary">{{ execution.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ execution.started_at|format_datetime('%Y-%m-%d %H:%M') if execution.started_at else 'N/A' }}</td>
+                                    <td>
+                                        {% if execution.completed_at and execution.started_at %}
+                                            {% set duration_min = execution.completed_at|duration_minutes(execution.started_at) %}
+                                            {% if duration_min %}
+                                                {{ duration_min|round(2) }} min
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_execution', execution_id=execution.execution_id) }}" 
+                                           class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation()">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end mt-3">
+                        <a href="{{ url_for('list_executions') }}" class="btn btn-primary">
+                            View All Executions <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No executions found. Start by creating and executing a workflow.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Tasks -->
+    {% if pending_tasks %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Pending Tasks 
+                        <span class="badge bg-dark">{{ pending_tasks|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Task ID</th>
+                                    <th>Type</th>
+                                    <th>Created At</th>
+                                    <th>Timeout At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in pending_tasks %}
+                                <tr onclick="window.location='{{ url_for('view_task', task_id=task.task_id) }}'">
+                                    <td><code>{{ task.task_id[:8] }}...</code></td>
+                                    <td>
+                                        <span class="badge bg-info">{{ task.task_type }}</span>
+                                    </td>
+                                    <td>{{ task.created_at|format_datetime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        {% if task.timeout_at %}
+                                        <span class="text-danger">
+                                            <i class="fas fa-clock"></i> {{ task.timeout_at|format_datetime('%Y-%m-%d %H:%M') }}
+                                        </span>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_task', task_id=task.task_id) }}" 
+                                           class="btn btn-sm btn-outline-warning" onclick="event.stopPropagation()">
+                                            <i class="fas fa-clipboard-check"></i> Review
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Auto-refresh every 30 seconds
+    setInterval(function() {
+        location.reload();
+    }, 30000);
+});
+</script>
+{% endblock %}

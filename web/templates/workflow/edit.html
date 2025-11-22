@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Workflow - Abhikarta LLM Platform{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-edit"></i> Edit Workflow: {{ workflow.name }}</h2>
+    
+    <form id="workflowForm">
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Workflow Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Workflow Name</label>
+                            <input type="text" class="form-control" id="workflowName" 
+                                   value="{{ workflow.name }}" disabled>
+                            <small class="text-muted">Name cannot be changed</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="workflowDescription" 
+                                      rows="3">{{ workflow.description }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="workflowStatus">
+                                <option value="draft" {{ 'selected' if workflow.status == 'draft' }}>Draft</option>
+                                <option value="active" {{ 'selected' if workflow.status == 'active' }}>Active</option>
+                                <option value="archived" {{ 'selected' if workflow.status == 'archived' }}>Archived</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tags (comma-separated)</label>
+                            <input type="text" class="form-control" id="workflowTags" 
+                                   value="{{ workflow.tags | join(', ') if workflow.tags else '' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Workflow Definition</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control" id="workflowDefinition" 
+                                  rows="20">{{ workflow.definition_json | tojson(indent=2) }}</textarea>
+                        <small class="text-muted">Edit workflow definition in JSON format</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-12 text-end">
+                <a href="{{ url_for('view_workflow', workflow_id=workflow.workflow_id) }}" 
+                   class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('workflowForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const description = document.getElementById('workflowDescription').value;
+    const status = document.getElementById('workflowStatus').value;
+    const tags = document.getElementById('workflowTags').value.split(',').map(t => t.trim()).filter(t => t);
+    const definition = JSON.parse(document.getElementById('workflowDefinition').value);
+    
+    fetch('/workflow/{{ workflow.workflow_id }}/edit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            description: description,
+            status: status,
+            tags: tags,
+            definition: definition
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Workflow updated successfully!');
+            window.location.href = '/workflow/{{ workflow.workflow_id }}';
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error updating workflow: ' + error);
+    });
+});
+</script>
+{% endblock %}

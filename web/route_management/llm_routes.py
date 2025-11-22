@@ -209,7 +209,7 @@ class LLMRoutes(AbstractRoutes):
                 f"(session: {chat_session_id})"
             )
 
-            return render_template('chat.html',
+            return render_template('chat/chat.html',
                                  fullname=session.get('fullname'),
                                  userid=userid,
                                  roles=session.get('roles', []),

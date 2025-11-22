@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Create Workflow - Abhikarta LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .workflow-editor { min-height: 500px; border: 1px solid #ddd; border-radius: 5px; padding: 20px; }
+    .node-palette { background: #f8f9fa; padding: 15px; border-radius: 5px; }
+    .node-item { padding: 10px; margin: 5px 0; background: white; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; }
+    .node-item:hover { background: #e9ecef; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-plus-circle"></i> Create New Workflow</h2>
+    
+    <form id="workflowForm">
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Workflow Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Workflow Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="workflowName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="workflowDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Version</label>
+                            <input type="text" class="form-control" id="workflowVersion" value="1.0.0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tags (comma-separated)</label>
+                            <input type="text" class="form-control" id="workflowTags" placeholder="tag1, tag2">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Workflow Definition</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control" id="workflowDefinition" rows="15" 
+                                  placeholder='{"nodes": [], "edges": [], "variables": {}}'></textarea>
+                        <small class="text-muted">Enter workflow definition in JSON format</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card node-palette">
+                    <h5>Node Types</h5>
+                    <hr>
+                    <div class="node-item">
+                        <i class="fas fa-play text-success"></i> <strong>Start</strong>
+                        <p class="mb-0 small text-muted">Workflow entry point</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-robot text-primary"></i> <strong>LLM</strong>
+                        <p class="mb-0 small text-muted">Execute LLM completion</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-tools text-warning"></i> <strong>Tool</strong>
+                        <p class="mb-0 small text-muted">Execute external tool</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-user text-info"></i> <strong>Human</strong>
+                        <p class="mb-0 small text-muted">Require human input</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-code-branch text-secondary"></i> <strong>Conditional</strong>
+                        <p class="mb-0 small text-muted">Branch execution</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-layer-group text-purple"></i> <strong>Parallel</strong>
+                        <p class="mb-0 small text-muted">Parallel execution</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-stop text-danger"></i> <strong>End</strong>
+                        <p class="mb-0 small text-muted">Workflow termination</p>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-success btn-lg w-100 mt-3" onclick="loadTemplate()">
+                    <i class="fas fa-file-code"></i> Load Sample Template
+                </button>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-12 text-end">
+                <a href="{{ url_for('list_workflows') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Workflow
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+function loadTemplate() {
+    const template = {
+        "nodes": [
+            {"node_id": "start", "node_type": "start", "name": "Start"},
+            {"node_id": "llm_1", "node_type": "llm", "name": "LLM Node", "config": {"prompt": "Hello", "model": "claude-3"}},
+            {"node_id": "end", "node_type": "end", "name": "End"}
+        ],
+        "edges": [
+            {"source": "start", "target": "llm_1"},
+            {"source": "llm_1", "target": "end"}
+        ],
+        "variables": {}
+    };
+    document.getElementById('workflowDefinition').value = JSON.stringify(template, null, 2);
+}
+
+document.getElementById('workflowForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('workflowName').value;
+    const description = document.getElementById('workflowDescription').value;
+    const version = document.getElementById('workflowVersion').value;
+    const tags = document.getElementById('workflowTags').value.split(',').map(t => t.trim()).filter(t => t);
+    const definition = JSON.parse(document.getElementById('workflowDefinition').value);
+    
+    fetch('/workflow/create', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            name: name,
+            description: description,
+            version: version,
+            tags: tags,
+            definition: definition
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Workflow created successfully!');
+            window.location.href = '/workflow/list';
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error creating workflow: ' + error);
+    });
+});
+</script>
+{% endblock %}

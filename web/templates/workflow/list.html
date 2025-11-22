@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Workflows - Abhikarta LLM Platform{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-list"></i> My Workflows</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('create_workflow') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Workflow
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="">All</option>
+                                <option value="draft">Draft</option>
+                                <option value="active">Active</option>
+                                <option value="archived">Archived</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary d-block">
+                                <i class="fas fa-search"></i> Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% if workflows %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Version</th>
+                            <th>Status</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for workflow in workflows %}
+                        <tr>
+                            <td><strong>{{ workflow.name }}</strong></td>
+                            <td><span class="badge bg-secondary">{{ workflow.version }}</span></td>
+                            <td>
+                                {% if workflow.status == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                                {% elif workflow.status == 'draft' %}
+                                <span class="badge bg-warning">Draft</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ workflow.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ workflow.created_by }}</td>
+                            <td>
+                                {% if workflow.created_at is string %}
+                                    {{ workflow.created_at }}
+                                {% else %}
+                                    {{ workflow.created_at|format_datetime('%Y-%m-%d %H:%M') if workflow.created_at else 'N/A' }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('view_workflow', workflow_id=workflow.workflow_id) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('edit_workflow', workflow_id=workflow.workflow_id) }}" 
+                                   class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-sm btn-outline-success" 
+                                        onclick="executeWorkflow('{{ workflow.workflow_id }}')">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No workflows found. Create your first workflow to get started.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function executeWorkflow(workflowId) {
+    if (confirm('Are you sure you want to execute this workflow?')) {
+        fetch(`/workflow/${workflowId}/execute`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({input_parameters: {}})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Workflow execution started!');
+                window.location.href = `/workflow/execution/${data.execution_id}`;
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

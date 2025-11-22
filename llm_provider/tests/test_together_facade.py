@@ -18,7 +18,7 @@ import os
 import sys
 import pytest
 
-sys.path.append('/home/claude/llm_facades')
+sys.path.append('/home/ashutosh/llm_facades')
 sys.path.append('/mnt/user-data/uploads')
 
 from together_facade import TogetherLLMFacade, create_together_llm

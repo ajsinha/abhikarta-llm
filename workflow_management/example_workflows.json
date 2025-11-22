@@ -1,0 +1,498 @@
+{
+  "sequential_workflow": {
+    "name": "Sequential Text Processing",
+    "description": "Analyzes text, transforms it, and validates the result",
+    "version": "1.0.0",
+    "workflow": {
+      "nodes": [
+        {
+          "node_id": "start",
+          "node_type": "start",
+          "name": "Start",
+          "description": "Workflow entry point"
+        },
+        {
+          "node_id": "analyze_text",
+          "node_type": "tool",
+          "name": "Analyze Text",
+          "description": "Analyze the input text",
+          "config": {
+            "tool_name": "text_analysis",
+            "parameters": {
+              "text": "{{input_text}}"
+            }
+          },
+          "input_mappings": {
+            "text": "input_text"
+          },
+          "output_mappings": {
+            "analysis_result": "output"
+          }
+        },
+        {
+          "node_id": "transform_text",
+          "node_type": "tool",
+          "name": "Transform Text",
+          "description": "Transform the text to uppercase",
+          "config": {
+            "tool_name": "data_transform",
+            "parameters": {
+              "input_data": "{{input_text}}",
+              "operation": "uppercase"
+            }
+          },
+          "input_mappings": {
+            "input_data": "input_text"
+          },
+          "output_mappings": {
+            "transformed_text": "output"
+          }
+        },
+        {
+          "node_id": "validate_length",
+          "node_type": "tool",
+          "name": "Validate Length",
+          "description": "Validate the word count is within acceptable range",
+          "config": {
+            "tool_name": "data_validator",
+            "parameters": {
+              "value": "{{word_count}}",
+              "min_threshold": 5,
+              "max_threshold": 1000
+            }
+          },
+          "input_mappings": {
+            "value": "word_count"
+          },
+          "output_mappings": {
+            "validation_result": "output"
+          }
+        },
+        {
+          "node_id": "end",
+          "node_type": "end",
+          "name": "End",
+          "description": "Workflow termination point"
+        }
+      ],
+      "edges": [
+        {
+          "source": "start",
+          "target": "analyze_text",
+          "condition": null
+        },
+        {
+          "source": "analyze_text",
+          "target": "transform_text",
+          "condition": null
+        },
+        {
+          "source": "transform_text",
+          "target": "validate_length",
+          "condition": null
+        },
+        {
+          "source": "validate_length",
+          "target": "end",
+          "condition": null
+        }
+      ],
+      "variables": {
+        "input_text": "This is a sample text for processing and analysis.",
+        "word_count": 0
+      }
+    }
+  },
+  
+  "parallel_workflow": {
+    "name": "Parallel Data Processing",
+    "description": "Processes data in parallel using multiple tools",
+    "version": "1.0.0",
+    "workflow": {
+      "nodes": [
+        {
+          "node_id": "start",
+          "node_type": "start",
+          "name": "Start",
+          "description": "Workflow entry point"
+        },
+        {
+          "node_id": "parallel_split",
+          "node_type": "parallel",
+          "name": "Parallel Split",
+          "description": "Split execution into parallel branches",
+          "config": {
+            "strategy": "all",
+            "max_concurrent": 3
+          }
+        },
+        {
+          "node_id": "branch1_analysis",
+          "node_type": "tool",
+          "name": "Text Analysis Branch",
+          "description": "Analyze text in parallel",
+          "config": {
+            "tool_name": "text_analysis",
+            "parameters": {
+              "text": "{{input_text}}"
+            }
+          }
+        },
+        {
+          "node_id": "branch2_transform",
+          "node_type": "tool",
+          "name": "Transform Branch",
+          "description": "Transform text in parallel",
+          "config": {
+            "tool_name": "data_transform",
+            "parameters": {
+              "input_data": "{{input_text}}",
+              "operation": "uppercase"
+            }
+          }
+        },
+        {
+          "node_id": "branch3_random",
+          "node_type": "tool",
+          "name": "Random Number Branch",
+          "description": "Generate random numbers in parallel",
+          "config": {
+            "tool_name": "random_number",
+            "parameters": {
+              "min_value": 1,
+              "max_value": 100,
+              "count": 5
+            }
+          }
+        },
+        {
+          "node_id": "parallel_join",
+          "node_type": "parallel",
+          "name": "Parallel Join",
+          "description": "Wait for all parallel branches",
+          "config": {
+            "strategy": "all"
+          }
+        },
+        {
+          "node_id": "aggregate_results",
+          "node_type": "tool",
+          "name": "Aggregate Results",
+          "description": "Combine results from parallel branches",
+          "config": {
+            "tool_name": "math_calculator",
+            "parameters": {
+              "operation": "add",
+              "operand1": 10,
+              "operand2": 20
+            }
+          }
+        },
+        {
+          "node_id": "end",
+          "node_type": "end",
+          "name": "End",
+          "description": "Workflow termination point"
+        }
+      ],
+      "edges": [
+        {
+          "source": "start",
+          "target": "parallel_split",
+          "condition": null
+        },
+        {
+          "source": "parallel_split",
+          "target": "branch1_analysis",
+          "priority": 1
+        },
+        {
+          "source": "parallel_split",
+          "target": "branch2_transform",
+          "priority": 2
+        },
+        {
+          "source": "parallel_split",
+          "target": "branch3_random",
+          "priority": 3
+        },
+        {
+          "source": "branch1_analysis",
+          "target": "parallel_join"
+        },
+        {
+          "source": "branch2_transform",
+          "target": "parallel_join"
+        },
+        {
+          "source": "branch3_random",
+          "target": "parallel_join"
+        },
+        {
+          "source": "parallel_join",
+          "target": "aggregate_results"
+        },
+        {
+          "source": "aggregate_results",
+          "target": "end"
+        }
+      ],
+      "variables": {
+        "input_text": "Hello World from Parallel Workflow!"
+      }
+    }
+  },
+  
+  "hitl_workflow": {
+    "name": "Human-in-the-Loop Approval Workflow",
+    "description": "Workflow requiring human approval before proceeding",
+    "version": "1.0.0",
+    "workflow": {
+      "nodes": [
+        {
+          "node_id": "start",
+          "node_type": "start",
+          "name": "Start",
+          "description": "Workflow entry point"
+        },
+        {
+          "node_id": "generate_random",
+          "node_type": "tool",
+          "name": "Generate Random Numbers",
+          "description": "Generate random numbers for review",
+          "config": {
+            "tool_name": "random_number",
+            "parameters": {
+              "min_value": 1,
+              "max_value": 100,
+              "count": 10
+            }
+          },
+          "output_mappings": {
+            "random_numbers": "output"
+          }
+        },
+        {
+          "node_id": "calculate_stats",
+          "node_type": "tool",
+          "name": "Calculate Statistics",
+          "description": "Calculate sum and average",
+          "config": {
+            "tool_name": "math_calculator",
+            "parameters": {
+              "operation": "add",
+              "operand1": 50,
+              "operand2": 75
+            }
+          },
+          "output_mappings": {
+            "calculation_result": "output"
+          }
+        },
+        {
+          "node_id": "human_approval",
+          "node_type": "human",
+          "name": "Review and Approve",
+          "description": "Human reviews the results and approves or rejects",
+          "config": {
+            "assigned_to": "admin",
+            "task_type": "approval",
+            "timeout": 3600,
+            "instructions": "Please review the generated random numbers and calculated statistics. Approve to continue with data processing, or reject to stop the workflow."
+          }
+        },
+        {
+          "node_id": "conditional_check",
+          "node_type": "conditional",
+          "name": "Check Approval",
+          "description": "Check if human approved",
+          "config": {
+            "condition": "approval_status == 'approved'"
+          }
+        },
+        {
+          "node_id": "process_approved",
+          "node_type": "tool",
+          "name": "Process Approved Data",
+          "description": "Continue processing after approval",
+          "config": {
+            "tool_name": "data_transform",
+            "parameters": {
+              "input_data": "Workflow Approved",
+              "operation": "uppercase"
+            }
+          }
+        },
+        {
+          "node_id": "process_rejected",
+          "node_type": "tool",
+          "name": "Handle Rejection",
+          "description": "Handle rejection scenario",
+          "config": {
+            "tool_name": "data_transform",
+            "parameters": {
+              "input_data": "Workflow Rejected",
+              "operation": "uppercase"
+            }
+          }
+        },
+        {
+          "node_id": "end_approved",
+          "node_type": "end",
+          "name": "End (Approved)",
+          "description": "Workflow completed after approval"
+        },
+        {
+          "node_id": "end_rejected",
+          "node_type": "end",
+          "name": "End (Rejected)",
+          "description": "Workflow terminated after rejection"
+        }
+      ],
+      "edges": [
+        {
+          "source": "start",
+          "target": "generate_random"
+        },
+        {
+          "source": "generate_random",
+          "target": "calculate_stats"
+        },
+        {
+          "source": "calculate_stats",
+          "target": "human_approval"
+        },
+        {
+          "source": "human_approval",
+          "target": "conditional_check"
+        },
+        {
+          "source": "conditional_check",
+          "target": "process_approved",
+          "condition": "status == 'completed'"
+        },
+        {
+          "source": "conditional_check",
+          "target": "process_rejected",
+          "condition": "status == 'rejected'"
+        },
+        {
+          "source": "process_approved",
+          "target": "end_approved"
+        },
+        {
+          "source": "process_rejected",
+          "target": "end_rejected"
+        }
+      ],
+      "variables": {
+        "approval_status": null
+      }
+    }
+  },
+  
+  "complex_workflow": {
+    "name": "Complex Multi-Stage Workflow",
+    "description": "Combines sequential, parallel, and HITL patterns",
+    "version": "1.0.0",
+    "workflow": {
+      "nodes": [
+        {
+          "node_id": "start",
+          "node_type": "start",
+          "name": "Start"
+        },
+        {
+          "node_id": "analyze_input",
+          "node_type": "tool",
+          "name": "Initial Analysis",
+          "config": {
+            "tool_name": "text_analysis",
+            "parameters": {
+              "text": "{{input_data}}"
+            }
+          }
+        },
+        {
+          "node_id": "parallel_processing",
+          "node_type": "parallel",
+          "name": "Parallel Processing Stage",
+          "config": {
+            "strategy": "all"
+          }
+        },
+        {
+          "node_id": "transform_upper",
+          "node_type": "tool",
+          "name": "Uppercase Transform",
+          "config": {
+            "tool_name": "data_transform",
+            "parameters": {
+              "input_data": "{{input_data}}",
+              "operation": "uppercase"
+            }
+          }
+        },
+        {
+          "node_id": "transform_lower",
+          "node_type": "tool",
+          "name": "Lowercase Transform",
+          "config": {
+            "tool_name": "data_transform",
+            "parameters": {
+              "input_data": "{{input_data}}",
+              "operation": "lowercase"
+            }
+          }
+        },
+        {
+          "node_id": "parallel_join",
+          "node_type": "parallel",
+          "name": "Join Results"
+        },
+        {
+          "node_id": "human_review",
+          "node_type": "human",
+          "name": "Quality Check",
+          "config": {
+            "assigned_to": "admin",
+            "task_type": "review",
+            "timeout": 7200
+          }
+        },
+        {
+          "node_id": "final_calculation",
+          "node_type": "tool",
+          "name": "Final Calculation",
+          "config": {
+            "tool_name": "math_calculator",
+            "parameters": {
+              "operation": "multiply",
+              "operand1": 42,
+              "operand2": 2
+            }
+          }
+        },
+        {
+          "node_id": "end",
+          "node_type": "end",
+          "name": "End"
+        }
+      ],
+      "edges": [
+        {"source": "start", "target": "analyze_input"},
+        {"source": "analyze_input", "target": "parallel_processing"},
+        {"source": "parallel_processing", "target": "transform_upper"},
+        {"source": "parallel_processing", "target": "transform_lower"},
+        {"source": "transform_upper", "target": "parallel_join"},
+        {"source": "transform_lower", "target": "parallel_join"},
+        {"source": "parallel_join", "target": "human_review"},
+        {"source": "human_review", "target": "final_calculation"},
+        {"source": "final_calculation", "target": "end"}
+      ],
+      "variables": {
+        "input_data": "Abhikarta Workflow System Test"
+      }
+    }
+  }
+}

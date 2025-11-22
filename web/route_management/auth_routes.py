@@ -138,15 +138,15 @@ class AuthRoutes(AbstractRoutes):
                 # Validate passwords
                 if not new_password or not confirm_password:
                     flash('Both password fields are required', 'error')
-                    return render_template('set_password.html', userid=temp_userid)
+                    return render_template('rbac/set_password.html', userid=temp_userid)
 
                 if len(new_password) < 8:
                     flash('Password must be at least 8 characters long', 'error')
-                    return render_template('set_password.html', userid=temp_userid)
+                    return render_template('rbac/set_password.html', userid=temp_userid)
 
                 if new_password != confirm_password:
                     flash('Passwords do not match', 'error')
-                    return render_template('set_password.html', userid=temp_userid)
+                    return render_template('rbac/set_password.html', userid=temp_userid)
 
                 # Load user and set password
                 user = self.user_manager.load_user(temp_userid)
@@ -183,10 +183,10 @@ class AuthRoutes(AbstractRoutes):
                         return redirect(url_for('user_dashboard'))
                 else:
                     flash('Failed to set password. Please try again.', 'error')
-                    return render_template('set_password.html', userid=temp_userid)
+                    return render_template('rbac/set_password.html', userid=temp_userid)
 
             # GET request - show password setup form
-            return render_template('set_password.html', userid=temp_userid)
+            return render_template('rbac/set_password.html', userid=temp_userid)
 
         @self.app.route('/reset-password', methods=['GET', 'POST'])
         @login_required
@@ -202,15 +202,15 @@ class AuthRoutes(AbstractRoutes):
                 # Validate inputs
                 if not current_password or not new_password or not confirm_password:
                     flash('All password fields are required', 'error')
-                    return render_template('reset_password.html')
+                    return render_template('rbac/reset_password.html')
 
                 if len(new_password) < 8:
                     flash('New password must be at least 8 characters long', 'error')
-                    return render_template('reset_password.html')
+                    return render_template('rbac/reset_password.html')
 
                 if new_password != confirm_password:
                     flash('New passwords do not match', 'error')
-                    return render_template('reset_password.html')
+                    return render_template('rbac/reset_password.html')
 
                 # Load user
                 user = self.user_manager.load_user(userid)
@@ -222,12 +222,12 @@ class AuthRoutes(AbstractRoutes):
                 if not user.verify_password(current_password):
                     flash('Current password is incorrect', 'error')
                     logger.warning(f"Failed password reset attempt for user {userid}: incorrect current password")
-                    return render_template('reset_password.html')
+                    return render_template('rbac/reset_password.html')
 
                 # Check if new password is same as current
                 if user.verify_password(new_password):
                     flash('New password must be different from current password', 'warning')
-                    return render_template('reset_password.html')
+                    return render_template('rbac/reset_password.html')
 
                 # Set new password
                 user.set_password(new_password)
@@ -244,10 +244,10 @@ class AuthRoutes(AbstractRoutes):
                         return redirect(url_for('user_dashboard'))
                 else:
                     flash('Failed to reset password. Please try again.', 'error')
-                    return render_template('reset_password.html')
+                    return render_template('rbac/reset_password.html')
 
             # GET request - show password reset form
-            return render_template('reset_password.html')
+            return render_template('rbac/reset_password.html')
 
         @self.app.route('/logout')
         def logout():

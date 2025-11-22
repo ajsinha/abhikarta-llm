@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Execution Details - Abhikarta LLM Platform{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-project-diagram"></i> Execution Details</h2>
+            <p class="text-muted">{{ workflow.name if workflow else 'Unknown Workflow' }} - Execution {{ execution.execution_id[:8] }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if execution.status == 'running' %}
+            <button class="btn btn-warning" onclick="pauseExecution()">
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="btn btn-danger" onclick="cancelExecution()">
+                <i class="fas fa-stop"></i> Cancel
+            </button>
+            {% elif execution.status == 'paused' %}
+            <button class="btn btn-success" onclick="resumeExecution()">
+                <i class="fas fa-play"></i> Resume
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Execution Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Status:</strong>
+                            {% if execution.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% elif execution.status == 'running' %}
+                            <span class="badge bg-primary">Running</span>
+                            {% elif execution.status == 'failed' %}
+                            <span class="badge bg-danger">Failed</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ execution.status }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Started:</strong><br>
+                            {{ execution.started_at|format_datetime('%Y-%m-%d %H:%M:%S') if execution.started_at else 'N/A' }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Completed:</strong><br>
+                            {{ execution.completed_at|format_datetime('%Y-%m-%d %H:%M:%S') if execution.completed_at else 'N/A' }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Triggered By:</strong><br>
+                            {{ execution.triggered_by }}
+                        </div>
+                    </div>
+                    {% if execution.error_message %}
+                    <div class="alert alert-danger mt-3">
+                        <strong>Error:</strong> {{ execution.error_message }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Node Executions</h5>
+                </div>
+                <div class="card-body">
+                    {% if node_executions %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Node ID</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Started</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for node in node_executions %}
+                                <tr>
+                                    <td><code>{{ node.node_id }}</code></td>
+                                    <td><span class="badge bg-info">{{ node.node_type }}</span></td>
+                                    <td>
+                                        {% if node.status == 'completed' %}
+                                        <span class="badge bg-success">✓</span>
+                                        {% elif node.status == 'running' %}
+                                        <span class="badge bg-primary">⟳</span>
+                                        {% elif node.status == 'failed' %}
+                                        <span class="badge bg-danger">✗</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ node.duration_ms }}ms</td>
+                                    <td>{{ node.started_at|format_datetime('%H:%M:%S') if node.started_at else '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No node executions yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Audit Logs</h5>
+                </div>
+                <div class="card-body">
+                    {% if audit_logs %}
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        {% for log in audit_logs %}
+                        <div class="mb-2 p-2 border-bottom">
+                            <small class="text-muted">{{ log.timestamp|format_datetime('%H:%M:%S') }}</small>
+                            <span class="badge bg-{{ 'danger' if log.log_level == 'ERROR' else 'warning' if log.log_level == 'WARN' else 'info' }}">
+                                {{ log.log_level }}
+                            </span>
+                            {{ log.message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No logs available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const executionId = '{{ execution.execution_id }}';
+
+function pauseExecution() {
+    fetch(`/workflow/execution/${executionId}/pause`, {method: 'POST'})
+        .then(r => r.json())
+        .then(d => {
+            alert(d.message);
+            location.reload();
+        });
+}
+
+function resumeExecution() {
+    fetch(`/workflow/execution/${executionId}/resume`, {method: 'POST'})
+        .then(r => r.json())
+        .then(d => {
+            alert(d.message);
+            location.reload();
+        });
+}
+
+function cancelExecution() {
+    if(confirm('Are you sure you want to cancel this execution?')) {
+        fetch(`/workflow/execution/${executionId}/cancel`, {method: 'POST'})
+            .then(r => r.json())
+            .then(d => {
+                alert(d.message);
+                location.reload();
+            });
+    }
+}
+
+// Auto-refresh if running
+{% if execution.status == 'running' %}
+setTimeout(() => location.reload(), 5000);
+{% endif %}
+</script>
+{% endblock %}

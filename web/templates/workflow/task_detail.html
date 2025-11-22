@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Task Details - Abhikarta LLM Platform{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-clipboard-check"></i> Task Details</h2>
+    
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Task Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Task Type:</strong><br>
+                            <span class="badge bg-info">{{ task.task_type }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Status:</strong><br>
+                            <span class="badge bg-{{ 'warning' if task.status == 'pending' else 'success' if task.status == 'completed' else 'danger' }}">
+                                {{ task.status }}
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Created:</strong><br>
+                            {{ task.created_at|format_datetime('%Y-%m-%d %H:%M') }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Timeout:</strong><br>
+                            {% if task.timeout_at %}
+                            <span class="text-danger">{{ task.timeout_at|format_datetime('%Y-%m-%d %H:%M') }}</span>
+                            {% else %}
+                            No timeout
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Workflow Context</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Workflow:</strong> {{ workflow.name if workflow else 'N/A' }}</p>
+                    <p><strong>Execution ID:</strong> <code>{{ execution.execution_id if execution else 'N/A' }}</code></p>
+                    {% if execution and execution.input_parameters %}
+                    <p><strong>Input Parameters:</strong></p>
+                    <pre class="bg-light p-2">{{ execution.input_parameters | tojson(indent=2) }}</pre>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if task.status == 'pending' %}
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Respond to Task</h5>
+                </div>
+                <div class="card-body">
+                    <form id="taskResponseForm">
+                        <div class="mb-3">
+                            <label class="form-label">Decision</label>
+                            <select class="form-select" id="taskStatus" required>
+                                <option value="completed">Approve</option>
+                                <option value="rejected">Reject</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Comments</label>
+                            <textarea class="form-control" id="taskComments" rows="4" 
+                                      placeholder="Add your comments here..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Response Data (JSON - optional)</label>
+                            <textarea class="form-control" id="taskResponseData" rows="3" 
+                                      placeholder='{"key": "value"}'></textarea>
+                            <small class="text-muted">Enter any additional data in JSON format</small>
+                        </div>
+
+                        <div class="text-end">
+                            <a href="{{ url_for('list_tasks') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Submit Response
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Task Response</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Responded At:</strong> {{ task.responded_at|format_datetime('%Y-%m-%d %H:%M') if task.responded_at else 'N/A' }}</p>
+                    {% if task.comments %}
+                    <p><strong>Comments:</strong></p>
+                    <div class="alert alert-info">{{ task.comments }}</div>
+                    {% endif %}
+                    {% if task.response_data %}
+                    <p><strong>Response Data:</strong></p>
+                    <pre class="bg-light p-2">{{ task.response_data | tojson(indent=2) }}</pre>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row mt-3">
+        <div class="col-md-12 text-end">
+            <a href="{{ url_for('view_execution', execution_id=execution.execution_id) }}" 
+               class="btn btn-primary">
+                <i class="fas fa-eye"></i> View Full Execution
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('taskResponseForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const status = document.getElementById('taskStatus').value;
+    const comments = document.getElementById('taskComments').value;
+    const responseDataText = document.getElementById('taskResponseData').value;
+    
+    let responseData = {};
+    if (responseDataText) {
+        try {
+            responseData = JSON.parse(responseDataText);
+        } catch (e) {
+            alert('Invalid JSON in Response Data field');
+            return;
+        }
+    }
+    
+    fetch('/workflow/task/{{ task.task_id }}/respond', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            status: status,
+            comments: comments,
+            response_data: responseData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Task response submitted successfully!');
+            window.location.href = '/workflow/tasks';
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error submitting response: ' + error);
+    });
+});
+</script>
+{% endblock %}

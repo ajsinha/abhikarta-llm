@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{{ workflow.name }} - Abhikarta LLM Platform{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-project-diagram"></i> {{ workflow.name }}</h2>
+            <p class="text-muted">{{ workflow.description }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('edit_workflow', workflow_id=workflow.workflow_id) }}" 
+               class="btn btn-secondary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <button class="btn btn-success" onclick="executeWorkflow()">
+                <i class="fas fa-play"></i> Execute
+            </button>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Workflow Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Version:</strong><br>
+                            <span class="badge bg-secondary">{{ workflow.version }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Status:</strong><br>
+                            <span class="badge bg-{{ 'success' if workflow.status == 'active' else 'warning' }}">
+                                {{ workflow.status }}
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Created By:</strong><br>
+                            {{ workflow.created_by }}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Created:</strong><br>
+                            {{ workflow.created_at|format_datetime('%Y-%m-%d') }}
+                        </div>
+                    </div>
+                    {% if workflow.tags %}
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <strong>Tags:</strong><br>
+                            {% for tag in workflow.tags %}
+                            <span class="badge bg-info">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Workflow Definition</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3" style="max-height: 400px; overflow-y: auto;">{{ workflow.definition_json | tojson(indent=2) }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Execution History</h5>
+                </div>
+                <div class="card-body">
+                    {% if executions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Execution ID</th>
+                                    <th>Status</th>
+                                    <th>Started</th>
+                                    <th>Duration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exec in executions %}
+                                <tr>
+                                    <td><code>{{ exec.execution_id[:8] }}...</code></td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if exec.status == 'completed' else 'primary' if exec.status == 'running' else 'danger' }}">
+                                            {{ exec.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ exec.started_at|format_datetime('%Y-%m-%d %H:%M') if exec.started_at else 'N/A' }}</td>
+                                    <td>
+                                        {% if exec.completed_at and exec.started_at %}
+                                            {% set duration_min = exec.completed_at|duration_minutes(exec.started_at) %}
+                                            {% if duration_min %}
+                                                {{ duration_min|round(2) }} min
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_execution', execution_id=exec.execution_id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No executions yet. Execute this workflow to see history.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function executeWorkflow() {
+    if (confirm('Execute this workflow?')) {
+        fetch('/workflow/{{ workflow.workflow_id }}/execute', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({input_parameters: {}})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/workflow/execution/${data.execution_id}`;
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    }
+}
+</script>
+{% endblock %}
