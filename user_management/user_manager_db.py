@@ -20,17 +20,17 @@ document may be subject to patent applications.
 import json
 import logging
 import threading
-from contextlib import contextmanager
+from db_management.db_aware import DBAware
 from typing import List, Optional, Dict, Any
 
-from db_management.pool_manager import get_pool_manager
+
 from user_management.user import User, Role, Resource, Permission
 from user_management.user_manager import UserManager
 
 logger = logging.getLogger(__name__)
 
 
-class UserManagerDB(UserManager):
+class UserManagerDB(UserManager, DBAware):
     """
     Database-backed implementation of UserManager.
     
@@ -52,34 +52,14 @@ class UserManagerDB(UserManager):
         Args:
             db_connection_pool_name: Database connection pool name
         """
-        super().__init__()
-        self._db_connection_pool_name = db_connection_pool_name
-        self._connection_pool_manager =  get_pool_manager()
+        UserManager.__init__(self)
+        DBAware.__init__(self, db_connection_pool_name)
+
         self._lock = threading.RLock()
         logger.info(f"UserManagerDB initialized with {db_connection_pool_name} connection pool")
 
     def initialize(self) -> bool:
         return True
-
-    @contextmanager
-    def _get_connection(self):
-        """Context manager for database connections with auto-commit."""
-        with self._connection_pool_manager.get_connection_context(self._db_connection_pool_name) as conn:
-            try:
-                yield conn  # Now this yields the actual connection
-                conn.commit()  # Auto-commit on success
-            except Exception as e:
-                conn.rollback()  # Auto-rollback on error
-                print(f"Database error: {e}")
-                raise
-
-    @contextmanager
-    def _get_cursor(self, conn):
-        cursor = conn.cursor()
-        try:
-            yield cursor
-        finally:
-            cursor.close()
 
 
     def close(self) -> None:

@@ -11,13 +11,12 @@ import json
 import logging
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Tuple
-from contextlib import contextmanager
-from db_management.pool_manager import get_pool_manager
+from db_management.db_aware import DBAware
 
 logger = logging.getLogger(__name__)
 
 
-class LLMInteractionLogger:
+class LLMInteractionLogger(DBAware):
     """
     Data Access Object for logging LLM interactions to database.
 
@@ -32,33 +31,13 @@ class LLMInteractionLogger:
         Args:
             _db_connection_pool_name: Database connection pool name
         """
+        DBAware.__init__(self, _db_connection_pool_name)
 
-
-        self._db_connection_pool_name = _db_connection_pool_name
-        self._connection_pool_manager = get_pool_manager()
 
         self.db_type ='sqlite'
 
 
-    @contextmanager
-    def _get_connection(self):
-        """Context manager for database connections with auto-commit."""
-        with self._connection_pool_manager.get_connection_context(self._db_connection_pool_name) as conn:
-            try:
-                yield conn  # Now this yields the actual connection
-                conn.commit()  # Auto-commit on success
-            except Exception as e:
-                conn.rollback()  # Auto-rollback on error
-                print(f"Database error: {e}")
-                raise
 
-    @contextmanager
-    def _get_cursor(self, conn):
-        cursor = conn.cursor()
-        try:
-            yield cursor
-        finally:
-            cursor.close()
 
     def log_interaction(self,
                         user_id: str,

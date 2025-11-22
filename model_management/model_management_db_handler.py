@@ -19,12 +19,11 @@ import sqlite3
 import threading
 from pathlib import Path
 from typing import Optional, List, Dict, Any, Tuple
-from contextlib import contextmanager
-from db_management.pool_manager import get_pool_manager
+from db_management.db_aware import DBAware
 
 logger = logging.getLogger(__name__)
 
-class ModelManagementDBHandler:
+class ModelManagementDBHandler(DBAware):
     """
     Singleton database handler for managing LLM model and provider data.
     
@@ -62,8 +61,7 @@ class ModelManagementDBHandler:
         Args:
             db_connection_pool_name: Name of database connection pool
         """
-        self._db_connection_pool_name = db_connection_pool_name
-        self._connection_pool_manager = get_pool_manager()
+        DBAware.__init__(self, db_connection_pool_name)
         self._lock = threading.RLock()
         self._local = threading.local()
         
@@ -96,25 +94,7 @@ class ModelManagementDBHandler:
                 cls._instance.close_all_connections()
                 cls._instance = None
 
-    @contextmanager
-    def _get_connection(self):
-        """Context manager for database connections with auto-commit."""
-        with self._connection_pool_manager.get_connection_context(self._db_connection_pool_name) as conn:
-            try:
-                yield conn  # Now this yields the actual connection
-                conn.commit()  # Auto-commit on success
-            except Exception as e:
-                conn.rollback()  # Auto-rollback on error
-                print(f"Database error: {e}")
-                raise
 
-    @contextmanager
-    def _get_cursor(self, conn):
-        cursor = conn.cursor()
-        try:
-            yield cursor
-        finally:
-            cursor.close()
 
     
     def close_all_connections(self) -> None:
