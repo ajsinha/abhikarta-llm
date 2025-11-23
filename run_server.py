@@ -40,7 +40,7 @@ def run_webserver(pool_name, mcp_server_manager):
     port = prop_conf.get_int('server.port')
     aweb.run(port=port)
 
-def prepare_database_pools():
+def prepare_database_pools(path_to_sqllite):
     # Get pool manager singleton
     manager = get_pool_manager()
 
@@ -49,7 +49,7 @@ def prepare_database_pools():
     # Create SQLite pool configuration
     config = SQLitePoolConfig(
         pool_name=pool_name,
-        database_path='/home/ashutosh/PycharmProjects/abhikarta-llm/data/abhikarta-llm.db',
+        database_path=path_to_sqllite,
 
         # Pool settings
         min_connections=1,
@@ -98,18 +98,21 @@ def set_llm_provider_facade_factory(pool_name: str):
 
 def prepare_prop_conf():
     from core.config.properties_configurator import PropertiesConfigurator
+
     prop_files = [
-        '/home/ashutosh/PycharmProjects/abhikarta-llm/config/mcp_server.properties',
-        '/home/ashutosh/PycharmProjects/abhikarta-llm/config/llm.properties',
-        '/home/ashutosh/PycharmProjects/abhikarta-llm/config/application.properties'
+        'config/mcp_server.properties',
+        'config/llm.properties',
+        'config/application.properties'
     ]
     prop_conf = PropertiesConfigurator(properties_files=prop_files)
 
     return prop_conf
 
 if __name__ == '__main__':
+    path_to_sqlite = 'data/abhikarta-llm.db'
+
     prepare_prop_conf()
-    pool_name,pool_manager = prepare_database_pools()
+    pool_name,pool_manager = prepare_database_pools(path_to_sqllite=path_to_sqlite)
     set_llm_provider_facade_factory(pool_name)
 
     mcp_server_manager = create_mcp_servers()
