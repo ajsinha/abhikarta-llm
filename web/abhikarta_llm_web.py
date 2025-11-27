@@ -29,7 +29,7 @@ from model_management.model_registry import ModelRegistry
 from llm_provider.llm_facade_factory import LLMFacadeFactory
 from llm_provider.facade_cache_manager import FacadeCacheManager
 from llm_provider.session_cleanup_task import create_cleanup_manager
-from web.template_filters import register_template_filters, register_app_context
+from web.template_filters import register_template_filters, register_app_context, register_cache_buster
 
 # Configure logging
 logging.basicConfig(
@@ -98,6 +98,8 @@ class AbhikartaLLMWeb:
         #
         register_template_filters(self.app)
         register_app_context(self.app, self.prop_conf)
+        register_cache_buster(self.app)
+
         # Initialize session
         Session(self.app)
 

@@ -178,6 +178,19 @@ def register_template_filters(app):
     app.jinja_env.filters['format_duration'] = format_duration
 
 
+def register_cache_buster(app):
+    import os, time
+    @app.context_processor
+    def inject_utilities():
+        def file_version(filename):
+            filepath = os.path.join(app.static_folder, filename)
+            if os.path.exists(filepath):
+                mtime = os.path.getmtime(filepath)
+                return int(mtime * 1000)
+            return int(time.time() * 1000)
+
+        return {'file_version': file_version}
+
 def register_app_context(app, prop_conf):
     """
     Register application context variables from properties configuration.

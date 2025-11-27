@@ -16,9 +16,11 @@ class WorkflowDesigner {
         this.connectionMode = false;
         this.connectionStart = null;
         this.tempLine = null;
+        this.zoomLevel = 1.0;  // Default zoom 100%
 
         this.canvas = document.getElementById('workflowCanvas');
         this.svgCanvas = document.getElementById('connectionCanvas');
+        this.canvasContainer = document.getElementById('canvasContainer');
 
         this.initializeSVG();
         this.setupEventListeners();
@@ -728,6 +730,41 @@ class WorkflowDesigner {
         this.deselectAll();
         this.nodeCounter = 0;
     }
+
+    setZoom(level) {
+        // Clamp zoom between 25% and 200%
+        this.zoomLevel = Math.max(0.25, Math.min(2.0, level));
+
+        // Apply transform to canvas
+        this.canvas.style.transform = `scale(${this.zoomLevel})`;
+        this.canvas.style.transformOrigin = 'top left';
+
+        // Update SVG canvas size to match zoom
+        const baseWidth = 3000;
+        const baseHeight = 2500;
+        this.svgCanvas.setAttribute('width', baseWidth * this.zoomLevel);
+        this.svgCanvas.setAttribute('height', baseHeight * this.zoomLevel);
+        this.svgCanvas.style.transform = `scale(${this.zoomLevel})`;
+        this.svgCanvas.style.transformOrigin = 'top left';
+
+        // Redraw connections to match new scale
+        this.redrawConnections();
+
+        // Show zoom level
+        this.showToast(`Zoom: ${Math.round(this.zoomLevel * 100)}%`, 'info');
+    }
+
+    zoomIn() {
+        this.setZoom(this.zoomLevel + 0.1);
+    }
+
+    zoomOut() {
+        this.setZoom(this.zoomLevel - 0.1);
+    }
+
+    resetZoom() {
+        this.setZoom(1.0);
+    }
 }
 
 // Global designer instance
@@ -1048,218 +1085,18 @@ function copyJSON() {
 }
 
 function zoomIn() {
-    // TODO: Implement zoom
-    designer.showToast('Zoom feature - coming soon', 'info');
+    if (designer) {
+        designer.zoomIn();
+    }
 }
 
 function zoomOut() {
-    // TODO: Implement zoom
-    designer.showToast('Zoom feature - coming soon', 'info');
-}
-
-// Import/Export Functions
-
-function showImportModal() {
-    // Get modal element first
-    const modalElement = document.getElementById('importJsonModal');
-    if (!modalElement) {
-        console.error('Import modal not found in HTML. Please update workflow_designer.html');
-        alert('Import modal not found. Please refresh the page and ensure workflow_designer.html is updated.');
-        return;
-    }
-
-    // Clear previous state - with null checks
-    const textarea = document.getElementById('importJsonTextarea');
-    const errorDiv = document.getElementById('importError');
-    const successDiv = document.getElementById('importSuccess');
-
-    if (textarea) textarea.value = '';
-    if (errorDiv) errorDiv.style.display = 'none';
-    if (successDiv) successDiv.style.display = 'none';
-
-    // Show modal
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
-}
-
-function importWorkflowJson() {
-    const textarea = document.getElementById('importJsonTextarea');
-    const errorDiv = document.getElementById('importError');
-    const errorMsg = document.getElementById('importErrorMessage');
-    const successDiv = document.getElementById('importSuccess');
-    const successMsg = document.getElementById('importSuccessMessage');
-
-    // Check if elements exist
-    if (!textarea || !errorDiv || !errorMsg || !successDiv || !successMsg) {
-        console.error('Import modal elements not found. HTML may need updating.');
-        alert('Import functionality error: Modal elements not found.\n\nPlease ensure workflow_designer.html is updated with the latest version.');
-        return;
-    }
-
-    // Hide previous messages
-    errorDiv.style.display = 'none';
-    successDiv.style.display = 'none';
-
-    // Get JSON text
-    const jsonText = textarea.value.trim();
-
-    if (!jsonText) {
-        errorMsg.textContent = 'Please paste JSON content';
-        errorDiv.style.display = 'block';
-        return;
-    }
-
-    try {
-        // Parse JSON
-        const workflowData = JSON.parse(jsonText);
-
-        console.log('Parsed workflow data:', workflowData);
-
-        // Validate structure
-        if (!workflowData.nodes || !Array.isArray(workflowData.nodes)) {
-            throw new Error('JSON must contain a "nodes" array');
-        }
-
-        if (!workflowData.edges || !Array.isArray(workflowData.edges)) {
-            throw new Error('JSON must contain an "edges" array');
-        }
-
-        // Clear existing workflow
-        if (designer.nodes.size > 0) {
-            if (!confirm('This will clear the current workflow. Continue?')) {
-                return;
-            }
-        }
-
-        // Clear canvas without confirmation prompt (already confirmed above)
-        designer.nodes.clear();
-        designer.connections = [];
-        designer.canvas.innerHTML = '';
-        designer.redrawConnections();
-        designer.deselectAll();
-        designer.nodeCounter = 0;
-
-        // Import nodes
-        const nodeIdMap = new Map(); // Map from node_id to internal ID
-        let xPos = 100;
-        let yPos = 100;
-        const xSpacing = 250;
-        const ySpacing = 150;
-        let nodesPerRow = 4;
-        let nodeCount = 0;
-
-        console.log(`Importing ${workflowData.nodes.length} nodes...`);
-
-        workflowData.nodes.forEach((nodeData, index) => {
-            console.log(`Processing node ${index}:`, nodeData);
-
-            // Calculate position in grid layout
-            const col = nodeCount % nodesPerRow;
-            const row = Math.floor(nodeCount / nodesPerRow);
-            const x = xPos + (col * xSpacing);
-            const y = yPos + (row * ySpacing);
-
-            console.log(`Creating node at position (${x}, ${y})`);
-
-            // Add node to canvas
-            const internalId = designer.addNode(nodeData.node_type, x, y);
-            const node = designer.nodes.get(internalId);
-
-            console.log(`Created node with internal ID: ${internalId}`);
-
-            // Set node configuration
-            if (nodeData.node_id) {
-                node.config.node_id = nodeData.node_id;
-            }
-
-            if (nodeData.config) {
-                Object.assign(node.config, nodeData.config);
-            }
-
-            // Handle extra fields (name, etc.) - ignore them gracefully
-            console.log(`Node config set:`, node.config);
-
-            // Update node title
-            const nodeElement = document.getElementById(internalId);
-            if (nodeElement) {
-                const titleElement = nodeElement.querySelector('.node-title');
-                if (titleElement) {
-                    titleElement.textContent = nodeData.name || node.config.node_id || node.type;
-                }
-            }
-
-            // Map node_id to internal ID
-            nodeIdMap.set(nodeData.node_id, internalId);
-            console.log(`Mapped ${nodeData.node_id} -> ${internalId}`);
-
-            nodeCount++;
-        });
-
-        console.log(`Importing ${workflowData.edges.length} edges...`);
-        console.log('Node ID map:', nodeIdMap);
-
-        // Import connections
-        workflowData.edges.forEach((edge, index) => {
-            console.log(`Processing edge ${index}:`, edge);
-
-            const sourceId = nodeIdMap.get(edge.source);
-            const targetId = nodeIdMap.get(edge.target);
-
-            console.log(`Edge mapping: ${edge.source} -> ${sourceId}, ${edge.target} -> ${targetId}`);
-
-            if (sourceId && targetId) {
-                // Check if connection already exists
-                const exists = designer.connections.some(
-                    c => c.source === sourceId && c.target === targetId
-                );
-
-                if (!exists) {
-                    designer.connections.push({
-                        source: sourceId,
-                        target: targetId
-                    });
-                    console.log(`Created connection: ${sourceId} -> ${targetId}`);
-                } else {
-                    console.log(`Connection already exists: ${sourceId} -> ${targetId}`);
-                }
-            } else {
-                const msg = `Could not create connection from ${edge.source} to ${edge.target} (source ID: ${sourceId}, target ID: ${targetId})`;
-                console.warn(msg);
-            }
-        });
-
-        console.log('Final connections:', designer.connections);
-
-        // Redraw connections
-        designer.redrawConnections();
-
-        console.log('Import complete!');
-
-        // Show success message
-        successMsg.innerHTML = `
-            Successfully imported:<br>
-            - ${workflowData.nodes.length} nodes<br>
-            - ${workflowData.edges.length} connections
-        `;
-        successDiv.style.display = 'block';
-
-        // Auto-close modal after 2 seconds
-        setTimeout(() => {
-            const modalElement = document.getElementById('importJsonModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.hide();
-            }
-            designer.showToast('Workflow imported successfully!', 'success');
-        }, 2000);
-
-    } catch (error) {
-        errorMsg.innerHTML = `${error.message}<br><br>Check browser console for details.`;
-        errorDiv.style.display = 'block';
-        console.error('Import error:', error);
-        console.error('Stack trace:', error.stack);
+    if (designer) {
+        designer.zoomOut();
     }
 }
+
+// Export Functions
 
 function showExportModal() {
     // Check if modal exists

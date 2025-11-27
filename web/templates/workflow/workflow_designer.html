@@ -11,9 +11,9 @@
     .designer-container {
         display: flex;
         height: calc(100vh - 56px);
-        overflow: hidden;
+        overflow: hidden;  /* Keep this to prevent page scrolling */
     }
-    
+
     /* Left Sidebar - Node Palette */
     .node-palette {
         width: 250px;
@@ -22,17 +22,17 @@
         overflow-y: auto;
         padding: 15px;
     }
-    
+
     .palette-section {
         margin-bottom: 20px;
     }
-    
+
     .palette-section h6 {
         font-weight: 600;
         margin-bottom: 10px;
         color: #495057;
     }
-    
+
     .node-template {
         background: white;
         border: 2px solid #dee2e6;
@@ -42,17 +42,17 @@
         cursor: move;
         transition: all 0.2s;
     }
-    
+
     .node-template:hover {
         border-color: #0d6efd;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         transform: translateY(-2px);
     }
-    
+
     .node-template i {
         margin-right: 8px;
     }
-    
+
     .node-template.start { border-left: 4px solid #28a745; }
     .node-template.end { border-left: 4px solid #dc3545; }
     .node-template.llm { border-left: 4px solid #0d6efd; }
@@ -60,25 +60,29 @@
     .node-template.human { border-left: 4px solid #6f42c1; }
     .node-template.conditional { border-left: 4px solid #ffc107; }
     .node-template.parallel { border-left: 4px solid #17a2b8; }
-    
+
     /* Main Canvas */
     .canvas-container {
         flex: 1;
         position: relative;
         background: #ffffff;
-        background-image: 
+        background-image:
             linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px),
             linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px);
         background-size: 20px 20px;
-        overflow: scroll;  /* Force both scrollbars */
+        overflow-x: scroll !important;  /* Force horizontal scroll */
+        overflow-y: scroll !important;  /* Force vertical scroll */
+        max-width: 100%;
+        max-height: 100%;
     }
 
     .workflow-canvas {
         position: relative;
-        width: 3000px;
-        height: 2500px;
-        min-width: 3000px;
-        min-height: 2500px;
+        width: 3000px !important;
+        height: 2500px !important;
+        min-width: 3000px !important;
+        min-height: 2500px !important;
+        flex-shrink: 0;  /* Prevent shrinking */
     }
 
     .workflow-node {
@@ -302,9 +306,6 @@
         </button>
     </div>
     <div class="toolbar-group">
-        <button class="btn btn-sm btn-outline-success" onclick="showImportModal()">
-            <i class="fas fa-file-import"></i> Import JSON
-        </button>
         <button class="btn btn-sm btn-outline-info" onclick="showExportModal()">
             <i class="fas fa-file-export"></i> Export JSON
         </button>
@@ -463,56 +464,6 @@
     </div>
 </div>
 
-<!-- Import JSON Modal -->
-<div class="modal fade" id="importJsonModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title"><i class="fas fa-file-import"></i> Import Workflow JSON</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> <strong>Paste your workflow JSON below.</strong>
-                    The JSON should contain "nodes" and "edges" arrays. The designer will load the workflow and create all nodes and connections.
-                </div>
-
-                <label for="importJsonTextarea" class="form-label"><strong>Workflow JSON:</strong></label>
-                <textarea id="importJsonTextarea" class="form-control" rows="15"
-                          style="font-family: monospace; font-size: 12px;"
-                          placeholder='Paste JSON here, e.g.:
-{
-  "nodes": [
-    {"node_id": "start", "node_type": "start"},
-    {"node_id": "process", "node_type": "llm", "config": {...}},
-    {"node_id": "end", "node_type": "end"}
-  ],
-  "edges": [
-    {"source": "start", "target": "process"},
-    {"source": "process", "target": "end"}
-  ]
-}'></textarea>
-
-                <div id="importError" class="alert alert-danger mt-3" style="display: none;">
-                    <i class="fas fa-exclamation-triangle"></i> <strong>Import Error:</strong>
-                    <div id="importErrorMessage"></div>
-                </div>
-
-                <div id="importSuccess" class="alert alert-success mt-3" style="display: none;">
-                    <i class="fas fa-check-circle"></i> <strong>Import Successful!</strong>
-                    <div id="importSuccessMessage"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success" onclick="importWorkflowJson()">
-                    <i class="fas fa-file-import"></i> Import Workflow
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Export JSON Modal -->
 <div class="modal fade" id="exportJsonModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -553,5 +504,5 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/workflow-designer.js') }}?v={{ range(1, 999999999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/workflow-designer.js') }}?v={{ file_version('js/workflow-designer.js') }}"></script>
 {% endblock %}

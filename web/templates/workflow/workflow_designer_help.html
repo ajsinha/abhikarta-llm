@@ -257,27 +257,28 @@
     <div class="help-nav">
         <ul>
             <li><a href="#getting-started"><i class="fas fa-play-circle"></i> Getting Started</a></li>
+            <li><a href="#saving-loading"><i class="fas fa-save"></i> Saving & Loading</a></li>
             <li><a href="#node-types"><i class="fas fa-boxes"></i> Node Types</a></li>
             <li><a href="#examples"><i class="fas fa-lightbulb"></i> Examples</a></li>
             <li><a href="#tips"><i class="fas fa-star"></i> Tips & Tricks</a></li>
         </ul>
     </div>
-    
+
     <!-- Getting Started Section -->
     <div class="help-section" id="getting-started">
         <h2><i class="fas fa-play-circle"></i> Getting Started</h2>
-        
+
         <h3>What is the Visual Workflow Designer?</h3>
         <p>The Visual Workflow Designer is a drag-and-drop interface that lets you create complex AI-powered workflows without writing any code. You can combine AI models, tools, human approvals, and logic to build sophisticated automation.</p>
-        
+
         <h3>Your First Workflow in 5 Steps</h3>
-        
+
         <div class="step-card">
             <span class="step-number">1</span>
             <strong>Access the Designer</strong>
             <p>Go to <strong>Workflows → Visual Designer</strong> in the menu</p>
         </div>
-        
+
         <div class="step-card">
             <span class="step-number">2</span>
             <strong>Drag Nodes onto Canvas</strong>
@@ -288,7 +289,7 @@
                 <li><strong>End</strong> - Exit point (required)</li>
             </ul>
         </div>
-        
+
         <div class="step-card">
             <span class="step-number">3</span>
             <strong>Connect the Nodes</strong>
@@ -297,7 +298,7 @@
                 <pre>[Start] ───→ [LLM] ───→ [End]</pre>
             </div>
         </div>
-        
+
         <div class="step-card">
             <span class="step-number">4</span>
             <strong>Configure the LLM Node</strong>
@@ -310,22 +311,119 @@
             </ul>
             <p>Click "Save Properties"</p>
         </div>
-        
+
         <div class="step-card">
             <span class="step-number">5</span>
             <strong>Save Your Workflow</strong>
             <p>Click the <strong>Save Workflow</strong> button in the toolbar, enter a name, and save!</p>
         </div>
-        
+
         <div class="success-box">
             <strong><i class="fas fa-check-circle"></i> Success!</strong> You've created your first workflow. It will analyze text sentiment using GPT-4.
         </div>
     </div>
-    
+
+    <!-- Saving & Loading Section -->
+    <div class="help-section" id="saving-loading">
+        <h2><i class="fas fa-save"></i> Saving & Loading Workflows</h2>
+
+        <h3>Save Workflow</h3>
+        <p>Save your workflow to the database so you can use it later:</p>
+        <div class="step-card">
+            <span class="step-number">1</span>
+            <strong>Click Save Workflow Button</strong>
+            <p>Click the <span class="badge bg-primary">Save Workflow</span> button in the toolbar</p>
+        </div>
+        <div class="step-card">
+            <span class="step-number">2</span>
+            <strong>Enter Workflow Name</strong>
+            <p>Give your workflow a descriptive name (e.g., "Sentiment Analysis Pipeline")</p>
+        </div>
+        <div class="step-card">
+            <span class="step-number">3</span>
+            <strong>Confirm Save</strong>
+            <p>Click the save button in the modal - your workflow is now saved!</p>
+        </div>
+
+        <div class="tip-box">
+            <strong>💡 Tip:</strong> Use the <span class="badge bg-info">Validate</span> button before saving to check for errors!
+        </div>
+
+        <h3>Load Workflow from File</h3>
+        <p>Load a workflow from a JSON file on your computer:</p>
+        <div class="step-card">
+            <span class="step-number">1</span>
+            <strong>Click Load Button</strong>
+            <p>Click the <span class="badge bg-secondary">Load</span> button in the toolbar</p>
+        </div>
+        <div class="step-card">
+            <span class="step-number">2</span>
+            <strong>Select JSON File</strong>
+            <p>A file dialog will open - select your workflow .json file</p>
+        </div>
+        <div class="step-card">
+            <span class="step-number">3</span>
+            <strong>Workflow Loads Automatically</strong>
+            <p>The workflow will be loaded onto the canvas with all nodes and connections</p>
+        </div>
+
+        <div class="success-box">
+            <strong>✅ Best Practice:</strong> Load works with any valid workflow JSON file, including those exported from this designer!
+        </div>
+
+        <h3>Export JSON</h3>
+        <p>Export your current workflow as a JSON file:</p>
+        <div class="step-card">
+            <span class="step-number">1</span>
+            <strong>Click Export JSON Button</strong>
+            <p>Click the <span class="badge bg-info">Export JSON</span> button in the toolbar</p>
+        </div>
+        <div class="step-card">
+            <span class="step-number">2</span>
+            <strong>Choose Export Method</strong>
+            <p>You have two options:</p>
+            <ul>
+                <li><strong>Copy to Clipboard</strong> - Instantly copy the JSON to paste elsewhere</li>
+                <li><strong>Download as File</strong> - Save as a .json file with timestamp</li>
+            </ul>
+        </div>
+
+        <div class="tip-box">
+            <strong>💡 Use Cases for Export:</strong>
+            <ul>
+                <li>Share workflows with team members</li>
+                <li>Version control (commit to Git)</li>
+                <li>Backup important workflows</li>
+                <li>Migrate between systems</li>
+                <li>Create workflow templates</li>
+            </ul>
+        </div>
+
+        <h3>Keyboard Shortcuts</h3>
+        <table class="table property-table">
+            <thead>
+                <tr>
+                    <th>Shortcut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
+                    <td>Save workflow</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="warning-box">
+            <strong><i class="fas fa-info-circle"></i> Note:</strong> The "Import JSON" (paste) feature has been removed due to stability issues. Use the <strong>Load</strong> button (file dialog) instead - it's more reliable and provides a better user experience.
+        </div>
+    </div>
+
     <!-- Node Types Section -->
     <div class="help-section" id="node-types">
         <h2><i class="fas fa-boxes"></i> Node Types Reference</h2>
-        
+
         <div class="node-example start">
             <div class="node-title">
                 <i class="fas fa-play-circle text-success"></i>
@@ -339,7 +437,7 @@
                 <strong>Tip:</strong> Place the Start node on the left side of your canvas to establish clear workflow direction.
             </div>
         </div>
-        
+
         <div class="node-example end">
             <div class="node-title">
                 <i class="fas fa-stop-circle text-danger"></i>
@@ -353,7 +451,7 @@
                 <strong>Tip:</strong> You can have multiple End nodes for different outcomes (success, error, etc.)
             </div>
         </div>
-        
+
         <div class="node-example llm">
             <div class="node-title">
                 <i class="fas fa-brain text-primary"></i>
@@ -361,7 +459,7 @@
             </div>
             <p><strong>Purpose:</strong> Call an AI language model (GPT-4, Claude, etc.)</p>
             <p><strong>Use Cases:</strong> Text analysis, generation, summarization, translation</p>
-            
+
             <h5>Properties:</h5>
             <table class="table property-table">
                 <thead>
@@ -389,7 +487,7 @@
                     </tr>
                 </tbody>
             </table>
-            
+
             <div class="code-block">
 <pre>{
   "node_id": "analyze",
@@ -402,7 +500,7 @@
 }</pre>
             </div>
         </div>
-        
+
         <div class="node-example tool">
             <div class="node-title">
                 <i class="fas fa-wrench text-warning"></i>
@@ -410,7 +508,7 @@
             </div>
             <p><strong>Purpose:</strong> Execute a specific function or tool</p>
             <p><strong>Use Cases:</strong> Data processing, API calls, calculations, validations</p>
-            
+
             <h5>Available Tools:</h5>
             <ul>
                 <li><strong>text_analysis</strong> - Analyze text properties (word count, sentiment, etc.)</li>
@@ -420,7 +518,7 @@
                 <li><strong>random_number</strong> - Generate random numbers</li>
                 <li><strong>delay_simulator</strong> - Add delays (testing)</li>
             </ul>
-            
+
             <h5>Properties:</h5>
             <table class="table property-table">
                 <thead>
@@ -444,7 +542,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <div class="node-example human">
             <div class="node-title">
                 <i class="fas fa-user text-purple"></i>
@@ -452,7 +550,7 @@
             </div>
             <p><strong>Purpose:</strong> Pause workflow for human approval or input</p>
             <p><strong>Use Cases:</strong> Approvals, reviews, manual data entry</p>
-            
+
             <h5>Properties:</h5>
             <table class="table property-table">
                 <thead>
@@ -485,12 +583,12 @@
                     </tr>
                 </tbody>
             </table>
-            
+
             <div class="warning-box">
                 <strong><i class="fas fa-exclamation-triangle"></i> Important:</strong> When a workflow reaches a Human node, it PAUSES until the assigned person completes the task.
             </div>
         </div>
-        
+
         <div class="node-example conditional">
             <div class="node-title">
                 <i class="fas fa-code-branch text-warning"></i>
@@ -498,7 +596,7 @@
             </div>
             <p><strong>Purpose:</strong> Branch workflow based on conditions</p>
             <p><strong>Use Cases:</strong> Decision making, routing, filtering</p>
-            
+
             <h5>Properties:</h5>
             <table class="table property-table">
                 <thead>
@@ -516,12 +614,12 @@
                     </tr>
                 </tbody>
             </table>
-            
+
             <div class="tip-box">
                 <strong>Tip:</strong> You can connect the conditional node to different paths based on true/false outcomes.
             </div>
         </div>
-        
+
         <div class="node-example parallel">
             <div class="node-title">
                 <i class="fas fa-layer-group text-info"></i>
@@ -529,7 +627,7 @@
             </div>
             <p><strong>Purpose:</strong> Execute multiple branches concurrently</p>
             <p><strong>Use Cases:</strong> Speed up processing, run independent tasks simultaneously</p>
-            
+
             <h5>Properties:</h5>
             <table class="table property-table">
                 <thead>
@@ -547,7 +645,7 @@
                     </tr>
                 </tbody>
             </table>
-            
+
             <div class="workflow-diagram">
 <pre>
                 ┌──→ [Tool A] ──┐
@@ -557,20 +655,20 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Examples Section -->
     <div class="help-section" id="examples">
         <h2><i class="fas fa-lightbulb"></i> Workflow Examples</h2>
-        
+
         <h3>Example 1: Simple Text Analysis</h3>
         <p><strong>Use Case:</strong> Analyze customer feedback sentiment</p>
-        
+
         <div class="workflow-diagram">
 <pre>
 [Start] ───→ [LLM: Analyze Sentiment] ───→ [End]
 </pre>
         </div>
-        
+
         <p><strong>Configuration:</strong></p>
         <ul>
             <li><strong>LLM Node (analyze_sentiment)</strong>
@@ -581,16 +679,16 @@
                 </ul>
             </li>
         </ul>
-        
+
         <h3>Example 2: Report Generation with Approval</h3>
         <p><strong>Use Case:</strong> Generate report, get manager approval, then send</p>
-        
+
         <div class="workflow-diagram">
 <pre>
 [Start] → [LLM: Generate] → [Human: Approve] → [Tool: Send] → [End]
 </pre>
         </div>
-        
+
         <p><strong>Configuration:</strong></p>
         <ul>
             <li><strong>LLM Node (generate_report)</strong>
@@ -614,10 +712,10 @@
                 </ul>
             </li>
         </ul>
-        
+
         <h3>Example 3: Conditional Routing</h3>
         <p><strong>Use Case:</strong> Route high-priority issues differently</p>
-        
+
         <div class="workflow-diagram">
 <pre>
                         ┌──→ [High Priority Path] ──→ [Notify Manager] ──┐
@@ -625,7 +723,7 @@
                         └──→ [Normal Path] ──→ [Standard Process] ─────┘
 </pre>
         </div>
-        
+
         <p><strong>Configuration:</strong></p>
         <ul>
             <li><strong>LLM Node (analyze_priority)</strong>
@@ -639,10 +737,10 @@
                 </ul>
             </li>
         </ul>
-        
+
         <h3>Example 4: Parallel Processing</h3>
         <p><strong>Use Case:</strong> Run multiple analyses simultaneously</p>
-        
+
         <div class="workflow-diagram">
 <pre>
                     ┌──→ [Sentiment Analysis] ──┐
@@ -650,22 +748,36 @@
                     └──→ [Language Detection] ──┘
 </pre>
         </div>
-        
+
         <p><strong>Why Parallel?</strong> All three analyses can run at the same time, making the workflow 3x faster!</p>
-        
+
         <h3>Example 5: Multi-Step AI Pipeline</h3>
         <p><strong>Use Case:</strong> Research → Analyze → Summarize → Review</p>
-        
+
         <div class="workflow-diagram">
 <pre>
 [Start] → [LLM: Research] → [Tool: Validate] → [LLM: Summarize] → [Human: Review] → [End]
 </pre>
         </div>
     </div>
-    
+
     <!-- Tips & Tricks Section -->
     <div class="help-section" id="tips">
         <h2><i class="fas fa-star"></i> Tips & Tricks</h2>
+
+        <h3>Toolbar Buttons Quick Reference</h3>
+        <div class="tip-box">
+            <ul>
+                <li><strong>Save Workflow:</strong> Save to database for execution</li>
+                <li><strong>Load:</strong> Open file dialog to load .json workflow</li>
+                <li><strong>Clear:</strong> Remove all nodes from canvas (with confirmation)</li>
+                <li><strong>Export JSON:</strong> Copy or download workflow as JSON file</li>
+                <li><strong>Validate:</strong> Check workflow for errors before saving</li>
+                <li><strong>View JSON:</strong> Preview the generated workflow definition</li>
+                <li><strong>Zoom +/-:</strong> Zoom in/out (25% to 200%)</li>
+                <li><strong>Help:</strong> Open this help guide in new tab</li>
+            </ul>
+        </div>
         
         <h3>Layout Best Practices</h3>
         <div class="tip-box">
