@@ -1,0 +1,626 @@
+{% extends "base.html" %}
+
+{% block title %}Create Workflow - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .workflow-editor { min-height: 500px; border: 1px solid #ddd; border-radius: 5px; padding: 20px; }
+    .node-palette { background: #f8f9fa; padding: 15px; border-radius: 5px; }
+    .node-item { padding: 10px; margin: 5px 0; background: white; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; }
+    .node-item:hover { background: #e9ecef; }
+    .format-tabs { margin-bottom: 20px; }
+    .format-tab { cursor: pointer; padding: 10px 20px; border: 2px solid #ddd; border-radius: 5px 5px 0 0; 
+                  background: #f8f9fa; display: inline-block; margin-right: 5px; }
+    .format-tab.active { background: #007bff; color: white; border-color: #007bff; }
+    .format-tab:hover { background: #e9ecef; }
+    .format-tab.active:hover { background: #0056b3; }
+    .editor-container { display: none; }
+    .editor-container.active { display: block; }
+    .code-editor { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 14px; }
+    .example-card { border: 1px solid #ddd; border-radius: 5px; padding: 10px; margin: 5px 0; cursor: pointer; }
+    .example-card:hover { background: #f8f9fa; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-plus-circle"></i> Create New Workflow</h2>
+    <p class="text-muted">Create workflows using JSON definitions or Python/LangGraph code</p>
+    
+    <form id="workflowForm">
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <!-- Workflow Details Card -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Workflow Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Workflow Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="workflowName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="workflowDescription" rows="2"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Version</label>
+                                    <input type="text" class="form-control" id="workflowVersion" value="1.0.0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Tags (comma-separated)</label>
+                                    <input type="text" class="form-control" id="workflowTags" placeholder="tag1, tag2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Format Selection Tabs -->
+                <div class="format-tabs mt-3">
+                    <div class="format-tab active" data-format="json" onclick="switchFormat('json')">
+                        <i class="fas fa-code"></i> JSON Definition
+                    </div>
+                    <div class="format-tab" data-format="python" onclick="switchFormat('python')">
+                        <i class="fab fa-python"></i> Python Code
+                    </div>
+                </div>
+
+                <!-- JSON Editor -->
+                <div class="card editor-container active" id="jsonEditor">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">JSON Workflow Definition</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control code-editor" id="workflowDefinitionJSON" rows="20" 
+                                  placeholder='{"nodes": [], "edges": [], "variables": {}}'></textarea>
+                        <small class="text-muted">Define workflow structure using JSON format</small>
+                    </div>
+                </div>
+
+                <!-- Python Editor -->
+                <div class="card editor-container" id="pythonEditor">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Python/LangGraph Code</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control code-editor" id="workflowDefinitionPython" rows="20" 
+                                  placeholder="# Write Python/LangGraph code here
+from langgraph.graph import StateGraph, END
+
+# Build your workflow..."></textarea>
+                        <small class="text-muted">Define workflow using Python and LangGraph</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar with Examples and Node Types -->
+            <div class="col-md-4">
+                <!-- Node Types Palette -->
+                <div class="card node-palette">
+                    <h5>Node Types</h5>
+                    <hr>
+                    <div class="node-item">
+                        <i class="fas fa-play text-success"></i> <strong>Start</strong>
+                        <p class="mb-0 small text-muted">Workflow entry point</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-robot text-primary"></i> <strong>LLM</strong>
+                        <p class="mb-0 small text-muted">Execute LLM completion</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-tools text-warning"></i> <strong>Tool</strong>
+                        <p class="mb-0 small text-muted">Execute external tool</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-user text-info"></i> <strong>Human</strong>
+                        <p class="mb-0 small text-muted">Require human input</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-code-branch text-secondary"></i> <strong>Conditional</strong>
+                        <p class="mb-0 small text-muted">Branch execution</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-layer-group text-purple"></i> <strong>Parallel</strong>
+                        <p class="mb-0 small text-muted">Parallel execution</p>
+                    </div>
+                    <div class="node-item">
+                        <i class="fas fa-stop text-danger"></i> <strong>End</strong>
+                        <p class="mb-0 small text-muted">Workflow termination</p>
+                    </div>
+                </div>
+
+                <!-- Example Templates -->
+                <div class="card mt-3">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">Example Templates</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="example-card" onclick="loadExample('sequential')">
+                            <strong><i class="fas fa-stream"></i> Sequential Workflow</strong>
+                            <p class="mb-0 small text-muted">Linear processing pipeline</p>
+                        </div>
+                        <div class="example-card" onclick="loadExample('parallel')">
+                            <strong><i class="fas fa-layer-group"></i> Parallel Workflow</strong>
+                            <p class="mb-0 small text-muted">Concurrent branch execution</p>
+                        </div>
+                        <div class="example-card" onclick="loadExample('hitl')">
+                            <strong><i class="fas fa-user-check"></i> Human-in-Loop</strong>
+                            <p class="mb-0 small text-muted">Workflow with approval</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <button type="button" class="btn btn-outline-primary btn-lg w-100 mt-3" onclick="validateWorkflow()">
+                    <i class="fas fa-check-circle"></i> Validate Workflow
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-lg w-100 mt-2" onclick="clearEditor()">
+                    <i class="fas fa-eraser"></i> Clear Editor
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="row mt-3">
+            <div class="col-md-12 text-end">
+                <a href="{{ url_for('list_workflows') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Create Workflow
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Current format: 'json' or 'python'
+let currentFormat = 'json';
+
+// Switch between JSON and Python editors
+function switchFormat(format) {
+    currentFormat = format;
+    
+    // Update tabs
+    document.querySelectorAll('.format-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelector(`.format-tab[data-format="${format}"]`).classList.add('active');
+    
+    // Update editors
+    document.querySelectorAll('.editor-container').forEach(editor => {
+        editor.classList.remove('active');
+    });
+    document.getElementById(format === 'json' ? 'jsonEditor' : 'pythonEditor').classList.add('active');
+}
+
+// Example Templates
+const exampleTemplates = {
+    sequential: {
+        json: {
+            "nodes": [
+                {"node_id": "start", "node_type": "start", "name": "Start"},
+                {
+                    "node_id": "analyze_text",
+                    "node_type": "tool",
+                    "name": "Analyze Text",
+                    "config": {
+                        "tool_name": "text_analysis",
+                        "parameters": {"text": "{{input_text}}"}
+                    }
+                },
+                {
+                    "node_id": "transform_data",
+                    "node_type": "tool",
+                    "name": "Transform",
+                    "config": {
+                        "tool_name": "data_transform",
+                        "parameters": {
+                            "input_data": "{{input_text}}",
+                            "operation": "uppercase"
+                        }
+                    }
+                },
+                {"node_id": "end", "node_type": "end", "name": "End"}
+            ],
+            "edges": [
+                {"source": "start", "target": "analyze_text"},
+                {"source": "analyze_text", "target": "transform_data"},
+                {"source": "transform_data", "target": "end"}
+            ],
+            "variables": {
+                "input_text": "Sample text for sequential processing"
+            }
+        },
+        python: `# Sequential Workflow - Python/LangGraph
+from langgraph.graph import StateGraph, END
+
+graph = StateGraph(WorkflowState)
+
+def analyze_node(state):
+    node_func = _create_node_function(execution_id, {
+        'node_id': 'analyze_text',
+        'node_type': 'tool',
+        'config': {
+            'tool_name': 'text_analysis',
+            'parameters': {'text': state['variables'].get('input_text', '')}
+        }
+    })
+    return node_func(state)
+
+def transform_node(state):
+    node_func = _create_node_function(execution_id, {
+        'node_id': 'transform_data',
+        'node_type': 'tool',
+        'config': {
+            'tool_name': 'data_transform',
+            'parameters': {
+                'input_data': state['variables'].get('input_text', ''),
+                'operation': 'uppercase'
+            }
+        }
+    })
+    return node_func(state)
+
+graph.add_node("start", lambda state: state)
+graph.add_node("analyze", analyze_node)
+graph.add_node("transform", transform_node)
+graph.add_node("end", lambda state: {**state, "status": "completed"})
+
+graph.set_entry_point("start")
+graph.add_edge("start", "analyze")
+graph.add_edge("analyze", "transform")
+graph.add_edge("transform", "end")
+graph.add_edge("end", END)
+
+compiled_graph = graph.compile()
+
+initial_state = WorkflowState(
+    execution_id=execution_id,
+    workflow_id="sequential",
+    current_node="start",
+    messages=[],
+    variables={'input_text': 'Sample text'},
+    node_outputs={},
+    input_parameters=input_parameters,
+    status="running",
+    error=None,
+    metadata={}
+)`
+    },
+    parallel: {
+        json: {
+            "nodes": [
+                {"node_id": "start", "node_type": "start", "name": "Start"},
+                {"node_id": "parallel_split", "node_type": "parallel", "name": "Split"},
+                {
+                    "node_id": "branch1",
+                    "node_type": "tool",
+                    "name": "Branch 1",
+                    "config": {
+                        "tool_name": "text_analysis",
+                        "parameters": {"text": "{{input_text}}"}
+                    }
+                },
+                {
+                    "node_id": "branch2",
+                    "node_type": "tool",
+                    "name": "Branch 2",
+                    "config": {
+                        "tool_name": "data_transform",
+                        "parameters": {"input_data": "{{input_text}}", "operation": "title"}
+                    }
+                },
+                {"node_id": "parallel_join", "node_type": "parallel", "name": "Join"},
+                {"node_id": "end", "node_type": "end", "name": "End"}
+            ],
+            "edges": [
+                {"source": "start", "target": "parallel_split"},
+                {"source": "parallel_split", "target": "branch1"},
+                {"source": "parallel_split", "target": "branch2"},
+                {"source": "branch1", "target": "parallel_join"},
+                {"source": "branch2", "target": "parallel_join"},
+                {"source": "parallel_join", "target": "end"}
+            ],
+            "variables": {
+                "input_text": "Parallel processing example"
+            }
+        },
+        python: `# Parallel Workflow - Python/LangGraph
+from langgraph.graph import StateGraph, END
+
+graph = StateGraph(WorkflowState)
+
+def branch1(state):
+    node_func = _create_node_function(execution_id, {
+        'node_id': 'branch1',
+        'node_type': 'tool',
+        'config': {
+            'tool_name': 'text_analysis',
+            'parameters': {'text': state['variables'].get('input_text', '')}
+        }
+    })
+    return node_func(state)
+
+def branch2(state):
+    node_func = _create_node_function(execution_id, {
+        'node_id': 'branch2',
+        'node_type': 'tool',
+        'config': {
+            'tool_name': 'data_transform',
+            'parameters': {
+                'input_data': state['variables'].get('input_text', ''),
+                'operation': 'title'
+            }
+        }
+    })
+    return node_func(state)
+
+graph.add_node("start", lambda state: state)
+graph.add_node("branch1", branch1)
+graph.add_node("branch2", branch2)
+graph.add_node("end", lambda state: {**state, "status": "completed"})
+
+# Parallel edges - LangGraph executes these concurrently
+graph.set_entry_point("start")
+graph.add_edge("start", "branch1")
+graph.add_edge("start", "branch2")
+graph.add_edge("branch1", "end")
+graph.add_edge("branch2", "end")
+graph.add_edge("end", END)
+
+compiled_graph = graph.compile()
+
+initial_state = WorkflowState(
+    execution_id=execution_id,
+    workflow_id="parallel",
+    current_node="start",
+    messages=[],
+    variables={'input_text': 'Parallel example'},
+    node_outputs={},
+    input_parameters=input_parameters,
+    status="running",
+    error=None,
+    metadata={}
+)`
+    },
+    hitl: {
+        json: {
+            "nodes": [
+                {"node_id": "start", "node_type": "start", "name": "Start"},
+                {
+                    "node_id": "generate",
+                    "node_type": "tool",
+                    "name": "Generate Data",
+                    "config": {
+                        "tool_name": "random_number",
+                        "parameters": {"min_value": 1, "max_value": 100, "count": 10}
+                    }
+                },
+                {
+                    "node_id": "human_approval",
+                    "node_type": "human",
+                    "name": "Human Approval",
+                    "config": {
+                        "assigned_to": "admin",
+                        "task_type": "approval",
+                        "timeout": 3600,
+                        "instructions": "Please review and approve"
+                    }
+                },
+                {
+                    "node_id": "process",
+                    "node_type": "tool",
+                    "name": "Process Approved",
+                    "config": {
+                        "tool_name": "data_transform",
+                        "parameters": {"input_data": "Approved", "operation": "uppercase"}
+                    }
+                },
+                {"node_id": "end", "node_type": "end", "name": "End"}
+            ],
+            "edges": [
+                {"source": "start", "target": "generate"},
+                {"source": "generate", "target": "human_approval"},
+                {"source": "human_approval", "target": "process"},
+                {"source": "process", "target": "end"}
+            ],
+            "variables": {}
+        },
+        python: `# Human-in-Loop Workflow - Python/LangGraph
+from langgraph.graph import StateGraph, END
+
+graph = StateGraph(WorkflowState)
+
+def generate_node(state):
+    node_func = _create_node_function(execution_id, {
+        'node_id': 'generate',
+        'node_type': 'tool',
+        'config': {
+            'tool_name': 'random_number',
+            'parameters': {'min_value': 1, 'max_value': 100, 'count': 10}
+        }
+    })
+    return node_func(state)
+
+def human_approval_node(state):
+    from workflow_management.models.workflow_models import HumanTask, TaskStatus
+    from datetime import datetime, timedelta
+    
+    task_id = HumanTask.generate_id()
+    task = HumanTask(
+        task_id=task_id,
+        execution_id=execution_id,
+        node_execution_id="human_approval",
+        assigned_to="admin",
+        task_type="approval",
+        status=TaskStatus.PENDING.value,
+        created_at=datetime.now(),
+        timeout_at=datetime.now() + timedelta(hours=1)
+    )
+    
+    db_handler.create_human_task(task)
+    
+    new_state = {**state}
+    new_state['node_outputs']['human_approval'] = {
+        'task_id': task_id,
+        'status': 'waiting_for_human'
+    }
+    return new_state
+
+def process_node(state):
+    node_func = _create_node_function(execution_id, {
+        'node_id': 'process',
+        'node_type': 'tool',
+        'config': {
+            'tool_name': 'data_transform',
+            'parameters': {
+                'input_data': 'Approved',
+                'operation': 'uppercase'
+            }
+        }
+    })
+    return node_func(state)
+
+graph.add_node("start", lambda state: state)
+graph.add_node("generate", generate_node)
+graph.add_node("human_approval", human_approval_node)
+graph.add_node("process", process_node)
+graph.add_node("end", lambda state: {**state, "status": "completed"})
+
+graph.set_entry_point("start")
+graph.add_edge("start", "generate")
+graph.add_edge("generate", "human_approval")
+graph.add_edge("human_approval", "process")
+graph.add_edge("process", "end")
+graph.add_edge("end", END)
+
+compiled_graph = graph.compile()
+
+initial_state = WorkflowState(
+    execution_id=execution_id,
+    workflow_id="hitl",
+    current_node="start",
+    messages=[],
+    variables={},
+    node_outputs={},
+    input_parameters=input_parameters,
+    status="running",
+    error=None,
+    metadata={}
+)`
+    }
+};
+
+// Load example template
+function loadExample(exampleType) {
+    if (currentFormat === 'json') {
+        document.getElementById('workflowDefinitionJSON').value = 
+            JSON.stringify(exampleTemplates[exampleType].json, null, 2);
+    } else {
+        document.getElementById('workflowDefinitionPython').value = 
+            exampleTemplates[exampleType].python;
+    }
+    
+    // Set workflow name based on example
+    const names = {
+        'sequential': 'Sequential Processing Workflow',
+        'parallel': 'Parallel Execution Workflow',
+        'hitl': 'Human-in-the-Loop Approval Workflow'
+    };
+    document.getElementById('workflowName').value = names[exampleType] || '';
+}
+
+// Validate workflow
+function validateWorkflow() {
+    try {
+        if (currentFormat === 'json') {
+            const definition = JSON.parse(document.getElementById('workflowDefinitionJSON').value);
+            if (!definition.nodes || !Array.isArray(definition.nodes)) {
+                throw new Error('Workflow must have a "nodes" array');
+            }
+            if (!definition.edges || !Array.isArray(definition.edges)) {
+                throw new Error('Workflow must have an "edges" array');
+            }
+            alert('✓ Valid JSON workflow definition!');
+        } else {
+            const code = document.getElementById('workflowDefinitionPython').value;
+            if (!code.includes('StateGraph') || !code.includes('compiled_graph')) {
+                throw new Error('Python code must create a StateGraph and compile it');
+            }
+            alert('✓ Python code appears valid! (Full validation will occur during execution)');
+        }
+    } catch (e) {
+        alert('✗ Validation Error: ' + e.message);
+    }
+}
+
+// Clear editor
+function clearEditor() {
+    if (confirm('Are you sure you want to clear the editor?')) {
+        if (currentFormat === 'json') {
+            document.getElementById('workflowDefinitionJSON').value = '';
+        } else {
+            document.getElementById('workflowDefinitionPython').value = '';
+        }
+    }
+}
+
+// Form submission
+document.getElementById('workflowForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('workflowName').value;
+    const description = document.getElementById('workflowDescription').value;
+    const version = document.getElementById('workflowVersion').value;
+    const tags = document.getElementById('workflowTags').value.split(',').map(t => t.trim()).filter(t => t);
+    
+    let definition;
+    if (currentFormat === 'json') {
+        try {
+            definition = JSON.parse(document.getElementById('workflowDefinitionJSON').value);
+        } catch (e) {
+            alert('Error: Invalid JSON - ' + e.message);
+            return;
+        }
+    } else {
+        definition = {
+            'workflow_type': 'python',
+            'python_code': document.getElementById('workflowDefinitionPython').value
+        };
+    }
+    
+    fetch('/workflow/create', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            name: name,
+            description: description,
+            version: version,
+            tags: tags,
+            workflow_type: currentFormat,
+            definition: definition
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✓ Workflow created successfully!');
+            window.location.href = '/workflow/list';
+        } else {
+            alert('✗ Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('✗ Error creating workflow: ' + error);
+    });
+});
+</script>
+{% endblock %}

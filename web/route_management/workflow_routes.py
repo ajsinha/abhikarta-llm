@@ -19,6 +19,7 @@ from datetime import datetime
 from web.route_management.abstract_routes import AbstractRoutes
 from workflow_management.workflow_db_handler import WorkflowDBHandler
 from workflow_management.workflow_execution_engine import WorkflowExecutionEngine
+from workflow_management.workflow_langgraph_engine import LangGraphWorkflowEngine
 from workflow_management.models.workflow_models import (
     Workflow, WorkflowStatus
 )
@@ -43,7 +44,11 @@ class WorkflowRoutes(AbstractRoutes):
         """
         super().__init__(app, db_connection_pool_name)
         self.db_handler = WorkflowDBHandler(db_connection_pool_name)
-        self.execution_engine = WorkflowExecutionEngine(self.db_handler)
+        #self.execution_engine = WorkflowExecutionEngine(self.db_handler)
+        self.execution_engine = LangGraphWorkflowEngine(
+            db_handler=self.db_handler,
+            max_workers=10
+        )
         logger.info("Workflow routes initialized")
 
     def register_routes(self):
@@ -115,12 +120,16 @@ class WorkflowRoutes(AbstractRoutes):
                                  userid=userid,
                                  is_admin=is_admin)
 
-        @self.app.route('/workflow/create', methods=['GET', 'POST'])
+        @self.app.route('/workflow/create', methods=['GET'])
+        def create_workflow_page():
+            return render_template('workflow/create_enhanced.html')
+
+        @self.app.route('/workflow/create', methods=['POST'])
         @login_required
         def create_workflow():
             """Create a new workflow"""
-            if request.method == 'GET':
-                return render_template('workflow/create.html')
+            data = request.json
+            workflow_type = data.get('workflow_type', 'json')
 
             try:
                 userid = session.get('userid')
@@ -132,9 +141,9 @@ class WorkflowRoutes(AbstractRoutes):
                     name=data['name'],
                     description=data.get('description', ''),
                     version=data.get('version', '1.0.0'),
-                    definition_json=data['definition'],
-                    status=WorkflowStatus.DRAFT.value,
-                    created_by=userid,
+                    definition_json=data['definition'],  # Stores both formats
+                    status='draft',
+                    created_by='current_user',
                     created_at=datetime.now(),
                     updated_at=datetime.now(),
                     tags=data.get('tags', [])

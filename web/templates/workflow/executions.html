@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Workflow Executions - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .badge-status { padding: 0.5em 1em; font-size: 0.875rem; }
+    .table-hover tbody tr:hover { background-color: #f8f9fa; cursor: pointer; }
+    .execution-id { font-family: monospace; font-size: 0.9rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-list"></i> Workflow Executions</h2>
+            <p class="text-muted">View and monitor workflow execution history</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('workflow_dashboard') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Workflow</label>
+                            <input type="text" name="workflow_id" class="form-control" 
+                                   placeholder="Enter workflow ID" 
+                                   value="{{ request.args.get('workflow_id', '') }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="">All</option>
+                                <option value="running" {% if request.args.get('status') == 'running' %}selected{% endif %}>Running</option>
+                                <option value="completed" {% if request.args.get('status') == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="failed" {% if request.args.get('status') == 'failed' %}selected{% endif %}>Failed</option>
+                                <option value="paused" {% if request.args.get('status') == 'paused' %}selected{% endif %}>Paused</option>
+                                <option value="cancelled" {% if request.args.get('status') == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary d-block w-100">
+                                <i class="fas fa-search"></i> Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executions Table -->
+    <div class="row">
+        <div class="col-md-12">
+            {% if executions %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Execution ID</th>
+                                    <th>Workflow</th>
+                                    <th>Status</th>
+                                    <th>Triggered By</th>
+                                    <th>Started At</th>
+                                    <th>Duration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for execution in executions %}
+                                <tr onclick="window.location='{{ url_for('view_execution', execution_id=execution.execution_id) }}'">
+                                    <td class="execution-id">
+                                        <code>{{ execution.execution_id[:16] }}...</code>
+                                    </td>
+                                    <td>
+                                        {% if execution.execution_metadata and execution.execution_metadata.workflow_name %}
+                                            <strong>{{ execution.execution_metadata.workflow_name }}</strong>
+                                        {% else %}
+                                            <span class="text-muted">Workflow {{ execution.workflow_id[:8] }}...</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if execution.status == 'completed' %}
+                                        <span class="badge badge-status bg-success">
+                                            <i class="fas fa-check"></i> Completed
+                                        </span>
+                                        {% elif execution.status == 'running' %}
+                                        <span class="badge badge-status bg-primary">
+                                            <i class="fas fa-spinner fa-spin"></i> Running
+                                        </span>
+                                        {% elif execution.status == 'failed' %}
+                                        <span class="badge badge-status bg-danger">
+                                            <i class="fas fa-times"></i> Failed
+                                        </span>
+                                        {% elif execution.status == 'paused' %}
+                                        <span class="badge badge-status bg-warning">
+                                            <i class="fas fa-pause"></i> Paused
+                                        </span>
+                                        {% elif execution.status == 'cancelled' %}
+                                        <span class="badge badge-status bg-secondary">
+                                            <i class="fas fa-ban"></i> Cancelled
+                                        </span>
+                                        {% else %}
+                                        <span class="badge badge-status bg-secondary">{{ execution.status|capitalize }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-user"></i> {{ execution.triggered_by }}
+                                    </td>
+                                    <td>
+                                        {% if execution.started_at is string %}
+                                            {{ execution.started_at }}
+                                        {% else %}
+                                            {{ execution.started_at|format_datetime('%Y-%m-%d %H:%M:%S') if execution.started_at else 'N/A' }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if execution.completed_at and execution.started_at %}
+                                            {% if execution.completed_at is string and execution.started_at is string %}
+                                                -
+                                            {% else %}
+                                                {% set duration_min = execution.completed_at|duration_minutes(execution.started_at) %}
+                                                {% if duration_min %}
+                                                    {% if duration_min < 1 %}
+                                                        {{ (duration_min * 60)|round(0) }}s
+                                                    {% else %}
+                                                        {{ duration_min|round(2) }}m
+                                                    {% endif %}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            {% endif %}
+                                        {% elif execution.status == 'running' %}
+                                            <span class="text-primary">
+                                                <i class="fas fa-hourglass-half"></i> In progress
+                                            </span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('view_execution', execution_id=execution.execution_id) }}" 
+                                               class="btn btn-outline-primary" onclick="event.stopPropagation()"
+                                               title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            
+                                            {% if execution.status == 'running' %}
+                                            <button class="btn btn-outline-warning" 
+                                                    onclick="event.stopPropagation(); pauseExecution('{{ execution.execution_id }}')"
+                                                    title="Pause">
+                                                <i class="fas fa-pause"></i>
+                                            </button>
+                                            {% endif %}
+                                            
+                                            {% if execution.status == 'paused' %}
+                                            <button class="btn btn-outline-success" 
+                                                    onclick="event.stopPropagation(); resumeExecution('{{ execution.execution_id }}')"
+                                                    title="Resume">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            {% endif %}
+                                            
+                                            {% if execution.status in ['running', 'paused'] %}
+                                            <button class="btn btn-outline-danger" 
+                                                    onclick="event.stopPropagation(); cancelExecution('{{ execution.execution_id }}')"
+                                                    title="Cancel">
+                                                <i class="fas fa-stop"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination info -->
+                    <div class="mt-3 text-muted">
+                        <i class="fas fa-info-circle"></i> Showing {{ executions|length }} execution(s)
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No executions found. 
+                {% if request.args.get('status') or request.args.get('workflow_id') %}
+                Try adjusting your filters or <a href="{{ url_for('list_executions') }}">view all executions</a>.
+                {% else %}
+                Start by <a href="{{ url_for('list_workflows') }}">executing a workflow</a>.
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function pauseExecution(executionId) {
+    if (confirm('Are you sure you want to pause this execution?')) {
+        fetch(`/workflow/execution/${executionId}/pause`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Execution paused successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error pausing execution: ' + error);
+        });
+    }
+}
+
+function resumeExecution(executionId) {
+    if (confirm('Are you sure you want to resume this execution?')) {
+        fetch(`/workflow/execution/${executionId}/resume`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Execution resumed successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error resuming execution: ' + error);
+        });
+    }
+}
+
+function cancelExecution(executionId) {
+    if (confirm('Are you sure you want to cancel this execution? This action cannot be undone.')) {
+        fetch(`/workflow/execution/${executionId}/cancel`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Execution cancelled successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error cancelling execution: ' + error);
+        });
+    }
+}
+</script>
+{% endblock %}
