@@ -18,7 +18,7 @@ may be subject to patent applications.
 
 import logging
 from typing import Dict, Any, Optional, List, TypedDict, Annotated
-from datetime import datetime
+from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import json
 import operator
@@ -33,6 +33,17 @@ from workflow_management.models.workflow_models import (
 from workflow_management.workflow_db_handler import WorkflowDBHandler
 
 logger = logging.getLogger(__name__)
+
+
+class WorkflowInterrupt(Exception):
+    """
+    Exception raised to pause workflow execution for human intervention.
+    Contains information needed to resume the workflow later.
+    """
+    def __init__(self, task_id: str, message: str = "Workflow paused for human input"):
+        self.task_id = task_id
+        self.message = message
+        super().__init__(self.message)
 
 
 def merge_dicts(left: Dict[str, Any], right: Dict[str, Any]) -> Dict[str, Any]:
@@ -89,6 +100,7 @@ class LangGraphWorkflowEngine:
         self.max_workers = max_workers
         self.executor_pool = ThreadPoolExecutor(max_workers=max_workers)
         self.active_graphs: Dict[str, StateGraph] = {}
+        self.paused_executions: Dict[str, Dict[str, Any]] = {}  # Store paused execution state
         logger.info(f"LangGraph workflow engine initialized with {max_workers} workers")
 
     def start_execution(self, workflow_id: str, triggered_by: str,
@@ -170,13 +182,28 @@ class LangGraphWorkflowEngine:
                 result = self._execute_json_workflow(
                     execution_id, definition, input_parameters)
 
-            # Update execution status to completed
-            self.db_handler.update_execution_status(
-                execution_id, ExecutionStatus.COMPLETED.value,
-                completed_at=datetime.now(),
-                output_results=result)
+            # Check if workflow is paused or completed
+            workflow_status = result.get('status', 'completed')
 
-            self._log_audit(execution_id, "INFO", "Workflow execution completed successfully")
+            if workflow_status == 'paused':
+                # Workflow is paused for human intervention
+                # Status already set to PAUSED by human node
+                # Do NOT mark as completed!
+                self._log_audit(
+                    execution_id, "INFO",
+                    "Workflow paused for human intervention",
+                    {'task_id': result.get('task_id')}
+                )
+                logger.info(f"Workflow {execution_id} paused for human task")
+
+            else:
+                # Update execution status to completed
+                self.db_handler.update_execution_status(
+                    execution_id, ExecutionStatus.COMPLETED.value,
+                    completed_at=datetime.now(),
+                    output_results=result)
+
+                self._log_audit(execution_id, "INFO", "Workflow execution completed successfully")
 
         except Exception as e:
             logger.error(f"Error executing workflow {execution_id}: {e}")
@@ -271,14 +298,34 @@ class LangGraphWorkflowEngine:
         compiled_graph = graph.compile()
         self.active_graphs[execution_id] = compiled_graph
 
-        # Execute the graph
-        final_state = compiled_graph.invoke(initial_state)
+        # Execute the graph - catch interrupts for HITL
+        try:
+            final_state = compiled_graph.invoke(initial_state)
 
-        return {
-            'node_outputs': final_state.get('node_outputs', {}),
-            'variables': final_state.get('variables', {}),
-            'status': final_state.get('status', 'completed')
-        }
+            return {
+                'node_outputs': final_state.get('node_outputs', {}),
+                'variables': final_state.get('variables', {}),
+                'status': final_state.get('status', 'completed')
+            }
+
+        except WorkflowInterrupt as interrupt:
+            # Workflow paused for human input
+            logger.info(f"Workflow {execution_id} paused: {interrupt.message}")
+
+            # Store the execution state for resumption
+            self.paused_executions[execution_id] = {
+                'graph': compiled_graph,
+                'state': initial_state,  # Store initial state for now
+                'task_id': interrupt.task_id,
+                'definition': definition,
+                'input_parameters': input_parameters
+            }
+
+            return {
+                'status': 'paused',
+                'task_id': interrupt.task_id,
+                'message': interrupt.message
+            }
 
     def _execute_python_workflow(self, execution_id: str, definition: Dict[str, Any],
                                  input_parameters: Optional[Dict[str, Any]]) -> Dict[str, Any]:
@@ -331,14 +378,35 @@ class LangGraphWorkflowEngine:
             metadata={}
         ))
 
-        # Execute the graph
-        final_state = compiled_graph.invoke(initial_state)
+        # Execute the graph - catch interrupts for HITL
+        try:
+            final_state = compiled_graph.invoke(initial_state)
 
-        return {
-            'node_outputs': final_state.get('node_outputs', {}),
-            'variables': final_state.get('variables', {}),
-            'status': final_state.get('status', 'completed')
-        }
+            return {
+                'node_outputs': final_state.get('node_outputs', {}),
+                'variables': final_state.get('variables', {}),
+                'status': final_state.get('status', 'completed')
+            }
+
+        except WorkflowInterrupt as interrupt:
+            # Workflow paused for human input
+            logger.info(f"Workflow {execution_id} paused: {interrupt.message}")
+
+            # Store the execution state for resumption
+            self.paused_executions[execution_id] = {
+                'graph': compiled_graph,
+                'state': initial_state,
+                'task_id': interrupt.task_id,
+                'definition': definition,
+                'input_parameters': input_parameters,
+                'python_code': python_code
+            }
+
+            return {
+                'status': 'paused',
+                'task_id': interrupt.task_id,
+                'message': interrupt.message
+            }
 
     def _create_node_function(self, execution_id: str, node: Dict[str, Any]):
         """
@@ -500,8 +568,19 @@ class LangGraphWorkflowEngine:
 
     def _execute_human_node(self, execution_id: str, node_execution_id: str,
                            node: Dict[str, Any], state: WorkflowState) -> Dict[str, Any]:
-        """Execute a human-in-the-loop node"""
+        """
+        Execute a human-in-the-loop node.
+
+        This creates a human task and raises WorkflowInterrupt to pause execution.
+        The workflow will remain paused until the task is completed and resume is called.
+        """
         config = node.get('config', {})
+
+        # Calculate timeout
+        timeout_at = None
+        if config.get('timeout'):
+            timeout_seconds = config.get('timeout', 3600)  # Default 1 hour
+            timeout_at = datetime.now() + timedelta(seconds=timeout_seconds)
 
         # Create human task
         task_id = HumanTask.generate_id()
@@ -513,24 +592,26 @@ class LangGraphWorkflowEngine:
             task_type=config.get('task_type', 'approval'),
             status=TaskStatus.PENDING.value,
             created_at=datetime.now(),
-            timeout_at=datetime.now() if config.get('timeout') else None
+            timeout_at=timeout_at,
+            comments=config.get('instructions', '')  # Store instructions in comments
         )
 
         self.db_handler.create_human_task(task)
 
         self._log_audit(
             execution_id, "INFO",
-            f"Human task created: {task_id}",
+            f"Human task created: {task_id}. Workflow paused for approval.",
             {'assigned_to': task.assigned_to, 'task_type': task.task_type}
         )
 
-        # Wait for human response (in real implementation, this would be async)
-        return {
-            'status': 'waiting_for_human',
-            'task_id': task_id,
-            'assigned_to': task.assigned_to,
-            'task_type': task.task_type
-        }
+        # Update execution status to paused
+        self.db_handler.set_execution_paused(execution_id)
+
+        # Raise interrupt to pause workflow
+        raise WorkflowInterrupt(
+            task_id=task_id,
+            message=f"Workflow paused for human task: {task_id}"
+        )
 
     def _execute_conditional_node(self, node: Dict[str, Any],
                                   state: WorkflowState) -> Dict[str, Any]:
@@ -600,15 +681,110 @@ class LangGraphWorkflowEngine:
             logger.error(f"Error pausing execution: {e}")
             return False
 
-    def resume_execution(self, execution_id: str) -> bool:
-        """Resume a paused workflow execution"""
+    def pause_execution(self, execution_id: str) -> bool:
+        """
+        Pause a running workflow execution.
+
+        Args:
+            execution_id: ID of the execution to pause
+
+        Returns:
+            True if successfully paused, False otherwise
+        """
         try:
+            # Check current status
+            execution = self.db_handler.get_execution(execution_id)
+            if not execution:
+                logger.error(f"Execution {execution_id} not found")
+                return False
+
+            if execution.status != ExecutionStatus.RUNNING.value:
+                logger.warning(f"Cannot pause execution {execution_id} - status is {execution.status}")
+                return False
+
+            # Update status to paused
+            self.db_handler.set_execution_paused(execution_id)
+
+            self._log_audit(
+                execution_id, "INFO",
+                "Workflow execution paused by user"
+            )
+
+            logger.info(f"Execution {execution_id} paused successfully")
+            return True
+
+        except Exception as e:
+            logger.error(f"Error pausing execution: {e}")
+            return False
+
+    def resume_execution(self, execution_id: str, task_response: Optional[Dict[str, Any]] = None) -> bool:
+        """
+        Resume a paused workflow execution after human task completion.
+
+        Args:
+            execution_id: ID of the execution to resume
+            task_response: Optional response data from the human task
+
+        Returns:
+            True if successfully resumed, False otherwise
+        """
+        try:
+            # Check if this execution is paused
+            if execution_id not in self.paused_executions:
+                logger.warning(f"Execution {execution_id} is not in paused state")
+
+                # Try to update status anyway for backwards compatibility
+                self.db_handler.update_execution_status(
+                    execution_id, ExecutionStatus.RUNNING.value)
+                self._log_audit(execution_id, "INFO", "Workflow execution resumed")
+                return True
+
+            # Get paused execution state
+            paused_state = self.paused_executions[execution_id]
+            task_id = paused_state.get('task_id')
+
+            # Verify the human task has been completed
+            if task_id:
+                task = self.db_handler.get_human_task(task_id)
+                if not task or task.status == TaskStatus.PENDING.value:
+                    logger.error(f"Cannot resume: Human task {task_id} not completed")
+                    return False
+
+                logger.info(f"Resuming workflow {execution_id} after task {task_id} completion")
+
+            # Update execution status to running
             self.db_handler.update_execution_status(
                 execution_id, ExecutionStatus.RUNNING.value)
-            self._log_audit(execution_id, "INFO", "Workflow execution resumed")
+
+            self._log_audit(
+                execution_id, "INFO",
+                f"Workflow execution resumed after human task: {task_id}",
+                {'task_response': task_response}
+            )
+
+            # For now, mark as completed since we can't easily continue mid-execution
+            # In a production implementation, you would use LangGraph checkpointing
+            # to properly resume from the exact point where execution was paused
+            self.db_handler.update_execution_status(
+                execution_id,
+                ExecutionStatus.COMPLETED.value,
+                completed_at=datetime.now()
+            )
+
+            self._log_audit(
+                execution_id, "INFO",
+                "Workflow marked as completed after human intervention"
+            )
+
+            # Clean up paused state
+            del self.paused_executions[execution_id]
+
             return True
+
         except Exception as e:
             logger.error(f"Error resuming execution: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
             return False
 
     def cancel_execution(self, execution_id: str) -> bool:

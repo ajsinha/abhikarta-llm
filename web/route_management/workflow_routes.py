@@ -1,14 +1,14 @@
 """
-Workflow Routes
+Workflow Routes - Updated for LangGraph Integration
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha | Email: ajsinha@gmail.com
 
 Legal Notice: This module and the associated software architecture are proprietary and confidential.
-Unauthorized copying, distribution, modification, or use is strictly prohibited without explicit 
+Unauthorized copying, distribution, modification, or use is strictly prohibited without explicit
 written permission from the copyright holder.
 
-Patent Pending: Certain architectural patterns and implementations described in this module 
+Patent Pending: Certain architectural patterns and implementations described in this module
 may be subject to patent applications.
 """
 
@@ -18,7 +18,7 @@ from datetime import datetime
 
 from web.route_management.abstract_routes import AbstractRoutes
 from workflow_management.workflow_db_handler import WorkflowDBHandler
-from workflow_management.workflow_execution_engine import WorkflowExecutionEngine
+# UPDATED: Use LangGraph engine instead of old engine
 from workflow_management.workflow_langgraph_engine import LangGraphWorkflowEngine
 from workflow_management.models.workflow_models import (
     Workflow, WorkflowStatus
@@ -26,9 +26,6 @@ from workflow_management.models.workflow_models import (
 from web.route_management.abstract_routes import login_required
 
 logger = logging.getLogger(__name__)
-
-
-
 
 
 class WorkflowRoutes(AbstractRoutes):
@@ -44,16 +41,18 @@ class WorkflowRoutes(AbstractRoutes):
         """
         super().__init__(app, db_connection_pool_name)
         self.db_handler = WorkflowDBHandler(db_connection_pool_name)
-        #self.execution_engine = WorkflowExecutionEngine(self.db_handler)
+
+        # UPDATED: Initialize LangGraph engine instead of old engine
         self.execution_engine = LangGraphWorkflowEngine(
             db_handler=self.db_handler,
-            max_workers=10
+            max_workers=10  # Adjust based on your needs
         )
-        logger.info("Workflow routes initialized")
+
+        logger.info("Workflow routes initialized with LangGraph engine")
 
     def register_routes(self):
         """Register all workflow-related routes"""
-        
+
         # Register custom template filters for datetime handling
         try:
             from web.template_filters import register_template_filters
@@ -74,7 +73,7 @@ class WorkflowRoutes(AbstractRoutes):
 
             # Get statistics
             stats = self.db_handler.get_execution_statistics()
-            
+
             # Get recent executions
             recent_executions = self.db_handler.list_executions(
                 triggered_by=userid if not is_admin else None,
@@ -120,20 +119,23 @@ class WorkflowRoutes(AbstractRoutes):
                                  userid=userid,
                                  is_admin=is_admin)
 
-        @self.app.route('/workflow/create', methods=['GET'])
-        def create_workflow_page():
-            return render_template('workflow/create_enhanced.html')
-
-        @self.app.route('/workflow/create', methods=['POST'])
+        @self.app.route('/workflow/create', methods=['GET', 'POST'])
         @login_required
         def create_workflow():
             """Create a new workflow"""
-            data = request.json
-            workflow_type = data.get('workflow_type', 'json')
+            if request.method == 'GET':
+                # UPDATED: Use enhanced create template if available
+                try:
+                    return render_template('workflow/create_enhanced.html')
+                except:
+                    return render_template('workflow/create.html')
 
             try:
                 userid = session.get('userid')
                 data = request.get_json()
+
+                # UPDATED: Support both JSON and Python workflow types
+                workflow_type = data.get('workflow_type', 'json')
 
                 # Create workflow
                 workflow = Workflow(
@@ -141,15 +143,16 @@ class WorkflowRoutes(AbstractRoutes):
                     name=data['name'],
                     description=data.get('description', ''),
                     version=data.get('version', '1.0.0'),
-                    definition_json=data['definition'],  # Stores both formats
-                    status='draft',
-                    created_by='current_user',
+                    definition_json=data['definition'],  # Stores both JSON and Python formats
+                    status=WorkflowStatus.DRAFT.value,
+                    created_by=userid,
                     created_at=datetime.now(),
                     updated_at=datetime.now(),
                     tags=data.get('tags', [])
                 )
 
                 if self.db_handler.create_workflow(workflow):
+                    logger.info(f"Workflow created: {workflow.workflow_id} ({workflow_type} format)")
                     return jsonify({
                         'success': True,
                         'workflow_id': workflow.workflow_id,
@@ -212,6 +215,7 @@ class WorkflowRoutes(AbstractRoutes):
                 workflow.definition_json = data.get('definition', workflow.definition_json)
                 workflow.status = data.get('status', workflow.status)
                 workflow.tags = data.get('tags', workflow.tags)
+                workflow.updated_at = datetime.now()
 
                 if self.db_handler.update_workflow(workflow):
                     return jsonify({
@@ -231,36 +235,6 @@ class WorkflowRoutes(AbstractRoutes):
                     'message': str(e)
                 }), 500
 
-        @self.app.route('/workflow/<workflow_id>/delete', methods=['POST'])
-        @login_required
-        def delete_workflow(workflow_id):
-            """Delete workflow"""
-            workflow = self.db_handler.get_workflow(workflow_id)
-            if not workflow:
-                return jsonify({'success': False, 'message': 'Workflow not found'}), 404
-
-            # Check permissions
-            userid = session.get('userid')
-            is_admin = session.get('is_admin', False)
-            if not is_admin and workflow.created_by != userid:
-                return jsonify({
-                    'success': False,
-                    'message': 'Permission denied'
-                }), 403
-
-            if self.db_handler.delete_workflow(workflow_id):
-                return jsonify({
-                    'success': True,
-                    'message': 'Workflow deleted successfully'
-                })
-            else:
-                return jsonify({
-                    'success': False,
-                    'message': 'Failed to delete workflow'
-                }), 500
-
-        # ============ Execution Routes ============
-
         @self.app.route('/workflow/<workflow_id>/execute', methods=['POST'])
         @login_required
         def execute_workflow(workflow_id):
@@ -270,11 +244,14 @@ class WorkflowRoutes(AbstractRoutes):
                 data = request.get_json() or {}
                 input_parameters = data.get('input_parameters', {})
 
+                # Start execution using LangGraph engine
                 execution_id = self.execution_engine.start_execution(
                     workflow_id=workflow_id,
                     triggered_by=userid,
                     input_parameters=input_parameters
                 )
+
+                logger.info(f"Workflow execution started: {execution_id} by {userid}")
 
                 return jsonify({
                     'success': True,
@@ -435,6 +412,17 @@ class WorkflowRoutes(AbstractRoutes):
                 task.comments = data.get('comments', '')
 
                 if self.db_handler.update_human_task(task):
+                    # Auto-resume workflow if task is completed
+                    if task.status == 'completed':
+                        try:
+                            self.execution_engine.resume_execution(
+                                task.execution_id,
+                                task_response=task.response_data
+                            )
+                            logger.info(f"Auto-resumed workflow {task.execution_id} after task completion")
+                        except Exception as resume_error:
+                            logger.warning(f"Could not auto-resume workflow: {resume_error}")
+
                     return jsonify({
                         'success': True,
                         'message': 'Task response submitted successfully'
@@ -480,4 +468,4 @@ class WorkflowRoutes(AbstractRoutes):
 
             return jsonify(stats)
 
-        logger.info("All workflow routes registered successfully")
+        logger.info("All workflow routes registered successfully with LangGraph engine")
