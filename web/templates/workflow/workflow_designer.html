@@ -71,14 +71,16 @@
             linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px);
         background-size: 20px 20px;
         overflow: auto;
+        overflow-x: auto;
+        overflow-y: auto;
     }
-    
+
     .workflow-canvas {
-        position: absolute;
-        min-width: 2000px;
-        min-height: 2000px;
+        position: relative;
+        width: 3000px;
+        height: 2500px;
     }
-    
+
     .workflow-node {
         position: absolute;
         background: white;
@@ -90,17 +92,17 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: all 0.2s;
     }
-    
+
     .workflow-node:hover {
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    
+
     .workflow-node.selected {
         border-color: #0d6efd;
         border-width: 3px;
         box-shadow: 0 4px 12px rgba(13,110,253,0.3);
     }
-    
+
     .workflow-node.start { border-left: 4px solid #28a745; }
     .workflow-node.end { border-left: 4px solid #dc3545; }
     .workflow-node.llm { border-left: 4px solid #0d6efd; }
@@ -108,38 +110,38 @@
     .workflow-node.human { border-left: 4px solid #6f42c1; }
     .workflow-node.conditional { border-left: 4px solid #ffc107; }
     .workflow-node.parallel { border-left: 4px solid #17a2b8; }
-    
+
     .node-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 8px;
     }
-    
+
     .node-title {
         font-weight: 600;
         font-size: 14px;
     }
-    
+
     .node-type-badge {
         font-size: 10px;
         padding: 2px 6px;
         border-radius: 3px;
         background: #e9ecef;
     }
-    
+
     .node-actions {
         margin-top: 8px;
         padding-top: 8px;
         border-top: 1px solid #e9ecef;
     }
-    
+
     .node-actions button {
         font-size: 11px;
         padding: 2px 8px;
         margin-right: 4px;
     }
-    
+
     .node-port {
         width: 12px;
         height: 12px;
@@ -150,29 +152,29 @@
         cursor: crosshair;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    
+
     .node-port.input {
         top: 50%;
         left: -6px;
         transform: translateY(-50%);
     }
-    
+
     .node-port.output {
         top: 50%;
         right: -6px;
         transform: translateY(-50%);
     }
-    
+
     .node-port:hover {
         width: 16px;
         height: 16px;
         left: -8px;
     }
-    
+
     .node-port.output:hover {
         right: -8px;
     }
-    
+
     /* Right Sidebar - Properties Panel */
     .properties-panel {
         width: 350px;
@@ -181,18 +183,18 @@
         overflow-y: auto;
         padding: 15px;
     }
-    
+
     .properties-panel .form-label {
         font-weight: 600;
         font-size: 12px;
         margin-bottom: 4px;
     }
-    
+
     .properties-panel .form-control,
     .properties-panel .form-select {
         font-size: 13px;
     }
-    
+
     /* Toolbar */
     .designer-toolbar {
         background: white;
@@ -202,41 +204,41 @@
         justify-content: space-between;
         align-items: center;
     }
-    
+
     .toolbar-group {
         display: flex;
         gap: 8px;
     }
-    
+
     /* SVG Canvas for connections */
     #connectionCanvas {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 3000px;
+        height: 2500px;
         pointer-events: none;
         z-index: 1;
     }
-    
+
     .connection-line {
         stroke: #6c757d;
         stroke-width: 2;
         fill: none;
         marker-end: url(#arrowhead);
     }
-    
+
     .connection-line.selected {
         stroke: #0d6efd;
         stroke-width: 3;
     }
-    
+
     .connection-line:hover {
         stroke: #0d6efd;
         stroke-width: 3;
         cursor: pointer;
     }
-    
+
     /* Temporary connection line while dragging */
     .temp-connection {
         stroke: #0d6efd;
@@ -244,7 +246,7 @@
         stroke-dasharray: 5, 5;
         fill: none;
     }
-    
+
     /* JSON Preview Modal */
     .json-preview {
         background: #282c34;
@@ -256,7 +258,7 @@
         max-height: 500px;
         overflow-y: auto;
     }
-    
+
     /* Validation Messages */
     .validation-message {
         padding: 8px 12px;
@@ -264,19 +266,19 @@
         margin-bottom: 8px;
         font-size: 13px;
     }
-    
+
     .validation-message.error {
         background: #f8d7da;
         color: #721c24;
         border: 1px solid #f5c6cb;
     }
-    
+
     .validation-message.warning {
         background: #fff3cd;
         color: #856404;
         border: 1px solid #ffeaa7;
     }
-    
+
     .validation-message.success {
         background: #d4edda;
         color: #155724;
@@ -297,6 +299,14 @@
         </button>
         <button class="btn btn-sm btn-outline-secondary" onclick="clearCanvas()">
             <i class="fas fa-trash"></i> Clear
+        </button>
+    </div>
+    <div class="toolbar-group">
+        <button class="btn btn-sm btn-outline-success" onclick="showImportModal()">
+            <i class="fas fa-file-import"></i> Import JSON
+        </button>
+        <button class="btn btn-sm btn-outline-info" onclick="showExportModal()">
+            <i class="fas fa-file-export"></i> Export JSON
         </button>
     </div>
     <div class="toolbar-group">
@@ -384,13 +394,13 @@
             </a>
         </div>
     </div>
-    
+
     <!-- Main Canvas -->
     <div class="canvas-container" id="canvasContainer">
         <svg id="connectionCanvas"></svg>
         <div class="workflow-canvas" id="workflowCanvas"></div>
     </div>
-    
+
     <!-- Right Sidebar - Properties Panel -->
     <div class="properties-panel" id="propertiesPanel">
         <h5 class="mb-3"><i class="fas fa-cog"></i> Properties</h5>
@@ -453,5 +463,95 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/workflow-designer.js') }}"></script>
+<!-- Import JSON Modal -->
+<div class="modal fade" id="importJsonModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-file-import"></i> Import Workflow JSON</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>Paste your workflow JSON below.</strong>
+                    The JSON should contain "nodes" and "edges" arrays. The designer will load the workflow and create all nodes and connections.
+                </div>
+
+                <label for="importJsonTextarea" class="form-label"><strong>Workflow JSON:</strong></label>
+                <textarea id="importJsonTextarea" class="form-control" rows="15"
+                          style="font-family: monospace; font-size: 12px;"
+                          placeholder='Paste JSON here, e.g.:
+{
+  "nodes": [
+    {"node_id": "start", "node_type": "start"},
+    {"node_id": "process", "node_type": "llm", "config": {...}},
+    {"node_id": "end", "node_type": "end"}
+  ],
+  "edges": [
+    {"source": "start", "target": "process"},
+    {"source": "process", "target": "end"}
+  ]
+}'></textarea>
+
+                <div id="importError" class="alert alert-danger mt-3" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Import Error:</strong>
+                    <div id="importErrorMessage"></div>
+                </div>
+
+                <div id="importSuccess" class="alert alert-success mt-3" style="display: none;">
+                    <i class="fas fa-check-circle"></i> <strong>Import Successful!</strong>
+                    <div id="importSuccessMessage"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="importWorkflowJson()">
+                    <i class="fas fa-file-import"></i> Import Workflow
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export JSON Modal -->
+<div class="modal fade" id="exportJsonModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-file-export"></i> Export Workflow JSON</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> <strong>Your workflow has been exported!</strong>
+                    You can copy the JSON below or download it as a file.
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label mb-0"><strong>Workflow JSON:</strong></label>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="copyExportJson()">
+                            <i class="fas fa-copy"></i> Copy to Clipboard
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="downloadWorkflowJson()">
+                            <i class="fas fa-download"></i> Download as File
+                        </button>
+                    </div>
+                </div>
+
+                <textarea id="exportJsonTextarea" class="form-control" rows="15"
+                          style="font-family: monospace; font-size: 12px;" readonly></textarea>
+
+                <div id="copySuccess" class="alert alert-success mt-3" style="display: none;">
+                    <i class="fas fa-check-circle"></i> JSON copied to clipboard!
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/workflow-designer.js') }}?v={{ range(1, 9999999) | random }}"></script>
 {% endblock %}

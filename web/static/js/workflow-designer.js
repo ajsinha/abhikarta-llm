@@ -48,9 +48,9 @@ class WorkflowDesigner {
     }
 
     updateSVGSize() {
-        const container = document.getElementById('canvasContainer');
-        this.svgCanvas.setAttribute('width', container.scrollWidth);
-        this.svgCanvas.setAttribute('height', container.scrollHeight);
+        // Set fixed SVG dimensions to match workflow canvas
+        this.svgCanvas.setAttribute('width', '3000');
+        this.svgCanvas.setAttribute('height', '2500');
     }
 
     setupEventListeners() {
@@ -817,8 +817,161 @@ function submitWorkflow() {
 }
 
 function loadWorkflow() {
-    // TODO: Implement workflow loading
-    alert('Load workflow functionality - to be implemented');
+    // Create a hidden file input element
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json,application/json';
+    fileInput.style.display = 'none';
+
+    // Handle file selection
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+
+        console.log('Loading file:', file.name);
+
+        // Check file extension
+        if (!file.name.endsWith('.json')) {
+            alert('Please select a JSON file (.json)');
+            return;
+        }
+
+        // Read file content
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            try {
+                const jsonText = event.target.result;
+                console.log('File content loaded, length:', jsonText.length);
+
+                // Parse JSON to validate
+                const workflowData = JSON.parse(jsonText);
+                console.log('Parsed workflow data:', workflowData);
+
+                // Validate structure
+                if (!workflowData.nodes || !Array.isArray(workflowData.nodes)) {
+                    throw new Error('JSON must contain a "nodes" array');
+                }
+
+                if (!workflowData.edges || !Array.isArray(workflowData.edges)) {
+                    throw new Error('JSON must contain an "edges" array');
+                }
+
+                // Confirm before clearing
+                if (designer.nodes.size > 0) {
+                    if (!confirm(`Load workflow from "${file.name}"? This will clear the current workflow.`)) {
+                        return;
+                    }
+                }
+
+                // Clear canvas
+                designer.nodes.clear();
+                designer.connections = [];
+                designer.canvas.innerHTML = '';
+                designer.redrawConnections();
+                designer.deselectAll();
+                designer.nodeCounter = 0;
+
+                // Import nodes
+                const nodeIdMap = new Map();
+                let xPos = 100;
+                let yPos = 100;
+                const xSpacing = 250;
+                const ySpacing = 150;
+                let nodesPerRow = 4;
+                let nodeCount = 0;
+
+                console.log(`Loading ${workflowData.nodes.length} nodes...`);
+
+                workflowData.nodes.forEach((nodeData, index) => {
+                    console.log(`Processing node ${index}:`, nodeData);
+
+                    const col = nodeCount % nodesPerRow;
+                    const row = Math.floor(nodeCount / nodesPerRow);
+                    const x = xPos + (col * xSpacing);
+                    const y = yPos + (row * ySpacing);
+
+                    const internalId = designer.addNode(nodeData.node_type, x, y);
+                    const node = designer.nodes.get(internalId);
+
+                    if (nodeData.node_id) {
+                        node.config.node_id = nodeData.node_id;
+                    }
+
+                    if (nodeData.config) {
+                        Object.assign(node.config, nodeData.config);
+                    }
+
+                    // Update node title
+                    const nodeElement = document.getElementById(internalId);
+                    if (nodeElement) {
+                        const titleElement = nodeElement.querySelector('.node-title');
+                        if (titleElement) {
+                            titleElement.textContent = nodeData.name || node.config.node_id || node.type;
+                        }
+                    }
+
+                    nodeIdMap.set(nodeData.node_id, internalId);
+                    nodeCount++;
+                });
+
+                console.log(`Loading ${workflowData.edges.length} edges...`);
+
+                // Import connections
+                workflowData.edges.forEach((edge, index) => {
+                    console.log(`Processing edge ${index}:`, edge);
+
+                    const sourceId = nodeIdMap.get(edge.source);
+                    const targetId = nodeIdMap.get(edge.target);
+
+                    if (sourceId && targetId) {
+                        const exists = designer.connections.some(
+                            c => c.source === sourceId && c.target === targetId
+                        );
+
+                        if (!exists) {
+                            designer.connections.push({
+                                source: sourceId,
+                                target: targetId
+                            });
+                            console.log(`Created connection: ${sourceId} -> ${targetId}`);
+                        }
+                    } else {
+                        console.warn(`Could not create connection from ${edge.source} to ${edge.target}`);
+                    }
+                });
+
+                // Redraw connections
+                designer.redrawConnections();
+
+                designer.showToast(`Workflow loaded from "${file.name}"!`, 'success');
+                console.log('Load complete!');
+
+            } catch (error) {
+                console.error('Error loading file:', error);
+                alert(`Error loading workflow: ${error.message}\n\nCheck browser console for details.`);
+            }
+        };
+
+        reader.onerror = (error) => {
+            console.error('FileReader error:', error);
+            alert('Error reading file. Please try again.');
+        };
+
+        // Read file as text
+        reader.readAsText(file);
+    };
+
+    // Trigger file selection
+    document.body.appendChild(fileInput);
+    fileInput.click();
+
+    // Cleanup
+    setTimeout(() => {
+        document.body.removeChild(fileInput);
+    }, 1000);
 }
 
 function clearCanvas() {
@@ -902,4 +1055,306 @@ function zoomIn() {
 function zoomOut() {
     // TODO: Implement zoom
     designer.showToast('Zoom feature - coming soon', 'info');
+}
+
+// Import/Export Functions
+
+function showImportModal() {
+    // Get modal element first
+    const modalElement = document.getElementById('importJsonModal');
+    if (!modalElement) {
+        console.error('Import modal not found in HTML. Please update workflow_designer.html');
+        alert('Import modal not found. Please refresh the page and ensure workflow_designer.html is updated.');
+        return;
+    }
+
+    // Clear previous state - with null checks
+    const textarea = document.getElementById('importJsonTextarea');
+    const errorDiv = document.getElementById('importError');
+    const successDiv = document.getElementById('importSuccess');
+
+    if (textarea) textarea.value = '';
+    if (errorDiv) errorDiv.style.display = 'none';
+    if (successDiv) successDiv.style.display = 'none';
+
+    // Show modal
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+}
+
+function importWorkflowJson() {
+    const textarea = document.getElementById('importJsonTextarea');
+    const errorDiv = document.getElementById('importError');
+    const errorMsg = document.getElementById('importErrorMessage');
+    const successDiv = document.getElementById('importSuccess');
+    const successMsg = document.getElementById('importSuccessMessage');
+
+    // Check if elements exist
+    if (!textarea || !errorDiv || !errorMsg || !successDiv || !successMsg) {
+        console.error('Import modal elements not found. HTML may need updating.');
+        alert('Import functionality error: Modal elements not found.\n\nPlease ensure workflow_designer.html is updated with the latest version.');
+        return;
+    }
+
+    // Hide previous messages
+    errorDiv.style.display = 'none';
+    successDiv.style.display = 'none';
+
+    // Get JSON text
+    const jsonText = textarea.value.trim();
+
+    if (!jsonText) {
+        errorMsg.textContent = 'Please paste JSON content';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    try {
+        // Parse JSON
+        const workflowData = JSON.parse(jsonText);
+
+        console.log('Parsed workflow data:', workflowData);
+
+        // Validate structure
+        if (!workflowData.nodes || !Array.isArray(workflowData.nodes)) {
+            throw new Error('JSON must contain a "nodes" array');
+        }
+
+        if (!workflowData.edges || !Array.isArray(workflowData.edges)) {
+            throw new Error('JSON must contain an "edges" array');
+        }
+
+        // Clear existing workflow
+        if (designer.nodes.size > 0) {
+            if (!confirm('This will clear the current workflow. Continue?')) {
+                return;
+            }
+        }
+
+        // Clear canvas without confirmation prompt (already confirmed above)
+        designer.nodes.clear();
+        designer.connections = [];
+        designer.canvas.innerHTML = '';
+        designer.redrawConnections();
+        designer.deselectAll();
+        designer.nodeCounter = 0;
+
+        // Import nodes
+        const nodeIdMap = new Map(); // Map from node_id to internal ID
+        let xPos = 100;
+        let yPos = 100;
+        const xSpacing = 250;
+        const ySpacing = 150;
+        let nodesPerRow = 4;
+        let nodeCount = 0;
+
+        console.log(`Importing ${workflowData.nodes.length} nodes...`);
+
+        workflowData.nodes.forEach((nodeData, index) => {
+            console.log(`Processing node ${index}:`, nodeData);
+
+            // Calculate position in grid layout
+            const col = nodeCount % nodesPerRow;
+            const row = Math.floor(nodeCount / nodesPerRow);
+            const x = xPos + (col * xSpacing);
+            const y = yPos + (row * ySpacing);
+
+            console.log(`Creating node at position (${x}, ${y})`);
+
+            // Add node to canvas
+            const internalId = designer.addNode(nodeData.node_type, x, y);
+            const node = designer.nodes.get(internalId);
+
+            console.log(`Created node with internal ID: ${internalId}`);
+
+            // Set node configuration
+            if (nodeData.node_id) {
+                node.config.node_id = nodeData.node_id;
+            }
+
+            if (nodeData.config) {
+                Object.assign(node.config, nodeData.config);
+            }
+
+            // Handle extra fields (name, etc.) - ignore them gracefully
+            console.log(`Node config set:`, node.config);
+
+            // Update node title
+            const nodeElement = document.getElementById(internalId);
+            if (nodeElement) {
+                const titleElement = nodeElement.querySelector('.node-title');
+                if (titleElement) {
+                    titleElement.textContent = nodeData.name || node.config.node_id || node.type;
+                }
+            }
+
+            // Map node_id to internal ID
+            nodeIdMap.set(nodeData.node_id, internalId);
+            console.log(`Mapped ${nodeData.node_id} -> ${internalId}`);
+
+            nodeCount++;
+        });
+
+        console.log(`Importing ${workflowData.edges.length} edges...`);
+        console.log('Node ID map:', nodeIdMap);
+
+        // Import connections
+        workflowData.edges.forEach((edge, index) => {
+            console.log(`Processing edge ${index}:`, edge);
+
+            const sourceId = nodeIdMap.get(edge.source);
+            const targetId = nodeIdMap.get(edge.target);
+
+            console.log(`Edge mapping: ${edge.source} -> ${sourceId}, ${edge.target} -> ${targetId}`);
+
+            if (sourceId && targetId) {
+                // Check if connection already exists
+                const exists = designer.connections.some(
+                    c => c.source === sourceId && c.target === targetId
+                );
+
+                if (!exists) {
+                    designer.connections.push({
+                        source: sourceId,
+                        target: targetId
+                    });
+                    console.log(`Created connection: ${sourceId} -> ${targetId}`);
+                } else {
+                    console.log(`Connection already exists: ${sourceId} -> ${targetId}`);
+                }
+            } else {
+                const msg = `Could not create connection from ${edge.source} to ${edge.target} (source ID: ${sourceId}, target ID: ${targetId})`;
+                console.warn(msg);
+            }
+        });
+
+        console.log('Final connections:', designer.connections);
+
+        // Redraw connections
+        designer.redrawConnections();
+
+        console.log('Import complete!');
+
+        // Show success message
+        successMsg.innerHTML = `
+            Successfully imported:<br>
+            - ${workflowData.nodes.length} nodes<br>
+            - ${workflowData.edges.length} connections
+        `;
+        successDiv.style.display = 'block';
+
+        // Auto-close modal after 2 seconds
+        setTimeout(() => {
+            const modalElement = document.getElementById('importJsonModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+            designer.showToast('Workflow imported successfully!', 'success');
+        }, 2000);
+
+    } catch (error) {
+        errorMsg.innerHTML = `${error.message}<br><br>Check browser console for details.`;
+        errorDiv.style.display = 'block';
+        console.error('Import error:', error);
+        console.error('Stack trace:', error.stack);
+    }
+}
+
+function showExportModal() {
+    // Check if modal exists
+    const modalElement = document.getElementById('exportJsonModal');
+    if (!modalElement) {
+        console.error('Export modal not found in HTML. Please update workflow_designer.html');
+        alert('Export modal not found. Please refresh the page and ensure workflow_designer.html is updated.');
+        return;
+    }
+
+    // Generate current workflow JSON
+    const json = designer.generateJSON();
+    const formatted = JSON.stringify(json, null, 2);
+
+    // Set textarea content - with null check
+    const textarea = document.getElementById('exportJsonTextarea');
+    if (textarea) {
+        textarea.value = formatted;
+    }
+
+    // Hide copy success message - with null check
+    const successDiv = document.getElementById('copySuccess');
+    if (successDiv) {
+        successDiv.style.display = 'none';
+    }
+
+    // Show modal
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+}
+
+function copyExportJson() {
+    const textarea = document.getElementById('exportJsonTextarea');
+    const successDiv = document.getElementById('copySuccess');
+
+    // Check if elements exist
+    if (!textarea) {
+        console.error('Export textarea not found');
+        alert('Export functionality error: Elements not found.');
+        return;
+    }
+
+    // Select and copy text
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // For mobile devices
+
+    navigator.clipboard.writeText(textarea.value).then(() => {
+        // Show success message
+        if (successDiv) {
+            successDiv.style.display = 'block';
+
+            // Hide after 2 seconds
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 2000);
+        }
+
+        designer.showToast('JSON copied to clipboard!', 'success');
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy to clipboard. Please manually select and copy.');
+    });
+}
+
+function downloadWorkflowJson() {
+    const textarea = document.getElementById('exportJsonTextarea');
+
+    // Check if element exists
+    if (!textarea) {
+        console.error('Export textarea not found');
+        alert('Export functionality error: Elements not found.');
+        return;
+    }
+
+    const json = textarea.value;
+
+    // Create blob
+    const blob = new Blob([json], { type: 'application/json' });
+
+    // Create download link
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+    a.download = `workflow-${timestamp}.json`;
+
+    // Trigger download
+    document.body.appendChild(a);
+    a.click();
+
+    // Cleanup
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    designer.showToast('Workflow JSON downloaded!', 'success');
 }

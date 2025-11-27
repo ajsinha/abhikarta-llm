@@ -1,0 +1,76 @@
+{
+  "nodes": [
+    {
+      "node_id": "start",
+      "node_type": "start",
+      "name": "Start"
+    },
+    {
+      "node_id": "parallel_split",
+      "node_type": "parallel",
+      "name": "Split"
+    },
+    {
+      "node_id": "branch1",
+      "node_type": "tool",
+      "name": "Branch 1",
+      "config": {
+        "tool_name": "text_analysis",
+        "parameters": {
+          "text": ""
+        }
+      }
+    },
+    {
+      "node_id": "branch2",
+      "node_type": "tool",
+      "name": "Branch 2",
+      "config": {
+        "tool_name": "data_transform",
+        "parameters": {
+          "input_data": "",
+          "operation": "title"
+        }
+      }
+    },
+    {
+      "node_id": "parallel_join",
+      "node_type": "parallel",
+      "name": "Join"
+    },
+    {
+      "node_id": "end",
+      "node_type": "end",
+      "name": "End"
+    }
+  ],
+  "edges": [
+    {
+      "source": "start",
+      "target": "parallel_split"
+    },
+    {
+      "source": "parallel_split",
+      "target": "branch1"
+    },
+    {
+      "source": "parallel_split",
+      "target": "branch2"
+    },
+    {
+      "source": "branch1",
+      "target": "parallel_join"
+    },
+    {
+      "source": "branch2",
+      "target": "parallel_join"
+    },
+    {
+      "source": "parallel_join",
+      "target": "end"
+    }
+  ],
+  "variables": {
+    "input_text": "Parallel processing example"
+  }
+}
