@@ -105,6 +105,20 @@
                             <li><a class="dropdown-item" href="{{ url_for('list_tasks') }}">
                                 <i class="fas fa-tasks"></i> My Tasks
                             </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('workflow_designer') }}">
+                                    <i class="fas fa-paint-brush text-primary"></i> Visual Designer
+                                    <span class="badge bg-success ms-2">New!</span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('workflow_help') }}">
+                                    <i class="fas fa-paint-brush text-primary"></i> Help
+                                    <span class="badge bg-success ms-2">New!</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>

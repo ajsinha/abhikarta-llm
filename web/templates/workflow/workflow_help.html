@@ -1,0 +1,2078 @@
+{% extends "base.html" %}
+
+{% block title %}Workflow Documentation - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .doc-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 15px;
+    }
+    
+    .doc-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 50px;
+        border-radius: 12px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+    
+    .doc-header h1 {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+    
+    .doc-nav {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 70px;
+        z-index: 100;
+    }
+    
+    .doc-nav h5 {
+        color: #667eea;
+        margin-bottom: 15px;
+    }
+    
+    .doc-nav-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    
+    .doc-nav-link {
+        display: block;
+        padding: 12px 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #495057;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+    }
+    
+    .doc-nav-link:hover {
+        background: #667eea;
+        color: white;
+        border-left-color: #764ba2;
+        transform: translateX(5px);
+    }
+    
+    .doc-section {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .doc-section h2 {
+        color: #667eea;
+        font-size: 2.5rem;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #667eea;
+    }
+    
+    .doc-section h3 {
+        color: #764ba2;
+        font-size: 1.8rem;
+        margin-top: 35px;
+        margin-bottom: 20px;
+    }
+    
+    .doc-section h4 {
+        color: #495057;
+        font-size: 1.4rem;
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+    
+    .intro-box {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 8px;
+        padding: 30px;
+        margin: 25px 0;
+        border-left: 5px solid #667eea;
+    }
+    
+    .intro-box h4 {
+        color: #667eea;
+        margin-top: 0;
+    }
+    
+    .code-tabs {
+        margin: 25px 0;
+    }
+    
+    .code-tabs .nav-tabs {
+        border-bottom: 2px solid #667eea;
+    }
+    
+    .code-tabs .nav-link {
+        color: #495057;
+        border: none;
+        padding: 12px 25px;
+        font-weight: 600;
+    }
+    
+    .code-tabs .nav-link.active {
+        color: #667eea;
+        background: transparent;
+        border-bottom: 3px solid #667eea;
+    }
+    
+    .code-tabs .nav-link:hover {
+        color: #764ba2;
+    }
+    
+    .code-block {
+        background: #282c34;
+        color: #abb2bf;
+        padding: 25px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 0;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        position: relative;
+    }
+    
+    .code-block pre {
+        margin: 0;
+    }
+    
+    .copy-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+    }
+    
+    .copy-button:hover {
+        opacity: 1;
+    }
+    
+    .workflow-diagram {
+        background: #f8f9fa;
+        border: 3px solid #dee2e6;
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        font-family: monospace;
+        margin: 30px 0;
+        font-size: 16px;
+        overflow-x: auto;
+    }
+    
+    .workflow-diagram pre {
+        margin: 0;
+        text-align: left;
+        display: inline-block;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+    
+    .feature-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 25px;
+        transition: all 0.3s;
+    }
+    
+    .feature-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        transform: translateY(-5px);
+    }
+    
+    .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: #667eea;
+    }
+    
+    .tip-box {
+        background: #e7f3ff;
+        border-left: 5px solid #0c5460;
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 4px;
+    }
+    
+    .tip-box h5 {
+        color: #0c5460;
+        margin-top: 0;
+    }
+    
+    .warning-box {
+        background: #fff8e1;
+        border-left: 5px solid #ff6f00;
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 4px;
+    }
+    
+    .warning-box h5 {
+        color: #ff6f00;
+        margin-top: 0;
+    }
+    
+    .success-box {
+        background: #e8f5e9;
+        border-left: 5px solid #2e7d32;
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 4px;
+    }
+    
+    .success-box h5 {
+        color: #2e7d32;
+        margin-top: 0;
+    }
+    
+    .comparison-table {
+        width: 100%;
+        margin: 25px 0;
+        border-collapse: collapse;
+    }
+    
+    .comparison-table th {
+        background: #667eea;
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .comparison-table td {
+        padding: 15px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .comparison-table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+    
+    .example-box {
+        background: #f8f9fa;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        padding: 30px;
+        margin: 30px 0;
+    }
+    
+    .example-title {
+        background: #667eea;
+        color: white;
+        padding: 10px 20px;
+        margin: -30px -30px 20px -30px;
+        border-radius: 6px 6px 0 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+    
+    .parameter-table {
+        width: 100%;
+        margin: 20px 0;
+    }
+    
+    .parameter-table th {
+        background: #764ba2;
+        color: white;
+        padding: 12px;
+        text-align: left;
+    }
+    
+    .parameter-table td {
+        padding: 12px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .back-to-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #667eea;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s;
+        z-index: 1000;
+    }
+    
+    .back-to-top:hover {
+        background: #764ba2;
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+        color: white;
+    }
+    
+    .syntax-highlight .keyword { color: #c678dd; }
+    .syntax-highlight .string { color: #98c379; }
+    .syntax-highlight .number { color: #d19a66; }
+    .syntax-highlight .comment { color: #5c6370; font-style: italic; }
+    .syntax-highlight .function { color: #61afef; }
+    
+    @media (max-width: 768px) {
+        .doc-header h1 {
+            font-size: 2rem;
+        }
+        
+        .doc-section {
+            padding: 25px;
+        }
+        
+        .code-block {
+            font-size: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="doc-container">
+    <!-- Header -->
+    <div class="doc-header">
+        <h1><i class="fas fa-book"></i> Abhikarta Workflow Documentation</h1>
+        <p class="lead">Complete guide to building powerful AI-driven workflows</p>
+        <p>Learn how to create sequential, parallel, conditional, and human-in-the-loop workflows</p>
+    </div>
+    
+    <!-- Quick Navigation -->
+    <div class="doc-nav">
+        <h5><i class="fas fa-compass"></i> Quick Navigation</h5>
+        <div class="doc-nav-grid">
+            <a href="#introduction" class="doc-nav-link"><i class="fas fa-info-circle"></i> Introduction</a>
+            <a href="#getting-started" class="doc-nav-link"><i class="fas fa-rocket"></i> Getting Started</a>
+            <a href="#sequential" class="doc-nav-link"><i class="fas fa-arrow-right"></i> Sequential Workflows</a>
+            <a href="#parallel" class="doc-nav-link"><i class="fas fa-project-diagram"></i> Parallel Workflows</a>
+            <a href="#conditional" class="doc-nav-link"><i class="fas fa-code-branch"></i> Conditional Workflows</a>
+            <a href="#hitl" class="doc-nav-link"><i class="fas fa-user-check"></i> Human-in-the-Loop</a>
+            <a href="#advanced" class="doc-nav-link"><i class="fas fa-graduation-cap"></i> Advanced Topics</a>
+            <a href="#api" class="doc-nav-link"><i class="fas fa-code"></i> API Reference</a>
+        </div>
+    </div>
+    
+    <!-- Introduction Section -->
+    <div class="doc-section" id="introduction">
+        <h2><i class="fas fa-info-circle"></i> Introduction to Abhikarta Workflows</h2>
+        
+        <div class="intro-box">
+            <h4>What is Abhikarta?</h4>
+            <p><strong>Abhikarta</strong> is a comprehensive LLM execution platform that enables you to build sophisticated AI-powered workflows. It combines:</p>
+            <ul>
+                <li><strong>Chat Interfaces</strong> - Interactive AI conversations</li>
+                <li><strong>RAG (Retrieval-Augmented Generation)</strong> - Knowledge-enhanced AI responses</li>
+                <li><strong>Workflow Orchestration</strong> - Complex multi-step AI processes</li>
+                <li><strong>DAG Processing</strong> - Directed acyclic graph execution</li>
+                <li><strong>Autonomous Planning</strong> - AI-driven decision making</li>
+                <li><strong>Human-in-the-Loop</strong> - Human oversight and approval</li>
+            </ul>
+        </div>
+        
+        <h3>Workflow Architecture</h3>
+        <p>Abhikarta workflows are built on top of <strong>LangChain</strong> and <strong>LangGraph</strong>, providing a robust foundation for AI orchestration. The system supports multiple execution patterns:</p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-arrow-right"></i></div>
+                <h4>Sequential</h4>
+                <p>Execute nodes one after another in a linear flow</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-project-diagram"></i></div>
+                <h4>Parallel</h4>
+                <p>Run multiple branches simultaneously for faster processing</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-code-branch"></i></div>
+                <h4>Conditional</h4>
+                <p>Branch execution based on dynamic conditions</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-user-check"></i></div>
+                <h4>Human-in-the-Loop</h4>
+                <p>Pause for human approval before proceeding</p>
+            </div>
+        </div>
+        
+        <h3>Core Components</h3>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Description</th>
+                    <th>Use Cases</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Workflow Engine</strong></td>
+                    <td>LangGraph-based execution engine</td>
+                    <td>Process workflows, manage state, handle errors</td>
+                </tr>
+                <tr>
+                    <td><strong>Node Types</strong></td>
+                    <td>Building blocks for workflows</td>
+                    <td>LLM, Tool, Human, Conditional, Parallel</td>
+                </tr>
+                <tr>
+                    <td><strong>State Management</strong></td>
+                    <td>SQLite-based persistence</td>
+                    <td>Resume workflows, audit trails, checkpointing</td>
+                </tr>
+                <tr>
+                    <td><strong>Database Layer</strong></td>
+                    <td>6-table schema for workflow data</td>
+                    <td>Workflows, executions, tasks, variables, audit logs</td>
+                </tr>
+                <tr>
+                    <td><strong>API Layer</strong></td>
+                    <td>Flask routes for workflow management</td>
+                    <td>Create, execute, monitor, control workflows</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Getting Started Section -->
+    <div class="doc-section" id="getting-started">
+        <h2><i class="fas fa-rocket"></i> Getting Started</h2>
+        
+        <h3>Creating Your First Workflow</h3>
+        <p>Workflows in Abhikarta can be defined in two ways:</p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-file-code"></i></div>
+                <h4>JSON Definition</h4>
+                <p>Declarative approach using JSON configuration</p>
+                <ul>
+                    <li>Easy to read and understand</li>
+                    <li>Portable and versionable</li>
+                    <li>Visual designer generates this</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fab fa-python"></i></div>
+                <h4>Python Code</h4>
+                <p>Programmatic approach using Python</p>
+                <ul>
+                    <li>Maximum flexibility</li>
+                    <li>Dynamic workflow generation</li>
+                    <li>Custom logic and functions</li>
+                </ul>
+            </div>
+        </div>
+        
+        <h3>Workflow Definition Format</h3>
+        
+        <h4>JSON Structure</h4>
+        <div class="code-block">
+<pre>{
+  "nodes": [
+    {
+      "node_id": "unique_identifier",
+      "node_type": "llm|tool|human|conditional|parallel",
+      "config": {
+        // Node-specific configuration
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "source_node_id",
+      "target": "target_node_id"
+    }
+  ]
+}</pre>
+        </div>
+        
+        <h4>Python Structure</h4>
+        <div class="code-block">
+<pre>from workflow_management.workflow_langgraph_engine import LangGraphWorkflowEngine
+
+# Create workflow
+workflow = {
+    'nodes': [
+        {'node_id': 'start', 'node_type': 'start'},
+        {'node_id': 'process', 'node_type': 'llm', 'config': {...}},
+        {'node_id': 'end', 'node_type': 'end'}
+    ],
+    'edges': [
+        {'source': 'start', 'target': 'process'},
+        {'source': 'process', 'target': 'end'}
+    ]
+}
+
+# Execute
+engine = LangGraphWorkflowEngine(workflow)
+result = engine.execute({'input': 'your data'})</pre>
+        </div>
+    </div>
+    
+    <!-- Sequential Workflows Section -->
+    <div class="doc-section" id="sequential">
+        <h2><i class="fas fa-arrow-right"></i> Sequential Workflows</h2>
+        
+        <div class="intro-box">
+            <h4>What are Sequential Workflows?</h4>
+            <p>Sequential workflows execute nodes one after another in a linear chain. Each node processes the output of the previous node. This is the simplest and most common workflow pattern.</p>
+        </div>
+        
+        <h3>Use Cases</h3>
+        <ul>
+            <li><strong>Text Processing Pipeline</strong> - Extract → Analyze → Summarize → Generate</li>
+            <li><strong>Data Transformation</strong> - Validate → Clean → Transform → Store</li>
+            <li><strong>Content Generation</strong> - Research → Outline → Write → Edit</li>
+            <li><strong>Customer Support</strong> - Classify → Route → Respond → Log</li>
+        </ul>
+        
+        <h3>Execution Flow</h3>
+        <div class="workflow-diagram">
+<pre>
+┌───────┐      ┌──────────┐      ┌──────────┐      ┌──────────┐      ┌─────┐
+│ Start │  →   │  Node 1  │  →   │  Node 2  │  →   │  Node 3  │  →   │ End │
+└───────┘      └──────────┘      └──────────┘      └──────────┘      └─────┘
+               Extract Text      Analyze         Summarize
+</pre>
+        </div>
+        
+        <div class="example-box">
+            <div class="example-title">Example 1: Text Sentiment Analysis Pipeline</div>
+            
+            <p><strong>Scenario:</strong> Analyze customer feedback through multiple stages</p>
+            
+            <div class="code-tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#seq1-json">JSON</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#seq1-python">Python</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="seq1-json">
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre>{
+  "nodes": [
+    {
+      "node_id": "start",
+      "node_type": "start"
+    },
+    {
+      "node_id": "extract_text",
+      "node_type": "tool",
+      "config": {
+        "tool_name": "text_extractor",
+        "parameters": {
+          "format": "plain_text"
+        }
+      }
+    },
+    {
+      "node_id": "analyze_sentiment",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Analyze the sentiment of this customer feedback and classify as positive, negative, or neutral. Also provide a confidence score (0-1) and key emotional indicators.\n\nFeedback: {input}\n\nProvide response in JSON format.",
+        "temperature": 0.3
+      }
+    },
+    {
+      "node_id": "categorize",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Based on this sentiment analysis: {previous_result}\n\nCategorize the feedback into one of these categories:\n- Product Quality\n- Customer Service\n- Delivery\n- Pricing\n- Other\n\nProvide the category and reasoning.",
+        "temperature": 0.2
+      }
+    },
+    {
+      "node_id": "generate_response",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Generate a professional response to this customer based on:\n\nSentiment: {sentiment}\nCategory: {category}\nOriginal Feedback: {original_feedback}\n\nCreate a personalized, empathetic response.",
+        "temperature": 0.7
+      }
+    },
+    {
+      "node_id": "end",
+      "node_type": "end"
+    }
+  ],
+  "edges": [
+    {"source": "start", "target": "extract_text"},
+    {"source": "extract_text", "target": "analyze_sentiment"},
+    {"source": "analyze_sentiment", "target": "categorize"},
+    {"source": "categorize", "target": "generate_response"},
+    {"source": "generate_response", "target": "end"}
+  ]
+}</pre>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="seq1-python">
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre>from workflow_management.workflow_langgraph_engine import LangGraphWorkflowEngine
+from workflow_management.workflow_models import Workflow
+from datetime import datetime
+
+# Define the sequential workflow
+workflow_definition = {
+    'nodes': [
+        {
+            'node_id': 'start',
+            'node_type': 'start'
+        },
+        {
+            'node_id': 'extract_text',
+            'node_type': 'tool',
+            'config': {
+                'tool_name': 'text_extractor',
+                'parameters': {'format': 'plain_text'}
+            }
+        },
+        {
+            'node_id': 'analyze_sentiment',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''Analyze the sentiment of this customer feedback.
+                
+Feedback: {input}
+
+Classify as: positive, negative, or neutral
+Provide confidence score (0-1)
+List key emotional indicators
+
+Return JSON format.''',
+                'temperature': 0.3
+            }
+        },
+        {
+            'node_id': 'categorize',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''Based on sentiment: {previous_result}
+
+Categorize into:
+- Product Quality
+- Customer Service  
+- Delivery
+- Pricing
+- Other
+
+Provide category and reasoning.''',
+                'temperature': 0.2
+            }
+        },
+        {
+            'node_id': 'generate_response',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''Generate professional customer response.
+
+Sentiment: {sentiment}
+Category: {category}
+Feedback: {original_feedback}
+
+Create personalized, empathetic response.''',
+                'temperature': 0.7
+            }
+        },
+        {
+            'node_id': 'end',
+            'node_type': 'end'
+        }
+    ],
+    'edges': [
+        {'source': 'start', 'target': 'extract_text'},
+        {'source': 'extract_text', 'target': 'analyze_sentiment'},
+        {'source': 'analyze_sentiment', 'target': 'categorize'},
+        {'source': 'categorize', 'target': 'generate_response'},
+        {'source': 'generate_response', 'target': 'end'}
+    ]
+}
+
+# Create workflow object
+workflow = Workflow(
+    workflow_id=Workflow.generate_id(),
+    name="Customer Feedback Analysis",
+    description="Sequential analysis of customer feedback",
+    definition_json=workflow_definition,
+    version=1,
+    status='active',
+    created_by='system',
+    created_at=datetime.now()
+)
+
+# Execute workflow
+engine = LangGraphWorkflowEngine(workflow_definition)
+result = engine.execute({
+    'input': 'The product quality was excellent but delivery took too long!'
+})
+
+print(f"Final Response: {result.get('response')}")
+print(f"Status: {result.get('status')}")
+print(f"Sentiment: {result.get('sentiment')}")
+print(f"Category: {result.get('category')}")</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tip-box">
+            <h5><i class="fas fa-lightbulb"></i> Best Practices for Sequential Workflows</h5>
+            <ul>
+                <li><strong>Clear Node Names:</strong> Use descriptive IDs like "extract_text" not "node1"</li>
+                <li><strong>State Passing:</strong> Each node can access previous results via {previous_result}</li>
+                <li><strong>Error Handling:</strong> Use try-catch in tool nodes to handle failures gracefully</li>
+                <li><strong>Temperature Control:</strong> Lower temperature (0.2-0.3) for factual tasks, higher (0.7-0.9) for creative tasks</li>
+                <li><strong>Prompt Engineering:</strong> Be specific about expected output format</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Parallel Workflows Section -->
+    <div class="doc-section" id="parallel">
+        <h2><i class="fas fa-project-diagram"></i> Parallel Workflows</h2>
+        
+        <div class="intro-box">
+            <h4>What are Parallel Workflows?</h4>
+            <p>Parallel workflows execute multiple branches simultaneously, allowing independent tasks to run concurrently. This dramatically reduces overall execution time when tasks don't depend on each other.</p>
+        </div>
+        
+        <h3>Use Cases</h3>
+        <ul>
+            <li><strong>Multi-Model Analysis</strong> - Run different AI models simultaneously on the same input</li>
+            <li><strong>Data Processing</strong> - Process multiple data sources concurrently</li>
+            <li><strong>Content Generation</strong> - Generate multiple variations in parallel</li>
+            <li><strong>Research Aggregation</strong> - Query multiple sources simultaneously</li>
+        </ul>
+        
+        <h3>Execution Flow</h3>
+        <div class="workflow-diagram">
+<pre>
+                     ┌──→ Branch 1 (GPT-4 Analysis) ──┐
+                     │                                 │
+┌───────┐      ┌─────────┐                       ┌─────────┐      ┌─────┐
+│ Start │  →   │ Parallel│                       │ Combine │  →   │ End │
+└───────┘      └─────────┘                       └─────────┘      └─────┘
+                     │                                 │
+                     └──→ Branch 2 (Claude Analysis) ─┘
+
+All branches run simultaneously
+Results merged at combine node
+</pre>
+        </div>
+        
+        <div class="example-box">
+            <div class="example-title">Example 2: Multi-Model Text Analysis</div>
+            
+            <p><strong>Scenario:</strong> Analyze text using multiple AI models in parallel and compare results</p>
+            
+            <div class="code-tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#par1-json">JSON</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#par1-python">Python</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="par1-json">
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre>{
+  "nodes": [
+    {
+      "node_id": "start",
+      "node_type": "start"
+    },
+    {
+      "node_id": "parallel_analysis",
+      "node_type": "parallel",
+      "config": {
+        "branches": ["gpt4_analysis", "claude_analysis", "sentiment_tool"]
+      }
+    },
+    {
+      "node_id": "gpt4_analysis",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Analyze this text comprehensively:\n\n{input}\n\nProvide:\n1. Main themes\n2. Tone and style\n3. Key insights\n4. Sentiment score (0-1)",
+        "temperature": 0.5
+      }
+    },
+    {
+      "node_id": "claude_analysis",
+      "node_type": "llm",
+      "config": {
+        "model": "claude-3",
+        "prompt_template": "Perform detailed text analysis:\n\n{input}\n\nFocus on:\n1. Linguistic patterns\n2. Emotional content\n3. Implicit meanings\n4. Overall assessment",
+        "temperature": 0.5
+      }
+    },
+    {
+      "node_id": "sentiment_tool",
+      "node_type": "tool",
+      "config": {
+        "tool_name": "text_analysis",
+        "parameters": {
+          "operations": ["sentiment", "emotion", "tone"]
+        }
+      }
+    },
+    {
+      "node_id": "combine_results",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Compare and synthesize these three analyses:\n\nGPT-4 Analysis:\n{gpt4_result}\n\nClaude Analysis:\n{claude_result}\n\nTool Analysis:\n{tool_result}\n\nProvide:\n1. Consensus findings\n2. Conflicting interpretations\n3. Most reliable assessment\n4. Confidence level",
+        "temperature": 0.3
+      }
+    },
+    {
+      "node_id": "end",
+      "node_type": "end"
+    }
+  ],
+  "edges": [
+    {"source": "start", "target": "parallel_analysis"},
+    {"source": "parallel_analysis", "target": "gpt4_analysis"},
+    {"source": "parallel_analysis", "target": "claude_analysis"},
+    {"source": "parallel_analysis", "target": "sentiment_tool"},
+    {"source": "gpt4_analysis", "target": "combine_results"},
+    {"source": "claude_analysis", "target": "combine_results"},
+    {"source": "sentiment_tool", "target": "combine_results"},
+    {"source": "combine_results", "target": "end"}
+  ]
+}</pre>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="par1-python">
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre>from workflow_management.workflow_langgraph_engine import LangGraphWorkflowEngine
+import operator
+from typing import Annotated
+
+# Define reducer functions for parallel results
+def merge_dicts(left: dict, right: dict) -> dict:
+    """Merge two dictionaries"""
+    return {**left, **right}
+
+# Define parallel workflow
+workflow_definition = {
+    'nodes': [
+        {'node_id': 'start', 'node_type': 'start'},
+        {
+            'node_id': 'parallel_analysis',
+            'node_type': 'parallel',
+            'config': {
+                'branches': ['gpt4_analysis', 'claude_analysis', 'sentiment_tool']
+            }
+        },
+        {
+            'node_id': 'gpt4_analysis',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''Analyze this text comprehensively:
+
+{input}
+
+Provide:
+1. Main themes
+2. Tone and style
+3. Key insights
+4. Sentiment score (0-1)
+
+Return as JSON.''',
+                'temperature': 0.5
+            }
+        },
+        {
+            'node_id': 'claude_analysis',
+            'node_type': 'llm',
+            'config': {
+                'model': 'claude-3',
+                'prompt_template': '''Perform detailed text analysis:
+
+{input}
+
+Focus on:
+1. Linguistic patterns
+2. Emotional content
+3. Implicit meanings
+4. Overall assessment
+
+Return as JSON.''',
+                'temperature': 0.5
+            }
+        },
+        {
+            'node_id': 'sentiment_tool',
+            'node_type': 'tool',
+            'config': {
+                'tool_name': 'text_analysis',
+                'parameters': {
+                    'operations': ['sentiment', 'emotion', 'tone']
+                }
+            }
+        },
+        {
+            'node_id': 'combine_results',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''Compare and synthesize these analyses:
+
+GPT-4: {gpt4_result}
+Claude: {claude_result}
+Tool: {tool_result}
+
+Provide:
+1. Consensus findings
+2. Conflicting interpretations
+3. Most reliable assessment
+4. Confidence level''',
+                'temperature': 0.3
+            }
+        },
+        {'node_id': 'end', 'node_type': 'end'}
+    ],
+    'edges': [
+        {'source': 'start', 'target': 'parallel_analysis'},
+        {'source': 'parallel_analysis', 'target': 'gpt4_analysis'},
+        {'source': 'parallel_analysis', 'target': 'claude_analysis'},
+        {'source': 'parallel_analysis', 'target': 'sentiment_tool'},
+        {'source': 'gpt4_analysis', 'target': 'combine_results'},
+        {'source': 'claude_analysis', 'target': 'combine_results'},
+        {'source': 'sentiment_tool', 'target': 'combine_results'},
+        {'source': 'combine_results', 'target': 'end'}
+    ]
+}
+
+# Execute parallel workflow
+engine = LangGraphWorkflowEngine(workflow_definition)
+
+input_text = """
+The new AI assistant demonstrates remarkable capabilities in understanding
+context and generating coherent responses. Users report high satisfaction
+with the natural conversation flow and accurate information retrieval.
+"""
+
+result = engine.execute({'input': input_text})
+
+print(f"Synthesis: {result.get('synthesis')}")
+print(f"Confidence: {result.get('confidence')}")
+print(f"Execution Time: {result.get('execution_time')} seconds")
+
+# Parallel execution is typically 3x faster than sequential!
+# Sequential: 15 seconds, Parallel: 5 seconds</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="warning-box">
+            <h5><i class="fas fa-exclamation-triangle"></i> Important Notes</h5>
+            <ul>
+                <li><strong>Reducer Functions:</strong> Must define how to merge parallel results (merge_dicts, operator.add)</li>
+                <li><strong>State Typing:</strong> Use Annotated types for proper state management</li>
+                <li><strong>Cost Consideration:</strong> Parallel execution uses more API tokens simultaneously</li>
+                <li><strong>Error Handling:</strong> One branch failure doesn't stop others, but results may be incomplete</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Conditional Workflows Section -->
+    <div class="doc-section" id="conditional">
+        <h2><i class="fas fa-code-branch"></i> Conditional Workflows</h2>
+        
+        <div class="intro-box">
+            <h4>What are Conditional Workflows?</h4>
+            <p>Conditional workflows make decisions during execution, routing to different branches based on runtime conditions. This enables dynamic, context-aware processing.</p>
+        </div>
+        
+        <h3>Use Cases</h3>
+        <ul>
+            <li><strong>Priority Routing</strong> - High-priority items take a fast-track path</li>
+            <li><strong>Quality Gates</strong> - Only high-quality outputs proceed to next stage</li>
+            <li><strong>Error Recovery</strong> - Different handling for errors vs. success</li>
+            <li><strong>User Segmentation</strong> - Different flows for different user types</li>
+        </ul>
+        
+        <h3>Execution Flow</h3>
+        <div class="workflow-diagram">
+<pre>
+                              ┌──→ High Priority Path ──→ Escalate ──┐
+                              │                                      │
+┌───────┐      ┌──────────┐  │                                      │    ┌─────┐
+│ Start │  →   │ Analyze  │  → [Conditional: Priority > 0.8?]       →  →│ End │
+└───────┘      └──────────┘  │                                      │    └─────┘
+                              │                                      │
+                              └──→ Normal Path ──→ Standard Process ─┘
+
+Decision made at runtime based on analysis results
+</pre>
+        </div>
+        
+        <div class="example-box">
+            <div class="example-title">Example 3: Priority-Based Customer Support Routing</div>
+            
+            <p><strong>Scenario:</strong> Route customer inquiries based on urgency and sentiment</p>
+            
+            <div class="code-tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#cond1-json">JSON</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#cond1-python">Python</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="cond1-json">
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre>{
+  "nodes": [
+    {
+      "node_id": "start",
+      "node_type": "start"
+    },
+    {
+      "node_id": "analyze_inquiry",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Analyze this customer inquiry:\n\n{input}\n\nProvide:\n1. Urgency score (0-1): How urgent is this?\n2. Sentiment score (-1 to 1): Customer emotion\n3. Category: technical/billing/general\n4. Key issues mentioned\n\nReturn as JSON with fields: urgency, sentiment, category, issues",
+        "temperature": 0.3
+      }
+    },
+    {
+      "node_id": "check_priority",
+      "node_type": "conditional",
+      "config": {
+        "condition": "result['urgency'] > 0.7 or result['sentiment'] < -0.5"
+      }
+    },
+    {
+      "node_id": "high_priority_path",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "HIGH PRIORITY INQUIRY\n\nAnalysis: {analysis}\n\nGenerate immediate response addressing:\n1. Acknowledge urgency\n2. Provide immediate solutions\n3. Escalation to human agent\n4. Expected response time: within 1 hour",
+        "temperature": 0.5
+      }
+    },
+    {
+      "node_id": "notify_manager",
+      "node_type": "tool",
+      "config": {
+        "tool_name": "send_notification",
+        "parameters": {
+          "recipient": "support_manager",
+          "priority": "high",
+          "channel": "slack"
+        }
+      }
+    },
+    {
+      "node_id": "normal_priority_path",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Standard inquiry response\n\nAnalysis: {analysis}\n\nGenerate helpful response:\n1. Address customer's questions\n2. Provide relevant information\n3. Include helpful resources\n4. Standard response time: 24 hours",
+        "temperature": 0.7
+      }
+    },
+    {
+      "node_id": "add_to_queue",
+      "node_type": "tool",
+      "config": {
+        "tool_name": "queue_manager",
+        "parameters": {
+          "queue": "standard_support",
+          "priority": "normal"
+        }
+      }
+    },
+    {
+      "node_id": "end",
+      "node_type": "end"
+    }
+  ],
+  "edges": [
+    {"source": "start", "target": "analyze_inquiry"},
+    {"source": "analyze_inquiry", "target": "check_priority"},
+    {"source": "check_priority", "target": "high_priority_path", "condition": "true"},
+    {"source": "check_priority", "target": "normal_priority_path", "condition": "false"},
+    {"source": "high_priority_path", "target": "notify_manager"},
+    {"source": "notify_manager", "target": "end"},
+    {"source": "normal_priority_path", "target": "add_to_queue"},
+    {"source": "add_to_queue", "target": "end"}
+  ]
+}</pre>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="cond1-python">
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre>from workflow_management.workflow_langgraph_engine import LangGraphWorkflowEngine
+from typing import Literal
+
+# Define conditional workflow
+workflow_definition = {
+    'nodes': [
+        {'node_id': 'start', 'node_type': 'start'},
+        {
+            'node_id': 'analyze_inquiry',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''Analyze this customer inquiry:
+
+{input}
+
+Provide JSON with:
+- urgency: 0-1 score
+- sentiment: -1 to 1 score
+- category: technical/billing/general
+- issues: list of key issues''',
+                'temperature': 0.3
+            }
+        },
+        {
+            'node_id': 'check_priority',
+            'node_type': 'conditional',
+            'config': {
+                'condition': "result['urgency'] > 0.7 or result['sentiment'] < -0.5"
+            }
+        },
+        {
+            'node_id': 'high_priority_path',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''HIGH PRIORITY INQUIRY
+
+Analysis: {analysis}
+
+Generate immediate response:
+1. Acknowledge urgency
+2. Immediate solutions
+3. Escalate to human
+4. Response time: 1 hour''',
+                'temperature': 0.5
+            }
+        },
+        {
+            'node_id': 'notify_manager',
+            'node_type': 'tool',
+            'config': {
+                'tool_name': 'send_notification',
+                'parameters': {
+                    'recipient': 'support_manager',
+                    'priority': 'high',
+                    'channel': 'slack'
+                }
+            }
+        },
+        {
+            'node_id': 'normal_priority_path',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''Standard inquiry
+
+Analysis: {analysis}
+
+Generate response:
+1. Address questions
+2. Provide information
+3. Include resources
+4. Response time: 24h''',
+                'temperature': 0.7
+            }
+        },
+        {
+            'node_id': 'add_to_queue',
+            'node_type': 'tool',
+            'config': {
+                'tool_name': 'queue_manager',
+                'parameters': {
+                    'queue': 'standard_support',
+                    'priority': 'normal'
+                }
+            }
+        },
+        {'node_id': 'end', 'node_type': 'end'}
+    ],
+    'edges': [
+        {'source': 'start', 'target': 'analyze_inquiry'},
+        {'source': 'analyze_inquiry', 'target': 'check_priority'},
+        {'source': 'check_priority', 'target': 'high_priority_path', 'condition': 'true'},
+        {'source': 'check_priority', 'target': 'normal_priority_path', 'condition': 'false'},
+        {'source': 'high_priority_path', 'target': 'notify_manager'},
+        {'source': 'notify_manager', 'target': 'end'},
+        {'source': 'normal_priority_path', 'target': 'add_to_queue'},
+        {'source': 'add_to_queue', 'target': 'end'}
+    ]
+}
+
+# Execute with different inputs
+engine = LangGraphWorkflowEngine(workflow_definition)
+
+# High priority case
+urgent_inquiry = "URGENT: Our production system is down! We're losing money every minute!"
+result1 = engine.execute({'input': urgent_inquiry})
+print(f"Path taken: {result1.get('path')}")  # high_priority_path
+
+# Normal case
+normal_inquiry = "Can you explain how the billing cycle works?"
+result2 = engine.execute({'input': normal_inquiry})
+print(f"Path taken: {result2.get('path')}")  # normal_priority_path</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tip-box">
+            <h5><i class="fas fa-lightbulb"></i> Conditional Logic Best Practices</h5>
+            <ul>
+                <li><strong>Clear Conditions:</strong> Use simple, testable conditions like "score > 0.8"</li>
+                <li><strong>Boolean Expressions:</strong> Combine with AND/OR: "urgency > 0.7 or sentiment < -0.5"</li>
+                <li><strong>State Access:</strong> Reference result fields: result['field_name']</li>
+                <li><strong>Default Paths:</strong> Always have a fallback for when condition is false</li>
+                <li><strong>Testing:</strong> Test both true and false paths thoroughly</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Human-in-the-Loop Section -->
+    <div class="doc-section" id="hitl">
+        <h2><i class="fas fa-user-check"></i> Human-in-the-Loop (HITL) Workflows</h2>
+        
+        <div class="intro-box">
+            <h4>What are HITL Workflows?</h4>
+            <p>Human-in-the-Loop workflows pause execution at critical points to wait for human approval, input, or decision. This ensures human oversight in automated processes, combining AI efficiency with human judgment.</p>
+        </div>
+        
+        <h3>Use Cases</h3>
+        <ul>
+            <li><strong>Content Approval</strong> - Review AI-generated content before publishing</li>
+            <li><strong>Financial Decisions</strong> - Approve large transactions or investments</li>
+            <li><strong>Quality Control</strong> - Verify AI outputs meet standards</li>
+            <li><strong>Policy Compliance</strong> - Ensure actions comply with regulations</li>
+            <li><strong>Critical Operations</strong> - Human verification for important actions</li>
+        </ul>
+        
+        <h3>Execution Flow</h3>
+        <div class="workflow-diagram">
+<pre>
+┌───────┐    ┌────────┐    ┌────────────────┐    ┌──────────┐    ┌─────┐
+│ Start │ → │Generate│ → │ Human Approval │ → │ Publish  │ → │ End │
+└───────┘    └────────┘    └────────────────┘    └──────────┘    └─────┘
+                                  ↓
+                            ⏸ PAUSED
+                            Waiting for human
+                            Task created in UI
+                            Email notification sent
+</pre>
+        </div>
+        
+        <div class="example-box">
+            <div class="example-title">Example 4: Report Generation with Manager Approval</div>
+            
+            <p><strong>Scenario:</strong> Generate weekly report with AI, get manager approval, then distribute</p>
+            
+            <div class="code-tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#hitl1-json">JSON</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#hitl1-python">Python</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="hitl1-json">
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre>{
+  "nodes": [
+    {
+      "node_id": "start",
+      "node_type": "start"
+    },
+    {
+      "node_id": "gather_data",
+      "node_type": "tool",
+      "config": {
+        "tool_name": "data_aggregator",
+        "parameters": {
+          "sources": ["sales_db", "crm", "analytics"],
+          "time_period": "last_7_days"
+        }
+      }
+    },
+    {
+      "node_id": "generate_report",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Generate a comprehensive weekly report based on this data:\n\n{data}\n\nInclude:\n1. Executive Summary\n2. Key Metrics (with % change)\n3. Highlights and Lowlights\n4. Trends Analysis\n5. Recommendations\n6. Next Week Forecast\n\nFormat as professional business report with sections and bullet points.",
+        "temperature": 0.5
+      }
+    },
+    {
+      "node_id": "create_visualizations",
+      "node_type": "tool",
+      "config": {
+        "tool_name": "chart_generator",
+        "parameters": {
+          "chart_types": ["line", "bar", "pie"],
+          "data_source": "report_metrics"
+        }
+      }
+    },
+    {
+      "node_id": "manager_approval",
+      "node_type": "human",
+      "config": {
+        "assigned_to": "manager@company.com",
+        "task_type": "approval",
+        "instructions": "Please review the generated weekly report and visualizations. Approve to send to stakeholders, or provide feedback for revisions.\n\nKey items to verify:\n- Data accuracy\n- Metric calculations\n- Trend interpretations\n- Recommendations appropriateness",
+        "timeout": 7200,
+        "allow_comments": true,
+        "attachments": ["report_document", "charts"]
+      }
+    },
+    {
+      "node_id": "process_feedback",
+      "node_type": "conditional",
+      "config": {
+        "condition": "human_task['status'] == 'approved'"
+      }
+    },
+    {
+      "node_id": "revise_report",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Revise the report based on this feedback:\n\nOriginal Report:\n{original_report}\n\nManager Feedback:\n{feedback}\n\nMake the requested changes while maintaining professional quality.",
+        "temperature": 0.4
+      }
+    },
+    {
+      "node_id": "distribute_report",
+      "node_type": "tool",
+      "config": {
+        "tool_name": "email_sender",
+        "parameters": {
+          "recipients": ["team@company.com", "executives@company.com"],
+          "subject": "Weekly Report - Week of {date}",
+          "format": "html",
+          "attachments": true
+        }
+      }
+    },
+    {
+      "node_id": "log_distribution",
+      "node_type": "tool",
+      "config": {
+        "tool_name": "audit_logger",
+        "parameters": {
+          "action": "report_distributed",
+          "approved_by": "{approver}",
+          "timestamp": true
+        }
+      }
+    },
+    {
+      "node_id": "end",
+      "node_type": "end"
+    }
+  ],
+  "edges": [
+    {"source": "start", "target": "gather_data"},
+    {"source": "gather_data", "target": "generate_report"},
+    {"source": "generate_report", "target": "create_visualizations"},
+    {"source": "create_visualizations", "target": "manager_approval"},
+    {"source": "manager_approval", "target": "process_feedback"},
+    {"source": "process_feedback", "target": "distribute_report", "condition": "approved"},
+    {"source": "process_feedback", "target": "revise_report", "condition": "feedback"},
+    {"source": "revise_report", "target": "manager_approval"},
+    {"source": "distribute_report", "target": "log_distribution"},
+    {"source": "log_distribution", "target": "end"}
+  ]
+}</pre>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="hitl1-python">
+                        <div class="code-block">
+                            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+<pre>from workflow_management.workflow_langgraph_engine import LangGraphWorkflowEngine
+from workflow_management.workflow_models import Workflow, HumanTask
+from datetime import datetime, timedelta
+
+# Define HITL workflow
+workflow_definition = {
+    'nodes': [
+        {'node_id': 'start', 'node_type': 'start'},
+        {
+            'node_id': 'gather_data',
+            'node_type': 'tool',
+            'config': {
+                'tool_name': 'data_aggregator',
+                'parameters': {
+                    'sources': ['sales_db', 'crm', 'analytics'],
+                    'time_period': 'last_7_days'
+                }
+            }
+        },
+        {
+            'node_id': 'generate_report',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''Generate weekly report from data:
+
+{data}
+
+Include:
+1. Executive Summary
+2. Key Metrics (% change)
+3. Highlights & Lowlights
+4. Trends Analysis
+5. Recommendations
+6. Next Week Forecast
+
+Professional business format.''',
+                'temperature': 0.5
+            }
+        },
+        {
+            'node_id': 'create_visualizations',
+            'node_type': 'tool',
+            'config': {
+                'tool_name': 'chart_generator',
+                'parameters': {
+                    'chart_types': ['line', 'bar', 'pie'],
+                    'data_source': 'report_metrics'
+                }
+            }
+        },
+        {
+            'node_id': 'manager_approval',
+            'node_type': 'human',
+            'config': {
+                'assigned_to': 'manager@company.com',
+                'task_type': 'approval',
+                'instructions': '''Review weekly report and visualizations.
+
+Approve to send to stakeholders, or provide feedback.
+
+Verify:
+- Data accuracy
+- Metric calculations
+- Trend interpretations
+- Recommendations''',
+                'timeout': 7200,  # 2 hours
+                'allow_comments': True,
+                'attachments': ['report_document', 'charts']
+            }
+        },
+        {
+            'node_id': 'process_feedback',
+            'node_type': 'conditional',
+            'config': {
+                'condition': "human_task['status'] == 'approved'"
+            }
+        },
+        {
+            'node_id': 'revise_report',
+            'node_type': 'llm',
+            'config': {
+                'model': 'gpt-4',
+                'prompt_template': '''Revise report with feedback:
+
+Original: {original_report}
+Feedback: {feedback}
+
+Make requested changes, maintain quality.''',
+                'temperature': 0.4
+            }
+        },
+        {
+            'node_id': 'distribute_report',
+            'node_type': 'tool',
+            'config': {
+                'tool_name': 'email_sender',
+                'parameters': {
+                    'recipients': ['team@company.com', 'executives@company.com'],
+                    'subject': 'Weekly Report - Week of {date}',
+                    'format': 'html',
+                    'attachments': True
+                }
+            }
+        },
+        {
+            'node_id': 'log_distribution',
+            'node_type': 'tool',
+            'config': {
+                'tool_name': 'audit_logger',
+                'parameters': {
+                    'action': 'report_distributed',
+                    'approved_by': '{approver}',
+                    'timestamp': True
+                }
+            }
+        },
+        {'node_id': 'end', 'node_type': 'end'}
+    ],
+    'edges': [
+        {'source': 'start', 'target': 'gather_data'},
+        {'source': 'gather_data', 'target': 'generate_report'},
+        {'source': 'generate_report', 'target': 'create_visualizations'},
+        {'source': 'create_visualizations', 'target': 'manager_approval'},
+        {'source': 'manager_approval', 'target': 'process_feedback'},
+        {'source': 'process_feedback', 'target': 'distribute_report', 'condition': 'approved'},
+        {'source': 'process_feedback', 'target': 'revise_report', 'condition': 'feedback'},
+        {'source': 'revise_report', 'target': 'manager_approval'},
+        {'source': 'distribute_report', 'target': 'log_distribution'},
+        {'source': 'log_distribution', 'target': 'end'}
+    ]
+}
+
+# Execute workflow
+engine = LangGraphWorkflowEngine(workflow_definition)
+execution = engine.execute_async({'input': 'weekly_report_request'})
+
+print(f"Execution ID: {execution.execution_id}")
+print(f"Status: {execution.status}")  # Will be 'paused'
+
+# Workflow is now PAUSED at manager_approval node
+# Manager will see task in their task list
+# They can:
+# 1. Approve → Workflow continues to distribute_report
+# 2. Provide feedback → Workflow goes to revise_report then back to approval
+# 3. Reject → Workflow ends
+
+# To resume after approval:
+# engine.resume_execution(execution.execution_id, {'status': 'approved'})
+
+# To resume with feedback:
+# engine.resume_execution(execution.execution_id, {
+#     'status': 'feedback',
+#     'comments': 'Please add more detail on Q3 projections'
+# })</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="success-box">
+            <h5><i class="fas fa-check-circle"></i> HITL Workflow Behavior</h5>
+            <p><strong>When workflow reaches human node:</strong></p>
+            <ol>
+                <li>Workflow execution PAUSES (status='paused')</li>
+                <li>Human task is created in database</li>
+                <li>Task appears in assigned user's task list</li>
+                <li>Email notification sent (if configured)</li>
+                <li>Workflow waits indefinitely (or until timeout)</li>
+                <li>User completes task through UI</li>
+                <li>Workflow RESUMES automatically</li>
+                <li>Proceeds to next node based on user's decision</li>
+            </ol>
+        </div>
+        
+        <div class="warning-box">
+            <h5><i class="fas fa-exclamation-triangle"></i> Critical HITL Configuration</h5>
+            <table class="parameter-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>assigned_to</strong></td>
+                        <td>✅ Yes</td>
+                        <td>User email or ID</td>
+                        <td>manager@company.com</td>
+                    </tr>
+                    <tr>
+                        <td><strong>task_type</strong></td>
+                        <td>✅ Yes</td>
+                        <td>approval/review/input</td>
+                        <td>approval</td>
+                    </tr>
+                    <tr>
+                        <td><strong>instructions</strong></td>
+                        <td>✅ Yes</td>
+                        <td>What user should do</td>
+                        <td>Review and approve report</td>
+                    </tr>
+                    <tr>
+                        <td><strong>timeout</strong></td>
+                        <td>⚠️ Recommended</td>
+                        <td>Seconds before timeout</td>
+                        <td>3600 (1 hour)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>allow_comments</strong></td>
+                        <td>❌ Optional</td>
+                        <td>Can user add feedback?</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td><strong>attachments</strong></td>
+                        <td>❌ Optional</td>
+                        <td>Files to show user</td>
+                        <td>["report.pdf"]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Advanced Topics Section -->
+    <div class="doc-section" id="advanced">
+        <h2><i class="fas fa-graduation-cap"></i> Advanced Topics</h2>
+        
+        <h3>Complex Workflow Patterns</h3>
+        
+        <h4>1. Nested Conditionals</h4>
+        <p>Combine multiple conditional nodes for sophisticated decision trees:</p>
+        <div class="workflow-diagram">
+<pre>
+                    ┌──→ VIP Path ──────→
+                    │
+Start → Classify ──→ Check Priority ──→ Check Sentiment ──→ Route
+                    │                    │
+                    └──→ Standard Path ──┘
+</pre>
+        </div>
+        
+        <h4>2. Parallel with Aggregation</h4>
+        <p>Run parallel analyses and intelligently combine results:</p>
+        <div class="code-block">
+<pre># Define custom reducer
+from typing import Annotated
+import operator
+
+def intelligent_merge(results: list) -> dict:
+    """Merge parallel results with conflict resolution"""
+    if all(r.get('sentiment') == 'positive' for r in results):
+        return {'consensus': 'positive', 'confidence': 0.95}
+    elif all(r.get('sentiment') == 'negative' for r in results):
+        return {'consensus': 'negative', 'confidence': 0.95}
+    else:
+        return {'consensus': 'mixed', 'confidence': 0.6}
+
+# Use in workflow state
+class WorkflowState(TypedDict):
+    results: Annotated[list, intelligent_merge]</pre>
+        </div>
+        
+        <h4>3. Loop Workflows</h4>
+        <p>Create iterative refinement workflows:</p>
+        <div class="workflow-diagram">
+<pre>
+         ┌──────────────────────────┐
+         │                          │
+Start → Generate → Evaluate → [Good?] ──No──┘
+                       │
+                      Yes
+                       │
+                       ↓
+                      End
+                      
+Loops until quality threshold met (max 5 iterations)
+</pre>
+        </div>
+        
+        <h4>4. Error Recovery Patterns</h4>
+        <div class="code-block">
+<pre>{
+  "nodes": [
+    {
+      "node_id": "risky_operation",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "{input}",
+        "on_error": "fallback_operation",
+        "max_retries": 3,
+        "retry_delay": 5
+      }
+    },
+    {
+      "node_id": "fallback_operation",
+      "node_type": "llm",
+      "config": {
+        "model": "gpt-3.5-turbo",  // Cheaper fallback
+        "prompt_template": "{input}"
+      }
+    }
+  ]
+}</pre>
+        </div>
+        
+        <h3>State Management</h3>
+        <p>Abhikarta uses LangGraph's StateGraph for powerful state management:</p>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Description</th>
+                    <th>Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Checkpointing</strong></td>
+                    <td>Save state at each node</td>
+                    <td>Resume after failures</td>
+                </tr>
+                <tr>
+                    <td><strong>State Persistence</strong></td>
+                    <td>SQLite-based storage</td>
+                    <td>Long-running workflows</td>
+                </tr>
+                <tr>
+                    <td><strong>State Reducers</strong></td>
+                    <td>Custom merge functions</td>
+                    <td>Parallel result aggregation</td>
+                </tr>
+                <tr>
+                    <td><strong>State History</strong></td>
+                    <td>Track all state changes</td>
+                    <td>Debugging, auditing</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>Performance Optimization</h3>
+        
+        <div class="tip-box">
+            <h5><i class="fas fa-tachometer-alt"></i> Speed Optimization Strategies</h5>
+            <ul>
+                <li><strong>Use Parallel Nodes:</strong> Independent operations run simultaneously</li>
+                <li><strong>Cache Results:</strong> Store expensive computations</li>
+                <li><strong>Batch Processing:</strong> Process multiple items together</li>
+                <li><strong>Model Selection:</strong> Use smaller models where appropriate</li>
+                <li><strong>Prompt Optimization:</strong> Shorter prompts = faster responses</li>
+            </ul>
+        </div>
+        
+        <h3>Monitoring and Observability</h3>
+        <p>Abhikarta provides comprehensive monitoring:</p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                <h4>Execution Tracking</h4>
+                <p>Real-time status updates</p>
+                <ul>
+                    <li>Node-level progress</li>
+                    <li>Execution time metrics</li>
+                    <li>Resource utilization</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-clipboard-list"></i></div>
+                <h4>Audit Logs</h4>
+                <p>Complete execution history</p>
+                <ul>
+                    <li>All state changes</li>
+                    <li>User actions</li>
+                    <li>System events</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <h4>Error Tracking</h4>
+                <p>Detailed error information</p>
+                <ul>
+                    <li>Stack traces</li>
+                    <li>Error context</li>
+                    <li>Recovery options</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- API Reference Section -->
+    <div class="doc-section" id="api">
+        <h2><i class="fas fa-code"></i> API Reference</h2>
+        
+        <h3>Core Classes</h3>
+        
+        <h4>LangGraphWorkflowEngine</h4>
+        <div class="code-block">
+<pre>from workflow_management.workflow_langgraph_engine import LangGraphWorkflowEngine
+
+# Initialize engine
+engine = LangGraphWorkflowEngine(workflow_definition)
+
+# Execute workflow
+result = engine.execute(input_data: dict) -> dict
+
+# Execute asynchronously (for HITL)
+execution = engine.execute_async(input_data: dict) -> Execution
+
+# Resume paused workflow
+result = engine.resume_execution(execution_id: str, user_input: dict) -> dict
+
+# Cancel execution
+engine.cancel_execution(execution_id: str) -> bool
+
+# Get execution status
+status = engine.get_execution_status(execution_id: str) -> dict</pre>
+        </div>
+        
+        <h4>Workflow Model</h4>
+        <div class="code-block">
+<pre>from workflow_management.workflow_models import Workflow
+
+workflow = Workflow(
+    workflow_id: str,           # Unique identifier
+    name: str,                  # Display name
+    description: str,           # Description
+    definition_json: dict,      # Workflow definition
+    version: int,               # Version number
+    status: str,                # active/inactive/archived
+    created_by: str,            # Creator user ID
+    created_at: datetime        # Creation timestamp
+)</pre>
+        </div>
+        
+        <h3>REST API Endpoints</h3>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Endpoint</th>
+                    <th>Method</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>/workflow/create</code></td>
+                    <td>POST</td>
+                    <td>Create new workflow</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/list</code></td>
+                    <td>GET</td>
+                    <td>List all workflows</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/&lt;id&gt;</code></td>
+                    <td>GET</td>
+                    <td>Get workflow details</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/execute/&lt;id&gt;</code></td>
+                    <td>POST</td>
+                    <td>Execute workflow</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/executions</code></td>
+                    <td>GET</td>
+                    <td>List executions</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/execution/&lt;id&gt;</code></td>
+                    <td>GET</td>
+                    <td>Execution details</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/execution/&lt;id&gt;/pause</code></td>
+                    <td>POST</td>
+                    <td>Pause execution</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/execution/&lt;id&gt;/resume</code></td>
+                    <td>POST</td>
+                    <td>Resume execution</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/execution/&lt;id&gt;/cancel</code></td>
+                    <td>POST</td>
+                    <td>Cancel execution</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/tasks</code></td>
+                    <td>GET</td>
+                    <td>List human tasks</td>
+                </tr>
+                <tr>
+                    <td><code>/workflow/task/&lt;id&gt;/complete</code></td>
+                    <td>POST</td>
+                    <td>Complete human task</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>Database Schema</h3>
+        <p>Abhikarta uses 6 tables for workflow data:</p>
+        
+        <div class="code-block">
+<pre>-- Workflows table
+CREATE TABLE wf_workflows (
+    workflow_id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    definition_json TEXT NOT NULL,
+    version INTEGER,
+    status TEXT,
+    created_by TEXT,
+    created_at TIMESTAMP
+);
+
+-- Executions table
+CREATE TABLE wf_executions (
+    execution_id TEXT PRIMARY KEY,
+    workflow_id TEXT,
+    status TEXT,
+    input_data TEXT,
+    output_data TEXT,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    error_message TEXT
+);
+
+-- Node executions table
+CREATE TABLE wf_node_executions (
+    node_execution_id TEXT PRIMARY KEY,
+    execution_id TEXT,
+    node_id TEXT,
+    status TEXT,
+    input_data TEXT,
+    output_data TEXT,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP
+);
+
+-- Human tasks table
+CREATE TABLE wf_human_tasks (
+    task_id TEXT PRIMARY KEY,
+    execution_id TEXT,
+    node_id TEXT,
+    assigned_to TEXT,
+    task_type TEXT,
+    instructions TEXT,
+    status TEXT,
+    created_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    response_data TEXT
+);
+
+-- Variables table
+CREATE TABLE wf_variables (
+    variable_id TEXT PRIMARY KEY,
+    execution_id TEXT,
+    variable_name TEXT,
+    variable_value TEXT,
+    created_at TIMESTAMP
+);
+
+-- Audit logs table
+CREATE TABLE wf_audit_logs (
+    log_id TEXT PRIMARY KEY,
+    execution_id TEXT,
+    action TEXT,
+    details TEXT,
+    user_id TEXT,
+    timestamp TIMESTAMP
+);</pre>
+        </div>
+    </div>
+    
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+<script>
+// Copy code functionality
+function copyCode(button) {
+    const codeBlock = button.nextElementSibling;
+    const code = codeBlock.textContent;
+    
+    navigator.clipboard.writeText(code).then(() => {
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+            button.textContent = 'Copy';
+        }, 2000);
+    });
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

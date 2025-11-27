@@ -62,6 +62,22 @@ class WorkflowRoutes(AbstractRoutes):
             logger.warning(f"Could not register workflow template filters: {e}")
 
         # ============ Workflow Management Routes ============
+        @self.app.route('/workflow/help')
+        @login_required
+        def workflow_help():
+            """Comprehensive workflow documentation with examples"""
+            return render_template('workflow/workflow_help.html')
+
+        @self.app.route('/workflow/designer/help')
+        @login_required
+        def workflow_designer_help():
+            """Workflow designer help and documentation"""
+            return render_template('workflow/workflow_designer_help.html')
+
+        @self.app.route('/workflow/designer')
+        @login_required
+        def workflow_designer():
+            return render_template('workflow/workflow_designer.html')
 
         @self.app.route('/workflow/dashboard')
         @login_required
