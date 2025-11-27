@@ -13,16 +13,14 @@ may be subject to patent applications.
 """
 
 from flask import render_template, request, jsonify, session, redirect, url_for, flash
-from functools import wraps
 import logging
-import json
 from datetime import datetime
 
 from web.route_management.abstract_routes import AbstractRoutes
 from workflow_management.workflow_db_handler import WorkflowDBHandler
 from workflow_management.workflow_execution_engine import WorkflowExecutionEngine
 from workflow_management.models.workflow_models import (
-    Workflow, WorkflowExecution, HumanTask, WorkflowStatus
+    Workflow, WorkflowStatus
 )
 from web.route_management.abstract_routes import login_required
 
@@ -53,7 +51,7 @@ class WorkflowRoutes(AbstractRoutes):
         
         # Register custom template filters for datetime handling
         try:
-            from workflow_management.template_filters import register_template_filters
+            from web.template_filters import register_template_filters
             register_template_filters(self.app)
             logger.info("Workflow template filters registered")
         except Exception as e:

@@ -176,3 +176,22 @@ def register_template_filters(app):
     
     # Duration formatting
     app.jinja_env.filters['format_duration'] = format_duration
+
+
+def register_app_context(app, prop_conf):
+    """
+    Register application context variables from properties configuration.
+    Makes app name, owner, and email available to all templates.
+
+    Args:
+        app: Flask application instance
+        prop_conf: PropertiesConfigurator instance
+    """
+    @app.context_processor
+    def inject_app_info():
+        """Inject application information into all templates."""
+        return {
+            'app_name': prop_conf.get('app.name', 'Abhikarta LLM'),
+            'app_owner': prop_conf.get('app.owner', 'Ashutosh Sinha'),
+            'app_owner_email': prop_conf.get('app.owner.email', 'ajsinha@gmail.com')
+        }

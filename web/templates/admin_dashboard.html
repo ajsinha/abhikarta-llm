@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard - Abhikarta LLM Platform{% endblock %}
+{% block title %}Admin Dashboard - {{ app_name }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -8,7 +8,7 @@
         padding: 30px 0;
         min-height: calc(100vh - 200px);
     }
-    
+
     .welcome-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -17,7 +17,7 @@
         margin-bottom: 30px;
         box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
     }
-    
+
     .management-card {
         border-radius: 15px;
         transition: all 0.3s ease;
@@ -26,29 +26,29 @@
         border: none;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
-    
+
     .management-card:hover {
         transform: translateY(-10px);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
-    
+
     .card-icon {
         font-size: 3.5rem;
         margin-bottom: 20px;
     }
-    
+
     .card-users { border-top: 5px solid #3498db; }
     .card-users:hover { background: linear-gradient(135deg, #3498db22 0%, #3498db11 100%); }
     .card-users .card-icon { color: #3498db; }
-    
+
     .card-models { border-top: 5px solid #e74c3c; }
     .card-models:hover { background: linear-gradient(135deg, #e74c3c22 0%, #e74c3c11 100%); }
     .card-models .card-icon { color: #e74c3c; }
-    
+
     .card-roles { border-top: 5px solid #9b59b6; }
     .card-roles:hover { background: linear-gradient(135deg, #9b59b622 0%, #9b59b611 100%); }
     .card-roles .card-icon { color: #9b59b6; }
-    
+
     .card-resources { border-top: 5px solid #16a085; }
     .card-resources:hover { background: linear-gradient(135deg, #16a08522 0%, #16a08511 100%); }
     .card-resources .card-icon { color: #16a085; }
@@ -322,7 +322,7 @@
         <div class="row align-items-center">
             <div class="col-md-8 welcome-card-content">
                 <h2><i class="fas fa-user-shield"></i> Welcome, {{ fullname }}!</h2>
-                <p class="mb-0">Administrator Dashboard - Abhikarta LLM Platform</p>
+                <p class="mb-0">Administrator Dashboard - {{ app_name }}</p>
                 <small>User ID: {{ userid }} | Role: Admin</small>
             </div>
             <div class="col-md-4 text-end">

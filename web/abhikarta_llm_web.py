@@ -29,7 +29,7 @@ from model_management.model_registry import ModelRegistry
 from llm_provider.llm_facade_factory import LLMFacadeFactory
 from llm_provider.facade_cache_manager import FacadeCacheManager
 from llm_provider.session_cleanup_task import create_cleanup_manager
-from workflow_management.template_filters import register_template_filters
+from web.template_filters import register_template_filters, register_app_context
 
 # Configure logging
 logging.basicConfig(
@@ -42,23 +42,23 @@ logger = logging.getLogger(__name__)
 class AbhikartaLLMWeb:
     """
     Main Flask application class for Abhikarta LLM Web Interface.
-    
+
     This class encapsulates the Flask application and manages route registration
     for different modules (authentication, admin, user).
-    
+
     Attributes:
         app: Flask application instance
         user_manager: UserManager instance for user operations
     """
-    
+
     def __init__(self, secret_key: Optional[str] = None):
         """
         Initialize the Abhikarta LLM Web Application.
-        
+
         Args:
             secret_key: Secret key for session management (generated if not provided)
         """
-        self.app = Flask(__name__, 
+        self.app = Flask(__name__,
                         template_folder='templates',
                         static_folder='static')
         self.prop_conf = PropertiesConfigurator()
@@ -97,9 +97,10 @@ class AbhikartaLLMWeb:
         )
         #
         register_template_filters(self.app)
+        register_app_context(self.app, self.prop_conf)
         # Initialize session
         Session(self.app)
-        
+
         self.cleanup_sessions()
         logger.info("Abhikarta LLM Web Application initialized")
 
@@ -209,26 +210,26 @@ class AbhikartaLLMWeb:
         def index():
             """Redirect to login page."""
             return redirect(url_for('login'))
-        
+
         logger.info("All routes registered successfully")
-    
+
     def _register_error_handlers(self):
         """Register error handlers for the application."""
-        
+
         @self.app.errorhandler(404)
         def not_found(error):
             """Handle 404 errors."""
-            return render_template('error.html', 
+            return render_template('error.html',
                                  error_code=404,
                                  error_message="Page not found"), 404
-        
+
         @self.app.errorhandler(403)
         def forbidden(error):
             """Handle 403 errors."""
             return render_template('error.html',
                                  error_code=403,
                                  error_message="Access forbidden"), 403
-        
+
         @self.app.errorhandler(500)
         def internal_error(error):
             """Handle 500 errors."""
@@ -236,13 +237,13 @@ class AbhikartaLLMWeb:
             return render_template('error.html',
                                  error_code=500,
                                  error_message="Internal server error"), 500
-        
+
         logger.info("Error handlers registered")
-    
+
     def run(self, host='0.0.0.0', port=5000, debug=False):
         """
         Run the Flask application.
-        
+
         Args:
             host: Host address to bind to
             port: Port number to listen on
@@ -250,14 +251,12 @@ class AbhikartaLLMWeb:
         """
         logger.info(f"Starting Abhikarta LLM Web Application on {host}:{port}")
         self.app.run(host=host, port=port, debug=debug)
-    
+
     def get_app(self):
         """
         Get the Flask application instance.
-        
+
         Returns:
             Flask application instance
         """
         return self.app
-
-
