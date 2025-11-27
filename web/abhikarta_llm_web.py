@@ -181,6 +181,7 @@ class AbhikartaLLMWeb:
         from web.route_management.mcp_routes import MCPRoutes
         from web.route_management.llm_routes import LLMRoutes
         from web.route_management.workflow_routes import WorkflowRoutes
+        from web.route_management.agent_routes import AgentRoutes
 
         def check_and_run_a_method(obj, method_name, method_arg):
             if hasattr(obj, method_name):
@@ -198,7 +199,7 @@ class AbhikartaLLMWeb:
                     print(f"'{method_name}' exists but is not callable.")
 
         for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes,
-                   UserRoutes, ModelRoutes, MCPRoutes, LLMRoutes, WorkflowRoutes]:
+                   UserRoutes, ModelRoutes, MCPRoutes, LLMRoutes, WorkflowRoutes, AgentRoutes]:
             # Register route handler
             logger.info(f'registering route using {rt}')
             r_rt = rt(self.app, self.db_connection_pool_name)

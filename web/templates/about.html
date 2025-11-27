@@ -1,0 +1,1025 @@
+{% extends "base.html" %}
+
+{% block title %}About Abhikarta - Enterprise LLM Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --section-bg: #f8f9fa;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    .about-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 4rem 0 3rem;
+        text-align: center;
+        margin-bottom: 3rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .about-header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .about-header .tagline {
+        font-size: 1.5rem;
+        font-weight: 300;
+        opacity: 0.95;
+        margin-bottom: 0.5rem;
+    }
+
+    .about-header .version {
+        font-size: 1rem;
+        opacity: 0.8;
+        margin-top: 1rem;
+    }
+
+    .section {
+        padding: 3rem 0;
+    }
+
+    .section:nth-child(even) {
+        background: var(--section-bg);
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: var(--primary-gradient);
+        border-radius: 2px;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid #667eea;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-card h3 {
+        color: #667eea;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .feature-card h3 i {
+        font-size: 1.8rem;
+    }
+
+    .feature-card p {
+        color: #666;
+        line-height: 1.8;
+        margin: 0;
+    }
+
+    .architecture-diagram {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: var(--card-shadow);
+        margin: 2rem 0;
+    }
+
+    .architecture-layer {
+        padding: 1.5rem;
+        margin: 1rem 0;
+        border-radius: 8px;
+        border-left: 4px solid;
+    }
+
+    .layer-presentation {
+        background: #e3f2fd;
+        border-color: #2196f3;
+    }
+
+    .layer-business {
+        background: #f3e5f5;
+        border-color: #9c27b0;
+    }
+
+    .layer-integration {
+        background: #fff3e0;
+        border-color: #ff9800;
+    }
+
+    .layer-data {
+        background: #e8f5e9;
+        border-color: #4caf50;
+    }
+
+    .architecture-layer h4 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .architecture-layer ul {
+        margin: 0.5rem 0 0 1.5rem;
+        padding: 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        border-top: 4px solid #667eea;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #667eea;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .provider-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .provider-badge {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.3s ease;
+    }
+
+    .provider-badge:hover {
+        transform: scale(1.05);
+    }
+
+    .provider-badge i {
+        font-size: 2.5rem;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+
+    .provider-badge .provider-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    .info-box {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: var(--card-shadow);
+        margin: 2rem 0;
+    }
+
+    .info-box h4 {
+        color: #667eea;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-box ul {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+
+    .info-box li {
+        margin: 0.5rem 0;
+        line-height: 1.8;
+    }
+
+    .copyright-section {
+        background: #2c3e50;
+        color: white;
+        padding: 3rem 0;
+    }
+
+    .copyright-section h3 {
+        color: white;
+        margin-bottom: 1.5rem;
+    }
+
+    .copyright-section p {
+        margin-bottom: 1rem;
+        line-height: 1.8;
+    }
+
+    .legal-disclaimer {
+        background: #34495e;
+        color: #ecf0f1;
+        padding: 3rem 0;
+    }
+
+    .legal-disclaimer h3 {
+        color: white;
+        margin-bottom: 1.5rem;
+    }
+
+    .legal-disclaimer .disclaimer-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        border-left: 4px solid #3498db;
+    }
+
+    .legal-disclaimer .disclaimer-item h4 {
+        color: #3498db;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .legal-disclaimer .disclaimer-item p {
+        margin: 0;
+        line-height: 1.8;
+        opacity: 0.95;
+    }
+
+    .contact-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: var(--card-shadow);
+        text-align: center;
+        margin: 2rem auto;
+        max-width: 600px;
+    }
+
+    .contact-card i {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+
+    .contact-card h4 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    .contact-card a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .contact-card a:hover {
+        text-decoration: underline;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+        margin: 2rem 0;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--primary-gradient);
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -0.6rem;
+        top: 0;
+        width: 1.2rem;
+        height: 1.2rem;
+        border-radius: 50%;
+        background: #667eea;
+        border: 4px solid white;
+        box-shadow: 0 0 0 4px #667eea;
+    }
+
+    .timeline-item h4 {
+        color: #667eea;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-item p {
+        margin: 0;
+        color: #666;
+    }
+
+    .badge-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0;
+    }
+
+    .tech-badge {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .highlight-box {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-left: 4px solid #667eea;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+    }
+
+    .highlight-box p {
+        margin: 0;
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+
+    @media (max-width: 768px) {
+        .about-header h1 {
+            font-size: 2rem;
+        }
+
+        .about-header .tagline {
+            font-size: 1.2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .feature-grid,
+        .stats-grid,
+        .provider-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-page">
+    <!-- Header -->
+    <div class="about-header">
+        <div class="container">
+            <h1><i class="fas fa-brain"></i> Abhikarta</h1>
+            <div class="tagline">Enterprise-Grade LLM Platform for AI-Powered Solutions</div>
+            <div class="version">Version 1.0 | Build 2025.1</div>
+        </div>
+    </div>
+
+    <!-- Platform Overview Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Platform Overview</h2>
+            <div class="highlight-box">
+                <p>
+                    <strong>Abhikarta</strong> is a comprehensive, enterprise-grade Large Language Model (LLM) platform 
+                    designed to empower organizations with cutting-edge AI capabilities. Built on a robust, scalable 
+                    architecture, Abhikarta provides seamless integration with multiple AI providers, sophisticated 
+                    workflow orchestration, and advanced session management—all within a secure, production-ready environment.
+                </p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">13+</div>
+                    <div class="stat-label">AI Providers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">14</div>
+                    <div class="stat-label">Execution Modes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">90%</div>
+                    <div class="stat-label">Performance Boost</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">200K+</div>
+                    <div class="stat-label">Context Window</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Core Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3><i class="fas fa-network-wired"></i> Multi-Provider Integration</h3>
+                    <p>
+                        Seamlessly integrate with 13+ leading AI providers including OpenAI, Anthropic, Google, 
+                        Cohere, Mistral, Meta, Groq, HuggingFace, Together AI, Ollama, AWS Bedrock, and more. 
+                        Switch between providers dynamically with zero downtime.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-project-diagram"></i> Workflow Orchestration</h3>
+                    <p>
+                        Design complex AI workflows using our visual workflow designer with support for 7 node types: 
+                        Start, End, LLM, Tool, Human-in-the-Loop, Conditional, and Parallel execution. Export, import, 
+                        and version control your workflows with ease.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-bolt"></i> Advanced Session Management</h3>
+                    <p>
+                        Industry-leading session-based facade caching delivers 90% performance improvements for 
+                        subsequent requests. Automatic cleanup, 60-minute TTL, and intelligent cache invalidation 
+                        ensure optimal resource utilization.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-cogs"></i> 14 Execution Modes</h3>
+                    <p>
+                        Support for Chat, DAG, ReAct, Planning, Autonomous, Human-in-the-Loop, Background, RAG, 
+                        Chain of Thought, Tool Calling, Multi-Agent, Hybrid, Kafka Listening, and custom execution modes. 
+                        Choose the right paradigm for your use case.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-database"></i> Comprehensive Data Persistence</h3>
+                    <p>
+                        SQLite-based persistence layer with 19 tables managing sessions, conversations, workflows, 
+                        executions, tool calls, and audit logs. Full conversation history with efficient retrieval 
+                        and analysis capabilities.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-shield-alt"></i> Enterprise Security</h3>
+                    <p>
+                        Role-based access control, secure session management, comprehensive audit logging, and 
+                        PII protection. All interactions logged for compliance and security analysis with 
+                        configurable retention policies.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-chart-line"></i> Real-Time Analytics</h3>
+                    <p>
+                        Monitor usage patterns, track token consumption, analyze cost metrics, and gain insights 
+                        into model performance. Comprehensive dashboards for administrators and users with 
+                        exportable reports.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-plug"></i> MCP Integration</h3>
+                    <p>
+                        Model Context Protocol integration enables seamless tool calling and external service 
+                        connectivity. Build custom tools, integrate APIs, and extend platform capabilities 
+                        with standardized protocols.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-robot"></i> Agent Orchestration</h3>
+                    <p>
+                        Advanced agent systems supporting autonomous operation, multi-agent collaboration, 
+                        dynamic tool selection, and goal-oriented task completion. ReAct and Planning modes 
+                        enable sophisticated reasoning workflows.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supported Providers Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Supported AI Providers</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 2rem; font-size: 1.1rem;">
+                Abhikarta integrates with the world's leading AI providers, giving you the flexibility to choose 
+                the best model for your specific use case.
+            </p>
+            <div class="provider-grid">
+                <div class="provider-badge">
+                    <i class="fas fa-brain"></i>
+                    <div class="provider-name">OpenAI</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-robot"></i>
+                    <div class="provider-name">Anthropic</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-search"></i>
+                    <div class="provider-name">Google AI</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-comment-dots"></i>
+                    <div class="provider-name">Cohere</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-wind"></i>
+                    <div class="provider-name">Mistral AI</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-book"></i>
+                    <div class="provider-name">Meta</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-bolt"></i>
+                    <div class="provider-name">Groq</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-smile"></i>
+                    <div class="provider-name">HuggingFace</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-users"></i>
+                    <div class="provider-name">Together AI</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-server"></i>
+                    <div class="provider-name">Ollama</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-cloud"></i>
+                    <div class="provider-name">AWS Bedrock</div>
+                </div>
+                <div class="provider-badge">
+                    <i class="fas fa-vial"></i>
+                    <div class="provider-name">Mock Provider</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">System Architecture</h2>
+            <div class="architecture-diagram">
+                <h3 style="text-align: center; color: #333; margin-bottom: 2rem;">
+                    Layered Architecture with Clean Separation of Concerns
+                </h3>
+
+                <div class="architecture-layer layer-presentation">
+                    <h4><i class="fas fa-desktop"></i> Presentation Layer</h4>
+                    <ul>
+                        <li><strong>Flask Web Framework</strong> - RESTful API endpoints and web interface</li>
+                        <li><strong>Bootstrap 5 UI</strong> - Responsive, mobile-first design</li>
+                        <li><strong>Jinja2 Templates</strong> - Dynamic server-side rendering</li>
+                        <li><strong>JavaScript/AJAX</strong> - Real-time interactions and updates</li>
+                        <li><strong>D3.js Visualization</strong> - Workflow designer and analytics</li>
+                    </ul>
+                </div>
+
+                <div class="architecture-layer layer-business">
+                    <h4><i class="fas fa-cogs"></i> Business Logic Layer</h4>
+                    <ul>
+                        <li><strong>LLM Facades</strong> - Unified interface for 13+ providers</li>
+                        <li><strong>Session Manager</strong> - Thread-safe session lifecycle management</li>
+                        <li><strong>Workflow Engine</strong> - DAG execution with LangGraph integration</li>
+                        <li><strong>Execution Modes</strong> - 14 different execution paradigms</li>
+                        <li><strong>Caching Layer</strong> - Redis-based facade caching (90% speedup)</li>
+                    </ul>
+                </div>
+
+                <div class="architecture-layer layer-integration">
+                    <h4><i class="fas fa-plug"></i> Integration Layer</h4>
+                    <ul>
+                        <li><strong>LangChain Framework</strong> - Chain composition and tool integration</li>
+                        <li><strong>LangGraph</strong> - State machine and graph-based workflows</li>
+                        <li><strong>MCP Protocol</strong> - Model Context Protocol for tool calling</li>
+                        <li><strong>Kafka Integration</strong> - Event streaming and message processing</li>
+                        <li><strong>REST APIs</strong> - External service integration</li>
+                    </ul>
+                </div>
+
+                <div class="architecture-layer layer-data">
+                    <h4><i class="fas fa-database"></i> Data Layer</h4>
+                    <ul>
+                        <li><strong>SQLite Database</strong> - 19 tables for comprehensive data management</li>
+                        <li><strong>Session Store</strong> - User sessions and authentication state</li>
+                        <li><strong>Conversation History</strong> - Full context preservation and retrieval</li>
+                        <li><strong>Workflow Definitions</strong> - JSON-based workflow specifications</li>
+                        <li><strong>Audit Logs</strong> - Complete interaction history and compliance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Technology Stack</h2>
+            <div class="info-box">
+                <h4><i class="fas fa-code"></i> Backend Technologies</h4>
+                <div class="badge-container">
+                    <span class="tech-badge">Python 3.9+</span>
+                    <span class="tech-badge">Flask 2.3+</span>
+                    <span class="tech-badge">LangChain</span>
+                    <span class="tech-badge">LangGraph</span>
+                    <span class="tech-badge">SQLite</span>
+                    <span class="tech-badge">Redis</span>
+                    <span class="tech-badge">Gunicorn</span>
+                    <span class="tech-badge">Threading</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fas fa-palette"></i> Frontend Technologies</h4>
+                <div class="badge-container">
+                    <span class="tech-badge">Bootstrap 5</span>
+                    <span class="tech-badge">JavaScript ES6+</span>
+                    <span class="tech-badge">jQuery</span>
+                    <span class="tech-badge">D3.js</span>
+                    <span class="tech-badge">Font Awesome</span>
+                    <span class="tech-badge">Jinja2</span>
+                    <span class="tech-badge">CSS3</span>
+                    <span class="tech-badge">AJAX</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fas fa-brain"></i> AI/ML Frameworks</h4>
+                <div class="badge-container">
+                    <span class="tech-badge">OpenAI API</span>
+                    <span class="tech-badge">Anthropic API</span>
+                    <span class="tech-badge">Google AI API</span>
+                    <span class="tech-badge">LangChain</span>
+                    <span class="tech-badge">LangGraph</span>
+                    <span class="tech-badge">HuggingFace</span>
+                    <span class="tech-badge">PyTorch</span>
+                    <span class="tech-badge">Transformers</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Use Cases</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3><i class="fas fa-comments"></i> Conversational AI</h3>
+                    <p>
+                        Deploy intelligent chatbots and virtual assistants with multi-turn conversation support, 
+                        context awareness, and seamless handoff between AI and human agents.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-file-code"></i> Code Generation</h3>
+                    <p>
+                        Generate, review, and debug code across multiple programming languages with intelligent 
+                        suggestions, best practices, and automated testing capabilities.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-search-plus"></i> Document Analysis</h3>
+                    <p>
+                        Extract insights from documents, perform semantic search, summarize content, and answer 
+                        questions using advanced RAG (Retrieval-Augmented Generation) techniques.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-tasks"></i> Workflow Automation</h3>
+                    <p>
+                        Automate complex business processes with AI-powered decision making, parallel execution, 
+                        conditional branching, and human approval checkpoints.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-chart-bar"></i> Data Analysis</h3>
+                    <p>
+                        Analyze datasets, generate insights, create visualizations, and produce comprehensive 
+                        reports using natural language queries and AI-powered analytics.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-language"></i> Content Creation</h3>
+                    <p>
+                        Generate marketing copy, technical documentation, creative writing, and localized content 
+                        with style consistency and brand voice preservation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Development Timeline Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Development Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Phase 1: Foundation (Q1 2025)</h4>
+                    <p>
+                        Core platform architecture, multi-provider integration, basic chat interface, 
+                        user authentication, and database schema design.
+                    </p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>Phase 2: Advanced Features (Q2 2025)</h4>
+                    <p>
+                        Session management, facade caching, workflow designer, execution modes, 
+                        and comprehensive logging infrastructure.
+                    </p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>Phase 3: Enterprise Capabilities (Q3 2025)</h4>
+                    <p>
+                        Agent orchestration, MCP integration, analytics dashboards, admin tools, 
+                        and security hardening.
+                    </p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>Phase 4: Scale & Optimization (Q4 2025)</h4>
+                    <p>
+                        Performance optimization, horizontal scaling, advanced caching strategies, 
+                        monitoring tools, and production deployment.
+                    </p>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>Future Roadmap (2026+)</h4>
+                    <p>
+                        Multi-modal support, real-time streaming, custom model fine-tuning, 
+                        marketplace for workflows and agents, and advanced collaboration features.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Copyright Section -->
+    <section class="copyright-section">
+        <div class="container">
+            <h3><i class="fas fa-copyright"></i> Copyright & Intellectual Property</h3>
+            <p>
+                <strong>Copyright © 2025-2030, All Rights Reserved</strong>
+            </p>
+            <p>
+                Abhikarta LLM Platform and all associated documentation, source code, design patterns, 
+                architectural decisions, and intellectual property are owned exclusively by:
+            </p>
+            <p style="font-size: 1.2rem; margin: 1.5rem 0;">
+                <strong>Ashutosh Sinha</strong><br>
+                Email: <a href="mailto:ajsinha@gmail.com" style="color: #3498db;">ajsinha@gmail.com</a>
+            </p>
+            <p>
+                No part of this software, documentation, or related materials may be reproduced, distributed, 
+                modified, reverse engineered, or used for commercial purposes without explicit written permission 
+                from the copyright holder.
+            </p>
+            <p>
+                <strong>Patent Pending:</strong> Certain architectural patterns, algorithms, and implementations 
+                described herein may be subject to pending patent applications. Unauthorized use may constitute 
+                patent infringement.
+            </p>
+            <p>
+                All trademarks, service marks, trade names, product names, and logos appearing in this software 
+                are the property of their respective owners. Use of these marks does not imply endorsement.
+            </p>
+        </div>
+    </section>
+
+    <!-- Legal Disclaimers Section -->
+    <section class="legal-disclaimer">
+        <div class="container">
+            <h3><i class="fas fa-balance-scale"></i> Legal Disclaimers & Terms of Use</h3>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-exclamation-triangle"></i> General Disclaimer</h4>
+                <p>
+                    This software is provided "AS IS" without warranty of any kind, express or implied, including 
+                    but not limited to the warranties of merchantability, fitness for a particular purpose, and 
+                    non-infringement. In no event shall the authors or copyright holders be liable for any claim, 
+                    damages, or other liability arising from the use of this software.
+                </p>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-robot"></i> AI-Generated Content Disclaimer</h4>
+                <p>
+                    Abhikarta Platform facilitates access to Large Language Models (LLMs) from various providers. 
+                    The content generated by these AI models is not reviewed, verified, or endorsed by the platform 
+                    operators. Users are solely responsible for validating, verifying, and ensuring the accuracy, 
+                    appropriateness, and legality of AI-generated content before use in any production environment 
+                    or decision-making process.
+                </p>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-shield-alt"></i> Security & Data Privacy</h4>
+                <p>
+                    While Abhikarta implements industry-standard security practices, users are responsible for 
+                    ensuring compliance with applicable data protection regulations (GDPR, CCPA, HIPAA, etc.). 
+                    Do not input personally identifiable information (PII), protected health information (PHI), 
+                    payment card information (PCI), or other sensitive data without appropriate safeguards and 
+                    organizational approval. All interactions are logged for security and compliance purposes.
+                </p>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-dollar-sign"></i> Third-Party Service Costs</h4>
+                <p>
+                    Use of external AI providers (OpenAI, Anthropic, Google, etc.) through this platform incurs 
+                    costs directly with those providers based on their pricing models. Users and organizations 
+                    are responsible for monitoring usage, managing API quotas, and paying for services consumed. 
+                    Abhikarta is not liable for costs incurred through use of third-party services.
+                </p>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-gavel"></i> Compliance & Regulatory Use</h4>
+                <p>
+                    Organizations using Abhikarta in regulated industries (healthcare, finance, legal, etc.) are 
+                    responsible for ensuring compliance with applicable regulations and industry standards. This 
+                    software does not constitute legal, medical, financial, or professional advice. Consult 
+                    appropriate professionals before using AI-generated content for critical decisions.
+                </p>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-user-shield"></i> User Responsibilities</h4>
+                <p>
+                    Users must adhere to all applicable laws, regulations, and ethical guidelines when using 
+                    this platform. Prohibited uses include: generating malicious code, creating misleading 
+                    content, violating intellectual property rights, processing unauthorized data, or any use 
+                    that could cause harm to individuals or organizations. Users are responsible for their 
+                    prompts, queries, and the use of AI-generated outputs.
+                </p>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-sync-alt"></i> Service Availability</h4>
+                <p>
+                    While we strive to maintain high availability, this platform depends on third-party AI 
+                    services which may experience outages, rate limiting, or service degradation. We do not 
+                    guarantee uninterrupted access and are not liable for losses resulting from service 
+                    unavailability, data loss, or errors in AI-generated content.
+                </p>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-code-branch"></i> Software Modifications</h4>
+                <p>
+                    Unauthorized modification, reverse engineering, decompilation, or disassembly of this 
+                    software is strictly prohibited. Organizations wishing to modify or extend the platform 
+                    must obtain explicit written permission and licensing agreements from the copyright holder.
+                </p>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-file-contract"></i> Limitation of Liability</h4>
+                <p>
+                    To the maximum extent permitted by law, the copyright holder and contributors shall not be 
+                    liable for any indirect, incidental, special, consequential, or punitive damages, including 
+                    lost profits, data loss, business interruption, or system failures arising from use or 
+                    inability to use this software, even if advised of the possibility of such damages.
+                </p>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-edit"></i> Changes to Terms</h4>
+                <p>
+                    These terms, disclaimers, and notices may be updated at any time without prior notice. 
+                    Continued use of the platform after changes constitutes acceptance of the modified terms. 
+                    Users are responsible for regularly reviewing this page for updates.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Contact Information</h2>
+            <div class="contact-card">
+                <i class="fas fa-envelope"></i>
+                <h4>Get in Touch</h4>
+                <p style="color: #666; margin-bottom: 1rem;">
+                    For inquiries, licensing, support, or partnership opportunities:
+                </p>
+                <a href="mailto:ajsinha@gmail.com">ajsinha@gmail.com</a>
+            </div>
+
+            <div class="info-box" style="margin-top: 2rem;">
+                <h4><i class="fas fa-info-circle"></i> Additional Information</h4>
+                <ul>
+                    <li>
+                        <strong>Technical Support:</strong> For technical issues, consult the help documentation 
+                        accessible from the Chat and Workflows menus.
+                    </li>
+                    <li>
+                        <strong>Feature Requests:</strong> Feature suggestions and enhancement requests are welcome 
+                        and will be considered for future releases.
+                    </li>
+                    <li>
+                        <strong>Security Issues:</strong> Report security vulnerabilities privately to the email 
+                        address above. Please allow 48 hours for initial response.
+                    </li>
+                    <li>
+                        <strong>Licensing:</strong> Enterprise licensing options, custom deployments, and white-label 
+                        solutions are available upon request.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="copyright-section" style="padding: 2rem 0; text-align: center;">
+        <div class="container">
+            <p style="margin: 0; font-size: 0.9rem;">
+                © 2025-2030 Abhikarta Platform. All Rights Reserved. | 
+                <a href="mailto:ajsinha@gmail.com" style="color: #3498db;">Contact</a> | 
+                Patent Pending
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

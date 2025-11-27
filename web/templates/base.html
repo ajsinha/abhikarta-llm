@@ -66,17 +66,17 @@
 
                     <!-- Run Menu for LLM Operations -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="runDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-play-circle"></i> Run
+                        <a class="nav-link dropdown-toggle" href="#" id="chatDropdown"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-comments"></i> Chat
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="runDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="chatDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('llm_chat') }}">
-                                <i class="fas fa-comments"></i> Chat
+                                <i class="fas fa-comments"></i> Chat Interface
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item disabled" href="#">
-                                <i class="fas fa-robot"></i> Agent (Coming Soon)
+                            <li><a class="dropdown-item" href="{{ url_for('llm_chat_help') }}">
+                                <i class="fas fa-question-circle"></i> Help
                             </a></li>
                         </ul>
                     </li>
@@ -120,6 +120,29 @@
                                 </a>
                             </li>
                         </ul>
+                    </li>
+
+                    <!-- Agents Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="agentsDropdown"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-robot"></i> Agents
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="agentsDropdown">
+                            <li>
+                                <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">
+                                    <i class="fas fa-magic"></i> Agent Orchestration
+                                    <span class="badge bg-secondary ms-2">Coming Soon</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- About Menu -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') }}">
+                            <i class="fas fa-info-circle"></i> About
+                        </a>
                     </li>
                 </ul>
 

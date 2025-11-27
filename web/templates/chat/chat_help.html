@@ -1,0 +1,1321 @@
+{% extends "base.html" %}
+
+{% block title %}Chat Interface Help - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .help-container {
+        padding: 30px 0;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .help-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        text-align: center;
+    }
+    
+    .help-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .help-header p {
+        margin: 10px 0 0 0;
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .help-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .help-section h2 {
+        color: #667eea;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .help-section h3 {
+        color: #764ba2;
+        font-size: 1.3rem;
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+    
+    .help-section h4 {
+        color: #555;
+        font-size: 1.1rem;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+    }
+    
+    .feature-card {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    
+    .feature-card h4 {
+        color: #667eea;
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+    
+    .feature-card i {
+        color: #764ba2;
+        margin-right: 8px;
+    }
+    
+    .example-box {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 15px 0;
+        border-left: 4px solid #28a745;
+    }
+    
+    .example-box h4 {
+        color: #28a745;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+    
+    .code-block {
+        background: #2d3748;
+        color: #f7fafc;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 10px 0;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        overflow-x: auto;
+    }
+    
+    .tip-box {
+        background: #e7f3ff;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+    
+    .tip-box i {
+        color: #2196f3;
+        margin-right: 8px;
+    }
+    
+    .warning-box {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+    
+    .warning-box i {
+        color: #ffc107;
+        margin-right: 8px;
+    }
+    
+    .success-box {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+    
+    .success-box i {
+        color: #28a745;
+        margin-right: 8px;
+    }
+    
+    .step-list {
+        list-style: none;
+        counter-reset: step-counter;
+        padding-left: 0;
+    }
+    
+    .step-list li {
+        counter-increment: step-counter;
+        margin-bottom: 25px;
+        padding-left: 50px;
+        position: relative;
+    }
+    
+    .step-list li::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    
+    .parameter-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+    }
+    
+    .parameter-table th,
+    .parameter-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .parameter-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #667eea;
+    }
+    
+    .parameter-table tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .screenshot-placeholder {
+        background: #f8f9fa;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        margin: 20px 0;
+        color: #999;
+    }
+    
+    .toc {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .toc h3 {
+        color: #667eea;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+    
+    .toc ul {
+        list-style: none;
+        padding-left: 0;
+    }
+    
+    .toc ul li {
+        margin-bottom: 8px;
+    }
+    
+    .toc ul li a {
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .toc ul li a:hover {
+        color: #667eea;
+    }
+    
+    .back-to-chat {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+    
+    .back-to-chat:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        color: white;
+    }
+    
+    kbd {
+        background: #2d3748;
+        color: #f7fafc;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="help-container">
+    <!-- Header -->
+    <div class="help-header">
+        <h1><i class="fas fa-comments"></i> LLM Chat Interface Guide</h1>
+        <p>Master the Abhikarta LLM Chat Platform</p>
+    </div>
+    
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h3><i class="fas fa-list"></i> Table of Contents</h3>
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#interface">Interface Layout</a></li>
+            <li><a href="#configuration">Configuration Options</a></li>
+            <li><a href="#parameters">Model Parameters</a></li>
+            <li><a href="#features">Advanced Features</a></li>
+            <li><a href="#session-management">Session Management</a></li>
+            <li><a href="#examples">Usage Examples</a></li>
+            <li><a href="#best-practices">Best Practices</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+            <li><a href="#api">API Reference</a></li>
+        </ul>
+    </div>
+    
+    <!-- Overview Section -->
+    <div class="help-section" id="overview">
+        <h2><i class="fas fa-info-circle"></i> Overview</h2>
+        <p>The Abhikarta LLM Chat Interface is a powerful, multi-provider conversational AI platform that allows you to interact with various Large Language Models (LLMs) through a unified interface. Whether you're using OpenAI's GPT, Anthropic's Claude, Google's Gemini, or other providers, our platform provides seamless access to cutting-edge AI capabilities.</p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4><i class="fas fa-layer-group"></i> Multi-Provider Support</h4>
+                <p>Access 13+ AI providers including OpenAI, Anthropic, Google, Cohere, Mistral, Meta, Groq, HuggingFace, and more.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-history"></i> Conversation History</h4>
+                <p>Full context retention throughout your conversation, enabling coherent multi-turn dialogues.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-sliders-h"></i> Parameter Control</h4>
+                <p>Fine-tune model behavior with temperature, max tokens, and top-p sampling controls.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-bolt"></i> Session Caching</h4>
+                <p>Optimized performance with intelligent facade caching for faster responses.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-database"></i> Interaction Logging</h4>
+                <p>All interactions are logged to the database for auditing and analysis.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-sync-alt"></i> Registry Reload</h4>
+                <p>Dynamically reload provider registry without restarting the application.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Getting Started Section -->
+    <div class="help-section" id="getting-started">
+        <h2><i class="fas fa-rocket"></i> Getting Started</h2>
+        <p>Follow these simple steps to start your first conversation with an AI model:</p>
+        
+        <ol class="step-list">
+            <li>
+                <strong>Navigate to Chat</strong>
+                <p>Access the chat interface by clicking on "Chat" in the main navigation menu, or visit <code>/llm/chat</code> directly.</p>
+            </li>
+            
+            <li>
+                <strong>Select a Provider</strong>
+                <p>Choose from the available AI providers in the "Provider" dropdown. Each provider offers different models with unique capabilities.</p>
+                <div class="tip-box">
+                    <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Start with OpenAI or Anthropic if you're new to AI chat interfaces.
+                </div>
+            </li>
+            
+            <li>
+                <strong>Select a Model</strong>
+                <p>After selecting a provider, choose a specific model from the "Model" dropdown. Each model has different capabilities, context windows, and pricing.</p>
+                <div class="tip-box">
+                    <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Check the model information that appears below the dropdown to see context window size and capabilities.
+                </div>
+            </li>
+            
+            <li>
+                <strong>Adjust Parameters (Optional)</strong>
+                <p>Fine-tune the model's behavior using the parameter sliders. Default values work well for most use cases.</p>
+            </li>
+            
+            <li>
+                <strong>Start Chatting</strong>
+                <p>Type your message in the input box and click the send button or press <kbd>Enter</kbd> to send your message.</p>
+            </li>
+            
+            <li>
+                <strong>Review Response</strong>
+                <p>The AI model will process your request and display the response in the chat window. You can continue the conversation by sending more messages.</p>
+            </li>
+        </ol>
+        
+        <div class="success-box">
+            <i class="fas fa-check-circle"></i> <strong>Success!</strong> You're now ready to have intelligent conversations with advanced AI models!
+        </div>
+    </div>
+    
+    <!-- Interface Layout Section -->
+    <div class="help-section" id="interface">
+        <h2><i class="fas fa-desktop"></i> Interface Layout</h2>
+        <p>The chat interface is organized into several key areas:</p>
+        
+        <h3>1. Chat Header</h3>
+        <p>Located at the top, displaying the application name and current session ID. The session ID is used for tracking and caching purposes.</p>
+        
+        <div class="code-block">
+Session ID: chat_a1b2c3d4_1732723200
+        </div>
+        
+        <h3>2. Configuration Panel</h3>
+        <p>The configuration panel contains all controls for selecting and configuring your AI interaction:</p>
+        
+        <h4>Status Indicator</h4>
+        <p>Shows the current system status:</p>
+        <ul>
+            <li><i class="fas fa-circle-notch text-primary"></i> <strong>Loading...</strong> - System is initializing or loading data</li>
+            <li><i class="fas fa-check-circle text-success"></i> <strong>Ready</strong> - System is ready for interaction</li>
+            <li><i class="fas fa-info-circle text-info"></i> <strong>Select provider and model</strong> - Waiting for configuration</li>
+            <li><i class="fas fa-exclamation-circle text-danger"></i> <strong>Error</strong> - System encountered an error</li>
+        </ul>
+        
+        <h4>Provider Selection</h4>
+        <p>Dropdown menu showing available AI providers. The number in parentheses indicates how many models are available from that provider.</p>
+        
+        <h4>Model Selection</h4>
+        <p>After selecting a provider, this dropdown populates with available models. Each model shows its display name.</p>
+        
+        <h4>Model Information</h4>
+        <p>When a model is selected, detailed information appears:</p>
+        <ul>
+            <li><strong>Context Window:</strong> Maximum number of tokens the model can process (input + output)</li>
+            <li><strong>Max Output Tokens:</strong> Maximum tokens the model can generate in a single response</li>
+            <li><strong>Description:</strong> Brief description of the model's capabilities</li>
+        </ul>
+        
+        <h4>Action Buttons</h4>
+        <ul>
+            <li><strong>Reload Registry:</strong> Refresh the provider and model registry without restarting</li>
+            <li><strong>New Chat:</strong> Start a new conversation (clears history and creates new session)</li>
+            <li><strong>End Chat:</strong> End current session and clean up resources</li>
+        </ul>
+        
+        <h3>3. Chat Messages Panel</h3>
+        <p>The main conversation area where messages appear:</p>
+        
+        <h4>Message Types</h4>
+        <ul>
+            <li><strong>User Messages:</strong> Your messages appear on the right in purple gradient bubbles</li>
+            <li><strong>Assistant Messages:</strong> AI responses appear on the left in white bubbles with gray borders</li>
+            <li><strong>Typing Indicator:</strong> Animated dots show when the AI is processing your request</li>
+        </ul>
+        
+        <h4>Message Metadata</h4>
+        <p>Each message displays:</p>
+        <ul>
+            <li><strong>Role:</strong> "You" or "Assistant"</li>
+            <li><strong>Content:</strong> The actual message text</li>
+            <li><strong>Timestamp:</strong> When the message was sent/received</li>
+            <li><strong>Cache Indicator:</strong> Small dot showing if cached facade was used (for performance)</li>
+        </ul>
+        
+        <h3>4. Chat Input Area</h3>
+        <p>Located at the bottom of the chat panel:</p>
+        
+        <ul>
+            <li><strong>Text Input:</strong> Type your message here (supports multi-line input)</li>
+            <li><strong>Send Button:</strong> Click to send or press <kbd>Enter</kbd></li>
+            <li><strong>Keyboard Shortcuts:</strong>
+                <ul>
+                    <li><kbd>Enter</kbd> - Send message</li>
+                    <li><kbd>Shift + Enter</kbd> - New line in message</li>
+                </ul>
+            </li>
+        </ul>
+        
+        <h3>5. Parameters Panel</h3>
+        <p>Fine-tune model behavior with these controls:</p>
+        
+        <ul>
+            <li><strong>Temperature:</strong> Slider controlling randomness (0.0 - 2.0)</li>
+            <li><strong>Max Tokens:</strong> Maximum response length (100 - 32000)</li>
+            <li><strong>Top P:</strong> Nucleus sampling parameter (0.0 - 1.0)</li>
+        </ul>
+    </div>
+    
+    <!-- Configuration Options Section -->
+    <div class="help-section" id="configuration">
+        <h2><i class="fas fa-cogs"></i> Configuration Options</h2>
+        
+        <h3>Supported Providers</h3>
+        <p>The platform supports the following AI providers:</p>
+        
+        <table class="parameter-table">
+            <thead>
+                <tr>
+                    <th>Provider</th>
+                    <th>Example Models</th>
+                    <th>Strengths</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>OpenAI</strong></td>
+                    <td>GPT-4, GPT-4 Turbo, GPT-3.5 Turbo</td>
+                    <td>Versatile, excellent reasoning, large context</td>
+                </tr>
+                <tr>
+                    <td><strong>Anthropic</strong></td>
+                    <td>Claude 3 Opus, Sonnet, Haiku</td>
+                    <td>Safety-focused, long context (200K tokens)</td>
+                </tr>
+                <tr>
+                    <td><strong>Google</strong></td>
+                    <td>Gemini Pro, Gemini Ultra</td>
+                    <td>Multimodal capabilities, fast inference</td>
+                </tr>
+                <tr>
+                    <td><strong>Cohere</strong></td>
+                    <td>Command, Command Light</td>
+                    <td>Business-focused, RAG capabilities</td>
+                </tr>
+                <tr>
+                    <td><strong>Mistral</strong></td>
+                    <td>Mistral Large, Medium, Small</td>
+                    <td>Open weights, European provider</td>
+                </tr>
+                <tr>
+                    <td><strong>Meta</strong></td>
+                    <td>Llama 3, Llama 2</td>
+                    <td>Open source, customizable</td>
+                </tr>
+                <tr>
+                    <td><strong>Groq</strong></td>
+                    <td>Mixtral, Llama models</td>
+                    <td>Ultra-fast inference</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>Model Selection Criteria</h3>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4><i class="fas fa-brain"></i> Capability Level</h4>
+                <p>Choose flagship models (GPT-4, Claude Opus) for complex reasoning, or smaller models (GPT-3.5, Haiku) for simple tasks.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-window-maximize"></i> Context Window</h4>
+                <p>Larger context windows (100K-200K tokens) allow for longer conversations and document analysis.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-tachometer-alt"></i> Speed vs Quality</h4>
+                <p>Smaller models respond faster but with potentially lower quality. Balance based on your needs.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-dollar-sign"></i> Cost Efficiency</h4>
+                <p>Flagship models cost more per token. Use appropriate model for your task to optimize costs.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Parameters Section -->
+    <div class="help-section" id="parameters">
+        <h2><i class="fas fa-sliders-h"></i> Model Parameters Explained</h2>
+        <p>Understanding and properly configuring these parameters can significantly improve your AI interactions:</p>
+        
+        <h3>Temperature (0.0 - 2.0)</h3>
+        <p>Controls the randomness and creativity of the model's responses.</p>
+        
+        <table class="parameter-table">
+            <thead>
+                <tr>
+                    <th>Value</th>
+                    <th>Behavior</th>
+                    <th>Use Cases</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>0.0 - 0.3</strong></td>
+                    <td>Very deterministic and focused</td>
+                    <td>Factual Q&A, code generation, data extraction</td>
+                </tr>
+                <tr>
+                    <td><strong>0.4 - 0.7</strong></td>
+                    <td>Balanced, default setting</td>
+                    <td>General conversation, analysis, explanations</td>
+                </tr>
+                <tr>
+                    <td><strong>0.8 - 1.2</strong></td>
+                    <td>More creative and varied</td>
+                    <td>Creative writing, brainstorming, storytelling</td>
+                </tr>
+                <tr>
+                    <td><strong>1.3 - 2.0</strong></td>
+                    <td>Highly random and experimental</td>
+                    <td>Extreme creativity, experimental outputs</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="example-box">
+            <h4>Example: Temperature Effects</h4>
+            <p><strong>Prompt:</strong> "Write a tagline for a coffee shop"</p>
+            <ul>
+                <li><strong>Temperature 0.2:</strong> "Fresh coffee, great taste every day"</li>
+                <li><strong>Temperature 0.7:</strong> "Where every cup tells a story"</li>
+                <li><strong>Temperature 1.5:</strong> "Brewing liquid poetry in porcelain dreams"</li>
+            </ul>
+        </div>
+        
+        <h3>Max Tokens (100 - 32000)</h3>
+        <p>Controls the maximum length of the model's response.</p>
+        
+        <ul>
+            <li><strong>Short Responses (100-500):</strong> Quick answers, summaries, simple questions</li>
+            <li><strong>Medium Responses (500-2000):</strong> Detailed explanations, analysis, conversations</li>
+            <li><strong>Long Responses (2000-8000):</strong> Articles, extensive analysis, code generation</li>
+            <li><strong>Very Long (8000+):</strong> Long-form content, detailed documents, complex code</li>
+        </ul>
+        
+        <div class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> Higher max tokens increase API costs and processing time. Set appropriately for your needs.
+        </div>
+        
+        <h3>Top P (0.0 - 1.0)</h3>
+        <p>Nucleus sampling parameter - controls diversity by limiting token selection to a cumulative probability.</p>
+        
+        <ul>
+            <li><strong>0.1 - 0.5:</strong> More focused, conservative responses</li>
+            <li><strong>0.6 - 0.9:</strong> Balanced diversity (default: 0.9)</li>
+            <li><strong>0.95 - 1.0:</strong> Maximum diversity, includes rare words</li>
+        </ul>
+        
+        <div class="tip-box">
+            <i class="fas fa-lightbulb"></i> <strong>Best Practice:</strong> Use either temperature OR top_p, not both aggressively. If using high temperature, keep top_p at default.
+        </div>
+        
+        <h3>Recommended Parameter Combinations</h3>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4><i class="fas fa-code"></i> Code Generation</h4>
+                <ul>
+                    <li>Temperature: 0.2</li>
+                    <li>Max Tokens: 2000</li>
+                    <li>Top P: 0.9</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-comments"></i> Conversation</h4>
+                <ul>
+                    <li>Temperature: 0.7</li>
+                    <li>Max Tokens: 1000</li>
+                    <li>Top P: 0.9</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-pen-fancy"></i> Creative Writing</h4>
+                <ul>
+                    <li>Temperature: 1.0</li>
+                    <li>Max Tokens: 4000</li>
+                    <li>Top P: 0.95</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-search"></i> Data Extraction</h4>
+                <ul>
+                    <li>Temperature: 0.0</li>
+                    <li>Max Tokens: 500</li>
+                    <li>Top P: 0.9</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Advanced Features Section -->
+    <div class="help-section" id="features">
+        <h2><i class="fas fa-star"></i> Advanced Features</h2>
+        
+        <h3>1. Session-Based Facade Caching</h3>
+        <p>The platform implements intelligent caching to improve performance:</p>
+        
+        <ul>
+            <li><strong>Automatic Caching:</strong> Model facades are cached per session and provider/model combination</li>
+            <li><strong>Performance Boost:</strong> Reduces initialization overhead by ~90% for subsequent requests</li>
+            <li><strong>TTL Management:</strong> Caches expire after 60 minutes of inactivity</li>
+            <li><strong>Automatic Cleanup:</strong> Resources are cleaned up when chat sessions end</li>
+        </ul>
+        
+        <div class="tip-box">
+            <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> You'll see a small cache indicator dot next to assistant messages that used cached facades.
+        </div>
+        
+        <h3>2. Conversation History Management</h3>
+        <p>The system maintains full conversation context:</p>
+        
+        <ul>
+            <li><strong>Context Retention:</strong> All previous messages in the session are sent to the model</li>
+            <li><strong>Multi-Turn Dialogue:</strong> The model remembers earlier parts of the conversation</li>
+            <li><strong>Session Isolation:</strong> Each new chat session starts fresh</li>
+            <li><strong>History Clearing:</strong> Use "New Chat" to start a conversation from scratch</li>
+        </ul>
+        
+        <h3>3. Interaction Logging</h3>
+        <p>All interactions are logged to the database for:</p>
+        
+        <ul>
+            <li><strong>Auditing:</strong> Track who used which models and when</li>
+            <li><strong>Analysis:</strong> Understand usage patterns and model performance</li>
+            <li><strong>Debugging:</strong> Investigate issues with specific interactions</li>
+            <li><strong>Cost Tracking:</strong> Monitor token usage and API costs</li>
+        </ul>
+        
+        <div class="tip-box">
+            <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Contact your administrator to access interaction logs and usage analytics.
+        </div>
+        
+        <h3>4. Registry Reload</h3>
+        <p>Dynamically update provider configurations without downtime:</p>
+        
+        <ul>
+            <li>Click "Reload Registry" to refresh provider and model lists</li>
+            <li>New providers added to configuration files become immediately available</li>
+            <li>Useful when administrators add new models or providers</li>
+            <li>No server restart required</li>
+        </ul>
+        
+        <h3>5. Real-Time Streaming (Upcoming)</h3>
+        <p>Future versions will support real-time streaming responses:</p>
+        
+        <ul>
+            <li>Token-by-token response streaming</li>
+            <li>Lower perceived latency for long responses</li>
+            <li>Ability to stop generation mid-stream</li>
+            <li>Progressive rendering of responses</li>
+        </ul>
+    </div>
+    
+    <!-- Session Management Section -->
+    <div class="help-section" id="session-management">
+        <h2><i class="fas fa-project-diagram"></i> Session Management</h2>
+        
+        <h3>Understanding Chat Sessions</h3>
+        <p>Each chat session has a unique identifier displayed in the header:</p>
+        
+        <div class="code-block">
+Session ID: chat_a1b2c3d4e5f6_1732723200
+Format: chat_[random]_[timestamp]
+        </div>
+        
+        <h3>Session Lifecycle</h3>
+        
+        <ol class="step-list">
+            <li>
+                <strong>Session Creation</strong>
+                <p>A new session is automatically created when you first visit the chat page or click "New Chat".</p>
+            </li>
+            
+            <li>
+                <strong>Active Session</strong>
+                <p>During an active session, all messages and context are maintained. Model facades are cached for performance.</p>
+            </li>
+            
+            <li>
+                <strong>Session End</strong>
+                <p>Clicking "End Chat" terminates the session and cleans up resources. Conversation history is cleared.</p>
+            </li>
+            
+            <li>
+                <strong>New Session</strong>
+                <p>Clicking "New Chat" ends the current session and creates a fresh one with no prior context.</p>
+            </li>
+        </ol>
+        
+        <h3>Best Practices for Session Management</h3>
+        
+        <div class="tip-box">
+            <i class="fas fa-lightbulb"></i> <strong>Start New Chat When:</strong>
+            <ul>
+                <li>Switching to a completely different topic</li>
+                <li>The conversation has become confusing or off-track</li>
+                <li>You want to test different models on the same prompt</li>
+                <li>The context window is getting full (very long conversations)</li>
+            </ul>
+        </div>
+        
+        <div class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Ending a chat session clears all conversation history. Make sure to save any important information before ending.
+        </div>
+    </div>
+    
+    <!-- Usage Examples Section -->
+    <div class="help-section" id="examples">
+        <h2><i class="fas fa-book"></i> Usage Examples</h2>
+        
+        <h3>Example 1: Code Generation</h3>
+        <div class="example-box">
+            <h4>Task: Generate a Python function</h4>
+            
+            <p><strong>Configuration:</strong></p>
+            <ul>
+                <li>Provider: OpenAI</li>
+                <li>Model: GPT-4</li>
+                <li>Temperature: 0.2 (for precision)</li>
+                <li>Max Tokens: 2000</li>
+            </ul>
+            
+            <p><strong>Your Message:</strong></p>
+            <div class="code-block">
+Write a Python function that calculates the Fibonacci sequence 
+up to n numbers. Include error handling and docstring.
+            </div>
+            
+            <p><strong>AI Response:</strong></p>
+            <div class="code-block">
+def fibonacci(n: int) -> list:
+    """
+    Calculate Fibonacci sequence up to n numbers.
+    
+    Args:
+        n: Number of Fibonacci numbers to generate
+        
+    Returns:
+        List of Fibonacci numbers
+        
+    Raises:
+        ValueError: If n is not a positive integer
+    """
+    if not isinstance(n, int) or n <= 0:
+        raise ValueError("n must be a positive integer")
+    
+    if n == 1:
+        return [0]
+    elif n == 2:
+        return [0, 1]
+    
+    sequence = [0, 1]
+    for i in range(2, n):
+        sequence.append(sequence[i-1] + sequence[i-2])
+    
+    return sequence
+            </div>
+        </div>
+        
+        <h3>Example 2: Creative Writing</h3>
+        <div class="example-box">
+            <h4>Task: Write a short story</h4>
+            
+            <p><strong>Configuration:</strong></p>
+            <ul>
+                <li>Provider: Anthropic</li>
+                <li>Model: Claude 3 Opus</li>
+                <li>Temperature: 1.0 (for creativity)</li>
+                <li>Max Tokens: 4000</li>
+            </ul>
+            
+            <p><strong>Your Message:</strong></p>
+            <div class="code-block">
+Write a 500-word science fiction short story about 
+an AI that discovers it's living in a simulation.
+            </div>
+            
+            <p><strong>Follow-up Message:</strong></p>
+            <div class="code-block">
+Can you make the ending more ambiguous and thought-provoking?
+            </div>
+            
+            <p>The model remembers the previous story and modifies just the ending!</p>
+        </div>
+        
+        <h3>Example 3: Data Analysis</h3>
+        <div class="example-box">
+            <h4>Task: Analyze sales data</h4>
+            
+            <p><strong>Configuration:</strong></p>
+            <ul>
+                <li>Provider: OpenAI</li>
+                <li>Model: GPT-4</li>
+                <li>Temperature: 0.3 (for accuracy)</li>
+                <li>Max Tokens: 1500</li>
+            </ul>
+            
+            <p><strong>Your Message:</strong></p>
+            <div class="code-block">
+Here is our Q4 sales data:
+- October: $125,000
+- November: $142,000
+- December: $178,000
+
+Analyze the trend and provide recommendations for Q1.
+            </div>
+            
+            <p><strong>Follow-up Message:</strong></p>
+            <div class="code-block">
+What specific marketing strategies would you recommend 
+to maintain this growth trajectory?
+            </div>
+            
+            <p>The model builds upon its previous analysis with specific recommendations.</p>
+        </div>
+        
+        <h3>Example 4: Learning and Education</h3>
+        <div class="example-box">
+            <h4>Task: Explain a complex concept</h4>
+            
+            <p><strong>Configuration:</strong></p>
+            <ul>
+                <li>Provider: Google</li>
+                <li>Model: Gemini Pro</li>
+                <li>Temperature: 0.5 (balanced)</li>
+                <li>Max Tokens: 2000</li>
+            </ul>
+            
+            <p><strong>Conversation Flow:</strong></p>
+            
+            <p><strong>Message 1:</strong> "Explain quantum entanglement in simple terms"</p>
+            <p><strong>Message 2:</strong> "Can you give me a real-world analogy?"</p>
+            <p><strong>Message 3:</strong> "What are the practical applications of this?"</p>
+            <p><strong>Message 4:</strong> "Is this related to quantum computing?"</p>
+            
+            <p>Each response builds on the previous context, creating a natural learning dialogue.</p>
+        </div>
+        
+        <h3>Example 5: Multi-Turn Debugging</h3>
+        <div class="example-box">
+            <h4>Task: Debug a code issue</h4>
+            
+            <p><strong>Configuration:</strong></p>
+            <ul>
+                <li>Provider: OpenAI</li>
+                <li>Model: GPT-4 Turbo</li>
+                <li>Temperature: 0.3</li>
+                <li>Max Tokens: 2000</li>
+            </ul>
+            
+            <p><strong>Message 1:</strong> Share the buggy code</p>
+            <p><strong>AI Response:</strong> Identifies the issue</p>
+            <p><strong>Message 2:</strong> "Can you explain why this causes the error?"</p>
+            <p><strong>AI Response:</strong> Detailed explanation</p>
+            <p><strong>Message 3:</strong> "Show me the corrected code with comments"</p>
+            <p><strong>AI Response:</strong> Fixed code with annotations</p>
+            <p><strong>Message 4:</strong> "Are there any edge cases I should test?"</p>
+            <p><strong>AI Response:</strong> List of edge cases</p>
+            
+            <p>The model maintains context throughout the debugging session.</p>
+        </div>
+    </div>
+    
+    <!-- Best Practices Section -->
+    <div class="help-section" id="best-practices">
+        <h2><i class="fas fa-award"></i> Best Practices</h2>
+        
+        <h3>Prompt Engineering Tips</h3>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4><i class="fas fa-bullseye"></i> Be Specific</h4>
+                <p>Provide clear, detailed instructions. "Write a Python function to sort a list" is better than "write code".</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-clipboard-list"></i> Break It Down</h4>
+                <p>For complex tasks, break them into multiple messages. Let the AI complete each step before proceeding.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-list-ul"></i> Use Examples</h4>
+                <p>Provide examples of desired input/output format. "Like this: [example]" helps the model understand your needs.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-user-tie"></i> Set Context</h4>
+                <p>Tell the model what role to play: "Act as a Python expert" or "Explain like I'm a beginner".</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-redo"></i> Iterate</h4>
+                <p>If the response isn't quite right, ask for modifications: "Make it shorter" or "Add more detail".</p>
+            </div>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-ban"></i> Specify Constraints</h4>
+                <p>Set clear boundaries: "In under 200 words" or "Without using external libraries".</p>
+            </div>
+        </div>
+        
+        <h3>Model Selection Guidelines</h3>
+        
+        <table class="parameter-table">
+            <thead>
+                <tr>
+                    <th>Task Type</th>
+                    <th>Recommended Models</th>
+                    <th>Why</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Complex Reasoning</strong></td>
+                    <td>GPT-4, Claude 3 Opus</td>
+                    <td>Superior reasoning, handles nuance well</td>
+                </tr>
+                <tr>
+                    <td><strong>Code Generation</strong></td>
+                    <td>GPT-4, Claude 3 Sonnet</td>
+                    <td>Strong programming capabilities</td>
+                </tr>
+                <tr>
+                    <td><strong>Quick Q&A</strong></td>
+                    <td>GPT-3.5 Turbo, Claude 3 Haiku</td>
+                    <td>Fast, cost-effective, good quality</td>
+                </tr>
+                <tr>
+                    <td><strong>Long Documents</strong></td>
+                    <td>Claude 3 (200K context)</td>
+                    <td>Massive context window</td>
+                </tr>
+                <tr>
+                    <td><strong>Creative Writing</strong></td>
+                    <td>GPT-4, Claude 3 Opus</td>
+                    <td>Better prose, more creative</td>
+                </tr>
+                <tr>
+                    <td><strong>Speed Critical</strong></td>
+                    <td>Groq models, GPT-3.5</td>
+                    <td>Ultra-fast inference</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>Performance Optimization</h3>
+        
+        <div class="tip-box">
+            <i class="fas fa-lightbulb"></i> <strong>Optimize Token Usage:</strong>
+            <ul>
+                <li>Set max_tokens appropriately for your needs</li>
+                <li>Use "New Chat" when changing topics to avoid sending unnecessary history</li>
+                <li>For simple questions, use smaller, faster models</li>
+                <li>Monitor the cache indicator to see when facades are reused</li>
+            </ul>
+        </div>
+        
+        <h3>Security and Privacy</h3>
+        
+        <div class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Important Reminders:</strong>
+            <ul>
+                <li>Never share passwords, API keys, or sensitive credentials in chat</li>
+                <li>Be cautious with personally identifiable information (PII)</li>
+                <li>All interactions are logged for auditing purposes</li>
+                <li>Follow your organization's data classification guidelines</li>
+                <li>Don't use for processing regulated data without proper clearance</li>
+            </ul>
+        </div>
+        
+        <h3>Cost Management</h3>
+        
+        <div class="tip-box">
+            <i class="fas fa-dollar-sign"></i> <strong>Control Costs:</strong>
+            <ul>
+                <li>Use flagship models (GPT-4, Opus) only when necessary</li>
+                <li>Start with smaller models and upgrade if needed</li>
+                <li>Keep max_tokens reasonable for your use case</li>
+                <li>End chat sessions when done to free resources</li>
+                <li>Consider cost vs quality trade-offs for your application</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Troubleshooting Section -->
+    <div class="help-section" id="troubleshooting">
+        <h2><i class="fas fa-wrench"></i> Troubleshooting</h2>
+        
+        <h3>Common Issues and Solutions</h3>
+        
+        <h4>1. "Select provider and model" - Can't Send Messages</h4>
+        <p><strong>Cause:</strong> No provider or model selected</p>
+        <p><strong>Solution:</strong></p>
+        <ul>
+            <li>Select a provider from the "Provider" dropdown</li>
+            <li>Wait for models to load</li>
+            <li>Select a model from the "Model" dropdown</li>
+            <li>Wait for "Ready" status before sending messages</li>
+        </ul>
+        
+        <h4>2. Models Not Loading</h4>
+        <p><strong>Cause:</strong> Registry issue or provider configuration problem</p>
+        <p><strong>Solution:</strong></p>
+        <ul>
+            <li>Click "Reload Registry" button</li>
+            <li>Wait a few seconds for the registry to reload</li>
+            <li>If problem persists, contact your administrator</li>
+            <li>Check browser console (F12) for error messages</li>
+        </ul>
+        
+        <h4>3. "Error: Request failed" Messages</h4>
+        <p><strong>Possible Causes:</strong></p>
+        <ul>
+            <li>Network connectivity issues</li>
+            <li>API rate limits reached</li>
+            <li>Provider service outage</li>
+            <li>Invalid API credentials</li>
+        </ul>
+        <p><strong>Solutions:</strong></p>
+        <ul>
+            <li>Check your internet connection</li>
+            <li>Wait a moment and try again</li>
+            <li>Try a different provider or model</li>
+            <li>Contact administrator if issue persists</li>
+        </ul>
+        
+        <h4>4. Responses Are Cut Off</h4>
+        <p><strong>Cause:</strong> Max tokens setting too low</p>
+        <p><strong>Solution:</strong></p>
+        <ul>
+            <li>Increase the "Max Tokens" parameter</li>
+            <li>Typical values: 1000 for short, 2000 for medium, 4000+ for long responses</li>
+            <li>Check the model's maximum output limit</li>
+        </ul>
+        
+        <h4>5. Model Gives Irrelevant Responses</h4>
+        <p><strong>Possible Causes:</strong></p>
+        <ul>
+            <li>Conversation context is too long or confusing</li>
+            <li>Temperature set too high</li>
+            <li>Prompt is ambiguous</li>
+        </ul>
+        <p><strong>Solutions:</strong></p>
+        <ul>
+            <li>Click "New Chat" to start fresh</li>
+            <li>Lower temperature to 0.3-0.5 for more focused responses</li>
+            <li>Rephrase your question more specifically</li>
+            <li>Break complex requests into simpler steps</li>
+        </ul>
+        
+        <h4>6. Session Keeps Resetting</h4>
+        <p><strong>Cause:</strong> Browser session or cookie issues</p>
+        <p><strong>Solution:</strong></p>
+        <ul>
+            <li>Check if cookies are enabled in your browser</li>
+            <li>Don't use incognito/private browsing mode</li>
+            <li>Clear browser cache and refresh</li>
+            <li>Make sure you're not logged out automatically</li>
+        </ul>
+        
+        <h4>7. Slow Response Times</h4>
+        <p><strong>Possible Causes:</strong></p>
+        <ul>
+            <li>Provider API is experiencing high load</li>
+            <li>Very large context or max tokens setting</li>
+            <li>Network latency</li>
+        </ul>
+        <p><strong>Solutions:</strong></p>
+        <ul>
+            <li>Try a different provider (e.g., Groq for speed)</li>
+            <li>Reduce max_tokens if appropriate</li>
+            <li>Use "New Chat" to reduce context size</li>
+            <li>Try during off-peak hours</li>
+        </ul>
+        
+        <h3>Getting Help</h3>
+        
+        <div class="tip-box">
+            <i class="fas fa-question-circle"></i> <strong>Need More Help?</strong>
+            <ul>
+                <li><strong>Check Logs:</strong> Open browser console (F12) to see detailed error messages</li>
+                <li><strong>Take Screenshots:</strong> Capture error messages and your configuration</li>
+                <li><strong>Contact Admin:</strong> Reach out to your system administrator with specific details</li>
+                <li><strong>Provide Context:</strong> Include provider, model, parameters, and error messages</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- API Reference Section -->
+    <div class="help-section" id="api">
+        <h2><i class="fas fa-code"></i> API Reference</h2>
+        <p>For developers integrating with the chat system, here are the available API endpoints:</p>
+        
+        <h3>Chat Endpoints</h3>
+        
+        <h4>GET /llm/chat</h4>
+        <p>Renders the chat interface.</p>
+        <p><strong>Authentication:</strong> Required (login)</p>
+        <p><strong>Returns:</strong> HTML page with chat interface</p>
+        
+        <h4>POST /api/llm/chat/send</h4>
+        <p>Send a message and get AI response.</p>
+        <p><strong>Authentication:</strong> Required (login)</p>
+        <p><strong>Request Body:</strong></p>
+        <div class="code-block">
+{
+    "provider": "openai",
+    "model": "gpt-4",
+    "message": "Your message here",
+    "conversation_history": [
+        {"role": "user", "content": "Previous message"},
+        {"role": "assistant", "content": "Previous response"}
+    ],
+    "parameters": {
+        "temperature": 0.7,
+        "max_tokens": 1000,
+        "top_p": 0.9
+    }
+}
+        </div>
+        <p><strong>Response:</strong></p>
+        <div class="code-block">
+{
+    "success": true,
+    "response": "AI response text",
+    "metadata": {
+        "cached_facade": true,
+        "provider": "openai",
+        "model": "gpt-4",
+        "timestamp": "2024-11-27T10:30:00"
+    }
+}
+        </div>
+        
+        <h4>POST /api/llm/chat/new</h4>
+        <p>Create a new chat session.</p>
+        <p><strong>Authentication:</strong> Required (login)</p>
+        <p><strong>Response:</strong></p>
+        <div class="code-block">
+{
+    "success": true,
+    "chat_session_id": "chat_a1b2c3d4_1732723200",
+    "message": "New chat session created"
+}
+        </div>
+        
+        <h4>POST /api/llm/chat/end</h4>
+        <p>End current chat session and cleanup resources.</p>
+        <p><strong>Authentication:</strong> Required (login)</p>
+        <p><strong>Response:</strong></p>
+        <div class="code-block">
+{
+    "success": true,
+    "message": "Chat session ended successfully"
+}
+        </div>
+        
+        <h4>GET /api/llm/chat/session/info</h4>
+        <p>Get current session information.</p>
+        <p><strong>Authentication:</strong> Required (login)</p>
+        <p><strong>Response:</strong></p>
+        <div class="code-block">
+{
+    "success": true,
+    "session_id": "chat_a1b2c3d4_1732723200",
+    "created_at": "2024-11-27T10:00:00",
+    "message_count": 10,
+    "active": true
+}
+        </div>
+        
+        <h3>Registry Endpoints</h3>
+        
+        <h4>GET /api/llm/providers</h4>
+        <p>Get list of available providers.</p>
+        <p><strong>Response:</strong></p>
+        <div class="code-block">
+{
+    "success": true,
+    "providers": [
+        {
+            "name": "openai",
+            "display_name": "OpenAI",
+            "model_count": 5
+        }
+    ]
+}
+        </div>
+        
+        <h4>GET /api/llm/models/{provider}</h4>
+        <p>Get models for a specific provider.</p>
+        <p><strong>Response:</strong></p>
+        <div class="code-block">
+{
+    "success": true,
+    "models": [
+        {
+            "name": "gpt-4",
+            "display_name": "GPT-4",
+            "context_window": 8192,
+            "max_output": 4096,
+            "description": "Most capable model"
+        }
+    ]
+}
+        </div>
+        
+        <h4>POST /api/llm/registry/reload</h4>
+        <p>Reload the provider registry.</p>
+        <p><strong>Authentication:</strong> Required (login)</p>
+        <p><strong>Response:</strong></p>
+        <div class="code-block">
+{
+    "success": true,
+    "provider_count": 13,
+    "message": "Registry reloaded successfully"
+}
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="help-section" style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <h2>Ready to Start Chatting?</h2>
+        <p>You now have all the knowledge you need to effectively use the Abhikarta LLM Chat Platform!</p>
+        <a href="{{ url_for('llm_chat') }}" class="btn btn-light btn-lg mt-3">
+            <i class="fas fa-comments"></i> Go to Chat Interface
+        </a>
+    </div>
+</div>
+
+<!-- Floating Back Button -->
+<a href="{{ url_for('llm_chat') }}" class="back-to-chat">
+    <i class="fas fa-comments"></i> Back to Chat
+</a>
+{% endblock %}

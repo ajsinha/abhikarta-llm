@@ -52,6 +52,25 @@ class AuthRoutes(AbstractRoutes):
     def register_routes(self):
         """Register all authentication routes."""
 
+        @self.app.route('/about', methods=['GET'])
+        def about():
+            """
+            Render the About page with platform information, copyright, and legal disclaimers.
+
+            This page is publicly accessible and does not require authentication.
+            """
+            logger.info("About page accessed")
+
+            # Get user info if logged in, otherwise use default values
+            fullname = session.get('fullname', 'Guest')
+            userid = session.get('userid', None)
+            roles = session.get('roles', [])
+
+            return render_template('about.html',
+                                   fullname=fullname,
+                                   userid=userid,
+                                   roles=roles)
+
         @self.app.route('/login', methods=['GET', 'POST'])
         def login():
             """Handle user login with password validation."""

@@ -215,6 +215,19 @@ class LLMRoutes(AbstractRoutes):
                                  roles=session.get('roles', []),
                                  chat_session_id=chat_session_id)
 
+        @self.app.route('/llm/chat/help', methods=['GET'])
+        @login_required
+        def llm_chat_help():
+            """Render the chat help documentation page."""
+            userid = session.get('userid')
+
+            logger.info(f"User {userid} accessing chat help documentation")
+
+            return render_template('chat/chat_help.html',
+                                 fullname=session.get('fullname'),
+                                 userid=userid,
+                                 roles=session.get('roles', []))
+
         @self.app.route('/api/llm/chat/new', methods=['POST'])
         @login_required
         def new_chat_session():
