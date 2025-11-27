@@ -17,7 +17,7 @@ class TablePagination {
         this.rows = Array.from(this.tbody.querySelectorAll('tr'));
         this.currentPage = 1;
         this.rowsPerPage = options.defaultRowsPerPage || 10;
-        this.containerId = options.containerId || `${tableId}-pagination-container`;
+        this.tableId = tableId;
 
         this.init();
     }
@@ -30,40 +30,52 @@ class TablePagination {
     }
 
     createControls() {
-        // Find or create container
-        let container = document.getElementById(this.containerId);
-        if (!container) {
-            container = document.createElement('div');
-            container.id = this.containerId;
-            container.className = 'row mt-3';
-            this.table.parentElement.appendChild(container);
-        }
-
-        container.innerHTML = `
-            <div class="col-md-6">
-                <div class="d-flex align-items-center">
-                    <label class="me-2 mb-0">Show</label>
-                    <select class="form-select form-select-sm" style="width: auto;" id="${this.containerId}-rows-select">
-                        <option value="5">5</option>
-                        <option value="10" ${this.rowsPerPage === 10 ? 'selected' : ''}>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="all">ALL</option>
-                    </select>
-                    <label class="ms-2 mb-0">entries</label>
-                    <span class="ms-3 text-muted" id="${this.containerId}-info"></span>
+        // Create top container (before table) for row selector
+        const topContainer = document.createElement('div');
+        topContainer.id = `${this.tableId}-pagination-top`;
+        topContainer.className = 'row mb-3';
+        topContainer.innerHTML = `
+            <div class="col-md-12">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <label class="me-2 mb-0">Show</label>
+                        <select class="form-select form-select-sm" style="width: auto;" id="${this.tableId}-rows-select">
+                            <option value="5">5</option>
+                            <option value="10" ${this.rowsPerPage === 10 ? 'selected' : ''}>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="all">ALL</option>
+                        </select>
+                        <label class="ms-2 mb-0">entries</label>
+                    </div>
+                    <div>
+                        <span class="text-muted" id="${this.tableId}-info"></span>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
+        `;
+
+        // Create bottom container (after table) for pagination links
+        const bottomContainer = document.createElement('div');
+        bottomContainer.id = `${this.tableId}-pagination-bottom`;
+        bottomContainer.className = 'row mt-3';
+        bottomContainer.innerHTML = `
+            <div class="col-md-12">
                 <nav aria-label="Table pagination">
-                    <ul class="pagination pagination-sm justify-content-end mb-0" id="${this.containerId}-pagination">
+                    <ul class="pagination pagination-sm justify-content-end mb-0" id="${this.tableId}-pagination">
                     </ul>
                 </nav>
             </div>
         `;
 
+        // Insert top container before table
+        this.table.parentElement.insertBefore(topContainer, this.table);
+
+        // Insert bottom container after table
+        this.table.parentElement.appendChild(bottomContainer);
+
         // Add event listener for rows per page
-        document.getElementById(`${this.containerId}-rows-select`).addEventListener('change', (e) => {
+        document.getElementById(`${this.tableId}-rows-select`).addEventListener('change', (e) => {
             const value = e.target.value;
             this.rowsPerPage = value === 'all' ? this.rows.length : parseInt(value);
             this.currentPage = 1;
@@ -91,14 +103,14 @@ class TablePagination {
         const infoText = totalRows === 0
             ? 'No entries found'
             : `Showing ${start + 1} to ${end} of ${totalRows} entries`;
-        document.getElementById(`${this.containerId}-info`).textContent = infoText;
+        document.getElementById(`${this.tableId}-info`).textContent = infoText;
 
         // Render pagination links
         this.renderPagination(totalPages);
     }
 
     renderPagination(totalPages) {
-        const paginationContainer = document.getElementById(`${this.containerId}-pagination`);
+        const paginationContainer = document.getElementById(`${this.tableId}-pagination`);
         paginationContainer.innerHTML = '';
 
         if (totalPages <= 1) {

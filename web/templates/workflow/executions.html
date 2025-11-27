@@ -63,6 +63,7 @@
         100% { transform: rotate(360deg); }
     }
 </style>
+<script src="{{ url_for('static', filename='js/pagination.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -129,7 +130,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="executionsTable" data-pagination="true" data-default-rows="10">
                             <thead class="table-light">
                                 <tr>
                                     <th>Execution ID</th>
@@ -251,11 +252,7 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Pagination info -->
-                    <div class="mt-3 text-muted">
-                        <i class="fas fa-info-circle"></i> Showing {{ executions|length }} execution(s)
-                    </div>
+                    <!-- Pagination controls will be added here by pagination.js -->
                 </div>
             </div>
             {% else %}
