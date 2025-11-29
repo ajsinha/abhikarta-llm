@@ -194,9 +194,11 @@ class AbhikartaLLMWeb:
 
                     # 4. Invoke the method
                     result = method(method_arg)
-                    print(result)
+                    #print(result)
+                    return result
                 else:
                     print(f"'{method_name}' exists but is not callable.")
+                    return None
 
         for rt in [AuthRoutes, AdminRoutes, ResourceRoutes, RoleRoutes,
                    UserRoutes, ModelRoutes, MCPRoutes, LLMRoutes, WorkflowRoutes, AgentRoutes]:
