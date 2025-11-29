@@ -21,9 +21,7 @@ import json
 from typing import Dict, Any, List, Optional
 import time
 from datetime import datetime
-import uuid
 
-from llm_provider.facade_cache_manager import FacadeCacheManager
 from llm_provider.llm_interaction_logger import LLMInteractionLogger
 
 logger = logging.getLogger(__name__)
@@ -59,8 +57,6 @@ class LLMRoutes(AbstractRoutes):
         """
         super().__init__(app, db_connection_pool_name)
 
-        # Initialize facade cache manager
-        self.facade_cache = FacadeCacheManager(default_ttl_minutes=60)
 
         # Initialize interaction logger
         self.interaction_logger = None  # Will be initialized after db_pool is set
@@ -70,14 +66,7 @@ class LLMRoutes(AbstractRoutes):
 
         logger.info("LLMRoutes initialized with facade caching")
 
-    def _generate_chat_session_id(self) -> str:
-        """
-        Generate a unique chat session ID.
 
-        Returns:
-            Unique session identifier
-        """
-        return f"chat_{uuid.uuid4().hex[:16]}_{int(time.time())}"
 
     def _get_or_create_chat_session(self) -> str:
         """
@@ -89,7 +78,7 @@ class LLMRoutes(AbstractRoutes):
         chat_session_id = session.get('chat_session_id')
 
         if not chat_session_id:
-            chat_session_id = self._generate_chat_session_id()
+            chat_session_id = self.generate_interaction_session_id()
             session['chat_session_id'] = chat_session_id
             session['chat_session_created_at'] = datetime.now().isoformat()
 
@@ -179,15 +168,7 @@ class LLMRoutes(AbstractRoutes):
             except Exception as e:
                 logger.warning(f"Could not initialize interaction logger: {e}")
 
-    def set_facade_cache(self, facade_cache: FacadeCacheManager):
-        """
-        Set the facade cache manager.
 
-        Args:
-            facade_cache: FacadeCacheManager instance
-        """
-        self.facade_cache = facade_cache
-        logger.info("Facade cache set from external source")
 
     def register_routes(self):
         """Register all LLM-related routes."""
@@ -244,7 +225,7 @@ class LLMRoutes(AbstractRoutes):
                     self._end_chat_session(current_session_id)
 
                 # Create new session
-                chat_session_id = self._generate_chat_session_id()
+                chat_session_id = self.generate_interaction_session_id()
                 session['chat_session_id'] = chat_session_id
                 session['chat_session_created_at'] = datetime.now().isoformat()
 

@@ -5,6 +5,7 @@ import logging
 from tool_management.mcp_server_manager import MCPServerManager
 from model_management.model_registry import ModelRegistry
 from llm_provider.llm_facade_factory import LLMFacadeFactory
+from llm_provider.facade_cache_manager import FacadeCacheManager
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,31 @@ class AbstractRoutes(ABC):
         self.llm_facade_factory: LLMFacadeFactory = None
         self.model_provider_registry: ModelRegistry = None
 
+        # Initialize facade cache manager
+        self.facade_cache = FacadeCacheManager(default_ttl_minutes=60)
+
+        # Initialize MCP Server Manager
         self.mcp_server_manager = MCPServerManager()
+
+    def set_facade_cache(self, facade_cache: FacadeCacheManager):
+        """
+        Set the facade cache manager.
+
+        Args:
+            facade_cache: FacadeCacheManager instance
+        """
+        self.facade_cache = facade_cache
+        logger.info("Facade cache set from external source")
+
+    def generate_interaction_session_id(self) -> str:
+        import uuid, time
+        """
+        Generate a unique chat session ID.
+
+        Returns:
+            Unique session identifier
+        """
+        return f"chat_{uuid.uuid4().hex[:16]}_{int(time.time())}"
 
     def set_user_manager(self, user_manager):
         self.user_manager = user_manager
