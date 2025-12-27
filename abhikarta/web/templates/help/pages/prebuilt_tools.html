@@ -1,0 +1,677 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Pre-built Tools Library" %}
+{% set description = "Ready-to-use tools for common operations" %}
+{% set icon = "bi-tools" %}
+{% set header_color = "#fd7e14" %}
+{% set header_color_dark = "#dc6a12" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#common-tools">Common Tools</a>
+<a href="#banking-tools">Banking Tools</a>
+<a href="#integration-tools">Integration Tools</a>
+<a href="#usage">Usage Guide</a>
+<a href="#extending">Extending Tools</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Pre-built Tools Overview</h2>
+<p class="lead">Abhikarta provides a comprehensive library of pre-built tools that are immediately available for use in agents and workflows.</p>
+
+<div class="alert alert-info">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Quick Start:</strong> All pre-built tools are automatically registered with the ToolsRegistry on startup.
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card text-center h-100 border-warning">
+            <div class="card-body">
+                <i class="bi bi-wrench text-warning" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">28+</h3>
+                <p class="text-muted mb-0">Common Tools</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100 border-success">
+            <div class="card-body">
+                <i class="bi bi-bank text-success" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">13+</h3>
+                <p class="text-muted mb-0">Banking Tools</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100 border-primary">
+            <div class="card-body">
+                <i class="bi bi-plug text-primary" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">20+</h3>
+                <p class="text-muted mb-0">Integration Tools</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="common-tools">Common Utility Tools</h2>
+<p>General-purpose tools for everyday operations.</p>
+
+<div class="accordion" id="commonToolsAccordion">
+    <!-- Date/Time Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#dateTimeTools">
+                <i class="bi bi-calendar me-2"></i> Date & Time Tools (5 tools)
+            </button>
+        </h2>
+        <div id="dateTimeTools" class="accordion-collapse collapse show" data-bs-parent="#commonToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>get_current_datetime</code></td>
+                            <td>Get current date/time in specified format</td>
+                            <td><code>get_current_datetime(format="%Y-%m-%d")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>parse_date</code></td>
+                            <td>Parse date string into components</td>
+                            <td><code>parse_date("2025-01-15")</code> → year, month, day, weekday</td>
+                        </tr>
+                        <tr>
+                            <td><code>calculate_date_difference</code></td>
+                            <td>Calculate days/weeks/months between dates</td>
+                            <td><code>calculate_date_difference("2025-01-01", "2025-12-31")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>add_days_to_date</code></td>
+                            <td>Add or subtract days from a date</td>
+                            <td><code>add_days_to_date("2025-01-01", 30)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>get_business_days</code></td>
+                            <td>Count business days (excluding weekends)</td>
+                            <td><code>get_business_days("2025-01-01", "2025-01-31")</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Math Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mathTools">
+                <i class="bi bi-calculator me-2"></i> Math & Calculator Tools (5 tools)
+            </button>
+        </h2>
+        <div id="mathTools" class="accordion-collapse collapse" data-bs-parent="#commonToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>calculate_expression</code></td>
+                            <td>Safely evaluate math expressions</td>
+                            <td><code>calculate_expression("sqrt(16) + pow(2, 3)")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>calculate_percentage</code></td>
+                            <td>Calculate percentage of value</td>
+                            <td><code>calculate_percentage(1000, 15)</code> → 150</td>
+                        </tr>
+                        <tr>
+                            <td><code>calculate_compound_interest</code></td>
+                            <td>Calculate compound interest</td>
+                            <td><code>calculate_compound_interest(10000, 5, 10)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>calculate_loan_emi</code></td>
+                            <td>Calculate EMI for loans</td>
+                            <td><code>calculate_loan_emi(100000, 7.5, 60)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>convert_currency</code></td>
+                            <td>Convert currency with exchange rate</td>
+                            <td><code>convert_currency(100, "USD", "EUR", 0.92)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#textTools">
+                <i class="bi bi-fonts me-2"></i> Text Processing Tools (5 tools)
+            </button>
+        </h2>
+        <div id="textTools" class="accordion-collapse collapse" data-bs-parent="#commonToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>extract_text_patterns</code></td>
+                            <td>Extract patterns using regex</td>
+                            <td><code>extract_text_patterns(text, r"\d{3}-\d{4}")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>clean_text</code></td>
+                            <td>Clean and normalize text</td>
+                            <td><code>clean_text(text, remove_html=True)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>extract_entities</code></td>
+                            <td>Extract emails, phones, URLs, dates</td>
+                            <td><code>extract_entities("Contact: john@example.com")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>generate_summary_stats</code></td>
+                            <td>Generate text statistics</td>
+                            <td><code>generate_summary_stats(text)</code> → word count, etc.</td>
+                        </tr>
+                        <tr>
+                            <td><code>mask_sensitive_data</code></td>
+                            <td>Mask PII in text</td>
+                            <td><code>mask_sensitive_data(text, mask_emails=True)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Validation Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#validationTools">
+                <i class="bi bi-check-circle me-2"></i> Validation Tools (5 tools)
+            </button>
+        </h2>
+        <div id="validationTools" class="accordion-collapse collapse" data-bs-parent="#commonToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>validate_email</code></td>
+                            <td>Validate email format</td>
+                            <td><code>validate_email("user@example.com")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>validate_phone</code></td>
+                            <td>Validate phone number by country</td>
+                            <td><code>validate_phone("555-123-4567", "US")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>validate_credit_card</code></td>
+                            <td>Validate card with Luhn algorithm</td>
+                            <td><code>validate_credit_card("4111111111111111")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>validate_iban</code></td>
+                            <td>Validate international bank account</td>
+                            <td><code>validate_iban("DE89370400440532013000")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>validate_ssn</code></td>
+                            <td>Validate US Social Security Number</td>
+                            <td><code>validate_ssn("123-45-6789")</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conversion Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#conversionTools">
+                <i class="bi bi-arrow-left-right me-2"></i> Format Conversion Tools (5 tools)
+            </button>
+        </h2>
+        <div id="conversionTools" class="accordion-collapse collapse" data-bs-parent="#commonToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>json_to_csv</code></td>
+                            <td>Convert JSON array to CSV</td>
+                            <td><code>json_to_csv('[{"a":1},{"a":2}]')</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>csv_to_json</code></td>
+                            <td>Convert CSV to JSON array</td>
+                            <td><code>csv_to_json("a,b\n1,2")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>base64_encode</code></td>
+                            <td>Encode text to base64</td>
+                            <td><code>base64_encode("Hello World")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>base64_decode</code></td>
+                            <td>Decode base64 to text</td>
+                            <td><code>base64_decode("SGVsbG8gV29ybGQ=")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>generate_hash</code></td>
+                            <td>Generate hash (MD5, SHA256, etc.)</td>
+                            <td><code>generate_hash("password", "sha256")</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ID Generation Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#idTools">
+                <i class="bi bi-upc me-2"></i> ID Generation Tools (3 tools)
+            </button>
+        </h2>
+        <div id="idTools" class="accordion-collapse collapse" data-bs-parent="#commonToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>generate_uuid</code></td>
+                            <td>Generate UUID v1 or v4</td>
+                            <td><code>generate_uuid(version=4)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>generate_reference_number</code></td>
+                            <td>Generate reference number with prefix</td>
+                            <td><code>generate_reference_number("REF")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>generate_account_number</code></td>
+                            <td>Generate bank account number format</td>
+                            <td><code>generate_account_number("BANK")</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="banking-tools">Banking Industry Tools</h2>
+<p>Specialized tools for financial services. See <a href="/help/page/banking-solutions">Banking Solutions</a> for complete details.</p>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">KYC Verification</div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><code>verify_identity_document</code> - Document validation</li>
+                    <li><code>calculate_kyc_risk_score</code> - Risk assessment</li>
+                    <li><code>verify_address</code> - Address verification</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">Credit Assessment</div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><code>calculate_credit_score</code> - Credit scoring</li>
+                    <li><code>assess_debt_to_income</code> - DTI calculation</li>
+                    <li><code>calculate_loan_eligibility</code> - Eligibility check</li>
+                    <li><code>generate_amortization_schedule</code> - Payment schedule</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">Transaction Analysis</div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><code>analyze_transaction</code> - Risk analysis</li>
+                    <li><code>detect_transaction_patterns</code> - Pattern detection</li>
+                    <li><code>calculate_transaction_limits</code> - Limit calculation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-danger text-white">Compliance</div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><code>check_sanctions_list</code> - OFAC/Sanctions screening</li>
+                    <li><code>generate_aml_report</code> - AML reporting</li>
+                    <li><code>validate_regulatory_compliance</code> - Compliance check</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="integration-tools">Integration Tools</h2>
+<p>Tools for connecting systems and processing data.</p>
+
+<div class="accordion" id="integrationAccordion">
+    <!-- API Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#apiTools">
+                <i class="bi bi-cloud me-2"></i> HTTP/API Tools (4 tools)
+            </button>
+        </h2>
+        <div id="apiTools" class="accordion-collapse collapse show" data-bs-parent="#integrationAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>make_http_request</code></td>
+                            <td>Make HTTP requests (GET, POST, PUT, DELETE)</td>
+                        </tr>
+                        <tr>
+                            <td><code>build_query_string</code></td>
+                            <td>Build URL query string from parameters</td>
+                        </tr>
+                        <tr>
+                            <td><code>parse_json_response</code></td>
+                            <td>Parse JSON and extract nested values</td>
+                        </tr>
+                        <tr>
+                            <td><code>validate_api_response</code></td>
+                            <td>Validate response structure and status</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#notificationTools">
+                <i class="bi bi-bell me-2"></i> Notification Tools (3 tools)
+            </button>
+        </h2>
+        <div id="notificationTools" class="accordion-collapse collapse" data-bs-parent="#integrationAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>format_email_template</code></td>
+                            <td>Format email with variable substitution</td>
+                        </tr>
+                        <tr>
+                            <td><code>create_notification</code></td>
+                            <td>Create notification record (email, SMS, push)</td>
+                        </tr>
+                        <tr>
+                            <td><code>format_sms_message</code></td>
+                            <td>Format and validate SMS content</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Transformation -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#dataTools">
+                <i class="bi bi-shuffle me-2"></i> Data Transformation Tools (5 tools)
+            </button>
+        </h2>
+        <div id="dataTools" class="accordion-collapse collapse" data-bs-parent="#integrationAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>map_fields</code></td>
+                            <td>Map fields from source to target structure</td>
+                        </tr>
+                        <tr>
+                            <td><code>flatten_nested_dict</code></td>
+                            <td>Flatten nested dict to single level</td>
+                        </tr>
+                        <tr>
+                            <td><code>unflatten_dict</code></td>
+                            <td>Restore nested structure from flat dict</td>
+                        </tr>
+                        <tr>
+                            <td><code>merge_dicts</code></td>
+                            <td>Merge dictionaries with strategy</td>
+                        </tr>
+                        <tr>
+                            <td><code>filter_dict_keys</code></td>
+                            <td>Include/exclude dictionary keys</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- List/Array Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#listTools">
+                <i class="bi bi-list-ul me-2"></i> List/Array Tools (5 tools)
+            </button>
+        </h2>
+        <div id="listTools" class="accordion-collapse collapse" data-bs-parent="#integrationAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>filter_list</code></td>
+                            <td>Filter list by field condition (eq, gt, contains, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>sort_list</code></td>
+                            <td>Sort list of objects by key</td>
+                        </tr>
+                        <tr>
+                            <td><code>group_by</code></td>
+                            <td>Group list items by key value</td>
+                        </tr>
+                        <tr>
+                            <td><code>aggregate_list</code></td>
+                            <td>Aggregate values (sum, avg, min, max, count)</td>
+                        </tr>
+                        <tr>
+                            <td><code>paginate_list</code></td>
+                            <td>Paginate list with page info</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workflow Helpers -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#workflowTools">
+                <i class="bi bi-diagram-3 me-2"></i> Workflow Helper Tools (3 tools)
+            </button>
+        </h2>
+        <div id="workflowTools" class="accordion-collapse collapse" data-bs-parent="#integrationAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>create_workflow_context</code></td>
+                            <td>Create execution context for workflow</td>
+                        </tr>
+                        <tr>
+                            <td><code>update_workflow_context</code></td>
+                            <td>Update context with step results</td>
+                        </tr>
+                        <tr>
+                            <td><code>evaluate_condition</code></td>
+                            <td>Evaluate condition expression</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="usage">Usage Guide</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">Using in Agents</div>
+            <div class="card-body">
+<pre><code class="language-json">{
+  "agent_id": "my_agent",
+  "tools": [
+    "validate_email",
+    "calculate_loan_emi",
+    "mask_sensitive_data"
+  ]
+}</code></pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">Using in Workflows</div>
+            <div class="card-body">
+<pre><code class="language-json">{
+  "id": "my_node",
+  "type": "tool",
+  "config": {
+    "tool_name": "calculate_credit_score"
+  }
+}</code></pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">Using Programmatically</div>
+            <div class="card-body">
+<pre><code class="language-python">from abhikarta.tools import get_tools_registry
+from abhikarta.tools.prebuilt import register_all_prebuilt_tools
+
+# Get registry and register tools
+registry = get_tools_registry()
+count = register_all_prebuilt_tools(registry)
+print(f"Registered {count} tools")
+
+# Execute a tool
+result = registry.execute("calculate_loan_emi", 
+    principal=100000, 
+    annual_rate=7.5, 
+    tenure_months=60
+)
+print(f"EMI: ${result.output['emi']}")
+
+# Search for tools
+credit_tools = registry.search("credit")
+for tool in credit_tools:
+    print(f"- {tool.name}: {tool.description}")</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="extending">Extending the Tools Library</h2>
+<p>Create your own tools and add them to the registry:</p>
+
+<pre><code class="language-python">from abhikarta.tools import BaseTool, ToolResult, ToolSchema, ToolParameter
+from abhikarta.tools import get_tools_registry
+
+class MyCustomTool(BaseTool):
+    """Custom tool implementation."""
+    
+    def __init__(self):
+        super().__init__(
+            name="my_custom_tool",
+            description="Does something custom",
+            category=ToolCategory.CUSTOM
+        )
+    
+    def execute(self, **kwargs) -> ToolResult:
+        # Your tool logic here
+        result = {"processed": True}
+        return ToolResult(success=True, output=result)
+    
+    def get_schema(self) -> ToolSchema:
+        return ToolSchema(
+            name=self.name,
+            description=self.description,
+            parameters=[
+                ToolParameter(name="input", type="string", required=True)
+            ]
+        )
+
+# Register with the registry
+registry = get_tools_registry()
+registry.register(MyCustomTool())</code></pre>
+
+<div class="alert alert-success mt-4">
+    <h5><i class="bi bi-lightbulb me-2"></i>Pro Tip</h5>
+    <p class="mb-0">Use the <code>@tool</code> decorator for simpler tools:</p>
+<pre class="mb-0 mt-2"><code class="language-python">from abhikarta.tools import tool
+
+@tool(name="double_value", description="Doubles the input")
+def double_value(value: int) -> int:
+    return value * 2</code></pre>
+</div>
+
+{% endblock %}

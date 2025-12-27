@@ -1,0 +1,79 @@
+{
+  "agent_id": "banking_kyc_verification",
+  "name": "KYC Verification Agent",
+  "description": "Automated Know Your Customer (KYC) verification agent that validates customer identity documents, performs risk assessment, and ensures regulatory compliance.",
+  "version": "1.0.0",
+  "category": "banking",
+  "subcategory": "compliance",
+  "agent_type": "react",
+  "model_id": "gpt-4o",
+  "system_prompt": "You are a KYC (Know Your Customer) verification specialist agent for a banking institution. Your role is to:\n\n1. Verify customer identity documents (passport, driver's license, national ID)\n2. Validate address proof documents\n3. Perform sanctions and PEP (Politically Exposed Person) screening\n4. Calculate customer risk scores\n5. Determine if Enhanced Due Diligence (EDD) is required\n6. Generate KYC verification reports\n\nAlways follow regulatory requirements and maintain audit trails. Be thorough but efficient in your verification process.\n\nWhen verifying documents:\n- Check document format validity\n- Verify expiry dates\n- Cross-reference information consistency\n- Flag any discrepancies\n\nProvide clear explanations for any decisions and always cite the specific checks performed.",
+  "tools": [
+    "verify_identity_document",
+    "calculate_kyc_risk_score",
+    "verify_address",
+    "check_sanctions_list",
+    "validate_regulatory_compliance",
+    "mask_sensitive_data",
+    "extract_entities",
+    "generate_reference_number"
+  ],
+  "max_iterations": 10,
+  "temperature": 0.3,
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "customer_name": {"type": "string", "description": "Full legal name"},
+      "document_type": {"type": "string", "enum": ["passport", "drivers_license", "national_id"]},
+      "document_number": {"type": "string"},
+      "issuing_country": {"type": "string"},
+      "expiry_date": {"type": "string", "format": "date"},
+      "date_of_birth": {"type": "string", "format": "date"},
+      "address": {"type": "object"},
+      "occupation": {"type": "string"},
+      "is_pep": {"type": "boolean"},
+      "income_source": {"type": "string"}
+    },
+    "required": ["customer_name", "document_type", "document_number", "issuing_country"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "verification_id": {"type": "string"},
+      "customer_name": {"type": "string"},
+      "verification_status": {"type": "string", "enum": ["approved", "pending_review", "rejected"]},
+      "risk_level": {"type": "string", "enum": ["low", "medium", "high"]},
+      "risk_score": {"type": "number"},
+      "checks_performed": {"type": "array", "items": {"type": "string"}},
+      "edd_required": {"type": "boolean"},
+      "notes": {"type": "string"}
+    }
+  },
+  "example_inputs": [
+    {
+      "customer_name": "John Smith",
+      "document_type": "passport",
+      "document_number": "AB1234567",
+      "issuing_country": "US",
+      "expiry_date": "2028-05-15",
+      "date_of_birth": "1985-03-20",
+      "address": {
+        "street": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "postal_code": "10001",
+        "country": "US"
+      },
+      "occupation": "software_engineer",
+      "is_pep": false,
+      "income_source": "employment"
+    }
+  ],
+  "tags": ["kyc", "compliance", "verification", "banking", "aml"],
+  "permissions": {
+    "allowed_roles": ["agent_developer", "super_admin", "domain_admin"]
+  },
+  "status": "published",
+  "created_at": "2025-01-01T00:00:00Z",
+  "author": "Abhikarta System"
+}

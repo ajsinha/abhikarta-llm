@@ -8,12 +8,13 @@
 
 {% block help_nav %}
 <a href="#workflow-dags">Workflow DAGs</a>
+<a href="#tools-system">Tools System</a>
+<a href="#prebuilt-tools">Pre-built Tools</a>
+<a href="#banking-solutions">Banking Solutions</a>
 <a href="#llm-management">LLM Management</a>
-<a href="#llm-logging">LLM Logging</a>
 <a href="#hitl">Human-in-the-Loop</a>
 <a href="#mcp-plugins">MCP Plugins</a>
 <a href="#rbac">Enterprise RBAC</a>
-<a href="#analytics">Execution Analytics</a>
 {% endblock %}
 
 {% block help_content %}
@@ -83,7 +84,125 @@
 
 <hr class="my-5">
 
-<h2 id="llm-management">LLM Provider & Model Management <span class="badge bg-success">NEW in v1.1.6</span></h2>
+<h2 id="tools-system">Tools System <span class="badge bg-success">v1.1.6</span></h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6">
+        <p class="lead">Unified tool architecture with centralized registry and multiple tool types.</p>
+        <ul>
+            <li><strong>BaseTool:</strong> Abstract base class for all tool implementations</li>
+            <li><strong>FunctionTool:</strong> Wrap Python functions with @tool decorator</li>
+            <li><strong>MCPTool:</strong> Automatically wrap MCP server tools</li>
+            <li><strong>HTTPTool:</strong> Call REST APIs as tools</li>
+            <li><strong>CodeFragmentTool:</strong> Execute database-stored code</li>
+            <li><strong>ToolsRegistry:</strong> Centralized registration and discovery</li>
+            <li>Format conversion: OpenAI, Anthropic, LangChain</li>
+        </ul>
+    </div>
+    <div class="col-lg-6">
+        <pre><code class="language-python">from abhikarta.tools import tool, get_tools_registry
+
+@tool(name="calculate", description="Calculate expression")
+def calculate(expression: str) -> float:
+    return eval(expression)
+
+# Register and use
+registry = get_tools_registry()
+result = registry.execute("calculate", expression="2+2")
+# result.output = 4
+
+# Convert for LLM
+openai_funcs = registry.to_openai_functions()</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="prebuilt-tools">Pre-built Tools Library <span class="badge bg-success">v1.1.7</span></h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6 order-lg-2">
+        <p class="lead">60+ ready-to-use tools across common categories.</p>
+        <ul>
+            <li><strong>Common Tools (28):</strong> Date/time, math, text, validation, conversion</li>
+            <li><strong>Banking Tools (13):</strong> KYC, credit, loan, transaction, compliance</li>
+            <li><strong>Integration Tools (20):</strong> HTTP, notifications, data transformation</li>
+            <li>All tools follow BaseTool architecture</li>
+            <li>Automatically registered on startup</li>
+            <li>Compatible with all LLM providers</li>
+        </ul>
+        <a href="{{ url_for('help_page', page='prebuilt-tools') }}" class="btn btn-outline-primary">View All Tools →</a>
+    </div>
+    <div class="col-lg-6 order-lg-1">
+        <pre><code class="language-python"># Example banking tools
+verify_identity_document(
+    document_type="passport",
+    document_number="AB1234567",
+    issuing_country="US"
+)
+
+calculate_credit_score(credit_data={
+    "payment_history": {"on_time_percentage": 95},
+    "credit_utilization": 25,
+    "credit_history_years": 8
+})
+
+analyze_transaction(transaction={
+    "amount": 9500,
+    "type": "wire_transfer",
+    "is_international": True
+})</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="banking-solutions">Banking Industry Solutions <span class="badge bg-success">v1.1.7</span></h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6">
+        <p class="lead">Complete pre-built agents and workflows for banking operations.</p>
+        <h6>Pre-built Agents (10)</h6>
+        <ul class="list-unstyled">
+            <li><i class="bi bi-check-circle text-success me-2"></i>KYC Verification Agent</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>Loan Processing Agent</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>Fraud Detection Agent</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>Credit Risk Agent</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>Customer Service Agent</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>+ 5 more...</li>
+        </ul>
+        <h6>Pre-built Workflows (7)</h6>
+        <ul class="list-unstyled">
+            <li><i class="bi bi-diagram-3 text-info me-2"></i>Loan Application Processing</li>
+            <li><i class="bi bi-diagram-3 text-info me-2"></i>Customer Onboarding</li>
+            <li><i class="bi bi-diagram-3 text-info me-2"></i>Transaction Monitoring</li>
+            <li><i class="bi bi-diagram-3 text-info me-2"></i>+ 4 more...</li>
+        </ul>
+        <a href="{{ url_for('help_page', page='banking-solutions') }}" class="btn btn-outline-success">View Banking Solutions →</a>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">Clone & Customize</div>
+            <div class="card-body">
+                <p>All banking solutions are designed to be:</p>
+                <ul>
+                    <li><strong>Cloneable:</strong> Create your own copy</li>
+                    <li><strong>Customizable:</strong> Modify prompts, tools, logic</li>
+                    <li><strong>Production-ready:</strong> Include HITL and compliance</li>
+                </ul>
+                <pre><code class="language-python"># Clone a banking agent
+agent = manager.clone_agent(
+    source_id="banking_kyc_verification",
+    new_name="My KYC Agent",
+    modifications={
+        "temperature": 0.2
+    }
+)</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="llm-management">LLM Provider & Model Management <span class="badge bg-success">v1.1.0</span></h2>
 <div class="row align-items-center mb-5">
     <div class="col-lg-6">
         <p class="lead">Centralized management of LLM providers and models with role-based access control.</p>

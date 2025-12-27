@@ -1,269 +1,367 @@
-# Abhikarta-LLM
+# Abhikarta-LLM v1.1.7
 
-## AI Agent Design & Orchestration Platform
+[![Version](https://img.shields.io/badge/version-1.1.7-blue.svg)](https://github.com/abhikarta-llm)
+[![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
-**Version:** 1.1.6  
-**Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.**
+**Enterprise-grade AI Agent & Workflow Orchestration Platform**
+
+Abhikarta-LLM is a comprehensive platform for building, deploying, and managing AI agents and workflows with multi-provider LLM support, visual designers, human-in-the-loop controls, and banking industry solutions.
 
 ---
 
-## Overview
+## 🚀 What's New in v1.1.7
 
-Abhikarta-LLM is an enterprise-grade AI agent design and orchestration platform built on low-code/no-code principles. The platform enables administrators to design, configure, and publish AI agents while providing controlled access for end users through RBAC-governed interfaces with full Human-in-the-Loop (HITL) support.
+### Pre-built Tools Library (60+ Tools)
+- **Common Tools**: Date/time, math, text processing, validation, format conversion
+- **Banking Tools**: KYC verification, credit scoring, loan processing, compliance
+- **Integration Tools**: HTTP/API, notifications, data transformation, workflow helpers
 
-## Features
+### Banking Industry Solutions
+- **10 Pre-built Agents**: KYC, Loan Processing, Fraud Detection, Credit Risk, Customer Service, etc.
+- **7 Production-Ready Workflows**: Loan Application, Customer Onboarding, Transaction Monitoring, Mortgage, Wire Transfer
+- **Clone & Customize**: All solutions can be cloned, modified, and deployed immediately
 
-- **Visual Agent Designer** - Drag-and-drop interface for building AI agents
-- **Visual Workflow Designer** - Design workflows with node-based canvas
-- **LangChain Integration** - Agent execution using LangChain (ReAct, Tool-Calling, Structured Chat)
-- **LangGraph Workflows** - DAG workflow execution with state management and conditional branching
-- **Multi-LLM Support** - 11+ providers: OpenAI, Anthropic, Google, Mistral, Groq, Ollama, and more
-- **LLM Provider Management** - Configure providers, models, and access via Admin UI
-- **Model RBAC** - Role-based access control for models with usage limits
-- **Centralized Tools System** - BaseTool abstraction with FunctionTool, MCPTool, HTTPTool, CodeFragmentTool
-- **ToolsRegistry** - Centralized tool management with automatic discovery and registration
-- **MCP Server Manager** - Centralized MCP server lifecycle management with auto-connect and health monitoring
-- **MCP Tool Servers** - Dynamic tool loading from external MCP servers at runtime
-- **Code Fragments** - Reusable code modules via db://, file://, s3:// URIs
-- **MCP Plugin Framework** - Extensible tool integration via Model Context Protocol
-- **Enterprise RBAC** - Role-based access control with fine-grained permissions
-- **Human-in-the-Loop (HITL)** - Full task management with assignment, comments, approval/rejection workflow
-- **Execution Progress Tracking** - Real-time visual execution monitoring
-- **Dual Database Support** - SQLite for development, PostgreSQL for production
-- **Admin Portal** - Comprehensive management interface
-- **Complete LLM Logging** - Track tokens, costs, and latency for all calls
+### Enhanced Documentation
+- Comprehensive help pages for all features
+- Banking solutions guide with complete tool/agent/workflow reference
+- Updated architecture documentation
 
-## Quick Start
+---
+
+## ✨ Key Features
+
+### 🤖 Agent Management
+- **Visual Agent Designer**: Drag-and-drop interface with 14 node types
+- **Multiple Agent Types**: ReAct, Chain-of-Thought, Plan-and-Execute, Custom
+- **Tool Integration**: Function tools, MCP tools, HTTP tools, code fragments
+- **Pre-built Agents**: 10+ banking agents ready for deployment
+
+### 📊 Workflow Orchestration
+- **Visual Workflow Designer**: 10 node types (Start, End, LLM, Agent, Tool, Code, RAG, Condition, Passthrough, HITL)
+- **DAG Execution Engine**: JSON-defined workflows with Python execution
+- **Parallel Processing**: Fork/join patterns, conditional routing
+- **Pre-built Workflows**: 7+ banking workflows with HITL integration
+
+### 🔧 Tools System (v1.1.6+)
+- **BaseTool Architecture**: Abstract base class for all tool types
+- **Tool Types**: FunctionTool, MCPTool, HTTPTool, CodeFragmentTool, LangChainTool
+- **ToolsRegistry**: Centralized registration, discovery, and execution
+- **Format Conversion**: OpenAI, Anthropic, LangChain compatible outputs
+- **60+ Pre-built Tools**: Ready for immediate use
+
+### 🔌 MCP Integration (v1.1.6+)
+- **MCPServerManager**: Centralized server lifecycle management
+- **Multiple Transports**: HTTP, WebSocket, SSE, STDIO
+- **Auto-connect**: Automatic connection on startup
+- **Health Monitoring**: Background health checks with auto-reconnect
+- **Tool Discovery**: Automatic tool registration from MCP servers
+
+### 👤 Human-in-the-Loop (v1.1.5+)
+- **Task Management**: Create, assign, track approval tasks
+- **Priority Levels**: Low, Medium, High, Critical
+- **Comments & History**: Full audit trail of decisions
+- **Workflow Integration**: HITL nodes pause execution for human input
+- **User & Admin Interfaces**: Separate views for different roles
+
+### 🏦 Banking Solutions (v1.1.7+)
+- **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
+- **Credit Assessment**: Credit scoring, DTI calculation, eligibility
+- **Loan Processing**: EMI calculation, amortization schedules
+- **Fraud Detection**: Transaction analysis, pattern detection
+- **Compliance**: AML reporting, regulatory validation
+
+### 🔐 Security & RBAC
+- **Role-Based Access**: Super Admin, Domain Admin, Agent Developer, Agent User
+- **LLM Permissions**: Model-level access control
+- **API Key Management**: Secure key generation and rotation
+- **Audit Logging**: Complete activity tracking
+
+### 🤝 LLM Provider Support
+| Provider | Models | Status |
+|----------|--------|--------|
+| OpenAI | GPT-4o, GPT-4 Turbo, GPT-3.5 | ✅ Full |
+| Anthropic | Claude 3.5, Claude 3 | ✅ Full |
+| Google | Gemini Pro, Gemini Ultra | ✅ Full |
+| Azure OpenAI | All GPT models | ✅ Full |
+| AWS Bedrock | Claude, Titan, Llama | ✅ Full |
+| Mistral | All models | ✅ Full |
+| Groq | Llama, Mixtral | ✅ Full |
+| Together AI | Open source models | ✅ Full |
+| Cohere | Command models | ✅ Full |
+| Hugging Face | Inference API | ✅ Full |
+| Ollama | Local models | ✅ Full |
+
+---
+
+## 📁 Project Structure
+
+```
+abhikarta-llm-v1.1.7/
+├── abhikarta/
+│   ├── __init__.py
+│   ├── agent/                    # Agent management
+│   │   ├── agent_manager.py      # Agent CRUD operations
+│   │   └── agent_template.py     # Agent templates
+│   ├── config/                   # Configuration
+│   │   └── settings.py           # App settings
+│   ├── core/                     # Core utilities
+│   │   └── config/               # Properties configuration
+│   ├── database/                 # Database layer
+│   │   ├── db_facade.py          # Database abstraction
+│   │   ├── sqlite_handler.py     # SQLite implementation
+│   │   ├── postgres_handler.py   # PostgreSQL implementation
+│   │   └── schema/               # 22 database tables
+│   ├── hitl/                     # Human-in-the-Loop (v1.1.5)
+│   │   └── hitl_manager.py       # HITL task management
+│   ├── langchain/                # LangChain integration
+│   │   ├── agents.py             # LangChain agent factory
+│   │   ├── llm_factory.py        # LLM provider factory
+│   │   ├── tools.py              # Tool adapters
+│   │   └── workflow_graph.py     # LangGraph integration
+│   ├── llm_provider/             # LLM abstraction
+│   │   └── llm_facade.py         # Multi-provider facade
+│   ├── mcp/                      # MCP Integration (v1.1.6)
+│   │   ├── server.py             # MCPServer, MCPServerConfig
+│   │   ├── client.py             # HTTP/WebSocket clients
+│   │   └── manager.py            # MCPServerManager singleton
+│   ├── rbac/                     # Role-based access control
+│   │   └── __init__.py           # RBAC decorators
+│   ├── tools/                    # Tools System (v1.1.6)
+│   │   ├── base_tool.py          # BaseTool, ToolSchema, ToolResult
+│   │   ├── function_tool.py      # FunctionTool, @tool decorator
+│   │   ├── mcp_tool.py           # MCPTool wrapper
+│   │   ├── http_tool.py          # HTTPTool, WebhookTool
+│   │   ├── code_fragment_tool.py # CodeFragmentTool
+│   │   ├── langchain_tool.py     # LangChain integration
+│   │   ├── registry.py           # ToolsRegistry singleton
+│   │   └── prebuilt/             # Pre-built tools (v1.1.7)
+│   │       ├── common_tools.py   # 28 common utilities
+│   │       ├── banking_tools.py  # 13 banking tools
+│   │       └── integration_tools.py  # 20 integration tools
+│   ├── user_management/          # User management
+│   │   └── user_facade.py        # User CRUD operations
+│   ├── utils/                    # Utilities
+│   │   ├── code_loader.py        # Code fragment loader
+│   │   ├── helpers.py            # Helper functions
+│   │   ├── llm_logger.py         # LLM call logging
+│   │   └── logger.py             # Application logging
+│   ├── web/                      # Web application
+│   │   ├── app.py                # Flask app factory
+│   │   ├── routes/               # Route blueprints
+│   │   │   ├── admin_routes.py   # Admin endpoints
+│   │   │   ├── agent_routes.py   # Agent endpoints
+│   │   │   ├── api_routes.py     # REST API
+│   │   │   ├── auth_routes.py    # Authentication
+│   │   │   ├── mcp_routes.py     # MCP management
+│   │   │   ├── user_routes.py    # User endpoints
+│   │   │   └── workflow_routes.py # Workflow endpoints
+│   │   ├── static/               # CSS, JS, images
+│   │   └── templates/            # Jinja2 templates (50+ files)
+│   │       ├── admin/            # Admin UI
+│   │       ├── agents/           # Agent UI
+│   │       ├── help/             # Documentation (30+ pages)
+│   │       ├── user/             # User UI
+│   │       └── workflows/        # Workflow UI
+│   └── workflow/                 # Workflow engine
+│       ├── dag_parser.py         # DAG parsing
+│       ├── executor.py           # Workflow execution
+│       └── node_types.py         # Node implementations
+├── config/
+│   └── application.properties    # Configuration file
+├── data/
+│   └── prebuilt/                 # Pre-built solutions (v1.1.7)
+│       ├── agents/
+│       │   └── banking/          # 10 banking agents
+│       └── workflows/
+│           └── banking/          # 7 banking workflows
+├── docs/
+│   ├── README.md                 # Documentation index
+│   ├── QUICKSTART.md             # Quick start guide
+│   ├── DESIGN.md                 # Architecture design
+│   └── REQUIREMENTS.md           # Requirements spec
+├── logs/                         # Application logs
+├── tests/                        # Test suite
+├── requirements.txt              # Python dependencies
+├── run_server.py                 # Application entry point
+└── LICENSE                       # License file
+```
+
+---
+
+## 🛠 Installation
 
 ### Prerequisites
+- Python 3.9+
+- PostgreSQL 12+ (recommended) or SQLite
+- 4GB+ RAM
 
-- Python 3.11+
-- pip
-- (Optional) PostgreSQL 16+
-- (Optional) Redis 7+
+### Quick Install
 
-### Installation
+```bash
+# Clone repository
+git clone https://github.com/your-org/abhikarta-llm.git
+cd abhikarta-llm
 
-1. **Clone or extract the project:**
-   ```bash
-   unzip abhikarta-llm-v1.1.6.zip
-   cd abhikarta-llm-v1.1.6
-   ```
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or: venv\Scripts\activate  # Windows
 
-2. **Create virtual environment:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   # or
-   venv\Scripts\activate  # Windows
-   ```
+# Install dependencies
+pip install -r requirements.txt
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Configure application
+cp config/application.properties.example config/application.properties
+# Edit config/application.properties with your settings
 
-4. **Configure the application:**
-   ```bash
-   # Edit config/application.properties as needed
-   # For LLM providers, set environment variables:
-   export OPENAI_API_KEY="your-openai-key"
-   export ANTHROPIC_API_KEY="your-anthropic-key"
-   ```
+# Initialize database
+python -c "from abhikarta.database import db_facade; db_facade.init_db()"
 
-5. **Run the application:**
-   ```bash
-   python run_server.py
-   
-   # Or with command line overrides:
-   python run_server.py --server.port=8080 --app.debug=true
-   ```
-
-6. **Access the application:**
-   Open http://localhost:5000 in your browser
-
-### Default Credentials
-
-| User | Password | Role |
-|------|----------|------|
-| admin | admin123 | Super Admin |
-| domain_admin | domain123 | Domain Admin |
-| developer | dev123 | Agent Developer |
-| user | user123 | Agent User |
-
-## Configuration
-
-### Properties Files
-
-Configuration is managed through `config/application.properties`:
-
-```properties
-# Database (sqlite or postgresql)
-database.type=sqlite
-database.sqlite.path=./data/abhikarta.db
-
-# Server
-server.host=0.0.0.0
-server.port=5000
-
-# LLM Providers
-llm.openai.api.key=${OPENAI_API_KEY}
-llm.anthropic.api.key=${ANTHROPIC_API_KEY}
+# Run server
+python run_server.py
 ```
 
-### Configuration Precedence
+### Access the Application
+- **Web UI**: http://localhost:5000
+- **Default Login**: admin / admin123 (change immediately)
 
-Properties can be overridden with precedence (highest to lowest):
-1. **Command line arguments** (`--key=value`)
-2. **Environment variables**
-3. **Property files**
+---
 
-### Environment Variables
+## 📊 Database Schema
 
-| Variable | Description |
+The platform uses 22 tables across these categories:
+
+| Category | Tables |
+|----------|--------|
+| **Core** | agents, workflows, executions, execution_steps |
+| **Users** | users, api_keys, audit_logs |
+| **LLM** | llm_providers, llm_models, llm_model_permissions, llm_logs |
+| **Tools** | mcp_servers, mcp_tools, code_fragments |
+| **HITL** | hitl_tasks, hitl_comments, hitl_assignments |
+| **Config** | settings, templates |
+
+---
+
+## 🏦 Banking Industry Solutions
+
+### Pre-built Agents
+
+| Agent | Use Case |
+|-------|----------|
+| KYC Verification | Identity verification, risk scoring, sanctions screening |
+| Loan Processing | Credit evaluation, eligibility, amortization |
+| Fraud Detection | Transaction analysis, pattern detection, SAR |
+| Credit Risk | Risk assessment, tier classification, pricing |
+| Customer Service | Account inquiries, product info, disputes |
+| Account Opening | Guided onboarding, document verification |
+| Compliance Officer | Regulatory monitoring, AML reporting |
+| Investment Advisor | Portfolio recommendations, risk profiling |
+| Collections | Debt recovery, payment plans |
+| Document Processor | Document classification, data extraction |
+
+### Pre-built Workflows
+
+| Workflow | Description |
 |----------|-------------|
-| `SECRET_KEY` | Flask secret key for sessions |
-| `OPENAI_API_KEY` | OpenAI API key |
-| `ANTHROPIC_API_KEY` | Anthropic API key |
-| `OLLAMA_BASE_URL` | Ollama server URL |
-| `PG_HOST` | PostgreSQL host |
-| `PG_DATABASE` | PostgreSQL database name |
-| `PG_USER` | PostgreSQL user |
-| `PG_PASSWORD` | PostgreSQL password |
+| Loan Application | End-to-end loan processing with HITL |
+| Customer Onboarding | KYC → Verification → Account Creation |
+| Transaction Monitoring | Real-time fraud detection and AML |
+| Mortgage Application | Full underwriting workflow |
+| Credit Card Application | Application to issuance |
+| Wire Transfer | OFAC screening, execution, CTR |
+| Dispute Resolution | Classification, investigation, resolution |
 
-## Project Structure
+---
 
-```
-abhikarta-llm-v1.1.6/
-├── abhikarta/                  # Main package
-│   ├── core/                   # Core utilities
-│   │   └── config/             # PropertiesConfigurator (singleton)
-│   ├── config/                 # Settings management
-│   ├── database/               # Database facade (SQLite/PostgreSQL)
-│   ├── user_management/        # User facade (users.json)
-│   ├── rbac/                   # Role-based access control
-│   ├── llm_provider/           # LLM abstraction layer (legacy)
-│   ├── tools/                  # Centralized Tools System
-│   │   ├── base_tool.py        # BaseTool abstract class
-│   │   ├── function_tool.py    # Python function tools
-│   │   ├── mcp_tool.py         # MCP server tools
-│   │   ├── http_tool.py        # HTTP/REST API tools
-│   │   ├── code_fragment_tool.py  # Database code fragment tools
-│   │   ├── langchain_tool.py   # LangChain tool wrappers
-│   │   └── registry.py         # ToolsRegistry singleton
-│   ├── langchain/              # LangChain & LangGraph integration
-│   │   ├── llm_factory.py      # LangChain LLM creation
-│   │   ├── tools.py            # Tool creation & MCP integration
-│   │   ├── agents.py           # Agent execution
-│   │   └── workflow_graph.py   # LangGraph workflow execution
-│   ├── mcp/                    # MCP Server Management
-│   │   ├── server.py           # MCPServer, MCPServerConfig models
-│   │   ├── client.py           # HTTP & WebSocket MCP clients
-│   │   └── manager.py          # MCPServerManager singleton
-│   ├── workflow/               # Workflow execution
-│   ├── agent/                  # Agent management
-│   ├── hitl/                   # Human-in-the-loop
-│   ├── web/                    # Flask web application
-│   │   ├── abhikarta_llm_web.py  # Main application class
-│   │   ├── routes/             # Route handlers
-│   │   ├── templates/          # Jinja2 templates
-│   │   │   ├── auth/           # Authentication pages
-│   │   │   ├── admin/          # Admin dashboard pages
-│   │   │   ├── user/           # User dashboard pages
-│   │   │   ├── agents/         # Agent management pages
-│   │   │   ├── workflows/      # Workflow designer pages
-│   │   │   ├── mcp/            # MCP plugin pages
-│   │   │   ├── help/           # Help & About pages
-│   │   │   └── errors/         # Error pages
-│   │   └── static/             # CSS, JS, images
-│   └── utils/                  # Utilities
-├── config/                     # Configuration files
-│   └── application.properties  # Main configuration
-├── data/                       # Data directory
-│   └── users.json              # User credentials
-├── logs/                       # Log files
-├── docs/                       # Documentation
-│   ├── REQUIREMENTS.md         # Product requirements
-│   └── DESIGN.md               # Detailed design
-├── tests/                      # Test suite
-├── run_server.py               # Entry point
-├── requirements.txt            # Python dependencies
-├── README.md                   # This file
-└── LICENSE                     # License
-```
+## 🔧 Pre-built Tools
 
-## User Roles
+### Common Tools (28)
+- **Date/Time**: get_current_datetime, parse_date, calculate_date_difference, add_days_to_date, get_business_days
+- **Math**: calculate_expression, calculate_percentage, calculate_compound_interest, calculate_loan_emi, convert_currency
+- **Text**: extract_text_patterns, clean_text, extract_entities, generate_summary_stats, mask_sensitive_data
+- **Validation**: validate_email, validate_phone, validate_credit_card, validate_iban, validate_ssn
+- **Conversion**: json_to_csv, csv_to_json, base64_encode, base64_decode, generate_hash
+- **ID Generation**: generate_uuid, generate_reference_number, generate_account_number
 
-| Role | Description |
-|------|-------------|
-| Super Admin | Full system access |
-| Domain Admin | Domain-level administration |
-| Agent Developer | Create and test agents |
-| Agent Publisher | Approve and publish agents |
-| HITL Reviewer | Handle human intervention requests |
-| Agent User | Execute assigned agents |
-| Viewer | Read-only access |
+### Banking Tools (13)
+- **KYC**: verify_identity_document, calculate_kyc_risk_score, verify_address
+- **Credit**: calculate_credit_score, assess_debt_to_income
+- **Loan**: calculate_loan_eligibility, generate_amortization_schedule
+- **Transaction**: analyze_transaction, detect_transaction_patterns, calculate_transaction_limits
+- **Compliance**: check_sanctions_list, generate_aml_report, validate_regulatory_compliance
 
-## API Documentation
+### Integration Tools (20)
+- **HTTP/API**: make_http_request, build_query_string, parse_json_response, validate_api_response
+- **Notifications**: format_email_template, create_notification, format_sms_message
+- **Data Transform**: map_fields, flatten_nested_dict, unflatten_dict, merge_dicts, filter_dict_keys
+- **List/Array**: filter_list, sort_list, group_by, aggregate_list, paginate_list
+- **Workflow**: create_workflow_context, update_workflow_context, evaluate_condition
 
-### Authentication
+---
 
-All API endpoints require authentication via session cookie.
+## 📚 API Reference
 
-### Endpoints
+### REST Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/auth/login` | User login |
-| POST | `/api/auth/logout` | User logout |
 | GET | `/api/agents` | List agents |
-| GET | `/api/agents/{id}` | Get agent details |
 | POST | `/api/agents` | Create agent |
+| GET | `/api/agents/{id}` | Get agent |
+| PUT | `/api/agents/{id}` | Update agent |
+| DELETE | `/api/agents/{id}` | Delete agent |
 | POST | `/api/agents/{id}/execute` | Execute agent |
+| GET | `/api/workflows` | List workflows |
+| POST | `/api/workflows` | Create workflow |
+| POST | `/api/workflows/{id}/execute` | Execute workflow |
+| GET | `/api/executions` | List executions |
+| GET | `/api/executions/{id}` | Get execution details |
+| GET | `/api/hitl/tasks` | List HITL tasks |
+| POST | `/api/hitl/tasks/{id}/complete` | Complete HITL task |
+| GET | `/api/tools` | List available tools |
+| POST | `/api/tools/{name}/execute` | Execute tool |
 
-## Development
+---
 
-### Running in Debug Mode
+## 🔒 Security
 
-```bash
-python run_server.py --app.debug=true
-```
+- **Authentication**: Session-based with secure cookies
+- **Password Hashing**: bcrypt with salt
+- **RBAC**: Four-tier role system
+- **API Keys**: Secure generation with rotation
+- **Audit Logging**: Complete activity tracking
+- **Input Validation**: Comprehensive sanitization
 
-### Running Tests
+---
 
-```bash
-pytest tests/
-```
+## 📈 Version History
 
-## Help & About
+| Version | Date | Highlights |
+|---------|------|------------|
+| 1.1.7 | 2025-01 | Pre-built tools library (60+), banking solutions, comprehensive docs |
+| 1.1.6 | 2025-01 | Tools System, MCP Integration, ToolsRegistry |
+| 1.1.5 | 2025-01 | HITL System, Execution Progress, Visual Workflow Designer |
+| 1.1.0 | 2024-12 | LLM Management, Visual Agent Designer, LangChain integration |
+| 1.0.1 | 2024-12 | Code Fragments (db://, file://, s3://) |
+| 1.0.0 | 2024-12 | Initial release |
 
-The application includes comprehensive built-in documentation:
+---
 
-- **Help Page** (`/help`) - Full documentation with architecture diagrams, examples, and tutorials
-- **About Page** (`/about`) - Platform overview with competitive analysis
+## 📄 License
 
-## Security Considerations
+Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.
 
-1. **Change default passwords** before deployment
-2. **Set a strong SECRET_KEY** in production
-3. **Use PostgreSQL** for production deployments
-4. **Enable HTTPS** in production
-5. **Review RBAC permissions** for your organization
+This software is proprietary. See [LICENSE](LICENSE) for details.
 
-## License
+---
 
-This software is proprietary and confidential. See LICENSE file for details.
+## 🤝 Support
 
-## Legal Notice
+- **Documentation**: Access in-app help at `/help`
+- **Issues**: Report via GitHub Issues
+- **Email**: support@abhikarta.com
 
-Copyright © 2025-2030, All Rights Reserved  
-Ashutosh Sinha  
-Email: ajsinha@gmail.com
+---
 
-This document and the associated software architecture are proprietary and confidential. Unauthorized copying, distribution, modification, or use of this document or the software system it describes is strictly prohibited without explicit written permission from the copyright holder.
-
-**Patent Pending:** Certain architectural patterns and implementations may be subject to patent applications.
-
-## Support
-
-For support inquiries, contact: ajsinha@gmail.com
+*Built with ❤️ for enterprise AI automation*

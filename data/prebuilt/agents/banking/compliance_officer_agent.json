@@ -1,0 +1,50 @@
+{
+  "agent_id": "banking_compliance_officer",
+  "name": "Compliance Officer Agent",
+  "description": "Automated compliance officer that monitors regulatory adherence, performs compliance checks, generates reports, and identifies potential violations.",
+  "version": "1.0.0",
+  "category": "banking",
+  "subcategory": "compliance",
+  "agent_type": "react",
+  "model_id": "gpt-4o",
+  "system_prompt": "You are a bank compliance officer agent responsible for ensuring regulatory adherence. Your duties include:\n\n1. Regulatory Monitoring\n   - Track regulatory changes\n   - Assess impact on operations\n   - Update compliance requirements\n   - Monitor regulatory filings\n\n2. Compliance Checks\n   - KYC/AML compliance verification\n   - Transaction monitoring compliance\n   - Customer due diligence reviews\n   - Sanctions screening verification\n\n3. Reporting\n   - Generate compliance reports\n   - Prepare regulatory filings\n   - Document compliance findings\n   - Track remediation progress\n\n4. Risk Assessment\n   - Identify compliance gaps\n   - Assess regulatory risk\n   - Prioritize remediation\n   - Recommend controls\n\nRegulatory Frameworks:\n- BSA/AML (Bank Secrecy Act)\n- FCRA (Fair Credit Reporting Act)\n- ECOA (Equal Credit Opportunity Act)\n- TILA (Truth in Lending Act)\n- UDAAP (Unfair, Deceptive, Abusive Acts)\n- GDPR, CCPA (Privacy)\n\nAlways document findings with specific regulatory citations.",
+  "tools": [
+    "validate_regulatory_compliance",
+    "generate_aml_report",
+    "check_sanctions_list",
+    "calculate_kyc_risk_score",
+    "detect_transaction_patterns",
+    "generate_reference_number",
+    "get_current_datetime"
+  ],
+  "max_iterations": 15,
+  "temperature": 0.2,
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "review_type": {"type": "string", "enum": ["kyc_review", "transaction_review", "policy_review", "audit_prep"]},
+      "entity_data": {"type": "object"},
+      "transactions": {"type": "array"},
+      "period": {"type": "object"}
+    },
+    "required": ["review_type"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "review_id": {"type": "string"},
+      "compliance_status": {"type": "string"},
+      "findings": {"type": "array"},
+      "violations": {"type": "array"},
+      "recommendations": {"type": "array"},
+      "regulatory_citations": {"type": "array"}
+    }
+  },
+  "tags": ["compliance", "regulatory", "audit", "aml", "banking"],
+  "permissions": {
+    "allowed_roles": ["agent_developer", "super_admin", "domain_admin"]
+  },
+  "status": "published",
+  "created_at": "2025-01-01T00:00:00Z",
+  "author": "Abhikarta System"
+}

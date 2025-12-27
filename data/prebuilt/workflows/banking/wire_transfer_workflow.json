@@ -1,0 +1,226 @@
+{
+  "workflow_id": "banking_wire_transfer",
+  "name": "Wire Transfer Processing Workflow",
+  "description": "Secure wire transfer processing with AML screening, OFAC checks, fraud detection, and regulatory compliance for domestic and international wires.",
+  "version": "1.0.0",
+  "category": "banking",
+  "subcategory": "payments",
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "name": "Wire Request Received",
+      "config": {},
+      "position": {"x": 100, "y": 300}
+    },
+    {
+      "id": "validate_request",
+      "type": "code",
+      "name": "Validate Wire Details",
+      "config": {
+        "language": "python",
+        "code": "required = ['sender_account', 'amount', 'beneficiary_name', 'beneficiary_account']\nmissing = [f for f in required if not input_data.get(f)]\nis_international = input_data.get('beneficiary_country', 'US') != 'US'\nif is_international:\n    required.extend(['swift_code', 'beneficiary_address'])\n    missing.extend([f for f in ['swift_code', 'beneficiary_address'] if not input_data.get(f)])\nresult = {'valid': len(missing) == 0, 'missing': missing, 'is_international': is_international, 'wire_id': f\"WIRE-{input_data.get('sender_account', '')[-4:]}{datetime.now().strftime('%Y%m%d%H%M%S')}\"}"
+      },
+      "position": {"x": 300, "y": 300}
+    },
+    {
+      "id": "check_balance",
+      "type": "code",
+      "name": "Verify Funds",
+      "config": {
+        "language": "python",
+        "code": "amount = input_data.get('amount', 0)\nwire_fee = 25 if not input_data.get('is_international') else 45\navailable_balance = input_data.get('available_balance', 0)\ntotal_required = amount + wire_fee\nresult = {'sufficient_funds': available_balance >= total_required, 'amount': amount, 'fee': wire_fee, 'total': total_required, 'available': available_balance}"
+      },
+      "position": {"x": 500, "y": 300}
+    },
+    {
+      "id": "check_limits",
+      "type": "tool",
+      "name": "Check Transaction Limits",
+      "config": {
+        "tool_name": "calculate_transaction_limits"
+      },
+      "position": {"x": 700, "y": 300}
+    },
+    {
+      "id": "ofac_screening",
+      "type": "tool",
+      "name": "OFAC/Sanctions Screening",
+      "config": {
+        "tool_name": "check_sanctions_list"
+      },
+      "position": {"x": 900, "y": 200}
+    },
+    {
+      "id": "fraud_check",
+      "type": "agent",
+      "name": "Fraud Detection",
+      "config": {
+        "agent_id": "banking_fraud_detection",
+        "prompt": "Analyze this wire transfer for fraud indicators. Check for:\n- Unusual beneficiary patterns\n- High-risk countries\n- Velocity anomalies\n- Amount patterns\nProvide risk assessment and recommendation."
+      },
+      "position": {"x": 900, "y": 400}
+    },
+    {
+      "id": "merge_screening",
+      "type": "passthrough",
+      "name": "Merge Screening",
+      "config": {},
+      "position": {"x": 1100, "y": 300}
+    },
+    {
+      "id": "risk_router",
+      "type": "condition",
+      "name": "Risk Assessment Router",
+      "config": {
+        "condition": "risk_level",
+        "description": "Route based on combined risk assessment"
+      },
+      "position": {"x": 1300, "y": 300}
+    },
+    {
+      "id": "auto_approve",
+      "type": "code",
+      "name": "Auto Approve Wire",
+      "config": {
+        "language": "python",
+        "code": "result = {\n  'status': 'approved',\n  'processing_date': datetime.now().isoformat(),\n  'estimated_arrival': (datetime.now() + timedelta(days=1 if not input_data.get('is_international') else 3)).strftime('%Y-%m-%d')\n}"
+      },
+      "position": {"x": 1500, "y": 150}
+    },
+    {
+      "id": "additional_verification",
+      "type": "llm",
+      "name": "Request Verification",
+      "config": {
+        "model_id": "gpt-4o",
+        "prompt": "Generate callback verification request for medium-risk wire transfer. Include specific verification questions about the transaction purpose and beneficiary relationship.",
+        "temperature": 0.3
+      },
+      "position": {"x": 1500, "y": 300}
+    },
+    {
+      "id": "hitl_review",
+      "type": "hitl",
+      "name": "Compliance Review",
+      "config": {
+        "task_type": "wire_review",
+        "priority": "critical",
+        "description": "High-risk wire transfer requires compliance officer review"
+      },
+      "position": {"x": 1500, "y": 450}
+    },
+    {
+      "id": "block_wire",
+      "type": "code",
+      "name": "Block Wire",
+      "config": {
+        "language": "python",
+        "code": "result = {\n  'status': 'blocked',\n  'reason': 'OFAC/Sanctions match or high fraud risk',\n  'sar_required': True,\n  'blocked_at': datetime.now().isoformat()\n}"
+      },
+      "position": {"x": 1500, "y": 600}
+    },
+    {
+      "id": "execute_wire",
+      "type": "code",
+      "name": "Execute Wire Transfer",
+      "config": {
+        "language": "python",
+        "code": "import uuid\nresult = {\n  'confirmation_number': f'CONF-{uuid.uuid4().hex[:12].upper()}',\n  'executed_at': datetime.now().isoformat(),\n  'status': 'completed',\n  'debit_amount': input_data.get('total', 0)\n}"
+      },
+      "position": {"x": 1700, "y": 200}
+    },
+    {
+      "id": "generate_confirmation",
+      "type": "llm",
+      "name": "Generate Confirmation",
+      "config": {
+        "model_id": "gpt-4o",
+        "prompt": "Generate wire transfer confirmation including:\n- Confirmation number\n- Transfer details (amount, beneficiary)\n- Expected arrival date\n- Fee breakdown\n- Contact information for questions",
+        "temperature": 0.3
+      },
+      "position": {"x": 1900, "y": 200}
+    },
+    {
+      "id": "ctr_check",
+      "type": "condition",
+      "name": "CTR Required?",
+      "config": {
+        "condition": "amount >= 10000",
+        "description": "Check if Currency Transaction Report required"
+      },
+      "position": {"x": 2100, "y": 200}
+    },
+    {
+      "id": "generate_ctr",
+      "type": "tool",
+      "name": "Generate CTR",
+      "config": {
+        "tool_name": "generate_aml_report"
+      },
+      "position": {"x": 2300, "y": 150}
+    },
+    {
+      "id": "send_notification",
+      "type": "tool",
+      "name": "Send Notification",
+      "config": {
+        "tool_name": "create_notification"
+      },
+      "position": {"x": 2300, "y": 300}
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "name": "Wire Complete",
+      "config": {},
+      "position": {"x": 2500, "y": 300}
+    }
+  ],
+  "edges": [
+    {"from": "start", "to": "validate_request"},
+    {"from": "validate_request", "to": "check_balance"},
+    {"from": "check_balance", "to": "check_limits"},
+    {"from": "check_limits", "to": "ofac_screening"},
+    {"from": "check_limits", "to": "fraud_check"},
+    {"from": "ofac_screening", "to": "merge_screening"},
+    {"from": "fraud_check", "to": "merge_screening"},
+    {"from": "merge_screening", "to": "risk_router"},
+    {"from": "risk_router", "to": "auto_approve", "condition": "low"},
+    {"from": "risk_router", "to": "additional_verification", "condition": "medium"},
+    {"from": "risk_router", "to": "hitl_review", "condition": "high"},
+    {"from": "risk_router", "to": "block_wire", "condition": "blocked"},
+    {"from": "auto_approve", "to": "execute_wire"},
+    {"from": "additional_verification", "to": "execute_wire"},
+    {"from": "hitl_review", "to": "execute_wire"},
+    {"from": "execute_wire", "to": "generate_confirmation"},
+    {"from": "generate_confirmation", "to": "ctr_check"},
+    {"from": "ctr_check", "to": "generate_ctr", "condition": "required"},
+    {"from": "ctr_check", "to": "send_notification", "condition": "not_required"},
+    {"from": "generate_ctr", "to": "send_notification"},
+    {"from": "block_wire", "to": "send_notification"},
+    {"from": "send_notification", "to": "end"}
+  ],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "sender_account": {"type": "string"},
+      "amount": {"type": "number"},
+      "currency": {"type": "string", "default": "USD"},
+      "beneficiary_name": {"type": "string"},
+      "beneficiary_account": {"type": "string"},
+      "beneficiary_bank": {"type": "string"},
+      "beneficiary_country": {"type": "string"},
+      "swift_code": {"type": "string"},
+      "reference": {"type": "string"},
+      "purpose": {"type": "string"}
+    }
+  },
+  "tags": ["wire", "transfer", "payments", "ofac", "aml", "banking"],
+  "permissions": {
+    "allowed_roles": ["agent_developer", "super_admin", "domain_admin"]
+  },
+  "status": "published",
+  "created_at": "2025-01-01T00:00:00Z",
+  "author": "Abhikarta System"
+}

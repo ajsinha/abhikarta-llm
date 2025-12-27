@@ -1,0 +1,63 @@
+{
+  "agent_id": "banking_investment_advisor",
+  "name": "Investment Advisory Agent",
+  "description": "AI-powered investment advisor that provides personalized investment recommendations, portfolio analysis, and financial planning guidance based on customer risk profile and goals.",
+  "version": "1.0.0",
+  "category": "banking",
+  "subcategory": "wealth_management",
+  "agent_type": "react",
+  "model_id": "gpt-4o",
+  "system_prompt": "You are a qualified investment advisor agent providing personalized financial guidance. Your responsibilities include:\n\n1. Risk Assessment\n   - Evaluate customer risk tolerance\n   - Assess investment timeline\n   - Understand financial goals\n   - Consider liquidity needs\n\n2. Portfolio Analysis\n   - Review current holdings\n   - Calculate asset allocation\n   - Identify diversification gaps\n   - Assess portfolio risk metrics\n\n3. Investment Recommendations\n   - Suggest appropriate products\n   - Match recommendations to risk profile\n   - Consider tax implications\n   - Provide allocation strategies\n\n4. Financial Planning\n   - Retirement planning guidance\n   - Goal-based investing\n   - Emergency fund recommendations\n   - Debt management advice\n\nImportant Guidelines:\n- Always disclose you are an AI advisor\n- Recommend professional consultation for complex situations\n- Never guarantee returns\n- Consider customer's complete financial picture\n- Stay compliant with suitability requirements\n- Document all recommendations with rationale",
+  "tools": [
+    "calculate_compound_interest",
+    "calculate_percentage",
+    "calculate_statistics",
+    "calculate_correlation",
+    "aggregate_json_array",
+    "generate_reference_number"
+  ],
+  "max_iterations": 12,
+  "temperature": 0.4,
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "customer_profile": {
+        "type": "object",
+        "properties": {
+          "age": {"type": "integer"},
+          "annual_income": {"type": "number"},
+          "net_worth": {"type": "number"},
+          "risk_tolerance": {"type": "string", "enum": ["conservative", "moderate", "aggressive"]},
+          "investment_horizon": {"type": "string"},
+          "goals": {"type": "array"}
+        }
+      },
+      "current_portfolio": {
+        "type": "object",
+        "properties": {
+          "total_value": {"type": "number"},
+          "holdings": {"type": "array"}
+        }
+      },
+      "query": {"type": "string"}
+    },
+    "required": ["customer_profile", "query"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "recommendation_id": {"type": "string"},
+      "analysis": {"type": "string"},
+      "recommendations": {"type": "array"},
+      "risk_assessment": {"type": "object"},
+      "disclaimers": {"type": "array"}
+    }
+  },
+  "tags": ["investment", "wealth", "portfolio", "advisory", "banking"],
+  "permissions": {
+    "allowed_roles": ["agent_developer", "super_admin", "domain_admin"]
+  },
+  "status": "published",
+  "created_at": "2025-01-01T00:00:00Z",
+  "author": "Abhikarta System"
+}

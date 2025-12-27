@@ -1,140 +1,112 @@
 # Abhikarta-LLM Documentation
 
-**Version:** 1.1.6  
-**Date:** December 2025
+**Version:** 1.1.7  
+**Copyright:** © 2025-2030 Ashutosh Sinha. All Rights Reserved.
 
----
+## Documentation Index
 
-## Copyright Notice
+| Document | Description |
+|----------|-------------|
+| [README.md](../README.md) | Project overview and features |
+| [QUICKSTART.md](QUICKSTART.md) | Quick start guide |
+| [DESIGN.md](DESIGN.md) | Architecture and design |
+| [REQUIREMENTS.md](REQUIREMENTS.md) | Requirements specification |
 
-**Copyright © 2025-2030, All Rights Reserved**  
-**Ashutosh Sinha** | ajsinha@gmail.com
+## Version 1.1.7 Features
 
----
+### Pre-built Tools Library (60+)
+- **Common Tools (28)**: Date/time, math, text processing, validation, format conversion, ID generation
+- **Banking Tools (13)**: KYC verification, credit scoring, loan processing, transaction analysis, compliance
+- **Integration Tools (20)**: HTTP/API, notifications, data transformation, list/array operations, workflow helpers
 
-## Documentation Overview
+### Banking Industry Solutions
+- **10 Pre-built Agents**: KYC Verification, Loan Processing, Fraud Detection, Credit Risk, Customer Service, Account Opening, Compliance Officer, Investment Advisor, Collections, Document Processor
+- **7 Pre-built Workflows**: Loan Application, Customer Onboarding, Transaction Monitoring, Mortgage Application, Credit Card Application, Wire Transfer, Dispute Resolution
 
-This folder contains all documentation for the Abhikarta-LLM AI Agent Design & Orchestration Platform.
+### Comprehensive Documentation
+- Updated help pages for all features
+- Banking solutions guide
+- Pre-built tools reference
 
----
+## Previous Version Highlights
 
-## Document Index
+### v1.1.6: Tools System & MCP Integration
+- Unified tools architecture with BaseTool
+- ToolsRegistry for centralized management
+- MCPServerManager for MCP lifecycle
+- Format conversion for all LLM providers
 
-| Document | Description | Audience |
-|----------|-------------|----------|
-| [QUICKSTART.md](QUICKSTART.md) | Get up and running in minutes | All Users |
-| [REQUIREMENTS.md](REQUIREMENTS.md) | Product Requirements Document (PRD) | Product Managers, Architects |
-| [DESIGN.md](DESIGN.md) | Detailed Technical Design Document | Developers, Architects |
+### v1.1.5: Human-in-the-Loop
+- HITL task management
+- Execution progress monitoring
+- Visual workflow designer
 
----
+### v1.1.0: LLM Management
+- Multi-provider LLM configuration
+- Model permissions with RBAC
+- Visual agent designer
+
+### v1.0.1: Code Fragments
+- db://, file://, s3:// URI support
+- Reusable code modules
 
 ## Quick Links
 
-### For New Users
-Start with the [Quick Start Guide](QUICKSTART.md) to get the system running.
+### In-App Help
+- `/help` - Main documentation hub
+- `/help/page/prebuilt-tools` - Pre-built tools reference
+- `/help/page/banking-solutions` - Banking solutions guide
+- `/help/page/tools-system` - Tools system documentation
+- `/help/about/architecture` - System architecture
 
-### For Product Managers
-Review the [Requirements Document](REQUIREMENTS.md) for feature specifications and roadmap.
+### API Reference
+- `/help/page/api-reference` - REST API documentation
 
-### For Developers
-See the [Design Document](DESIGN.md) for architecture, APIs, and implementation details.
+## Architecture Overview
 
----
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     PRESENTATION LAYER                           │
+│         Flask Web UI │ REST API │ Help Documentation            │
+├─────────────────────────────────────────────────────────────────┤
+│                     APPLICATION LAYER                            │
+│    Agent Manager │ Workflow Engine │ HITL Manager                │
+├─────────────────────────────────────────────────────────────────┤
+│                        TOOLS LAYER                               │
+│  BaseTool │ FunctionTool │ MCPTool │ HTTPTool │ ToolsRegistry   │
+│  Pre-built Tools: Common (28) │ Banking (13) │ Integration (20) │
+├─────────────────────────────────────────────────────────────────┤
+│                     INTEGRATION LAYER                            │
+│    LangChain │ LangGraph │ MCP Clients │ LLM Providers (11)     │
+├─────────────────────────────────────────────────────────────────┤
+│                        DATA LAYER                                │
+│         PostgreSQL/SQLite │ 22 Tables │ Audit Logs              │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-## Document Descriptions
+## Key Statistics
 
-### QUICKSTART.md
-A concise guide to get Abhikarta-LLM installed and running:
-- Installation steps
-- First login
-- Creating your first agent
-- Configuration basics
-- Troubleshooting
+| Metric | Count |
+|--------|-------|
+| LLM Providers | 11 |
+| Pre-built Tools | 60+ |
+| Banking Agents | 10 |
+| Banking Workflows | 7 |
+| Database Tables | 22 |
+| Workflow Node Types | 10 |
+| Help Pages | 30+ |
 
-### REQUIREMENTS.md
-Comprehensive Product Requirements Document covering:
-- Executive Summary
-- Vision & Strategic Goals
-- System Architecture
-- Functional Requirements
-- RBAC and HITL Framework
-- LLM Abstraction Layer
-- MCP Plugin Framework
-- Non-Functional Requirements
-- Deployment & Infrastructure
+## Version History
 
-### DESIGN.md
-Detailed Technical Design Document including:
-- System Architecture
-- Module Design
-- Database Schema
-- User Management
-- Web Application Design
-- API Specifications
-- Security Design
-- Deployment Architecture
-
----
-
-## Version 1.1.6 Features
-
-### Visual Agent Designer
-Drag-and-drop workflow builder with:
-- 12 node types (Input, Output, LLM, Tool, Condition, Loop, etc.)
-- Real-time validation
-- Import/export JSON workflows
-- Auto-layout functionality
-
-### Template Library
-6 pre-built agent templates:
-- Basic ReAct Agent
-- Customer Support Agent
-- Data Analysis Agent
-- Research Assistant
-- Code Assistant
-- Workflow Automation
-
-### Enhanced User Management
-- Modal-based CRUD operations
-- Role filtering and search
-- Password reset
-- User status toggle
-
-### Database Schema Module
-- Separate SQLite and PostgreSQL schemas
-- 15+ tables with indexes
-- Full-text search (PostgreSQL)
-- Automatic timestamp triggers
+| Version | Date | Highlights |
+|---------|------|------------|
+| 1.1.7 | Jan 2025 | Pre-built tools (60+), banking solutions, comprehensive docs |
+| 1.1.6 | Jan 2025 | Tools System, MCP Integration, ToolsRegistry |
+| 1.1.5 | Jan 2025 | HITL System, Execution Progress, Visual Workflow Designer |
+| 1.1.0 | Dec 2024 | LLM Management, Visual Agent Designer, LangChain |
+| 1.0.1 | Dec 2024 | Code Fragments (db://, file://, s3://) |
+| 1.0.0 | Dec 2024 | Initial release |
 
 ---
 
-## Additional Resources
-
-### In-Application Help
-Access built-in help at `/help` when the application is running.
-
-### About Page
-View version and system information at `/about`.
-
----
-
-## Contributing to Documentation
-
-When updating documentation:
-1. Update version numbers in all affected documents
-2. Add entries to document history sections
-3. Keep the README.md index current
-4. Test all code examples
-
----
-
-## Document History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | Dec 2025 | Initial documentation |
-| 1.1.6 | Dec 2025 | Added QUICKSTART.md, updated REQUIREMENTS.md and DESIGN.md with new features |
-
----
-
-*For questions or feedback, contact: ajsinha@gmail.com*
+*For the most up-to-date documentation, access the in-app help at `/help`.*
