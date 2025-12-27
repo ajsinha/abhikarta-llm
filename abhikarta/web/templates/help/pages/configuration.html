@@ -1,0 +1,156 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Configuration" %}
+{% set description = "Application settings and environment variables" %}
+{% set icon = "bi-gear" %}
+{% set header_color = "#fd7e14" %}
+{% set header_color_dark = "#ca6510" %}
+
+{% block help_nav %}
+<a href="#app-settings">Application Settings</a>
+<a href="#database">Database</a>
+<a href="#llm-config">LLM Providers</a>
+<a href="#security">Security</a>
+<a href="#logging">Logging</a>
+<a href="#env-vars">Environment Variables</a>
+<a href="#docker">Docker</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="app-settings">Application Settings</h2>
+<pre><code class="language-properties"># config/application.properties
+
+# Application Information
+app.name=Abhikarta-LLM
+app.version=1.1.0
+app.description=AI Agent Design & Orchestration Platform
+
+# Server Configuration
+server.host=0.0.0.0
+server.port=5000
+server.debug=false
+server.secret_key=your-secret-key-here</code></pre>
+
+<hr class="my-5">
+
+<h2 id="database">Database Configuration</h2>
+<pre><code class="language-properties"># Database Type: sqlite or postgresql
+database.type=sqlite
+
+# SQLite Configuration
+database.sqlite.path=./data/abhikarta.db
+
+# PostgreSQL Configuration
+database.postgres.host=localhost
+database.postgres.port=5432
+database.postgres.database=abhikarta
+database.postgres.user=postgres
+database.postgres.password=postgres
+database.postgres.pool_size=10</code></pre>
+
+<hr class="my-5">
+
+<h2 id="llm-config">LLM Provider Settings</h2>
+<pre><code class="language-properties"># Default Provider
+llm.default_provider=openai
+
+# OpenAI
+llm.openai.api_key=sk-your-openai-api-key
+llm.openai.default_model=gpt-4o
+
+# Anthropic
+llm.anthropic.api_key=sk-ant-your-anthropic-key
+llm.anthropic.default_model=claude-3-5-sonnet-20241022
+
+# Google
+llm.google.api_key=your-google-api-key
+llm.google.default_model=gemini-1.5-pro
+
+# Mistral
+llm.mistral.api_key=your-mistral-api-key
+llm.mistral.default_model=mistral-large-latest
+
+# Ollama (Local)
+llm.ollama.base_url=http://localhost:11434
+llm.ollama.default_model=llama3.1
+
+# Fallback Chain
+llm.fallback_chain=openai,anthropic,ollama</code></pre>
+
+<hr class="my-5">
+
+<h2 id="security">Security Settings</h2>
+<pre><code class="language-properties"># Session Configuration
+security.session.type=filesystem
+security.session.lifetime_hours=24
+security.session.permanent=true
+
+# Password Policy
+security.password.min_length=8
+security.password.require_uppercase=true
+security.password.require_number=true
+
+# Rate Limiting
+security.rate_limit.enabled=true
+security.rate_limit.requests_per_minute=60</code></pre>
+
+<hr class="my-5">
+
+<h2 id="logging">Logging Configuration</h2>
+<pre><code class="language-properties"># Log Level: DEBUG, INFO, WARNING, ERROR
+logging.level=INFO
+logging.file=./logs/abhikarta.log
+logging.max_size_mb=10
+logging.backup_count=5
+logging.format=%(asctime)s - %(name)s - %(levelname)s - %(message)s</code></pre>
+
+<hr class="my-5">
+
+<h2 id="env-vars">Environment Variables</h2>
+<p>Override settings with environment variables:</p>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Variable</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>ABHIKARTA_DATABASE_TYPE</code></td><td>Database type</td></tr>
+            <tr><td><code>ABHIKARTA_OPENAI_API_KEY</code></td><td>OpenAI API key</td></tr>
+            <tr><td><code>ABHIKARTA_ANTHROPIC_API_KEY</code></td><td>Anthropic API key</td></tr>
+            <tr><td><code>ABHIKARTA_SECRET_KEY</code></td><td>Flask secret key</td></tr>
+            <tr><td><code>ABHIKARTA_SERVER_PORT</code></td><td>Server port</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="docker">Docker Configuration</h2>
+<pre><code class="language-yaml"># docker-compose.yml
+version: '3.8'
+services:
+  abhikarta:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - ABHIKARTA_DATABASE_TYPE=postgresql
+      - ABHIKARTA_OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: abhikarta
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:</code></pre>
+{% endblock %}

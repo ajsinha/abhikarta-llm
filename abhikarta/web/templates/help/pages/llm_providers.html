@@ -1,0 +1,306 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "LLM Providers" %}
+{% set description = "Configure and use 11+ AI model providers for your agents and workflows" %}
+{% set icon = "bi-cpu" %}
+{% set header_color = "#ffc107" %}
+{% set header_color_dark = "#e0a800" %}
+
+{% block help_nav %}
+<a href="#all-providers">All Providers</a>
+<a href="#quick-comparison">Quick Comparison</a>
+<a href="#choosing">Choosing a Provider</a>
+<a href="#configuration">Configuration</a>
+<a href="#fallback">Fallback Chain</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="all-providers">Supported LLM Providers</h2>
+<p class="lead">Abhikarta-LLM supports 11 LLM providers out of the box. Click on any provider to see detailed documentation, models, pricing, and configuration guides.</p>
+
+<div class="row g-4 mb-5">
+    <!-- OpenAI -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='openai') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #10a37f;">
+            <div class="card-body text-center">
+                <i class="bi bi-lightning-charge-fill fs-1" style="color: #10a37f;"></i>
+                <h5 class="mt-2 mb-1">OpenAI</h5>
+                <small class="text-muted">GPT-4o, GPT-4, o1</small>
+                <div class="mt-2"><span class="badge bg-success">Industry Leader</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Anthropic -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='anthropic') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #d4a574;">
+            <div class="card-body text-center">
+                <i class="bi bi-stars fs-1" style="color: #d4a574;"></i>
+                <h5 class="mt-2 mb-1">Anthropic</h5>
+                <small class="text-muted">Claude 3.5, Claude 3</small>
+                <div class="mt-2"><span class="badge bg-warning text-dark">Best Safety</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Google -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='google') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #4285f4;">
+            <div class="card-body text-center">
+                <i class="bi bi-google fs-1" style="color: #4285f4;"></i>
+                <h5 class="mt-2 mb-1">Google AI</h5>
+                <small class="text-muted">Gemini 2.0, 1.5</small>
+                <div class="mt-2"><span class="badge bg-primary">Largest Context</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Mistral -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='mistral') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #ff7000;">
+            <div class="card-body text-center">
+                <i class="bi bi-wind fs-1" style="color: #ff7000;"></i>
+                <h5 class="mt-2 mb-1">Mistral AI</h5>
+                <small class="text-muted">Large, Medium, Codestral</small>
+                <div class="mt-2"><span class="badge bg-info">European</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Hugging Face -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='huggingface') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #ff9d00;">
+            <div class="card-body text-center">
+                <i class="bi bi-emoji-smile fs-1" style="color: #ff9d00;"></i>
+                <h5 class="mt-2 mb-1">Hugging Face</h5>
+                <small class="text-muted">400K+ Models</small>
+                <div class="mt-2"><span class="badge bg-warning text-dark">Open Source Hub</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Cohere -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='cohere') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #d18ee2;">
+            <div class="card-body text-center">
+                <i class="bi bi-chat-square-text-fill fs-1" style="color: #d18ee2;"></i>
+                <h5 class="mt-2 mb-1">Cohere</h5>
+                <small class="text-muted">Command R+, Embed</small>
+                <div class="mt-2"><span class="badge bg-secondary">Best RAG</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- AWS Bedrock -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='bedrock') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #ff9900;">
+            <div class="card-body text-center">
+                <i class="bi bi-cloud-fill fs-1" style="color: #ff9900;"></i>
+                <h5 class="mt-2 mb-1">AWS Bedrock</h5>
+                <small class="text-muted">Multi-Provider</small>
+                <div class="mt-2"><span class="badge bg-dark">Enterprise</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Ollama -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='ollama') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #333;">
+            <div class="card-body text-center">
+                <i class="bi bi-hdd-fill fs-1" style="color: #333;"></i>
+                <h5 class="mt-2 mb-1">Ollama</h5>
+                <small class="text-muted">Local LLMs</small>
+                <div class="mt-2"><span class="badge bg-success">Free & Private</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Groq -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='groq') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #f55036;">
+            <div class="card-body text-center">
+                <i class="bi bi-lightning-fill fs-1" style="color: #f55036;"></i>
+                <h5 class="mt-2 mb-1">Groq</h5>
+                <small class="text-muted">LPU Inference</small>
+                <div class="mt-2"><span class="badge bg-danger">Fastest</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Together AI -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='together') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #5046e4;">
+            <div class="card-body text-center">
+                <i class="bi bi-people-fill fs-1" style="color: #5046e4;"></i>
+                <h5 class="mt-2 mb-1">Together AI</h5>
+                <small class="text-muted">100+ Models</small>
+                <div class="mt-2"><span class="badge bg-primary">Open Models</span></div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Azure OpenAI -->
+    <div class="col-md-4 col-6">
+        <a href="{{ url_for('help_provider', provider='azure') }}" class="card h-100 text-decoration-none" style="border-left: 4px solid #0078d4;">
+            <div class="card-body text-center">
+                <i class="bi bi-microsoft fs-1" style="color: #0078d4;"></i>
+                <h5 class="mt-2 mb-1">Azure OpenAI</h5>
+                <small class="text-muted">Enterprise GPT</small>
+                <div class="mt-2"><span class="badge bg-info">Compliance</span></div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="quick-comparison">Quick Comparison</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Provider</th>
+                <th>Best Model</th>
+                <th>Context</th>
+                <th>Cost ($/1M)</th>
+                <th>Speed</th>
+                <th>Best For</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>OpenAI</strong></td>
+                <td>gpt-4o</td>
+                <td>128K</td>
+                <td>$2.50 / $10</td>
+                <td>Fast</td>
+                <td>General purpose, multimodal</td>
+            </tr>
+            <tr>
+                <td><strong>Anthropic</strong></td>
+                <td>claude-3.5-sonnet</td>
+                <td>200K</td>
+                <td>$3.00 / $15</td>
+                <td>Fast</td>
+                <td>Safety, long context, coding</td>
+            </tr>
+            <tr>
+                <td><strong>Google</strong></td>
+                <td>gemini-1.5-pro</td>
+                <td>2M</td>
+                <td>$1.25 / $5</td>
+                <td>Fast</td>
+                <td>Massive context, multimodal</td>
+            </tr>
+            <tr>
+                <td><strong>Mistral</strong></td>
+                <td>mistral-large</td>
+                <td>128K</td>
+                <td>$2.00 / $6</td>
+                <td>Fast</td>
+                <td>EU compliance, coding</td>
+            </tr>
+            <tr>
+                <td><strong>Hugging Face</strong></td>
+                <td>Various</td>
+                <td>Varies</td>
+                <td>Free - $$$</td>
+                <td>Varies</td>
+                <td>Specialized models, fine-tuning</td>
+            </tr>
+            <tr>
+                <td><strong>Groq</strong></td>
+                <td>llama-3.1-70b</td>
+                <td>128K</td>
+                <td>Low</td>
+                <td>Ultra-fast</td>
+                <td>Real-time apps, low latency</td>
+            </tr>
+            <tr>
+                <td><strong>Ollama</strong></td>
+                <td>llama3.1</td>
+                <td>128K</td>
+                <td>Free</td>
+                <td>Hardware-dep</td>
+                <td>Privacy, offline, development</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="choosing">Choosing a Provider</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">For Production</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>OpenAI</strong> - Best overall reliability</li>
+                    <li><strong>Anthropic</strong> - Best for safety-critical</li>
+                    <li><strong>AWS Bedrock</strong> - Best for enterprise compliance</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">For Development</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Ollama</strong> - Free, unlimited local testing</li>
+                    <li><strong>Groq</strong> - Free tier, ultra-fast iteration</li>
+                    <li><strong>gpt-4o-mini</strong> - Cheap, good quality</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Quick Configuration</h2>
+<pre><code class="language-properties"># config/application.properties
+
+# Default Provider
+llm.default_provider=openai
+
+# OpenAI
+llm.openai.enabled=true
+llm.openai.api_key=${OPENAI_API_KEY}
+llm.openai.default_model=gpt-4o
+
+# Anthropic
+llm.anthropic.enabled=true
+llm.anthropic.api_key=${ANTHROPIC_API_KEY}
+llm.anthropic.default_model=claude-3-5-sonnet-20241022
+
+# Google
+llm.google.enabled=true
+llm.google.api_key=${GOOGLE_API_KEY}
+
+# Hugging Face
+llm.huggingface.enabled=true
+llm.huggingface.api_key=${HUGGINGFACE_API_KEY}
+
+# Ollama (Local)
+llm.ollama.enabled=true
+llm.ollama.base_url=http://localhost:11434</code></pre>
+
+<hr class="my-5">
+
+<h2 id="fallback">Fallback Chain</h2>
+<p>Configure automatic failover between providers:</p>
+<pre><code class="language-properties"># If OpenAI fails, try Anthropic, then Ollama
+llm.fallback_chain=openai,anthropic,ollama</code></pre>
+
+<div class="alert alert-info">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Pro Tip:</strong> Click on any provider above to see detailed documentation including all models, pricing, strengths/weaknesses, and code examples.
+</div>
+{% endblock %}

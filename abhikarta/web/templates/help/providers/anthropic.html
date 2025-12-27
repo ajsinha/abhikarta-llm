@@ -1,0 +1,349 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Anthropic" %}
+{% set description = "Claude 3.5 Sonnet, Claude 3 Opus - Safe, helpful AI assistants" %}
+{% set icon = "bi-stars" %}
+{% set header_color = "#d97757" %}
+{% set header_color_dark = "#c4623f" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Available Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#usage">Usage in Abhikarta</a>
+<a href="#best-practices">Best Practices</a>
+<a href="#pricing">Pricing</a>
+<a href="#resources">Resources</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 64px; height: 64px; background: linear-gradient(135deg, #d97757, #c4623f);">
+        <i class="bi bi-stars text-white fs-2"></i>
+    </div>
+    <div>
+        <h2 id="overview" class="mb-1">Anthropic</h2>
+        <p class="text-muted mb-0">Creator of Claude - AI focused on safety and helpfulness</p>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <i class="bi bi-award me-2"></i>
+    <strong>Top Pick for Complex Tasks:</strong> Claude 3.5 Sonnet consistently ranks among the best models for coding, analysis, and nuanced reasoning.
+</div>
+
+<p class="lead">Anthropic was founded by former OpenAI researchers with a focus on AI safety. Claude models are known for their helpfulness, harmlessness, and honesty - plus exceptional performance on complex reasoning tasks.</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-warning">200K</h3>
+                <small class="text-muted">Context Window</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-success">#1</h3>
+                <small class="text-muted">Coding Benchmarks</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-primary">Constitutional</h3>
+                <small class="text-muted">AI Training Method</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="models">Available Models</h2>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Model</th>
+                <th>Context</th>
+                <th>Input $/1M</th>
+                <th>Output $/1M</th>
+                <th>Speed</th>
+                <th>Best For</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="table-success">
+                <td><code>claude-3-5-sonnet-20241022</code> <span class="badge bg-success">Best</span></td>
+                <td>200K</td>
+                <td>$3.00</td>
+                <td>$15.00</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Fast</td>
+                <td>Best overall - coding, analysis, writing</td>
+            </tr>
+            <tr>
+                <td><code>claude-3-opus-20240229</code> <span class="badge bg-warning text-dark">Premium</span></td>
+                <td>200K</td>
+                <td>$15.00</td>
+                <td>$75.00</td>
+                <td><i class="bi bi-hourglass text-warning"></i> Slower</td>
+                <td>Most capable for complex tasks</td>
+            </tr>
+            <tr>
+                <td><code>claude-3-sonnet-20240229</code></td>
+                <td>200K</td>
+                <td>$3.00</td>
+                <td>$15.00</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Fast</td>
+                <td>Previous generation balanced model</td>
+            </tr>
+            <tr>
+                <td><code>claude-3-haiku-20240307</code> <span class="badge bg-info">Budget</span></td>
+                <td>200K</td>
+                <td>$0.25</td>
+                <td>$1.25</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Very Fast</td>
+                <td>Fast, simple tasks, high volume</td>
+            </tr>
+            <tr>
+                <td><code>claude-2.1</code></td>
+                <td>200K</td>
+                <td>$8.00</td>
+                <td>$24.00</td>
+                <td><i class="bi bi-speedometer text-warning"></i> Medium</td>
+                <td>Legacy support only</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Coding Excellence</h5>
+                <p class="mb-0">Claude 3.5 Sonnet tops coding benchmarks. Exceptional at code generation, review, and debugging.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>200K Context Window</h5>
+                <p class="mb-0">Process entire codebases, long documents, or extensive conversation history in a single request.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Nuanced Reasoning</h5>
+                <p class="mb-0">Excellent at understanding context, handling ambiguity, and providing thoughtful analysis.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Writing Quality</h5>
+                <p class="mb-0">Natural, engaging writing style. Great for content creation, editing, and creative work.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Safety & Alignment</h5>
+                <p class="mb-0">Constitutional AI training produces helpful yet safe responses. Less likely to produce harmful content.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Honest Uncertainty</h5>
+                <p class="mb-0">Will admit when it doesn't know something rather than hallucinating confidently.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>No Native Image Generation</h5>
+                <p class="mb-0">Can analyze images but cannot generate them (unlike some competitors).</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Opus Cost</h5>
+                <p class="mb-0">Claude 3 Opus is expensive ($15/$75 per 1M tokens). Use Sonnet for most tasks.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Rate Limits</h5>
+                <p class="mb-0">Stricter rate limits than some providers. May need to manage request pacing.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Geographic Restrictions</h5>
+                <p class="mb-0">API not available in all countries. Check availability for your region.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration in Abhikarta-LLM</h2>
+
+<h5>Step 1: Get Your API Key</h5>
+<ol>
+    <li>Go to <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a></li>
+    <li>Click "Create Key"</li>
+    <li>Copy the key (starts with <code>sk-ant-</code>)</li>
+</ol>
+
+<h5>Step 2: Configure in application.properties</h5>
+<pre><code class="language-properties"># config/application.properties
+
+# Enable Anthropic
+llm.anthropic.enabled=true
+
+# API Key
+llm.anthropic.api_key=sk-ant-your-api-key-here
+# Or: llm.anthropic.api_key=${ANTHROPIC_API_KEY}
+
+# Default model
+llm.anthropic.default_model=claude-3-5-sonnet-20241022
+
+# Default max tokens (Claude requires explicit max_tokens)
+llm.anthropic.max_tokens=4096
+
+# Optional: Set as default provider
+llm.default_provider=anthropic</code></pre>
+
+<hr class="my-5">
+
+<h2 id="usage">Usage in Abhikarta-LLM</h2>
+
+<h5>In Agent Configuration</h5>
+<pre><code class="language-json">{
+  "agent_id": "code-reviewer",
+  "name": "Code Review Agent",
+  "llm_config": {
+    "provider": "anthropic",
+    "model": "claude-3-5-sonnet-20241022",
+    "temperature": 0.3,
+    "max_tokens": 4096
+  },
+  "system_prompt": "You are an expert code reviewer. Analyze code for bugs, security issues, and best practices."
+}</code></pre>
+
+<h5>In Workflow DAG</h5>
+<pre><code class="language-json">{
+  "analyze_code": {
+    "type": "llm",
+    "name": "Code Analysis with Claude",
+    "config": {
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20241022",
+      "max_tokens": 4096,
+      "prompt": "Review this code and provide detailed feedback:\n\n```\n{<!-- -->{context.code}<!-- -->}\n```"
+    }
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="best-practices">Best Practices</h2>
+
+<div class="alert alert-info">
+    <h5><i class="bi bi-lightbulb me-2"></i>Key Tip: Always Set max_tokens</h5>
+    <p class="mb-0">Unlike OpenAI, Anthropic requires explicit <code>max_tokens</code>. Default is 4096 in Abhikarta but adjust based on your needs.</p>
+</div>
+
+<ul>
+    <li><strong>Use Claude 3.5 Sonnet</strong> for most tasks - it's the best balance of capability and cost</li>
+    <li><strong>Use Haiku</strong> for high-volume simple tasks like classification</li>
+    <li><strong>Reserve Opus</strong> for truly complex reasoning tasks where quality is paramount</li>
+    <li><strong>Leverage the 200K context</strong> - great for analyzing entire documents or codebases</li>
+    <li><strong>Be specific in prompts</strong> - Claude responds well to detailed instructions</li>
+</ul>
+
+<hr class="my-5">
+
+<h2 id="pricing">Pricing (as of Jan 2025)</h2>
+
+<div class="table-responsive">
+    <table class="table table-sm">
+        <thead class="table-light">
+            <tr><th>Model</th><th>Input</th><th>Output</th><th>~Cost per 1K calls*</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Claude 3.5 Sonnet</td><td>$3.00</td><td>$15.00</td><td>~$5.10</td></tr>
+            <tr><td>Claude 3 Opus</td><td>$15.00</td><td>$75.00</td><td>~$30.00</td></tr>
+            <tr><td>Claude 3 Haiku</td><td>$0.25</td><td>$1.25</td><td>~$0.50</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="resources">Resources & Links</h2>
+<div class="row g-3">
+    <div class="col-md-4">
+        <a href="https://docs.anthropic.com" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-book display-4 text-primary"></i>
+                <h6 class="mt-2">API Documentation</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://console.anthropic.com" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-terminal display-4 text-success"></i>
+                <h6 class="mt-2">Console</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://www.anthropic.com/pricing" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-currency-dollar display-4 text-warning"></i>
+                <h6 class="mt-2">Pricing</h6>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{{ fragment.name }} - Code Fragment{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_code_fragments') }}">Code Fragments</a></li>
+                    <li class="breadcrumb-item active">{{ fragment.fragment_id }}</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header bg-bmo-blue text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-code-square me-2"></i>{{ fragment.name }}
+                    </h5>
+                    <div>
+                        <span class="badge bg-light text-dark me-2">v{{ fragment.version }}</span>
+                        {% if fragment.is_active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Fragment Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th width="120">Fragment ID:</th>
+                                    <td><code class="text-primary">{{ fragment.fragment_id }}</code></td>
+                                </tr>
+                                <tr>
+                                    <th>URI:</th>
+                                    <td>
+                                        <code class="bg-light px-2 py-1 rounded user-select-all">db://{{ fragment.fragment_id }}</code>
+                                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('db://{{ fragment.fragment_id }}')">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Language:</th>
+                                    <td>{{ fragment.language }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Category:</th>
+                                    <td><span class="badge bg-secondary">{{ fragment.category }}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th width="120">Created:</th>
+                                    <td>{{ fragment.created_at }} by {{ fragment.created_by }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Updated:</th>
+                                    <td>{{ fragment.updated_at }}{% if fragment.updated_by %} by {{ fragment.updated_by }}{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <th>Usage Count:</th>
+                                    <td>{{ fragment.usage_count or 0 }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Tags:</th>
+                                    <td>
+                                        {% for tag in fragment.tags %}
+                                        <span class="badge bg-info me-1">{{ tag }}</span>
+                                        {% endfor %}
+                                        {% if not fragment.tags %}<span class="text-muted">None</span>{% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    {% if fragment.description %}
+                    <div class="mb-4">
+                        <h6>Description</h6>
+                        <p>{{ fragment.description }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if fragment.dependencies %}
+                    <div class="mb-4">
+                        <h6>Dependencies</h6>
+                        <p>This fragment depends on:
+                            {% for dep in fragment.dependencies %}
+                            <code class="me-2">db://{{ dep }}</code>
+                            {% endfor %}
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Code -->
+                    <h6>Code</h6>
+                    <pre><code class="language-{{ fragment.language }}">{{ fragment.code }}</code></pre>
+                    
+                    <hr>
+                    
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('edit_code_fragment', fragment_id=fragment.fragment_id) }}" class="btn btn-primary">
+                            <i class="bi bi-pencil me-2"></i>Edit
+                        </a>
+                        <a href="{{ url_for('admin_code_fragments') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to List
+                        </a>
+                        {% if not fragment.is_system %}
+                        <form method="POST" action="{{ url_for('delete_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                              class="ms-auto" onsubmit="return confirm('Delete this code fragment?');">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="bi bi-trash me-2"></i>Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Usage Example -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-journal-code me-2"></i>Usage in Workflow</h5>
+                </div>
+                <div class="card-body">
+                    <pre><code class="language-json">{
+  "python_modules": {
+    "{{ fragment.fragment_id|replace('-', '_') }}": "db://{{ fragment.fragment_id }}"
+  },
+  "nodes": {
+    "my_node": {
+      "type": "python",
+      "code": "from {{ fragment.fragment_id|replace('-', '_') }} import *\n# Use functions from the fragment..."
+    }
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text);
+    // Show toast or feedback
+    alert('Copied: ' + text);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ workflow.name }} - Workflow - Abhikarta LLM{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-diagram-3 me-2"></i>{{ workflow.name }}</h2>
+            <p class="text-muted mb-0">{{ workflow.description or 'No description' }}</p>
+        </div>
+        <div>
+            <a href="{{ url_for('execute_workflow', workflow_id=workflow.workflow_id) }}" class="btn btn-success me-2">
+                <i class="bi bi-play-fill me-1"></i>Execute
+            </a>
+            <a href="{{ url_for('list_workflows') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Workflow Info -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless table-sm">
+                        <tr>
+                            <td class="text-muted">ID</td>
+                            <td><code>{{ workflow.workflow_id }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Status</td>
+                            <td>
+                                {% if workflow.status == 'published' %}
+                                    <span class="badge bg-success">Published</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ workflow.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Version</td>
+                            <td>{{ workflow.version or '1.0.0' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Created</td>
+                            <td>{{ workflow.created_at }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Executions</td>
+                            <td>{{ workflow.execution_count or 0 }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Nodes List -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-diagram-2 me-2"></i>Nodes</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% set dag = workflow.dag_definition %}
+                        {% if dag and dag.nodes %}
+                            {% for node_id, node in dag.nodes.items() %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ node.name or node_id }}</strong>
+                                    <br><small class="text-muted">{{ node.type or node.node_type }}</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ node_id }}</span>
+                            </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item text-muted">No nodes defined</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAG Definition & Code -->
+        <div class="col-md-8">
+            <!-- DAG JSON -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-code me-2"></i>DAG Definition</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard('dagCode')">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                </div>
+                <div class="card-body">
+                    <pre id="dagCode" class="bg-dark text-light p-3 rounded" style="max-height: 400px; overflow: auto;">{{ workflow.dag_definition | tojson(indent=2) }}</pre>
+                </div>
+            </div>
+
+            <!-- Python Modules -->
+            {% if workflow.python_modules and workflow.python_modules != {} %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-filetype-py me-2"></i>Python Modules</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-dark text-light p-3 rounded" style="max-height: 300px; overflow: auto;">{{ workflow.python_modules | tojson(indent=2) }}</pre>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recent Executions -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Executions</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Execution ID</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Started</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if executions %}
+                                    {% for exec in executions %}
+                                    <tr>
+                                        <td><code>{{ exec.execution_id[:8] }}...</code></td>
+                                        <td>
+                                            {% if exec.status == 'completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif exec.status == 'failed' %}
+                                                <span class="badge bg-danger">Failed</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">{{ exec.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ exec.duration_ms }}ms</td>
+                                        <td>{{ exec.started_at }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">No executions yet</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(elementId) {
+    const el = document.getElementById(elementId);
+    navigator.clipboard.writeText(el.textContent);
+    alert('Copied to clipboard!');
+}
+</script>
+{% endblock %}

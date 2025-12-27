@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Workflow - Abhikarta LLM{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-upload me-2"></i>Upload Workflow DAG</h2>
+                    <p class="text-muted mb-0">Upload a JSON workflow definition with optional Python modules</p>
+                </div>
+                <a href="{{ url_for('list_workflows') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Workflows
+                </a>
+            </div>
+
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-circle me-2"></i>{{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                <div class="row">
+                    <!-- Left Column - Upload -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-file-earmark-code me-2"></i>Workflow Definition</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Workflow Name</label>
+                                    <input type="text" class="form-control" name="name" required placeholder="My Data Pipeline">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" name="description" rows="2" placeholder="Describe what this workflow does..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Upload JSON File</label>
+                                    <input type="file" class="form-control" name="workflow_file" accept=".json" id="fileInput">
+                                    <div class="form-text">Upload a .json file containing your DAG definition</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Or Paste JSON Definition</label>
+                                    <textarea class="form-control font-monospace" name="dag_json" rows="15" 
+                                              id="dagJson" placeholder='{
+  "name": "My Workflow",
+  "nodes": {
+    "input": {"type": "input", "name": "Start"},
+    "process": {"type": "python", "name": "Process", "code": "output = input_data", "dependencies": ["input"]},
+    "output": {"type": "output", "name": "End", "dependencies": ["process"]}
+  }
+}'></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Python Modules -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-filetype-py me-2"></i>Python Modules (Optional)</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Custom Python Code</label>
+                                    <textarea class="form-control font-monospace" name="python_modules" rows="20" 
+                                              id="pythonModules" placeholder='{
+  "helpers": "def process_data(data):\n    return data.upper()\n\ndef validate(x):\n    return x is not None",
+  "utils": "import json\n\ndef to_json(obj):\n    return json.dumps(obj)"
+}'></textarea>
+                                    <div class="form-text">
+                                        JSON object mapping module names to Python code. These modules will be available in Python nodes.
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <h6><i class="bi bi-info-circle me-2"></i>Supported Node Types</h6>
+                                    <ul class="mb-0 small">
+                                        <li><code>input</code> - Entry point</li>
+                                        <li><code>output</code> - Final output</li>
+                                        <li><code>python</code> - Execute Python code</li>
+                                        <li><code>llm</code> - LLM call</li>
+                                        <li><code>http</code> - HTTP request</li>
+                                        <li><code>condition</code> - Branching</li>
+                                        <li><code>transform</code> - Data transformation</li>
+                                        <li><code>delay</code> - Add delay</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Validation</h5>
+                            </div>
+                            <div class="card-body">
+                                <button type="button" class="btn btn-outline-primary w-100 mb-3" onclick="validateWorkflow()">
+                                    <i class="bi bi-check-lg me-1"></i>Validate Workflow
+                                </button>
+                                <div id="validationResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-cloud-upload me-1"></i>Upload Workflow
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle file upload preview
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('dagJson').value = e.target.result;
+        };
+        reader.readAsText(file);
+    }
+});
+
+function validateWorkflow() {
+    const dagJson = document.getElementById('dagJson').value;
+    const resultDiv = document.getElementById('validationResult');
+    
+    if (!dagJson.trim()) {
+        resultDiv.innerHTML = '<div class="alert alert-warning">Please enter a workflow definition</div>';
+        return;
+    }
+    
+    try {
+        const dag = JSON.parse(dagJson);
+        
+        // Basic validation
+        const errors = [];
+        if (!dag.nodes || Object.keys(dag.nodes).length === 0) {
+            errors.push('Workflow must have at least one node');
+        }
+        
+        // Check for cycles (basic)
+        const visited = new Set();
+        function hasCycle(nodeId, path = new Set()) {
+            if (path.has(nodeId)) return true;
+            if (visited.has(nodeId)) return false;
+            
+            visited.add(nodeId);
+            path.add(nodeId);
+            
+            const node = dag.nodes[nodeId];
+            if (node && node.dependencies) {
+                for (const dep of node.dependencies) {
+                    if (hasCycle(dep, new Set(path))) return true;
+                }
+            }
+            return false;
+        }
+        
+        for (const nodeId of Object.keys(dag.nodes || {})) {
+            if (hasCycle(nodeId)) {
+                errors.push('Workflow contains cycles - DAG must be acyclic');
+                break;
+            }
+        }
+        
+        if (errors.length > 0) {
+            resultDiv.innerHTML = `<div class="alert alert-danger">
+                <strong>Validation Failed:</strong>
+                <ul class="mb-0">${errors.map(e => `<li>${e}</li>`).join('')}</ul>
+            </div>`;
+        } else {
+            const nodeCount = Object.keys(dag.nodes || {}).length;
+            resultDiv.innerHTML = `<div class="alert alert-success">
+                <i class="bi bi-check-circle me-2"></i>
+                <strong>Valid!</strong> ${nodeCount} nodes found.
+            </div>`;
+        }
+    } catch (e) {
+        resultDiv.innerHTML = `<div class="alert alert-danger">
+            <strong>Invalid JSON:</strong> ${e.message}
+        </div>`;
+    }
+}
+</script>
+{% endblock %}

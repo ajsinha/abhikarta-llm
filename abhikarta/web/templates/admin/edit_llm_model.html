@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ model.display_name or model.name }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_llm_models') }}">LLM Models</a></li>
+                    <li class="breadcrumb-item active">Edit {{ model.display_name or model.name }}</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header bg-bmo-blue text-white">
+                    <h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit LLM Model</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Model ID</label>
+                                    <input type="text" class="form-control" value="{{ model.model_id }}" disabled>
+                                    <div class="form-text">Model ID cannot be changed</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Provider</label>
+                                    <input type="text" class="form-control" value="{{ model.provider_id }}" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="display_name" class="form-label">Display Name</label>
+                            <input type="text" class="form-control" id="display_name" name="display_name"
+                                   value="{{ model.display_name or model.name }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2">{{ model.description or '' }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="context_window" class="form-label">Context Window</label>
+                                    <input type="number" class="form-control" id="context_window" name="context_window"
+                                           value="{{ model.context_window or 4096 }}" min="512">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="max_output_tokens" class="form-label">Max Output Tokens</label>
+                                    <input type="number" class="form-control" id="max_output_tokens" name="max_output_tokens"
+                                           value="{{ model.max_output_tokens or 4096 }}" min="256">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="input_cost_per_1k" class="form-label">Input Cost (per 1K tokens)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="input_cost_per_1k" name="input_cost_per_1k"
+                                               value="{{ model.input_cost_per_1k or 0 }}" min="0" step="0.0001">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="output_cost_per_1k" class="form-label">Output Cost (per 1K tokens)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="output_cost_per_1k" name="output_cost_per_1k"
+                                               value="{{ model.output_cost_per_1k or 0 }}" min="0" step="0.0001">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="supports_vision" name="supports_vision"
+                                               {% if model.supports_vision %}checked{% endif %}>
+                                        <label class="form-check-label" for="supports_vision">Vision</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="supports_functions" name="supports_functions"
+                                               {% if model.supports_functions %}checked{% endif %}>
+                                        <label class="form-check-label" for="supports_functions">Functions</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="supports_streaming" name="supports_streaming"
+                                               {% if model.supports_streaming %}checked{% endif %}>
+                                        <label class="form-check-label" for="supports_streaming">Streaming</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
+                                               {% if model.is_active %}checked{% endif %}>
+                                        <label class="form-check-label" for="is_active">Active</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="is_default" name="is_default"
+                                       {% if model.is_default %}checked{% endif %}>
+                                <label class="form-check-label" for="is_default">Default Model (for this provider)</label>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Save Changes
+                            </button>
+                            <a href="{{ url_for('model_permissions', model_id=model.model_id) }}" class="btn btn-warning">
+                                <i class="bi bi-shield-lock me-2"></i>Manage Permissions
+                            </a>
+                            <a href="{{ url_for('admin_llm_models') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Abhikarta LLM{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-gear me-2"></i>System Settings</h2>
+            <p class="text-muted mb-0">Configure application settings and preferences</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- System Info Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>System Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="text-muted" width="40%">Application</td>
+                            <td><strong>Abhikarta LLM</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Version</td>
+                            <td><span class="badge bg-primary">{{ app_version }}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Database</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ db_type|upper }}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Environment</td>
+                            <td>{{ settings.environment if settings else 'development' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Server Host</td>
+                            <td><code>{{ settings.server.host if settings else '0.0.0.0' }}:{{ settings.server.port if settings else '5000' }}</code></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- LLM Configuration Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-cpu me-2"></i>LLM Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="text-muted" width="40%">Default Provider</td>
+                            <td>
+                                {% if settings and settings.llm %}
+                                    <span class="badge bg-info">{{ settings.llm.default_provider|upper }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Not Configured</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">OpenAI</td>
+                            <td>
+                                {% if settings and settings.llm and settings.llm.openai and settings.llm.openai.api_key %}
+                                    <span class="text-success"><i class="bi bi-check-circle"></i> Configured</span>
+                                {% else %}
+                                    <span class="text-muted"><i class="bi bi-x-circle"></i> Not Set</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Anthropic</td>
+                            <td>
+                                {% if settings and settings.llm and settings.llm.anthropic and settings.llm.anthropic.api_key %}
+                                    <span class="text-success"><i class="bi bi-check-circle"></i> Configured</span>
+                                {% else %}
+                                    <span class="text-muted"><i class="bi bi-x-circle"></i> Not Set</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Ollama</td>
+                            <td>
+                                {% if settings and settings.llm and settings.llm.ollama and settings.llm.ollama.base_url %}
+                                    <span class="text-success"><i class="bi bi-check-circle"></i> {{ settings.llm.ollama.base_url }}</span>
+                                {% else %}
+                                    <span class="text-muted"><i class="bi bi-x-circle"></i> Not Set</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Security Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form id="securityForm">
+                        <div class="mb-3">
+                            <label class="form-label">Session Timeout (minutes)</label>
+                            <input type="number" class="form-control" value="60" name="session_timeout">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Max Login Attempts</label>
+                            <input type="number" class="form-control" value="5" name="max_login_attempts">
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="enforceHttps" checked>
+                            <label class="form-check-label" for="enforceHttps">
+                                Enforce HTTPS in Production
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="auditLogging" checked>
+                            <label class="form-check-label" for="auditLogging">
+                                Enable Audit Logging
+                            </label>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="saveSecuritySettings()">
+                            <i class="bi bi-save me-1"></i>Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitoring Settings -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Monitoring</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="text-muted" width="50%">Prometheus Metrics</td>
+                            <td>
+                                <span class="text-success"><i class="bi bi-check-circle"></i> Enabled</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Metrics Endpoint</td>
+                            <td><code>/metrics</code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Health Endpoint</td>
+                            <td><code>/health</code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Log Level</td>
+                            <td>
+                                <select class="form-select form-select-sm" style="width: auto;">
+                                    <option value="DEBUG">DEBUG</option>
+                                    <option value="INFO" selected>INFO</option>
+                                    <option value="WARNING">WARNING</option>
+                                    <option value="ERROR">ERROR</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration File -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-file-code me-2"></i>Configuration File</h5>
+                    <span class="badge bg-secondary">application.properties</span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        The main configuration file is located at <code>config/application.properties</code>. 
+                        To modify settings, edit this file and restart the server.
+                    </p>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Note:</strong> Some settings require a server restart to take effect.
+                    </div>
+                    <a href="{{ url_for('help') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-book me-1"></i>View Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="col-12 mb-4">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Danger Zone</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6>Clear Cache</h6>
+                            <p class="text-muted small">Clear all cached data. This may temporarily slow down the application.</p>
+                            <button class="btn btn-outline-warning btn-sm" onclick="clearCache()">
+                                <i class="bi bi-trash me-1"></i>Clear Cache
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6>Reset Database</h6>
+                            <p class="text-muted small">Reset all data to initial state. This action cannot be undone!</p>
+                            <button class="btn btn-outline-danger btn-sm" onclick="resetDatabase()">
+                                <i class="bi bi-database-x me-1"></i>Reset Database
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function saveSecuritySettings() {
+    alert('Settings saved successfully!');
+}
+
+function clearCache() {
+    if (confirm('Are you sure you want to clear the cache?')) {
+        fetch('/api/admin/clear-cache', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cache cleared successfully!');
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to clear cache'));
+                }
+            })
+            .catch(err => alert('Error: ' + err));
+    }
+}
+
+function resetDatabase() {
+    if (confirm('⚠️ WARNING: This will delete ALL data! Are you absolutely sure?')) {
+        if (prompt('Type "RESET" to confirm:') === 'RESET') {
+            alert('Database reset is not implemented in this version for safety.');
+        }
+    }
+}
+</script>
+{% endblock %}

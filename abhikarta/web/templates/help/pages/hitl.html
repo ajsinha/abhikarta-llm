@@ -1,0 +1,120 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Human-in-the-Loop (HITL)" %}
+{% set description = "Add human oversight and approval checkpoints to agents" %}
+{% set icon = "bi-person-check" %}
+{% set header_color = "#dc3545" %}
+{% set header_color_dark = "#bb2d3b" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#trigger-types">Trigger Types</a>
+<a href="#workflow-hitl">HITL in Workflows</a>
+<a href="#agent-hitl">HITL in Agents</a>
+<a href="#reviewing-tasks">Reviewing Tasks</a>
+<a href="#task-states">Task States</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Overview</h2>
+<p>Human-in-the-Loop (HITL) adds human oversight and approval checkpoints to ensure AI operations meet quality and safety standards.</p>
+
+<hr class="my-5">
+
+<h2 id="trigger-types">HITL Trigger Types</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Trigger</th><th>Description</th><th>Use Case</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>approval</code></td><td>Requires explicit human approval</td><td>High-risk actions, financial decisions</td></tr>
+            <tr><td><code>review</code></td><td>Human reviews output before continuing</td><td>Content generation, customer responses</td></tr>
+            <tr><td><code>cost_threshold</code></td><td>Triggers when cost exceeds limit</td><td>Budget control</td></tr>
+            <tr><td><code>confidence</code></td><td>Low AI confidence triggers review</td><td>Uncertain classifications</td></tr>
+            <tr><td><code>keyword</code></td><td>Specific keywords trigger review</td><td>Sensitive topics</td></tr>
+            <tr><td><code>scheduled</code></td><td>Periodic human checkpoints</td><td>Long-running workflows</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="workflow-hitl">Adding HITL to Workflows</h2>
+<pre><code class="language-json">{
+  "type": "hitl",
+  "name": "Manager Approval",
+  "dependencies": ["generate_report"],
+  "config": {
+    "task_type": "approval",
+    "title": "Approve Report Publication",
+    "description": "Review the generated report before publishing",
+    "assignee_roles": ["hitl_reviewer", "domain_admin"],
+    "timeout_hours": 24,
+    "priority": "high",
+    "escalation": {
+      "after_hours": 12,
+      "escalate_to": "super_admin"
+    }
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="agent-hitl">HITL in Agent Configuration</h2>
+<pre><code class="language-json">{
+  "hitl_config": {
+    "enabled": true,
+    "triggers": [
+      {
+        "type": "cost_threshold",
+        "threshold": 1.00,
+        "action": "approval"
+      },
+      {
+        "type": "confidence",
+        "threshold": 0.7,
+        "action": "review"
+      },
+      {
+        "type": "keyword",
+        "keywords": ["refund", "cancel", "legal"],
+        "action": "approval"
+      }
+    ],
+    "default_assignee": "hitl_reviewer",
+    "sla_hours": 4
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="reviewing-tasks">Reviewing HITL Tasks</h2>
+<ol>
+    <li>Navigate to <strong>Dashboard</strong> to see pending tasks</li>
+    <li>Click on a task to view details</li>
+    <li>Review the AI-generated content or action</li>
+    <li>Choose action:
+        <ul>
+            <li><strong>Approve</strong> - Continue execution</li>
+            <li><strong>Reject</strong> - Stop and return error</li>
+            <li><strong>Modify</strong> - Edit and continue</li>
+            <li><strong>Escalate</strong> - Send to higher authority</li>
+        </ul>
+    </li>
+    <li>Add comments if needed</li>
+</ol>
+
+<hr class="my-5">
+
+<h2 id="task-states">HITL Task States</h2>
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <span class="badge bg-warning text-dark fs-6">pending</span>
+    <span class="badge bg-info fs-6">assigned</span>
+    <span class="badge bg-primary fs-6">in_review</span>
+    <span class="badge bg-success fs-6">approved</span>
+    <span class="badge bg-danger fs-6">rejected</span>
+    <span class="badge bg-secondary fs-6">escalated</span>
+    <span class="badge bg-dark fs-6">expired</span>
+</div>
+{% endblock %}

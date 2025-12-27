@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}Template Library - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .template-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        height: 100%;
+    }
+    .template-card:hover {
+        border-color: var(--bmo-blue);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .template-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+    .template-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    .difficulty-beginner { background-color: #28a745; }
+    .difficulty-intermediate { background-color: #ffc107; color: #333; }
+    .difficulty-advanced { background-color: #dc3545; }
+    .category-filter {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+    .category-filter .btn {
+        border-radius: 20px;
+    }
+    .category-filter .btn.active {
+        background-color: var(--bmo-blue);
+        border-color: var(--bmo-blue);
+    }
+    .template-tags {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+    .template-tags .badge {
+        font-weight: normal;
+    }
+    .use-count {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">
+                <i class="bi bi-collection me-2"></i>Template Library
+            </h4>
+            <p class="text-muted mb-0">Start building agents faster with pre-built templates</p>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#saveTemplateModal">
+                <i class="bi bi-plus-circle me-1"></i> Save Custom Template
+            </button>
+            <a href="{{ url_for('admin_agents') }}" class="btn btn-primary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Agents
+            </a>
+        </div>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filter">
+        <button class="btn btn-outline-secondary active" data-category="all">
+            <i class="bi bi-grid me-1"></i> All
+        </button>
+        {% for category in categories %}
+        <button class="btn btn-outline-secondary" data-category="{{ category|lower }}">
+            {{ category }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="template-search" 
+                       placeholder="Search templates...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="difficulty-filter">
+                <option value="">All Difficulty Levels</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="type-filter">
+                <option value="">All Agent Types</option>
+                <option value="react">ReAct</option>
+                <option value="plan_and_execute">Plan & Execute</option>
+                <option value="tool_calling">Tool Calling</option>
+                <option value="conversational">Conversational</option>
+                <option value="retrieval">Retrieval</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="row g-4" id="templates-grid">
+        {% for template in templates %}
+        <div class="col-md-6 col-lg-4 template-item" 
+             data-category="{{ template.category|lower }}"
+             data-difficulty="{{ template.difficulty }}"
+             data-type="{{ template.agent_type }}"
+             data-name="{{ template.name|lower }}">
+            <div class="card template-card h-100 position-relative">
+                <span class="template-badge badge difficulty-{{ template.difficulty }}">
+                    {{ template.difficulty|capitalize }}
+                </span>
+                <div class="card-body">
+                    <div class="template-icon bg-light" style="background-color: {{ get_color(template.agent_type) }}20 !important;">
+                        <i class="{{ template.icon }}" style="color: {{ get_color(template.agent_type) }};"></i>
+                    </div>
+                    <h5 class="card-title">{{ template.name }}</h5>
+                    <p class="card-text text-muted small">{{ template.description }}</p>
+                    
+                    <div class="template-tags">
+                        <span class="badge bg-primary">{{ template.agent_type }}</span>
+                        {% for tag in template.tags[:3] %}
+                        <span class="badge bg-light text-dark">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="use-count">
+                            <i class="bi bi-download me-1"></i>{{ template.use_count }} uses
+                        </span>
+                        <small class="text-muted">{{ template.category }}</small>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary btn-sm" 
+                                onclick="useTemplate('{{ template.template_id }}', '{{ template.name }}')">
+                            <i class="bi bi-plus-circle me-1"></i> Use This Template
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" 
+                                onclick="previewTemplate('{{ template.template_id }}')">
+                            <i class="bi bi-eye me-1"></i> Preview
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Empty State -->
+    <div class="text-center py-5 d-none" id="no-templates">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h5 class="mt-3">No templates found</h5>
+        <p class="text-muted">Try adjusting your filters or search terms</p>
+    </div>
+</div>
+
+<!-- Use Template Modal -->
+<div class="modal fade" id="useTemplateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Create Agent from Template</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="create-from-template-form" method="POST" action="{{ url_for('create_agent_from_template') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="template_id" id="selected-template-id">
+                    <div class="mb-3">
+                        <label class="form-label">Template</label>
+                        <input type="text" class="form-control" id="selected-template-name" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Agent Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="agent_name" required
+                               placeholder="Enter a name for your agent">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"
+                                  placeholder="Optionally describe what this agent will do"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Create Agent
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Template Modal -->
+<div class="modal fade" id="previewTemplateModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="bi bi-eye me-2"></i>Template Preview</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="preview-content">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="preview-use-btn">
+                    <i class="bi bi-plus-circle me-1"></i> Use This Template
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Category filter
+    $('.category-filter .btn').click(function() {
+        $('.category-filter .btn').removeClass('active');
+        $(this).addClass('active');
+        filterTemplates();
+    });
+    
+    // Search filter
+    $('#template-search').on('input', filterTemplates);
+    
+    // Dropdown filters
+    $('#difficulty-filter, #type-filter').change(filterTemplates);
+});
+
+function filterTemplates() {
+    const category = $('.category-filter .btn.active').data('category');
+    const search = $('#template-search').val().toLowerCase();
+    const difficulty = $('#difficulty-filter').val();
+    const type = $('#type-filter').val();
+    
+    let visibleCount = 0;
+    
+    $('.template-item').each(function() {
+        const $item = $(this);
+        const itemCategory = $item.data('category');
+        const itemDifficulty = $item.data('difficulty');
+        const itemType = $item.data('type');
+        const itemName = $item.data('name');
+        
+        let visible = true;
+        
+        if (category !== 'all' && itemCategory !== category) visible = false;
+        if (difficulty && itemDifficulty !== difficulty) visible = false;
+        if (type && itemType !== type) visible = false;
+        if (search && !itemName.includes(search)) visible = false;
+        
+        $item.toggle(visible);
+        if (visible) visibleCount++;
+    });
+    
+    $('#no-templates').toggleClass('d-none', visibleCount > 0);
+}
+
+function useTemplate(templateId, templateName) {
+    $('#selected-template-id').val(templateId);
+    $('#selected-template-name').val(templateName);
+    new bootstrap.Modal('#useTemplateModal').show();
+}
+
+function previewTemplate(templateId) {
+    $.get(`/api/templates/${templateId}`, function(template) {
+        let workflowHtml = '<p class="text-muted">No workflow defined</p>';
+        
+        if (template.workflow && template.workflow.nodes) {
+            workflowHtml = `
+                <div class="bg-light p-3 rounded mb-3">
+                    <h6>Workflow Nodes</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        ${template.workflow.nodes.map(n => `
+                            <span class="badge bg-primary">${n.name || n.node_type}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        const html = `
+            <div class="row">
+                <div class="col-md-8">
+                    <h4>${template.name}</h4>
+                    <p class="text-muted">${template.description}</p>
+                    
+                    ${workflowHtml}
+                    
+                    <h6>LLM Configuration</h6>
+                    <pre class="bg-dark text-light p-3 rounded">${JSON.stringify(template.llm_config, null, 2)}</pre>
+                    
+                    <h6>Tools</h6>
+                    <div class="mb-3">
+                        ${template.tools.map(t => `<span class="badge bg-warning text-dark me-1">${t}</span>`).join('')}
+                    </div>
+                    
+                    <h6>Sample Prompts</h6>
+                    <ul class="list-group">
+                        ${template.sample_prompts.map(p => `<li class="list-group-item">${p}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Template Info</h6>
+                            <table class="table table-sm">
+                                <tr><td>Category</td><td>${template.category}</td></tr>
+                                <tr><td>Type</td><td>${template.agent_type}</td></tr>
+                                <tr><td>Difficulty</td><td><span class="badge difficulty-${template.difficulty}">${template.difficulty}</span></td></tr>
+                                <tr><td>Uses</td><td>${template.use_count}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        $('#preview-content').html(html);
+        $('#preview-use-btn').off('click').on('click', function() {
+            bootstrap.Modal.getInstance('#previewTemplateModal').hide();
+            useTemplate(templateId, template.name);
+        });
+        
+        new bootstrap.Modal('#previewTemplateModal').show();
+    });
+}
+</script>
+{% endblock %}

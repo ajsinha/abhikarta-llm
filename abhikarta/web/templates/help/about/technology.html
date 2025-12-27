@@ -1,0 +1,234 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Technology Stack" %}
+{% set description = "Backend, database, and LLM provider technologies" %}
+{% set icon = "bi-stack" %}
+{% set header_color = "#fd7e14" %}
+{% set header_color_dark = "#ca6510" %}
+
+{% block help_nav %}
+<a href="#backend">Backend</a>
+<a href="#frontend">Frontend</a>
+<a href="#database">Database</a>
+<a href="#llm-providers">LLM Providers</a>
+<a href="#deployment">Deployment</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="backend">Backend Technologies</h2>
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" height="64">
+                <h5 class="mt-3">Python 3.11+</h5>
+                <p class="text-muted small">Core language for all backend services</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg" alt="Flask" height="64">
+                <h5 class="mt-3">Flask 3.x</h5>
+                <p class="text-muted small">Web framework for API and UI</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-gear-fill display-4 text-secondary"></i>
+                <h5 class="mt-3">Jinja2</h5>
+                <p class="text-muted small">Template engine for web pages</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5>Key Python Libraries</h5>
+<pre><code class="language-text">flask==3.0.0            # Web framework
+werkzeug==3.0.1         # WSGI toolkit
+jinja2==3.1.2           # Templates
+openai==1.40.0          # OpenAI API client
+anthropic==0.34.0       # Anthropic API client
+google-generativeai     # Google Gemini client
+mistralai               # Mistral API client
+httpx==0.27.0           # HTTP client for MCP
+pydantic==2.5.0         # Data validation
+bcrypt==4.1.0           # Password hashing</code></pre>
+
+<hr class="my-5">
+
+<h2 id="frontend">Frontend Technologies</h2>
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg" alt="Bootstrap" height="48">
+                <h6 class="mt-2">Bootstrap 5.3</h6>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" height="48">
+                <h6 class="mt-2">JavaScript ES6+</h6>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-table fs-1 text-primary"></i>
+                <h6 class="mt-2">DataTables</h6>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-code-slash fs-1 text-warning"></i>
+                <h6 class="mt-2">Highlight.js</h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="database">Database Support</h2>
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-database me-2"></i>SQLite</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Best for:</strong> Development, testing, small deployments</p>
+                <ul>
+                    <li>Zero configuration</li>
+                    <li>File-based storage</li>
+                    <li>Included with Python</li>
+                </ul>
+                <pre><code class="language-properties">database.type=sqlite
+database.sqlite.path=./data/abhikarta.db</code></pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-database-fill me-2"></i>PostgreSQL</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Best for:</strong> Production, scale, enterprise</p>
+                <ul>
+                    <li>Full ACID compliance</li>
+                    <li>Connection pooling</li>
+                    <li>Advanced features</li>
+                </ul>
+                <pre><code class="language-properties">database.type=postgresql
+database.postgres.host=localhost
+database.postgres.database=abhikarta</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="llm-providers">Supported LLM Providers</h2>
+<div class="row g-3">
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>OpenAI</strong><br><small class="text-muted">GPT-4o, GPT-4, o1</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>Anthropic</strong><br><small class="text-muted">Claude 3.5, 3 Opus</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>Google</strong><br><small class="text-muted">Gemini 2.0, 1.5</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>Mistral</strong><br><small class="text-muted">Large, Medium, Small</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>Cohere</strong><br><small class="text-muted">Command R+, R</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>AWS Bedrock</strong><br><small class="text-muted">Multi-model</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>Azure OpenAI</strong><br><small class="text-muted">Enterprise GPT</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>Ollama</strong><br><small class="text-muted">Local LLMs</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>Groq</strong><br><small class="text-muted">Ultra-fast</small>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center h-100"><div class="card-body py-3">
+            <strong>Together AI</strong><br><small class="text-muted">100+ models</small>
+        </div></div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="deployment">Deployment Options</h2>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-terminal display-4 text-success"></i>
+                <h5 class="mt-3">Direct</h5>
+                <pre><code class="language-bash">python run_server.py</code></pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-box display-4 text-primary"></i>
+                <h5 class="mt-3">Docker</h5>
+                <pre><code class="language-bash">docker-compose up -d</code></pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-cloud display-4 text-info"></i>
+                <h5 class="mt-3">Kubernetes</h5>
+                <pre><code class="language-bash">kubectl apply -f k8s/</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('about') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to About
+    </a>
+</div>
+{% endblock %}

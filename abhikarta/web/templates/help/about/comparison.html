@@ -1,0 +1,262 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Competitive Analysis" %}
+{% set description = "Compare Abhikarta-LLM with other AI agent frameworks" %}
+{% set icon = "bi-bar-chart" %}
+{% set header_color = "#0dcaf0" %}
+{% set header_color_dark = "#0aa2c0" %}
+
+{% block help_nav %}
+<a href="#comparison">Feature Comparison</a>
+<a href="#langchain">vs LangChain</a>
+<a href="#crewai">vs CrewAI</a>
+<a href="#autogen">vs AutoGen</a>
+<a href="#strengths">Our Strengths</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="comparison">Feature Comparison Matrix</h2>
+
+<div class="table-responsive">
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Feature</th>
+                <th class="text-center">Abhikarta-LLM</th>
+                <th class="text-center">LangChain</th>
+                <th class="text-center">CrewAI</th>
+                <th class="text-center">AutoGen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Visual Agent Designer</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td>Workflow DAG Execution</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Limited</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td>Enterprise RBAC</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td>Code Fragment URIs</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> db/file/s3</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td>Model RBAC (Usage Limits)</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> Built-in</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td>Human-in-the-Loop</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Basic</td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Basic</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+            </tr>
+            <tr>
+                <td>Complete LLM Logging</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Manual</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Manual</td>
+            </tr>
+            <tr>
+                <td>Cost Tracking</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td>MCP Plugin Support</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Limited</td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Limited</td>
+            </tr>
+            <tr>
+                <td>Multi-LLM Provider</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> 10+</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+            </tr>
+            <tr>
+                <td>Web Dashboard</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Studio</td>
+            </tr>
+            <tr>
+                <td>Audit Trail</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="langchain">vs LangChain</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-success mb-3">
+            <div class="card-header bg-success text-white">Abhikarta-LLM Advantages</div>
+            <div class="card-body">
+                <ul>
+                    <li>Built-in web UI and dashboard</li>
+                    <li>Enterprise RBAC out of the box</li>
+                    <li>Automatic LLM call logging with costs</li>
+                    <li>LLM Provider & Model management UI</li>
+                    <li>Role-based model access with limits</li>
+                    <li>Visual workflow designer</li>
+                    <li>Complete HITL system</li>
+                    <li>External code loading (db://, file://, s3://)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-info mb-3">
+            <div class="card-header bg-info text-white">LangChain Advantages</div>
+            <div class="card-body">
+                <ul>
+                    <li>Larger community and ecosystem</li>
+                    <li>More third-party integrations</li>
+                    <li>Extensive documentation</li>
+                    <li>LangSmith for tracing (paid)</li>
+                    <li>More flexible for custom implementations</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="crewai">vs CrewAI</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-success mb-3">
+            <div class="card-header bg-success text-white">Abhikarta-LLM Advantages</div>
+            <div class="card-body">
+                <ul>
+                    <li>More sophisticated workflow DAGs</li>
+                    <li>Enterprise security features</li>
+                    <li>Complete execution tracking</li>
+                    <li>Cost management and budgets</li>
+                    <li>Production-ready web interface</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-info mb-3">
+            <div class="card-header bg-info text-white">CrewAI Advantages</div>
+            <div class="card-body">
+                <ul>
+                    <li>Simpler multi-agent setup</li>
+                    <li>Role-based agent personas</li>
+                    <li>Easier learning curve</li>
+                    <li>Good for quick prototypes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="autogen">vs AutoGen</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-success mb-3">
+            <div class="card-header bg-success text-white">Abhikarta-LLM Advantages</div>
+            <div class="card-body">
+                <ul>
+                    <li>Web-based management UI</li>
+                    <li>Built-in RBAC and audit</li>
+                    <li>JSON-based workflow definitions</li>
+                    <li>Complete cost tracking</li>
+                    <li>MCP plugin ecosystem</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-info mb-3">
+            <div class="card-header bg-info text-white">AutoGen Advantages</div>
+            <div class="card-body">
+                <ul>
+                    <li>Microsoft backing and support</li>
+                    <li>AutoGen Studio visual editor</li>
+                    <li>Advanced conversation patterns</li>
+                    <li>Strong code execution sandbox</li>
+                    <li>Azure integration</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="strengths">Our Key Differentiators</h2>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-building display-4 text-primary"></i>
+                <h5 class="mt-3">Enterprise Ready</h5>
+                <p class="text-muted">RBAC, audit trails, and compliance features built-in from day one.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-currency-dollar display-4 text-success"></i>
+                <h5 class="mt-3">Cost Control</h5>
+                <p class="text-muted">Automatic cost tracking, budgets, and alerts for every LLM call.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-person-check display-4 text-warning"></i>
+                <h5 class="mt-3">Human Oversight</h5>
+                <p class="text-muted">Comprehensive HITL system for safety and quality assurance.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('about') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to About
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Code Fragments" %}
+{% set description = "Reusable code modules loaded from database, files, or cloud storage" %}
+{% set icon = "bi-code-square" %}
+{% set header_color = "#6f42c1" %}
+{% set header_color_dark = "#59359a" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#uri-schemes">URI Schemes</a>
+<a href="#database">Database Fragments</a>
+<a href="#filesystem">File System</a>
+<a href="#s3">AWS S3</a>
+<a href="#workflow-usage">Workflow Usage</a>
+<a href="#best-practices">Best Practices</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Overview</h2>
+<p class="lead">Code Fragments allow you to create reusable Python modules that can be loaded at runtime from various sources: database, filesystem, or cloud storage.</p>
+
+<div class="alert alert-success">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Benefits:</strong> Centralized code management, version control, easy updates without workflow changes, and team collaboration on shared utilities.
+</div>
+
+<hr class="my-5">
+
+<h2 id="uri-schemes">Supported URI Schemes</h2>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Scheme</th>
+                <th>Format</th>
+                <th>Example</th>
+                <th>Use Case</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>db://</code></td>
+                <td><code>db://&lt;fragment_id&gt;</code></td>
+                <td><code>db://data-utils</code></td>
+                <td>Managed code in database with versioning and admin UI</td>
+            </tr>
+            <tr>
+                <td><code>file://</code></td>
+                <td><code>file://&lt;absolute_path&gt;</code></td>
+                <td><code>file:///opt/code/utils.py</code></td>
+                <td>Local development or containerized deployments</td>
+            </tr>
+            <tr>
+                <td><code>s3://</code></td>
+                <td><code>s3://&lt;bucket&gt;/&lt;key&gt;</code></td>
+                <td><code>s3://my-bucket/code/helpers.py</code></td>
+                <td>Shared code across environments, enterprise deployments</td>
+            </tr>
+            <tr>
+                <td><em>(inline)</em></td>
+                <td>Raw Python code</td>
+                <td><code>def foo(): pass</code></td>
+                <td>Simple, self-contained workflows</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="database">Database Fragments (db://)</h2>
+<p>Database fragments are managed through the Admin UI and stored in the <code>code_fragments</code> table.</p>
+
+<h5>Creating a Fragment</h5>
+<ol>
+    <li>Go to <strong>Admin → Code Fragments</strong></li>
+    <li>Click <strong>Add Fragment</strong></li>
+    <li>Enter a unique <code>fragment_id</code> (lowercase, hyphens allowed)</li>
+    <li>Write your Python code</li>
+    <li>Save</li>
+</ol>
+
+<h5>Fragment Properties</h5>
+<div class="table-responsive">
+    <table class="table table-sm">
+        <tr><th>Property</th><th>Description</th></tr>
+        <tr><td><code>fragment_id</code></td><td>Unique identifier used in URI (e.g., <code>data-utils</code>)</td></tr>
+        <tr><td><code>name</code></td><td>Human-readable display name</td></tr>
+        <tr><td><code>version</code></td><td>Auto-incremented on each save</td></tr>
+        <tr><td><code>category</code></td><td>Grouping category (e.g., data, text, api)</td></tr>
+        <tr><td><code>tags</code></td><td>Searchable tags as JSON array</td></tr>
+        <tr><td><code>dependencies</code></td><td>Other fragment IDs this depends on</td></tr>
+        <tr><td><code>usage_count</code></td><td>Number of times this fragment has been loaded</td></tr>
+    </table>
+</div>
+
+<h5>Example Fragment</h5>
+<pre><code class="language-python"># fragment_id: csv-parser
+# category: data
+
+import json
+from typing import List, Dict
+
+def parse_csv(csv_text: str, delimiter: str = ',') -> List[Dict[str, str]]:
+    """Parse CSV text into list of dictionaries."""
+    lines = csv_text.strip().split('\n')
+    if not lines:
+        return []
+    
+    headers = [h.strip() for h in lines[0].split(delimiter)]
+    data = []
+    
+    for line in lines[1:]:
+        values = [v.strip() for v in line.split(delimiter)]
+        if len(values) == len(headers):
+            data.append(dict(zip(headers, values)))
+    
+    return data
+
+def to_csv(data: List[Dict], headers: List[str] = None) -> str:
+    """Convert list of dicts back to CSV string."""
+    if not data:
+        return ''
+    
+    headers = headers or list(data[0].keys())
+    lines = [','.join(headers)]
+    
+    for row in data:
+        lines.append(','.join(str(row.get(h, '')) for h in headers))
+    
+    return '\n'.join(lines)</code></pre>
+
+<hr class="my-5">
+
+<h2 id="filesystem">File System (file://)</h2>
+<p>Load Python files directly from the filesystem. Useful for development or when code is managed in Git.</p>
+
+<pre><code class="language-json">{
+  "python_modules": {
+    "utils": "file:///opt/abhikarta/code/utils.py",
+    "helpers": "file:///home/user/project/helpers.py"
+  }
+}</code></pre>
+
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    <strong>Security:</strong> File paths are validated to prevent directory traversal attacks. Only absolute paths are recommended.
+</div>
+
+<hr class="my-5">
+
+<h2 id="s3">AWS S3 (s3://)</h2>
+<p>Load code from AWS S3 buckets. Requires boto3 and appropriate AWS credentials.</p>
+
+<h5>Configuration</h5>
+<pre><code class="language-properties"># config/application.properties
+aws.access_key_id=AKIAXXXXXXXXXXXXXXXX
+aws.secret_access_key=your-secret-key
+aws.region=us-east-1</code></pre>
+
+<h5>Usage</h5>
+<pre><code class="language-json">{
+  "python_modules": {
+    "enterprise_utils": "s3://company-code/shared/utils.py",
+    "ml_helpers": "s3://ml-models/preprocessing/helpers.py"
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="workflow-usage">Using in Workflows</h2>
+
+<h5>In python_modules Section</h5>
+<pre><code class="language-json">{
+  "workflow_id": "data-pipeline",
+  "python_modules": {
+    "csv_parser": "db://csv-parser",
+    "data_utils": "db://data-utils",
+    "custom": "file:///opt/code/custom.py"
+  },
+  "nodes": {
+    "parse_data": {
+      "type": "python",
+      "code": "from csv_parser import parse_csv\ndata = parse_csv(input_data['raw_csv'])\noutput = {'records': data}"
+    }
+  }
+}</code></pre>
+
+<h5>In Node Code Property</h5>
+<p>You can also use URIs directly in node code (the code will be loaded and executed):</p>
+<pre><code class="language-json">{
+  "nodes": {
+    "transform": {
+      "type": "python",
+      "code": "db://transform-logic"
+    }
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="best-practices">Best Practices</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5 class="card-title text-success"><i class="bi bi-check-circle me-2"></i>Do</h5>
+                <ul class="mb-0">
+                    <li>Use meaningful fragment IDs</li>
+                    <li>Add documentation/docstrings</li>
+                    <li>Use categories to organize</li>
+                    <li>Declare dependencies explicitly</li>
+                    <li>Keep fragments focused (single responsibility)</li>
+                    <li>Test code before creating fragments</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5 class="card-title text-danger"><i class="bi bi-x-circle me-2"></i>Don't</h5>
+                <ul class="mb-0">
+                    <li>Put secrets/credentials in code</li>
+                    <li>Create circular dependencies</li>
+                    <li>Modify global state</li>
+                    <li>Use fragments for one-off code</li>
+                    <li>Delete fragments in active use</li>
+                    <li>Skip version updates for changes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mt-4">
+    <h5><i class="bi bi-info-circle me-2"></i>Caching</h5>
+    <p class="mb-0">Code fragments are cached in memory after first load. Changes to database fragments require workflow restart to take effect. Use the <code>usage_count</code> field to track how often fragments are loaded.</p>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Documentation
+    </a>
+</div>
+{% endblock %}

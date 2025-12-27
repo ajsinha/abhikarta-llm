@@ -1,0 +1,286 @@
+"""
+Auth Routes Module - Handles authentication routes and functionality
+
+Copyright © 2025-2030, All Rights Reserved
+Ashutosh Sinha
+Email: ajsinha@gmail.com
+
+Legal Notice:
+This document and the associated software architecture are proprietary and confidential.
+Unauthorized copying, distribution, modification, or use of this document or the software
+system it describes is strictly prohibited without explicit written permission from the
+copyright holder. This document is provided "as is" without warranty of any kind, either
+expressed or implied. The copyright holder shall not be liable for any damages arising
+from the use of this document or the software system it describes.
+
+Patent Pending: Certain architectural patterns and implementations described in this
+document may be subject to patent applications.
+"""
+
+from flask import render_template, request, redirect, url_for, session, flash
+from datetime import datetime
+import logging
+
+from .abstract_routes import AbstractRoutes
+
+logger = logging.getLogger(__name__)
+
+
+class AuthRoutes(AbstractRoutes):
+    """
+    Handles authentication routes for the application.
+    
+    This class manages login, logout, and session management.
+    
+    Attributes:
+        app: Flask application instance
+        user_facade: UserFacade instance for user operations
+    """
+    
+    def __init__(self, app):
+        """
+        Initialize AuthRoutes.
+        
+        Args:
+            app: Flask application instance
+        """
+        super().__init__(app)
+        logger.info("AuthRoutes initialized")
+    
+    def register_routes(self):
+        """Register all authentication routes."""
+        
+        @self.app.route('/')
+        def index():
+            """Root route - redirect to login or dashboard."""
+            if 'user_id' in session:
+                if session.get('is_admin', False):
+                    return redirect(url_for('admin_dashboard'))
+                return redirect(url_for('user_dashboard'))
+            return redirect(url_for('login'))
+        
+        @self.app.route('/login', methods=['GET', 'POST'])
+        def login():
+            """
+            Handle user login.
+            
+            GET: Display login form
+            POST: Process login credentials
+            """
+            if request.method == 'POST':
+                user_id = request.form.get('user_id', '').strip()
+                password = request.form.get('password', '')
+                
+                if not user_id or not password:
+                    flash('Please enter both user ID and password', 'error')
+                    return render_template('auth/login.html')
+                
+                # Authenticate user
+                user = self.user_facade.authenticate(user_id, password)
+                
+                if user:
+                    # Set session data
+                    session['user_id'] = user['user_id']
+                    session['fullname'] = user.get('fullname', user_id)
+                    session['email'] = user.get('email', '')
+                    session['roles'] = user.get('roles', [])
+                    session['is_admin'] = self.user_facade.is_admin(user_id)
+                    session['logged_in_at'] = datetime.now().isoformat()
+                    
+                    # Log audit
+                    self.log_audit('login', 'user', user_id, {'ip': request.remote_addr})
+                    
+                    logger.info(f"User logged in: {user_id}")
+                    flash(f'Welcome, {user.get("fullname", user_id)}!', 'success')
+                    
+                    # Redirect based on role
+                    if session['is_admin']:
+                        return redirect(url_for('admin_dashboard'))
+                    return redirect(url_for('user_dashboard'))
+                else:
+                    logger.warning(f"Failed login attempt for user: {user_id}")
+                    flash('Invalid user ID or password', 'error')
+                    return render_template('auth/login.html')
+            
+            # GET request - show login form
+            return render_template('auth/login.html')
+        
+        @self.app.route('/logout')
+        def logout():
+            """Handle user logout."""
+            user_id = session.get('user_id')
+            
+            if user_id:
+                # Log audit
+                self.log_audit('logout', 'user', user_id)
+                logger.info(f"User logged out: {user_id}")
+            
+            # Clear session
+            session.clear()
+            flash('You have been logged out successfully', 'info')
+            return redirect(url_for('login'))
+        
+        @self.app.route('/profile')
+        def profile():
+            """Display user profile."""
+            if 'user_id' not in session:
+                return redirect(url_for('login'))
+            
+            user = self.user_facade.get_user(session['user_id'])
+            if not user:
+                session.clear()
+                return redirect(url_for('login'))
+            
+            return render_template('auth/profile.html',
+                                   user=user,
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []))
+        
+        @self.app.route('/change-password', methods=['GET', 'POST'])
+        def change_password():
+            """Handle password change."""
+            if 'user_id' not in session:
+                return redirect(url_for('login'))
+            
+            if request.method == 'POST':
+                current_password = request.form.get('current_password', '')
+                new_password = request.form.get('new_password', '')
+                confirm_password = request.form.get('confirm_password', '')
+                
+                # Validate inputs
+                if not all([current_password, new_password, confirm_password]):
+                    flash('Please fill in all fields', 'error')
+                    return render_template('auth/change_password.html',
+                                           fullname=session.get('fullname'),
+                                           userid=session.get('user_id'),
+                                           roles=session.get('roles', []))
+                
+                if new_password != confirm_password:
+                    flash('New passwords do not match', 'error')
+                    return render_template('auth/change_password.html',
+                                           fullname=session.get('fullname'),
+                                           userid=session.get('user_id'),
+                                           roles=session.get('roles', []))
+                
+                # Verify current password
+                user = self.user_facade.authenticate(session['user_id'], current_password)
+                if not user:
+                    flash('Current password is incorrect', 'error')
+                    return render_template('auth/change_password.html',
+                                           fullname=session.get('fullname'),
+                                           userid=session.get('user_id'),
+                                           roles=session.get('roles', []))
+                
+                # Change password
+                if self.user_facade.change_password(session['user_id'], new_password):
+                    self.log_audit('password_change', 'user', session['user_id'])
+                    flash('Password changed successfully', 'success')
+                    return redirect(url_for('profile'))
+                else:
+                    flash('Failed to change password', 'error')
+            
+            return render_template('auth/change_password.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []))
+        
+        @self.app.route('/help')
+        def help():
+            """Display help and documentation page."""
+            return render_template('help/help.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   is_admin=session.get('is_admin', False))
+        
+        @self.app.route('/help/<page>')
+        def help_page(page):
+            """Display individual help page."""
+            # Map URL slugs to template files
+            page_map = {
+                'getting-started': 'help/pages/getting_started.html',
+                'agent-designer': 'help/pages/agent_designer.html',
+                'workflow-dags': 'help/pages/workflow_dags.html',
+                'llm-providers': 'help/pages/llm_providers.html',
+                'mcp-plugins': 'help/pages/mcp_plugins.html',
+                'hitl': 'help/pages/hitl.html',
+                'executions-logging': 'help/pages/executions_logging.html',
+                'api-reference': 'help/pages/api_reference.html',
+                'rbac': 'help/pages/rbac.html',
+                'configuration': 'help/pages/configuration.html',
+                'troubleshooting': 'help/pages/troubleshooting.html',
+                'prebuilt': 'help/pages/prebuilt.html',
+                'code-fragments': 'help/pages/code_fragments.html',
+                'llm-management': 'help/pages/llm_management.html',
+            }
+            
+            template = page_map.get(page)
+            if not template:
+                return render_template('errors/404.html'), 404
+            
+            return render_template(template,
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   is_admin=session.get('is_admin', False))
+        
+        @self.app.route('/help/providers/<provider>')
+        def help_provider(provider):
+            """Display individual LLM provider page."""
+            provider_map = {
+                'openai': 'help/providers/openai.html',
+                'anthropic': 'help/providers/anthropic.html',
+                'google': 'help/providers/google.html',
+                'mistral': 'help/providers/mistral.html',
+                'cohere': 'help/providers/cohere.html',
+                'huggingface': 'help/providers/huggingface.html',
+                'bedrock': 'help/providers/bedrock.html',
+                'azure': 'help/providers/azure.html',
+                'ollama': 'help/providers/ollama.html',
+                'groq': 'help/providers/groq.html',
+                'together': 'help/providers/together.html',
+            }
+            
+            template = provider_map.get(provider)
+            if not template:
+                return render_template('errors/404.html'), 404
+            
+            return render_template(template,
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   is_admin=session.get('is_admin', False))
+        
+        @self.app.route('/about')
+        def about():
+            """Display about page with competitive analysis."""
+            return render_template('help/about.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   is_admin=session.get('is_admin', False))
+        
+        @self.app.route('/about/<page>')
+        def about_page(page):
+            """Display individual about page."""
+            page_map = {
+                'features': 'help/about/features.html',
+                'architecture': 'help/about/architecture.html',
+                'comparison': 'help/about/comparison.html',
+                'technology': 'help/about/technology.html',
+                'roadmap': 'help/about/roadmap.html',
+                'legal': 'help/about/legal.html',
+            }
+            
+            template = page_map.get(page)
+            if not template:
+                return render_template('errors/404.html'), 404
+            
+            return render_template(template,
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   is_admin=session.get('is_admin', False))
+        
+        logger.info("Auth routes registered")

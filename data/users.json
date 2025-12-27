@@ -1,0 +1,67 @@
+{
+  "users": [
+    {
+      "user_id": "admin",
+      "password": "admin123",
+      "fullname": "System Administrator",
+      "email": "admin@abhikarta.local",
+      "roles": ["super_admin"],
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00"
+    },
+    {
+      "user_id": "domain_admin",
+      "password": "domain123",
+      "fullname": "Domain Administrator",
+      "email": "domain_admin@abhikarta.local",
+      "roles": ["domain_admin"],
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00"
+    },
+    {
+      "user_id": "developer",
+      "password": "dev123",
+      "fullname": "Agent Developer",
+      "email": "developer@abhikarta.local",
+      "roles": ["agent_developer"],
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00"
+    },
+    {
+      "user_id": "publisher",
+      "password": "pub123",
+      "fullname": "Agent Publisher",
+      "email": "publisher@abhikarta.local",
+      "roles": ["agent_publisher"],
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00"
+    },
+    {
+      "user_id": "reviewer",
+      "password": "review123",
+      "fullname": "HITL Reviewer",
+      "email": "reviewer@abhikarta.local",
+      "roles": ["hitl_reviewer"],
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00"
+    },
+    {
+      "user_id": "user",
+      "password": "user123",
+      "fullname": "Business User",
+      "email": "user@abhikarta.local",
+      "roles": ["agent_user"],
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00"
+    },
+    {
+      "user_id": "viewer",
+      "password": "view123",
+      "fullname": "Read-Only Viewer",
+      "email": "viewer@abhikarta.local",
+      "roles": ["viewer"],
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00"
+    }
+  ]
+}

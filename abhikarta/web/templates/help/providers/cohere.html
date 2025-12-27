@@ -1,0 +1,183 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Cohere" %}
+{% set description = "Enterprise-focused AI with exceptional RAG and search capabilities" %}
+{% set icon = "bi-chat-square-text-fill" %}
+{% set header_color = "#d18ee2" %}
+{% set header_color_dark = "#9c5aab" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Available Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#usage">Usage Examples</a>
+<a href="#references">References</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle p-3 me-3" style="background: #d18ee2;">
+        <i class="bi bi-chat-square-text-fill text-white fs-3"></i>
+    </div>
+    <div>
+        <h1 class="mb-0">Cohere</h1>
+        <p class="text-muted mb-0">Enterprise AI with world-class RAG capabilities</p>
+    </div>
+</div>
+
+<h2 id="overview">Overview</h2>
+<p class="lead">Cohere specializes in enterprise AI solutions with industry-leading retrieval-augmented generation (RAG) capabilities. Their models are optimized for search, classification, and enterprise workflows.</p>
+
+<hr class="my-5">
+
+<h2 id="models">Available Models</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Context</th><th>Input $/1M</th><th>Output $/1M</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr class="table-success">
+                <td><code>command-r-plus</code> <span class="badge bg-success">Flagship</span></td>
+                <td>128K</td>
+                <td>$2.50</td>
+                <td>$10.00</td>
+                <td>Complex tasks, RAG, multilingual</td>
+            </tr>
+            <tr>
+                <td><code>command-r</code></td>
+                <td>128K</td>
+                <td>$0.15</td>
+                <td>$0.60</td>
+                <td>General purpose, cost-effective</td>
+            </tr>
+            <tr>
+                <td><code>command</code></td>
+                <td>4K</td>
+                <td>$1.00</td>
+                <td>$2.00</td>
+                <td>Simple generation tasks</td>
+            </tr>
+            <tr>
+                <td><code>command-light</code></td>
+                <td>4K</td>
+                <td>$0.30</td>
+                <td>$0.60</td>
+                <td>Fast, lightweight tasks</td>
+            </tr>
+            <tr class="table-info">
+                <td><code>embed-english-v3.0</code></td>
+                <td>512</td>
+                <td>$0.10</td>
+                <td>-</td>
+                <td>Text embeddings</td>
+            </tr>
+            <tr>
+                <td><code>rerank-english-v3.0</code></td>
+                <td>4K</td>
+                <td>$2.00</td>
+                <td>-</td>
+                <td>Search result reranking</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Best-in-Class RAG</h5>
+                <p class="mb-0">Purpose-built for retrieval-augmented generation with native document grounding.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Enterprise Focus</h5>
+                <p class="mb-0">SOC 2 Type II compliant, data privacy guarantees, enterprise SLAs.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Excellent Embeddings</h5>
+                <p class="mb-0">State-of-the-art embedding models for semantic search.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Citation Support</h5>
+                <p class="mb-0">Built-in citation generation for grounded responses.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Smaller Ecosystem</h5>
+                <p class="mb-0">Less community support compared to OpenAI or Anthropic.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Limited Creative Tasks</h5>
+                <p class="mb-0">Optimized for enterprise use, less suited for creative writing.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration</h2>
+<pre><code class="language-properties"># config/application.properties
+llm.cohere.enabled=true
+llm.cohere.api_key=your-cohere-api-key
+llm.cohere.default_model=command-r-plus</code></pre>
+
+<hr class="my-5">
+
+<h2 id="usage">Usage Examples</h2>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "cohere",
+    "model": "command-r-plus",
+    "temperature": 0.3,
+    "prompt": "Based on these documents, answer the question:\n\nDocuments: {input_data.documents}\n\nQuestion: {input_data.question}"
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="references">References</h2>
+<ul>
+    <li><a href="https://docs.cohere.com/" target="_blank">Cohere Documentation</a></li>
+    <li><a href="https://dashboard.cohere.com/" target="_blank">Cohere Dashboard</a></li>
+    <li><a href="https://cohere.com/pricing" target="_blank">Pricing</a></li>
+</ul>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Execute {{ workflow.name }} - Abhikarta LLM{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-play-fill me-2"></i>Execute Workflow</h2>
+                    <p class="text-muted mb-0">{{ workflow.name }}</p>
+                </div>
+                <a href="{{ url_for('workflow_detail', workflow_id=workflow.workflow_id) }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Workflow
+                </a>
+            </div>
+
+            <div class="row">
+                <!-- Input Form -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-input-cursor me-2"></i>Input Data</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Input JSON</label>
+                                <textarea class="form-control font-monospace" id="inputData" rows="15" placeholder='{
+  "text": "Hello world",
+  "count": 5,
+  "options": {
+    "uppercase": true
+  }
+}'></textarea>
+                                <div class="form-text">Provide input data as JSON. This will be available as <code>input_data</code> in Python nodes.</div>
+                            </div>
+
+                            <button type="button" class="btn btn-success btn-lg w-100" onclick="executeWorkflow()" id="executeBtn">
+                                <i class="bi bi-play-fill me-1"></i>Execute Workflow
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-terminal me-2"></i>Execution Result</h5>
+                            <span id="statusBadge"></span>
+                        </div>
+                        <div class="card-body">
+                            <div id="executionResult">
+                                <p class="text-muted text-center py-5">
+                                    <i class="bi bi-play-circle display-4"></i>
+                                    <br>Click Execute to run the workflow
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Execution Steps -->
+                    <div class="card mt-4" id="stepsCard" style="display: none;">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Execution Steps</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="executionSteps"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function executeWorkflow() {
+    const inputData = document.getElementById('inputData').value || '{}';
+    const btn = document.getElementById('executeBtn');
+    const resultDiv = document.getElementById('executionResult');
+    const statusBadge = document.getElementById('statusBadge');
+    const stepsCard = document.getElementById('stepsCard');
+    const stepsDiv = document.getElementById('executionSteps');
+    
+    // Validate JSON
+    try {
+        JSON.parse(inputData);
+    } catch (e) {
+        resultDiv.innerHTML = `<div class="alert alert-danger">Invalid JSON: ${e.message}</div>`;
+        return;
+    }
+    
+    // Show loading
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Executing...';
+    resultDiv.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Running workflow...</p></div>';
+    statusBadge.innerHTML = '<span class="badge bg-warning">Running</span>';
+    
+    // Execute
+    fetch('{{ url_for("execute_workflow", workflow_id=workflow.workflow_id) }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'input_data=' + encodeURIComponent(inputData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-play-fill me-1"></i>Execute Again';
+        
+        if (data.success) {
+            const exec = data.execution;
+            
+            // Status badge
+            if (exec.status === 'completed') {
+                statusBadge.innerHTML = '<span class="badge bg-success">Completed</span>';
+            } else if (exec.status === 'failed') {
+                statusBadge.innerHTML = '<span class="badge bg-danger">Failed</span>';
+            }
+            
+            // Result
+            let resultHtml = `
+                <div class="mb-3">
+                    <strong>Execution ID:</strong> <code>${exec.execution_id}</code><br>
+                    <strong>Duration:</strong> ${exec.duration_ms}ms<br>
+                    <strong>Status:</strong> ${exec.status}
+                </div>
+            `;
+            
+            if (exec.error_message) {
+                resultHtml += `<div class="alert alert-danger"><strong>Error:</strong> ${exec.error_message}</div>`;
+            }
+            
+            if (exec.output_data) {
+                resultHtml += `
+                    <div class="mt-3">
+                        <strong>Output:</strong>
+                        <pre class="bg-dark text-light p-3 rounded mt-2" style="max-height: 300px; overflow: auto;">${JSON.stringify(exec.output_data, null, 2)}</pre>
+                    </div>
+                `;
+            }
+            
+            resultDiv.innerHTML = resultHtml;
+            
+            // Steps
+            if (exec.steps && exec.steps.length > 0) {
+                stepsCard.style.display = 'block';
+                let stepsHtml = '<ul class="list-group list-group-flush">';
+                exec.steps.forEach(step => {
+                    const icon = step.status === 'completed' ? 'check-circle-fill text-success' : 'x-circle-fill text-danger';
+                    stepsHtml += `
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-${icon} me-2"></i>
+                                    <strong>${step.node_id}</strong>
+                                    <span class="text-muted">(${step.node_type})</span>
+                                </div>
+                                <span class="badge bg-secondary">${step.duration_ms}ms</span>
+                            </div>
+                            ${step.error_message ? `<small class="text-danger">${step.error_message}</small>` : ''}
+                        </li>
+                    `;
+                });
+                stepsHtml += '</ul>';
+                stepsDiv.innerHTML = stepsHtml;
+            }
+            
+        } else {
+            statusBadge.innerHTML = '<span class="badge bg-danger">Error</span>';
+            resultDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-play-fill me-1"></i>Execute Workflow';
+        statusBadge.innerHTML = '<span class="badge bg-danger">Error</span>';
+        resultDiv.innerHTML = `<div class="alert alert-danger">Request failed: ${err}</div>`;
+    });
+}
+</script>
+{% endblock %}

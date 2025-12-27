@@ -1,0 +1,191 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Mistral AI" %}
+{% set description = "European AI leader with efficient open-weight and proprietary models" %}
+{% set icon = "bi-wind" %}
+{% set header_color = "#ff7000" %}
+{% set header_color_dark = "#cc5a00" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Available Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#resources">Resources</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 64px; height: 64px; background: linear-gradient(135deg, #ff7000, #cc5a00);">
+        <i class="bi bi-wind text-white fs-2"></i>
+    </div>
+    <div>
+        <h2 id="overview" class="mb-1">Mistral AI</h2>
+        <p class="text-muted mb-0">European AI champion - efficient, open, and powerful</p>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <i class="bi bi-shield-check me-2"></i>
+    <strong>EU Data Sovereignty:</strong> Mistral is a French company offering EU-based processing - ideal for European data compliance.
+</div>
+
+<p class="lead">Founded by former Google DeepMind and Meta researchers, Mistral has quickly become a leader with their efficient open-weight models and competitive API service.</p>
+
+<hr class="my-5">
+
+<h2 id="models">Available Models</h2>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Context</th><th>Input $/1M</th><th>Output $/1M</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr class="table-success">
+                <td><code>mistral-large-latest</code> <span class="badge bg-success">Best</span></td>
+                <td>128K</td>
+                <td>$2.00</td>
+                <td>$6.00</td>
+                <td>Complex reasoning, multilingual</td>
+            </tr>
+            <tr>
+                <td><code>mistral-small-latest</code></td>
+                <td>32K</td>
+                <td>$0.20</td>
+                <td>$0.60</td>
+                <td>Cost-effective, fast</td>
+            </tr>
+            <tr>
+                <td><code>codestral-latest</code> <span class="badge bg-info">Code</span></td>
+                <td>32K</td>
+                <td>$0.20</td>
+                <td>$0.60</td>
+                <td>Code generation, 80+ languages</td>
+            </tr>
+            <tr>
+                <td><code>mixtral-8x7b-instruct</code></td>
+                <td>32K</td>
+                <td>$0.45</td>
+                <td>$0.70</td>
+                <td>Open source MoE</td>
+            </tr>
+            <tr>
+                <td><code>mistral-embed</code></td>
+                <td>8K</td>
+                <td>$0.10</td>
+                <td>-</td>
+                <td>Embeddings for RAG</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Efficiency</h5>
+                <p class="mb-0">Excellent performance-per-parameter. Fast inference with lower costs.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Multilingual</h5>
+                <p class="mb-0">Strong performance in European languages (French, German, Spanish, Italian).</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Open Weights</h5>
+                <p class="mb-0">Many models available for self-hosting via Ollama or direct download.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Codestral</h5>
+                <p class="mb-0">Dedicated code model supporting 80+ programming languages.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Smaller Ecosystem</h5>
+                <p class="mb-0">Fewer community resources and examples compared to OpenAI.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Context Limits</h5>
+                <p class="mb-0">32K context for most models (vs 128K+ for competitors).</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration in Abhikarta-LLM</h2>
+
+<pre><code class="language-properties"># config/application.properties
+
+llm.mistral.enabled=true
+llm.mistral.api_key=your-mistral-api-key
+llm.mistral.default_model=mistral-large-latest
+llm.mistral.base_url=https://api.mistral.ai/v1</code></pre>
+
+<hr class="my-5">
+
+<h2 id="resources">Resources & Links</h2>
+<div class="row g-3">
+    <div class="col-md-4">
+        <a href="https://docs.mistral.ai" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-book display-4 text-primary"></i>
+                <h6 class="mt-2">Documentation</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://console.mistral.ai" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-terminal display-4 text-success"></i>
+                <h6 class="mt-2">Console</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://mistral.ai/technology" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-gear display-4 text-warning"></i>
+                <h6 class="mt-2">Technology</h6>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

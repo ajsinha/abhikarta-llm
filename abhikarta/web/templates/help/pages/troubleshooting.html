@@ -1,0 +1,215 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Troubleshooting & FAQ" %}
+{% set description = "Common issues and frequently asked questions" %}
+{% set icon = "bi-bug" %}
+{% set header_color = "#e83e8c" %}
+{% set header_color_dark = "#c21766" %}
+
+{% block help_nav %}
+<a href="#common-issues">Common Issues</a>
+<a href="#faq">FAQ</a>
+<a href="#getting-help">Getting Help</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="common-issues">Common Issues</h2>
+
+<div class="accordion" id="troubleshootingAccordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#issue1">
+                <i class="bi bi-exclamation-circle text-danger me-2"></i>
+                Server won't start - "Address already in use"
+            </button>
+        </h2>
+        <div id="issue1" class="accordion-collapse collapse show" data-bs-parent="#troubleshootingAccordion">
+            <div class="accordion-body">
+                <p><strong>Cause:</strong> Port 5000 is already in use by another process.</p>
+                <p><strong>Solution:</strong></p>
+                <pre><code class="language-bash"># Find process using port 5000
+lsof -i :5000  # Linux/Mac
+netstat -ano | findstr :5000  # Windows
+
+# Kill the process or change port in config
+server.port=5001</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#issue2">
+                <i class="bi bi-exclamation-circle text-danger me-2"></i>
+                LLM calls failing - "API key invalid"
+            </button>
+        </h2>
+        <div id="issue2" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+            <div class="accordion-body">
+                <p><strong>Cause:</strong> API key not set or incorrect.</p>
+                <p><strong>Solution:</strong></p>
+                <ol>
+                    <li>Check <code>config/application.properties</code></li>
+                    <li>Ensure no extra whitespace around the key</li>
+                    <li>Verify the key is active in your provider's dashboard</li>
+                    <li>Try environment variable: <code>export ABHIKARTA_OPENAI_API_KEY=sk-xxx</code></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#issue3">
+                <i class="bi bi-exclamation-circle text-danger me-2"></i>
+                Workflow execution stuck in "running" state
+            </button>
+        </h2>
+        <div id="issue3" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+            <div class="accordion-body">
+                <p><strong>Cause:</strong> Node failed silently or infinite loop in Python code.</p>
+                <p><strong>Solution:</strong></p>
+                <ol>
+                    <li>Check execution trace for the last completed step</li>
+                    <li>Review Python code for infinite loops</li>
+                    <li>Check logs: <code>tail -f logs/abhikarta.log</code></li>
+                    <li>Add timeout to workflow configuration</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#issue4">
+                <i class="bi bi-exclamation-circle text-danger me-2"></i>
+                Python node "ModuleNotFoundError"
+            </button>
+        </h2>
+        <div id="issue4" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+            <div class="accordion-body">
+                <p><strong>Cause:</strong> Module not defined in python_modules or import error.</p>
+                <p><strong>Solution:</strong></p>
+                <ol>
+                    <li>Ensure module is defined in workflow's <code>python_modules</code></li>
+                    <li>Check for syntax errors in module code</li>
+                    <li>Use correct import: <code>from module_name import function</code></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="faq">Frequently Asked Questions</h2>
+
+<div class="accordion" id="faqAccordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                <i class="bi bi-question-circle text-info me-2"></i>
+                How do I switch from SQLite to PostgreSQL?
+            </button>
+        </h2>
+        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+                <ol>
+                    <li>Install PostgreSQL and create database</li>
+                    <li>Update <code>application.properties</code>:
+                        <pre><code class="language-properties">database.type=postgresql
+database.postgres.host=localhost
+database.postgres.database=abhikarta
+database.postgres.user=postgres
+database.postgres.password=your-password</code></pre>
+                    </li>
+                    <li>Restart server - schema will be auto-created</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                <i class="bi bi-question-circle text-info me-2"></i>
+                Can I use local LLM models?
+            </button>
+        </h2>
+        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+                <p>Yes! Use Ollama for local models:</p>
+                <pre><code class="language-bash"># Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull a model
+ollama pull llama3.1</code></pre>
+                <p>Then configure in properties:</p>
+                <pre><code class="language-properties">llm.ollama.base_url=http://localhost:11434
+llm.ollama.default_model=llama3.1</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                <i class="bi bi-question-circle text-info me-2"></i>
+                How do I reset the admin password?
+            </button>
+        </h2>
+        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+                <p>Delete <code>data/users.json</code> and restart the server. Default users will be recreated.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                <i class="bi bi-question-circle text-info me-2"></i>
+                How are LLM costs calculated?
+            </button>
+        </h2>
+        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+                <p>Costs are estimated based on token counts and stored pricing. Actual costs may vary - always check your provider dashboard.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="getting-help">Getting Help</h2>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-book display-4 text-primary"></i>
+                <h6 class="mt-2">Documentation</h6>
+                <p class="small text-muted">Read the full docs</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-github display-4 text-dark"></i>
+                <h6 class="mt-2">GitHub Issues</h6>
+                <p class="small text-muted">Report bugs & features</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-envelope display-4 text-info"></i>
+                <h6 class="mt-2">Email Support</h6>
+                <p class="small text-muted">ajsinha@gmail.com</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

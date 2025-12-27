@@ -1,0 +1,478 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "OpenAI" %}
+{% set description = "GPT-4o, GPT-4, o1 reasoning models - Industry-leading AI from OpenAI" %}
+{% set icon = "bi-lightning-charge-fill" %}
+{% set header_color = "#10a37f" %}
+{% set header_color_dark = "#0d8a6a" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Available Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#usage">Usage in Abhikarta</a>
+<a href="#best-practices">Best Practices</a>
+<a href="#pricing">Pricing</a>
+<a href="#resources">Resources</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle bg-dark d-flex align-items-center justify-content-center me-3" style="width: 64px; height: 64px;">
+        <i class="bi bi-lightning-charge-fill text-success fs-2"></i>
+    </div>
+    <div>
+        <h2 id="overview" class="mb-1">OpenAI</h2>
+        <p class="text-muted mb-0">The industry leader in large language models</p>
+    </div>
+</div>
+
+<div class="alert alert-success">
+    <i class="bi bi-star-fill me-2"></i>
+    <strong>Recommended Provider:</strong> OpenAI is the default provider in Abhikarta-LLM due to its balance of capability, speed, and reliability.
+</div>
+
+<p class="lead">OpenAI pioneered modern large language models with the GPT series. Their models power ChatGPT and are known for excellent instruction following, broad knowledge, and strong reasoning capabilities.</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-success">2022</h3>
+                <small class="text-muted">ChatGPT Launch</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-primary">128K</h3>
+                <small class="text-muted">Max Context Window</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-warning">#1</h3>
+                <small class="text-muted">Market Leader</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="models">Available Models</h2>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Model</th>
+                <th>Context</th>
+                <th>Input $/1M</th>
+                <th>Output $/1M</th>
+                <th>Speed</th>
+                <th>Best For</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="table-success">
+                <td><code>gpt-4o</code> <span class="badge bg-success">Recommended</span></td>
+                <td>128K</td>
+                <td>$2.50</td>
+                <td>$10.00</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Fast</td>
+                <td>General purpose, multimodal, best value</td>
+            </tr>
+            <tr>
+                <td><code>gpt-4o-mini</code> <span class="badge bg-info">Budget</span></td>
+                <td>128K</td>
+                <td>$0.15</td>
+                <td>$0.60</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Very Fast</td>
+                <td>High volume, cost-sensitive tasks</td>
+            </tr>
+            <tr>
+                <td><code>gpt-4-turbo</code></td>
+                <td>128K</td>
+                <td>$10.00</td>
+                <td>$30.00</td>
+                <td><i class="bi bi-speedometer text-warning"></i> Medium</td>
+                <td>Complex reasoning, legacy compatibility</td>
+            </tr>
+            <tr>
+                <td><code>gpt-4</code></td>
+                <td>8K</td>
+                <td>$30.00</td>
+                <td>$60.00</td>
+                <td><i class="bi bi-speedometer text-warning"></i> Medium</td>
+                <td>Legacy support only</td>
+            </tr>
+            <tr>
+                <td><code>gpt-3.5-turbo</code></td>
+                <td>16K</td>
+                <td>$0.50</td>
+                <td>$1.50</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Very Fast</td>
+                <td>Simple tasks, chatbots</td>
+            </tr>
+            <tr class="table-warning">
+                <td><code>o1-preview</code> <span class="badge bg-warning text-dark">Reasoning</span></td>
+                <td>128K</td>
+                <td>$15.00</td>
+                <td>$60.00</td>
+                <td><i class="bi bi-hourglass text-danger"></i> Slow</td>
+                <td>Complex math, coding, scientific reasoning</td>
+            </tr>
+            <tr>
+                <td><code>o1-mini</code></td>
+                <td>128K</td>
+                <td>$3.00</td>
+                <td>$12.00</td>
+                <td><i class="bi bi-speedometer text-warning"></i> Medium</td>
+                <td>Reasoning tasks, cost-effective</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Instruction Following</h5>
+                <p class="mb-0">Best-in-class at understanding and following complex instructions. Excellent system prompt adherence.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>API Reliability</h5>
+                <p class="mb-0">99.9%+ uptime, excellent documentation, stable API with minimal breaking changes.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Multimodal (Vision)</h5>
+                <p class="mb-0">GPT-4o can process images, making it ideal for document analysis and visual understanding.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Function Calling</h5>
+                <p class="mb-0">Robust structured output and function calling, essential for agent tool use.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Speed</h5>
+                <p class="mb-0">GPT-4o offers excellent latency for its capability level. Mini variant is extremely fast.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Ecosystem</h5>
+                <p class="mb-0">Largest ecosystem of tools, libraries, and community support.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Cost</h5>
+                <p class="mb-0">Generally more expensive than competitors, especially for high-volume use cases.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Context Window</h5>
+                <p class="mb-0">128K is good but smaller than Claude (200K) and Gemini (1-2M).</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Rate Limits</h5>
+                <p class="mb-0">Strict rate limits on new accounts. Need to build up usage history.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Censorship</h5>
+                <p class="mb-0">Can be overly cautious on sensitive topics compared to some alternatives.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration in Abhikarta-LLM</h2>
+
+<h5>Step 1: Get Your API Key</h5>
+<ol>
+    <li>Go to <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a></li>
+    <li>Click "Create new secret key"</li>
+    <li>Copy the key (starts with <code>sk-</code>)</li>
+</ol>
+
+<h5>Step 2: Configure in application.properties</h5>
+<pre><code class="language-properties"># config/application.properties
+
+# Enable OpenAI
+llm.openai.enabled=true
+
+# API Key (or use environment variable)
+llm.openai.api_key=sk-your-api-key-here
+# Or: llm.openai.api_key=${OPENAI_API_KEY}
+
+# Default model for OpenAI provider
+llm.openai.default_model=gpt-4o
+
+# Optional: Organization ID (for enterprise accounts)
+llm.openai.organization=org-xxxxxxxx
+
+# Optional: Custom base URL (for proxies or Azure)
+llm.openai.base_url=https://api.openai.com/v1
+
+# Set as default provider
+llm.default_provider=openai</code></pre>
+
+<h5>Step 3: Environment Variables (Recommended for Production)</h5>
+<pre><code class="language-bash"># Linux/Mac
+export OPENAI_API_KEY=sk-your-api-key-here
+
+# Windows PowerShell
+$env:OPENAI_API_KEY="sk-your-api-key-here"
+
+# Docker
+docker run -e OPENAI_API_KEY=sk-xxx abhikarta-llm</code></pre>
+
+<hr class="my-5">
+
+<h2 id="usage">Usage in Abhikarta-LLM</h2>
+
+<h5>In Agent Configuration</h5>
+<pre><code class="language-json">{
+  "agent_id": "customer-support",
+  "name": "Customer Support Agent",
+  "llm_config": {
+    "provider": "openai",
+    "model": "gpt-4o",
+    "temperature": 0.7,
+    "max_tokens": 2000,
+    "top_p": 1.0
+  },
+  "system_prompt": "You are a helpful customer support agent..."
+}</code></pre>
+
+<h5>In Workflow DAG</h5>
+<pre><code class="language-json">{
+  "analyze_data": {
+    "type": "llm",
+    "name": "Analyze with GPT-4o",
+    "dependencies": ["process_data"],
+    "config": {
+      "provider": "openai",
+      "model": "gpt-4o",
+      "temperature": 0.3,
+      "system_prompt": "You are a data analyst. Provide insights in JSON format.",
+      "prompt": "Analyze this data:\n\n{<!-- -->{context.process_data}<!-- -->}"
+    }
+  }
+}</code></pre>
+
+<h5>Via Python API</h5>
+<pre><code class="language-python">from abhikarta.llm_provider import LLMFacade
+
+facade = LLMFacade(db_facade=db)
+facade.configure_provider('openai', api_key='sk-xxx')
+
+response = facade.complete(
+    messages=[
+        {'role': 'system', 'content': 'You are a helpful assistant.'},
+        {'role': 'user', 'content': 'Explain quantum computing.'}
+    ],
+    provider='openai',
+    model='gpt-4o',
+    temperature=0.7
+)
+
+print(response.content)
+print(f"Cost: ${response.cost_estimate:.4f}")</code></pre>
+
+<hr class="my-5">
+
+<h2 id="best-practices">Best Practices</h2>
+
+<div class="accordion" id="bestPractices">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#bp1">
+                <i class="bi bi-lightbulb text-warning me-2"></i>Model Selection
+            </button>
+        </h2>
+        <div id="bp1" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <ul>
+                    <li><strong>gpt-4o</strong>: Default choice for most tasks</li>
+                    <li><strong>gpt-4o-mini</strong>: High volume, cost-sensitive (10x cheaper)</li>
+                    <li><strong>o1-preview/o1-mini</strong>: Math, coding, complex reasoning only</li>
+                    <li>Avoid legacy gpt-4 unless you have specific compatibility needs</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bp2">
+                <i class="bi bi-lightbulb text-warning me-2"></i>Temperature Settings
+            </button>
+        </h2>
+        <div id="bp2" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li><strong>0.0-0.3</strong>: Factual tasks, data extraction, classification</li>
+                    <li><strong>0.5-0.7</strong>: General conversation, customer support</li>
+                    <li><strong>0.8-1.0</strong>: Creative writing, brainstorming</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bp3">
+                <i class="bi bi-lightbulb text-warning me-2"></i>Cost Optimization
+            </button>
+        </h2>
+        <div id="bp3" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Use gpt-4o-mini for simple tasks (classification, extraction)</li>
+                    <li>Set appropriate max_tokens limits</li>
+                    <li>Use system prompts to encourage concise responses</li>
+                    <li>Cache common queries when possible</li>
+                    <li>Monitor costs in Abhikarta dashboard</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="pricing">Pricing (as of Jan 2025)</h2>
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    Prices are per 1 million tokens. Check <a href="https://openai.com/pricing" target="_blank">openai.com/pricing</a> for current rates.
+</div>
+
+<div class="table-responsive">
+    <table class="table table-sm">
+        <thead class="table-light">
+            <tr><th>Model</th><th>Input</th><th>Output</th><th>~Cost per 1K calls*</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>gpt-4o</td><td>$2.50</td><td>$10.00</td><td>~$3.75</td></tr>
+            <tr><td>gpt-4o-mini</td><td>$0.15</td><td>$0.60</td><td>~$0.22</td></tr>
+            <tr><td>gpt-4-turbo</td><td>$10.00</td><td>$30.00</td><td>~$12.00</td></tr>
+            <tr><td>o1-preview</td><td>$15.00</td><td>$60.00</td><td>~$22.50</td></tr>
+            <tr><td>o1-mini</td><td>$3.00</td><td>$12.00</td><td>~$4.50</td></tr>
+        </tbody>
+    </table>
+</div>
+<p class="small text-muted">*Estimated based on average 500 input + 300 output tokens per call</p>
+
+<hr class="my-5">
+
+<h2 id="resources">Resources & Links</h2>
+<div class="row g-3">
+    <div class="col-md-4">
+        <a href="https://platform.openai.com/docs" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-book display-4 text-primary"></i>
+                <h6 class="mt-2">API Documentation</h6>
+                <small class="text-muted">Official API docs</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://platform.openai.com/api-keys" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-key display-4 text-warning"></i>
+                <h6 class="mt-2">API Keys</h6>
+                <small class="text-muted">Manage your keys</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://platform.openai.com/usage" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up display-4 text-success"></i>
+                <h6 class="mt-2">Usage Dashboard</h6>
+                <small class="text-muted">Monitor usage & costs</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://openai.com/pricing" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-currency-dollar display-4 text-info"></i>
+                <h6 class="mt-2">Pricing</h6>
+                <small class="text-muted">Current pricing</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://status.openai.com" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-heart-pulse display-4 text-danger"></i>
+                <h6 class="mt-2">Status Page</h6>
+                <small class="text-muted">Service status</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://community.openai.com" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-people display-4 text-secondary"></i>
+                <h6 class="mt-2">Community</h6>
+                <small class="text-muted">Forums & support</small>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "User Roles & RBAC" %}
+{% set description = "Role-based access control and permissions" %}
+{% set icon = "bi-shield-lock" %}
+{% set header_color = "#20c997" %}
+{% set header_color_dark = "#1aa179" %}
+
+{% block help_nav %}
+<a href="#predefined-roles">Predefined Roles</a>
+<a href="#permissions">Permission Structure</a>
+<a href="#managing-users">Managing Users</a>
+<a href="#role-hierarchy">Role Hierarchy</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="predefined-roles">Predefined Roles</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Role</th><th>Description</th><th>Key Permissions</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="badge bg-danger">super_admin</span></td>
+                <td>Full system access</td>
+                <td>All permissions (*)</td>
+            </tr>
+            <tr>
+                <td><span class="badge bg-warning text-dark">domain_admin</span></td>
+                <td>Domain-level administrator</td>
+                <td>Manage users, agents, executions within domain</td>
+            </tr>
+            <tr>
+                <td><span class="badge bg-primary">agent_developer</span></td>
+                <td>Create and manage agents</td>
+                <td>agents:read, agents:write, agents:test</td>
+            </tr>
+            <tr>
+                <td><span class="badge bg-info">agent_publisher</span></td>
+                <td>Review and publish agents</td>
+                <td>agents:review, agents:publish</td>
+            </tr>
+            <tr>
+                <td><span class="badge bg-success">hitl_reviewer</span></td>
+                <td>Review HITL tasks</td>
+                <td>hitl:read, hitl:respond</td>
+            </tr>
+            <tr>
+                <td><span class="badge bg-secondary">agent_user</span></td>
+                <td>Execute published agents</td>
+                <td>agents:read:published, executions:create</td>
+            </tr>
+            <tr>
+                <td><span class="badge bg-dark">viewer</span></td>
+                <td>Read-only access</td>
+                <td>agents:read:published, executions:read:own</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="permissions">Permission Structure</h2>
+<p>Permissions follow the format: <code>resource:action[:scope]</code></p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6>Resources</h6>
+                <ul class="small mb-0">
+                    <li><code>users</code></li>
+                    <li><code>agents</code></li>
+                    <li><code>workflows</code></li>
+                    <li><code>executions</code></li>
+                    <li><code>hitl</code></li>
+                    <li><code>mcp</code></li>
+                    <li><code>audit</code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6>Actions</h6>
+                <ul class="small mb-0">
+                    <li><code>read</code></li>
+                    <li><code>write</code></li>
+                    <li><code>create</code></li>
+                    <li><code>delete</code></li>
+                    <li><code>execute</code></li>
+                    <li><code>publish</code></li>
+                    <li><code>*</code> (all)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6>Scopes</h6>
+                <ul class="small mb-0">
+                    <li><code>own</code> - User's own</li>
+                    <li><code>domain</code> - Same domain</li>
+                    <li><code>published</code> - Published only</li>
+                    <li><code>all</code> - Everything</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="managing-users">Managing Users</h2>
+<ol>
+    <li>Navigate to <strong>Admin → Users</strong></li>
+    <li>Click <strong>"Add User"</strong></li>
+    <li>Fill in user details: username, email, full name</li>
+    <li>Assign roles</li>
+    <li>Set domain (optional)</li>
+    <li>Click <strong>"Create User"</strong></li>
+</ol>
+
+<pre><code class="language-json">{
+  "user_id": "user-123",
+  "username": "john.doe",
+  "email": "john@example.com",
+  "fullname": "John Doe",
+  "roles": ["agent_developer", "hitl_reviewer"],
+  "domain": "engineering",
+  "is_active": true
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="role-hierarchy">Role Hierarchy</h2>
+<pre><code class="language-text">super_admin
+  └── domain_admin
+        ├── agent_developer
+        │     └── agent_publisher
+        ├── hitl_reviewer
+        └── agent_user
+              └── viewer</code></pre>
+
+<div class="alert alert-warning mt-4">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    <strong>Security Note:</strong> Always follow the principle of least privilege. Assign users only the roles they need.
+</div>
+{% endblock %}

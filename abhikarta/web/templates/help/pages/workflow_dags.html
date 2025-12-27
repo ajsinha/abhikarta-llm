@@ -1,0 +1,312 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Workflow DAG Execution" %}
+{% set description = "Build and execute complex multi-step workflows with JSON + Python" %}
+{% set icon = "bi-diagram-3" %}
+{% set header_color = "#0dcaf0" %}
+{% set header_color_dark = "#0aa2c0" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#node-types">Node Types</a>
+<a href="#json-format">JSON Format</a>
+<a href="#python-modules">Python Modules</a>
+<a href="#code-uris">Code Fragment URIs</a>
+<a href="#variables">Variables</a>
+<a href="#tutorial">Complete Tutorial</a>
+<a href="#upload">Upload & Execute</a>
+<a href="#api">API Access</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Overview</h2>
+<p>The Workflow DAG system enables you to define and execute complex multi-step pipelines as Directed Acyclic Graphs (DAGs) with embedded Python code modules.</p>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Key Feature:</strong> Upload JSON workflow definitions with Python modules to create powerful automation pipelines that combine LLM calls, data processing, HTTP requests, and conditional logic.
+</div>
+
+<hr class="my-5">
+
+<h2 id="node-types">Supported Node Types</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Node Type</th><th>Description</th><th>Key Configuration</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="badge bg-primary">input</span></td><td>Workflow entry point</td><td>schema, defaults</td></tr>
+            <tr><td><span class="badge bg-primary">output</span></td><td>Final output formatting</td><td>format, schema</td></tr>
+            <tr><td><span class="badge bg-success">python</span></td><td>Execute Python code</td><td>code, imports</td></tr>
+            <tr><td><span class="badge bg-info">llm</span></td><td>Call language model</td><td>provider, model, prompt</td></tr>
+            <tr><td><span class="badge bg-warning text-dark">http</span></td><td>Make HTTP request</td><td>url, method, headers</td></tr>
+            <tr><td><span class="badge bg-secondary">condition</span></td><td>Conditional branching</td><td>expression, branches</td></tr>
+            <tr><td><span class="badge bg-dark">transform</span></td><td>Data transformation</td><td>operation, mapping</td></tr>
+            <tr><td><span class="badge bg-danger">delay</span></td><td>Add delay</td><td>seconds</td></tr>
+            <tr><td><span class="badge" style="background:#6f42c1;">hitl</span></td><td>Human approval</td><td>task_type, timeout</td></tr>
+            <tr><td><span class="badge" style="background:#20c997;">parallel</span></td><td>Parallel execution</td><td>branches</td></tr>
+            <tr><td><span class="badge" style="background:#fd7e14;">loop</span></td><td>Iterate over items</td><td>items, max_iterations</td></tr>
+            <tr><td><span class="badge" style="background:#e83e8c;">tool</span></td><td>Execute MCP tool</td><td>plugin_id, tool_name</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="json-format">JSON DAG Format</h2>
+<pre><code class="language-json">{
+  "workflow_id": "my-workflow",
+  "name": "My Data Pipeline",
+  "description": "Process and analyze data",
+  "version": "1.0.0",
+  
+  "nodes": {
+    "start": {
+      "type": "input",
+      "name": "Input Data",
+      "config": {
+        "schema": {"type": "object"}
+      }
+    },
+    "process": {
+      "type": "python",
+      "name": "Process Data",
+      "dependencies": ["start"],
+      "code": "output = {'processed': input_data}"
+    },
+    "end": {
+      "type": "output",
+      "name": "Results",
+      "dependencies": ["process"]
+    }
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="python-modules">Python Modules</h2>
+<p>Define reusable Python code that can be imported by Python nodes. Code can be provided inline or loaded from external sources using URIs.</p>
+
+<div class="alert alert-info">
+    <i class="bi bi-link-45deg me-2"></i>
+    <strong>Code Fragment URIs:</strong> Load code from database, filesystem, or S3 instead of embedding inline. See <a href="{{ url_for('help_page', page='code-fragments') }}">Code Fragments</a> for full documentation.
+</div>
+
+<h5>Option 1: Inline Code</h5>
+<pre><code class="language-json">{
+  "python_modules": {
+    "utils": "def clean_text(text):\n    return text.strip().lower()\n\ndef validate(data):\n    return 'name' in data",
+    
+    "transformers": "def to_json(obj):\n    import json\n    return json.dumps(obj)"
+  }
+}</code></pre>
+
+<h5 id="code-uris">Option 2: Load from URI</h5>
+<p>Reference code stored externally using URI patterns:</p>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered">
+        <thead class="table-light">
+            <tr><th>URI Pattern</th><th>Source</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>db://&lt;fragment_id&gt;</code></td>
+                <td>Database (Admin → Code Fragments)</td>
+                <td><code>db://data-utils</code></td>
+            </tr>
+            <tr>
+                <td><code>file://&lt;path&gt;</code></td>
+                <td>Local filesystem</td>
+                <td><code>file:///opt/code/utils.py</code></td>
+            </tr>
+            <tr>
+                <td><code>s3://&lt;bucket&gt;/&lt;key&gt;</code></td>
+                <td>AWS S3 bucket</td>
+                <td><code>s3://my-bucket/code/helpers.py</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<pre><code class="language-json">{
+  "python_modules": {
+    "data_utils": "db://data-utils",
+    "csv_parser": "db://csv-parser",
+    "custom_logic": "file:///opt/abhikarta/code/custom.py",
+    "enterprise_utils": "s3://company-code/shared/utils.py"
+  }
+}</code></pre>
+
+<h5>Option 3: Mixed (Inline + URI)</h5>
+<pre><code class="language-json">{
+  "python_modules": {
+    "shared_utils": "db://data-utils",
+    "local_helpers": "def helper(x):\n    return x * 2"
+  }
+}</code></pre>
+
+<h5>Using Modules in Python Nodes</h5>
+<pre><code class="language-python"># In a Python node's code field:
+from data_utils import parse_csv, calculate_stats
+from local_helpers import helper
+
+data = parse_csv(input_data['csv_text'])
+stats = calculate_stats(data)
+output = {'result': helper(stats['total'])}</code></pre>
+
+<div class="alert alert-success">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Benefits of URI Loading:</strong>
+    <ul class="mb-0 mt-2">
+        <li>Centralized code management with versioning</li>
+        <li>Update code without modifying workflows</li>
+        <li>Share utilities across multiple workflows</li>
+        <li>Track usage with <code>usage_count</code> in database</li>
+    </ul>
+</div>
+
+<hr class="my-5">
+
+<h2 id="variables">Available Variables in Python Nodes</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Variable</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>input_data</code></td><td>Data from dependency nodes or workflow input</td></tr>
+            <tr><td><code>context</code></td><td>Dict with outputs from all previous nodes</td></tr>
+            <tr><td><code>config</code></td><td>Node configuration from the JSON definition</td></tr>
+            <tr><td><code>output</code></td><td>Set this to pass data to downstream nodes</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="tutorial">Complete Tutorial: Data Analysis Pipeline</h2>
+<div class="alert alert-success">
+    <strong>What we'll build:</strong> A workflow that validates input, processes items, calls an LLM for analysis, and formats results.
+</div>
+
+<h5>Full Workflow JSON (with inline code)</h5>
+<pre><code class="language-json">{
+  "workflow_id": "data-analysis-pipeline",
+  "name": "Data Analysis Pipeline",
+  "description": "Validate, process, and analyze data with AI",
+  "version": "1.0.0",
+  
+  "python_modules": {
+    "validators": "def validate_input(data):\n    if not isinstance(data, dict):\n        return False, 'Input must be a dictionary'\n    if 'items' not in data:\n        return False, 'Missing required field: items'\n    return True, 'Valid'",
+    
+    "processors": "def process_item(item):\n    return {\n        'id': item.get('id', 'unknown'),\n        'value': item.get('value', 0) * 2,\n        'processed': True\n    }\n\ndef aggregate(items):\n    total = sum(i.get('value', 0) for i in items)\n    return {'total': total, 'count': len(items)}"
+  },
+  
+  "nodes": {
+    "input": {
+      "type": "input",
+      "name": "Receive Input"
+    },
+    
+    "validate": {
+      "type": "python",
+      "name": "Validate Input",
+      "dependencies": ["input"],
+      "code": "from validators import validate_input\n\nis_valid, message = validate_input(input_data)\nif not is_valid:\n    raise ValueError(message)\noutput = {'validated': True, 'data': input_data}"
+    },
+    
+    "process": {
+      "type": "python",
+      "name": "Process Items",
+      "dependencies": ["validate"],
+      "code": "from processors import process_item, aggregate\n\nitems = input_data['data']['items']\nprocessed = [process_item(item) for item in items]\nstats = aggregate(processed)\noutput = {'items': processed, 'stats': stats}"
+    },
+    
+    "analyze": {
+      "type": "llm",
+      "name": "AI Analysis",
+      "dependencies": ["process"],
+      "config": {
+        "provider": "openai",
+        "model": "gpt-4o",
+        "temperature": 0.7,
+        "prompt": "Analyze this data summary:\n\nItems processed: {stats.count}\nTotal value: {stats.total}\n\nProvide 3 key insights."
+      }
+    },
+    
+    "output": {
+      "type": "output",
+      "name": "Final Output",
+      "dependencies": ["process", "analyze"]
+    }
+  }
+}</code></pre>
+
+<h5>Alternative: Using Code Fragment URIs</h5>
+<p>The same workflow using code stored in the database (first create fragments via <strong>Admin → Code Fragments</strong>):</p>
+<pre><code class="language-json">{
+  "workflow_id": "data-analysis-pipeline-v2",
+  "name": "Data Analysis Pipeline (URI-based)",
+  "version": "1.0.0",
+  
+  "python_modules": {
+    "validators": "db://input-validators",
+    "processors": "db://data-processors"
+  },
+  
+  "nodes": { ... }
+}</code></pre>
+<p class="text-muted">This approach keeps workflows cleaner and allows code updates without modifying workflow JSON.</p>
+
+<hr class="my-5">
+
+<h2 id="upload">Upload & Execute</h2>
+<h5>Via Web UI</h5>
+<ol>
+    <li>Navigate to <strong>Workflows</strong> in the sidebar</li>
+    <li>Click <strong>"Upload Workflow"</strong></li>
+    <li>Paste JSON or upload file</li>
+    <li>Click <strong>"Validate"</strong> to check for errors</li>
+    <li>Click <strong>"Upload"</strong></li>
+    <li>Go to workflow detail page and click <strong>"Execute"</strong></li>
+    <li>Enter input JSON and run</li>
+</ol>
+
+<h5>Via API</h5>
+<pre><code class="language-bash"># Upload workflow
+curl -X POST http://localhost:5000/api/workflows \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=YOUR_SESSION" \
+  -d @workflow.json
+
+# Execute workflow
+curl -X POST http://localhost:5000/api/workflows/data-analysis-pipeline/execute \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=YOUR_SESSION" \
+  -d '{"items": [{"id": "A", "value": 10}, {"id": "B", "value": 25}]}'</code></pre>
+
+<hr class="my-5">
+
+<h2 id="api">API Endpoints</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/workflows</code></td><td>List all workflows</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/workflows</code></td><td>Create workflow</td></tr>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/workflows/{id}</code></td><td>Get workflow details</td></tr>
+            <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/workflows/{id}</code></td><td>Delete workflow</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/workflows/{id}/execute</code></td><td>Execute workflow</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/workflows/{id}/validate</code></td><td>Validate DAG</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-warning mt-4">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Tip:</strong> Every LLM call within the workflow is automatically logged to the <code>llm_calls</code> table with tokens, cost, and latency.
+</div>
+{% endblock %}

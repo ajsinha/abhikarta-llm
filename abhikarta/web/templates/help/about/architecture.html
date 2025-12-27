@@ -1,0 +1,278 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "System Architecture" %}
+{% set description = "Technical design and component overview" %}
+{% set icon = "bi-building" %}
+{% set header_color = "#198754" %}
+{% set header_color_dark = "#146c43" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#layers">Architecture Layers</a>
+<a href="#database">Database Schema</a>
+<a href="#workflow-engine">Workflow Engine</a>
+<a href="#code-loader">Code Loader</a>
+<a href="#llm-facade">LLM Facade</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Architecture Overview</h2>
+<p class="lead">Abhikarta-LLM follows a layered architecture with clear separation of concerns.</p>
+
+<pre><code class="language-text">┌─────────────────────────────────────────────────────────────────────┐
+│                      PRESENTATION LAYER                              │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐                 │
+│  │   Web UI     │ │  REST API    │ │   CLI        │                 │
+│  │   (Flask)    │ │  Endpoints   │ │   Tools      │                 │
+│  └──────────────┘ └──────────────┘ └──────────────┘                 │
+├─────────────────────────────────────────────────────────────────────┤
+│                        API LAYER                                     │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐                 │
+│  │  Auth        │ │  Agent       │ │  Workflow    │                 │
+│  │  Routes      │ │  Routes      │ │  Routes      │                 │
+│  └──────────────┘ └──────────────┘ └──────────────┘                 │
+├─────────────────────────────────────────────────────────────────────┤
+│                     CORE SERVICES                                    │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
+│  │   Agent    │ │  Workflow  │ │    LLM     │ │    MCP     │       │
+│  │  Manager   │ │  Executor  │ │   Facade   │ │  Manager   │       │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
+│  │   User     │ │   RBAC     │ │   Code     │ │   Audit    │       │
+│  │  Manager   │ │  Manager   │ │  Loader    │ │   Logger   │       │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
+├─────────────────────────────────────────────────────────────────────┤
+│                  EXTERNAL CODE SOURCES                               │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐                       │
+│  │   db://    │ │  file://   │ │   s3://    │                       │
+│  │ (Database) │ │(Filesystem)│ │  (AWS S3)  │                       │
+│  └────────────┘ └────────────┘ └────────────┘                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                      DATABASE LAYER                                  │
+│  ┌──────────────────────────────────────────────────────────┐       │
+│  │                    DB Facade                              │       │
+│  │         (SQLite / PostgreSQL Abstraction)                │       │
+│  └──────────────────────────────────────────────────────────┘       │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+
+<hr class="my-5">
+
+<h2 id="layers">Architecture Layers</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Presentation Layer</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Web UI:</strong> Flask templates with Bootstrap 5</li>
+                    <li><strong>REST API:</strong> JSON endpoints for programmatic access</li>
+                    <li><strong>CLI:</strong> Command-line tools for admin tasks</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Core Services</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Agent Manager:</strong> Agent CRUD and lifecycle</li>
+                    <li><strong>Workflow Executor:</strong> DAG parsing and execution</li>
+                    <li><strong>LLM Facade:</strong> Unified LLM interface with logging</li>
+                    <li><strong>Code Loader:</strong> URI-based code resolution</li>
+                    <li><strong>MCP Manager:</strong> Plugin registry and invocation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="database">Database Schema</h2>
+<p>19 tables supporting the complete data model:</p>
+
+<pre><code class="language-sql">-- Core Tables
+users              -- User accounts and authentication
+roles              -- Role definitions
+user_roles         -- User-role assignments
+sessions           -- Active sessions
+api_keys           -- API key authentication
+
+-- Agent Tables
+agents             -- Agent definitions
+agent_versions     -- Version history
+agent_templates    -- Reusable templates
+
+-- Workflow Tables
+workflows          -- Workflow definitions
+workflow_nodes     -- Node configurations
+
+-- Code Management
+code_fragments     -- Reusable code modules (db:// URIs)
+                   -- fragment_id, name, code, version
+                   -- category, tags, dependencies
+                   -- usage_count, is_active
+
+-- LLM Management (NEW in v1.1.0)
+llm_providers      -- Provider configurations
+                   -- provider_id, name, provider_type
+                   -- api_endpoint, api_key_name, rate_limits
+llm_models         -- Model definitions
+                   -- model_id, provider_id, context_window
+                   -- costs, capabilities (vision, functions)
+model_permissions  -- RBAC for model access
+                   -- model_id, role_name, can_use
+                   -- daily_limit, monthly_limit
+
+-- Execution Tables
+executions         -- Execution records
+execution_steps    -- Per-node execution data
+llm_calls          -- LLM interaction logs
+
+-- HITL Tables
+hitl_tasks         -- Human review tasks
+
+-- MCP Tables
+mcp_plugins        -- Plugin registry
+
+-- System Tables
+audit_logs         -- Activity audit trail
+system_settings    -- Configuration settings</code></pre>
+
+<hr class="my-5">
+
+<h2 id="workflow-engine">Workflow Execution Engine</h2>
+<pre><code class="language-text">┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│  JSON DAG    │───▶│  DAG Parser  │───▶│ DAGWorkflow  │
+│  Definition  │    │              │    │   Object     │
+└──────────────┘    └──────────────┘    └──────────────┘
+                                               │
+                                               ▼
+                    ┌──────────────────────────────────┐
+                    │       Workflow Executor          │
+                    │  ┌──────────────────────────┐   │
+                    │  │ 1. Load Python Modules   │   │
+                    │  │    (Resolve URIs)        │   │
+                    │  │ 2. Topological Sort      │   │
+                    │  │ 3. For each node:        │   │
+                    │  │    - Resolve deps        │   │
+                    │  │    - Execute node        │   │
+                    │  │    - Log step            │   │
+                    │  │ 4. Return final output   │   │
+                    │  └──────────────────────────┘   │
+                    └──────────────────────────────────┘
+                                               │
+                                               ▼
+                    ┌──────────────────────────────────┐
+                    │         Execution Record         │
+                    │  - Status, Duration, Tokens      │
+                    │  - Input/Output Data             │
+                    │  - Step-by-step Trace            │
+                    └──────────────────────────────────┘</code></pre>
+
+<hr class="my-5">
+
+<h2 id="code-loader">Code Loader (URI Resolution)</h2>
+<p>The CodeLoader utility resolves code from multiple sources at workflow runtime:</p>
+
+<pre><code class="language-text">┌─────────────────────────────────────────────────────────────────┐
+│                        CODE LOADER                               │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ Input: "db://data-utils" or "file://..." or "s3://..."    │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                             │                                    │
+│          ┌──────────────────┼──────────────────┐                │
+│          ▼                  ▼                  ▼                │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │   db://      │  │   file://    │  │    s3://     │          │
+│  │ ─────────── │  │ ─────────── │  │ ─────────── │          │
+│  │ Query       │  │ Read from   │  │ boto3        │          │
+│  │ code_       │  │ filesystem  │  │ get_object() │          │
+│  │ fragments   │  │             │  │              │          │
+│  │ table       │  │             │  │              │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│          │                  │                  │                │
+│          └──────────────────┼──────────────────┘                │
+│                             ▼                                    │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ Output: Python code string (cached for performance)       │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+
+<pre><code class="language-python">class CodeLoader:
+    """Load Python code from various URI sources."""
+    
+    def load(self, uri: str) -> Optional[str]:
+        """
+        Resolve URI and return code string.
+        
+        Supported schemes:
+        - db://fragment_id  → Query code_fragments table
+        - file:///path      → Read from filesystem
+        - s3://bucket/key   → Fetch from AWS S3
+        - (inline code)     → Return as-is
+        """
+        scheme = urlparse(uri).scheme
+        
+        if scheme == 'db':
+            return self._load_from_db(fragment_id)
+        elif scheme == 'file':
+            return self._load_from_file(path)
+        elif scheme == 's3':
+            return self._load_from_s3(bucket, key)
+        else:
+            return uri  # Treat as inline code
+    
+    def resolve_uri(self, uri_or_code: str) -> str:
+        """Smart resolution: detect if URI or inline code."""
+        if uri_or_code.startswith(('db://', 'file://', 's3://')):
+            return self.load(uri_or_code)
+        return uri_or_code</code></pre>
+
+<hr class="my-5">
+
+<h2 id="llm-facade">LLM Facade Pattern</h2>
+<p>Unified interface for all LLM providers with automatic logging:</p>
+
+<pre><code class="language-python">class LLMFacade:
+    def complete(self, messages, provider, model, **kwargs):
+        """
+        1. Select provider client
+        2. Make API call
+        3. Log to llm_calls table:
+           - Provider, model
+           - Prompts, response
+           - Tokens (input/output)
+           - Cost estimate
+           - Latency
+        4. Return response
+        """
+        
+        start_time = time.time()
+        response = self._call_provider(provider, model, messages)
+        latency_ms = (time.time() - start_time) * 1000
+        
+        # Auto-log to database
+        self._log_call(
+            provider=provider,
+            model=model,
+            input_tokens=response.input_tokens,
+            output_tokens=response.output_tokens,
+            cost=self._estimate_cost(provider, model, tokens),
+            latency_ms=latency_ms
+        )
+        
+        return response</code></pre>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('about') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to About
+    </a>
+</div>
+{% endblock %}

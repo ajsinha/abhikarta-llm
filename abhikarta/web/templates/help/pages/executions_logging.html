@@ -1,0 +1,140 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Executions & LLM Logging" %}
+{% set description = "Track executions, view traces, and monitor LLM usage" %}
+{% set icon = "bi-database-check" %}
+{% set header_color = "#212529" %}
+{% set header_color_dark = "#000000" %}
+
+{% block help_nav %}
+<a href="#execution-tracking">Execution Tracking</a>
+<a href="#execution-steps">Execution Steps</a>
+<a href="#llm-logging">LLM Call Logging</a>
+<a href="#viewing-ui">Viewing in UI</a>
+<a href="#api-endpoints">API Endpoints</a>
+<a href="#queries">Database Queries</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="execution-tracking">Execution Tracking</h2>
+<div class="alert alert-success">
+    <i class="bi bi-check-circle me-2"></i>
+    <strong>Every LLM call is automatically logged</strong> to the database, including prompts, responses, tokens, costs, and latency.
+</div>
+
+<p>Each execution records:</p>
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <ul>
+            <li>Execution ID (unique identifier)</li>
+            <li>Agent/Workflow ID</li>
+            <li>User who triggered it</li>
+            <li>Input data (JSON)</li>
+            <li>Output data (JSON)</li>
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <ul>
+            <li>Status (pending, running, completed, failed)</li>
+            <li>Start and end timestamps</li>
+            <li>Duration in milliseconds</li>
+            <li>Total tokens used</li>
+            <li>Estimated cost</li>
+        </ul>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="execution-steps">Execution Steps</h2>
+<p>For workflow executions, each node's execution is tracked:</p>
+<pre><code class="language-json">{
+  "step_number": 1,
+  "node_id": "validate",
+  "node_type": "python",
+  "status": "completed",
+  "input_data": {},
+  "output_data": {"validated": true},
+  "started_at": "2025-01-15T10:30:00Z",
+  "completed_at": "2025-01-15T10:30:01Z",
+  "duration_ms": 150
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="llm-logging">LLM Call Logging</h2>
+<p>The <code>llm_calls</code> table captures every LLM interaction:</p>
+<div class="table-responsive">
+    <table class="table table-sm table-hover">
+        <thead class="table-light">
+            <tr><th>Field</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>call_id</code></td><td>Unique identifier</td></tr>
+            <tr><td><code>execution_id</code></td><td>Link to parent execution</td></tr>
+            <tr><td><code>provider</code></td><td>openai, anthropic, google, etc.</td></tr>
+            <tr><td><code>model</code></td><td>gpt-4o, claude-3-5-sonnet, etc.</td></tr>
+            <tr><td><code>system_prompt</code></td><td>System message content</td></tr>
+            <tr><td><code>user_prompt</code></td><td>User message content</td></tr>
+            <tr><td><code>response_content</code></td><td>LLM response text</td></tr>
+            <tr><td><code>input_tokens</code></td><td>Prompt token count</td></tr>
+            <tr><td><code>output_tokens</code></td><td>Completion token count</td></tr>
+            <tr><td><code>cost_estimate</code></td><td>Estimated cost in USD</td></tr>
+            <tr><td><code>latency_ms</code></td><td>Response time</td></tr>
+            <tr><td><code>status</code></td><td>success or failed</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="viewing-ui">Viewing Executions (Web UI)</h2>
+<ol>
+    <li>Go to <strong>Executions</strong> in the sidebar</li>
+    <li>View list with status, duration, tokens</li>
+    <li>Click on an execution to see details</li>
+    <li>Click "View Trace" to see step-by-step breakdown</li>
+    <li>Click "Retry" to re-run failed executions</li>
+</ol>
+
+<hr class="my-5">
+
+<h2 id="api-endpoints">API Endpoints</h2>
+<pre><code class="language-bash"># List executions
+GET /api/executions
+
+# Get execution details
+GET /api/executions/{execution_id}
+
+# Get execution trace (steps)
+GET /api/executions/{execution_id}/trace
+
+# Retry failed execution
+POST /api/executions/{execution_id}/retry
+
+# List LLM calls
+GET /api/llm/calls?limit=100
+
+# Get LLM usage statistics
+GET /api/llm/usage?days=30</code></pre>
+
+<hr class="my-5">
+
+<h2 id="queries">Database Queries</h2>
+<pre><code class="language-sql">-- Get LLM usage by provider
+SELECT provider, model,
+       COUNT(*) as calls,
+       SUM(total_tokens) as tokens,
+       SUM(cost_estimate) as cost
+FROM llm_calls
+WHERE created_at > datetime('now', '-30 days')
+GROUP BY provider, model
+ORDER BY calls DESC;
+
+-- Get execution success rate
+SELECT status,
+       COUNT(*) as count,
+       AVG(duration_ms) as avg_duration
+FROM executions
+GROUP BY status;</code></pre>
+{% endblock %}

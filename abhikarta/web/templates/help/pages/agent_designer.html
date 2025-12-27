@@ -1,0 +1,264 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Visual Agent Designer" %}
+{% set description = "Build AI agents with drag-and-drop workflow design" %}
+{% set icon = "bi-diagram-3" %}
+{% set header_color = "#6f42c1" %}
+{% set header_color_dark = "#5a32a3" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#interface">Interface</a>
+<a href="#node-types">Node Types</a>
+<a href="#connections">Connections</a>
+<a href="#properties">Properties</a>
+<a href="#testing">Testing</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Visual Designer Overview</h2>
+<p class="lead">The Visual Agent Designer provides a drag-and-drop interface for building AI agent workflows without writing code.</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-primary">
+            <div class="card-body text-center">
+                <i class="bi bi-mouse display-4 text-primary"></i>
+                <h5 class="mt-3">Drag & Drop</h5>
+                <p class="small text-muted">Drag nodes from palette onto canvas to build workflows</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-success">
+            <div class="card-body text-center">
+                <i class="bi bi-link-45deg display-4 text-success"></i>
+                <h5 class="mt-3">Visual Connections</h5>
+                <p class="small text-muted">Connect nodes by dragging from output to input ports</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-warning">
+            <div class="card-body text-center">
+                <i class="bi bi-play-circle display-4 text-warning"></i>
+                <h5 class="mt-3">Test & Validate</h5>
+                <p class="small text-muted">Test your workflow directly from the designer</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="interface">Designer Interface</h2>
+
+<h5>Layout</h5>
+<div class="row mb-4">
+    <div class="col-md-8">
+        <table class="table table-bordered">
+            <tr>
+                <td style="width: 150px;"><strong>Node Palette</strong></td>
+                <td>Left sidebar with draggable node types organized by category</td>
+            </tr>
+            <tr>
+                <td><strong>Canvas</strong></td>
+                <td>Main area where you build workflows by placing and connecting nodes</td>
+            </tr>
+            <tr>
+                <td><strong>Properties Panel</strong></td>
+                <td>Right sidebar showing properties of the selected node</td>
+            </tr>
+            <tr>
+                <td><strong>Header Bar</strong></td>
+                <td>Agent name, type, LLM configuration, and action buttons</td>
+            </tr>
+            <tr>
+                <td><strong>Minimap</strong></td>
+                <td>Bottom-left thumbnail view for navigation in large workflows</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<h5>Toolbar Actions</h5>
+<ul>
+    <li><i class="bi bi-zoom-in me-1"></i><strong>Zoom In/Out</strong> - Adjust canvas zoom level</li>
+    <li><i class="bi bi-grid-3x3 me-1"></i><strong>Auto Layout</strong> - Automatically arrange nodes</li>
+    <li><i class="bi bi-download me-1"></i><strong>Export</strong> - Save workflow as JSON file</li>
+    <li><i class="bi bi-upload me-1"></i><strong>Import</strong> - Load workflow from JSON file</li>
+    <li><i class="bi bi-trash me-1"></i><strong>Clear</strong> - Remove all nodes from canvas</li>
+    <li><i class="bi bi-check-circle me-1"></i><strong>Validate</strong> - Check workflow for errors</li>
+    <li><i class="bi bi-play me-1"></i><strong>Test</strong> - Run a test execution</li>
+    <li><i class="bi bi-save me-1"></i><strong>Save</strong> - Save agent to database</li>
+</ul>
+
+<hr class="my-5">
+
+<h2 id="node-types">Node Types</h2>
+
+<h5 class="mt-4">Input/Output</h5>
+<table class="table table-sm">
+    <tr>
+        <td style="width: 140px;"><span class="badge" style="background:#28a745;"><i class="bi bi-box-arrow-in-right me-1"></i>Input</span></td>
+        <td>Entry point - receives input data to start the workflow</td>
+    </tr>
+    <tr>
+        <td><span class="badge" style="background:#dc3545;"><i class="bi bi-box-arrow-right me-1"></i>Output</span></td>
+        <td>Exit point - returns the final result from the workflow</td>
+    </tr>
+</table>
+
+<h5 class="mt-4">Processing Nodes</h5>
+<table class="table table-sm">
+    <tr>
+        <td style="width: 140px;"><span class="badge" style="background:#6f42c1;"><i class="bi bi-robot me-1"></i>LLM Call</span></td>
+        <td>Make a call to an LLM (OpenAI, Anthropic, etc.) with prompts</td>
+    </tr>
+    <tr>
+        <td><span class="badge" style="background:#3776ab;"><i class="bi bi-code-slash me-1"></i>Python</span></td>
+        <td>Execute custom Python code or load from Code Fragments (db://, file://)</td>
+    </tr>
+    <tr>
+        <td><span class="badge" style="background:#fd7e14;"><i class="bi bi-tools me-1"></i>MCP Tool</span></td>
+        <td>Call an MCP plugin tool (web search, calculator, etc.)</td>
+    </tr>
+    <tr>
+        <td><span class="badge" style="background:#e83e8c;"><i class="bi bi-globe me-1"></i>HTTP Request</span></td>
+        <td>Make HTTP API calls (GET, POST, PUT, DELETE)</td>
+    </tr>
+    <tr>
+        <td><span class="badge" style="background:#20c997;"><i class="bi bi-arrow-left-right me-1"></i>Transform</span></td>
+        <td>Transform or map data between nodes</td>
+    </tr>
+</table>
+
+<h5 class="mt-4">Flow Control</h5>
+<table class="table table-sm">
+    <tr>
+        <td style="width: 140px;"><span class="badge" style="background:#17a2b8;"><i class="bi bi-diamond me-1"></i>Condition</span></td>
+        <td>Branch flow based on a Python expression</td>
+    </tr>
+    <tr>
+        <td><span class="badge" style="background:#6c757d;"><i class="bi bi-arrow-repeat me-1"></i>Loop</span></td>
+        <td>Repeat a section of the workflow</td>
+    </tr>
+    <tr>
+        <td><span class="badge" style="background:#0d6efd;"><i class="bi bi-arrows-expand me-1"></i>Parallel</span></td>
+        <td>Execute multiple branches concurrently</td>
+    </tr>
+</table>
+
+<h5 class="mt-4">Human-in-the-Loop</h5>
+<table class="table table-sm">
+    <tr>
+        <td style="width: 140px;"><span class="badge" style="background:#ffc107;color:#000;"><i class="bi bi-person-raised-hand me-1"></i>HITL</span></td>
+        <td>Pause for human review before continuing</td>
+    </tr>
+    <tr>
+        <td><span class="badge" style="background:#28a745;"><i class="bi bi-check2-square me-1"></i>Approval</span></td>
+        <td>Require human approval to proceed</td>
+    </tr>
+</table>
+
+<h5 class="mt-4">Data Nodes</h5>
+<table class="table table-sm">
+    <tr>
+        <td style="width: 140px;"><span class="badge" style="background:#6f42c1;"><i class="bi bi-memory me-1"></i>Memory</span></td>
+        <td>Store and retrieve conversation history</td>
+    </tr>
+    <tr>
+        <td><span class="badge" style="background:#17a2b8;"><i class="bi bi-search me-1"></i>Retrieval</span></td>
+        <td>RAG retrieval from vector databases</td>
+    </tr>
+</table>
+
+<hr class="my-5">
+
+<h2 id="connections">Creating Connections</h2>
+
+<ol>
+    <li><strong>Start Connection:</strong> Click and drag from the <span class="badge bg-primary">output port</span> (right side) of a node</li>
+    <li><strong>Draw Line:</strong> A dashed green line follows your cursor</li>
+    <li><strong>Complete Connection:</strong> Release on the <span class="badge bg-primary">input port</span> (left side) of the target node</li>
+    <li><strong>Delete Connection:</strong> Click on any connection line and confirm deletion</li>
+</ol>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Tip:</strong> Press <kbd>Escape</kbd> to cancel a connection in progress.
+</div>
+
+<h5>Connection Rules</h5>
+<ul>
+    <li>Connections flow left-to-right (output → input)</li>
+    <li>Input nodes have no input port</li>
+    <li>Output nodes have no output port</li>
+    <li>Multiple outputs can connect to the same input</li>
+    <li>Self-connections are not allowed</li>
+</ul>
+
+<hr class="my-5">
+
+<h2 id="properties">Node Properties</h2>
+
+<h5>LLM Node Configuration</h5>
+<pre><code class="language-json">{
+  "provider": "openai",
+  "model": "gpt-4o",
+  "temperature": 0.7,
+  "max_tokens": 1000,
+  "system_prompt": "You are a helpful assistant.",
+  "prompt": "Process the following: {input_data}"
+}</code></pre>
+
+<h5>Python Node Configuration</h5>
+<pre><code class="language-json">{
+  "uri": "db://my_function",
+  "code": "# Inline code (used if uri is empty)\nresult = process(input_data)\noutput = result"
+}</code></pre>
+
+<h5>HTTP Node Configuration</h5>
+<pre><code class="language-json">{
+  "method": "POST",
+  "url": "https://api.example.com/endpoint",
+  "headers": {"Authorization": "Bearer {token}"},
+  "body": "{input_data}"
+}</code></pre>
+
+<h5>Condition Node Configuration</h5>
+<pre><code class="language-json">{
+  "expression": "input_data.get('confidence', 0) > 0.8"
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="testing">Testing Your Workflow</h2>
+
+<ol>
+    <li>Click the <button class="btn btn-warning btn-sm"><i class="bi bi-play"></i></button> Test button</li>
+    <li>Enter test input data (JSON format)</li>
+    <li>Click <strong>Run</strong> to execute</li>
+    <li>View execution results and any errors</li>
+</ol>
+
+<h5>Validation Checks</h5>
+<ul>
+    <li>At least one Input node is required</li>
+    <li>At least one Output node is required</li>
+    <li>All processing nodes should be connected</li>
+    <li>No circular dependencies (infinite loops)</li>
+</ul>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('new_agent_designer') }}" class="btn btn-primary me-2">
+        <i class="bi bi-plus-circle me-2"></i>Create New Agent
+    </a>
+    <a href="{{ url_for('admin_agents') }}" class="btn btn-outline-primary me-2">
+        <i class="bi bi-robot me-2"></i>View All Agents
+    </a>
+    <a href="{{ url_for('help') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Help
+    </a>
+</div>
+{% endblock %}

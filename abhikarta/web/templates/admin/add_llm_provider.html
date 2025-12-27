@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Add LLM Provider - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_llm_providers') }}">LLM Providers</a></li>
+                    <li class="breadcrumb-item active">Add New</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header bg-bmo-blue text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Add LLM Provider</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="provider_id" class="form-label">Provider ID <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="provider_id" name="provider_id" required
+                                           pattern="[a-z0-9-]+" placeholder="e.g., openai, anthropic, my-custom">
+                                    <div class="form-text">Lowercase letters, numbers, hyphens only</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Display Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" required
+                                           placeholder="e.g., OpenAI, Anthropic">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2"
+                                      placeholder="Brief description of this provider"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="provider_type" class="form-label">Provider Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="provider_type" name="provider_type" required>
+                                        <option value="">Select Type...</option>
+                                        <option value="openai">OpenAI</option>
+                                        <option value="anthropic">Anthropic</option>
+                                        <option value="google">Google AI</option>
+                                        <option value="azure">Azure OpenAI</option>
+                                        <option value="mistral">Mistral AI</option>
+                                        <option value="groq">Groq</option>
+                                        <option value="together">Together AI</option>
+                                        <option value="cohere">Cohere</option>
+                                        <option value="bedrock">AWS Bedrock</option>
+                                        <option value="ollama">Ollama</option>
+                                        <option value="huggingface">Hugging Face</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="api_key_name" class="form-label">API Key Environment Variable</label>
+                                    <input type="text" class="form-control" id="api_key_name" name="api_key_name"
+                                           placeholder="e.g., OPENAI_API_KEY">
+                                    <div class="form-text">Name of environment variable containing API key</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="api_endpoint" class="form-label">API Endpoint URL</label>
+                            <input type="url" class="form-control" id="api_endpoint" name="api_endpoint"
+                                   placeholder="https://api.example.com/v1">
+                            <div class="form-text">Optional: Override default endpoint</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="rate_limit_rpm" class="form-label">Rate Limit (Requests/Min)</label>
+                                    <input type="number" class="form-control" id="rate_limit_rpm" name="rate_limit_rpm"
+                                           value="60" min="1">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="rate_limit_tpm" class="form-label">Rate Limit (Tokens/Min)</label>
+                                    <input type="number" class="form-control" id="rate_limit_tpm" name="rate_limit_tpm"
+                                           value="100000" min="1000">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+                                <label class="form-check-label" for="is_active">Active</label>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Create Provider
+                            </button>
+                            <a href="{{ url_for('admin_llm_providers') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

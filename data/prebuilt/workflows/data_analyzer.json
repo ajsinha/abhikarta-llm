@@ -1,0 +1,73 @@
+{
+  "workflow_id": "prebuilt-data-analyzer",
+  "name": "Data Analysis Pipeline",
+  "description": "Analyze CSV data with AI-powered insights. Upload a CSV file and get statistical analysis, patterns, and recommendations.",
+  "version": "1.0.0",
+  "category": "analytics",
+  "tags": ["data", "csv", "analysis", "statistics"],
+  "is_prebuilt": true,
+  
+  "python_modules": {
+    "data_utils": "import json\n\ndef parse_csv_text(csv_text):\n    \"\"\"Parse CSV text into list of dicts.\"\"\"\n    lines = csv_text.strip().split('\\n')\n    if not lines:\n        return []\n    headers = [h.strip() for h in lines[0].split(',')]\n    data = []\n    for line in lines[1:]:\n        values = [v.strip() for v in line.split(',')]\n        if len(values) == len(headers):\n            data.append(dict(zip(headers, values)))\n    return data\n\ndef get_basic_stats(data, column):\n    \"\"\"Get basic statistics for a numeric column.\"\"\"\n    values = []\n    for row in data:\n        try:\n            values.append(float(row.get(column, 0)))\n        except:\n            pass\n    if not values:\n        return None\n    return {\n        'count': len(values),\n        'sum': sum(values),\n        'mean': sum(values) / len(values),\n        'min': min(values),\n        'max': max(values)\n    }",
+    
+    "report_utils": "def format_analysis(stats, insights):\n    \"\"\"Format analysis results.\"\"\"\n    return {\n        'statistics': stats,\n        'ai_insights': insights,\n        'generated_at': __import__('datetime').datetime.now().isoformat()\n    }"
+  },
+  
+  "nodes": {
+    "input": {
+      "type": "input",
+      "name": "CSV Input",
+      "config": {
+        "schema": {
+          "type": "object",
+          "required": ["csv_data"],
+          "properties": {
+            "csv_data": {"type": "string", "description": "CSV data as text"},
+            "analysis_focus": {"type": "string", "description": "What to focus analysis on"}
+          }
+        }
+      }
+    },
+    
+    "parse_data": {
+      "type": "python",
+      "name": "Parse CSV Data",
+      "dependencies": ["input"],
+      "code": "from data_utils import parse_csv_text\n\ndata = parse_csv_text(input_data.get('csv_data', ''))\ncolumns = list(data[0].keys()) if data else []\n\noutput = {\n    'records': data,\n    'columns': columns,\n    'row_count': len(data)\n}"
+    },
+    
+    "calculate_stats": {
+      "type": "python",
+      "name": "Calculate Statistics",
+      "dependencies": ["parse_data"],
+      "code": "from data_utils import get_basic_stats\n\ndata = input_data['records']\ncolumns = input_data['columns']\n\nstats = {}\nfor col in columns:\n    col_stats = get_basic_stats(data, col)\n    if col_stats:\n        stats[col] = col_stats\n\noutput = {\n    'statistics': stats,\n    'numeric_columns': list(stats.keys()),\n    'total_records': input_data['row_count']\n}"
+    },
+    
+    "ai_analysis": {
+      "type": "llm",
+      "name": "AI-Powered Analysis",
+      "dependencies": ["calculate_stats", "parse_data"],
+      "config": {
+        "provider": "openai",
+        "model": "gpt-4o-mini",
+        "temperature": 0.3,
+        "max_tokens": 1500,
+        "system_prompt": "You are a data analyst. Analyze the provided data and statistics. Provide:\n1. Key patterns and trends\n2. Anomalies or outliers\n3. Actionable recommendations\n\nBe specific and reference actual numbers.",
+        "prompt": "Data Summary:\n- Total Records: {context.calculate_stats.total_records}\n- Columns: {context.parse_data.columns}\n\nStatistics:\n{context.calculate_stats.statistics}\n\nFirst 5 records:\n{context.parse_data.records[:5]}\n\nFocus area: {context.input.analysis_focus}\n\nProvide your analysis:"
+      }
+    },
+    
+    "format_output": {
+      "type": "python",
+      "name": "Format Report",
+      "dependencies": ["calculate_stats", "ai_analysis"],
+      "code": "from report_utils import format_analysis\n\noutput = format_analysis(\n    context['calculate_stats']['statistics'],\n    input_data\n)"
+    },
+    
+    "output": {
+      "type": "output",
+      "name": "Analysis Report",
+      "dependencies": ["format_output"]
+    }
+  }
+}

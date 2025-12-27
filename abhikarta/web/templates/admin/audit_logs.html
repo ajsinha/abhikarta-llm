@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Logs - Abhikarta LLM{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-journal-text me-2"></i>Audit Logs</h2>
+            <p class="text-muted mb-0">View system activity and audit trail</p>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary" onclick="exportLogs()">
+                <i class="bi bi-download me-1"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Action Type</label>
+                    <select class="form-select" name="action">
+                        <option value="">All Actions</option>
+                        <option value="login">Login</option>
+                        <option value="logout">Logout</option>
+                        <option value="create_user">Create User</option>
+                        <option value="update_user">Update User</option>
+                        <option value="delete_user">Delete User</option>
+                        <option value="create_agent">Create Agent</option>
+                        <option value="update_agent">Update Agent</option>
+                        <option value="delete_agent">Delete Agent</option>
+                        <option value="execute_agent">Execute Agent</option>
+                        <option value="change_status">Change Status</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">User</label>
+                    <input type="text" class="form-control" name="user_id" placeholder="User ID">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">From Date</label>
+                    <input type="date" class="form-control" name="from_date">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">To Date</label>
+                    <input type="date" class="form-control" name="to_date">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search me-1"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Logs Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Activity Log</h5>
+            <span class="badge bg-primary">{{ total_count }} total entries</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Resource</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if logs %}
+                            {% for log in logs %}
+                            <tr>
+                                <td>
+                                    <small>{{ log.created_at or log.timestamp or 'N/A' }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ log.user_id or 'system' }}</span>
+                                </td>
+                                <td>
+                                    {% set action = log.action|lower %}
+                                    {% if 'login' in action %}
+                                        <span class="badge bg-success">{{ log.action }}</span>
+                                    {% elif 'logout' in action %}
+                                        <span class="badge bg-info">{{ log.action }}</span>
+                                    {% elif 'create' in action %}
+                                        <span class="badge bg-primary">{{ log.action }}</span>
+                                    {% elif 'update' in action %}
+                                        <span class="badge bg-warning text-dark">{{ log.action }}</span>
+                                    {% elif 'delete' in action %}
+                                        <span class="badge bg-danger">{{ log.action }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ log.action }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.resource_type %}
+                                        <code>{{ log.resource_type }}/{{ log.resource_id or '*' }}</code>
+                                    {% elif log.entity_type %}
+                                        <code>{{ log.entity_type }}/{{ log.entity_id or '*' }}</code>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if log.details %}
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="showDetails('{{ log.details|e }}')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ log.ip_address or log.user_ip or '-' }}</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="bi bi-journal-text display-4 text-muted"></i>
+                                    <p class="text-muted mt-2">No audit logs found</p>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        {% if total_pages > 1 %}
+        <div class="card-footer">
+            <nav>
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    {% if page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page - 1 }}">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for p in range(1, total_pages + 1) %}
+                        {% if p == page %}
+                            <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                        {% elif p <= 3 or p > total_pages - 3 or (p >= page - 2 and p <= page + 2) %}
+                            <li class="page-item"><a class="page-link" href="?page={{ p }}">{{ p }}</a></li>
+                        {% elif p == 4 or p == total_pages - 3 %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page < total_pages %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page + 1 }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Log Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="detailsContent" class="bg-light p-3 rounded" style="max-height: 400px; overflow: auto;"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showDetails(details) {
+    try {
+        const parsed = JSON.parse(details);
+        document.getElementById('detailsContent').textContent = JSON.stringify(parsed, null, 2);
+    } catch {
+        document.getElementById('detailsContent').textContent = details;
+    }
+    new bootstrap.Modal(document.getElementById('detailsModal')).show();
+}
+
+function exportLogs() {
+    window.location.href = '/admin/audit-logs/export';
+}
+</script>
+{% endblock %}

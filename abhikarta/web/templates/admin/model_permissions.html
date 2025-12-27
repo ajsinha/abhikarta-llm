@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Permissions: {{ model.display_name or model.name }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_llm_models') }}">LLM Models</a></li>
+                    <li class="breadcrumb-item active">Permissions: {{ model.display_name or model.name }}</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Model Access Permissions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Configure which roles can use <strong>{{ model.display_name or model.name }}</strong> 
+                        (<code>{{ model.model_id }}</code>) and set usage limits.
+                        <br>
+                        <small>A limit of <code>-1</code> means unlimited.</small>
+                    </div>
+                    
+                    <form method="POST">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Role</th>
+                                        <th class="text-center">Can Use</th>
+                                        <th>Daily Limit</th>
+                                        <th>Monthly Limit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for role in roles %}
+                                    {% set perm = perm_dict.get(role.role_name, {}) %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ role.display_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ role.role_name }}</small>
+                                            {% if role.description %}
+                                            <br>
+                                            <small class="text-muted">{{ role.description[:50] }}...</small>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="form-check form-switch d-flex justify-content-center">
+                                                <input class="form-check-input" type="checkbox" 
+                                                       id="can_use_{{ role.role_name }}" 
+                                                       name="can_use_{{ role.role_name }}"
+                                                       {% if perm.get('can_use', 0) or role.role_name == 'super_admin' %}checked{% endif %}
+                                                       {% if role.role_name == 'super_admin' %}disabled{% endif %}>
+                                                {% if role.role_name == 'super_admin' %}
+                                                <input type="hidden" name="can_use_{{ role.role_name }}" value="1">
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm" 
+                                                   name="daily_limit_{{ role.role_name }}"
+                                                   value="{{ perm.get('daily_limit', -1) }}"
+                                                   min="-1" style="width: 100px;">
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm" 
+                                                   name="monthly_limit_{{ role.role_name }}"
+                                                   value="{{ perm.get('monthly_limit', -1) }}"
+                                                   min="-1" style="width: 100px;">
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-check-lg me-2"></i>Save Permissions
+                            </button>
+                            <a href="{{ url_for('admin_llm_models') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb me-2"></i>Permission Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Role Hierarchy</h6>
+                            <ul class="list-unstyled">
+                                <li><span class="badge bg-danger">super_admin</span> - Always has access</li>
+                                <li><span class="badge bg-warning text-dark">domain_admin</span> - Typically unlimited</li>
+                                <li><span class="badge bg-primary">agent_developer</span> - For development/testing</li>
+                                <li><span class="badge bg-success">agent_user</span> - End users with limits</li>
+                                <li><span class="badge bg-secondary">viewer</span> - Read-only, limited access</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Recommended Limits</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td>Premium Models (GPT-4, Claude Opus)</td>
+                                    <td>50/day, 1000/month</td>
+                                </tr>
+                                <tr>
+                                    <td>Standard Models (GPT-4o-mini, Sonnet)</td>
+                                    <td>200/day, 5000/month</td>
+                                </tr>
+                                <tr>
+                                    <td>Budget Models (GPT-3.5, Haiku)</td>
+                                    <td>Unlimited (-1)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

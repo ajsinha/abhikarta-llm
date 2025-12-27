@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Agent Management - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">
+                <i class="bi bi-robot me-2"></i>Agent Management
+            </h4>
+            <p class="text-muted mb-0">Create, configure, and manage AI agents</p>
+        </div>
+        <div class="btn-group">
+            <a href="{{ url_for('agent_templates') }}" class="btn btn-outline-primary">
+                <i class="bi bi-collection me-1"></i> Templates
+            </a>
+            <a href="{{ url_for('new_agent_designer') }}" class="btn btn-outline-success">
+                <i class="bi bi-diagram-3 me-1"></i> Visual Designer
+            </a>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAgentModal">
+                <i class="bi bi-plus-circle me-1"></i> Create Agent
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50">Total Agents</h6>
+                            <h3 class="mb-0">{{ stats.total }}</h3>
+                        </div>
+                        <i class="bi bi-robot display-6 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50">Published</h6>
+                            <h3 class="mb-0">{{ stats.published }}</h3>
+                        </div>
+                        <i class="bi bi-check-circle display-6 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="opacity-75">In Development</h6>
+                            <h3 class="mb-0">{{ stats.draft }}</h3>
+                        </div>
+                        <i class="bi bi-pencil display-6 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50">Executions Today</h6>
+                            <h3 class="mb-0">{{ stats.executions_today|default(0) }}</h3>
+                        </div>
+                        <i class="bi bi-play-circle display-6 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="agent-search" placeholder="Search agents...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="status-filter">
+                        <option value="">All Status</option>
+                        <option value="draft">Draft</option>
+                        <option value="testing">Testing</option>
+                        <option value="pending_review">Pending Review</option>
+                        <option value="approved">Approved</option>
+                        <option value="published">Published</option>
+                        <option value="deprecated">Deprecated</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="type-filter">
+                        <option value="">All Types</option>
+                        {% for type in agent_types %}
+                        <option value="{{ type.value }}">{{ type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="sort-filter">
+                        <option value="updated_desc">Recently Updated</option>
+                        <option value="created_desc">Recently Created</option>
+                        <option value="name_asc">Name A-Z</option>
+                        <option value="name_desc">Name Z-A</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                        <i class="bi bi-x-circle me-1"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agents Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="agents-table">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Created By</th>
+                            <th>Last Updated</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for agent in agents %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-robot text-white"></i>
+                                    </div>
+                                    <div>
+                                        <strong>{{ agent.name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ agent.agent_id }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ agent.agent_type }}</span>
+                            </td>
+                            <td>
+                                {% set status_colors = {
+                                    'draft': 'secondary',
+                                    'testing': 'warning',
+                                    'pending_review': 'info',
+                                    'approved': 'primary',
+                                    'published': 'success',
+                                    'deprecated': 'danger',
+                                    'archived': 'dark'
+                                } %}
+                                <span class="badge bg-{{ status_colors.get(agent.status, 'secondary') }}">
+                                    {{ agent.status|replace('_', ' ')|title }}
+                                </span>
+                            </td>
+                            <td>{{ agent.created_by }}</td>
+                            <td>{{ agent.updated_at|datetime('%Y-%m-%d %H:%M') }}</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('agent_designer', agent_id=agent.agent_id) }}" 
+                                       class="btn btn-outline-primary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button class="btn btn-outline-success" 
+                                            onclick="testAgent('{{ agent.agent_id }}')" title="Test">
+                                        <i class="bi bi-play"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info" 
+                                            onclick="viewAgent('{{ agent.agent_id }}')" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" 
+                                            onclick="deleteAgent('{{ agent.agent_id }}', '{{ agent.name }}')" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="bi bi-inbox display-4 text-muted"></i>
+                                <p class="mt-3 text-muted">No agents found. Create your first agent to get started!</p>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAgentModal">
+                                    <i class="bi bi-plus-circle me-1"></i> Create Agent
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Agent Modal -->
+<div class="modal fade" id="createAgentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Create New Agent</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="create-agent-form" method="POST" action="{{ url_for('create_agent') }}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label">Agent Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" required
+                                       placeholder="Enter agent name">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Agent Type <span class="text-danger">*</span></label>
+                                <select class="form-select" name="agent_type" required>
+                                    {% for type in agent_types %}
+                                    <option value="{{ type.value }}">{{ type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"
+                                  placeholder="Describe what this agent does"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">LLM Provider</label>
+                                <select class="form-select" name="llm_provider">
+                                    <option value="openai">OpenAI</option>
+                                    <option value="anthropic">Anthropic</option>
+                                    <option value="ollama">Ollama (Local)</option>
+                                    <option value="bedrock">AWS Bedrock</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Model</label>
+                                <input type="text" class="form-control" name="model" 
+                                       placeholder="e.g., gpt-4o" value="gpt-4o">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        After creation, you can configure the agent workflow in the Visual Designer.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="{{ url_for('new_agent_designer') }}" class="btn btn-outline-success">
+                        <i class="bi bi-diagram-3 me-1"></i> Use Visual Designer
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Create Agent
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Search filter
+    $('#agent-search').on('input', filterAgents);
+    $('#status-filter, #type-filter').change(filterAgents);
+});
+
+function filterAgents() {
+    const search = $('#agent-search').val().toLowerCase();
+    const status = $('#status-filter').val();
+    const type = $('#type-filter').val();
+    
+    $('#agents-table tbody tr').each(function() {
+        const $row = $(this);
+        if ($row.find('td').length < 6) return; // Skip empty row
+        
+        const name = $row.find('td:first').text().toLowerCase();
+        const rowStatus = $row.find('td:eq(2) .badge').text().toLowerCase().replace(' ', '_');
+        const rowType = $row.find('td:eq(1) .badge').text().toLowerCase();
+        
+        let visible = true;
+        if (search && !name.includes(search)) visible = false;
+        if (status && rowStatus !== status) visible = false;
+        if (type && rowType !== type) visible = false;
+        
+        $row.toggle(visible);
+    });
+}
+
+function resetFilters() {
+    $('#agent-search').val('');
+    $('#status-filter').val('');
+    $('#type-filter').val('');
+    filterAgents();
+}
+
+function testAgent(agentId) {
+    window.location.href = `/agents/${agentId}/test`;
+}
+
+function viewAgent(agentId) {
+    window.location.href = `/agents/${agentId}`;
+}
+
+function deleteAgent(agentId, agentName) {
+    if (!confirm(`Are you sure you want to delete "${agentName}"? This action cannot be undone.`)) {
+        return;
+    }
+    
+    $.ajax({
+        url: `/api/agents/${agentId}`,
+        method: 'DELETE',
+        success: function() {
+            showToast('Agent deleted successfully', 'success');
+            location.reload();
+        },
+        error: function(xhr) {
+            showToast('Error deleting agent: ' + xhr.responseJSON?.error, 'error');
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}MCP Plugins - Abhikarta LLM{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-plug me-2"></i>MCP Plugins</h2>
+            <p class="text-muted mb-0">Manage Model Context Protocol plugins and integrations</p>
+        </div>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPluginModal">
+                <i class="bi bi-plus-lg me-1"></i>Add Plugin
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50">Total Plugins</h6>
+                            <h3 class="mb-0">{{ plugins|length }}</h3>
+                        </div>
+                        <i class="bi bi-plug display-6 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50">Active</h6>
+                            <h3 class="mb-0">{{ plugins|selectattr('status', 'equalto', 'active')|list|length if plugins else 0 }}</h3>
+                        </div>
+                        <i class="bi bi-check-circle display-6 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="opacity-75">Inactive</h6>
+                            <h3 class="mb-0">{{ plugins|selectattr('status', 'equalto', 'inactive')|list|length if plugins else 0 }}</h3>
+                        </div>
+                        <i class="bi bi-pause-circle display-6 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50">Tool Types</h6>
+                            <h3 class="mb-0">{{ plugins|map(attribute='plugin_type')|unique|list|length if plugins else 0 }}</h3>
+                        </div>
+                        <i class="bi bi-tools display-6 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plugins Table -->
+    <div class="card">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0">Installed Plugins</h5>
+                </div>
+                <div class="col-auto">
+                    <input type="text" class="form-control form-control-sm" placeholder="Search plugins..." id="searchPlugins">
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Plugin</th>
+                            <th>Type</th>
+                            <th>Server</th>
+                            <th>Status</th>
+                            <th>Health</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if plugins %}
+                            {% for plugin in plugins %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded p-2 me-3">
+                                            <i class="bi bi-plug text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ plugin.name }}</strong>
+                                            <br><small class="text-muted">{{ plugin.plugin_id }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-secondary">{{ plugin.plugin_type or 'tool' }}</span></td>
+                                <td>
+                                    {% if plugin.server_url %}
+                                        <code>{{ plugin.server_url }}</code>
+                                    {% else %}
+                                        <span class="text-muted">Not configured</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if plugin.status == 'active' %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if plugin.health_status == 'healthy' %}
+                                        <span class="text-success"><i class="bi bi-heart-pulse-fill"></i> Healthy</span>
+                                    {% elif plugin.health_status == 'unhealthy' %}
+                                        <span class="text-danger"><i class="bi bi-heart-pulse-fill"></i> Unhealthy</span>
+                                    {% else %}
+                                        <span class="text-muted"><i class="bi bi-question-circle"></i> Unknown</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" title="Configure" onclick="configurePlugin('{{ plugin.plugin_id }}')">
+                                            <i class="bi bi-gear"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info" title="Test" onclick="testPlugin('{{ plugin.plugin_id }}')">
+                                            <i class="bi bi-play"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" title="Delete" onclick="deletePlugin('{{ plugin.plugin_id }}')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="bi bi-plug display-4 text-muted"></i>
+                                    <p class="text-muted mt-2">No plugins installed yet</p>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPluginModal">
+                                        <i class="bi bi-plus-lg me-1"></i>Add Your First Plugin
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Plugin Modal -->
+<div class="modal fade" id="addPluginModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-lg me-2"></i>Add MCP Plugin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('add_mcp_plugin') }}" method="POST">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Plugin ID</label>
+                            <input type="text" class="form-control" name="plugin_id" required placeholder="my-plugin">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Plugin Name</label>
+                            <input type="text" class="form-control" name="name" required placeholder="My Plugin">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="2" placeholder="Plugin description..."></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Plugin Type</label>
+                            <select class="form-select" name="plugin_type">
+                                <option value="tool">Tool</option>
+                                <option value="resource">Resource</option>
+                                <option value="prompt">Prompt</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Server Type</label>
+                            <select class="form-select" name="server_type">
+                                <option value="stdio">Standard I/O</option>
+                                <option value="http">HTTP/SSE</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Server URL / Command</label>
+                            <input type="text" class="form-control" name="server_url" placeholder="http://localhost:8080 or npx @modelcontextprotocol/server-filesystem">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Plugin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function configurePlugin(pluginId) {
+    window.location.href = `/admin/mcp/plugins/${pluginId}/configure`;
+}
+
+function testPlugin(pluginId) {
+    fetch(`/api/mcp/plugins/${pluginId}/test`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Plugin test successful!');
+            } else {
+                alert('Plugin test failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(err => alert('Error testing plugin: ' + err));
+}
+
+function deletePlugin(pluginId) {
+    if (confirm('Are you sure you want to delete this plugin?')) {
+        fetch(`/api/mcp/plugins/${pluginId}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to delete plugin'));
+                }
+            })
+            .catch(err => alert('Error: ' + err));
+    }
+}
+
+// Search functionality
+document.getElementById('searchPlugins').addEventListener('input', function(e) {
+    const search = e.target.value.toLowerCase();
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(search) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

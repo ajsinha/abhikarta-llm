@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-bmo-blue text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-gear me-2"></i>Edit User: {{ user.username }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fullname" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullname" name="fullname" value="{{ user.fullname }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="roles" class="form-label">Roles</label>
+                            <select class="form-select" id="roles" name="roles" multiple>
+                                <option value="super_admin" {% if 'super_admin' in user.roles %}selected{% endif %}>Super Admin</option>
+                                <option value="domain_admin" {% if 'domain_admin' in user.roles %}selected{% endif %}>Domain Admin</option>
+                                <option value="agent_developer" {% if 'agent_developer' in user.roles %}selected{% endif %}>Agent Developer</option>
+                                <option value="agent_publisher" {% if 'agent_publisher' in user.roles %}selected{% endif %}>Agent Publisher</option>
+                                <option value="hitl_reviewer" {% if 'hitl_reviewer' in user.roles %}selected{% endif %}>HITL Reviewer</option>
+                                <option value="agent_user" {% if 'agent_user' in user.roles %}selected{% endif %}>Agent User</option>
+                                <option value="viewer" {% if 'viewer' in user.roles %}selected{% endif %}>Viewer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if user.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">Active</label>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-2"></i>Save Changes</button>
+                            <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

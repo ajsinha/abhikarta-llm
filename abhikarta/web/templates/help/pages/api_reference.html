@@ -1,0 +1,142 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "API Reference" %}
+{% set description = "REST API endpoints for programmatic access" %}
+{% set icon = "bi-code-slash" %}
+{% set header_color = "#6f42c1" %}
+{% set header_color_dark = "#59359a" %}
+
+{% block help_nav %}
+<a href="#authentication">Authentication</a>
+<a href="#agents-api">Agents API</a>
+<a href="#workflows-api">Workflows API</a>
+<a href="#executions-api">Executions API</a>
+<a href="#llm-api">LLM API</a>
+<a href="#users-api">Users API</a>
+<a href="#response-format">Response Format</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="authentication">Authentication</h2>
+<pre><code class="language-bash"># Login to get session
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+# Use session cookie or API key in subsequent requests
+Cookie: session=xxx
+# OR
+Authorization: Bearer API_KEY</code></pre>
+
+<hr class="my-5">
+
+<h2 id="agents-api">Agents API</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/agents</code></td><td>List all agents</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/agents</code></td><td>Create new agent</td></tr>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/agents/{id}</code></td><td>Get agent details</td></tr>
+            <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/agents/{id}</code></td><td>Update agent</td></tr>
+            <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/agents/{id}</code></td><td>Delete agent</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/agents/{id}/execute</code></td><td>Execute agent</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="workflows-api">Workflows API</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/workflows</code></td><td>List all workflows</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/workflows</code></td><td>Create workflow</td></tr>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/workflows/{id}</code></td><td>Get workflow details</td></tr>
+            <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/workflows/{id}</code></td><td>Delete workflow</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/workflows/{id}/execute</code></td><td>Execute workflow</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/workflows/{id}/validate</code></td><td>Validate DAG</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="executions-api">Executions API</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/executions</code></td><td>List executions</td></tr>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/executions/{id}</code></td><td>Get details</td></tr>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/executions/{id}/trace</code></td><td>Get steps</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/executions/{id}/retry</code></td><td>Retry failed</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="llm-api">LLM API</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/llm/calls</code></td><td>List LLM calls</td></tr>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/llm/usage</code></td><td>Get usage stats</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="users-api">Users API (Admin)</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/users</code></td><td>List users</td></tr>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/users</code></td><td>Create user</td></tr>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/users/{id}</code></td><td>Get user</td></tr>
+            <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/users/{id}</code></td><td>Update user</td></tr>
+            <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/users/{id}</code></td><td>Delete user</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="response-format">Response Format</h2>
+<pre><code class="language-json">// Success
+{
+  "success": true,
+  "data": {},
+  "timestamp": "2025-01-15T10:30:00Z"
+}
+
+// Error
+{
+  "success": false,
+  "error": {
+    "code": "AUTH_001",
+    "message": "Authentication required"
+  },
+  "timestamp": "2025-01-15T10:30:00Z"
+}</code></pre>
+{% endblock %}

@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}Help & Documentation - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .help-hero {
+        background: linear-gradient(135deg, #0066b3 0%, #003d6b 100%);
+        color: white;
+        padding: 3rem 0;
+    }
+    .help-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    .help-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateY(-5px);
+        color: inherit;
+    }
+    .help-card .icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+    .help-card h5 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .help-card p {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+    .search-box {
+        position: relative;
+    }
+    .search-box input {
+        padding-left: 2.5rem;
+        border-radius: 25px;
+    }
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="help-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="bi bi-book me-3"></i>Documentation
+                </h1>
+                <p class="lead mb-0">
+                    Complete guide to building and managing AI agents with Abhikarta-LLM
+                </p>
+            </div>
+            <div class="col-lg-4">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control form-control-lg" id="helpSearch" 
+                           placeholder="Search documentation...">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Getting Started -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='getting-started') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon bg-primary text-white mx-auto">
+                        <i class="bi bi-rocket-takeoff"></i>
+                    </div>
+                    <h5>Getting Started</h5>
+                    <p>Installation, setup, and first steps with Abhikarta-LLM</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Agent Designer -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='agent-designer') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon bg-success text-white mx-auto">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <h5>Agent Designer</h5>
+                    <p>Create and configure AI agents with the visual designer</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Workflow DAGs -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='workflow-dags') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon bg-info text-white mx-auto">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <h5>Workflow DAG Execution</h5>
+                    <p>Build complex multi-step workflows with JSON + Python</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- LLM Providers -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='llm-providers') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon bg-warning text-dark mx-auto">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h5>LLM Providers</h5>
+                    <p>OpenAI, Anthropic, Google, Mistral, Hugging Face & more</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- LLM Management -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='llm-management') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: #0d6efd; color: white;">
+                        <i class="bi bi-cloud"></i>
+                    </div>
+                    <h5>LLM Management & RBAC</h5>
+                    <p>Provider config, model management, role-based access</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Pre-built Items -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='prebuilt') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: #6f42c1; color: white;">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <h5>Pre-built Workflows & Agents</h5>
+                    <p>Ready-to-use templates to get started quickly</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Code Fragments -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='code-fragments') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: #17a2b8; color: white;">
+                        <i class="bi bi-code-square"></i>
+                    </div>
+                    <h5>Code Fragments</h5>
+                    <p>Reusable code modules from db://, file://, or s3://</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- MCP Plugins -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='mcp-plugins') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon bg-secondary text-white mx-auto">
+                        <i class="bi bi-plug"></i>
+                    </div>
+                    <h5>MCP Plugins</h5>
+                    <p>Connect external tools using Model Context Protocol</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- HITL -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='hitl') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon bg-danger text-white mx-auto">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <h5>Human-in-the-Loop</h5>
+                    <p>Add human oversight and approval checkpoints</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Executions & Logging -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='executions-logging') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon bg-dark text-white mx-auto">
+                        <i class="bi bi-database-check"></i>
+                    </div>
+                    <h5>Executions & LLM Logging</h5>
+                    <p>Track executions, view traces, monitor LLM usage</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- API Reference -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='api-reference') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: #6f42c1; color: white;">
+                        <i class="bi bi-code-slash"></i>
+                    </div>
+                    <h5>API Reference</h5>
+                    <p>REST API endpoints for programmatic access</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- RBAC -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='rbac') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: #20c997; color: white;">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <h5>User Roles & RBAC</h5>
+                    <p>Role-based access control and permissions</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Configuration -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='configuration') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: #fd7e14; color: white;">
+                        <i class="bi bi-gear"></i>
+                    </div>
+                    <h5>Configuration</h5>
+                    <p>Application settings and environment variables</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='troubleshooting') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: #e83e8c; color: white;">
+                        <i class="bi bi-bug"></i>
+                    </div>
+                    <h5>Troubleshooting & FAQ</h5>
+                    <p>Common issues and frequently asked questions</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- About -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('about') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: #17a2b8; color: white;">
+                        <i class="bi bi-info-circle"></i>
+                    </div>
+                    <h5>About Abhikarta-LLM</h5>
+                    <p>Platform overview, features, and architecture</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Search functionality
+document.getElementById('helpSearch').addEventListener('input', function(e) {
+    const query = e.target.value.toLowerCase();
+    document.querySelectorAll('.help-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.closest('.col-md-6').style.display = text.includes(query) ? 'block' : 'none';
+    });
+});
+</script>
+{% endblock %}

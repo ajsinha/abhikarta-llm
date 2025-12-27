@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ plugin.name }} - MCP Plugin - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('mcp_plugins') }}">MCP Plugins</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('mcp_plugin_detail', plugin_id=plugin.plugin_id) }}">{{ plugin.name }}</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header bg-bmo-blue text-white">
+                    <h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Plugin: {{ plugin.name }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="plugin_id" class="form-label">Plugin ID</label>
+                            <input type="text" class="form-control" id="plugin_id" value="{{ plugin.plugin_id }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Display Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ plugin.name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2">{{ plugin.description }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="plugin_type" class="form-label">Plugin Type</label>
+                            <input type="text" class="form-control" id="plugin_type" value="{{ plugin.plugin_type | upper }}" readonly>
+                        </div>
+                        {% if plugin.plugin_type == 'http' %}
+                        <div class="mb-3">
+                            <label for="base_url" class="form-label">Base URL</label>
+                            <input type="url" class="form-control" id="base_url" name="base_url" value="{{ plugin.config.base_url }}" required>
+                        </div>
+                        {% else %}
+                        <div class="mb-3">
+                            <label for="command" class="form-label">Command</label>
+                            <input type="text" class="form-control" id="command" name="command" value="{{ plugin.config.command }}" required>
+                        </div>
+                        {% endif %}
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if plugin.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">Active</label>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-2"></i>Save Changes</button>
+                            <a href="{{ url_for('mcp_plugin_detail', plugin_id=plugin.plugin_id) }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

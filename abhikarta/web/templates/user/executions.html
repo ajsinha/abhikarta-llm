@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}My Executions - Abhikarta LLM{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-play-circle me-2"></i>My Executions</h2>
+            <p class="text-muted mb-0">View your agent and workflow execution history</p>
+        </div>
+        <div>
+            <button class="btn btn-outline-secondary" onclick="refreshExecutions()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Total Executions</h6>
+                    <h3 class="mb-0">{{ executions|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Completed</h6>
+                    <h3 class="mb-0">{{ executions|selectattr('status', 'equalto', 'completed')|list|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Failed</h6>
+                    <h3 class="mb-0">{{ executions|selectattr('status', 'equalto', 'failed')|list|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Total Tokens</h6>
+                    <h3 class="mb-0">{{ executions|sum(attribute='tokens_used') }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="filterStatus">
+                        <option value="">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="failed">Failed</option>
+                        <option value="running">Running</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Agent/Workflow</label>
+                    <input type="text" class="form-control" id="filterAgent" placeholder="Search by name...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Date Range</label>
+                    <select class="form-select" id="filterDate">
+                        <option value="">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100" onclick="applyFilters()">
+                        <i class="bi bi-funnel me-1"></i>Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executions Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Execution History</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="executionsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Execution ID</th>
+                            <th>Agent/Workflow</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Tokens</th>
+                            <th>Cost</th>
+                            <th>Started</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if executions %}
+                            {% for exec in executions %}
+                            <tr data-status="{{ exec.status }}" data-agent="{{ exec.agent_id }}">
+                                <td>
+                                    <code class="text-primary">{{ exec.execution_id[:12] }}...</code>
+                                </td>
+                                <td>
+                                    <strong>{{ exec.agent_id }}</strong>
+                                    {% if exec.agent_version %}
+                                    <br><small class="text-muted">v{{ exec.agent_version }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if exec.status == 'completed' %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Completed</span>
+                                    {% elif exec.status == 'failed' %}
+                                        <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Failed</span>
+                                    {% elif exec.status == 'running' %}
+                                        <span class="badge bg-warning"><i class="bi bi-hourglass-split me-1"></i>Running</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ exec.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if exec.duration_ms %}
+                                        {{ "%.2f"|format(exec.duration_ms / 1000) }}s
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">{{ exec.tokens_used or 0 }}</span>
+                                </td>
+                                <td>
+                                    {% if exec.cost_estimate %}
+                                        ${{ "%.4f"|format(exec.cost_estimate) }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ exec.started_at }}</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" title="View Details" 
+                                                onclick="viewExecution('{{ exec.execution_id }}')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info" title="View Trace" 
+                                                onclick="viewTrace('{{ exec.execution_id }}')">
+                                            <i class="bi bi-diagram-3"></i>
+                                        </button>
+                                        {% if exec.status == 'failed' %}
+                                        <button class="btn btn-outline-warning" title="Retry" 
+                                                onclick="retryExecution('{{ exec.execution_id }}')">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <i class="bi bi-play-circle display-4 text-muted"></i>
+                                    <p class="text-muted mt-2">No executions yet</p>
+                                    <a href="{{ url_for('user_agents') }}" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-robot me-1"></i>Run an Agent
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Execution Detail Modal -->
+<div class="modal fade" id="executionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i>Execution Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="executionModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-2">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trace Modal -->
+<div class="modal fade" id="traceModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-diagram-3 me-2"></i>Execution Trace</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="traceModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-2">Loading trace data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function refreshExecutions() {
+    location.reload();
+}
+
+function applyFilters() {
+    const status = document.getElementById('filterStatus').value;
+    const agent = document.getElementById('filterAgent').value.toLowerCase();
+    
+    document.querySelectorAll('#executionsTable tbody tr').forEach(row => {
+        const rowStatus = row.dataset.status || '';
+        const rowAgent = row.dataset.agent || '';
+        
+        let show = true;
+        if (status && rowStatus !== status) show = false;
+        if (agent && !rowAgent.toLowerCase().includes(agent)) show = false;
+        
+        row.style.display = show ? '' : 'none';
+    });
+}
+
+function viewExecution(executionId) {
+    const modal = new bootstrap.Modal(document.getElementById('executionModal'));
+    const body = document.getElementById('executionModalBody');
+    
+    body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Loading...</p></div>';
+    modal.show();
+    
+    fetch(`/api/executions/${executionId}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const exec = data.execution;
+                body.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Basic Info</h6>
+                            <table class="table table-sm">
+                                <tr><td class="text-muted">Execution ID</td><td><code>${exec.execution_id}</code></td></tr>
+                                <tr><td class="text-muted">Agent/Workflow</td><td>${exec.agent_id}</td></tr>
+                                <tr><td class="text-muted">Status</td><td>${exec.status}</td></tr>
+                                <tr><td class="text-muted">Duration</td><td>${exec.duration_ms ? (exec.duration_ms/1000).toFixed(2) + 's' : '-'}</td></tr>
+                                <tr><td class="text-muted">Tokens Used</td><td>${exec.tokens_used || 0}</td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Timing</h6>
+                            <table class="table table-sm">
+                                <tr><td class="text-muted">Started</td><td>${exec.started_at}</td></tr>
+                                <tr><td class="text-muted">Completed</td><td>${exec.completed_at || '-'}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    ${exec.error_message ? `<div class="alert alert-danger mt-3"><strong>Error:</strong> ${exec.error_message}</div>` : ''}
+                    <h6 class="mt-3">Input</h6>
+                    <pre class="bg-dark text-light p-3 rounded" style="max-height: 200px; overflow: auto;">${JSON.stringify(exec.input_data, null, 2)}</pre>
+                    <h6 class="mt-3">Output</h6>
+                    <pre class="bg-dark text-light p-3 rounded" style="max-height: 200px; overflow: auto;">${JSON.stringify(exec.output_data, null, 2)}</pre>
+                `;
+            } else {
+                body.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            }
+        })
+        .catch(err => {
+            body.innerHTML = `<div class="alert alert-danger">Failed to load: ${err}</div>`;
+        });
+}
+
+function viewTrace(executionId) {
+    const modal = new bootstrap.Modal(document.getElementById('traceModal'));
+    const body = document.getElementById('traceModalBody');
+    
+    body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Loading trace...</p></div>';
+    modal.show();
+    
+    fetch(`/api/executions/${executionId}/trace`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.steps) {
+                let html = '<div class="timeline">';
+                data.steps.forEach((step, i) => {
+                    const icon = step.status === 'completed' ? 'check-circle-fill text-success' : 'x-circle-fill text-danger';
+                    html += `
+                        <div class="card mb-2">
+                            <div class="card-body py-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-${icon} me-2"></i>
+                                        <strong>Step ${step.step_number}: ${step.node_id}</strong>
+                                        <span class="badge bg-secondary ms-2">${step.node_type}</span>
+                                    </div>
+                                    <span class="text-muted">${step.duration_ms}ms</span>
+                                </div>
+                                ${step.error_message ? `<small class="text-danger d-block mt-1">${step.error_message}</small>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                body.innerHTML = html;
+            } else {
+                body.innerHTML = '<div class="alert alert-info">No trace data available</div>';
+            }
+        })
+        .catch(err => {
+            body.innerHTML = `<div class="alert alert-danger">Failed to load trace: ${err}</div>`;
+        });
+}
+
+function retryExecution(executionId) {
+    if (confirm('Retry this execution with the same input?')) {
+        fetch(`/api/executions/${executionId}/retry`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Execution restarted: ' + data.new_execution_id);
+                    location.reload();
+                } else {
+                    alert('Retry failed: ' + data.error);
+                }
+            });
+    }
+}
+
+// Auto-apply filters on input
+document.getElementById('filterStatus').addEventListener('change', applyFilters);
+document.getElementById('filterAgent').addEventListener('input', applyFilters);
+document.getElementById('filterDate').addEventListener('change', applyFilters);
+</script>
+{% endblock %}

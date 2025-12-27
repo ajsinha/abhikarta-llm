@@ -1,0 +1,178 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Getting Started" %}
+{% set description = "Installation, setup, and first steps with Abhikarta-LLM" %}
+{% set icon = "bi-rocket-takeoff" %}
+{% set header_color = "#0d6efd" %}
+{% set header_color_dark = "#0a58ca" %}
+
+{% block help_nav %}
+<a href="#requirements">Requirements</a>
+<a href="#installation">Installation</a>
+<a href="#configuration">Configuration</a>
+<a href="#start-server">Start Server</a>
+<a href="#default-users">Default Users</a>
+<a href="#first-steps">First Steps</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="requirements">System Requirements</h2>
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5><i class="bi bi-pc-display text-primary me-2"></i>Hardware</h5>
+                <ul class="mb-0">
+                    <li>2+ CPU cores</li>
+                    <li>4GB+ RAM (8GB recommended)</li>
+                    <li>10GB disk space</li>
+                    <li>Optional: GPU for local LLMs</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5><i class="bi bi-code-slash text-success me-2"></i>Software</h5>
+                <ul class="mb-0">
+                    <li>Python 3.11+</li>
+                    <li>pip 23.0+</li>
+                    <li>Git 2.30+</li>
+                    <li>Optional: PostgreSQL 14+</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5><i class="bi bi-globe text-info me-2"></i>Browser</h5>
+                <ul class="mb-0">
+                    <li>Chrome 90+</li>
+                    <li>Firefox 88+</li>
+                    <li>Edge 90+</li>
+                    <li>Safari 14+</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="installation">Installation</h2>
+<h5>Step 1: Clone Repository</h5>
+<pre><code class="language-bash"># Clone the repository
+git clone https://github.com/your-repo/abhikarta-llm.git
+cd abhikarta-llm</code></pre>
+
+<h5>Step 2: Create Virtual Environment</h5>
+<pre><code class="language-bash"># Create and activate virtual environment
+python -m venv venv
+
+# Linux/Mac
+source venv/bin/activate
+
+# Windows
+venv\Scripts\activate</code></pre>
+
+<h5>Step 3: Install Dependencies</h5>
+<pre><code class="language-bash"># Install required packages
+pip install -r requirements.txt</code></pre>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration</h2>
+<p>Edit <code>config/application.properties</code> to configure your installation:</p>
+
+<pre><code class="language-properties"># Application Settings
+app.name=Abhikarta-LLM
+app.version=1.1.0
+
+# Server
+server.host=0.0.0.0
+server.port=5000
+server.debug=false
+server.secret_key=change-this-to-a-random-secret-key
+
+# Database (sqlite or postgresql)
+database.type=sqlite
+database.sqlite.path=./data/abhikarta.db
+
+# LLM Providers (add your API keys)
+llm.openai.api_key=sk-your-openai-key
+llm.anthropic.api_key=sk-ant-your-anthropic-key
+llm.default_provider=openai</code></pre>
+
+<hr class="my-5">
+
+<h2 id="start-server">Start the Server</h2>
+<pre><code class="language-bash"># Start the server
+python run_server.py</code></pre>
+
+<p>You should see:</p>
+<pre><code class="language-text">╔══════════════════════════════════════════════════════════════════╗
+║   █████╗ ██████╗ ██╗  ██╗██╗██╗  ██╗ █████╗ ██████╗ ████████╗   ║
+║  ██╔══██╗██╔══██╗██║  ██║██║██║ ██╔╝██╔══██╗██╔══██╗╚══██╔══╝   ║
+║  ███████║██████╔╝███████║██║█████╔╝ ███████║██████╔╝   ██║      ║
+║  ██╔══██║██╔══██╗██╔══██║██║██╔═██╗ ██╔══██║██╔══██╗   ██║      ║
+║  ██║  ██║██████╔╝██║  ██║██║██║  ██╗██║  ██║██║  ██║   ██║      ║
+║  ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝      ║
+║                          LLM                                     ║
+╠══════════════════════════════════════════════════════════════════╣
+  Starting server...
+  Access the application at: http://localhost:5000</code></pre>
+
+<hr class="my-5">
+
+<h2 id="default-users">Default Users</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Role</th><th>Username</th><th>Password</th><th>Permissions</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="badge bg-danger">Super Admin</span></td><td><code>admin</code></td><td><code>admin123</code></td><td>Full access</td></tr>
+            <tr><td><span class="badge bg-warning text-dark">Domain Admin</span></td><td><code>domain_admin</code></td><td><code>domain123</code></td><td>Domain management</td></tr>
+            <tr><td><span class="badge bg-primary">Developer</span></td><td><code>developer</code></td><td><code>dev123</code></td><td>Create agents</td></tr>
+            <tr><td><span class="badge bg-info">Publisher</span></td><td><code>publisher</code></td><td><code>pub123</code></td><td>Publish agents</td></tr>
+            <tr><td><span class="badge bg-success">Reviewer</span></td><td><code>reviewer</code></td><td><code>review123</code></td><td>HITL tasks</td></tr>
+            <tr><td><span class="badge bg-secondary">User</span></td><td><code>user</code></td><td><code>user123</code></td><td>Execute agents</td></tr>
+            <tr><td><span class="badge bg-dark">Viewer</span></td><td><code>viewer</code></td><td><code>view123</code></td><td>Read-only</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    <strong>Security:</strong> Change default passwords immediately in production!
+</div>
+
+<hr class="my-5">
+
+<h2 id="first-steps">First Steps</h2>
+<ol class="list-group list-group-numbered mb-4">
+    <li class="list-group-item">
+        <strong>Login as Admin</strong> - Use <code>admin/admin123</code> to access the admin dashboard
+    </li>
+    <li class="list-group-item">
+        <strong>Configure LLM Provider</strong> - Add your API keys in Settings
+    </li>
+    <li class="list-group-item">
+        <strong>Create Your First Agent</strong> - Go to Agents → Create Agent
+    </li>
+    <li class="list-group-item">
+        <strong>Test the Agent</strong> - Use the test sandbox to validate
+    </li>
+    <li class="list-group-item">
+        <strong>Upload a Workflow</strong> - Try uploading a JSON workflow DAG
+    </li>
+    <li class="list-group-item">
+        <strong>Create Code Fragments</strong> - Add reusable Python modules via Admin → Code Fragments for use in workflows
+    </li>
+    <li class="list-group-item">
+        <strong>Monitor Executions</strong> - View execution history and LLM logs
+    </li>
+</ol>
+{% endblock %}

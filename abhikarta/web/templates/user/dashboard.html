@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1><i class="bi bi-house me-2"></i>Welcome, {{ fullname }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Available Agents -->
+    <div class="col-lg-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-bmo">
+                <h5 class="mb-0"><i class="bi bi-robot me-2"></i>Available Agents</h5>
+            </div>
+            <div class="card-body">
+                {% if agents %}
+                <div class="row">
+                    {% for agent in agents %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100 border">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-cpu me-2 text-bmo"></i>{{ agent.name }}
+                                </h5>
+                                <p class="card-text text-muted small">
+                                    {{ agent.description|truncate(100) if agent.description else 'No description' }}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge badge-status badge-{{ agent.agent_type or 'react' }}">
+                                        {{ agent.agent_type or 'react' }}
+                                    </span>
+                                    <a href="{{ url_for('execute_agent', agent_id=agent.agent_id) }}" 
+                                       class="btn btn-sm btn-bmo">
+                                        <i class="bi bi-play-fill me-1"></i>Execute
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-robot fs-1 d-block mb-2"></i>
+                    No agents available yet
+                </div>
+                {% endif %}
+            </div>
+            {% if agents %}
+            <div class="card-footer">
+                <a href="{{ url_for('user_agents') }}" class="text-bmo">
+                    View all agents <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Recent Executions -->
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-bmo">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Executions</h5>
+            </div>
+            <div class="card-body">
+                {% if executions %}
+                <div class="list-group list-group-flush">
+                    {% for exec in executions[:5] %}
+                    <a href="{{ url_for('execution_detail', execution_id=exec.execution_id) }}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ exec.agent_id }}</h6>
+                            <span class="badge badge-status badge-{{ exec.status }}">
+                                {{ exec.status }}
+                            </span>
+                        </div>
+                        <small class="text-muted">{{ exec.created_at }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    No recent executions
+                </div>
+                {% endif %}
+            </div>
+            {% if executions %}
+            <div class="card-footer">
+                <a href="{{ url_for('user_executions') }}" class="text-bmo">
+                    View all executions <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Quick Help -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5><i class="bi bi-question-circle me-2 text-bmo"></i>Getting Started</h5>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="badge bg-bmo rounded-circle p-2">1</span>
+                            </div>
+                            <div>
+                                <h6>Browse Agents</h6>
+                                <p class="text-muted small mb-0">
+                                    View available agents in the catalog
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="badge bg-bmo rounded-circle p-2">2</span>
+                            </div>
+                            <div>
+                                <h6>Execute Agent</h6>
+                                <p class="text-muted small mb-0">
+                                    Run an agent with your input
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="badge bg-bmo rounded-circle p-2">3</span>
+                            </div>
+                            <div>
+                                <h6>View Results</h6>
+                                <p class="text-muted small mb-0">
+                                    Check execution history for results
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

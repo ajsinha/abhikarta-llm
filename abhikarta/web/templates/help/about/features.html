@@ -1,0 +1,268 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Core Features" %}
+{% set description = "Explore the key capabilities of Abhikarta-LLM" %}
+{% set icon = "bi-stars" %}
+{% set header_color = "#0d6efd" %}
+{% set header_color_dark = "#0a58ca" %}
+
+{% block help_nav %}
+<a href="#workflow-dags">Workflow DAGs</a>
+<a href="#llm-management">LLM Management</a>
+<a href="#llm-logging">LLM Logging</a>
+<a href="#hitl">Human-in-the-Loop</a>
+<a href="#mcp-plugins">MCP Plugins</a>
+<a href="#rbac">Enterprise RBAC</a>
+<a href="#analytics">Execution Analytics</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="workflow-dags">Workflow DAG Execution</h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6">
+        <p class="lead">Define complex multi-step workflows as Directed Acyclic Graphs with embedded Python modules.</p>
+        <ul>
+            <li>12+ node types: LLM, Python, HTTP, Condition, Loop, Parallel, HITL</li>
+            <li>Visual workflow editor</li>
+            <li>JSON-based workflow definitions</li>
+            <li>Reusable Python modules (inline or via URI)</li>
+            <li><strong>Code Fragments:</strong> Load code from <code>db://</code>, <code>file://</code>, or <code>s3://</code></li>
+            <li>Dependency management</li>
+            <li>Error handling and retry logic</li>
+        </ul>
+    </div>
+    <div class="col-lg-6">
+        <pre><code class="language-json">{
+  "workflow_id": "data-pipeline",
+  "python_modules": {
+    "utils": "db://data-utils"
+  },
+  "nodes": {
+    "input": {"type": "input"},
+    "process": {
+      "type": "python",
+      "dependencies": ["input"],
+      "code": "from utils import transform\noutput = transform(input_data)"
+    },
+    "analyze": {
+      "type": "llm",
+      "dependencies": ["process"],
+      "config": {"model": "gpt-4o"}
+    }
+  }
+}</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="code-fragments">Code Fragments</h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6 order-lg-2">
+        <p class="lead">Manage reusable code modules that can be loaded at runtime from multiple sources.</p>
+        <ul>
+            <li><code>db://</code> - Database-managed fragments with versioning</li>
+            <li><code>file://</code> - Local filesystem for development</li>
+            <li><code>s3://</code> - AWS S3 for enterprise deployments</li>
+            <li>Admin UI for creating and editing fragments</li>
+            <li>Usage tracking and version history</li>
+            <li>Categories and tags for organization</li>
+        </ul>
+    </div>
+    <div class="col-lg-6 order-lg-1">
+        <pre><code class="language-json">{
+  "python_modules": {
+    "data_utils": "db://data-utils",
+    "csv_parser": "db://csv-parser",
+    "custom": "file:///opt/code/custom.py",
+    "enterprise": "s3://bucket/utils.py"
+  }
+}</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="llm-management">LLM Provider & Model Management <span class="badge bg-success">NEW in v1.1.0</span></h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6">
+        <p class="lead">Centralized management of LLM providers and models with role-based access control.</p>
+        <ul>
+            <li>Configure 11+ LLM providers (OpenAI, Anthropic, Google, etc.)</li>
+            <li>Define models with costs, context limits, and capabilities</li>
+            <li>Role-based model access permissions</li>
+            <li>Daily and monthly usage limits per role</li>
+            <li>Pre-configured with 15+ popular models</li>
+            <li>Admin UI for all management tasks</li>
+        </ul>
+    </div>
+    <div class="col-lg-6">
+        <pre><code class="language-sql">-- Model Permissions Example
+SELECT m.display_name, r.display_name as role,
+       mp.can_use, mp.daily_limit, mp.monthly_limit
+FROM model_permissions mp
+JOIN llm_models m ON mp.model_id = m.model_id
+JOIN roles r ON mp.role_name = r.role_name
+WHERE m.model_id = 'gpt-4o';
+
+-- Result:
+-- GPT-4o | Super Admin     | 1 | -1  | -1
+-- GPT-4o | Agent Developer | 1 | 100 | 3000
+-- GPT-4o | Agent User      | 1 | 50  | 1000</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="llm-logging">Complete LLM Activity Logging</h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6 order-lg-2">
+        <p class="lead">Every LLM interaction is automatically logged with full detail.</p>
+        <ul>
+            <li>Prompts and responses</li>
+            <li>Token counts (input/output)</li>
+            <li>Cost estimation per call</li>
+            <li>Latency tracking</li>
+            <li>Provider and model info</li>
+            <li>Link to parent execution</li>
+        </ul>
+    </div>
+    <div class="col-lg-6 order-lg-1">
+        <pre><code class="language-sql">SELECT provider, model,
+       COUNT(*) as calls,
+       SUM(total_tokens) as tokens,
+       SUM(cost_estimate) as cost
+FROM llm_calls
+WHERE created_at > datetime('now', '-7 days')
+GROUP BY provider, model;</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="hitl">Human-in-the-Loop (HITL)</h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6">
+        <p class="lead">Add human oversight and approval checkpoints to ensure quality and safety.</p>
+        <ul>
+            <li>Multiple trigger types: keyword, confidence, cost, scheduled</li>
+            <li>Task assignment and routing</li>
+            <li>Approval/Rejection/Modification flows</li>
+            <li>Escalation rules</li>
+            <li>SLA tracking</li>
+            <li>Audit trail</li>
+        </ul>
+    </div>
+    <div class="col-lg-6">
+        <pre><code class="language-json">{
+  "type": "hitl",
+  "config": {
+    "task_type": "approval",
+    "title": "Review AI Response",
+    "assignee_roles": ["hitl_reviewer"],
+    "timeout_hours": 24,
+    "escalation": {
+      "after_hours": 12,
+      "escalate_to": "domain_admin"
+    }
+  }
+}</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="mcp-plugins">MCP Plugin System</h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6 order-lg-2">
+        <p class="lead">Extend agent capabilities with Model Context Protocol plugins.</p>
+        <ul>
+            <li>HTTP/SSE remote plugins</li>
+            <li>STDIO local plugins</li>
+            <li>Dynamic tool discovery</li>
+            <li>FastMCP Python framework</li>
+            <li>Secure credential management</li>
+        </ul>
+    </div>
+    <div class="col-lg-6 order-lg-1">
+        <pre><code class="language-python">from fastmcp import FastMCP
+
+mcp = FastMCP("My Tools")
+
+@mcp.tool()
+def search_database(query: str) -> str:
+    """Search internal database"""
+    results = db.search(query)
+    return format_results(results)</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="rbac">Enterprise RBAC</h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6">
+        <p class="lead">Fine-grained role-based access control for enterprise deployments.</p>
+        <ul>
+            <li>7 predefined roles</li>
+            <li>Custom role creation</li>
+            <li>Resource-level permissions</li>
+            <li>Domain/scope restrictions</li>
+            <li>Audit logging</li>
+        </ul>
+    </div>
+    <div class="col-lg-6">
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-danger fs-6">super_admin</span>
+            <span class="badge bg-warning text-dark fs-6">domain_admin</span>
+            <span class="badge bg-primary fs-6">agent_developer</span>
+            <span class="badge bg-info fs-6">agent_publisher</span>
+            <span class="badge bg-success fs-6">hitl_reviewer</span>
+            <span class="badge bg-secondary fs-6">agent_user</span>
+            <span class="badge bg-dark fs-6">viewer</span>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="analytics">Execution Analytics</h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6 order-lg-2">
+        <p class="lead">Comprehensive analytics and monitoring dashboard.</p>
+        <ul>
+            <li>Real-time execution tracking</li>
+            <li>Cost analysis by agent/workflow</li>
+            <li>Performance metrics</li>
+            <li>Error rate monitoring</li>
+            <li>Usage trends</li>
+        </ul>
+    </div>
+    <div class="col-lg-6 order-lg-1">
+        <div class="card">
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h4 class="text-success">98.5%</h4>
+                        <small class="text-muted">Success Rate</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-primary">1.2s</h4>
+                        <small class="text-muted">Avg Latency</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-warning">$0.04</h4>
+                        <small class="text-muted">Avg Cost</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('about') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to About
+    </a>
+</div>
+{% endblock %}

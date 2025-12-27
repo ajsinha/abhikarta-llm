@@ -1,0 +1,254 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Pre-built Workflows & Agents" %}
+{% set description = "Ready-to-use workflows and agents - start building immediately" %}
+{% set icon = "bi-box-seam-fill" %}
+{% set header_color = "#6f42c1" %}
+{% set header_color_dark = "#59359a" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#workflows">Pre-built Workflows</a>
+<a href="#agents">Pre-built Agents</a>
+<a href="#customizing">Customizing</a>
+<a href="#importing">Importing</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Overview</h2>
+<p class="lead">Abhikarta-LLM comes with professionally designed workflows and agents that you can use immediately or customize for your needs.</p>
+
+<div class="alert alert-success">
+    <i class="bi bi-rocket-takeoff me-2"></i>
+    <strong>Quick Start:</strong> These pre-built items are production-ready and have been tested extensively. Just configure your LLM provider and start using them!
+</div>
+
+<hr class="my-5">
+
+<h2 id="workflows">Pre-built Workflows</h2>
+
+<div class="row g-4">
+    <!-- Data Analyzer -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-bar-chart-fill me-2"></i>Data Analysis Pipeline</h5>
+            </div>
+            <div class="card-body">
+                <p>Analyze CSV data with AI-powered insights. Upload data and get statistical analysis, patterns, and recommendations.</p>
+                
+                <h6>Features:</h6>
+                <ul>
+                    <li>Automatic CSV parsing</li>
+                    <li>Statistical calculations (mean, min, max, etc.)</li>
+                    <li>AI-powered pattern detection</li>
+                    <li>Actionable recommendations</li>
+                </ul>
+                
+                <h6>Input:</h6>
+                <pre><code class="language-json">{
+  "csv_data": "name,age,salary\nJohn,30,50000\nJane,25,60000",
+  "analysis_focus": "salary distribution"
+}</code></pre>
+                
+                <h6>Workflow ID:</h6>
+                <code>prebuilt-data-analyzer</code>
+            </div>
+            <div class="card-footer">
+                <span class="badge bg-primary">analytics</span>
+                <span class="badge bg-secondary">data</span>
+                <span class="badge bg-secondary">csv</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Document Summarizer -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Document Summarizer</h5>
+            </div>
+            <div class="card-body">
+                <p>Summarize long documents with AI. Supports multiple output formats: executive summary, bullet points, or detailed analysis.</p>
+                
+                <h6>Features:</h6>
+                <ul>
+                    <li>Multiple summary types (executive, bullets, detailed)</li>
+                    <li>Configurable output length</li>
+                    <li>Compression ratio tracking</li>
+                    <li>Handles large documents via chunking</li>
+                </ul>
+                
+                <h6>Input:</h6>
+                <pre><code class="language-json">{
+  "document_text": "Your long document text here...",
+  "summary_type": "executive",
+  "max_length": 500
+}</code></pre>
+                
+                <h6>Workflow ID:</h6>
+                <code>prebuilt-doc-summarizer</code>
+            </div>
+            <div class="card-footer">
+                <span class="badge bg-success">content</span>
+                <span class="badge bg-secondary">document</span>
+                <span class="badge bg-secondary">summary</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="agents">Pre-built Agents</h2>
+
+<div class="row g-4">
+    <!-- Customer Support Agent -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-headset me-2"></i>Customer Support Agent</h5>
+            </div>
+            <div class="card-body">
+                <p>A professional customer support agent that handles inquiries, provides product information, and resolves common issues with empathy.</p>
+                
+                <h6>Capabilities:</h6>
+                <ul>
+                    <li>Answer product questions</li>
+                    <li>Handle complaints professionally</li>
+                    <li>Escalate complex issues (HITL enabled)</li>
+                    <li>Provide order status updates</li>
+                </ul>
+                
+                <h6>HITL Triggers:</h6>
+                <ul>
+                    <li>Keywords: "refund", "cancel", "legal"</li>
+                    <li>Cost threshold: $0.50</li>
+                </ul>
+                
+                <h6>Agent ID:</h6>
+                <code>prebuilt-customer-support</code>
+                
+                <h6>Try It:</h6>
+                <pre><code class="language-text">"I ordered a product 3 days ago and haven't received shipping confirmation yet."</code></pre>
+            </div>
+            <div class="card-footer">
+                <span class="badge bg-info">support</span>
+                <span class="badge bg-secondary">conversational</span>
+                <span class="badge bg-warning text-dark">HITL</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Code Reviewer Agent -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-code-square me-2"></i>Code Review Assistant</h5>
+            </div>
+            <div class="card-body">
+                <p>An expert code reviewer that analyzes code for bugs, security issues, performance problems, and style improvements.</p>
+                
+                <h6>Review Categories:</h6>
+                <ul>
+                    <li>Bugs & Logic Errors</li>
+                    <li>Security Vulnerabilities (SQL injection, XSS, etc.)</li>
+                    <li>Performance Issues</li>
+                    <li>Code Quality & Best Practices</li>
+                </ul>
+                
+                <h6>Model:</h6>
+                <p>Uses GPT-4o for highest quality code analysis.</p>
+                
+                <h6>Agent ID:</h6>
+                <code>prebuilt-code-reviewer</code>
+                
+                <h6>Try It:</h6>
+                <pre><code class="language-text">"Review this: query = f'SELECT * FROM users WHERE id = {user_id}'"</code></pre>
+            </div>
+            <div class="card-footer">
+                <span class="badge bg-warning text-dark">code</span>
+                <span class="badge bg-secondary">development</span>
+                <span class="badge bg-secondary">security</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="customizing">Customizing Pre-built Items</h2>
+
+<h5>1. Clone and Modify</h5>
+<p>The easiest way to customize is to clone a pre-built item and modify it:</p>
+<ol>
+    <li>Go to the workflow or agent detail page</li>
+    <li>Click "Clone" to create a copy</li>
+    <li>Modify the configuration, prompts, or workflow nodes</li>
+    <li>Save with a new name</li>
+</ol>
+
+<h5>2. Common Customizations</h5>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>What to Change</th><th>How</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>LLM Provider/Model</td><td>Edit <code>llm_config.provider</code> and <code>llm_config.model</code></td></tr>
+            <tr><td>Agent Personality</td><td>Modify the <code>system_prompt</code></td></tr>
+            <tr><td>HITL Triggers</td><td>Adjust <code>hitl_config.triggers</code> keywords or thresholds</td></tr>
+            <tr><td>Workflow Steps</td><td>Add, remove, or modify nodes in the workflow</td></tr>
+            <tr><td>Temperature</td><td>Lower for factual (0.1-0.3), higher for creative (0.7-1.0)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>3. Example: Customize for Your Brand</h5>
+<pre><code class="language-json">{
+  "system_prompt": "You are a friendly support agent for ACME Corp. Our products include...\n\nUse this greeting: 'Hi! I'm Alex from ACME support.'\n\n[rest of your customizations]"
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="importing">Importing Pre-built Items</h2>
+
+<h5>Via Web UI</h5>
+<ol>
+    <li>Go to <strong>Workflows</strong> or <strong>Agents</strong></li>
+    <li>Click <strong>"Import from Templates"</strong></li>
+    <li>Select a pre-built item</li>
+    <li>Click <strong>"Import"</strong></li>
+</ol>
+
+<h5>Via API</h5>
+<pre><code class="language-bash"># Import a pre-built workflow
+curl -X POST "http://localhost:5000/api/workflows/import" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"template_id": "prebuilt-data-analyzer"}'
+
+# Import a pre-built agent
+curl -X POST "http://localhost:5000/api/agents/import" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"template_id": "prebuilt-customer-support"}'</code></pre>
+
+<h5>File Locations</h5>
+<p>Pre-built items are stored in:</p>
+<ul>
+    <li>Workflows: <code>data/prebuilt/workflows/*.json</code></li>
+    <li>Agents: <code>data/prebuilt/agents/*.json</code></li>
+</ul>
+
+<div class="alert alert-info mt-4">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Pro Tip:</strong> Create your own "pre-built" items by saving JSON files to these directories. They'll be available for import after server restart.
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Documentation
+    </a>
+</div>
+{% endblock %}

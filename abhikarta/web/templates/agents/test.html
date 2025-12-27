@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Test {{ agent.name }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .test-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .output-panel {
+        height: 400px;
+        overflow-y: auto;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.85rem;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    .log-entry {
+        padding: 0.25rem 0;
+        border-bottom: 1px solid #333;
+    }
+    .log-entry.info { color: #3794ff; }
+    .log-entry.success { color: #89d185; }
+    .log-entry.warning { color: #cca700; }
+    .log-entry.error { color: #f14c4c; }
+    .step-badge {
+        display: inline-block;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="test-container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a href="{{ url_for('admin_agents') }}">Agents</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('view_agent', agent_id=agent.agent_id) }}">{{ agent.name }}</a></li>
+                        <li class="breadcrumb-item active">Test</li>
+                    </ol>
+                </nav>
+                <h4 class="mb-0">
+                    <i class="bi bi-play-circle me-2"></i>Test: {{ agent.name }}
+                </h4>
+            </div>
+            <div>
+                <span class="badge bg-{{ agent.agent_type }}">{{ agent.agent_type }}</span>
+                <span class="badge bg-{{ 'success' if agent.status == 'published' else 'secondary' }}">
+                    {{ agent.status }}
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Input Panel -->
+            <div class="col-md-5">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Test Input</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">User Message</label>
+                            <textarea class="form-control" id="test-input" rows="6"
+                                      placeholder="Enter your test message here..."></textarea>
+                        </div>
+                        
+                        <div class="accordion mb-3" id="advancedOptions">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#optionsCollapse">
+                                        Advanced Options
+                                    </button>
+                                </h2>
+                                <div id="optionsCollapse" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label class="form-label">Temperature</label>
+                                                <input type="number" class="form-control form-control-sm" 
+                                                       id="opt-temperature" value="0.7" min="0" max="1" step="0.1">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label">Max Tokens</label>
+                                                <input type="number" class="form-control form-control-sm" 
+                                                       id="opt-max-tokens" value="2000" min="100" max="8000">
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="opt-verbose" checked>
+                                                <label class="form-check-label" for="opt-verbose">
+                                                    Verbose logging
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="opt-stream">
+                                                <label class="form-check-label" for="opt-stream">
+                                                    Stream output
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success btn-lg" id="run-test-btn" onclick="runTest()">
+                                <i class="bi bi-play-fill me-2"></i>Run Test
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="clearAll()">
+                                <i class="bi bi-trash me-1"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="col-md-7">
+                <div class="card h-100">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="bi bi-terminal me-2"></i>Execution Log</h6>
+                        <div>
+                            <span id="exec-status" class="badge bg-secondary">Ready</span>
+                            <button class="btn btn-sm btn-outline-light ms-2" onclick="copyLogs()">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="output-panel" id="output-panel">
+                            <div class="log-entry info">
+                                <span class="step-badge bg-info text-white">READY</span>
+                                Agent loaded: {{ agent.name }} ({{ agent.agent_type }})
+                            </div>
+                            <div class="log-entry">
+                                <span class="step-badge bg-secondary text-white">INFO</span>
+                                Waiting for test input...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Execution time: <span id="exec-time">-</span>
+                                </small>
+                            </div>
+                            <div class="col text-end">
+                                <small class="text-muted">
+                                    <i class="bi bi-coin me-1"></i>
+                                    Tokens: <span id="token-count">-</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="card mt-4" id="result-panel" style="display: none;">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="bi bi-check-circle me-2"></i>Final Output</h6>
+            </div>
+            <div class="card-body">
+                <div id="final-output" class="bg-light p-3 rounded"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let startTime = null;
+
+function addLog(message, type = 'info', step = null) {
+    const $panel = $('#output-panel');
+    const stepBadge = step ? `<span class="step-badge bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'primary'} text-white">${step}</span>` : '';
+    $panel.append(`<div class="log-entry ${type}">${stepBadge}${message}</div>`);
+    $panel.scrollTop($panel[0].scrollHeight);
+}
+
+function runTest() {
+    const input = $('#test-input').val().trim();
+    if (!input) {
+        alert('Please enter test input');
+        return;
+    }
+    
+    // Clear previous output
+    $('#output-panel').html('');
+    $('#result-panel').hide();
+    $('#exec-status').text('Running').removeClass('bg-secondary bg-success bg-danger').addClass('bg-warning');
+    $('#run-test-btn').prop('disabled', true).html('<i class="bi bi-hourglass-split me-2"></i>Running...');
+    
+    startTime = Date.now();
+    
+    addLog('Starting test execution...', 'info', 'START');
+    addLog(`Input: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"`, 'info');
+    
+    // Simulate execution steps
+    setTimeout(() => addLog('Initializing agent workflow...', 'info', 'INIT'), 300);
+    setTimeout(() => addLog('Loading LLM provider: {{ agent.llm_config.provider if agent.llm_config else "openai" }}', 'info'), 600);
+    setTimeout(() => addLog('Sending request to LLM...', 'info', 'LLM'), 900);
+    
+    {% if agent.tools %}
+    setTimeout(() => addLog('Tools available: {{ agent.tools|join(", ") }}', 'info'), 1200);
+    {% endif %}
+    
+    setTimeout(() => addLog('Processing response...', 'info'), 1500);
+    setTimeout(() => addLog('Executing tool calls (if any)...', 'info', 'TOOLS'), 1800);
+    
+    // Complete execution
+    setTimeout(() => {
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+        $('#exec-time').text(elapsed + 's');
+        $('#token-count').text(Math.floor(Math.random() * 500) + 200);
+        
+        addLog('Execution completed successfully!', 'success', 'DONE');
+        
+        $('#exec-status').text('Success').removeClass('bg-warning').addClass('bg-success');
+        $('#run-test-btn').prop('disabled', false).html('<i class="bi bi-play-fill me-2"></i>Run Test');
+        
+        // Show result
+        $('#final-output').html(`
+            <p><strong>Agent Response:</strong></p>
+            <p>This is a simulated response from the {{ agent.name }} agent. In production, this would contain the actual LLM output based on your input.</p>
+            <p class="text-muted small mb-0">Execution ID: exec_${Date.now()}</p>
+        `);
+        $('#result-panel').show();
+        
+    }, 2500);
+}
+
+function clearAll() {
+    $('#test-input').val('');
+    $('#output-panel').html(`
+        <div class="log-entry info">
+            <span class="step-badge bg-info text-white">READY</span>
+            Agent loaded: {{ agent.name }} ({{ agent.agent_type }})
+        </div>
+        <div class="log-entry">
+            <span class="step-badge bg-secondary text-white">INFO</span>
+            Waiting for test input...
+        </div>
+    `);
+    $('#result-panel').hide();
+    $('#exec-status').text('Ready').removeClass('bg-success bg-warning bg-danger').addClass('bg-secondary');
+    $('#exec-time').text('-');
+    $('#token-count').text('-');
+}
+
+function copyLogs() {
+    const logs = $('#output-panel').text();
+    navigator.clipboard.writeText(logs).then(() => {
+        showToast('Logs copied to clipboard', 'success');
+    });
+}
+</script>
+{% endblock %}

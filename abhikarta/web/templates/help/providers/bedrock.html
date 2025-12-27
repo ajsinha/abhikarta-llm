@@ -1,0 +1,188 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "AWS Bedrock" %}
+{% set description = "Access multiple foundation models through AWS" %}
+{% set icon = "bi-cloud-fill" %}
+{% set header_color = "#ff9900" %}
+{% set header_color_dark = "#cc7a00" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Available Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#usage">Usage Examples</a>
+<a href="#references">References</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle p-3 me-3" style="background: #ff9900;">
+        <i class="bi bi-cloud-fill text-white fs-3"></i>
+    </div>
+    <div>
+        <h1 class="mb-0">AWS Bedrock</h1>
+        <p class="text-muted mb-0">Multi-model access through Amazon Web Services</p>
+    </div>
+</div>
+
+<h2 id="overview">Overview</h2>
+<p class="lead">Amazon Bedrock provides serverless access to foundation models from multiple providers including Anthropic, Meta, Mistral, Cohere, and Amazon's own Titan models. Ideal for enterprises already in the AWS ecosystem.</p>
+
+<hr class="my-5">
+
+<h2 id="models">Available Models</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr><th>Model ID</th><th>Provider</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr class="table-success">
+                <td><code>anthropic.claude-3-5-sonnet-20241022-v2:0</code></td>
+                <td>Anthropic</td>
+                <td>General purpose, best quality</td>
+            </tr>
+            <tr>
+                <td><code>anthropic.claude-3-opus-20240229-v1:0</code></td>
+                <td>Anthropic</td>
+                <td>Complex reasoning</td>
+            </tr>
+            <tr>
+                <td><code>anthropic.claude-3-haiku-20240307-v1:0</code></td>
+                <td>Anthropic</td>
+                <td>Fast, cost-effective</td>
+            </tr>
+            <tr>
+                <td><code>meta.llama3-1-70b-instruct-v1:0</code></td>
+                <td>Meta</td>
+                <td>Open source alternative</td>
+            </tr>
+            <tr>
+                <td><code>meta.llama3-1-8b-instruct-v1:0</code></td>
+                <td>Meta</td>
+                <td>Fast, efficient</td>
+            </tr>
+            <tr>
+                <td><code>mistral.mistral-large-2407-v1:0</code></td>
+                <td>Mistral</td>
+                <td>European data sovereignty</td>
+            </tr>
+            <tr>
+                <td><code>amazon.titan-text-premier-v1:0</code></td>
+                <td>Amazon</td>
+                <td>AWS-native model</td>
+            </tr>
+            <tr>
+                <td><code>cohere.command-r-plus-v1:0</code></td>
+                <td>Cohere</td>
+                <td>RAG applications</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Multi-Model Access</h5>
+                <p class="mb-0">Single API for Claude, Llama, Mistral, Titan, and more.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>AWS Integration</h5>
+                <p class="mb-0">Native integration with IAM, VPC, CloudWatch, and other AWS services.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Enterprise Security</h5>
+                <p class="mb-0">Data never leaves your AWS account, no external API calls.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Guardrails</h5>
+                <p class="mb-0">Built-in content filtering and safety guardrails.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>AWS Lock-in</h5>
+                <p class="mb-0">Requires AWS account and infrastructure knowledge.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Model Lag</h5>
+                <p class="mb-0">New models may not be immediately available on Bedrock.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration</h2>
+<pre><code class="language-properties"># config/application.properties
+llm.bedrock.enabled=true
+llm.bedrock.region=us-east-1
+llm.bedrock.access_key_id=AKIAXXXXXXXXXXXXXXXX
+llm.bedrock.secret_access_key=your-secret-key
+llm.bedrock.default_model=anthropic.claude-3-5-sonnet-20241022-v2:0</code></pre>
+
+<div class="alert alert-info mt-3">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Tip:</strong> Use IAM roles instead of access keys when running on EC2 or ECS.
+</div>
+
+<hr class="my-5">
+
+<h2 id="usage">Usage Examples</h2>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "bedrock",
+    "model": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+    "temperature": 0.7,
+    "prompt": "Analyze this data: {input_data}"
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="references">References</h2>
+<ul>
+    <li><a href="https://docs.aws.amazon.com/bedrock/" target="_blank">AWS Bedrock Documentation</a></li>
+    <li><a href="https://aws.amazon.com/bedrock/pricing/" target="_blank">Bedrock Pricing</a></li>
+    <li><a href="https://console.aws.amazon.com/bedrock/" target="_blank">Bedrock Console</a></li>
+</ul>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

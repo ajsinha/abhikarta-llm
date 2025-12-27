@@ -1,0 +1,213 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Google AI (Gemini)" %}
+{% set description = "Gemini 2.0, 1.5 Pro - Google's multimodal AI with massive context windows" %}
+{% set icon = "bi-google" %}
+{% set header_color = "#4285f4" %}
+{% set header_color_dark = "#3367d6" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Available Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#usage">Usage in Abhikarta</a>
+<a href="#resources">Resources</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle bg-white border d-flex align-items-center justify-content-center me-3" style="width: 64px; height: 64px;">
+        <i class="bi bi-google fs-2" style="color: #4285f4;"></i>
+    </div>
+    <div>
+        <h2 id="overview" class="mb-1">Google AI (Gemini)</h2>
+        <p class="text-muted mb-0">Multimodal AI with the largest context windows available</p>
+    </div>
+</div>
+
+<div class="alert alert-primary">
+    <i class="bi bi-infinity me-2"></i>
+    <strong>Massive Context:</strong> Gemini 1.5 Pro supports up to 2 million tokens - process entire books or codebases in one request.
+</div>
+
+<p class="lead">Google's Gemini models are natively multimodal, able to process text, images, audio, and video. With context windows up to 2M tokens, they're ideal for long-document analysis.</p>
+
+<hr class="my-5">
+
+<h2 id="models">Available Models</h2>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Context</th><th>Input $/1M</th><th>Output $/1M</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr class="table-info">
+                <td><code>gemini-2.0-flash-exp</code> <span class="badge bg-info">New</span></td>
+                <td>1M</td>
+                <td>Free*</td>
+                <td>Free*</td>
+                <td>Latest experimental, agentic capabilities</td>
+            </tr>
+            <tr class="table-success">
+                <td><code>gemini-1.5-pro</code> <span class="badge bg-success">Recommended</span></td>
+                <td>2M</td>
+                <td>$1.25</td>
+                <td>$5.00</td>
+                <td>Long documents, complex analysis</td>
+            </tr>
+            <tr>
+                <td><code>gemini-1.5-flash</code></td>
+                <td>1M</td>
+                <td>$0.075</td>
+                <td>$0.30</td>
+                <td>Fast, cost-effective</td>
+            </tr>
+            <tr>
+                <td><code>gemini-1.5-flash-8b</code></td>
+                <td>1M</td>
+                <td>$0.0375</td>
+                <td>$0.15</td>
+                <td>Very fast, high volume</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<p class="small text-muted">*Free tier with rate limits</p>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>2M Token Context</h5>
+                <p class="mb-0">Largest context window available. Process entire books, codebases, or months of logs.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>True Multimodal</h5>
+                <p class="mb-0">Native support for text, images, audio, and video in the same request.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Competitive Pricing</h5>
+                <p class="mb-0">Flash models are among the cheapest available. Free tier for experimentation.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Google Integration</h5>
+                <p class="mb-0">Tight integration with Google Cloud, Vertex AI, and Google Workspace.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Instruction Following</h5>
+                <p class="mb-0">Can be less precise than GPT-4 or Claude at following complex instructions.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>API Stability</h5>
+                <p class="mb-0">Frequent model updates can cause behavior changes. Test thoroughly.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration in Abhikarta-LLM</h2>
+
+<h5>Step 1: Get Your API Key</h5>
+<ol>
+    <li>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+    <li>Click "Get API Key"</li>
+    <li>Create or select a project</li>
+</ol>
+
+<h5>Step 2: Configure in application.properties</h5>
+<pre><code class="language-properties"># config/application.properties
+
+llm.google.enabled=true
+llm.google.api_key=your-google-api-key
+llm.google.default_model=gemini-1.5-pro
+
+# For Vertex AI (enterprise)
+# llm.google.project_id=your-project-id
+# llm.google.location=us-central1</code></pre>
+
+<hr class="my-5">
+
+<h2 id="usage">Usage in Abhikarta-LLM</h2>
+
+<pre><code class="language-json">{
+  "analyze_document": {
+    "type": "llm",
+    "name": "Analyze Long Document",
+    "config": {
+      "provider": "google",
+      "model": "gemini-1.5-pro",
+      "prompt": "Analyze this 500-page document and provide a summary:\n\n{<!-- -->{context.document}<!-- -->}"
+    }
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="resources">Resources & Links</h2>
+<div class="row g-3">
+    <div class="col-md-4">
+        <a href="https://ai.google.dev/docs" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-book display-4 text-primary"></i>
+                <h6 class="mt-2">Documentation</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://aistudio.google.com" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-terminal display-4 text-success"></i>
+                <h6 class="mt-2">AI Studio</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="https://ai.google.dev/pricing" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-currency-dollar display-4 text-warning"></i>
+                <h6 class="mt-2">Pricing</h6>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

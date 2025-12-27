@@ -1,0 +1,264 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Ollama" %}
+{% set description = "Run powerful AI models locally - free and private" %}
+{% set icon = "bi-hdd-fill" %}
+{% set header_color = "#333333" %}
+{% set header_color_dark = "#1a1a1a" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Available Models</a>
+<a href="#installation">Installation</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#usage">Usage Examples</a>
+<a href="#references">References</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle p-3 me-3" style="background: #333;">
+        <i class="bi bi-hdd-fill text-white fs-3"></i>
+    </div>
+    <div>
+        <h1 class="mb-0">Ollama</h1>
+        <p class="text-muted mb-0">Run LLMs locally - completely free and private</p>
+    </div>
+</div>
+
+<h2 id="overview">Overview</h2>
+<p class="lead">Ollama makes it easy to run large language models locally on your own hardware. Perfect for development, testing, privacy-sensitive applications, or when you need unlimited free inference.</p>
+
+<div class="alert alert-success">
+    <i class="bi bi-gift me-2"></i>
+    <strong>100% Free!</strong> No API costs, no rate limits, no data leaving your machine.
+</div>
+
+<hr class="my-5">
+
+<h2 id="models">Available Models</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Sizes</th><th>RAM Required</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr class="table-success">
+                <td><code>llama3.2</code> <span class="badge bg-success">Newest</span></td>
+                <td>1B, 3B</td>
+                <td>2-4GB</td>
+                <td>Fast, efficient, edge deployment</td>
+            </tr>
+            <tr>
+                <td><code>llama3.1</code></td>
+                <td>8B, 70B, 405B</td>
+                <td>8-256GB</td>
+                <td>General purpose, best open model</td>
+            </tr>
+            <tr>
+                <td><code>mistral</code></td>
+                <td>7B</td>
+                <td>8GB</td>
+                <td>Balanced performance/speed</td>
+            </tr>
+            <tr>
+                <td><code>mixtral</code></td>
+                <td>8x7B</td>
+                <td>48GB</td>
+                <td>Complex tasks, MoE architecture</td>
+            </tr>
+            <tr>
+                <td><code>codellama</code></td>
+                <td>7B, 13B, 34B</td>
+                <td>8-48GB</td>
+                <td>Code generation and analysis</td>
+            </tr>
+            <tr>
+                <td><code>deepseek-coder</code></td>
+                <td>6.7B, 33B</td>
+                <td>8-32GB</td>
+                <td>Code generation</td>
+            </tr>
+            <tr>
+                <td><code>phi3</code></td>
+                <td>3B, 14B</td>
+                <td>4-16GB</td>
+                <td>Small but capable</td>
+            </tr>
+            <tr>
+                <td><code>gemma2</code></td>
+                <td>2B, 9B, 27B</td>
+                <td>4-32GB</td>
+                <td>Google's open model</td>
+            </tr>
+            <tr>
+                <td><code>qwen2.5</code></td>
+                <td>0.5B-72B</td>
+                <td>2-128GB</td>
+                <td>Multilingual, Chinese support</td>
+            </tr>
+            <tr>
+                <td><code>nomic-embed-text</code></td>
+                <td>137M</td>
+                <td>1GB</td>
+                <td>Text embeddings</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="installation">Installation</h2>
+
+<h5>Linux/macOS</h5>
+<pre><code class="language-bash"># One-line install
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull models you want to use
+ollama pull llama3.1
+ollama pull mistral
+ollama pull codellama
+
+# Verify installation
+ollama list</code></pre>
+
+<h5>Windows</h5>
+<pre><code class="language-bash"># Download installer from https://ollama.ai/download
+# Or use winget
+winget install Ollama.Ollama</code></pre>
+
+<h5>Docker</h5>
+<pre><code class="language-bash">docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+
+# Pull a model
+docker exec -it ollama ollama pull llama3.1</code></pre>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Completely Free</h5>
+                <p class="mb-0">No API costs, unlimited usage. Perfect for development and testing.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>100% Private</h5>
+                <p class="mb-0">Data never leaves your machine. No external API calls.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Works Offline</h5>
+                <p class="mb-0">No internet required after downloading models.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Easy to Use</h5>
+                <p class="mb-0">Simple installation, one-command model downloads.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Hardware Requirements</h5>
+                <p class="mb-0">Larger models require significant RAM and GPU memory.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Slower Than Cloud</h5>
+                <p class="mb-0">Inference speed depends on your hardware, often slower than API providers.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Quality Gap</h5>
+                <p class="mb-0">Open models may not match GPT-4 or Claude 3.5 quality.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>No Multimodal</h5>
+                <p class="mb-0">Limited vision/image capabilities on most models.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration</h2>
+<pre><code class="language-properties"># config/application.properties
+llm.ollama.enabled=true
+llm.ollama.base_url=http://localhost:11434
+llm.ollama.default_model=llama3.1
+
+# For remote Ollama server
+llm.ollama.base_url=http://your-server:11434</code></pre>
+
+<hr class="my-5">
+
+<h2 id="usage">Usage Examples</h2>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "ollama",
+    "model": "llama3.1",
+    "temperature": 0.7,
+    "prompt": "Write a Python function to calculate fibonacci numbers"
+  }
+}</code></pre>
+
+<h5>Using Code Models</h5>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "ollama",
+    "model": "codellama",
+    "temperature": 0.2,
+    "prompt": "Review this code for bugs:\n\n{input_data.code}"
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="references">References</h2>
+<ul>
+    <li><a href="https://ollama.ai/" target="_blank">Ollama Website</a></li>
+    <li><a href="https://github.com/ollama/ollama" target="_blank">GitHub Repository</a></li>
+    <li><a href="https://ollama.ai/library" target="_blank">Model Library</a></li>
+</ul>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

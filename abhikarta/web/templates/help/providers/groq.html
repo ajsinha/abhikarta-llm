@@ -1,0 +1,177 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Groq" %}
+{% set description = "Ultra-fast LLM inference with custom LPU hardware" %}
+{% set icon = "bi-lightning-fill" %}
+{% set header_color = "#f55036" %}
+{% set header_color_dark = "#d93920" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Available Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#usage">Usage Examples</a>
+<a href="#references">References</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle p-3 me-3" style="background: #f55036;">
+        <i class="bi bi-lightning-fill text-white fs-3"></i>
+    </div>
+    <div>
+        <h1 class="mb-0">Groq</h1>
+        <p class="text-muted mb-0">The fastest LLM inference in the world</p>
+    </div>
+</div>
+
+<h2 id="overview">Overview</h2>
+<p class="lead">Groq uses custom Language Processing Units (LPUs) to achieve unprecedented inference speeds - often 10-50x faster than GPU-based solutions. Perfect for real-time applications where latency matters.</p>
+
+<div class="alert alert-warning">
+    <i class="bi bi-speedometer2 me-2"></i>
+    <strong>Speed Benchmark:</strong> Groq can generate up to 800 tokens/second on Llama 3.1 8B!
+</div>
+
+<hr class="my-5">
+
+<h2 id="models">Available Models</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Context</th><th>Speed</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr class="table-success">
+                <td><code>llama-3.1-70b-versatile</code></td>
+                <td>128K</td>
+                <td>~250 tok/s</td>
+                <td>Best quality + speed balance</td>
+            </tr>
+            <tr>
+                <td><code>llama-3.1-8b-instant</code> <span class="badge bg-danger">Fastest</span></td>
+                <td>128K</td>
+                <td>~800 tok/s</td>
+                <td>Ultra-fast inference</td>
+            </tr>
+            <tr>
+                <td><code>llama-3.2-90b-text-preview</code></td>
+                <td>128K</td>
+                <td>~180 tok/s</td>
+                <td>Highest quality</td>
+            </tr>
+            <tr>
+                <td><code>mixtral-8x7b-32768</code></td>
+                <td>32K</td>
+                <td>~480 tok/s</td>
+                <td>MoE architecture</td>
+            </tr>
+            <tr>
+                <td><code>gemma2-9b-it</code></td>
+                <td>8K</td>
+                <td>~500 tok/s</td>
+                <td>Google's efficient model</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Blazing Fast</h5>
+                <p class="mb-0">10-50x faster than traditional GPU inference. Sub-second responses.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Low Latency</h5>
+                <p class="mb-0">Time-to-first-token often under 100ms. Perfect for real-time apps.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Generous Free Tier</h5>
+                <p class="mb-0">Free API access with reasonable rate limits for testing.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>OpenAI Compatible</h5>
+                <p class="mb-0">Drop-in replacement for OpenAI API format.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Limited Model Selection</h5>
+                <p class="mb-0">Only open-source models, no GPT-4 or Claude.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Rate Limits</h5>
+                <p class="mb-0">Strict rate limits even on paid plans.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration</h2>
+<pre><code class="language-properties"># config/application.properties
+llm.groq.enabled=true
+llm.groq.api_key=gsk_your-groq-api-key
+llm.groq.default_model=llama-3.1-70b-versatile
+llm.groq.base_url=https://api.groq.com/openai/v1</code></pre>
+
+<hr class="my-5">
+
+<h2 id="usage">Usage Examples</h2>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "groq",
+    "model": "llama-3.1-8b-instant",
+    "temperature": 0.5,
+    "prompt": "Quickly summarize: {input_data.text}"
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="references">References</h2>
+<ul>
+    <li><a href="https://console.groq.com/" target="_blank">Groq Console</a></li>
+    <li><a href="https://console.groq.com/docs/" target="_blank">API Documentation</a></li>
+    <li><a href="https://groq.com/" target="_blank">Groq Website</a></li>
+</ul>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

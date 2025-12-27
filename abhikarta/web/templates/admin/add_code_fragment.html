@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Add Code Fragment - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_code_fragments') }}">Code Fragments</a></li>
+                    <li class="breadcrumb-item active">Add New</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header bg-bmo-blue text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Add Code Fragment</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="fragment_id" class="form-label">Fragment ID <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="fragment_id" name="fragment_id" required
+                                           pattern="[a-z0-9-]+" placeholder="e.g., data-utils, string-helpers">
+                                    <div class="form-text">Lowercase letters, numbers, and hyphens only. Used in URI: <code>db://&lt;fragment_id&gt;</code></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Display Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" required
+                                           placeholder="e.g., Data Utilities">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2"
+                                      placeholder="Brief description of what this code fragment does"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="language" class="form-label">Language</label>
+                                    <select class="form-select" id="language" name="language">
+                                        <option value="python" selected>Python</option>
+                                        <option value="sql">SQL</option>
+                                        <option value="javascript">JavaScript</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category</label>
+                                    <input type="text" class="form-control" id="category" name="category" 
+                                           value="general" placeholder="e.g., data, text, api">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="tags" class="form-label">Tags</label>
+                                    <input type="text" class="form-control" id="tags" name="tags"
+                                           placeholder="Comma-separated tags">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="dependencies" class="form-label">Dependencies</label>
+                            <input type="text" class="form-control" id="dependencies" name="dependencies"
+                                   placeholder="Comma-separated fragment IDs this depends on">
+                            <div class="form-text">Other fragment IDs that must be loaded before this one</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="code" class="form-label">Code <span class="text-danger">*</span></label>
+                            <textarea class="form-control font-monospace" id="code" name="code" rows="20" required
+                                      placeholder="# Your Python code here&#10;&#10;def my_function(data):&#10;    pass"></textarea>
+                            <div class="form-text">Write your reusable code. Functions and classes defined here will be available in workflows.</div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-2"></i>Create Fragment
+                            </button>
+                            <a href="{{ url_for('admin_code_fragments') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Example -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb me-2"></i>Example Code Fragment</h5>
+                </div>
+                <div class="card-body">
+                    <pre><code class="language-python"># Example: Data Utilities
+# fragment_id: data-utils
+
+import json
+from typing import List, Dict, Any
+
+def parse_csv_text(csv_text: str) -> List[Dict[str, str]]:
+    """Parse CSV text into list of dictionaries."""
+    lines = csv_text.strip().split('\n')
+    if not lines:
+        return []
+    headers = [h.strip() for h in lines[0].split(',')]
+    data = []
+    for line in lines[1:]:
+        values = [v.strip() for v in line.split(',')]
+        if len(values) == len(headers):
+            data.append(dict(zip(headers, values)))
+    return data
+
+def get_basic_stats(data: List[Dict], column: str) -> Dict[str, Any]:
+    """Calculate basic statistics for a numeric column."""
+    values = []
+    for row in data:
+        try:
+            values.append(float(row.get(column, 0)))
+        except (ValueError, TypeError):
+            pass
+    if not values:
+        return None
+    return {
+        'count': len(values),
+        'sum': sum(values),
+        'mean': sum(values) / len(values),
+        'min': min(values),
+        'max': max(values)
+    }</code></pre>
+                    
+                    <p class="mt-3 mb-0"><strong>Usage in workflow:</strong></p>
+                    <pre><code class="language-json">{
+  "python_modules": {
+    "data_utils": "db://data-utils"
+  },
+  "nodes": {
+    "process": {
+      "type": "python",
+      "code": "from data_utils import parse_csv_text\ndata = parse_csv_text(input_data['csv'])"
+    }
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

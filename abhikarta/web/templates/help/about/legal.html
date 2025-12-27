@@ -1,0 +1,120 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Legal & Copyright" %}
+{% set description = "License, copyright, and legal notices" %}
+{% set icon = "bi-shield-check" %}
+{% set header_color = "#212529" %}
+{% set header_color_dark = "#000000" %}
+
+{% block help_nav %}
+<a href="#copyright">Copyright</a>
+<a href="#license">License</a>
+<a href="#patents">Patents</a>
+<a href="#trademarks">Trademarks</a>
+<a href="#contact">Contact</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="copyright">Copyright Notice</h2>
+<div class="card border-dark mb-5">
+    <div class="card-body">
+        <p class="lead mb-0">
+            <strong>© 2025-2030 Ashutosh Sinha. All Rights Reserved.</strong>
+        </p>
+    </div>
+</div>
+
+<p>This software, including but not limited to all source code, documentation, design, architecture, algorithms, workflows, and associated intellectual property, is the proprietary and confidential property of Ashutosh Sinha.</p>
+
+<hr class="my-5">
+
+<h2 id="license">License Terms</h2>
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    <strong>Proprietary Software</strong>
+</div>
+
+<p>This software is provided under a proprietary license. Unauthorized copying, modification, distribution, or use of this software, in whole or in part, is strictly prohibited without explicit written permission from the copyright holder.</p>
+
+<h5>Permitted Uses</h5>
+<ul>
+    <li>Internal evaluation and testing</li>
+    <li>Development and learning purposes</li>
+    <li>Use as authorized by a separate license agreement</li>
+</ul>
+
+<h5>Prohibited Uses</h5>
+<ul>
+    <li>Commercial use without license</li>
+    <li>Redistribution of source code</li>
+    <li>Modification for commercial purposes</li>
+    <li>Reverse engineering beyond fair use</li>
+    <li>Creating derivative works for distribution</li>
+</ul>
+
+<hr class="my-5">
+
+<h2 id="patents">Patent Notice</h2>
+<div class="card border-info mb-4">
+    <div class="card-body">
+        <h5><i class="bi bi-file-earmark-text me-2"></i>Patent Pending</h5>
+        <p class="mb-0">Certain aspects of this software may be covered by pending patent applications. The following technologies and methods are subject to intellectual property protection:</p>
+    </div>
+</div>
+
+<ul>
+    <li>Workflow DAG execution system with embedded Python modules</li>
+    <li>Unified LLM facade with automatic cost tracking</li>
+    <li>Human-in-the-Loop trigger and escalation system</li>
+    <li>Agent lifecycle management architecture</li>
+    <li>Enterprise RBAC integration for AI agents</li>
+</ul>
+
+<hr class="my-5">
+
+<h2 id="trademarks">Trademarks</h2>
+<p><strong>Abhikarta-LLM™</strong> and the Abhikarta logo are trademarks of Ashutosh Sinha.</p>
+
+<p>All other trademarks, service marks, and product names mentioned in this software are the property of their respective owners:</p>
+<ul>
+    <li>OpenAI, GPT-4, and ChatGPT are trademarks of OpenAI, Inc.</li>
+    <li>Claude and Anthropic are trademarks of Anthropic, PBC.</li>
+    <li>Google, Gemini, and Google Cloud are trademarks of Google LLC.</li>
+    <li>Mistral AI is a trademark of Mistral AI.</li>
+    <li>Python is a trademark of the Python Software Foundation.</li>
+    <li>Flask is a trademark of Pallets Projects.</li>
+</ul>
+
+<hr class="my-5">
+
+<h2 id="contact">Contact Information</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5><i class="bi bi-person me-2"></i>Author</h5>
+                <p class="mb-0">Ashutosh Sinha</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5><i class="bi bi-envelope me-2"></i>Email</h5>
+                <p class="mb-0"><a href="mailto:ajsinha@gmail.com">ajsinha@gmail.com</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mt-5">
+    <i class="bi bi-info-circle me-2"></i>
+    For licensing inquiries, partnership opportunities, or legal questions, please contact via email.
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('about') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to About
+    </a>
+</div>
+{% endblock %}

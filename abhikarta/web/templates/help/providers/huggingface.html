@@ -1,0 +1,367 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Hugging Face" %}
+{% set description = "The AI community hub with 500,000+ models - open source meets enterprise" %}
+{% set icon = "bi-emoji-smile" %}
+{% set header_color = "#ffcc00" %}
+{% set header_color_dark = "#e6b800" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#inference-api">Inference API</a>
+<a href="#models">Popular Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#inference-endpoints">Inference Endpoints</a>
+<a href="#resources">Resources</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 64px; height: 64px; background: #ffcc00;">
+        <span style="font-size: 2rem;">🤗</span>
+    </div>
+    <div>
+        <h2 id="overview" class="mb-1">Hugging Face</h2>
+        <p class="text-muted mb-0">The GitHub of Machine Learning - 500,000+ models</p>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <i class="bi bi-infinity me-2"></i>
+    <strong>Massive Selection:</strong> Access to virtually every open-source model including Llama, Mistral, Falcon, StarCoder, and thousands more.
+</div>
+
+<p class="lead">Hugging Face is the central hub for the AI community, hosting models, datasets, and applications. Their Inference API and Inference Endpoints let you run any model without infrastructure management.</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-warning">500K+</h3>
+                <small class="text-muted">Models</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-primary">250K+</h3>
+                <small class="text-muted">Datasets</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-success">100K+</h3>
+                <small class="text-muted">Spaces</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <h3 class="text-danger">Free</h3>
+                <small class="text-muted">Tier Available</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="inference-api">Inference API Options</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Serverless Inference API</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Best for:</strong> Quick testing, low volume</p>
+                <ul>
+                    <li>Free tier with rate limits</li>
+                    <li>Pay-as-you-go for more</li>
+                    <li>Curated popular models</li>
+                    <li>No setup required</li>
+                </ul>
+                <p class="mb-0"><strong>Pricing:</strong> $0.06-0.10 per 1K tokens (model dependent)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-server me-2"></i>Inference Endpoints</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Best for:</strong> Production, dedicated resources</p>
+                <ul>
+                    <li>Dedicated GPU instances</li>
+                    <li>Any model from Hub</li>
+                    <li>Auto-scaling</li>
+                    <li>Custom containers</li>
+                </ul>
+                <p class="mb-0"><strong>Pricing:</strong> From $0.06/hour (CPU) to $6.50/hour (A100)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="models">Popular Models on Hugging Face</h2>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Creator</th><th>Parameters</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>meta-llama/Llama-3.1-70B-Instruct</code></td>
+                <td>Meta</td>
+                <td>70B</td>
+                <td>General purpose, best open model</td>
+            </tr>
+            <tr>
+                <td><code>meta-llama/Llama-3.1-8B-Instruct</code></td>
+                <td>Meta</td>
+                <td>8B</td>
+                <td>Fast, efficient</td>
+            </tr>
+            <tr>
+                <td><code>mistralai/Mistral-7B-Instruct-v0.3</code></td>
+                <td>Mistral</td>
+                <td>7B</td>
+                <td>Efficient, multilingual</td>
+            </tr>
+            <tr>
+                <td><code>mistralai/Mixtral-8x7B-Instruct-v0.1</code></td>
+                <td>Mistral</td>
+                <td>47B MoE</td>
+                <td>Complex reasoning</td>
+            </tr>
+            <tr>
+                <td><code>Qwen/Qwen2.5-72B-Instruct</code></td>
+                <td>Alibaba</td>
+                <td>72B</td>
+                <td>Multilingual, Chinese</td>
+            </tr>
+            <tr>
+                <td><code>microsoft/Phi-3-medium-128k-instruct</code></td>
+                <td>Microsoft</td>
+                <td>14B</td>
+                <td>Small but capable</td>
+            </tr>
+            <tr>
+                <td><code>bigcode/starcoder2-15b</code></td>
+                <td>BigCode</td>
+                <td>15B</td>
+                <td>Code generation</td>
+            </tr>
+            <tr>
+                <td><code>BAAI/bge-large-en-v1.5</code></td>
+                <td>BAAI</td>
+                <td>335M</td>
+                <td>Embeddings for RAG</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Model Variety</h5>
+                <p class="mb-0">Access every major open-source model from one API. Try different models without infrastructure changes.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Free Tier</h5>
+                <p class="mb-0">Generous free tier for experimentation and testing.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Community</h5>
+                <p class="mb-0">Largest AI community. Model cards, discussions, and examples for every model.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Flexibility</h5>
+                <p class="mb-0">Run serverless or dedicated. Host any model including fine-tuned versions.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Specialized Models</h5>
+                <p class="mb-0">Domain-specific models for medical, legal, finance, and more.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Embeddings</h5>
+                <p class="mb-0">Excellent embedding models for RAG (BGE, E5, Sentence Transformers).</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Variable Quality</h5>
+                <p class="mb-0">Open models vary in quality. May need testing to find best fit.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Rate Limits</h5>
+                <p class="mb-0">Free tier has strict limits. Production requires paid plan.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Cold Starts</h5>
+                <p class="mb-0">Serverless API can have cold starts for less popular models.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>API Differences</h5>
+                <p class="mb-0">Not all models support the same features (function calling, etc).</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration in Abhikarta-LLM</h2>
+
+<h5>Step 1: Get Your API Token</h5>
+<ol>
+    <li>Go to <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co/settings/tokens</a></li>
+    <li>Click "New token"</li>
+    <li>Select "Read" access (or "Write" for fine-tuning)</li>
+    <li>Copy the token (starts with <code>hf_</code>)</li>
+</ol>
+
+<h5>Step 2: Configure in application.properties</h5>
+<pre><code class="language-properties"># config/application.properties
+
+# Enable Hugging Face
+llm.huggingface.enabled=true
+
+# API Token
+llm.huggingface.api_key=hf_your-token-here
+# Or: llm.huggingface.api_key=${HF_API_TOKEN}
+
+# Default model (use full model path)
+llm.huggingface.default_model=meta-llama/Llama-3.1-70B-Instruct
+
+# API endpoint (serverless)
+llm.huggingface.base_url=https://api-inference.huggingface.co/models
+
+# For Inference Endpoints (dedicated)
+# llm.huggingface.endpoint_url=https://your-endpoint.endpoints.huggingface.cloud</code></pre>
+
+<hr class="my-5">
+
+<h2 id="inference-endpoints">Setting Up Inference Endpoints</h2>
+
+<p>For production workloads, use dedicated Inference Endpoints:</p>
+
+<ol>
+    <li>Go to <a href="https://ui.endpoints.huggingface.co" target="_blank">Hugging Face Endpoints</a></li>
+    <li>Click "New Endpoint"</li>
+    <li>Search for your model (e.g., "Llama-3.1-70B-Instruct")</li>
+    <li>Select instance type:
+        <ul>
+            <li><strong>CPU:</strong> $0.06/hr - For embeddings, small models</li>
+            <li><strong>GPU (T4):</strong> $0.60/hr - For 7B models</li>
+            <li><strong>GPU (A10G):</strong> $1.30/hr - For 13B-30B models</li>
+            <li><strong>GPU (A100):</strong> $6.50/hr - For 70B+ models</li>
+        </ul>
+    </li>
+    <li>Configure auto-scaling</li>
+    <li>Deploy and copy the endpoint URL</li>
+</ol>
+
+<pre><code class="language-properties"># Configure dedicated endpoint
+llm.huggingface.endpoint_url=https://xyz123.us-east-1.aws.endpoints.huggingface.cloud</code></pre>
+
+<hr class="my-5">
+
+<h2 id="resources">Resources & Links</h2>
+<div class="row g-3">
+    <div class="col-md-3">
+        <a href="https://huggingface.co/docs/api-inference" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-book display-4 text-primary"></i>
+                <h6 class="mt-2">API Docs</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://huggingface.co/models" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-box-seam display-4 text-success"></i>
+                <h6 class="mt-2">Model Hub</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://ui.endpoints.huggingface.co" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-server display-4 text-warning"></i>
+                <h6 class="mt-2">Endpoints</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://huggingface.co/pricing" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-currency-dollar display-4 text-danger"></i>
+                <h6 class="mt-2">Pricing</h6>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

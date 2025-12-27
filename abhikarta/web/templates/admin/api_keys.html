@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}API Keys - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-key me-2"></i>API Key Management</h2>
+            <p class="text-muted mb-0">Manage API keys for programmatic access to Abhikarta-LLM</p>
+        </div>
+        <a href="{{ url_for('create_api_key') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-2"></i>Create API Key
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+        {% if 'abk_' in message %}
+        <i class="bi bi-key me-2"></i>
+        <strong>{{ message.split(':')[0] }}:</strong>
+        <code class="user-select-all bg-dark text-warning px-2 py-1 rounded">{{ message.split(': ')[1] }}</code>
+        <br><small class="text-muted">Copy this key now - it cannot be retrieved later!</small>
+        {% else %}
+        {{ message }}
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    
+    <div class="card">
+        <div class="card-header bg-bmo-blue text-white">
+            <h5 class="mb-0"><i class="bi bi-list me-2"></i>Active API Keys</h5>
+        </div>
+        <div class="card-body">
+            {% if api_keys %}
+            <div class="table-responsive">
+                <table class="table table-hover" id="apiKeysTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>User</th>
+                            <th>Key ID</th>
+                            <th>Status</th>
+                            <th>Rate Limit</th>
+                            <th>Usage</th>
+                            <th>Created</th>
+                            <th>Last Used</th>
+                            <th>Expires</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key in api_keys %}
+                        <tr>
+                            <td>
+                                <strong>{{ key.name }}</strong>
+                                {% if key.description %}
+                                <br><small class="text-muted">{{ key.description }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if key.user_id in users %}
+                                {{ users[key.user_id].fullname }}
+                                {% else %}
+                                {{ key.user_id }}
+                                {% endif %}
+                            </td>
+                            <td><code class="small">{{ key.key_id[:8] }}...</code></td>
+                            <td>
+                                {% if key.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger">Revoked</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ key.rate_limit }}/min</td>
+                            <td>{{ key.usage_count or 0 }}</td>
+                            <td><small>{{ key.created_at }}</small></td>
+                            <td><small>{{ key.last_used_at or 'Never' }}</small></td>
+                            <td><small>{{ key.expires_at }}</small></td>
+                            <td>
+                                {% if key.is_active %}
+                                <form method="POST" action="{{ url_for('revoke_api_key', key_id=key.key_id) }}" 
+                                      style="display: inline;" onsubmit="return confirm('Revoke this API key?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Revoke">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <form method="POST" action="{{ url_for('delete_api_key', key_id=key.key_id) }}" 
+                                      style="display: inline;" onsubmit="return confirm('Permanently delete this API key?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-key display-1 text-muted"></i>
+                <p class="mt-3 text-muted">No API keys created yet</p>
+                <a href="{{ url_for('create_api_key') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Create First API Key
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>API Authentication</h5>
+        </div>
+        <div class="card-body">
+            <p>To authenticate API requests, include your API key in the <code>Authorization</code> header:</p>
+            <pre><code class="language-bash">curl -X GET "http://localhost:5000/api/agents" \
+  -H "Authorization: Bearer abk_your_api_key_here"</code></pre>
+            
+            <p class="mt-3">Or use the <code>X-API-Key</code> header:</p>
+            <pre><code class="language-bash">curl -X GET "http://localhost:5000/api/agents" \
+  -H "X-API-Key: abk_your_api_key_here"</code></pre>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#apiKeysTable').DataTable({
+        order: [[6, 'desc']],
+        pageLength: 25
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

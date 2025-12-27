@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{{ plugin.name }} - MCP Plugin - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('mcp_plugins') }}">MCP Plugins</a></li>
+                    <li class="breadcrumb-item active">{{ plugin.name }}</li>
+                </ol>
+            </nav>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-bmo-blue text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-plug me-2"></i>{{ plugin.name }}</h5>
+                    <div>
+                        {% if plugin.is_active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                        <span class="badge bg-info">{{ plugin.plugin_type | upper }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Plugin ID:</strong> <code>{{ plugin.plugin_id }}</code></p>
+                            <p><strong>Type:</strong> {{ plugin.plugin_type }}</p>
+                            {% if plugin.plugin_type == 'http' %}
+                            <p><strong>Base URL:</strong> {{ plugin.config.base_url }}</p>
+                            {% else %}
+                            <p><strong>Command:</strong> <code>{{ plugin.config.command }}</code></p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Created:</strong> {{ plugin.created_at }}</p>
+                            <p><strong>Description:</strong> {{ plugin.description or 'No description' }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="{{ url_for('mcp_edit_plugin', plugin_id=plugin.plugin_id) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil me-2"></i>Edit
+                        </a>
+                        <button class="btn btn-outline-success" onclick="testConnection()">
+                            <i class="bi bi-wifi me-2"></i>Test Connection
+                        </button>
+                        <button class="btn btn-outline-info" onclick="refreshTools()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Refresh Tools
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Available Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div id="tools-container">
+                        {% if tools %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Tool Name</th>
+                                        <th>Description</th>
+                                        <th>Parameters</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tool in tools %}
+                                    <tr>
+                                        <td><code>{{ tool.name }}</code></td>
+                                        <td>{{ tool.description }}</td>
+                                        <td>
+                                            {% for param, details in tool.parameters.items() %}
+                                            <span class="badge bg-secondary">{{ param }}</span>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No tools discovered yet. Click "Refresh Tools" to discover available tools.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function testConnection() {
+    alert('Testing connection to plugin...');
+    // TODO: Implement API call
+}
+
+function refreshTools() {
+    alert('Refreshing tools from plugin...');
+    // TODO: Implement API call
+}
+</script>
+{% endblock %}

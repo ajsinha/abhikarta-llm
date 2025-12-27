@@ -1,0 +1,216 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "LLM Provider & Model Management" %}
+{% set description = "Configure LLM providers, models, and role-based access control" %}
+{% set icon = "bi-cloud" %}
+{% set header_color = "#0d6efd" %}
+{% set header_color_dark = "#0a58ca" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#providers">Providers</a>
+<a href="#models">Models</a>
+<a href="#permissions">RBAC Permissions</a>
+<a href="#usage">Usage in Agents</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Overview</h2>
+<p class="lead">Abhikarta-LLM v1.1.0 introduces comprehensive LLM provider and model management with role-based access control.</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-primary">
+            <div class="card-body text-center">
+                <i class="bi bi-cloud display-4 text-primary"></i>
+                <h5 class="mt-3">Providers</h5>
+                <p class="small text-muted">Configure API endpoints, keys, and rate limits for each LLM provider</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-success">
+            <div class="card-body text-center">
+                <i class="bi bi-cpu display-4 text-success"></i>
+                <h5 class="mt-3">Models</h5>
+                <p class="small text-muted">Define available models with context limits, costs, and capabilities</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-warning">
+            <div class="card-body text-center">
+                <i class="bi bi-shield-lock display-4 text-warning"></i>
+                <h5 class="mt-3">Permissions</h5>
+                <p class="small text-muted">Control which roles can use which models with usage limits</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="providers">Managing LLM Providers</h2>
+<p>Providers represent the LLM services your organization uses. Navigate to <strong>Admin → LLM Providers</strong> to manage them.</p>
+
+<h5>Supported Provider Types</h5>
+<div class="row">
+    <div class="col-md-4">
+        <h6>Major Cloud Providers</h6>
+        <ul>
+            <li><code>openai</code> - OpenAI (GPT-4, GPT-3.5)</li>
+            <li><code>anthropic</code> - Anthropic (Claude)</li>
+            <li><code>google</code> - Google AI (Gemini)</li>
+            <li><code>azure</code> - Azure OpenAI</li>
+        </ul>
+    </div>
+    <div class="col-md-4">
+        <h6>Alternative Providers</h6>
+        <ul>
+            <li><code>mistral</code> - Mistral AI</li>
+            <li><code>groq</code> - Groq (fast inference)</li>
+            <li><code>together</code> - Together AI</li>
+            <li><code>cohere</code> - Cohere</li>
+        </ul>
+    </div>
+    <div class="col-md-4">
+        <h6>Self-Hosted/Enterprise</h6>
+        <ul>
+            <li><code>ollama</code> - Local Ollama</li>
+            <li><code>huggingface</code> - HF Inference</li>
+            <li><code>bedrock</code> - AWS Bedrock</li>
+        </ul>
+    </div>
+</div>
+
+<h5>Provider Configuration</h5>
+<table class="table table-bordered">
+    <tr><th>Field</th><th>Description</th></tr>
+    <tr><td><code>provider_id</code></td><td>Unique identifier (lowercase, used in code)</td></tr>
+    <tr><td><code>provider_type</code></td><td>Type determines API client to use</td></tr>
+    <tr><td><code>api_key_name</code></td><td>Environment variable containing API key</td></tr>
+    <tr><td><code>api_endpoint</code></td><td>Optional: Override default API URL</td></tr>
+    <tr><td><code>rate_limit_rpm</code></td><td>Requests per minute limit</td></tr>
+    <tr><td><code>rate_limit_tpm</code></td><td>Tokens per minute limit</td></tr>
+</table>
+
+<hr class="my-5">
+
+<h2 id="models">Managing LLM Models</h2>
+<p>Models are specific LLMs available from each provider. Navigate to <strong>Admin → LLM Models</strong> to manage them.</p>
+
+<h5>Model Configuration</h5>
+<table class="table table-bordered">
+    <tr><th>Field</th><th>Description</th></tr>
+    <tr><td><code>model_id</code></td><td>Exact model identifier for API calls (e.g., <code>gpt-4o</code>)</td></tr>
+    <tr><td><code>provider_id</code></td><td>Which provider this model belongs to</td></tr>
+    <tr><td><code>context_window</code></td><td>Maximum input tokens</td></tr>
+    <tr><td><code>max_output_tokens</code></td><td>Maximum output tokens</td></tr>
+    <tr><td><code>input_cost_per_1k</code></td><td>Cost per 1000 input tokens (USD)</td></tr>
+    <tr><td><code>output_cost_per_1k</code></td><td>Cost per 1000 output tokens (USD)</td></tr>
+    <tr><td><code>supports_vision</code></td><td>Can process images</td></tr>
+    <tr><td><code>supports_functions</code></td><td>Supports function/tool calling</td></tr>
+</table>
+
+<h5>Pre-configured Models</h5>
+<p>The system comes with 15+ pre-configured models from major providers:</p>
+<div class="row">
+    <div class="col-md-6">
+        <ul>
+            <li><strong>OpenAI:</strong> GPT-4o, GPT-4o-mini, GPT-4 Turbo, GPT-3.5 Turbo</li>
+            <li><strong>Anthropic:</strong> Claude 3.5 Sonnet, Claude 3 Opus, Claude 3 Haiku</li>
+            <li><strong>Google:</strong> Gemini 1.5 Pro, Gemini 1.5 Flash</li>
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <ul>
+            <li><strong>Mistral:</strong> Mistral Large, Mistral Small</li>
+            <li><strong>Groq:</strong> Mixtral 8x7B, Llama 3.1 70B</li>
+            <li><strong>Cohere:</strong> Command R+, Command R</li>
+        </ul>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="permissions">Role-Based Model Access</h2>
+<p>Control which roles can use which models and set usage limits. Click the <span class="badge bg-warning text-dark"><i class="bi bi-shield-lock"></i></span> button on any model to configure permissions.</p>
+
+<h5>Permission Settings</h5>
+<table class="table table-bordered">
+    <tr><th>Setting</th><th>Description</th></tr>
+    <tr><td><code>can_use</code></td><td>Whether the role can use this model at all</td></tr>
+    <tr><td><code>daily_limit</code></td><td>Max requests per day (-1 = unlimited)</td></tr>
+    <tr><td><code>monthly_limit</code></td><td>Max requests per month (-1 = unlimited)</td></tr>
+</table>
+
+<h5>Recommended Configuration</h5>
+<table class="table table-sm">
+    <thead class="table-light">
+        <tr><th>Role</th><th>Premium Models (GPT-4)</th><th>Standard Models</th><th>Budget Models</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>super_admin</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+        <tr><td>domain_admin</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+        <tr><td>agent_developer</td><td>100/day, 3000/month</td><td>Unlimited</td><td>Unlimited</td></tr>
+        <tr><td>agent_user</td><td>50/day, 1000/month</td><td>200/day</td><td>Unlimited</td></tr>
+        <tr><td>viewer</td><td>No access</td><td>20/day</td><td>100/day</td></tr>
+    </tbody>
+</table>
+
+<hr class="my-5">
+
+<h2 id="usage">Using Models in Agents & Workflows</h2>
+
+<h5>In Agent Configuration</h5>
+<pre><code class="language-json">{
+  "agent_id": "my-assistant",
+  "llm_config": {
+    "provider": "openai",
+    "model": "gpt-4o",
+    "temperature": 0.7,
+    "max_tokens": 2000
+  }
+}</code></pre>
+
+<h5>In Workflow DAG Nodes</h5>
+<pre><code class="language-json">{
+  "nodes": {
+    "analyze": {
+      "type": "llm",
+      "config": {
+        "provider": "anthropic",
+        "model": "claude-3-5-sonnet-20241022",
+        "temperature": 0.3,
+        "prompt": "Analyze the following data..."
+      }
+    }
+  }
+}</code></pre>
+
+<h5>Runtime Permission Check</h5>
+<p>When an agent or workflow attempts to use a model:</p>
+<ol>
+    <li>System checks if the user's role has <code>can_use</code> permission for the model</li>
+    <li>If limits are set, checks daily and monthly usage counts</li>
+    <li>If allowed, the call proceeds and usage is logged</li>
+    <li>If denied, an error is returned with the reason</li>
+</ol>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Tip:</strong> All LLM calls are automatically logged to the <code>llm_calls</code> table with cost tracking, making it easy to monitor usage per user, agent, and model.
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('admin_llm_providers') }}" class="btn btn-primary me-2">
+        <i class="bi bi-cloud me-2"></i>Manage Providers
+    </a>
+    <a href="{{ url_for('admin_llm_models') }}" class="btn btn-success me-2">
+        <i class="bi bi-cpu me-2"></i>Manage Models
+    </a>
+    <a href="{{ url_for('help') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Documentation
+    </a>
+</div>
+{% endblock %}

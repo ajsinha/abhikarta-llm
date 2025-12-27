@@ -1,0 +1,127 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Azure OpenAI" %}
+{% set description = "OpenAI models hosted on Microsoft Azure for enterprise compliance" %}
+{% set icon = "bi-microsoft" %}
+{% set header_color = "#0078d4" %}
+{% set header_color_dark = "#005a9e" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Available Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#references">References</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle p-3 me-3" style="background: #0078d4;">
+        <i class="bi bi-microsoft text-white fs-3"></i>
+    </div>
+    <div>
+        <h1 class="mb-0">Azure OpenAI</h1>
+        <p class="text-muted mb-0">Enterprise-grade OpenAI on Microsoft Azure</p>
+    </div>
+</div>
+
+<h2 id="overview">Overview</h2>
+<p class="lead">Azure OpenAI Service provides access to OpenAI's powerful models with enterprise-grade security, compliance, and regional availability through Microsoft Azure.</p>
+
+<hr class="my-5">
+
+<h2 id="models">Available Models</h2>
+<p>Same models as OpenAI, deployed within Azure:</p>
+<ul>
+    <li>GPT-4o, GPT-4 Turbo, GPT-4</li>
+    <li>GPT-3.5 Turbo</li>
+    <li>Text Embedding models</li>
+    <li>DALL-E for image generation</li>
+</ul>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Enterprise Compliance</h5>
+                <p class="mb-0">SOC 2, HIPAA, GDPR, and more. Data stays in your Azure tenant.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Regional Availability</h5>
+                <p class="mb-0">Deploy in specific regions for data residency requirements.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Azure Integration</h5>
+                <p class="mb-0">Native integration with Azure AD, VNET, Private Endpoints.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Content Filtering</h5>
+                <p class="mb-0">Built-in content filtering and responsible AI features.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Complex Setup</h5>
+                <p class="mb-0">Requires Azure subscription and resource provisioning.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Model Availability</h5>
+                <p class="mb-0">New models may not be immediately available in all regions.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration</h2>
+<pre><code class="language-properties"># config/application.properties
+llm.azure.enabled=true
+llm.azure.api_key=your-azure-api-key
+llm.azure.endpoint=https://your-resource.openai.azure.com/
+llm.azure.api_version=2024-02-15-preview
+llm.azure.deployment_name=gpt-4o-deployment</code></pre>
+
+<hr class="my-5">
+
+<h2 id="references">References</h2>
+<ul>
+    <li><a href="https://azure.microsoft.com/en-us/products/ai-services/openai-service" target="_blank">Azure OpenAI Service</a></li>
+    <li><a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/" target="_blank">Documentation</a></li>
+    <li><a href="https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/" target="_blank">Pricing</a></li>
+</ul>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

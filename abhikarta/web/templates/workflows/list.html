@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Workflows - Abhikarta LLM{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-diagram-3 me-2"></i>DAG Workflows</h2>
+            <p class="text-muted mb-0">Manage and execute workflow DAGs with Python modules</p>
+        </div>
+        <div>
+            <a href="{{ url_for('upload_workflow') }}" class="btn btn-primary">
+                <i class="bi bi-upload me-1"></i>Upload Workflow
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Total Workflows</h6>
+                    <h3 class="mb-0">{{ workflows|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Published</h6>
+                    <h3 class="mb-0">{{ workflows|selectattr('status', 'equalto', 'published')|list|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Total Executions</h6>
+                    <h3 class="mb-0">{{ workflows|sum(attribute='execution_count') }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h6 class="opacity-75">Draft</h6>
+                    <h3 class="mb-0">{{ workflows|selectattr('status', 'equalto', 'draft')|list|length }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workflows Table -->
+    <div class="card">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <div class="col"><h5 class="mb-0">All Workflows</h5></div>
+                <div class="col-auto">
+                    <input type="text" class="form-control form-control-sm" placeholder="Search..." id="searchWorkflows">
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Workflow</th>
+                            <th>Status</th>
+                            <th>Nodes</th>
+                            <th>Executions</th>
+                            <th>Last Executed</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if workflows %}
+                            {% for wf in workflows %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('workflow_detail', workflow_id=wf.workflow_id) }}" class="text-decoration-none">
+                                        <strong>{{ wf.name }}</strong>
+                                    </a>
+                                    <br><small class="text-muted">{{ wf.description[:50] }}{{ '...' if wf.description|length > 50 else '' }}</small>
+                                </td>
+                                <td>
+                                    {% if wf.status == 'published' %}
+                                        <span class="badge bg-success">Published</span>
+                                    {% elif wf.status == 'draft' %}
+                                        <span class="badge bg-secondary">Draft</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">{{ wf.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">
+                                        {% set dag = wf.dag_definition %}
+                                        {% if dag is string %}
+                                            -
+                                        {% else %}
+                                            {{ dag.nodes|length if dag.nodes else 0 }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>{{ wf.execution_count or 0 }}</td>
+                                <td>
+                                    <small>{{ wf.last_executed_at or 'Never' }}</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('execute_workflow', workflow_id=wf.workflow_id) }}" 
+                                           class="btn btn-outline-success" title="Execute">
+                                            <i class="bi bi-play-fill"></i>
+                                        </a>
+                                        <a href="{{ url_for('workflow_detail', workflow_id=wf.workflow_id) }}" 
+                                           class="btn btn-outline-primary" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <button class="btn btn-outline-danger" title="Delete" 
+                                                onclick="deleteWorkflow('{{ wf.workflow_id }}')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="bi bi-diagram-3 display-4 text-muted"></i>
+                                    <p class="text-muted mt-2">No workflows yet</p>
+                                    <a href="{{ url_for('upload_workflow') }}" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-upload me-1"></i>Upload Your First Workflow
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('searchWorkflows').addEventListener('input', function(e) {
+    const search = e.target.value.toLowerCase();
+    document.querySelectorAll('tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(search) ? '' : 'none';
+    });
+});
+
+function deleteWorkflow(id) {
+    if (confirm('Delete this workflow? This cannot be undone.')) {
+        fetch(`/workflows/${id}/delete`, { method: 'POST' })
+            .then(r => r.json())
+            .then(d => { if (d.success) location.reload(); else alert(d.error); });
+    }
+}
+</script>
+{% endblock %}

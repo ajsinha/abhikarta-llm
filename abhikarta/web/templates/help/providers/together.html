@@ -1,0 +1,153 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Together AI" %}
+{% set description = "Access 100+ open-source models with competitive pricing" %}
+{% set icon = "bi-people-fill" %}
+{% set header_color = "#5046e4" %}
+{% set header_color_dark = "#3d35b0" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#models">Popular Models</a>
+<a href="#strengths">Strengths</a>
+<a href="#weaknesses">Weaknesses</a>
+<a href="#configuration">Configuration</a>
+<a href="#references">References</a>
+{% endblock %}
+
+{% block help_content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle p-3 me-3" style="background: #5046e4;">
+        <i class="bi bi-people-fill text-white fs-3"></i>
+    </div>
+    <div>
+        <h1 class="mb-0">Together AI</h1>
+        <p class="text-muted mb-0">The platform for open-source AI</p>
+    </div>
+</div>
+
+<h2 id="overview">Overview</h2>
+<p class="lead">Together AI provides access to over 100 open-source models with competitive pricing, fast inference, and easy deployment. Great for accessing the latest open models without managing infrastructure.</p>
+
+<hr class="my-5">
+
+<h2 id="models">Popular Models</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Price $/1M</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo</code></td>
+                <td>$3.50</td>
+                <td>Most capable open model</td>
+            </tr>
+            <tr>
+                <td><code>meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo</code></td>
+                <td>$0.88</td>
+                <td>Best balance of quality/cost</td>
+            </tr>
+            <tr>
+                <td><code>mistralai/Mixtral-8x22B-Instruct-v0.1</code></td>
+                <td>$1.20</td>
+                <td>MoE efficiency</td>
+            </tr>
+            <tr>
+                <td><code>Qwen/Qwen2.5-72B-Instruct-Turbo</code></td>
+                <td>$1.20</td>
+                <td>Multilingual, Chinese</td>
+            </tr>
+            <tr>
+                <td><code>deepseek-ai/deepseek-coder-33b-instruct</code></td>
+                <td>$0.80</td>
+                <td>Code generation</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="strengths">Strengths</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Massive Model Selection</h5>
+                <p class="mb-0">100+ models including Llama, Mistral, Qwen, and more.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Competitive Pricing</h5>
+                <p class="mb-0">Often cheaper than running your own infrastructure.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>OpenAI Compatible</h5>
+                <p class="mb-0">Drop-in replacement for OpenAI API format.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Fast New Models</h5>
+                <p class="mb-0">Quick to add new open-source releases.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="weaknesses">Weaknesses</h2>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Quality Variance</h5>
+                <p class="mb-0">Open models may not match GPT-4/Claude quality.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Model Churn</h5>
+                <p class="mb-0">Models may be deprecated as newer versions release.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="configuration">Configuration</h2>
+<pre><code class="language-properties"># config/application.properties
+llm.together.enabled=true
+llm.together.api_key=your-together-api-key
+llm.together.default_model=meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo
+llm.together.base_url=https://api.together.xyz/v1</code></pre>
+
+<hr class="my-5">
+
+<h2 id="references">References</h2>
+<ul>
+    <li><a href="https://www.together.ai/" target="_blank">Together AI Website</a></li>
+    <li><a href="https://docs.together.ai/" target="_blank">API Documentation</a></li>
+    <li><a href="https://api.together.xyz/models" target="_blank">Model Catalog</a></li>
+</ul>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Providers
+    </a>
+</div>
+{% endblock %}

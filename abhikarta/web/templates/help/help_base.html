@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Help - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .help-page-header {
+        background: linear-gradient(135deg, {{ header_color | default('#0066b3') }} 0%, {{ header_color_dark | default('#003d6b') }} 100%);
+        color: white;
+        padding: 2.5rem 0;
+    }
+    .help-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        padding: 2rem;
+        margin-top: -2rem;
+    }
+    .help-nav {
+        position: sticky;
+        top: 80px;
+    }
+    .help-nav a {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: #495057;
+        text-decoration: none;
+        border-left: 3px solid transparent;
+        font-size: 0.9rem;
+    }
+    .help-nav a:hover, .help-nav a.active {
+        color: #0066b3;
+        border-left-color: #0066b3;
+        background: #f8f9fa;
+    }
+    /* Code blocks with highlight.js */
+    pre code.hljs {
+        border-radius: 8px;
+        padding: 1.25rem;
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+    .hljs {
+        background: #282c34;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="help-page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('help') }}" class="text-white-50">Documentation</a></li>
+                <li class="breadcrumb-item active text-white">{{ title }}</li>
+            </ol>
+        </nav>
+        <h1 class="display-6 fw-bold mb-2">
+            <i class="bi {{ icon }} me-3"></i>{{ title }}
+        </h1>
+        <p class="lead mb-0 opacity-75">{{ description }}</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="help-content">
+                {% block help_content %}{% endblock %}
+            </div>
+        </div>
+        
+        <!-- Side Navigation -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="help-nav mt-4">
+                <h6 class="text-muted text-uppercase mb-3">On This Page</h6>
+                {% block help_nav %}{% endblock %}
+                
+                <hr class="my-4">
+                <h6 class="text-muted text-uppercase mb-3">Related Topics</h6>
+                <a href="{{ url_for('help') }}"><i class="bi bi-arrow-left me-2"></i>Back to Documentation</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
