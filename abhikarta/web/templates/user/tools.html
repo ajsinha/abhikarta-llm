@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block title %}Tools Registry - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tool-card {
+        transition: all 0.3s ease;
+    }
+    .tool-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .source-badge {
+        font-size: 0.75rem;
+    }
+    .tool-description {
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .stat-card {
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    .stat-card.primary { border-color: var(--bmo-blue); }
+    .stat-card.success { border-color: #198754; }
+    .stat-card.warning { border-color: #ffc107; }
+    .stat-card.info { border-color: #0dcaf0; }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--bmo-blue);
+    }
+    .refresh-spin {
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    /* DataTables styling */
+    .dataTables_wrapper .dataTables_length select {
+        min-width: 70px;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+        min-width: 200px;
+    }
+    #toolsTable tbody tr {
+        cursor: pointer;
+    }
+    #toolsTable tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    .action-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-wrench-adjustable me-2"></i>Tools Registry</h2>
+            <p class="text-muted mb-0">All available tools including pre-built, MCP, and custom tools</p>
+        </div>
+        <div>
+            {% if session.get('is_admin') %}
+            <button class="btn btn-outline-primary me-2" onclick="refreshMCPTools()" id="refreshBtn">
+                <i class="bi bi-arrow-clockwise me-1" id="refreshIcon"></i>Refresh MCP
+            </button>
+            {% endif %}
+            <a href="{{ url_for('help_page', page='prebuilt-tools') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-book me-1"></i>Documentation
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-number">{{ registry_stats.total_tools }}</div>
+                            <div class="text-muted">Total Tools</div>
+                        </div>
+                        <i class="bi bi-wrench display-4 text-muted opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-number">{{ registry_stats.enabled_tools }}</div>
+                            <div class="text-muted">Enabled Tools</div>
+                        </div>
+                        <i class="bi bi-check-circle display-4 text-muted opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-number">{{ mcp_stats.connected_servers }}</div>
+                            <div class="text-muted">MCP Servers</div>
+                        </div>
+                        <i class="bi bi-server display-4 text-muted opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stat-number">{{ mcp_stats.total_tools }}</div>
+                            <div class="text-muted">MCP Tools</div>
+                        </div>
+                        <i class="bi bi-plug display-4 text-muted opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tools Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Available Tools</h5>
+            <div class="d-flex gap-2">
+                <select id="categoryFilter" class="form-select form-select-sm" style="width: auto;">
+                    <option value="">All Categories</option>
+                    {% for category in registry_stats.by_category.keys() %}
+                    <option value="{{ category }}">{{ category|title }}</option>
+                    {% endfor %}
+                </select>
+                <select id="sourceFilter" class="form-select form-select-sm" style="width: auto;">
+                    <option value="">All Sources</option>
+                    <option value="prebuilt">Pre-built</option>
+                    <option value="mcp">MCP Server</option>
+                    <option value="code_fragment">Code Fragment</option>
+                    <option value="built-in">Built-in</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <table id="toolsTable" class="table table-hover" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Source</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tool in tools %}
+                    <tr data-tool-name="{{ tool.name }}" data-category="{{ tool.category }}" data-source="{{ tool.source_type }}">
+                        <td>
+                            <a href="{{ url_for('tool_detail', tool_name=tool.name) }}" class="text-decoration-none">
+                                <strong>{{ tool.name }}</strong>
+                            </a>
+                            <br>
+                            <small class="text-muted">{{ tool.tool_id[:8] }}...</small>
+                        </td>
+                        <td>
+                            <span class="tool-description" title="{{ tool.description }}">{{ tool.description }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ tool.type }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ tool.category }}</span>
+                        </td>
+                        <td>
+                            {% if tool.source_type == 'prebuilt' %}
+                            <span class="badge bg-success source-badge">
+                                <i class="bi bi-box-seam me-1"></i>Pre-built
+                            </span>
+                            {% elif tool.source_type == 'mcp' %}
+                            <span class="badge bg-primary source-badge" title="{{ tool.source_server }}">
+                                <i class="bi bi-plug me-1"></i>MCP: {{ tool.source_server|truncate(15) if tool.source_server else 'Unknown' }}
+                            </span>
+                            {% elif tool.source_type == 'code_fragment' %}
+                            <span class="badge bg-warning text-dark source-badge">
+                                <i class="bi bi-code-square me-1"></i>Code Fragment
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary source-badge">
+                                <i class="bi bi-wrench me-1"></i>Built-in
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if tool.enabled %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Enabled</span>
+                            {% else %}
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Disabled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('tool_detail', tool_name=tool.name) }}" 
+                                   class="btn btn-outline-secondary action-btn" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if tool.enabled %}
+                                <a href="{{ url_for('tool_test', tool_name=tool.name) }}" 
+                                   class="btn btn-outline-primary action-btn" title="Test Tool">
+                                    <i class="bi bi-play-fill"></i>
+                                </a>
+                                {% else %}
+                                <button class="btn btn-outline-secondary action-btn" disabled title="Tool Disabled">
+                                    <i class="bi bi-play-fill"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    let toolsTable;
+    
+    $(document).ready(function() {
+        // Initialize DataTable
+        toolsTable = $('#toolsTable').DataTable({
+            pageLength: 25,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            order: [[0, 'asc']],
+            columnDefs: [
+                { orderable: false, targets: [6] }  // Actions column
+            ],
+            language: {
+                search: "Search tools:",
+                lengthMenu: "Show _MENU_ tools",
+                info: "Showing _START_ to _END_ of _TOTAL_ tools",
+                infoEmpty: "No tools available",
+                infoFiltered: "(filtered from _MAX_ total tools)",
+                emptyTable: "No tools registered"
+            }
+        });
+        
+        // Category filter
+        $('#categoryFilter').on('change', function() {
+            const category = $(this).val();
+            toolsTable.column(3).search(category).draw();
+        });
+        
+        // Custom filtering for source
+        $('#sourceFilter').on('change', function() {
+            const source = $(this).val();
+            if (source) {
+                toolsTable.column(4).search(source, true, false).draw();
+            } else {
+                toolsTable.column(4).search('').draw();
+            }
+        });
+        
+        // Row click to navigate to detail page (except action buttons)
+        $('#toolsTable tbody').on('click', 'tr', function(e) {
+            if (!$(e.target).closest('a, button').length) {
+                const toolName = $(this).data('tool-name');
+                if (toolName) {
+                    window.location.href = '/tools/' + encodeURIComponent(toolName);
+                }
+            }
+        });
+    });
+    
+    function refreshMCPTools() {
+        const btn = $('#refreshBtn');
+        const icon = $('#refreshIcon');
+        
+        btn.prop('disabled', true);
+        icon.addClass('refresh-spin');
+        
+        fetch('/api/tools/refresh-mcp', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                let msg = 'MCP servers refreshed:\n';
+                for (const [id, info] of Object.entries(data.servers)) {
+                    msg += `- ${info.name}: ${info.healthy ? 'Online' : 'Offline'} (${info.tool_count} tools)\n`;
+                }
+                alert(msg);
+                // Reload page to show updated tools
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        })
+        .finally(() => {
+            btn.prop('disabled', false);
+            icon.removeClass('refresh-spin');
+        });
+    }
+</script>
+{% endblock %}
+
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Tool</strong>
+                            <p class="small text-muted mb-0">A function that an agent can use to perform actions like web search, calculations, or API calls.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">MCP (Model Context Protocol)</strong>
+                            <p class="small text-muted mb-0">An open protocol for connecting AI assistants to external tools and data sources.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Registry</strong>
+                            <p class="small text-muted mb-0">A centralized catalog of all available tools, including pre-built, MCP, and custom tools.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Pre-built Tool</strong>
+                            <p class="small text-muted mb-0">A ready-to-use tool included with Abhikarta LLM for common operations.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Code Fragment</strong>
+                            <p class="small text-muted mb-0">A custom Python code module that can be dynamically loaded as a tool.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">JSON Schema</strong>
+                            <p class="small text-muted mb-0">A standard for defining the structure and validation rules for tool parameters.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

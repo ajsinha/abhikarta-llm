@@ -131,7 +131,76 @@ def prepare_user_facade(prop_conf):
     return user_facade
 
 
-def run_webserver(prop_conf, user_facade, db_facade):
+def prepare_tools_registry(prop_conf, db_facade):
+    """
+    Initialize the tools registry with pre-built tools.
+    
+    Args:
+        prop_conf: PropertiesConfigurator instance
+        db_facade: DatabaseFacade instance
+        
+    Returns:
+        ToolsRegistry instance
+    """
+    from abhikarta.tools import get_tools_registry
+    from abhikarta.tools.prebuilt import register_all_prebuilt_tools
+    
+    logger = logging.getLogger(__name__)
+    
+    # Get singleton registry
+    registry = get_tools_registry()
+    registry.set_db_facade(db_facade)
+    
+    # Register pre-built tools
+    prebuilt_count = register_all_prebuilt_tools(registry)
+    logger.info(f"Registered {prebuilt_count} pre-built tools")
+    
+    # Register code fragment tools from database
+    code_fragment_count = registry.register_from_code_fragments()
+    logger.info(f"Registered {code_fragment_count} code fragment tools")
+    
+    return registry
+
+
+def prepare_mcp_manager(prop_conf, db_facade, tools_registry):
+    """
+    Initialize MCP server manager and connect to configured servers.
+    
+    Args:
+        prop_conf: PropertiesConfigurator instance
+        db_facade: DatabaseFacade instance
+        tools_registry: ToolsRegistry instance
+        
+    Returns:
+        MCPServerManager instance
+    """
+    from abhikarta.mcp import get_mcp_manager
+    
+    logger = logging.getLogger(__name__)
+    
+    # Get singleton manager
+    manager = get_mcp_manager()
+    manager.set_db_facade(db_facade)
+    manager.set_tools_registry(tools_registry)
+    
+    # Load servers from database
+    server_count = manager.load_from_database()
+    logger.info(f"Loaded {server_count} MCP servers from database")
+    
+    # Connect to auto-connect servers
+    connect_results = manager.connect_all()
+    connected = sum(1 for v in connect_results.values() if v)
+    logger.info(f"Connected to {connected} MCP servers")
+    
+    # Start health monitor
+    health_interval = prop_conf.get_int('mcp.health.interval.seconds', 30)
+    manager.start_health_monitor(health_interval)
+    logger.info(f"MCP health monitor started (interval: {health_interval}s)")
+    
+    return manager
+
+
+def run_webserver(prop_conf, user_facade, db_facade, tools_registry, mcp_manager):
     """
     Initialize and run the web server.
     
@@ -139,6 +208,8 @@ def run_webserver(prop_conf, user_facade, db_facade):
         prop_conf: PropertiesConfigurator instance
         user_facade: UserFacade instance
         db_facade: DatabaseFacade instance
+        tools_registry: ToolsRegistry instance
+        mcp_manager: MCPServerManager instance
     """
     from abhikarta.web import AbhikartaLLMWeb
     
@@ -164,7 +235,7 @@ def run_webserver(prop_conf, user_facade, db_facade):
     aweb.run(host=host, port=port, debug=debug)
 
 
-def print_banner(prop_conf):
+def print_banner(prop_conf, tools_count=0, mcp_count=0):
     """Print application startup banner."""
     version = prop_conf.get('app.version', '1.0.0')
     host = prop_conf.get('server.host', '0.0.0.0')
@@ -173,35 +244,38 @@ def print_banner(prop_conf):
     debug = prop_conf.get_bool('app.debug', False)
     
     print(f"""
-╔══════════════════════════════════════════════════════════════════╗
-║                                                                  ║
-║   █████╗ ██████╗ ██╗  ██╗██╗██╗  ██╗ █████╗ ██████╗ ████████╗   ║
-║  ██╔══██╗██╔══██╗██║  ██║██║██║ ██╔╝██╔══██╗██╔══██╗╚══██╔══╝   ║
-║  ███████║██████╔╝███████║██║█████╔╝ ███████║██████╔╝   ██║      ║
-║  ██╔══██║██╔══██╗██╔══██║██║██╔═██╗ ██╔══██║██╔══██╗   ██║      ║
-║  ██║  ██║██████╔╝██║  ██║██║██║  ██╗██║  ██║██║  ██║   ██║      ║
-║  ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝      ║
-║                          LLM                                     ║
-║            AI Agent Design & Orchestration Platform              ║
-║                        Version {version}                           ║
-║                                                                  ║
-╠══════════════════════════════════════════════════════════════════╣
-║  Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.      ║
-╚══════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║    █████╗ ██████╗ ██╗  ██╗██╗██╗  ██╗ █████╗ ██████╗ ████████╗ █████╗    ║
+║   ██╔══██╗██╔══██╗██║  ██║██║██║ ██╔╝██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗   ║
+║   ███████║██████╔╝███████║██║█████╔╝ ███████║██████╔╝   ██║   ███████║   ║
+║   ██╔══██║██╔══██╗██╔══██║██║██╔═██╗ ██╔══██║██╔══██╗   ██║   ██╔══██║   ║
+║   ██║  ██║██████╔╝██║  ██║██║██║  ██╗██║  ██║██║  ██║   ██║   ██║  ██║   ║
+║   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝   ║
+║                                                                           ║
+║                    ██╗     ██╗     ███╗   ███╗                            ║
+║                    ██║     ██║     ████╗ ████║                            ║
+║                    ██║     ██║     ██╔████╔██║                            ║
+║                    ██║     ██║     ██║╚██╔╝██║                            ║
+║                    ███████╗███████╗██║ ╚═╝ ██║                            ║
+║                    ╚══════╝╚══════╝╚═╝     ╚═╝                            ║
+║                                                                           ║
+║               AI Agent Design & Orchestration Platform                    ║
+║                           Version {version}                                  ║
+║                                                                           ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║   Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.              ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 
   Starting server...
   Host: {host}
   Port: {port}
   Debug: {debug}
   Database: {db_type}
+  Tools Loaded: {tools_count}
+  MCP Servers: {mcp_count}
   
   Access the application at: http://{host}:{port}
-  
-  Default credentials:
-    Admin: admin / admin123
-    Domain Admin: domain_admin / domain123
-    Developer: developer / dev123
-    User: user / user123
     
   Press Ctrl+C to stop the server.
 """)
@@ -210,6 +284,9 @@ def print_banner(prop_conf):
 def main():
     """Main entry point for running the Abhikarta-LLM server."""
     logger = logging.getLogger(__name__)
+    
+    tools_registry = None
+    mcp_manager = None
     
     try:
         # 1. Initialize properties configuration
@@ -227,11 +304,21 @@ def main():
         user_facade = prepare_user_facade(prop_conf)
         logger.info("User management initialized")
         
-        # 5. Print startup banner
-        print_banner(prop_conf)
+        # 5. Initialize tools registry with pre-built tools
+        tools_registry = prepare_tools_registry(prop_conf, db_facade)
+        tools_count = len(tools_registry.list_tools())
+        logger.info(f"Tools registry initialized with {tools_count} tools")
         
-        # 6. Run web server
-        run_webserver(prop_conf, user_facade, db_facade)
+        # 6. Initialize MCP manager and connect to servers
+        mcp_manager = prepare_mcp_manager(prop_conf, db_facade, tools_registry)
+        mcp_count = len(mcp_manager.list_servers())
+        logger.info(f"MCP manager initialized with {mcp_count} servers")
+        
+        # 7. Print startup banner
+        print_banner(prop_conf, tools_count, mcp_count)
+        
+        # 8. Run web server
+        run_webserver(prop_conf, user_facade, db_facade, tools_registry, mcp_manager)
         
     except KeyboardInterrupt:
         logger.info("Server shutdown requested")
@@ -242,6 +329,10 @@ def main():
         sys.exit(1)
     finally:
         # Cleanup
+        if mcp_manager:
+            mcp_manager.shutdown()
+            logger.info("MCP manager shutdown")
+        
         if 'db_facade' in locals():
             db_facade.disconnect()
             logger.info("Database connection closed")

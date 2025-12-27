@@ -130,6 +130,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('tools_list') }}">
+                            <i class="bi bi-wrench-adjustable me-1"></i> Tools
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('user_hitl_tasks') }}">
                             <i class="bi bi-person-check me-1"></i> HITL Tasks
                         </a>
@@ -213,6 +218,9 @@
     <main class="container-fluid py-4">
         {% block content %}{% endblock %}
     </main>
+    
+    <!-- Page Glossary - Key Terms -->
+    {% block page_glossary %}{% endblock %}
     
     <!-- Footer -->
     <footer class="footer mt-auto py-3 bg-bmo-dark text-white">

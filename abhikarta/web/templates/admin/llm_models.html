@@ -172,3 +172,68 @@
     </div>
 </div>
 {% endblock %}
+
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Model</strong>
+                            <p class="small text-muted mb-0">A specific version of an LLM (e.g., "gpt-4o", "claude-3-sonnet").</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Context Window</strong>
+                            <p class="small text-muted mb-0">Maximum tokens a model can process in one request (input + output).</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Max Tokens</strong>
+                            <p class="small text-muted mb-0">Maximum number of tokens the model can generate in response.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Temperature</strong>
+                            <p class="small text-muted mb-0">Controls randomness: 0 = deterministic, 1 = creative/varied.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Function Calling</strong>
+                            <p class="small text-muted mb-0">Model capability to generate structured output to call tools.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Model Permissions</strong>
+                            <p class="small text-muted mb-0">RBAC settings controlling which users can access specific models.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

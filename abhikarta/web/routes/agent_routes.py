@@ -86,6 +86,19 @@ class AgentRoutes(AbstractRoutes):
                                    stats=stats,
                                    agent_types=agent_types)
         
+        @self.app.route('/admin/agents/new')
+        @admin_required
+        def agent_create():
+            """Display create agent form."""
+            self._ensure_managers()
+            agent_types = self.agent_manager.get_agent_types()
+            
+            return render_template('agents/create.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   agent_types=agent_types)
+        
         @self.app.route('/admin/agents/create', methods=['POST'])
         @admin_required
         def create_agent():

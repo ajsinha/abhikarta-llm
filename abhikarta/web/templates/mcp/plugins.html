@@ -265,3 +265,68 @@ document.getElementById('searchPlugins').addEventListener('input', function(e) {
 });
 </script>
 {% endblock %}
+
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">MCP Plugin</strong>
+                            <p class="small text-muted mb-0">An extension that adds new capabilities via Model Context Protocol.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">MCP (Model Context Protocol)</strong>
+                            <p class="small text-muted mb-0">Open protocol for connecting AI assistants to external tools.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Plugin Status</strong>
+                            <p class="small text-muted mb-0">Whether the plugin is active and available for use.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Endpoint</strong>
+                            <p class="small text-muted mb-0">URL where the plugin's API can be accessed.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Tool Count</strong>
+                            <p class="small text-muted mb-0">Number of tools provided by this plugin.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Version</strong>
+                            <p class="small text-muted mb-0">The plugin's version identifier for compatibility tracking.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

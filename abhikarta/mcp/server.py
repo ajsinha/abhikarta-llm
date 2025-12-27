@@ -119,21 +119,39 @@ class MCPServerConfig:
             except:
                 metadata = {}
         
+        # Handle both 'url' and 'base_url' column names
+        url = record.get('url') or record.get('base_url', '')
+        
+        # Get auth token from auth_config if not in separate column
+        auth_token = record.get('auth_token', '')
+        if not auth_token and auth_config:
+            auth_token = auth_config.get('token') or auth_config.get('api_key', '')
+        
+        # Handle auto_connect as int or bool
+        auto_connect = record.get('auto_connect', True)
+        if isinstance(auto_connect, int):
+            auto_connect = bool(auto_connect)
+        
+        # Handle is_active column (maps to auto_connect behavior)
+        is_active = record.get('is_active', 1)
+        if isinstance(is_active, int):
+            is_active = bool(is_active)
+        
         return cls(
             server_id=record.get('server_id'),
             name=record.get('name', ''),
             description=record.get('description', ''),
-            url=record.get('url', ''),
+            url=url,
             transport=MCPTransportType(record.get('transport', 'http')),
             timeout_seconds=record.get('timeout_seconds', 30),
             auth_type=MCPAuthType(record.get('auth_type', 'none')),
-            auth_token=record.get('auth_token', ''),
+            auth_token=auth_token,
             auth_header=record.get('auth_header', 'Authorization'),
             auth_config=auth_config,
             tools_endpoint=record.get('tools_endpoint', '/api/tools'),
             call_endpoint=record.get('call_endpoint', '/api/tools/call'),
             health_endpoint=record.get('health_endpoint', '/health'),
-            auto_connect=record.get('auto_connect', True),
+            auto_connect=auto_connect and is_active,
             retry_count=record.get('retry_count', 3),
             retry_delay_seconds=record.get('retry_delay_seconds', 1.0),
             version=record.get('version', ''),

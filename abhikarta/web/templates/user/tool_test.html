@@ -1,0 +1,559 @@
+{% extends "base.html" %}
+
+{% block title %}Test Tool: {{ tool.name }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .test-card {
+        border-left: 4px solid var(--bmo-blue);
+    }
+    .param-input-group {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s ease;
+    }
+    .param-input-group:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .param-input-group.required {
+        border-left: 3px solid #dc3545;
+    }
+    .param-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .param-type-badge {
+        font-family: monospace;
+        background-color: #e9ecef;
+        padding: 3px 10px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+    .result-container {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.9rem;
+        padding: 1.5rem;
+        border-radius: 8px;
+        max-height: 500px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    .result-success {
+        border: 2px solid #198754;
+    }
+    .result-error {
+        border: 2px solid #dc3545;
+    }
+    .json-input {
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.9rem;
+        min-height: 150px;
+    }
+    .execution-time {
+        font-size: 0.85rem;
+    }
+    .breadcrumb-item a {
+        color: var(--bmo-blue);
+        text-decoration: none;
+    }
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+    .tool-header-icon {
+        font-size: 2rem;
+    }
+    .quick-value-btn {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('tools_list') }}">Tools</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('tool_detail', tool_name=tool.name) }}">{{ tool.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Test</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                {% if source_type == 'prebuilt' %}
+                <i class="bi bi-box-seam text-success tool-header-icon"></i>
+                {% elif source_type == 'mcp' %}
+                <i class="bi bi-plug text-primary tool-header-icon"></i>
+                {% elif source_type == 'code_fragment' %}
+                <i class="bi bi-code-square text-warning tool-header-icon"></i>
+                {% else %}
+                <i class="bi bi-wrench text-secondary tool-header-icon"></i>
+                {% endif %}
+            </div>
+            <div>
+                <h2 class="mb-0">Test: {{ tool.name }}</h2>
+                <p class="text-muted mb-0">{{ tool.description or 'No description available' }}</p>
+            </div>
+        </div>
+        <div>
+            <a href="{{ url_for('tool_detail', tool_name=tool.name) }}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-info-circle me-1"></i>View Details
+            </a>
+            <a href="{{ url_for('tools_list') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Tools
+            </a>
+        </div>
+    </div>
+
+    {% if not tool.is_enabled %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Tool Disabled:</strong> This tool is currently disabled and cannot be executed.
+    </div>
+    {% else %}
+
+    <div class="row g-4">
+        <!-- Left Column: Input Parameters -->
+        <div class="col-lg-6">
+            <div class="card test-card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-sliders me-2"></i>Input Parameters</h5>
+                    <span class="badge bg-primary">{{ parameters|length }} parameter{{ 's' if parameters|length != 1 else '' }}</span>
+                </div>
+                <div class="card-body">
+                    <form id="toolTestForm">
+                        {% if parameters %}
+                            {% for param in parameters %}
+                            <div class="param-input-group {% if param.required %}required{% endif %}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="param-name mb-0" for="param_{{ param.name }}">
+                                        {{ param.name }}
+                                    </label>
+                                    <div>
+                                        <span class="param-type-badge">{{ param.param_type }}</span>
+                                        {% if param.required %}
+                                        <span class="badge bg-danger ms-1">required</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary ms-1">optional</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <p class="text-muted small mb-2">{{ param.description or 'No description' }}</p>
+                                
+                                {% if param.enum %}
+                                <!-- Enum: Use select dropdown -->
+                                <select class="form-select" id="param_{{ param.name }}" name="{{ param.name }}" 
+                                        data-type="{{ param.param_type }}" {% if param.required %}required{% endif %}>
+                                    <option value="">-- Select --</option>
+                                    {% for val in param.enum %}
+                                    <option value="{{ val }}" {% if param.default == val %}selected{% endif %}>{{ val }}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                                {% elif param.param_type == 'boolean' %}
+                                <!-- Boolean: Use checkbox -->
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="param_{{ param.name }}" 
+                                           name="{{ param.name }}" data-type="boolean"
+                                           {% if param.default %}checked{% endif %}>
+                                    <label class="form-check-label" for="param_{{ param.name }}">
+                                        {{ 'Enabled' if param.default else 'Enable' }}
+                                    </label>
+                                </div>
+                                
+                                {% elif param.param_type == 'integer' or param.param_type == 'number' %}
+                                <!-- Number: Use number input -->
+                                <input type="number" class="form-control" id="param_{{ param.name }}" 
+                                       name="{{ param.name }}" data-type="{{ param.param_type }}"
+                                       {% if param.default is not none %}value="{{ param.default }}"{% endif %}
+                                       {% if param.param_type == 'number' %}step="any"{% endif %}
+                                       {% if param.required %}required{% endif %}
+                                       placeholder="Enter {{ param.param_type }}...">
+                                
+                                {% elif param.param_type == 'array' or param.param_type == 'object' %}
+                                <!-- Complex types: Use textarea with JSON -->
+                                <textarea class="form-control json-input" id="param_{{ param.name }}" 
+                                          name="{{ param.name }}" data-type="{{ param.param_type }}"
+                                          {% if param.required %}required{% endif %}
+                                          placeholder='{% if param.param_type == "array" %}["item1", "item2"]{% else %}{"key": "value"}{% endif %}'>{% if param.default %}{{ param.default | tojson }}{% endif %}</textarea>
+                                <small class="text-muted">Enter valid JSON {{ param.param_type }}</small>
+                                
+                                {% else %}
+                                <!-- String: Use text input or textarea based on description -->
+                                {% if 'content' in param.name.lower() or 'text' in param.name.lower() or 'body' in param.name.lower() %}
+                                <textarea class="form-control" id="param_{{ param.name }}" 
+                                          name="{{ param.name }}" data-type="string"
+                                          rows="3" {% if param.required %}required{% endif %}
+                                          placeholder="Enter {{ param.name }}...">{% if param.default %}{{ param.default }}{% endif %}</textarea>
+                                {% else %}
+                                <input type="text" class="form-control" id="param_{{ param.name }}" 
+                                       name="{{ param.name }}" data-type="string"
+                                       {% if param.default is not none %}value="{{ param.default }}"{% endif %}
+                                       {% if param.required %}required{% endif %}
+                                       placeholder="Enter {{ param.name }}...">
+                                {% endif %}
+                                {% endif %}
+                                
+                                {% if param.default is not none and param.param_type not in ['boolean', 'array', 'object'] and not param.enum %}
+                                <div class="mt-1">
+                                    <button type="button" class="btn btn-outline-secondary quick-value-btn"
+                                            onclick="document.getElementById('param_{{ param.name }}').value = '{{ param.default }}'">
+                                        Use default: {{ param.default }}
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-check-circle display-4 text-success"></i>
+                            <p class="text-muted mt-2 mb-0">This tool has no input parameters. Click Execute to run it.</p>
+                        </div>
+                        {% endif %}
+
+                        <hr class="my-4">
+
+                        <!-- Advanced: Raw JSON Input -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="useRawJson" onchange="toggleRawJson()">
+                                <label class="form-check-label" for="useRawJson">
+                                    <i class="bi bi-braces me-1"></i>Use Raw JSON Input
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div id="rawJsonSection" class="d-none">
+                            <label class="form-label">Raw JSON Parameters</label>
+                            <textarea class="form-control json-input" id="rawJsonInput" rows="6" 
+                                      placeholder='{"param1": "value1", "param2": 123}'>{}</textarea>
+                            <small class="text-muted">Enter parameters as a JSON object</small>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" id="executeBtn">
+                                <i class="bi bi-play-fill me-1"></i>Execute Tool
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Results -->
+        <div class="col-lg-6">
+            <div class="card test-card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-terminal me-2"></i>Execution Result</h5>
+                    <div id="resultMeta" class="d-none">
+                        <span id="executionStatus" class="badge me-2"></span>
+                        <span id="executionTime" class="execution-time text-muted"></span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="resultPlaceholder" class="text-center py-5">
+                        <i class="bi bi-arrow-left-circle display-4 text-muted"></i>
+                        <p class="text-muted mt-3 mb-0">Fill in the parameters and click <strong>Execute Tool</strong> to see results</p>
+                    </div>
+                    
+                    <div id="resultLoading" class="text-center py-5 d-none">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted mt-3 mb-0">Executing tool...</p>
+                    </div>
+                    
+                    <div id="resultContent" class="d-none">
+                        <div class="d-flex justify-content-end mb-2">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyResult()">
+                                <i class="bi bi-clipboard me-1"></i>Copy
+                            </button>
+                        </div>
+                        <pre class="result-container mb-0" id="resultJson"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request Info Card -->
+            <div class="card test-card shadow-sm mt-4" id="requestCard" style="display: none;">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-send me-2"></i>Request Sent</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyRequest()">
+                        <i class="bi bi-clipboard me-1"></i>Copy
+                    </button>
+                </div>
+                <div class="card-body">
+                    <pre class="result-container mb-0" id="requestJson" style="max-height: 200px;"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const toolName = "{{ tool.name }}";
+    let lastRequest = null;
+    
+    document.getElementById('toolTestForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        executeTool();
+    });
+    
+    function toggleRawJson() {
+        const useRaw = document.getElementById('useRawJson').checked;
+        const rawSection = document.getElementById('rawJsonSection');
+        const paramInputs = document.querySelectorAll('.param-input-group');
+        
+        if (useRaw) {
+            rawSection.classList.remove('d-none');
+            paramInputs.forEach(el => el.style.opacity = '0.5');
+        } else {
+            rawSection.classList.add('d-none');
+            paramInputs.forEach(el => el.style.opacity = '1');
+        }
+    }
+    
+    function collectParameters() {
+        // Check if using raw JSON
+        if (document.getElementById('useRawJson').checked) {
+            try {
+                return JSON.parse(document.getElementById('rawJsonInput').value || '{}');
+            } catch (e) {
+                throw new Error('Invalid JSON in raw input: ' + e.message);
+            }
+        }
+        
+        // Collect from form fields
+        const params = {};
+        const form = document.getElementById('toolTestForm');
+        const inputs = form.querySelectorAll('input, select, textarea');
+        
+        inputs.forEach(input => {
+            if (input.name && input.name !== 'useRawJson' && input.id !== 'rawJsonInput') {
+                const dataType = input.dataset.type || 'string';
+                let value = input.value;
+                
+                // Skip empty optional fields
+                if (value === '' && !input.required) {
+                    return;
+                }
+                
+                // Type conversion
+                if (input.type === 'checkbox') {
+                    value = input.checked;
+                } else if (dataType === 'integer') {
+                    value = parseInt(value);
+                    if (isNaN(value)) return;
+                } else if (dataType === 'number') {
+                    value = parseFloat(value);
+                    if (isNaN(value)) return;
+                } else if (dataType === 'boolean') {
+                    value = value.toLowerCase() === 'true';
+                } else if (dataType === 'array' || dataType === 'object') {
+                    try {
+                        value = JSON.parse(value);
+                    } catch (e) {
+                        throw new Error(`Invalid JSON for parameter "${input.name}": ${e.message}`);
+                    }
+                }
+                
+                params[input.name] = value;
+            }
+        });
+        
+        return params;
+    }
+    
+    function executeTool() {
+        const btn = document.getElementById('executeBtn');
+        const resultPlaceholder = document.getElementById('resultPlaceholder');
+        const resultLoading = document.getElementById('resultLoading');
+        const resultContent = document.getElementById('resultContent');
+        const resultMeta = document.getElementById('resultMeta');
+        const requestCard = document.getElementById('requestCard');
+        
+        // Collect parameters
+        let params;
+        try {
+            params = collectParameters();
+        } catch (e) {
+            alert(e.message);
+            return;
+        }
+        
+        // Show loading state
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Executing...';
+        resultPlaceholder.classList.add('d-none');
+        resultContent.classList.add('d-none');
+        resultLoading.classList.remove('d-none');
+        
+        // Store request for display
+        lastRequest = params;
+        
+        const startTime = performance.now();
+        
+        fetch(`/api/tools/${toolName}/execute`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const endTime = performance.now();
+            const duration = ((endTime - startTime) / 1000).toFixed(2);
+            
+            // Show result
+            resultLoading.classList.add('d-none');
+            resultContent.classList.remove('d-none');
+            resultMeta.classList.remove('d-none');
+            
+            // Update status badge
+            const statusBadge = document.getElementById('executionStatus');
+            if (data.success) {
+                statusBadge.className = 'badge bg-success me-2';
+                statusBadge.innerHTML = '<i class="bi bi-check-circle me-1"></i>Success';
+                document.getElementById('resultJson').classList.add('result-success');
+                document.getElementById('resultJson').classList.remove('result-error');
+            } else {
+                statusBadge.className = 'badge bg-danger me-2';
+                statusBadge.innerHTML = '<i class="bi bi-x-circle me-1"></i>Failed';
+                document.getElementById('resultJson').classList.add('result-error');
+                document.getElementById('resultJson').classList.remove('result-success');
+            }
+            
+            document.getElementById('executionTime').textContent = `${duration}s`;
+            document.getElementById('resultJson').textContent = JSON.stringify(data, null, 2);
+            
+            // Show request card
+            requestCard.style.display = 'block';
+            document.getElementById('requestJson').textContent = JSON.stringify(lastRequest, null, 2);
+        })
+        .catch(error => {
+            resultLoading.classList.add('d-none');
+            resultContent.classList.remove('d-none');
+            resultMeta.classList.remove('d-none');
+            
+            const statusBadge = document.getElementById('executionStatus');
+            statusBadge.className = 'badge bg-danger me-2';
+            statusBadge.innerHTML = '<i class="bi bi-x-circle me-1"></i>Error';
+            
+            document.getElementById('resultJson').classList.add('result-error');
+            document.getElementById('resultJson').classList.remove('result-success');
+            document.getElementById('resultJson').textContent = JSON.stringify({
+                success: false,
+                error: error.message
+            }, null, 2);
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-play-fill me-1"></i>Execute Tool';
+        });
+    }
+    
+    function copyResult() {
+        const resultText = document.getElementById('resultJson').textContent;
+        navigator.clipboard.writeText(resultText).then(() => {
+            const btn = event.target.closest('button');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+            }, 2000);
+        });
+    }
+    
+    function copyRequest() {
+        const requestText = document.getElementById('requestJson').textContent;
+        navigator.clipboard.writeText(requestText).then(() => {
+            const btn = event.target.closest('button');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+            }, 2000);
+        });
+    }
+</script>
+{% endblock %}
+
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Tool Test</strong>
+                            <p class="small text-muted mb-0">Execute a tool with sample parameters to verify it works correctly.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Parameter</strong>
+                            <p class="small text-muted mb-0">An input value required by the tool to perform its function.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">JSON Request</strong>
+                            <p class="small text-muted mb-0">The structured data format used to send parameters to the tool.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Response</strong>
+                            <p class="small text-muted mb-0">The output returned by the tool after execution.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Execution Time</strong>
+                            <p class="small text-muted mb-0">Duration taken for the tool to complete its operation.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Validation</strong>
+                            <p class="small text-muted mb-0">Checking that input parameters meet the required schema.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

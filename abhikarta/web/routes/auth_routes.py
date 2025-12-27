@@ -216,6 +216,8 @@ class AuthRoutes(AbstractRoutes):
                 'prebuilt': 'help/pages/prebuilt.html',
                 'code-fragments': 'help/pages/code_fragments.html',
                 'llm-management': 'help/pages/llm_management.html',
+                'glossary': 'help/pages/glossary.html',
+                'database-schema': 'help/pages/database_schema.html',
             }
             
             template = page_map.get(page)

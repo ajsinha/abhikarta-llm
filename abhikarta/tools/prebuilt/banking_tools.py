@@ -1011,6 +1011,9 @@ def register_banking_tools(registry) -> int:
     tools = get_banking_tools()
     count = 0
     for tool in tools:
+        # Set source metadata to indicate prebuilt
+        if tool.metadata:
+            tool.metadata.source = f"prebuilt:banking:{tool.name}"
         if registry.register(tool):
             count += 1
     logger.info(f"Registered {count} banking tools")

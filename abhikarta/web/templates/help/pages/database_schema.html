@@ -1,0 +1,893 @@
+{% extends "help/help_base.html" %}
+
+{% block title %}Database Schema - {{ app_name }}{% endblock %}
+
+{% block help_content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('help') }}">Help</a></li>
+        <li class="breadcrumb-item active">Database Schema</li>
+    </ol>
+</nav>
+
+<h1 class="mb-4"><i class="bi bi-database me-2"></i>Database Design & Schema</h1>
+
+<div class="alert alert-info mb-4">
+    <i class="bi bi-info-circle me-2"></i>
+    Abhikarta-LLM uses a relational database with <strong>22 interconnected tables</strong> supporting both SQLite and PostgreSQL backends. 
+    The schema is designed for scalability, auditability, and comprehensive LLM agent management.
+</div>
+
+<!-- Schema Overview -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Schema Overview</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <h6 class="text-primary"><i class="bi bi-people me-2"></i>Identity & Access</h6>
+                <ul class="list-unstyled">
+                    <li><code>users</code> - User accounts</li>
+                    <li><code>roles</code> - Role definitions</li>
+                    <li><code>user_roles</code> - User-role mapping</li>
+                    <li><code>sessions</code> - Active sessions</li>
+                    <li><code>api_keys</code> - API authentication</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-success"><i class="bi bi-robot me-2"></i>Agents & Workflows</h6>
+                <ul class="list-unstyled">
+                    <li><code>agents</code> - Agent definitions</li>
+                    <li><code>agent_versions</code> - Version history</li>
+                    <li><code>agent_templates</code> - Reusable templates</li>
+                    <li><code>workflows</code> - DAG definitions</li>
+                    <li><code>workflow_nodes</code> - DAG nodes</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-info"><i class="bi bi-play-circle me-2"></i>Execution & Tracking</h6>
+                <ul class="list-unstyled">
+                    <li><code>executions</code> - Execution records</li>
+                    <li><code>execution_steps</code> - Step details</li>
+                    <li><code>llm_calls</code> - LLM interactions</li>
+                    <li><code>audit_logs</code> - Activity audit</li>
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <h6 class="text-warning"><i class="bi bi-cpu me-2"></i>LLM Configuration</h6>
+                <ul class="list-unstyled">
+                    <li><code>llm_providers</code> - Provider configs</li>
+                    <li><code>llm_models</code> - Model definitions</li>
+                    <li><code>model_permissions</code> - RBAC for models</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-danger"><i class="bi bi-person-check me-2"></i>HITL & Tools</h6>
+                <ul class="list-unstyled">
+                    <li><code>hitl_tasks</code> - Human review tasks</li>
+                    <li><code>hitl_comments</code> - Task comments</li>
+                    <li><code>hitl_assignments</code> - Assignment history</li>
+                    <li><code>mcp_plugins</code> - MCP plugins</li>
+                    <li><code>mcp_tool_servers</code> - External servers</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6 class="text-secondary"><i class="bi bi-gear me-2"></i>Configuration</h6>
+                <ul class="list-unstyled">
+                    <li><code>code_fragments</code> - Reusable code</li>
+                    <li><code>system_settings</code> - App settings</li>
+                    <li><code>schema_version</code> - Migration tracking</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Entity Relationship Diagram -->
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-share me-2"></i>Entity Relationships</h5>
+    </div>
+    <div class="card-body">
+        <pre class="bg-light p-3 rounded" style="font-size: 0.75rem; overflow-x: auto;">
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                              ABHIKARTA-LLM DATABASE SCHEMA                               │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                          │
+│  ┌──────────┐     ┌────────────┐     ┌──────────┐                                       │
+│  │  users   │────▶│ user_roles │◀────│  roles   │                                       │
+│  └────┬─────┘     └────────────┘     └──────────┘                                       │
+│       │                                    │                                             │
+│       │ created_by                         │ role_name                                   │
+│       ▼                                    ▼                                             │
+│  ┌──────────┐     ┌────────────────┐  ┌───────────────────┐                             │
+│  │  agents  │────▶│ agent_versions │  │ model_permissions │                             │
+│  └────┬─────┘     └────────────────┘  └─────────┬─────────┘                             │
+│       │                                         │                                        │
+│       │ agent_id                                │ model_id                               │
+│       ▼                                         ▼                                        │
+│  ┌────────────┐   ┌────────────────┐     ┌────────────┐     ┌───────────────┐           │
+│  │ executions │──▶│execution_steps │     │ llm_models │────▶│ llm_providers │           │
+│  └─────┬──────┘   └────────────────┘     └────────────┘     └───────────────┘           │
+│        │                                                                                 │
+│        │ execution_id                                                                    │
+│        ▼                                                                                 │
+│  ┌────────────┐   ┌────────────┐   ┌──────────────────┐                                 │
+│  │ llm_calls  │   │ hitl_tasks │──▶│ hitl_assignments │                                 │
+│  └────────────┘   └─────┬──────┘   └──────────────────┘                                 │
+│                         │                                                                │
+│                         ▼                                                                │
+│                   ┌───────────────┐                                                      │
+│                   │ hitl_comments │                                                      │
+│                   └───────────────┘                                                      │
+│                                                                                          │
+│  ┌───────────┐   ┌──────────────────┐   ┌────────────────┐   ┌─────────────────┐        │
+│  │ workflows │──▶│ workflow_nodes   │   │ mcp_plugins    │   │ mcp_tool_servers│        │
+│  └───────────┘   └──────────────────┘   └────────────────┘   └─────────────────┘        │
+│                                                                                          │
+│  ┌────────────────┐  ┌──────────┐  ┌────────────┐  ┌─────────────────┐  ┌────────────┐  │
+│  │ agent_templates│  │ api_keys │  │  sessions  │  │ system_settings │  │ audit_logs │  │
+│  └────────────────┘  └──────────┘  └────────────┘  └─────────────────┘  └────────────┘  │
+│                                                                                          │
+│  ┌────────────────┐  ┌────────────────┐                                                  │
+│  │ code_fragments │  │ schema_version │                                                  │
+│  └────────────────┘  └────────────────┘                                                  │
+│                                                                                          │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+        </pre>
+    </div>
+</div>
+
+<!-- Detailed Table Documentation -->
+<h2 class="mt-5 mb-4"><i class="bi bi-table me-2"></i>Table Reference</h2>
+
+<!-- Users & Authentication Section -->
+<div class="card mb-4" id="identity">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-people me-2"></i>Identity & Access Management (5 tables)</h5>
+    </div>
+    <div class="card-body">
+        
+        <!-- users table -->
+        <h6 class="text-primary border-bottom pb-2"><code>users</code> - User Accounts</h6>
+        <p class="text-muted">Stores all user accounts with authentication credentials, profile information, and security controls.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>id</code></td><td>INTEGER PK</td><td>Auto-increment primary key</td></tr>
+                    <tr><td><code>user_id</code></td><td>TEXT UNIQUE</td><td>Username for login (e.g., "admin", "john_doe")</td></tr>
+                    <tr><td><code>password_hash</code></td><td>TEXT</td><td>Bcrypt hashed password</td></tr>
+                    <tr><td><code>fullname</code></td><td>TEXT</td><td>Display name</td></tr>
+                    <tr><td><code>email</code></td><td>TEXT</td><td>Email address for notifications</td></tr>
+                    <tr><td><code>is_active</code></td><td>INTEGER</td><td>Account active status (1=active, 0=disabled)</td></tr>
+                    <tr><td><code>failed_login_attempts</code></td><td>INTEGER</td><td>Consecutive failed logins (for lockout)</td></tr>
+                    <tr><td><code>locked_until</code></td><td>TIMESTAMP</td><td>Account lockout expiry time</td></tr>
+                    <tr><td><code>preferences</code></td><td>TEXT (JSON)</td><td>User preferences (theme, notifications, etc.)</td></tr>
+                    <tr><td><code>last_login</code></td><td>TIMESTAMP</td><td>Last successful login time</td></tr>
+                    <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>Account creation time</td></tr>
+                    <tr><td><code>updated_at</code></td><td>TIMESTAMP</td><td>Last update time (auto-updated via trigger)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p><strong>Relationships:</strong> Referenced by <code>user_roles</code>, <code>agents</code>, <code>executions</code>, <code>hitl_tasks</code>, <code>sessions</code>, <code>api_keys</code>, <code>audit_logs</code></p>
+
+        <!-- roles table -->
+        <h6 class="text-primary border-bottom pb-2 mt-4"><code>roles</code> - Role Definitions</h6>
+        <p class="text-muted">Defines available roles with associated permissions for RBAC.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>role_name</code></td><td>TEXT UNIQUE</td><td>Role identifier (super_admin, domain_admin, agent_developer, agent_user, viewer, hitl_reviewer)</td></tr>
+                    <tr><td><code>display_name</code></td><td>TEXT</td><td>Human-readable role name</td></tr>
+                    <tr><td><code>description</code></td><td>TEXT</td><td>Role description</td></tr>
+                    <tr><td><code>permissions</code></td><td>TEXT (JSON)</td><td>Array of permission strings</td></tr>
+                    <tr><td><code>is_system</code></td><td>INTEGER</td><td>System role flag (cannot be deleted)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p><strong>Default Roles:</strong> super_admin, domain_admin, agent_developer, agent_user, viewer, hitl_reviewer</p>
+
+        <!-- user_roles table -->
+        <h6 class="text-primary border-bottom pb-2 mt-4"><code>user_roles</code> - User-Role Mapping</h6>
+        <p class="text-muted">Many-to-many relationship between users and roles. Users can have multiple roles.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>user_id</code></td><td>TEXT FK</td><td>References users(user_id)</td></tr>
+                    <tr><td><code>role_name</code></td><td>TEXT FK</td><td>References roles(role_name)</td></tr>
+                    <tr><td><code>assigned_at</code></td><td>TIMESTAMP</td><td>When the role was assigned</td></tr>
+                    <tr><td><code>assigned_by</code></td><td>TEXT</td><td>Who assigned the role</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p><strong>Constraint:</strong> UNIQUE(user_id, role_name) - prevents duplicate assignments</p>
+
+        <!-- sessions table -->
+        <h6 class="text-primary border-bottom pb-2 mt-4"><code>sessions</code> - Active Sessions</h6>
+        <p class="text-muted">Tracks active user sessions for session management and security.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>session_id</code></td><td>TEXT UNIQUE</td><td>Session token</td></tr>
+                    <tr><td><code>user_id</code></td><td>TEXT FK</td><td>References users(user_id)</td></tr>
+                    <tr><td><code>session_data</code></td><td>TEXT (JSON)</td><td>Session state data</td></tr>
+                    <tr><td><code>ip_address</code></td><td>TEXT</td><td>Client IP address</td></tr>
+                    <tr><td><code>user_agent</code></td><td>TEXT</td><td>Browser/client info</td></tr>
+                    <tr><td><code>expires_at</code></td><td>TIMESTAMP</td><td>Session expiration time</td></tr>
+                    <tr><td><code>last_activity</code></td><td>TIMESTAMP</td><td>Last activity timestamp</td></tr>
+                    <tr><td><code>is_active</code></td><td>INTEGER</td><td>Session active flag</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- api_keys table -->
+        <h6 class="text-primary border-bottom pb-2 mt-4"><code>api_keys</code> - API Authentication Keys</h6>
+        <p class="text-muted">Stores API keys for programmatic access to the REST API.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>key_id</code></td><td>TEXT UNIQUE</td><td>API key identifier</td></tr>
+                    <tr><td><code>user_id</code></td><td>TEXT FK</td><td>Owner of the key</td></tr>
+                    <tr><td><code>key_hash</code></td><td>TEXT</td><td>Hashed API key (actual key shown once)</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Descriptive name</td></tr>
+                    <tr><td><code>permissions</code></td><td>TEXT (JSON)</td><td>Scope/permissions array</td></tr>
+                    <tr><td><code>rate_limit</code></td><td>INTEGER</td><td>Requests per minute limit</td></tr>
+                    <tr><td><code>expires_at</code></td><td>TIMESTAMP</td><td>Key expiration date</td></tr>
+                    <tr><td><code>last_used_at</code></td><td>TIMESTAMP</td><td>Last API call timestamp</td></tr>
+                    <tr><td><code>usage_count</code></td><td>INTEGER</td><td>Total API calls made</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Agents & Workflows Section -->
+<div class="card mb-4" id="agents">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-robot me-2"></i>Agents & Workflows (5 tables)</h5>
+    </div>
+    <div class="card-body">
+        
+        <!-- agents table -->
+        <h6 class="text-success border-bottom pb-2"><code>agents</code> - AI Agent Definitions</h6>
+        <p class="text-muted">Core table storing all AI agent configurations including LLM settings, tools, and workflow definitions.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>agent_id</code></td><td>TEXT UNIQUE</td><td>Unique agent identifier (UUID)</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Agent display name</td></tr>
+                    <tr><td><code>description</code></td><td>TEXT</td><td>Agent purpose and capabilities</td></tr>
+                    <tr><td><code>agent_type</code></td><td>TEXT</td><td>Type: react, function_calling, plan_execute, custom</td></tr>
+                    <tr><td><code>version</code></td><td>TEXT</td><td>Semantic version (e.g., "1.0.0")</td></tr>
+                    <tr><td><code>status</code></td><td>TEXT</td><td>Status: draft, published, deprecated</td></tr>
+                    <tr><td><code>config</code></td><td>TEXT (JSON)</td><td>General configuration options</td></tr>
+                    <tr><td><code>workflow</code></td><td>TEXT (JSON)</td><td>Workflow/DAG definition</td></tr>
+                    <tr><td><code>llm_config</code></td><td>TEXT (JSON)</td><td>LLM provider, model, temperature, etc.</td></tr>
+                    <tr><td><code>tools</code></td><td>TEXT (JSON)</td><td>Array of enabled tool names</td></tr>
+                    <tr><td><code>hitl_config</code></td><td>TEXT (JSON)</td><td>Human-in-the-loop settings</td></tr>
+                    <tr><td><code>tags</code></td><td>TEXT (JSON)</td><td>Categorization tags</td></tr>
+                    <tr><td><code>created_by</code></td><td>TEXT FK</td><td>Creator user_id</td></tr>
+                    <tr><td><code>published_at</code></td><td>TIMESTAMP</td><td>When agent was published</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- agent_versions table -->
+        <h6 class="text-success border-bottom pb-2 mt-4"><code>agent_versions</code> - Version History</h6>
+        <p class="text-muted">Maintains complete version history for agents, enabling rollback and audit trails.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>agent_id</code></td><td>TEXT FK</td><td>References agents(agent_id)</td></tr>
+                    <tr><td><code>version</code></td><td>TEXT</td><td>Version number</td></tr>
+                    <tr><td><code>config_snapshot</code></td><td>TEXT (JSON)</td><td>Complete config at this version</td></tr>
+                    <tr><td><code>workflow_snapshot</code></td><td>TEXT (JSON)</td><td>Workflow definition snapshot</td></tr>
+                    <tr><td><code>created_by</code></td><td>TEXT</td><td>Who created this version</td></tr>
+                    <tr><td><code>change_notes</code></td><td>TEXT</td><td>Version change description</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- agent_templates table -->
+        <h6 class="text-success border-bottom pb-2 mt-4"><code>agent_templates</code> - Reusable Templates</h6>
+        <p class="text-muted">Pre-configured agent templates that users can clone to create new agents quickly.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>template_id</code></td><td>TEXT UNIQUE</td><td>Template identifier</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Template name</td></tr>
+                    <tr><td><code>category</code></td><td>TEXT</td><td>Category: banking, customer_service, data_analysis</td></tr>
+                    <tr><td><code>agent_type</code></td><td>TEXT</td><td>Agent type for the template</td></tr>
+                    <tr><td><code>icon</code></td><td>TEXT</td><td>Bootstrap icon class</td></tr>
+                    <tr><td><code>difficulty</code></td><td>TEXT</td><td>beginner, intermediate, advanced</td></tr>
+                    <tr><td><code>sample_prompts</code></td><td>TEXT (JSON)</td><td>Example prompts to test the template</td></tr>
+                    <tr><td><code>use_count</code></td><td>INTEGER</td><td>Number of times template was used</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- workflows table -->
+        <h6 class="text-success border-bottom pb-2 mt-4"><code>workflows</code> - DAG Workflow Definitions</h6>
+        <p class="text-muted">Stores complex multi-step workflow definitions as Directed Acyclic Graphs (DAGs).</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>workflow_id</code></td><td>TEXT UNIQUE</td><td>Workflow identifier</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Workflow name</td></tr>
+                    <tr><td><code>workflow_type</code></td><td>TEXT</td><td>Type: dag, sequential, parallel</td></tr>
+                    <tr><td><code>dag_definition</code></td><td>TEXT (JSON)</td><td>Complete DAG structure with nodes and edges</td></tr>
+                    <tr><td><code>python_modules</code></td><td>TEXT (JSON)</td><td>Python code modules for custom logic</td></tr>
+                    <tr><td><code>entry_point</code></td><td>TEXT</td><td>Starting node ID</td></tr>
+                    <tr><td><code>input_schema</code></td><td>TEXT (JSON)</td><td>JSON Schema for workflow inputs</td></tr>
+                    <tr><td><code>output_schema</code></td><td>TEXT (JSON)</td><td>JSON Schema for workflow outputs</td></tr>
+                    <tr><td><code>status</code></td><td>TEXT</td><td>draft, published, deprecated</td></tr>
+                    <tr><td><code>execution_count</code></td><td>INTEGER</td><td>Total executions</td></tr>
+                    <tr><td><code>avg_duration_ms</code></td><td>INTEGER</td><td>Average execution time</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- workflow_nodes table -->
+        <h6 class="text-success border-bottom pb-2 mt-4"><code>workflow_nodes</code> - Individual DAG Nodes</h6>
+        <p class="text-muted">Individual nodes within a workflow DAG, each representing a processing step.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>node_id</code></td><td>TEXT UNIQUE</td><td>Node identifier</td></tr>
+                    <tr><td><code>workflow_id</code></td><td>TEXT FK</td><td>Parent workflow</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Node display name</td></tr>
+                    <tr><td><code>node_type</code></td><td>TEXT</td><td>Type: agent, tool, condition, transform, human</td></tr>
+                    <tr><td><code>config</code></td><td>TEXT (JSON)</td><td>Node-specific configuration</td></tr>
+                    <tr><td><code>python_code</code></td><td>TEXT</td><td>Custom Python code for the node</td></tr>
+                    <tr><td><code>position_x</code></td><td>INTEGER</td><td>X position in visual designer</td></tr>
+                    <tr><td><code>position_y</code></td><td>INTEGER</td><td>Y position in visual designer</td></tr>
+                    <tr><td><code>dependencies</code></td><td>TEXT (JSON)</td><td>Array of node_ids this depends on</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Execution & Tracking Section -->
+<div class="card mb-4" id="execution">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-play-circle me-2"></i>Execution & Tracking (4 tables)</h5>
+    </div>
+    <div class="card-body">
+        
+        <!-- executions table -->
+        <h6 class="text-info border-bottom pb-2"><code>executions</code> - Agent Execution Records</h6>
+        <p class="text-muted">Records every agent execution with inputs, outputs, status, cost, and performance metrics.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>execution_id</code></td><td>TEXT UNIQUE</td><td>Execution identifier (UUID)</td></tr>
+                    <tr><td><code>agent_id</code></td><td>TEXT FK</td><td>Executed agent</td></tr>
+                    <tr><td><code>agent_version</code></td><td>TEXT</td><td>Agent version at execution time</td></tr>
+                    <tr><td><code>user_id</code></td><td>TEXT FK</td><td>User who triggered execution</td></tr>
+                    <tr><td><code>status</code></td><td>TEXT</td><td>pending, running, completed, failed, cancelled</td></tr>
+                    <tr><td><code>input_data</code></td><td>TEXT (JSON)</td><td>Input parameters</td></tr>
+                    <tr><td><code>output_data</code></td><td>TEXT (JSON)</td><td>Final output/result</td></tr>
+                    <tr><td><code>error_message</code></td><td>TEXT</td><td>Error details if failed</td></tr>
+                    <tr><td><code>started_at</code></td><td>TIMESTAMP</td><td>Execution start time</td></tr>
+                    <tr><td><code>completed_at</code></td><td>TIMESTAMP</td><td>Execution completion time</td></tr>
+                    <tr><td><code>duration_ms</code></td><td>INTEGER</td><td>Total duration in milliseconds</td></tr>
+                    <tr><td><code>tokens_used</code></td><td>INTEGER</td><td>Total LLM tokens consumed</td></tr>
+                    <tr><td><code>cost_estimate</code></td><td>REAL</td><td>Estimated cost in USD</td></tr>
+                    <tr><td><code>trace_data</code></td><td>TEXT (JSON)</td><td>Full execution trace for debugging</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- execution_steps table -->
+        <h6 class="text-info border-bottom pb-2 mt-4"><code>execution_steps</code> - Step-by-Step Tracking</h6>
+        <p class="text-muted">Detailed tracking of each step within an execution for debugging and analysis.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>execution_id</code></td><td>TEXT FK</td><td>Parent execution</td></tr>
+                    <tr><td><code>step_number</code></td><td>INTEGER</td><td>Sequential step number</td></tr>
+                    <tr><td><code>node_id</code></td><td>TEXT</td><td>Workflow node ID (if applicable)</td></tr>
+                    <tr><td><code>node_type</code></td><td>TEXT</td><td>Type of step (llm_call, tool_use, etc.)</td></tr>
+                    <tr><td><code>status</code></td><td>TEXT</td><td>Step status</td></tr>
+                    <tr><td><code>input_data</code></td><td>TEXT (JSON)</td><td>Step input</td></tr>
+                    <tr><td><code>output_data</code></td><td>TEXT (JSON)</td><td>Step output</td></tr>
+                    <tr><td><code>duration_ms</code></td><td>INTEGER</td><td>Step duration</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- llm_calls table -->
+        <h6 class="text-info border-bottom pb-2 mt-4"><code>llm_calls</code> - LLM Interaction Log</h6>
+        <p class="text-muted">Comprehensive log of every LLM API call for cost tracking, debugging, and analytics.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>call_id</code></td><td>TEXT UNIQUE</td><td>LLM call identifier</td></tr>
+                    <tr><td><code>execution_id</code></td><td>TEXT FK</td><td>Parent execution (optional)</td></tr>
+                    <tr><td><code>agent_id</code></td><td>TEXT FK</td><td>Agent that made the call</td></tr>
+                    <tr><td><code>user_id</code></td><td>TEXT FK</td><td>User account</td></tr>
+                    <tr><td><code>provider</code></td><td>TEXT</td><td>Provider: openai, anthropic, google, etc.</td></tr>
+                    <tr><td><code>model</code></td><td>TEXT</td><td>Model name (gpt-4o, claude-3-5-sonnet, etc.)</td></tr>
+                    <tr><td><code>system_prompt</code></td><td>TEXT</td><td>System message content</td></tr>
+                    <tr><td><code>user_prompt</code></td><td>TEXT</td><td>User message content</td></tr>
+                    <tr><td><code>messages</code></td><td>TEXT (JSON)</td><td>Full messages array</td></tr>
+                    <tr><td><code>response_content</code></td><td>TEXT</td><td>LLM response text</td></tr>
+                    <tr><td><code>tool_calls</code></td><td>TEXT (JSON)</td><td>Tool calls made by LLM</td></tr>
+                    <tr><td><code>input_tokens</code></td><td>INTEGER</td><td>Tokens in request</td></tr>
+                    <tr><td><code>output_tokens</code></td><td>INTEGER</td><td>Tokens in response</td></tr>
+                    <tr><td><code>total_tokens</code></td><td>INTEGER</td><td>Total token count</td></tr>
+                    <tr><td><code>cost_estimate</code></td><td>REAL</td><td>Estimated cost (USD)</td></tr>
+                    <tr><td><code>temperature</code></td><td>REAL</td><td>Temperature setting used</td></tr>
+                    <tr><td><code>latency_ms</code></td><td>INTEGER</td><td>API response time</td></tr>
+                    <tr><td><code>status</code></td><td>TEXT</td><td>success, error, timeout</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- audit_logs table -->
+        <h6 class="text-info border-bottom pb-2 mt-4"><code>audit_logs</code> - Activity Audit Trail</h6>
+        <p class="text-muted">Complete audit trail of all system actions for compliance and security monitoring.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>log_id</code></td><td>TEXT UNIQUE</td><td>Log entry identifier</td></tr>
+                    <tr><td><code>action</code></td><td>TEXT</td><td>Action: create, update, delete, login, execute</td></tr>
+                    <tr><td><code>entity_type</code></td><td>TEXT</td><td>Type: user, agent, workflow, execution</td></tr>
+                    <tr><td><code>entity_id</code></td><td>TEXT</td><td>ID of affected entity</td></tr>
+                    <tr><td><code>user_id</code></td><td>TEXT FK</td><td>User who performed action</td></tr>
+                    <tr><td><code>user_ip</code></td><td>TEXT</td><td>Client IP address</td></tr>
+                    <tr><td><code>user_agent</code></td><td>TEXT</td><td>Browser/client information</td></tr>
+                    <tr><td><code>old_value</code></td><td>TEXT (JSON)</td><td>Previous state (for updates)</td></tr>
+                    <tr><td><code>new_value</code></td><td>TEXT (JSON)</td><td>New state (for creates/updates)</td></tr>
+                    <tr><td><code>metadata</code></td><td>TEXT (JSON)</td><td>Additional context</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- LLM Configuration Section -->
+<div class="card mb-4" id="llm">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="bi bi-cpu me-2"></i>LLM Configuration (3 tables)</h5>
+    </div>
+    <div class="card-body">
+        
+        <!-- llm_providers table -->
+        <h6 class="text-warning border-bottom pb-2"><code>llm_providers</code> - Provider Configurations</h6>
+        <p class="text-muted">Stores configurations for each LLM provider (OpenAI, Anthropic, Google, etc.).</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>provider_id</code></td><td>TEXT UNIQUE</td><td>Provider identifier</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Display name</td></tr>
+                    <tr><td><code>provider_type</code></td><td>TEXT</td><td>Type: openai, anthropic, google, azure, etc.</td></tr>
+                    <tr><td><code>api_endpoint</code></td><td>TEXT</td><td>API base URL</td></tr>
+                    <tr><td><code>api_key_name</code></td><td>TEXT</td><td>Environment variable for API key</td></tr>
+                    <tr><td><code>is_active</code></td><td>INTEGER</td><td>Provider enabled status</td></tr>
+                    <tr><td><code>is_default</code></td><td>INTEGER</td><td>Default provider flag</td></tr>
+                    <tr><td><code>config</code></td><td>TEXT (JSON)</td><td>Additional configuration</td></tr>
+                    <tr><td><code>rate_limit_rpm</code></td><td>INTEGER</td><td>Requests per minute limit</td></tr>
+                    <tr><td><code>rate_limit_tpm</code></td><td>INTEGER</td><td>Tokens per minute limit</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- llm_models table -->
+        <h6 class="text-warning border-bottom pb-2 mt-4"><code>llm_models</code> - Model Definitions</h6>
+        <p class="text-muted">Individual model configurations with pricing, capabilities, and limits.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>model_id</code></td><td>TEXT UNIQUE</td><td>Model identifier (e.g., gpt-4o)</td></tr>
+                    <tr><td><code>provider_id</code></td><td>TEXT FK</td><td>Parent provider</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>API model name</td></tr>
+                    <tr><td><code>display_name</code></td><td>TEXT</td><td>Human-readable name</td></tr>
+                    <tr><td><code>context_window</code></td><td>INTEGER</td><td>Maximum context tokens</td></tr>
+                    <tr><td><code>max_output_tokens</code></td><td>INTEGER</td><td>Maximum output tokens</td></tr>
+                    <tr><td><code>input_cost_per_1k</code></td><td>REAL</td><td>Cost per 1K input tokens (USD)</td></tr>
+                    <tr><td><code>output_cost_per_1k</code></td><td>REAL</td><td>Cost per 1K output tokens (USD)</td></tr>
+                    <tr><td><code>supports_vision</code></td><td>INTEGER</td><td>Vision capability flag</td></tr>
+                    <tr><td><code>supports_functions</code></td><td>INTEGER</td><td>Function calling support</td></tr>
+                    <tr><td><code>supports_streaming</code></td><td>INTEGER</td><td>Streaming support</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- model_permissions table -->
+        <h6 class="text-warning border-bottom pb-2 mt-4"><code>model_permissions</code> - Role-Based Model Access</h6>
+        <p class="text-muted">Controls which roles can use which models, with optional usage limits.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>model_id</code></td><td>TEXT FK</td><td>Model being controlled</td></tr>
+                    <tr><td><code>role_name</code></td><td>TEXT FK</td><td>Role being granted access</td></tr>
+                    <tr><td><code>can_use</code></td><td>INTEGER</td><td>Permission flag</td></tr>
+                    <tr><td><code>daily_limit</code></td><td>INTEGER</td><td>Daily call limit (-1 = unlimited)</td></tr>
+                    <tr><td><code>monthly_limit</code></td><td>INTEGER</td><td>Monthly call limit (-1 = unlimited)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p><strong>Constraint:</strong> UNIQUE(model_id, role_name)</p>
+    </div>
+</div>
+
+<!-- HITL Section -->
+<div class="card mb-4" id="hitl">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="bi bi-person-check me-2"></i>Human-in-the-Loop (3 tables)</h5>
+    </div>
+    <div class="card-body">
+        
+        <!-- hitl_tasks table -->
+        <h6 class="text-danger border-bottom pb-2"><code>hitl_tasks</code> - Human Review Tasks</h6>
+        <p class="text-muted">Tasks requiring human review, approval, or input during agent/workflow execution.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>task_id</code></td><td>TEXT UNIQUE</td><td>Task identifier</td></tr>
+                    <tr><td><code>execution_id</code></td><td>TEXT FK</td><td>Related execution</td></tr>
+                    <tr><td><code>agent_id</code></td><td>TEXT FK</td><td>Agent that created the task</td></tr>
+                    <tr><td><code>task_type</code></td><td>TEXT</td><td>approval, review, input, escalation</td></tr>
+                    <tr><td><code>title</code></td><td>TEXT</td><td>Task title</td></tr>
+                    <tr><td><code>description</code></td><td>TEXT</td><td>Task description</td></tr>
+                    <tr><td><code>status</code></td><td>TEXT</td><td>pending, approved, rejected, completed</td></tr>
+                    <tr><td><code>priority</code></td><td>INTEGER</td><td>Priority 1-10 (1=highest)</td></tr>
+                    <tr><td><code>context</code></td><td>TEXT (JSON)</td><td>Execution context for decision</td></tr>
+                    <tr><td><code>request_data</code></td><td>TEXT (JSON)</td><td>Data to be reviewed</td></tr>
+                    <tr><td><code>response_data</code></td><td>TEXT (JSON)</td><td>Reviewer's response/decision</td></tr>
+                    <tr><td><code>assigned_to</code></td><td>TEXT FK</td><td>Assigned reviewer</td></tr>
+                    <tr><td><code>due_at</code></td><td>TIMESTAMP</td><td>Due date for completion</td></tr>
+                    <tr><td><code>timeout_minutes</code></td><td>INTEGER</td><td>Auto-timeout period</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- hitl_comments table -->
+        <h6 class="text-danger border-bottom pb-2 mt-4"><code>hitl_comments</code> - Task Comments</h6>
+        <p class="text-muted">Discussion and notes on HITL tasks for collaboration.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>comment_id</code></td><td>TEXT UNIQUE</td><td>Comment identifier</td></tr>
+                    <tr><td><code>task_id</code></td><td>TEXT FK</td><td>Parent task</td></tr>
+                    <tr><td><code>user_id</code></td><td>TEXT FK</td><td>Comment author</td></tr>
+                    <tr><td><code>comment</code></td><td>TEXT</td><td>Comment content</td></tr>
+                    <tr><td><code>comment_type</code></td><td>TEXT</td><td>comment, note, system</td></tr>
+                    <tr><td><code>attachments</code></td><td>TEXT (JSON)</td><td>Attached files</td></tr>
+                    <tr><td><code>is_internal</code></td><td>INTEGER</td><td>Internal-only flag</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- hitl_assignments table -->
+        <h6 class="text-danger border-bottom pb-2 mt-4"><code>hitl_assignments</code> - Assignment History</h6>
+        <p class="text-muted">Tracks task assignment and reassignment history.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>assignment_id</code></td><td>TEXT UNIQUE</td><td>Assignment record ID</td></tr>
+                    <tr><td><code>task_id</code></td><td>TEXT FK</td><td>Task being assigned</td></tr>
+                    <tr><td><code>assigned_from</code></td><td>TEXT</td><td>Previous assignee</td></tr>
+                    <tr><td><code>assigned_to</code></td><td>TEXT FK</td><td>New assignee</td></tr>
+                    <tr><td><code>assigned_by</code></td><td>TEXT FK</td><td>Who made the assignment</td></tr>
+                    <tr><td><code>reason</code></td><td>TEXT</td><td>Reason for reassignment</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Tools & Extensions Section -->
+<div class="card mb-4" id="tools">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="bi bi-plug me-2"></i>Tools & Extensions (3 tables)</h5>
+    </div>
+    <div class="card-body">
+        
+        <!-- mcp_plugins table -->
+        <h6 class="text-secondary border-bottom pb-2"><code>mcp_plugins</code> - MCP Plugin Registry</h6>
+        <p class="text-muted">Registered Model Context Protocol plugins for tool extensions.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>plugin_id</code></td><td>TEXT UNIQUE</td><td>Plugin identifier</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Plugin name</td></tr>
+                    <tr><td><code>plugin_type</code></td><td>TEXT</td><td>tool, resource, prompt</td></tr>
+                    <tr><td><code>status</code></td><td>TEXT</td><td>active, disabled, error</td></tr>
+                    <tr><td><code>server_name</code></td><td>TEXT</td><td>MCP server name</td></tr>
+                    <tr><td><code>server_url</code></td><td>TEXT</td><td>Server endpoint URL</td></tr>
+                    <tr><td><code>manifest</code></td><td>TEXT (JSON)</td><td>Plugin manifest/metadata</td></tr>
+                    <tr><td><code>capabilities</code></td><td>TEXT (JSON)</td><td>Supported capabilities</td></tr>
+                    <tr><td><code>health_status</code></td><td>TEXT</td><td>healthy, unhealthy, unknown</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- mcp_tool_servers table -->
+        <h6 class="text-secondary border-bottom pb-2 mt-4"><code>mcp_tool_servers</code> - External Tool Servers</h6>
+        <p class="text-muted">External MCP-compatible tool servers that provide additional tools.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>server_id</code></td><td>TEXT UNIQUE</td><td>Server identifier</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Server display name</td></tr>
+                    <tr><td><code>base_url</code></td><td>TEXT</td><td>Server base URL</td></tr>
+                    <tr><td><code>tools_endpoint</code></td><td>TEXT</td><td>Tools list endpoint</td></tr>
+                    <tr><td><code>auth_type</code></td><td>TEXT</td><td>none, bearer, api_key, oauth</td></tr>
+                    <tr><td><code>auth_config</code></td><td>TEXT (JSON)</td><td>Authentication configuration</td></tr>
+                    <tr><td><code>is_active</code></td><td>INTEGER</td><td>Server enabled status</td></tr>
+                    <tr><td><code>auto_refresh</code></td><td>INTEGER</td><td>Auto-refresh tools flag</td></tr>
+                    <tr><td><code>refresh_interval_minutes</code></td><td>INTEGER</td><td>Refresh interval</td></tr>
+                    <tr><td><code>tool_count</code></td><td>INTEGER</td><td>Cached tool count</td></tr>
+                    <tr><td><code>cached_tools</code></td><td>TEXT (JSON)</td><td>Cached tool definitions</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- code_fragments table -->
+        <h6 class="text-secondary border-bottom pb-2 mt-4"><code>code_fragments</code> - Reusable Code Modules</h6>
+        <p class="text-muted">Reusable code modules that can be dynamically loaded into agents and workflows.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>fragment_id</code></td><td>TEXT UNIQUE</td><td>Fragment identifier</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Fragment name</td></tr>
+                    <tr><td><code>language</code></td><td>TEXT</td><td>Programming language (python)</td></tr>
+                    <tr><td><code>code</code></td><td>TEXT</td><td>Source code content</td></tr>
+                    <tr><td><code>version</code></td><td>TEXT</td><td>Code version</td></tr>
+                    <tr><td><code>category</code></td><td>TEXT</td><td>Category: tool, utility, transform</td></tr>
+                    <tr><td><code>dependencies</code></td><td>TEXT (JSON)</td><td>Required Python packages</td></tr>
+                    <tr><td><code>is_system</code></td><td>INTEGER</td><td>System-provided fragment flag</td></tr>
+                    <tr><td><code>usage_count</code></td><td>INTEGER</td><td>Usage statistics</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- System Configuration Section -->
+<div class="card mb-4" id="system">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-gear me-2"></i>System Configuration (2 tables)</h5>
+    </div>
+    <div class="card-body">
+        
+        <!-- system_settings table -->
+        <h6 class="border-bottom pb-2"><code>system_settings</code> - Application Settings</h6>
+        <p class="text-muted">Key-value store for application-wide configuration settings.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>setting_key</code></td><td>TEXT UNIQUE</td><td>Setting identifier</td></tr>
+                    <tr><td><code>setting_value</code></td><td>TEXT</td><td>Setting value</td></tr>
+                    <tr><td><code>setting_type</code></td><td>TEXT</td><td>Type: string, integer, boolean, json</td></tr>
+                    <tr><td><code>description</code></td><td>TEXT</td><td>Setting description</td></tr>
+                    <tr><td><code>is_encrypted</code></td><td>INTEGER</td><td>Encrypted value flag</td></tr>
+                    <tr><td><code>updated_by</code></td><td>TEXT</td><td>Last modifier</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- schema_version table -->
+        <h6 class="border-bottom pb-2 mt-4"><code>schema_version</code> - Database Migrations</h6>
+        <p class="text-muted">Tracks database schema versions for migration management.</p>
+        <div class="table-responsive mb-4">
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>version</code></td><td>TEXT</td><td>Schema version number</td></tr>
+                    <tr><td><code>applied_at</code></td><td>TIMESTAMP</td><td>When migration was applied</td></tr>
+                    <tr><td><code>description</code></td><td>TEXT</td><td>Migration description</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Database Indexes -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Performance Indexes</h5>
+    </div>
+    <div class="card-body">
+        <p>The following indexes are created for optimal query performance:</p>
+        <div class="row">
+            <div class="col-md-6">
+                <h6>User & Access</h6>
+                <ul class="small">
+                    <li><code>idx_users_email</code> - Email lookups</li>
+                    <li><code>idx_users_is_active</code> - Active user filtering</li>
+                    <li><code>idx_user_roles_user_id</code> - User role lookups</li>
+                    <li><code>idx_sessions_user_id</code> - Session queries</li>
+                    <li><code>idx_api_keys_user_id</code> - API key lookups</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Agents & Workflows</h6>
+                <ul class="small">
+                    <li><code>idx_agents_status</code> - Status filtering</li>
+                    <li><code>idx_agents_agent_type</code> - Type filtering</li>
+                    <li><code>idx_agents_created_by</code> - Creator queries</li>
+                    <li><code>idx_workflows_status</code> - Workflow status</li>
+                    <li><code>idx_workflow_nodes_workflow_id</code> - Node lookups</li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h6>Executions & Tracking</h6>
+                <ul class="small">
+                    <li><code>idx_executions_agent_id</code> - Agent execution history</li>
+                    <li><code>idx_executions_user_id</code> - User execution history</li>
+                    <li><code>idx_executions_status</code> - Status filtering</li>
+                    <li><code>idx_executions_started_at</code> - Time-based queries</li>
+                    <li><code>idx_llm_calls_created_at</code> - LLM call timeline</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Audit & HITL</h6>
+                <ul class="small">
+                    <li><code>idx_audit_logs_action</code> - Action filtering</li>
+                    <li><code>idx_audit_logs_entity_type</code> - Entity queries</li>
+                    <li><code>idx_audit_logs_created_at</code> - Audit timeline</li>
+                    <li><code>idx_hitl_tasks_status</code> - Task status queries</li>
+                    <li><code>idx_hitl_tasks_assigned_to</code> - Assignee queries</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Database Triggers -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="bi bi-arrow-repeat me-2"></i>Automatic Triggers</h5>
+    </div>
+    <div class="card-body">
+        <p>The following triggers automatically maintain data consistency:</p>
+        <table class="table table-sm table-bordered">
+            <thead class="table-light">
+                <tr><th>Trigger</th><th>Table</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>update_users_timestamp</code></td><td>users</td><td>Auto-updates <code>updated_at</code> on any change</td></tr>
+                <tr><td><code>update_agents_timestamp</code></td><td>agents</td><td>Auto-updates <code>updated_at</code> on any change</td></tr>
+                <tr><td><code>update_mcp_plugins_timestamp</code></td><td>mcp_plugins</td><td>Auto-updates <code>updated_at</code> on any change</td></tr>
+                <tr><td><code>update_mcp_tool_servers_timestamp</code></td><td>mcp_tool_servers</td><td>Auto-updates <code>updated_at</code> on any change</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Quick Navigation -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="bi bi-signpost me-2"></i>Quick Navigation</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <a href="#identity" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                    <i class="bi bi-people me-1"></i>Identity & Access
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#agents" class="btn btn-outline-success btn-sm w-100 mb-2">
+                    <i class="bi bi-robot me-1"></i>Agents & Workflows
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#execution" class="btn btn-outline-info btn-sm w-100 mb-2">
+                    <i class="bi bi-play-circle me-1"></i>Execution
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#llm" class="btn btn-outline-warning btn-sm w-100 mb-2">
+                    <i class="bi bi-cpu me-1"></i>LLM Config
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#hitl" class="btn btn-outline-danger btn-sm w-100 mb-2">
+                    <i class="bi bi-person-check me-1"></i>HITL
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#tools" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                    <i class="bi bi-plug me-1"></i>Tools
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="#system" class="btn btn-outline-dark btn-sm w-100 mb-2">
+                    <i class="bi bi-gear me-1"></i>System
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('help') }}" class="btn btn-primary btn-sm w-100 mb-2">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Help
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

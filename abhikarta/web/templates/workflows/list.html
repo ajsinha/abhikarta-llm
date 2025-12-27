@@ -168,3 +168,68 @@ function deleteWorkflow(id) {
 }
 </script>
 {% endblock %}
+
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Workflow</strong>
+                            <p class="small text-muted mb-0">A defined sequence of steps (nodes and edges) that accomplish a specific task.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">DAG (Directed Acyclic Graph)</strong>
+                            <p class="small text-muted mb-0">The graph structure representing workflow steps and their execution order.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Node</strong>
+                            <p class="small text-muted mb-0">A single unit of work in a workflow (LLM call, tool execution, conditional).</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Visual Designer</strong>
+                            <p class="small text-muted mb-0">A drag-and-drop interface for creating workflows graphically.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Published</strong>
+                            <p class="small text-muted mb-0">Workflow status indicating it's ready for production use.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Orchestration</strong>
+                            <p class="small text-muted mb-0">Coordination of multiple workflow steps to accomplish complex tasks.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

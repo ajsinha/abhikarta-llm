@@ -12,9 +12,9 @@
             </h4>
             <p class="text-muted mb-0">Manage users, roles, and permissions</p>
         </div>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <a href="{{ url_for('add_user') }}" class="btn btn-primary">
             <i class="bi bi-person-plus me-1"></i> Add User
-        </button>
+        </a>
     </div>
 
     <!-- Statistics Cards -->
@@ -105,7 +105,7 @@
                 </div>
                 <div class="col-md-2">
                     <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
-                        <i class="bi bi-x-circle me-1"></i> Reset
+                        <i class="bi bi-x-lg me-1"></i>Clear
                     </button>
                 </div>
             </div>
@@ -123,22 +123,23 @@
                             <th>Email</th>
                             <th>Roles</th>
                             <th>Status</th>
-                            <th>Created</th>
-                            <th class="text-end">Actions</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for user in users %}
-                        <tr data-userid="{{ user.user_id }}" 
-                            data-roles="{{ user.roles|join(',') if user.roles else '' }}"
+                        <tr data-roles="{{ user.roles|join(',') if user.roles else '' }}" 
                             data-status="{{ 'active' if user.is_active else 'inactive' }}">
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar-sm bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
-                                        <span class="text-white fw-bold">{{ user.fullname[:1]|upper if user.fullname else 'U' }}</span>
+                                    <div class="avatar bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                        <i class="bi bi-person text-primary"></i>
                                     </div>
                                     <div>
-                                        <strong>{{ user.fullname }}</strong>
+                                        <a href="{{ url_for('view_user', user_id=user.user_id) }}" class="text-decoration-none">
+                                            <strong>{{ user.fullname }}</strong>
+                                        </a>
                                         <br>
                                         <small class="text-muted">{{ user.user_id }}</small>
                                     </div>
@@ -146,58 +147,54 @@
                             </td>
                             <td>{{ user.email or '-' }}</td>
                             <td>
-                                {% for role in user.roles %}
-                                {% set role_colors = {
-                                    'super_admin': 'danger',
-                                    'domain_admin': 'warning',
-                                    'agent_developer': 'success',
-                                    'agent_publisher': 'info',
-                                    'hitl_reviewer': 'primary',
-                                    'agent_user': 'secondary',
-                                    'viewer': 'light'
-                                } %}
-                                <span class="badge bg-{{ role_colors.get(role, 'secondary') }} me-1">
-                                    {{ role|replace('_', ' ')|title }}
-                                </span>
-                                {% endfor %}
+                                {% if user.roles %}
+                                    {% for role in user.roles[:2] %}
+                                    <span class="badge bg-secondary">{{ role }}</span>
+                                    {% endfor %}
+                                    {% if user.roles|length > 2 %}
+                                    <span class="badge bg-light text-dark">+{{ user.roles|length - 2 }}</span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="text-muted">No roles</span>
+                                {% endif %}
                             </td>
                             <td>
                                 {% if user.is_active %}
                                 <span class="badge bg-success">Active</span>
                                 {% else %}
-                                <span class="badge bg-danger">Inactive</span>
+                                <span class="badge bg-secondary">Inactive</span>
                                 {% endif %}
                             </td>
-                            <td>{{ user.created_at if user.created_at else 'N/A' }}</td>
-                            <td class="text-end">
+                            <td>
+                                {% if user.last_login %}
+                                {{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login is not string else user.last_login[:16] }}
+                                {% else %}
+                                <span class="text-muted">Never</span>
+                                {% endif %}
+                            </td>
+                            <td>
                                 <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary" 
-                                            onclick="editUser('{{ user.user_id }}')" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-outline-info" 
-                                            onclick="viewUser('{{ user.user_id }}')" title="View">
+                                    <a href="{{ url_for('view_user', user_id=user.user_id) }}" 
+                                       class="btn btn-outline-secondary" title="View">
                                         <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button class="btn btn-outline-warning" 
-                                            onclick="resetPassword('{{ user.user_id }}')" title="Reset Password">
-                                        <i class="bi bi-key"></i>
+                                    </a>
+                                    <a href="{{ url_for('edit_user', user_id=user.user_id) }}" 
+                                       class="btn btn-outline-primary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button class="btn btn-outline-{{ 'warning' if user.is_active else 'success' }}" 
+                                            onclick="toggleStatus('{{ user.user_id }}', {{ 'true' if user.is_active else 'false' }})"
+                                            title="{{ 'Deactivate' if user.is_active else 'Activate' }}">
+                                        <i class="bi bi-{{ 'pause' if user.is_active else 'play' }}"></i>
                                     </button>
                                     {% if user.user_id != userid %}
-                                    <button class="btn btn-outline-{{ 'danger' if user.is_active else 'success' }}" 
-                                            onclick="toggleUserStatus('{{ user.user_id }}', {{ 'true' if user.is_active else 'false' }})" 
-                                            title="{{ 'Deactivate' if user.is_active else 'Activate' }}">
-                                        <i class="bi bi-{{ 'x-circle' if user.is_active else 'check-circle' }}"></i>
+                                    <button class="btn btn-outline-danger" 
+                                            onclick="confirmDelete('{{ user.user_id }}', '{{ user.fullname }}')"
+                                            title="Delete">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                     {% endif %}
                                 </div>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <i class="bi bi-people display-4 text-muted"></i>
-                                <p class="mt-3 text-muted">No users found</p>
                             </td>
                         </tr>
                         {% endfor %}
@@ -208,161 +205,13 @@
     </div>
 </div>
 
-<!-- Add User Modal -->
-<div class="modal fade" id="addUserModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Add New User</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="add-user-form" method="POST" action="{{ url_for('add_user') }}">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">User ID <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="user_id" required
-                                       pattern="[a-zA-Z0-9_]+" 
-                                       title="Only letters, numbers, and underscores"
-                                       placeholder="e.g., john_doe">
-                                <small class="text-muted">Unique identifier for login</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="fullname" required
-                                       placeholder="e.g., John Doe">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" name="email" required
-                                       placeholder="e.g., john@example.com">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Password <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" name="password" required
-                                       minlength="6" placeholder="Minimum 6 characters">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Roles <span class="text-danger">*</span></label>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="roles" value="super_admin" id="role-super_admin">
-                                    <label class="form-check-label" for="role-super_admin">Super Admin</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="roles" value="domain_admin" id="role-domain_admin">
-                                    <label class="form-check-label" for="role-domain_admin">Domain Admin</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="roles" value="agent_developer" id="role-agent_developer">
-                                    <label class="form-check-label" for="role-agent_developer">Agent Developer</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="roles" value="agent_publisher" id="role-agent_publisher">
-                                    <label class="form-check-label" for="role-agent_publisher">Agent Publisher</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="roles" value="hitl_reviewer" id="role-hitl_reviewer">
-                                    <label class="form-check-label" for="role-hitl_reviewer">HITL Reviewer</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="roles" value="agent_user" id="role-agent_user" checked>
-                                    <label class="form-check-label" for="role-agent_user">Agent User</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="roles" value="viewer" id="role-viewer">
-                                    <label class="form-check-label" for="role-viewer">Viewer</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" name="is_active" id="is-active" checked>
-                        <label class="form-check-label" for="is-active">User is active</label>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-person-plus me-1"></i> Add User
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Edit User Modal -->
-<div class="modal fade" id="editUserModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit User</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="edit-user-form" method="POST" action="{{ url_for('update_user') }}">
-                <div class="modal-body" id="edit-user-content">
-                    <!-- Dynamic content loaded via JS -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-info">
-                        <i class="bi bi-save me-1"></i> Save Changes
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- View User Modal -->
-<div class="modal fade" id="viewUserModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-secondary text-white">
-                <h5 class="modal-title"><i class="bi bi-person me-2"></i>User Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="view-user-content">
-                <!-- Dynamic content loaded via JS -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Hidden form for delete action -->
+<form id="deleteForm" method="POST" style="display: none;">
+</form>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// User data for modals
-const usersData = {{ users|tojson|safe if users else '[]' }};
-
 $(document).ready(function() {
     $('#user-search').on('input', filterUsers);
     $('#role-filter, #status-filter').change(filterUsers);
@@ -395,122 +244,97 @@ function resetFilters() {
     filterUsers();
 }
 
-function editUser(userId) {
-    const user = usersData.find(u => u.user_id === userId);
-    if (!user) return;
-    
-    const allRoles = ['super_admin', 'domain_admin', 'agent_developer', 'agent_publisher', 'hitl_reviewer', 'agent_user', 'viewer'];
-    const rolesHtml = allRoles.map(role => `
-        <div class="col-md-4">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="roles" value="${role}" 
-                       id="edit-role-${role}" ${user.roles && user.roles.includes(role) ? 'checked' : ''}>
-                <label class="form-check-label" for="edit-role-${role}">
-                    ${role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </label>
-            </div>
-        </div>
-    `).join('');
-    
-    const html = `
-        <input type="hidden" name="user_id" value="${user.user_id}">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label class="form-label">User ID</label>
-                    <input type="text" class="form-control" value="${user.user_id}" readonly>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="fullname" value="${user.fullname || ''}" required>
-                </div>
-            </div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Email <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" name="email" value="${user.email || ''}" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Roles</label>
-            <div class="row">${rolesHtml}</div>
-        </div>
-        <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" name="is_active" id="edit-is-active" ${user.is_active ? 'checked' : ''}>
-            <label class="form-check-label" for="edit-is-active">User is active</label>
-        </div>
-    `;
-    
-    $('#edit-user-content').html(html);
-    new bootstrap.Modal('#editUserModal').show();
+function toggleStatus(userId, isActive) {
+    const action = isActive ? 'deactivate' : 'activate';
+    if (confirm(`Are you sure you want to ${action} this user?`)) {
+        fetch(`/api/users/${userId}/toggle-status`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+    }
 }
 
-function viewUser(userId) {
-    const user = usersData.find(u => u.user_id === userId);
-    if (!user) return;
-    
-    const rolesHtml = (user.roles || []).map(r => 
-        `<span class="badge bg-info me-1">${r.replace(/_/g, ' ')}</span>`
-    ).join('');
-    
-    const html = `
-        <div class="row">
-            <div class="col-md-4 text-center">
-                <div class="bg-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
-                     style="width: 100px; height: 100px;">
-                    <span class="text-white display-4">${(user.fullname || 'U')[0].toUpperCase()}</span>
-                </div>
-                <h5>${user.fullname}</h5>
-                <p class="text-muted">${user.user_id}</p>
-                <span class="badge bg-${user.is_active ? 'success' : 'danger'}">
-                    ${user.is_active ? 'Active' : 'Inactive'}
-                </span>
-            </div>
-            <div class="col-md-8">
-                <table class="table">
-                    <tr><th width="150">Email</th><td>${user.email || '-'}</td></tr>
-                    <tr><th>Roles</th><td>${rolesHtml || '-'}</td></tr>
-                    <tr><th>Created</th><td>${user.created_at || 'N/A'}</td></tr>
-                </table>
-            </div>
-        </div>
-    `;
-    
-    $('#view-user-content').html(html);
-    new bootstrap.Modal('#viewUserModal').show();
-}
-
-function resetPassword(userId) {
-    if (!confirm(`Reset password for user "${userId}"?`)) return;
-    
-    $.ajax({
-        url: `/api/users/${userId}/reset-password`,
-        method: 'POST',
-        success: function(response) {
-            alert(`New password: ${response.new_password}\n\nPlease share this with the user securely.`);
-        },
-        error: function(xhr) {
-            showToast('Error resetting password', 'error');
-        }
-    });
-}
-
-function toggleUserStatus(userId, currentStatus) {
-    const action = currentStatus ? 'deactivate' : 'activate';
-    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
-    
-    $.ajax({
-        url: `/api/users/${userId}/toggle-status`,
-        method: 'POST',
-        success: function() {
-            showToast(`User ${action}d successfully`, 'success');
-            location.reload();
-        },
-        error: function(xhr) {
-            showToast('Error updating user status', 'error');
-        }
-    });
+function confirmDelete(userId, userName) {
+    if (confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
+        const form = document.getElementById('deleteForm');
+        form.action = `/admin/users/${userId}/delete`;
+        form.submit();
+    }
 }
 </script>
+{% endblock %}
+
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">User</strong>
+                            <p class="small text-muted mb-0">A person who interacts with the system, with credentials and assigned roles.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Role</strong>
+                            <p class="small text-muted mb-0">A named set of permissions (e.g., Admin, Developer, User) that determines access.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">RBAC (Role-Based Access Control)</strong>
+                            <p class="small text-muted mb-0">Security model where permissions are assigned to roles, and users are assigned roles.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Super Admin</strong>
+                            <p class="small text-muted mb-0">Highest privilege role with full access to all system features.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Active/Inactive</strong>
+                            <p class="small text-muted mb-0">User status indicating whether the account can be used for login.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">HITL Reviewer</strong>
+                            <p class="small text-muted mb-0">Role for users who review and approve human-in-the-loop tasks.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

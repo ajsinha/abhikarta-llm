@@ -1,0 +1,459 @@
+{% extends "help/help_base.html" %}
+
+{% block title %}Glossary of Terms - {{ app_name }}{% endblock %}
+
+{% block help_content %}
+<div class="help-content">
+    <h1><i class="bi bi-book me-2"></i>Glossary of Terms</h1>
+    <p class="lead">A comprehensive dictionary of terms, concepts, and acronyms used throughout the Abhikarta LLM platform.</p>
+
+    <!-- Quick Navigation -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <strong>Jump to:</strong>
+            <a href="#section-a" class="badge bg-primary text-decoration-none me-1">A</a>
+            <a href="#section-b" class="badge bg-primary text-decoration-none me-1">B</a>
+            <a href="#section-c" class="badge bg-primary text-decoration-none me-1">C</a>
+            <a href="#section-d" class="badge bg-primary text-decoration-none me-1">D</a>
+            <a href="#section-e" class="badge bg-primary text-decoration-none me-1">E</a>
+            <a href="#section-f" class="badge bg-primary text-decoration-none me-1">F</a>
+            <a href="#section-g" class="badge bg-primary text-decoration-none me-1">G</a>
+            <a href="#section-h" class="badge bg-primary text-decoration-none me-1">H</a>
+            <a href="#section-i" class="badge bg-primary text-decoration-none me-1">I</a>
+            <a href="#section-j" class="badge bg-primary text-decoration-none me-1">J</a>
+            <a href="#section-k" class="badge bg-primary text-decoration-none me-1">K</a>
+            <a href="#section-l" class="badge bg-primary text-decoration-none me-1">L</a>
+            <a href="#section-m" class="badge bg-primary text-decoration-none me-1">M</a>
+            <a href="#section-n" class="badge bg-primary text-decoration-none me-1">N</a>
+            <a href="#section-o" class="badge bg-primary text-decoration-none me-1">O</a>
+            <a href="#section-p" class="badge bg-primary text-decoration-none me-1">P</a>
+            <a href="#section-r" class="badge bg-primary text-decoration-none me-1">R</a>
+            <a href="#section-s" class="badge bg-primary text-decoration-none me-1">S</a>
+            <a href="#section-t" class="badge bg-primary text-decoration-none me-1">T</a>
+            <a href="#section-u" class="badge bg-primary text-decoration-none me-1">U</a>
+            <a href="#section-v" class="badge bg-primary text-decoration-none me-1">V</a>
+            <a href="#section-w" class="badge bg-primary text-decoration-none me-1">W</a>
+        </div>
+    </div>
+
+    <!-- Section A -->
+    <h2 id="section-a" class="border-bottom pb-2 mt-5">A</h2>
+    
+    <div class="glossary-term">
+        <h5>Agent</h5>
+        <p>An autonomous AI entity that can perceive its environment, make decisions, and take actions to achieve specific goals. In Abhikarta LLM, agents are configurable units that combine LLMs with tools and workflows to perform complex tasks.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Agent Type</h5>
+        <p>The architectural pattern that defines how an agent reasons and acts. Common types include:</p>
+        <ul>
+            <li><strong>ReAct</strong> - Reasoning and Acting pattern where the agent iteratively reasons about actions and observes results</li>
+            <li><strong>Chain of Thought (CoT)</strong> - Step-by-step reasoning through problems</li>
+            <li><strong>Plan and Execute</strong> - Creates a complete plan before execution</li>
+            <li><strong>Custom</strong> - User-defined agent logic</li>
+        </ul>
+    </div>
+
+    <div class="glossary-term">
+        <h5>API (Application Programming Interface)</h5>
+        <p>A set of protocols and tools that allow different software applications to communicate. Abhikarta LLM provides REST APIs for programmatic access to agents, workflows, and tools.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>API Key</h5>
+        <p>A unique identifier used to authenticate requests to an API. Required for accessing LLM providers like OpenAI, Anthropic, and others.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Audit Log</h5>
+        <p>A chronological record of system activities, including user actions, agent executions, and configuration changes. Used for security monitoring and compliance.</p>
+    </div>
+
+    <!-- Section B -->
+    <h2 id="section-b" class="border-bottom pb-2 mt-5">B</h2>
+
+    <div class="glossary-term">
+        <h5>Bedrock</h5>
+        <p>Amazon Web Services' fully managed service for building generative AI applications. Provides access to foundation models from AI21 Labs, Anthropic, Cohere, Meta, and Amazon.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Bearer Token</h5>
+        <p>An authentication credential passed in HTTP headers (Authorization: Bearer {token}) to access protected resources. Commonly used with OAuth 2.0 and API authentication.</p>
+    </div>
+
+    <!-- Section C -->
+    <h2 id="section-c" class="border-bottom pb-2 mt-5">C</h2>
+
+    <div class="glossary-term">
+        <h5>Chain of Thought (CoT)</h5>
+        <p>A prompting technique where the model is encouraged to show its reasoning process step-by-step before arriving at a final answer. Improves performance on complex reasoning tasks.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Code Fragment</h5>
+        <p>A reusable piece of Python code that can be dynamically loaded and executed as a tool. Code fragments are stored in the database and can be managed through the admin interface.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Completion</h5>
+        <p>The text generated by an LLM in response to a prompt. Also called "generation" or "response".</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Context Window</h5>
+        <p>The maximum amount of text (measured in tokens) that an LLM can process in a single request. Includes both input prompt and generated output. Different models have different context window sizes (e.g., 4K, 8K, 32K, 128K tokens).</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>CRUD</h5>
+        <p>Create, Read, Update, Delete - the four basic operations for persistent data storage. Abhikarta LLM supports CRUD operations for agents, workflows, tools, and other entities.</p>
+    </div>
+
+    <!-- Section D -->
+    <h2 id="section-d" class="border-bottom pb-2 mt-5">D</h2>
+
+    <div class="glossary-term">
+        <h5>DAG (Directed Acyclic Graph)</h5>
+        <p>A graph data structure with directed edges and no cycles. Used in Abhikarta LLM to represent workflow execution order, ensuring tasks are executed in the correct sequence.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Dashboard</h5>
+        <p>The main interface screen that provides an overview of system status, recent activities, and quick access to key functions.</p>
+    </div>
+
+    <!-- Section E -->
+    <h2 id="section-e" class="border-bottom pb-2 mt-5">E</h2>
+
+    <div class="glossary-term">
+        <h5>Embedding</h5>
+        <p>A numerical vector representation of text that captures semantic meaning. Used for similarity search, clustering, and retrieval-augmented generation (RAG).</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Endpoint</h5>
+        <p>A specific URL where an API can be accessed. For example, /api/agents is an endpoint for managing agents.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Execution</h5>
+        <p>A single run of an agent or workflow. Each execution has a unique ID, status (pending, running, completed, failed), input parameters, and output results.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Execution Trace</h5>
+        <p>A detailed log of all steps taken during an execution, including tool calls, LLM interactions, and intermediate results. Useful for debugging and optimization.</p>
+    </div>
+
+    <!-- Section F -->
+    <h2 id="section-f" class="border-bottom pb-2 mt-5">F</h2>
+
+    <div class="glossary-term">
+        <h5>Few-Shot Learning</h5>
+        <p>A technique where the model is given a few examples in the prompt to guide its behavior. Contrasted with zero-shot (no examples) and many-shot learning.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Fine-Tuning</h5>
+        <p>The process of further training a pre-trained model on specific data to improve performance on particular tasks.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Function Calling</h5>
+        <p>A capability where LLMs can generate structured output to call external functions or tools. The model determines which function to call and what arguments to pass.</p>
+    </div>
+
+    <!-- Section G -->
+    <h2 id="section-g" class="border-bottom pb-2 mt-5">G</h2>
+
+    <div class="glossary-term">
+        <h5>GPT (Generative Pre-trained Transformer)</h5>
+        <p>A family of large language models developed by OpenAI. The architecture is based on the Transformer neural network.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Guardrails</h5>
+        <p>Safety mechanisms that prevent AI systems from producing harmful, biased, or inappropriate outputs. Can include content filters, output validators, and ethical guidelines.</p>
+    </div>
+
+    <!-- Section H -->
+    <h2 id="section-h" class="border-bottom pb-2 mt-5">H</h2>
+
+    <div class="glossary-term">
+        <h5>Hallucination</h5>
+        <p>When an LLM generates information that appears plausible but is factually incorrect or entirely fabricated. A known limitation of generative AI systems.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>HITL (Human-in-the-Loop)</h5>
+        <p>A workflow pattern where human oversight and intervention are integrated into automated processes. Humans review, approve, or modify AI decisions before they take effect. Essential for high-stakes applications requiring human judgment.</p>
+    </div>
+
+    <!-- Section I -->
+    <h2 id="section-i" class="border-bottom pb-2 mt-5">I</h2>
+
+    <div class="glossary-term">
+        <h5>Inference</h5>
+        <p>The process of using a trained model to generate predictions or outputs. In LLMs, inference refers to generating text completions.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Input Schema</h5>
+        <p>A JSON Schema definition that describes the expected structure and types of input parameters for a tool or API endpoint.</p>
+    </div>
+
+    <!-- Section J -->
+    <h2 id="section-j" class="border-bottom pb-2 mt-5">J</h2>
+
+    <div class="glossary-term">
+        <h5>JSON (JavaScript Object Notation)</h5>
+        <p>A lightweight data interchange format. Used extensively in Abhikarta LLM for configuration files, API requests/responses, and tool schemas.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>JSON Schema</h5>
+        <p>A vocabulary for annotating and validating JSON documents. Used to define the structure of tool parameters, API payloads, and configuration objects.</p>
+    </div>
+
+    <!-- Section K -->
+    <h2 id="section-k" class="border-bottom pb-2 mt-5">K</h2>
+
+    <div class="glossary-term">
+        <h5>KYC (Know Your Customer)</h5>
+        <p>Regulatory requirements for financial institutions to verify customer identity. Abhikarta LLM includes pre-built banking agents for KYC verification workflows.</p>
+    </div>
+
+    <!-- Section L -->
+    <h2 id="section-l" class="border-bottom pb-2 mt-5">L</h2>
+
+    <div class="glossary-term">
+        <h5>LangChain</h5>
+        <p>A popular open-source framework for building applications with LLMs. Abhikarta LLM integrates with LangChain for agent orchestration and tool management.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>LangGraph</h5>
+        <p>A library for building stateful, multi-actor applications with LLMs. Used in Abhikarta LLM for complex workflow orchestration.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>LLM (Large Language Model)</h5>
+        <p>An AI model trained on vast amounts of text data that can understand and generate human-like text. Examples include GPT-4, Claude, Llama, and Gemini.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>LLM Provider</h5>
+        <p>A service that hosts and provides access to large language models via APIs. Supported providers in Abhikarta LLM include OpenAI, Anthropic, Google, AWS Bedrock, Azure, Mistral, Cohere, Groq, Together AI, HuggingFace, and Ollama.</p>
+    </div>
+
+    <!-- Section M -->
+    <h2 id="section-m" class="border-bottom pb-2 mt-5">M</h2>
+
+    <div class="glossary-term">
+        <h5>Max Tokens</h5>
+        <p>The maximum number of tokens the model should generate in its response. Controls output length and helps manage costs.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>MCP (Model Context Protocol)</h5>
+        <p>An open protocol for connecting AI assistants to external data sources and tools. MCP servers expose tools that can be dynamically discovered and integrated into Abhikarta LLM.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>MCP Tool Server</h5>
+        <p>A server that implements the Model Context Protocol, exposing one or more tools via a standardized API. Can be connected via HTTP/REST or stdio transport.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Model</h5>
+        <p>A specific version of an LLM offered by a provider. For example, "gpt-4o", "claude-3-sonnet", or "llama-3.2-70b".</p>
+    </div>
+
+    <!-- Section N -->
+    <h2 id="section-n" class="border-bottom pb-2 mt-5">N</h2>
+
+    <div class="glossary-term">
+        <h5>Node</h5>
+        <p>A single unit of work in a DAG workflow. Nodes can represent LLM calls, tool executions, conditionals, or other operations.</p>
+    </div>
+
+    <!-- Section O -->
+    <h2 id="section-o" class="border-bottom pb-2 mt-5">O</h2>
+
+    <div class="glossary-term">
+        <h5>Ollama</h5>
+        <p>An open-source tool for running large language models locally. Supports models like Llama, Mistral, and others without requiring cloud API calls.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Orchestration</h5>
+        <p>The coordination of multiple components (agents, tools, workflows) to accomplish complex tasks. Abhikarta LLM provides orchestration capabilities for building sophisticated AI applications.</p>
+    </div>
+
+    <!-- Section P -->
+    <h2 id="section-p" class="border-bottom pb-2 mt-5">P</h2>
+
+    <div class="glossary-term">
+        <h5>Parameter</h5>
+        <p>An input variable for a tool, function, or API. Parameters have names, types, descriptions, and may be required or optional.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Pre-built Tool</h5>
+        <p>A ready-to-use tool included with Abhikarta LLM. Categories include Common (date/time, math, text), Banking (account, loan, fraud), Integration (web search, database), and General (file, calculation).</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Prompt</h5>
+        <p>The input text sent to an LLM to elicit a response. Includes user messages, system instructions, and any context or examples.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Prompt Engineering</h5>
+        <p>The practice of designing and optimizing prompts to get desired outputs from LLMs. Includes techniques like few-shot learning, chain of thought, and structured output formatting.</p>
+    </div>
+
+    <!-- Section R -->
+    <h2 id="section-r" class="border-bottom pb-2 mt-5">R</h2>
+
+    <div class="glossary-term">
+        <h5>RAG (Retrieval-Augmented Generation)</h5>
+        <p>A technique that combines information retrieval with text generation. The model retrieves relevant documents from a knowledge base and uses them to generate more accurate, grounded responses.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>RBAC (Role-Based Access Control)</h5>
+        <p>A security model where permissions are assigned to roles, and users are assigned to roles. Abhikarta LLM implements RBAC with roles including Super Admin, Domain Admin, Agent Developer, Agent Publisher, HITL Reviewer, Agent User, and Viewer.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>ReAct (Reasoning and Acting)</h5>
+        <p>An agent architecture pattern where the model alternates between reasoning about the task and taking actions. The agent observes action results and reasons about next steps iteratively.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Registry</h5>
+        <p>A centralized catalog of available components. Abhikarta LLM maintains registries for tools, agents, workflows, and LLM providers.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>REST API</h5>
+        <p>Representational State Transfer - an architectural style for web APIs. Uses HTTP methods (GET, POST, PUT, DELETE) to perform operations on resources identified by URLs.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Role</h5>
+        <p>A named set of permissions that can be assigned to users. Determines what actions a user can perform within the system.</p>
+    </div>
+
+    <!-- Section S -->
+    <h2 id="section-s" class="border-bottom pb-2 mt-5">S</h2>
+
+    <div class="glossary-term">
+        <h5>Schema</h5>
+        <p>A formal definition of data structure. In Abhikarta LLM, schemas define tool parameters, API payloads, and database tables.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>STDIO Transport</h5>
+        <p>Standard Input/Output - a method of communication where data is exchanged through standard input and output streams. Used by some MCP servers for local tool execution.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>System Prompt</h5>
+        <p>Instructions provided to an LLM that define its role, behavior, and constraints. Typically set at the beginning of a conversation and influences all subsequent responses.</p>
+    </div>
+
+    <!-- Section T -->
+    <h2 id="section-t" class="border-bottom pb-2 mt-5">T</h2>
+
+    <div class="glossary-term">
+        <h5>Temperature</h5>
+        <p>A parameter that controls the randomness of LLM outputs. Lower values (0.0-0.3) produce more deterministic, focused responses. Higher values (0.7-1.0) produce more creative, varied outputs.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Token</h5>
+        <p>The basic unit of text that LLMs process. Tokens can be words, parts of words, or characters. A rough estimate is 1 token ≈ 4 characters or ¾ of a word in English.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Tool</h5>
+        <p>A function or capability that an agent can use to perform actions. Tools have names, descriptions, and parameter schemas. Examples include web search, database queries, calculations, and API calls.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Tool Call</h5>
+        <p>An invocation of a tool by an agent. Includes the tool name and arguments. The tool executes and returns results that the agent can use for further reasoning.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Top-P (Nucleus Sampling)</h5>
+        <p>A parameter that limits token selection to those with cumulative probability above a threshold. Alternative to temperature for controlling output diversity.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Trace</h5>
+        <p>A detailed record of all operations performed during an execution. Includes timestamps, inputs, outputs, and any errors encountered.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Transformer</h5>
+        <p>A neural network architecture that uses self-attention mechanisms. The foundation of modern LLMs including GPT, Claude, and Llama.</p>
+    </div>
+
+    <!-- Section U -->
+    <h2 id="section-u" class="border-bottom pb-2 mt-5">U</h2>
+
+    <div class="glossary-term">
+        <h5>User</h5>
+        <p>A person who interacts with the Abhikarta LLM system. Users have credentials (user ID, password), roles, and permissions.</p>
+    </div>
+
+    <!-- Section V -->
+    <h2 id="section-v" class="border-bottom pb-2 mt-5">V</h2>
+
+    <div class="glossary-term">
+        <h5>Vector Database</h5>
+        <p>A database optimized for storing and searching vector embeddings. Used for semantic search and RAG applications.</p>
+    </div>
+
+    <!-- Section W -->
+    <h2 id="section-w" class="border-bottom pb-2 mt-5">W</h2>
+
+    <div class="glossary-term">
+        <h5>Workflow</h5>
+        <p>A defined sequence of steps that accomplish a specific task. In Abhikarta LLM, workflows are represented as DAGs with nodes (operations) and edges (dependencies).</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Workflow Designer</h5>
+        <p>A visual interface for creating and editing workflows. Allows drag-and-drop node placement, connection drawing, and configuration.</p>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="alert alert-info">
+        <h5><i class="bi bi-lightbulb me-2"></i>Did We Miss Something?</h5>
+        <p class="mb-0">If you encounter a term that's not in this glossary, please let your administrator know so we can add it.</p>
+    </div>
+</div>
+
+<style>
+.glossary-term {
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--bmo-blue);
+}
+.glossary-term h5 {
+    color: var(--bmo-blue);
+    margin-bottom: 0.5rem;
+}
+.glossary-term p, .glossary-term ul {
+    color: #555;
+    margin-bottom: 0;
+}
+</style>
+{% endblock %}

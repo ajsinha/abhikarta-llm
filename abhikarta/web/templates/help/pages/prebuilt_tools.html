@@ -11,44 +11,54 @@
 <a href="#common-tools">Common Tools</a>
 <a href="#banking-tools">Banking Tools</a>
 <a href="#integration-tools">Integration Tools</a>
+<a href="#general-tools">General Tools</a>
 <a href="#usage">Usage Guide</a>
 <a href="#extending">Extending Tools</a>
 {% endblock %}
 
 {% block help_content %}
 <h2 id="overview">Pre-built Tools Overview</h2>
-<p class="lead">Abhikarta provides a comprehensive library of pre-built tools that are immediately available for use in agents and workflows.</p>
+<p class="lead">Abhikarta provides a comprehensive library of 85 pre-built tools that are immediately available for use in agents and workflows.</p>
 
 <div class="alert alert-info">
     <i class="bi bi-lightbulb me-2"></i>
-    <strong>Quick Start:</strong> All pre-built tools are automatically registered with the ToolsRegistry on startup.
+    <strong>Quick Start:</strong> All pre-built tools are automatically registered with the ToolsRegistry on startup. Browse them at <a href="/tools">/tools</a>.
 </div>
 
 <div class="row g-4 mb-5">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-center h-100 border-warning">
             <div class="card-body">
                 <i class="bi bi-wrench text-warning" style="font-size: 2.5rem;"></i>
-                <h3 class="mt-2">28+</h3>
+                <h3 class="mt-2">28</h3>
                 <p class="text-muted mb-0">Common Tools</p>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-center h-100 border-success">
             <div class="card-body">
                 <i class="bi bi-bank text-success" style="font-size: 2.5rem;"></i>
-                <h3 class="mt-2">13+</h3>
+                <h3 class="mt-2">13</h3>
                 <p class="text-muted mb-0">Banking Tools</p>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-center h-100 border-primary">
             <div class="card-body">
                 <i class="bi bi-plug text-primary" style="font-size: 2.5rem;"></i>
-                <h3 class="mt-2">20+</h3>
+                <h3 class="mt-2">20</h3>
                 <p class="text-muted mb-0">Integration Tools</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-info">
+            <div class="card-body">
+                <i class="bi bi-globe text-info" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">24</h3>
+                <p class="text-muted mb-0">General Tools</p>
             </div>
         </div>
     </div>
@@ -557,6 +567,253 @@
                         <tr>
                             <td><code>evaluate_condition</code></td>
                             <td>Evaluate condition expression</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="general-tools">General Purpose Tools</h2>
+<p>Tools for web search, document handling, file operations, and system utilities.</p>
+
+<div class="accordion" id="generalToolsAccordion">
+    <!-- Web/Search Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#webSearchTools">
+                <i class="bi bi-search me-2"></i> Web & Search Tools (4 tools)
+            </button>
+        </h2>
+        <div id="webSearchTools" class="accordion-collapse collapse show" data-bs-parent="#generalToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>web_search</code></td>
+                            <td>Search the web for information</td>
+                            <td><code>web_search("AI trends 2025", num_results=10)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>web_fetch</code></td>
+                            <td>Fetch content from a web URL</td>
+                            <td><code>web_fetch("https://example.com/api/data")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>intranet_search</code></td>
+                            <td>Search internal/intranet resources</td>
+                            <td><code>intranet_search("policy documents")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>news_search</code></td>
+                            <td>Search news articles</td>
+                            <td><code>news_search("technology", days_back=7)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Document Handling Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#documentTools">
+                <i class="bi bi-file-earmark-text me-2"></i> Document Handling Tools (4 tools)
+            </button>
+        </h2>
+        <div id="documentTools" class="accordion-collapse collapse" data-bs-parent="#generalToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>read_document</code></td>
+                            <td>Read and extract content from documents</td>
+                            <td><code>read_document("/path/to/file.txt")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>write_document</code></td>
+                            <td>Write content to a document file</td>
+                            <td><code>write_document("/path/to/output.md", content)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>convert_document</code></td>
+                            <td>Convert document between formats</td>
+                            <td><code>convert_document("input.txt", "md")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>extract_document_metadata</code></td>
+                            <td>Extract metadata from a document</td>
+                            <td><code>extract_document_metadata("/path/to/file.pdf")</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- File Operations Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fileOpsTools">
+                <i class="bi bi-folder me-2"></i> File Operations Tools (4 tools)
+            </button>
+        </h2>
+        <div id="fileOpsTools" class="accordion-collapse collapse" data-bs-parent="#generalToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>list_files</code></td>
+                            <td>List files in a directory</td>
+                            <td><code>list_files("/data", pattern="*.json")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>copy_file</code></td>
+                            <td>Copy a file to a new location</td>
+                            <td><code>copy_file("source.txt", "dest.txt")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>move_file</code></td>
+                            <td>Move a file to a new location</td>
+                            <td><code>move_file("old.txt", "new.txt")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>delete_file</code></td>
+                            <td>Delete a file (requires confirmation)</td>
+                            <td><code>delete_file("temp.txt", confirm=True)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Utilities -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#systemTools">
+                <i class="bi bi-terminal me-2"></i> System Utilities (4 tools)
+            </button>
+        </h2>
+        <div id="systemTools" class="accordion-collapse collapse" data-bs-parent="#generalToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>get_system_info</code></td>
+                            <td>Get system information (OS, memory, disk)</td>
+                            <td><code>get_system_info()</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>execute_shell_command</code></td>
+                            <td>Execute a shell command safely</td>
+                            <td><code>execute_shell_command("ls -la")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>get_environment_variable</code></td>
+                            <td>Get an environment variable value</td>
+                            <td><code>get_environment_variable("HOME")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>set_environment_variable</code></td>
+                            <td>Set an environment variable</td>
+                            <td><code>set_environment_variable("MY_VAR", "value")</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Network Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#networkTools">
+                <i class="bi bi-globe2 me-2"></i> Network Tools (4 tools)
+            </button>
+        </h2>
+        <div id="networkTools" class="accordion-collapse collapse" data-bs-parent="#generalToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>check_url_status</code></td>
+                            <td>Check the status of a URL</td>
+                            <td><code>check_url_status("https://api.example.com")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>ping_host</code></td>
+                            <td>Ping a host to check connectivity</td>
+                            <td><code>ping_host("google.com", count=4)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>dns_lookup</code></td>
+                            <td>Perform DNS lookup</td>
+                            <td><code>dns_lookup("example.com")</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>parse_url</code></td>
+                            <td>Parse a URL into components</td>
+                            <td><code>parse_url("https://user:pass@host:8080/path")</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Encoding Tools -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#encodingTools">
+                <i class="bi bi-code-square me-2"></i> Encoding Tools (4 tools)
+            </button>
+        </h2>
+        <div id="encodingTools" class="accordion-collapse collapse" data-bs-parent="#generalToolsAccordion">
+            <div class="accordion-body">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr><th>Tool</th><th>Description</th><th>Example</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>url_encode</code></td>
+                            <td>URL encode a string</td>
+                            <td><code>url_encode("hello world")</code> → "hello%20world"</td>
+                        </tr>
+                        <tr>
+                            <td><code>url_decode</code></td>
+                            <td>URL decode a string</td>
+                            <td><code>url_decode("hello%20world")</code> → "hello world"</td>
+                        </tr>
+                        <tr>
+                            <td><code>html_encode</code></td>
+                            <td>HTML encode special characters</td>
+                            <td><code>html_encode("<script>")</code> → "&amp;lt;script&amp;gt;"</td>
+                        </tr>
+                        <tr>
+                            <td><code>html_decode</code></td>
+                            <td>HTML decode special characters</td>
+                            <td><code>html_decode("&amp;lt;script&amp;gt;")</code> → "<script>"</td>
                         </tr>
                     </tbody>
                 </table>

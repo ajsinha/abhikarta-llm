@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Execution Trace: {{ execution.execution_id[:8] }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .trace-step {
+        border-left: 3px solid #dee2e6;
+        padding-left: 1rem;
+        margin-left: 0.5rem;
+        padding-bottom: 1rem;
+        position: relative;
+    }
+    .trace-step::before {
+        content: '';
+        position: absolute;
+        left: -8px;
+        top: 0;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #6c757d;
+    }
+    .trace-step.success::before { border-color: #198754; background: #198754; }
+    .trace-step.error::before { border-color: #dc3545; background: #dc3545; }
+    .trace-step.running::before { border-color: #0d6efd; background: #0d6efd; }
+    .trace-step:last-child { border-left-color: transparent; }
+    
+    .trace-content {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    .trace-json {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.85rem;
+        padding: 1rem;
+        border-radius: 4px;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+    }
+    .duration-badge {
+        font-family: monospace;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user_executions') }}">Executions</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user_execution_detail', execution_id=execution.execution_id) }}">{{ execution.execution_id[:8] }}</a></li>
+            <li class="breadcrumb-item active">Trace</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-diagram-3 me-2"></i>Execution Trace</h2>
+            <p class="text-muted mb-0">
+                {{ execution.execution_type|title }}: {{ execution.resource_name or execution.resource_id }}
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('user_execution_detail', execution_id=execution.execution_id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Execution
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Summary Card -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Summary</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tbody>
+                            <tr>
+                                <th>Execution ID</th>
+                                <td><code>{{ execution.execution_id[:12] }}...</code></td>
+                            </tr>
+                            <tr>
+                                <th>Type</th>
+                                <td>
+                                    <span class="badge bg-info">{{ execution.execution_type|title }}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    {% if execution.status == 'completed' %}
+                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Completed</span>
+                                    {% elif execution.status == 'failed' %}
+                                    <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Failed</span>
+                                    {% elif execution.status == 'running' %}
+                                    <span class="badge bg-primary"><i class="bi bi-play-circle me-1"></i>Running</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ execution.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Started</th>
+                                <td>{{ execution.started_at.strftime('%Y-%m-%d %H:%M:%S') if execution.started_at else 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Completed</th>
+                                <td>{{ execution.completed_at.strftime('%Y-%m-%d %H:%M:%S') if execution.completed_at else 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Duration</th>
+                                <td>
+                                    {% if execution.duration %}
+                                    <span class="duration-badge">{{ "%.2f"|format(execution.duration) }}s</span>
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Steps</th>
+                                <td>{{ trace_steps|length }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="fs-4 fw-bold text-success">{{ success_count }}</div>
+                            <small class="text-muted">Success</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="fs-4 fw-bold text-danger">{{ error_count }}</div>
+                            <small class="text-muted">Errors</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="fs-4 fw-bold text-info">{{ tool_calls }}</div>
+                            <small class="text-muted">Tool Calls</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trace Steps -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-list-nested me-2"></i>Execution Steps</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleAllSteps()">
+                        <i class="bi bi-arrows-expand me-1"></i>Expand All
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if trace_steps %}
+                    <div class="trace-timeline">
+                        {% for step in trace_steps %}
+                        <div class="trace-step {{ step.status }}">
+                            <div class="trace-content">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <strong>{{ step.step_name or 'Step ' ~ loop.index }}</strong>
+                                        <span class="badge bg-secondary ms-2">{{ step.step_type }}</span>
+                                    </div>
+                                    <div class="text-end">
+                                        {% if step.duration %}
+                                        <span class="duration-badge text-muted">{{ "%.3f"|format(step.duration) }}s</span>
+                                        {% endif %}
+                                        <br>
+                                        <small class="text-muted">{{ step.timestamp.strftime('%H:%M:%S.%f')[:-3] if step.timestamp else '' }}</small>
+                                    </div>
+                                </div>
+                                
+                                {% if step.message %}
+                                <p class="mb-2">{{ step.message }}</p>
+                                {% endif %}
+                                
+                                {% if step.input or step.output %}
+                                <div class="accordion" id="step{{ loop.index }}Accordion">
+                                    {% if step.input %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed py-2" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#input{{ loop.index }}">
+                                                <i class="bi bi-box-arrow-in-right me-2"></i>Input
+                                            </button>
+                                        </h2>
+                                        <div id="input{{ loop.index }}" class="accordion-collapse collapse">
+                                            <div class="accordion-body p-0">
+                                                <pre class="trace-json mb-0">{{ step.input | tojson(indent=2) }}</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if step.output %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed py-2" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#output{{ loop.index }}">
+                                                <i class="bi bi-box-arrow-right me-2"></i>Output
+                                            </button>
+                                        </h2>
+                                        <div id="output{{ loop.index }}" class="accordion-collapse collapse">
+                                            <div class="accordion-body p-0">
+                                                <pre class="trace-json mb-0">{{ step.output | tojson(indent=2) }}</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if step.error %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed py-2 text-danger" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#error{{ loop.index }}">
+                                                <i class="bi bi-exclamation-triangle me-2"></i>Error
+                                            </button>
+                                        </h2>
+                                        <div id="error{{ loop.index }}" class="accordion-collapse collapse">
+                                            <div class="accordion-body p-0">
+                                                <pre class="trace-json mb-0 text-danger">{{ step.error }}</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox display-4 text-muted"></i>
+                        <p class="text-muted mt-2 mb-0">No trace data available for this execution</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let allExpanded = false;
+    
+    function toggleAllSteps() {
+        const accordionButtons = document.querySelectorAll('.accordion-button');
+        const accordionCollapses = document.querySelectorAll('.accordion-collapse');
+        
+        allExpanded = !allExpanded;
+        
+        accordionCollapses.forEach(collapse => {
+            if (allExpanded) {
+                collapse.classList.add('show');
+            } else {
+                collapse.classList.remove('show');
+            }
+        });
+        
+        accordionButtons.forEach(button => {
+            if (allExpanded) {
+                button.classList.remove('collapsed');
+            } else {
+                button.classList.add('collapsed');
+            }
+        });
+        
+        const toggleBtn = event.target.closest('button');
+        toggleBtn.innerHTML = allExpanded ? 
+            '<i class="bi bi-arrows-collapse me-1"></i>Collapse All' : 
+            '<i class="bi bi-arrows-expand me-1"></i>Expand All';
+    }
+</script>
+{% endblock %}
+
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Execution Trace</strong>
+                            <p class="small text-muted mb-0">Detailed log of all steps taken during an agent or workflow execution.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Step</strong>
+                            <p class="small text-muted mb-0">A single operation in the execution (LLM call, tool use, decision).</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Tool Call</strong>
+                            <p class="small text-muted mb-0">Invocation of a tool by the agent with specific arguments.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Input</strong>
+                            <p class="small text-muted mb-0">Data or parameters provided to a step for processing.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Output</strong>
+                            <p class="small text-muted mb-0">Result or response returned by a step after execution.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Duration</strong>
+                            <p class="small text-muted mb-0">Time taken for each step to complete.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

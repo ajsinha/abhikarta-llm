@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+
+{% block title %}Tool: {{ tool.name }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-card {
+        border-left: 4px solid var(--bmo-blue);
+    }
+    .param-card {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease;
+    }
+    .param-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .param-type {
+        font-family: monospace;
+        background-color: #e9ecef;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .schema-json {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.85rem;
+        padding: 1rem;
+        border-radius: 8px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        width: 140px;
+    }
+    .info-value {
+        color: #212529;
+    }
+    .breadcrumb-item a {
+        color: var(--bmo-blue);
+        text-decoration: none;
+    }
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('tools_list') }}">Tools</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ tool.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>
+                {% if source_type == 'prebuilt' %}
+                <i class="bi bi-box-seam text-success me-2"></i>
+                {% elif source_type == 'mcp' %}
+                <i class="bi bi-plug text-primary me-2"></i>
+                {% elif source_type == 'code_fragment' %}
+                <i class="bi bi-code-square text-warning me-2"></i>
+                {% else %}
+                <i class="bi bi-wrench text-secondary me-2"></i>
+                {% endif %}
+                {{ tool.name }}
+            </h2>
+            <p class="text-muted mb-0">{{ tool.description or 'No description available' }}</p>
+        </div>
+        <div>
+            <a href="{{ url_for('tools_list') }}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left me-1"></i>Back to Tools
+            </a>
+            {% if tool.is_enabled %}
+            <a href="{{ url_for('tool_test', tool_name=tool.name) }}" class="btn btn-primary">
+                <i class="bi bi-play-fill me-1"></i>Test Tool
+            </a>
+            {% else %}
+            <button class="btn btn-secondary" disabled>
+                <i class="bi bi-play-fill me-1"></i>Tool Disabled
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column: Basic Information -->
+        <div class="col-lg-6">
+            <div class="card detail-card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <td class="info-label">Name</td>
+                                <td class="info-value"><code class="fs-5">{{ tool.name }}</code></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Tool ID</td>
+                                <td class="info-value">
+                                    <code class="text-muted">{{ tool.tool_id }}</code>
+                                    <button class="btn btn-sm btn-link p-0 ms-2" onclick="copyToClipboard('{{ tool.tool_id }}')" title="Copy ID">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Type</td>
+                                <td class="info-value">
+                                    <span class="badge bg-secondary fs-6">{{ tool.tool_type.value if tool.tool_type else 'unknown' }}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Category</td>
+                                <td class="info-value">
+                                    <span class="badge bg-info fs-6">{{ tool.category.value if tool.category else 'general' }}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Status</td>
+                                <td class="info-value">
+                                    {% if tool.is_enabled %}
+                                    <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i>Enabled</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary fs-6"><i class="bi bi-x-circle me-1"></i>Disabled</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Version</td>
+                                <td class="info-value">{{ tool.metadata.version if tool.metadata else '1.0.0' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Source Information -->
+        <div class="col-lg-6">
+            <div class="card detail-card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Source Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <td class="info-label">Source Type</td>
+                                <td class="info-value">
+                                    {% if source_type == 'prebuilt' %}
+                                    <span class="badge bg-success fs-6"><i class="bi bi-box-seam me-1"></i>Pre-built</span>
+                                    {% elif source_type == 'mcp' %}
+                                    <span class="badge bg-primary fs-6"><i class="bi bi-plug me-1"></i>MCP Server</span>
+                                    {% elif source_type == 'code_fragment' %}
+                                    <span class="badge bg-warning text-dark fs-6"><i class="bi bi-code-square me-1"></i>Code Fragment</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary fs-6"><i class="bi bi-wrench me-1"></i>Built-in</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Source</td>
+                                <td class="info-value"><code>{{ tool.metadata.source if tool.metadata else 'built-in' }}</code></td>
+                            </tr>
+                            {% if source_type == 'mcp' and source_server %}
+                            <tr>
+                                <td class="info-label">MCP Server</td>
+                                <td class="info-value">
+                                    <a href="{{ url_for('view_mcp_server_tools', server_id=source_server) }}" class="text-decoration-none">
+                                        <i class="bi bi-server me-1"></i>{{ source_server }}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td class="info-label">Author</td>
+                                <td class="info-value">{{ tool.metadata.author if tool.metadata and tool.metadata.author else 'Abhikarta' }}</td>
+                            </tr>
+                            {% if tool.metadata and tool.metadata.tags %}
+                            <tr>
+                                <td class="info-label">Tags</td>
+                                <td class="info-value">
+                                    {% for tag in tool.metadata.tags %}
+                                    <span class="badge bg-light text-dark me-1">{{ tag }}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+
+                    <hr>
+                    <h6 class="text-muted mb-3">Description</h6>
+                    <p class="mb-0">{{ tool.description or 'No description available for this tool.' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parameters Section -->
+    <div class="card detail-card shadow-sm mt-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-sliders me-2"></i>Parameters</h5>
+            <span class="badge bg-primary">{{ parameters|length }} parameter{{ 's' if parameters|length != 1 else '' }}</span>
+        </div>
+        <div class="card-body">
+            {% if parameters %}
+            <div class="row g-3">
+                {% for param in parameters %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="param-card p-3 rounded h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0">
+                                <i class="bi bi-input-cursor-text me-1 text-muted"></i>
+                                {{ param.name }}
+                            </h6>
+                            <div>
+                                {% if param.required %}
+                                <span class="badge bg-danger">required</span>
+                                {% else %}
+                                <span class="badge bg-secondary">optional</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <span class="param-type">{{ param.param_type }}</span>
+                        </div>
+                        <p class="text-muted small mb-0">{{ param.description or 'No description' }}</p>
+                        {% if param.default is not none %}
+                        <div class="mt-2">
+                            <small class="text-muted">Default: <code>{{ param.default }}</code></small>
+                        </div>
+                        {% endif %}
+                        {% if param.enum %}
+                        <div class="mt-2">
+                            <small class="text-muted">Values: 
+                                {% for val in param.enum %}
+                                <code>{{ val }}</code>{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="bi bi-inbox display-4 text-muted"></i>
+                <p class="text-muted mt-2 mb-0">This tool has no input parameters</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- JSON Schema Section -->
+    <div class="card detail-card shadow-sm mt-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-braces me-2"></i>JSON Schema</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="copySchema()">
+                <i class="bi bi-clipboard me-1"></i>Copy Schema
+            </button>
+        </div>
+        <div class="card-body">
+            <pre class="schema-json mb-0" id="schemaJson">{{ schema_json }}</pre>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <a href="{{ url_for('tools_list') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to Tools
+        </a>
+        {% if tool.is_enabled %}
+        <a href="{{ url_for('tool_test', tool_name=tool.name) }}" class="btn btn-primary btn-lg">
+            <i class="bi bi-play-fill me-1"></i>Test This Tool
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            // Show brief feedback
+            const btn = event.target.closest('button');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check text-success"></i>';
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+            }, 1500);
+        });
+    }
+    
+    function copySchema() {
+        const schemaText = document.getElementById('schemaJson').textContent;
+        navigator.clipboard.writeText(schemaText).then(() => {
+            const btn = event.target.closest('button');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-success');
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+        });
+    }
+</script>
+{% endblock %}
+
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Tool</strong>
+                            <p class="small text-muted mb-0">A function that agents can use to perform actions like API calls or calculations.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Parameter</strong>
+                            <p class="small text-muted mb-0">An input variable with name, type, description, and required/optional status.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">JSON Schema</strong>
+                            <p class="small text-muted mb-0">A standard for defining the structure and validation rules for parameters.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Input Schema</strong>
+                            <p class="small text-muted mb-0">Definition of what parameters a tool accepts and their types.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Tool Source</strong>
+                            <p class="small text-muted mb-0">Origin of the tool: pre-built, MCP server, code fragment, or built-in.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Category</strong>
+                            <p class="small text-muted mb-0">Classification of tools (common, banking, integration, general).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

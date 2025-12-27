@@ -1,4 +1,4 @@
-# Abhikarta-LLM v1.1.7 - Quick Start Guide
+# Abhikarta-LLM v1.2.0 - Quick Start Guide
 
 This guide will help you get started with Abhikarta-LLM in under 15 minutes.
 
@@ -121,6 +121,7 @@ After login, you'll see the main dashboard with:
 | **Agents** | Create and manage AI agents |
 | **Workflows** | Design and execute workflows |
 | **Executions** | View execution history and logs |
+| **Tools** | Browse, search, and test all tools |
 | **HITL Tasks** | Human-in-the-loop pending tasks |
 | **Admin** | User, LLM, and system management |
 | **Help** | Documentation and guides |
@@ -263,11 +264,11 @@ validate_regulatory_compliance(account_data)
 
 ## Using Tools
 
-### Pre-built Tools (60+)
+### Pre-built Tools (85)
 
-Abhikarta comes with 60+ pre-built tools organized in categories:
+Abhikarta comes with 85 pre-built tools organized in categories:
 
-#### Common Tools
+#### Common Tools (28)
 ```python
 # Date/Time
 get_current_datetime(format="%Y-%m-%d")
@@ -290,7 +291,30 @@ validate_credit_card("4111111111111111")
 validate_iban("DE89370400440532013000")
 ```
 
-#### Integration Tools
+#### General Tools (24) - NEW
+```python
+# Web/Search
+web_search("AI trends 2025", num_results=10)
+web_fetch("https://example.com/api/data")
+news_search("technology", days_back=7)
+
+# Document Handling
+read_document("/path/to/document.txt")
+write_document("/path/to/output.md", content)
+convert_document("input.txt", "md")
+
+# File Operations
+list_files("/data", pattern="*.json", recursive=True)
+copy_file("source.txt", "destination.txt")
+
+# System/Network
+get_system_info()
+check_url_status("https://api.example.com/health")
+ping_host("google.com")
+dns_lookup("example.com")
+```
+
+#### Integration Tools (20)
 ```python
 # Data Transformation
 map_fields(source, {"old_name": "new_name"})
@@ -303,6 +327,14 @@ sort_list(items, "created_at", descending=True)
 aggregate_list(items, "amount", "sum")
 paginate_list(items, page=1, page_size=10)
 ```
+
+### Tools Management Page
+
+Browse all available tools at **/tools**:
+- View all registered tools (pre-built, MCP, code fragments)
+- Search and filter by category or source
+- Test tools with custom parameters
+- Refresh MCP server connections
 
 ### Register Custom Tools
 
@@ -349,8 +381,12 @@ Add tool names to agent configuration:
 | **Execution Progress** | Real-time monitoring | v1.1.5 |
 | **Tools System** | Unified tool architecture | v1.1.6 |
 | **MCP Integration** | External tool servers | v1.1.6 |
-| **Pre-built Tools** | 60+ ready-to-use tools | v1.1.7 |
+| **Pre-built Tools** | 85 ready-to-use tools | v1.1.7 |
+| **Tools Page** | Browse, search, filter tools | v1.1.7 |
 | **Banking Solutions** | 10 agents, 7 workflows | v1.1.7 |
+| **Tool View/Test Pages** | Dedicated tool detail & testing UI | v1.1.8 |
+| **Database Schema Docs** | 22 tables documented with ER diagram | v1.2.0 |
+| **Page Glossaries** | Contextual help on 22 templates | v1.2.0 |
 
 ### Architecture Layers
 
@@ -386,17 +422,19 @@ Add tool names to agent configuration:
 
 ## Next Steps
 
-1. **Explore Help**: Click **Help** in navigation for detailed guides
-2. **Try Banking Agents**: Clone and test pre-built banking solutions
-3. **Build Custom Tools**: Create domain-specific tools
-4. **Set Up MCP**: Connect external tool servers
-5. **Configure HITL**: Add human approval points to workflows
+1. **Browse Tools**: Visit `/tools` to explore all 85 pre-built tools
+2. **Explore Help**: Click **Help** in navigation for detailed guides
+3. **Try Banking Agents**: Clone and test pre-built banking solutions
+4. **Build Custom Tools**: Create domain-specific tools
+5. **Set Up MCP**: Connect external tool servers
+6. **Configure HITL**: Add human approval points to workflows
 
 ---
 
 ## Getting Help
 
 - **In-App Help**: `/help` - Comprehensive documentation
+- **Tools Browser**: `/tools` - Browse and test all tools
 - **Architecture**: `/help/about/architecture` - System design
 - **API Reference**: `/help/page/api-reference` - REST API docs
 - **Banking Guide**: `/help/page/banking-solutions` - Banking solutions
@@ -406,7 +444,7 @@ Add tool names to agent configuration:
 ## File Structure Reference
 
 ```
-abhikarta-llm-v1.1.7/
+abhikarta-llm-v1.2.0/
 ├── abhikarta/
 │   ├── agent/          # Agent management
 │   ├── config/         # Configuration
@@ -415,7 +453,8 @@ abhikarta-llm-v1.1.7/
 │   ├── langchain/      # LangChain/LangGraph integration
 │   ├── llm_provider/   # Multi-provider LLM facade
 │   ├── mcp/            # MCP server management
-│   ├── tools/          # Tools system + prebuilt (60+)
+│   ├── tools/          # Tools system + prebuilt (85)
+│   │   └── prebuilt/   # Common(28), Banking(13), Integration(20), General(24)
 │   ├── web/            # Flask application
 │   └── workflow/       # DAG execution engine
 ├── config/             # Application properties
@@ -427,4 +466,4 @@ abhikarta-llm-v1.1.7/
 
 ---
 
-*Version 1.1.7 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
+*Version 1.2.0 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*

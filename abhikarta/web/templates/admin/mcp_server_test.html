@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Test MCP Server: {{ server.name }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .result-container {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.9rem;
+        padding: 1.5rem;
+        border-radius: 8px;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+    }
+    .result-success {
+        border: 2px solid #198754;
+    }
+    .result-error {
+        border: 2px solid #dc3545;
+    }
+    .test-step {
+        padding: 1rem;
+        border-left: 3px solid #dee2e6;
+        margin-bottom: 1rem;
+    }
+    .test-step.pending { border-color: #6c757d; }
+    .test-step.running { border-color: #0d6efd; background-color: rgba(13, 110, 253, 0.05); }
+    .test-step.success { border-color: #198754; background-color: rgba(25, 135, 84, 0.05); }
+    .test-step.failed { border-color: #dc3545; background-color: rgba(220, 53, 69, 0.05); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_mcp_tool_servers') }}">MCP Servers</a></li>
+            <li class="breadcrumb-item active">Test: {{ server.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-plug text-primary me-2"></i>Test MCP Server</h2>
+            <p class="text-muted mb-0">{{ server.name }} - {{ server.transport_type }}</p>
+        </div>
+        <div>
+            <a href="{{ url_for('admin_mcp_tool_servers') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Servers
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Server Info -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-server me-2"></i>Server Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tbody>
+                            <tr>
+                                <th>Name</th>
+                                <td>{{ server.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>ID</th>
+                                <td><code>{{ server.server_id }}</code></td>
+                            </tr>
+                            <tr>
+                                <th>Transport</th>
+                                <td><span class="badge bg-info">{{ server.transport_type }}</span></td>
+                            </tr>
+                            {% if server.transport_type == 'stdio' %}
+                            <tr>
+                                <th>Command</th>
+                                <td><code>{{ server.command }}</code></td>
+                            </tr>
+                            {% elif server.transport_type == 'http' %}
+                            <tr>
+                                <th>URL</th>
+                                <td><code>{{ server.url }}</code></td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    {% if server.is_connected %}
+                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Connected</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary"><i class="bi bi-x-circle me-1"></i>Disconnected</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Auto-Connect</th>
+                                <td>
+                                    {% if server.auto_connect %}
+                                    <span class="badge bg-primary">Yes</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <hr>
+                    <button class="btn btn-primary w-100" onclick="runTest()" id="runTestBtn">
+                        <i class="bi bi-play-fill me-1"></i>Run Connection Test
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Test Results</h5>
+                    <span id="testStatus" class="badge bg-secondary">Not Started</span>
+                </div>
+                <div class="card-body">
+                    <div id="testSteps">
+                        <div class="test-step pending" id="step1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong><i class="bi bi-1-circle me-2"></i>Initialize Connection</strong>
+                                <span class="step-status"><i class="bi bi-hourglass text-muted"></i></span>
+                            </div>
+                            <small class="text-muted">Establishing connection to MCP server...</small>
+                        </div>
+                        <div class="test-step pending" id="step2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong><i class="bi bi-2-circle me-2"></i>Handshake</strong>
+                                <span class="step-status"><i class="bi bi-hourglass text-muted"></i></span>
+                            </div>
+                            <small class="text-muted">Performing protocol handshake...</small>
+                        </div>
+                        <div class="test-step pending" id="step3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong><i class="bi bi-3-circle me-2"></i>List Tools</strong>
+                                <span class="step-status"><i class="bi bi-hourglass text-muted"></i></span>
+                            </div>
+                            <small class="text-muted">Fetching available tools from server...</small>
+                        </div>
+                        <div class="test-step pending" id="step4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong><i class="bi bi-4-circle me-2"></i>Verify Registration</strong>
+                                <span class="step-status"><i class="bi bi-hourglass text-muted"></i></span>
+                            </div>
+                            <small class="text-muted">Registering tools in tools registry...</small>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h6>Response Details</h6>
+                    <pre class="result-container mb-0" id="resultJson">Click "Run Connection Test" to start...</pre>
+                </div>
+            </div>
+
+            <!-- Tools Found -->
+            <div class="card shadow-sm mt-4" id="toolsCard" style="display: none;">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-wrench me-2"></i>Tools Found</h5>
+                </div>
+                <div class="card-body">
+                    <div id="toolsList" class="row g-2">
+                        <!-- Tools will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const serverId = "{{ server.server_id }}";
+    
+    function runTest() {
+        const btn = document.getElementById('runTestBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Testing...';
+        
+        // Reset steps
+        for (let i = 1; i <= 4; i++) {
+            const step = document.getElementById('step' + i);
+            step.className = 'test-step pending';
+            step.querySelector('.step-status').innerHTML = '<i class="bi bi-hourglass text-muted"></i>';
+        }
+        document.getElementById('testStatus').className = 'badge bg-info';
+        document.getElementById('testStatus').textContent = 'Running...';
+        document.getElementById('resultJson').textContent = 'Testing connection...';
+        document.getElementById('resultJson').className = 'result-container';
+        document.getElementById('toolsCard').style.display = 'none';
+        
+        // Animate steps
+        animateStep(1, 'running');
+        
+        fetch(`/api/admin/mcp-servers/${serverId}/test`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Success flow
+                animateStep(1, 'success');
+                setTimeout(() => animateStep(2, 'success'), 200);
+                setTimeout(() => animateStep(3, 'success'), 400);
+                setTimeout(() => animateStep(4, 'success'), 600);
+                
+                document.getElementById('testStatus').className = 'badge bg-success';
+                document.getElementById('testStatus').textContent = 'Success';
+                document.getElementById('resultJson').className = 'result-container result-success';
+                document.getElementById('resultJson').textContent = JSON.stringify(data, null, 2);
+                
+                // Show tools if any
+                if (data.tools && data.tools.length > 0) {
+                    document.getElementById('toolsCard').style.display = 'block';
+                    let toolsHtml = '';
+                    data.tools.forEach(tool => {
+                        toolsHtml += `
+                            <div class="col-md-6 col-lg-4">
+                                <div class="border rounded p-2">
+                                    <strong>${tool.name}</strong>
+                                    <br><small class="text-muted">${tool.description || 'No description'}</small>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('toolsList').innerHTML = toolsHtml;
+                }
+            } else {
+                // Error flow
+                animateStep(1, data.step >= 1 ? 'success' : 'failed');
+                animateStep(2, data.step >= 2 ? 'success' : (data.step === 1 ? 'failed' : 'pending'));
+                animateStep(3, data.step >= 3 ? 'success' : (data.step === 2 ? 'failed' : 'pending'));
+                animateStep(4, data.step >= 4 ? 'success' : (data.step === 3 ? 'failed' : 'pending'));
+                
+                document.getElementById('testStatus').className = 'badge bg-danger';
+                document.getElementById('testStatus').textContent = 'Failed';
+                document.getElementById('resultJson').className = 'result-container result-error';
+                document.getElementById('resultJson').textContent = JSON.stringify(data, null, 2);
+            }
+        })
+        .catch(error => {
+            animateStep(1, 'failed');
+            document.getElementById('testStatus').className = 'badge bg-danger';
+            document.getElementById('testStatus').textContent = 'Error';
+            document.getElementById('resultJson').className = 'result-container result-error';
+            document.getElementById('resultJson').textContent = 'Error: ' + error.message;
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-play-fill me-1"></i>Run Connection Test';
+        });
+    }
+    
+    function animateStep(stepNum, status) {
+        const step = document.getElementById('step' + stepNum);
+        step.className = 'test-step ' + status;
+        
+        const statusIcon = step.querySelector('.step-status');
+        if (status === 'running') {
+            statusIcon.innerHTML = '<span class="spinner-border spinner-border-sm text-primary"></span>';
+        } else if (status === 'success') {
+            statusIcon.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+        } else if (status === 'failed') {
+            statusIcon.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
+        }
+    }
+</script>
+{% endblock %}

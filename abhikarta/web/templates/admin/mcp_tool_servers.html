@@ -99,10 +99,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <button type="button" class="btn btn-sm btn-outline-info" 
-                                        onclick="testConnection('{{ server.server_id }}')" title="Test Connection">
+                                <a href="{{ url_for('mcp_server_test_page', server_id=server.server_id) }}" 
+                                   class="btn btn-sm btn-outline-info" title="Test Connection">
                                     <i class="bi bi-plug"></i>
-                                </button>
+                                </a>
                                 <form method="POST" action="{{ url_for('refresh_mcp_tool_server', server_id=server.server_id) }}" 
                                       style="display: inline;">
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Refresh Tools">
@@ -179,128 +179,69 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- Test Connection Modal -->
-<div class="modal fade" id="testModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h6 class="modal-title"><i class="bi bi-plug me-2"></i>Test Connection</h6>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div id="test-loading" class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-2 text-muted">Testing connection...</p>
-                </div>
-                <div id="test-result" class="d-none">
-                    <div class="alert" id="test-status-alert">
-                        <strong id="test-status-text"></strong>
-                    </div>
-                    
-                    <table class="table table-sm">
-                        <tr>
-                            <th style="width: 30%;">URL</th>
-                            <td><code id="test-url"></code></td>
-                        </tr>
-                        <tr>
-                            <th>HTTP Status</th>
-                            <td id="test-status-code"></td>
-                        </tr>
-                        <tr>
-                            <th>Content-Type</th>
-                            <td id="test-content-type"></td>
-                        </tr>
-                        <tr>
-                            <th>Response Size</th>
-                            <td id="test-response-size"></td>
-                        </tr>
-                        <tr>
-                            <th>Tools Found</th>
-                            <td id="test-tools-found"></td>
-                        </tr>
-                    </table>
-                    
-                    <div id="test-error-section" class="d-none">
-                        <h6 class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>Error</h6>
-                        <pre class="bg-danger bg-opacity-10 p-2 rounded small" id="test-error"></pre>
-                    </div>
-                    
-                    <div id="test-preview-section">
-                        <h6><i class="bi bi-code me-1"></i>Response Preview</h6>
-                        <pre class="bg-dark text-light p-2 rounded small" style="max-height: 300px; overflow: auto;" id="test-preview"></pre>
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">MCP (Model Context Protocol)</strong>
+                            <p class="small text-muted mb-0">An open protocol for connecting AI assistants to external tools and data sources.</p>
+                        </div>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">MCP Tool Server</strong>
+                            <p class="small text-muted mb-0">A server implementing MCP that exposes tools via REST API or stdio transport.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Transport Type</strong>
+                            <p class="small text-muted mb-0">Communication method: HTTP/REST for web APIs or STDIO for local processes.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Bearer Token</strong>
+                            <p class="small text-muted mb-0">An authentication credential passed in HTTP headers for API access.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Auto-Refresh</strong>
+                            <p class="small text-muted mb-0">Automatic periodic synchronization of tools from the MCP server.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Endpoint</strong>
+                            <p class="small text-muted mb-0">A specific URL path where the MCP server's tools API can be accessed.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-function testConnection(serverId) {
-    const modal = new bootstrap.Modal('#testModal');
-    modal.show();
-    
-    document.getElementById('test-loading').classList.remove('d-none');
-    document.getElementById('test-result').classList.add('d-none');
-    
-    fetch(`/admin/mcp-tool-servers/${serverId}/test`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('test-loading').classList.add('d-none');
-            document.getElementById('test-result').classList.remove('d-none');
-            
-            const statusAlert = document.getElementById('test-status-alert');
-            const statusText = document.getElementById('test-status-text');
-            
-            if (data.success) {
-                statusAlert.className = 'alert alert-success';
-                statusText.textContent = `✓ Connection successful - ${data.tools_found} tools found`;
-            } else {
-                statusAlert.className = 'alert alert-danger';
-                statusText.textContent = '✗ Connection failed';
-            }
-            
-            document.getElementById('test-url').textContent = data.url || '-';
-            document.getElementById('test-status-code').textContent = data.status_code || '-';
-            document.getElementById('test-content-type').textContent = data.content_type || '-';
-            document.getElementById('test-response-size').textContent = data.response_size ? `${data.response_size} bytes` : '-';
-            document.getElementById('test-tools-found').textContent = data.tools_found || '0';
-            
-            if (data.error) {
-                document.getElementById('test-error-section').classList.remove('d-none');
-                document.getElementById('test-error').textContent = data.error;
-            } else {
-                document.getElementById('test-error-section').classList.add('d-none');
-            }
-            
-            if (data.response_preview) {
-                document.getElementById('test-preview-section').classList.remove('d-none');
-                // Try to pretty print JSON
-                try {
-                    const parsed = JSON.parse(data.response_preview);
-                    document.getElementById('test-preview').textContent = JSON.stringify(parsed, null, 2);
-                } catch {
-                    document.getElementById('test-preview').textContent = data.response_preview;
-                }
-            } else {
-                document.getElementById('test-preview-section').classList.add('d-none');
-            }
-        })
-        .catch(err => {
-            document.getElementById('test-loading').classList.add('d-none');
-            document.getElementById('test-result').classList.remove('d-none');
-            
-            const statusAlert = document.getElementById('test-status-alert');
-            statusAlert.className = 'alert alert-danger';
-            document.getElementById('test-status-text').textContent = '✗ Request failed';
-            
-            document.getElementById('test-error-section').classList.remove('d-none');
-            document.getElementById('test-error').textContent = err.toString();
-        });
-}
-</script>
 {% endblock %}

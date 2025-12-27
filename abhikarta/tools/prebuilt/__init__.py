@@ -5,6 +5,7 @@ This package provides:
 - Common utility tools (date, math, text, validation)
 - Banking industry tools (KYC, credit, loan, compliance)
 - Integration tools (API, notifications, data transformation)
+- General-purpose tools (web search, document handling, file operations)
 
 Usage:
     from abhikarta.tools.prebuilt import get_all_prebuilt_tools, register_all_prebuilt_tools
@@ -113,10 +114,46 @@ from .integration_tools import (
     evaluate_condition,
 )
 
+from .general_tools import (
+    get_general_tools,
+    register_general_tools,
+    # Web/Search
+    web_search,
+    web_fetch,
+    intranet_search,
+    news_search,
+    # Document handling
+    read_document,
+    write_document,
+    convert_document,
+    extract_document_metadata,
+    # File operations
+    list_files,
+    copy_file,
+    move_file,
+    delete_file,
+    # System utilities
+    get_system_info,
+    execute_shell_command,
+    get_environment_variable,
+    set_environment_variable,
+    # Network tools
+    check_url_status,
+    ping_host,
+    dns_lookup,
+    parse_url,
+    # Encoding
+    url_encode,
+    url_decode,
+    html_encode,
+    html_decode,
+)
+
 
 def get_all_prebuilt_tools():
     """Get all pre-built tools."""
-    return get_common_tools() + get_banking_tools() + get_integration_tools()
+    return (get_common_tools() + get_banking_tools() + 
+            get_integration_tools() + get_general_tools())
 
 
 def register_all_prebuilt_tools(registry) -> int:
@@ -132,6 +169,7 @@ def register_all_prebuilt_tools(registry) -> int:
     count = register_common_tools(registry)
     count += register_banking_tools(registry)
     count += register_integration_tools(registry)
+    count += register_general_tools(registry)
     return count
 
 
@@ -142,9 +180,11 @@ __all__ = [
     'get_common_tools',
     'get_banking_tools',
     'get_integration_tools',
+    'get_general_tools',
     'register_common_tools',
     'register_banking_tools',
     'register_integration_tools',
+    'register_general_tools',
     
     # Common tools
     'get_current_datetime',
@@ -212,4 +252,30 @@ __all__ = [
     'create_workflow_context',
     'update_workflow_context',
     'evaluate_condition',
+    
+    # General tools
+    'web_search',
+    'web_fetch',
+    'intranet_search',
+    'news_search',
+    'read_document',
+    'write_document',
+    'convert_document',
+    'extract_document_metadata',
+    'list_files',
+    'copy_file',
+    'move_file',
+    'delete_file',
+    'get_system_info',
+    'execute_shell_command',
+    'get_environment_variable',
+    'set_environment_variable',
+    'check_url_status',
+    'ping_host',
+    'dns_lookup',
+    'parse_url',
+    'url_encode',
+    'url_decode',
+    'html_encode',
+    'html_decode',
 ]

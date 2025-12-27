@@ -229,6 +229,34 @@ class AdminRoutes(AbstractRoutes):
                                    user=user,
                                    available_roles=available_roles)
         
+        @self.app.route('/admin/users/<user_id>/view')
+        @admin_required
+        def view_user(user_id):
+            """View user details."""
+            user = self.user_facade.get_user(user_id)
+            
+            if not user:
+                flash(f'User "{user_id}" not found', 'error')
+                return redirect(url_for('manage_users'))
+            
+            # Get recent activity for this user
+            recent_activity = []
+            try:
+                logs = self.db_facade.execute_query(
+                    "SELECT * FROM audit_logs WHERE user_id = ? ORDER BY created_at DESC LIMIT 20",
+                    (user_id,)
+                )
+                recent_activity = logs if logs else []
+            except Exception as e:
+                logger.warning(f"Could not fetch user activity: {e}")
+            
+            return render_template('admin/view_user.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   user=user,
+                                   recent_activity=recent_activity)
+        
         @self.app.route('/admin/users/<user_id>/delete', methods=['POST'])
         @admin_required
         def delete_user(user_id):
@@ -1181,7 +1209,52 @@ class AdminRoutes(AbstractRoutes):
                          refresh_interval, timeout_seconds, session.get('user_id'))
                     )
                     self.log_audit('create', 'mcp_tool_server', server_id)
-                    flash(f'MCP Tool Server "{name}" added successfully', 'success')
+                    
+                    # Connect to MCP manager and load tools if active
+                    if is_active:
+                        try:
+                            from abhikarta.mcp import get_mcp_manager, MCPServerConfig
+                            from abhikarta.tools import get_tools_registry
+                            
+                            manager = get_mcp_manager()
+                            registry = get_tools_registry()
+                            
+                            # Ensure manager has registry set
+                            if not manager._tools_registry:
+                                manager.set_tools_registry(registry)
+                            if not manager._db_facade:
+                                manager.set_db_facade(self.db_facade)
+                            
+                            # Parse auth config
+                            auth_data = json.loads(auth_config) if auth_config else {}
+                            auth_token = auth_data.get('token') or auth_data.get('api_key')
+                            
+                            # Create server config
+                            config = MCPServerConfig(
+                                server_id=server_id,
+                                name=name,
+                                description=description,
+                                url=base_url,
+                                tools_endpoint=tools_endpoint,
+                                auth_token=auth_token,
+                                timeout_seconds=timeout_seconds,
+                                auto_connect=True
+                            )
+                            
+                            # Add and connect
+                            manager.add_server(config, connect=True)
+                            
+                            # Get tool count
+                            server = manager.get_server(server_id)
+                            tool_count = server.state.tool_count if server else 0
+                            
+                            flash(f'MCP Tool Server "{name}" added and connected successfully. Loaded {tool_count} tools.', 'success')
+                        except Exception as e:
+                            logger.error(f"Error connecting to MCP server: {e}")
+                            flash(f'Server added but connection failed: {str(e)}', 'warning')
+                    else:
+                        flash(f'MCP Tool Server "{name}" added successfully (not active)', 'success')
+                    
                     return redirect(url_for('admin_mcp_tool_servers'))
                 except Exception as e:
                     logger.error(f"Error adding MCP tool server: {e}")
@@ -1266,6 +1339,25 @@ class AdminRoutes(AbstractRoutes):
                 flash(f'Error deleting server: {str(e)}', 'error')
             return redirect(url_for('admin_mcp_tool_servers'))
         
+        @self.app.route('/admin/mcp-tool-servers/<server_id>/test-page')
+        @admin_required
+        def mcp_server_test_page(server_id):
+            """Display test page for an MCP Tool Server."""
+            server = self.db_facade.fetch_one(
+                "SELECT * FROM mcp_tool_servers WHERE server_id = ?",
+                (server_id,)
+            )
+            
+            if not server:
+                flash('Server not found', 'error')
+                return redirect(url_for('admin_mcp_tool_servers'))
+            
+            return render_template('admin/mcp_server_test.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   server=server)
+        
         @self.app.route('/admin/mcp-tool-servers/<server_id>/test', methods=['POST'])
         @admin_required
         def test_mcp_tool_server(server_id):
@@ -1308,7 +1400,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.1.7')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.0')
                 
                 # Add auth if configured
                 auth_type = server.get('auth_type', 'none')
@@ -1409,7 +1501,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.1.7')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.0')
                 
                 # Add auth headers if configured
                 auth_type = server.get('auth_type', 'none')

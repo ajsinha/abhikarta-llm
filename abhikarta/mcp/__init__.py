@@ -7,7 +7,7 @@ This module provides:
 - Centralized MCPServerManager for server lifecycle
 - Automatic tool discovery and registration
 
-Version: 1.1.7
+Version: 1.2.0
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 """
@@ -58,4 +58,4 @@ __all__ = [
     'get_mcp_manager',
 ]
 
-__version__ = '1.1.7'
+__version__ = '1.2.0'

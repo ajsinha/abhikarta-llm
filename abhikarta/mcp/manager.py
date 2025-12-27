@@ -433,14 +433,33 @@ class MCPServerManager:
         def monitor_loop():
             while self._monitor_running:
                 try:
-                    self.check_all_health()
-                    
-                    # Attempt reconnection for errored servers
-                    for server_id, server in self._servers.items():
-                        if (server.state.status == MCPServerStatus.ERROR and
-                            server.config.auto_connect):
-                            self.connect_server(server_id)
+                    # Check health and sync tools
+                    for server_id, server in list(self._servers.items()):
+                        try:
+                            healthy, latency = self.check_health(server_id)
                             
+                            if not healthy and server.is_connected:
+                                # Server went offline - unregister its tools
+                                logger.warning(f"MCP server {server.name} became unreachable, unregistering tools")
+                                self._unload_server_tools(server_id)
+                                server.state.status = MCPServerStatus.ERROR
+                                server.state.last_error = "Health check failed"
+                                self._notify_listeners('disconnected', server)
+                            
+                            elif healthy and not server.is_connected:
+                                # Server came back online - reconnect and reload tools
+                                logger.info(f"MCP server {server.name} is back online, reconnecting")
+                                if server.config.auto_connect:
+                                    self.connect_server(server_id)
+                            
+                            elif not healthy and server.config.auto_connect:
+                                # Attempt reconnection for errored servers
+                                if server.state.error_count < 5:  # Max 5 retries
+                                    self.connect_server(server_id)
+                                    
+                        except Exception as e:
+                            logger.error(f"Health check error for {server_id}: {e}")
+                
                 except Exception as e:
                     logger.error(f"Health monitor error: {e}")
                 
@@ -450,7 +469,7 @@ class MCPServerManager:
             target=monitor_loop, daemon=True
         )
         self._monitor_thread.start()
-        logger.info("Health monitor started")
+        logger.info(f"Health monitor started (interval: {interval_seconds}s)")
     
     def stop_health_monitor(self):
         """Stop background health monitoring."""
@@ -475,9 +494,16 @@ class MCPServerManager:
             return 0
         
         try:
-            records = self._db_facade.fetch_all(
-                "SELECT * FROM mcp_tool_servers WHERE status = 'active'"
-            ) or []
+            # Try with is_active column first (newer schema)
+            try:
+                records = self._db_facade.fetch_all(
+                    "SELECT * FROM mcp_tool_servers WHERE is_active = 1"
+                ) or []
+            except:
+                # Fallback to status column (older schema)
+                records = self._db_facade.fetch_all(
+                    "SELECT * FROM mcp_tool_servers WHERE status = 'active'"
+                ) or []
             
             count = 0
             for record in records:

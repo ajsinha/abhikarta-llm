@@ -685,6 +685,9 @@ def register_common_tools(registry) -> int:
     tools = get_common_tools()
     count = 0
     for tool in tools:
+        # Set source metadata to indicate prebuilt
+        if tool.metadata:
+            tool.metadata.source = f"prebuilt:common:{tool.name}"
         if registry.register(tool):
             count += 1
     logger.info(f"Registered {count} common tools")

@@ -44,11 +44,21 @@
             
             <hr class="my-4">
             
-            <div class="text-center text-muted small">
-                <p class="mb-1">Default Credentials:</p>
-                <p class="mb-0"><strong>Admin:</strong> admin / admin123</p>
-                <p class="mb-0"><strong>Developer:</strong> developer / dev123</p>
-                <p><strong>User:</strong> user / user123</p>
+            <div class="text-center">
+                <a href="{{ url_for('help') }}" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-question-circle me-1"></i>Help & Documentation
+                </a>
+                <a href="{{ url_for('about') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-info-circle me-1"></i>About
+                </a>
+            </div>
+            
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <a href="{{ url_for('help_page', page='glossary') }}" class="text-decoration-none">
+                        <i class="bi bi-book me-1"></i>Glossary of Terms
+                    </a>
+                </small>
             </div>
         </div>
     </div>

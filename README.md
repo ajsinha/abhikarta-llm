@@ -1,6 +1,6 @@
-# Abhikarta-LLM v1.1.7
+# Abhikarta-LLM v1.2.0
 
-[![Version](https://img.shields.io/badge/version-1.1.7-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
@@ -10,22 +10,51 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ---
 
-## 🚀 What's New in v1.1.7
+## 🚀 What's New in v1.2.0
 
-### Pre-built Tools Library (60+ Tools)
-- **Common Tools**: Date/time, math, text processing, validation, format conversion
-- **Banking Tools**: KYC verification, credit scoring, loan processing, compliance
-- **Integration Tools**: HTTP/API, notifications, data transformation, workflow helpers
+### Database Schema Documentation
+- **Comprehensive ER Diagram**: Visual representation of all 22 database tables
+- **Table Reference Guide**: Detailed column descriptions for every table
+- **Relationship Mapping**: Entity relationships clearly documented
+- **Index & Trigger Documentation**: Performance optimization details
+
+### Page-Specific Glossaries
+- **Contextual Help**: 6 relevant terms displayed on each page
+- **22 Templates Enhanced**: User, admin, agent, workflow pages updated
+- **Quick Links**: Direct access to full glossary from every page
+
+### Enhanced Help System
+- **New Help Card**: Database Schema added to documentation hub
+- **Improved Navigation**: Better organization of help topics
+- **Version 1.2.0 Branding**: Updated throughout all documentation
+
+### Tool View & Test Pages (from v1.1.8)
+- **Dedicated Tool Detail Page**: Full tool information with parameters, schema, metadata
+- **Tool Test Page**: Form-based parameter input with type-specific controls
+- **JSON Schema Display**: View complete tool schema with copy functionality
+
+### Pre-built Tools Library (85 Tools)
+- **Common Tools (28)**: Date/time, math, text processing, validation, format conversion
+- **Banking Tools (13)**: KYC verification, credit scoring, loan processing, compliance
+- **Integration Tools (20)**: HTTP/API, notifications, data transformation, workflow helpers
+- **General Tools (24)**: Web search, document handling, file operations, system utilities
+
+### Tools Management Page
+- **Centralized Tools View**: Browse all available tools (pre-built, MCP, code fragments)
+- **Search & Filter**: Find tools by name, category, or source
+- **DataTables Integration**: Pagination, sorting, search
+- **Quick Actions**: View details or test directly from listing
+- **Auto-Refresh**: MCP server tools automatically sync on connect/disconnect
 
 ### Banking Industry Solutions
 - **10 Pre-built Agents**: KYC, Loan Processing, Fraud Detection, Credit Risk, Customer Service, etc.
 - **7 Production-Ready Workflows**: Loan Application, Customer Onboarding, Transaction Monitoring, Mortgage, Wire Transfer
 - **Clone & Customize**: All solutions can be cloned, modified, and deployed immediately
 
-### Enhanced Documentation
-- Comprehensive help pages for all features
-- Banking solutions guide with complete tool/agent/workflow reference
-- Updated architecture documentation
+### Auto-initialization at Startup
+- All pre-built tools automatically registered on server start
+- MCP servers auto-connect and load tools from database
+- Health monitor runs in background for MCP server availability
 
 ---
 
@@ -48,14 +77,16 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Tool Types**: FunctionTool, MCPTool, HTTPTool, CodeFragmentTool, LangChainTool
 - **ToolsRegistry**: Centralized registration, discovery, and execution
 - **Format Conversion**: OpenAI, Anthropic, LangChain compatible outputs
-- **60+ Pre-built Tools**: Ready for immediate use
+- **85+ Pre-built Tools**: Ready for immediate use
+- **Tools Page**: Browse, search, filter, and test all tools
 
 ### 🔌 MCP Integration (v1.1.6+)
 - **MCPServerManager**: Centralized server lifecycle management
 - **Multiple Transports**: HTTP, WebSocket, SSE, STDIO
-- **Auto-connect**: Automatic connection on startup
+- **Auto-connect**: Automatic connection on startup and server add
 - **Health Monitoring**: Background health checks with auto-reconnect
 - **Tool Discovery**: Automatic tool registration from MCP servers
+- **Auto-sync**: Tools automatically added/removed based on server availability
 
 ### 👤 Human-in-the-Loop (v1.1.5+)
 - **Task Management**: Create, assign, track approval tasks
@@ -64,7 +95,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Workflow Integration**: HITL nodes pause execution for human input
 - **User & Admin Interfaces**: Separate views for different roles
 
-### 🏦 Banking Solutions (v1.1.7+)
+### 🏦 Banking Solutions (v1.2.0+)
 - **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
 - **Credit Assessment**: Credit scoring, DTI calculation, eligibility
 - **Loan Processing**: EMI calculation, amortization schedules
@@ -97,7 +128,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.1.7/
+abhikarta-llm-v1.2.0/
 ├── abhikarta/
 │   ├── __init__.py
 │   ├── agent/                    # Agent management
@@ -135,10 +166,11 @@ abhikarta-llm-v1.1.7/
 │   │   ├── code_fragment_tool.py # CodeFragmentTool
 │   │   ├── langchain_tool.py     # LangChain integration
 │   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.1.7)
+│   │   └── prebuilt/             # Pre-built tools (v1.2.0)
 │   │       ├── common_tools.py   # 28 common utilities
 │   │       ├── banking_tools.py  # 13 banking tools
-│   │       └── integration_tools.py  # 20 integration tools
+│   │       ├── integration_tools.py  # 20 integration tools
+│   │       └── general_tools.py  # 24 general-purpose tools
 │   ├── user_management/          # User management
 │   │   └── user_facade.py        # User CRUD operations
 │   ├── utils/                    # Utilities
@@ -154,14 +186,14 @@ abhikarta-llm-v1.1.7/
 │   │   │   ├── api_routes.py     # REST API
 │   │   │   ├── auth_routes.py    # Authentication
 │   │   │   ├── mcp_routes.py     # MCP management
-│   │   │   ├── user_routes.py    # User endpoints
+│   │   │   ├── user_routes.py    # User endpoints + Tools
 │   │   │   └── workflow_routes.py # Workflow endpoints
 │   │   ├── static/               # CSS, JS, images
 │   │   └── templates/            # Jinja2 templates (50+ files)
 │   │       ├── admin/            # Admin UI
 │   │       ├── agents/           # Agent UI
 │   │       ├── help/             # Documentation (30+ pages)
-│   │       ├── user/             # User UI
+│   │       ├── user/             # User UI + tools.html
 │   │       └── workflows/        # Workflow UI
 │   └── workflow/                 # Workflow engine
 │       ├── dag_parser.py         # DAG parsing
@@ -170,7 +202,7 @@ abhikarta-llm-v1.1.7/
 ├── config/
 │   └── application.properties    # Configuration file
 ├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.1.7)
+│   └── prebuilt/                 # Pre-built solutions (v1.2.0)
 │       ├── agents/
 │       │   └── banking/          # 10 banking agents
 │       └── workflows/
@@ -215,16 +247,14 @@ pip install -r requirements.txt
 cp config/application.properties.example config/application.properties
 # Edit config/application.properties with your settings
 
-# Initialize database
-python -c "from abhikarta.database import db_facade; db_facade.init_db()"
-
-# Run server
+# Run server (database auto-initializes)
 python run_server.py
 ```
 
 ### Access the Application
 - **Web UI**: http://localhost:5000
 - **Default Login**: admin / admin123 (change immediately)
+- **Tools Page**: http://localhost:5000/tools
 
 ---
 
@@ -274,7 +304,7 @@ The platform uses 22 tables across these categories:
 
 ---
 
-## 🔧 Pre-built Tools
+## 🔧 Pre-built Tools (85 Total)
 
 ### Common Tools (28)
 - **Date/Time**: get_current_datetime, parse_date, calculate_date_difference, add_days_to_date, get_business_days
@@ -298,6 +328,14 @@ The platform uses 22 tables across these categories:
 - **List/Array**: filter_list, sort_list, group_by, aggregate_list, paginate_list
 - **Workflow**: create_workflow_context, update_workflow_context, evaluate_condition
 
+### General Tools (24) - NEW
+- **Web/Search**: web_search, web_fetch, intranet_search, news_search
+- **Document Handling**: read_document, write_document, convert_document, extract_document_metadata
+- **File Operations**: list_files, copy_file, move_file, delete_file
+- **System Utilities**: get_system_info, execute_shell_command, get_environment_variable, set_environment_variable
+- **Network Tools**: check_url_status, ping_host, dns_lookup, parse_url
+- **Encoding**: url_encode, url_decode, html_encode, html_decode
+
 ---
 
 ## 📚 API Reference
@@ -319,8 +357,10 @@ The platform uses 22 tables across these categories:
 | GET | `/api/executions/{id}` | Get execution details |
 | GET | `/api/hitl/tasks` | List HITL tasks |
 | POST | `/api/hitl/tasks/{id}/complete` | Complete HITL task |
-| GET | `/api/tools` | List available tools |
+| GET | `/api/tools` | List all tools |
+| GET | `/api/tools/{name}` | Get tool details |
 | POST | `/api/tools/{name}/execute` | Execute tool |
+| POST | `/api/tools/refresh-mcp` | Refresh MCP tools (admin) |
 
 ---
 
@@ -339,7 +379,9 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.1.7 | 2025-01 | Pre-built tools library (60+), banking solutions, comprehensive docs |
+| 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |
+| 1.1.8 | 2025-01 | Tool View/Test pages, dedicated tool detail UI, form-based testing |
+| 1.1.7 | 2025-01 | Pre-built tools (85), Tools page, General tools, MCP auto-sync, Banking solutions |
 | 1.1.6 | 2025-01 | Tools System, MCP Integration, ToolsRegistry |
 | 1.1.5 | 2025-01 | HITL System, Execution Progress, Visual Workflow Designer |
 | 1.1.0 | 2024-12 | LLM Management, Visual Agent Designer, LangChain integration |

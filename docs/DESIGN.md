@@ -1,4 +1,4 @@
-# Abhikarta-LLM v1.1.7 - Architecture Design Document
+# Abhikarta-LLM v1.2.0 - Architecture Design Document
 
 ## Table of Contents
 
@@ -72,8 +72,8 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 │  │ BaseTool  │ │ MCPTool   │ │ HTTPTool  │ │ ToolsRegistry   │  │
 │  └───────────┘ └───────────┘ └───────────┘ └─────────────────┘  │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │              Pre-built Tools (60+)                       │    │
-│  │   Common (28) │ Banking (13) │ Integration (20)          │    │
+│  │              Pre-built Tools (85)                        │    │
+│  │   Common(28)│Banking(13)│Integration(20)│General(24)    │    │
 │  └─────────────────────────────────────────────────────────┘    │
 ├─────────────────────────────────────────────────────────────────┤
 │                     INTEGRATION LAYER                            │
@@ -510,7 +510,7 @@ class ToolsRegistry:
     def to_langchain_tools(self) -> List[LangChainTool]
 ```
 
-### 8.4 Pre-built Tools (60+)
+### 8.4 Pre-built Tools (85)
 
 #### Common Tools (28)
 - Date/Time: 5 tools
@@ -533,6 +533,53 @@ class ToolsRegistry:
 - Data Transform: 5 tools
 - List/Array: 5 tools
 - Workflow: 3 tools
+
+#### General Tools (24) - NEW in v1.2.0
+- Web/Search: 4 tools (web_search, web_fetch, intranet_search, news_search)
+- Document Handling: 4 tools (read_document, write_document, convert_document, extract_document_metadata)
+- File Operations: 4 tools (list_files, copy_file, move_file, delete_file)
+- System Utilities: 4 tools (get_system_info, execute_shell_command, get/set_environment_variable)
+- Network Tools: 4 tools (check_url_status, ping_host, dns_lookup, parse_url)
+- Encoding: 4 tools (url_encode/decode, html_encode/decode)
+
+### 8.5 Tools Management Pages
+
+#### Tools List Page (`/tools`)
+- **Centralized View**: Browse all registered tools (pre-built, MCP, code fragments)
+- **DataTables Integration**: Pagination, sorting, search
+- **Filtering**: By category, source type
+- **Quick Actions**: View and Test buttons for each tool
+- **MCP Refresh**: Manually trigger MCP server sync
+
+#### Tool Detail Page (`/tools/{name}`)
+- **Complete Information**: Name, ID, type, category, status, version
+- **Source Details**: Source type, server (for MCP), author, tags
+- **Parameters Display**: All parameters with types and descriptions
+- **JSON Schema**: Complete schema with copy functionality
+- **Navigation**: Links to test page and back to list
+
+#### Tool Test Page (`/tools/{name}/test`)
+- **Form-based Input**: Type-specific controls for each parameter
+- **Boolean**: Toggle switches
+- **Number**: Numeric inputs with step
+- **Enum**: Dropdown selects
+- **Array/Object**: JSON text areas
+- **String**: Text inputs or textareas
+- **Raw JSON Mode**: Toggle to enter parameters as JSON
+- **Execution Results**: Formatted output with success/error status
+- **Request Display**: View the request that was sent
+
+### 8.6 Tools API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/tools` | Tools listing page |
+| GET | `/tools/{name}` | Tool detail page |
+| GET | `/tools/{name}/test` | Tool test page |
+| GET | `/api/tools` | List all registered tools (JSON) |
+| GET | `/api/tools/{name}` | Get tool details and schema (JSON) |
+| POST | `/api/tools/{name}/execute` | Execute tool with parameters |
+| POST | `/api/tools/refresh-mcp` | Refresh MCP server tools (admin) |
 
 ---
 
@@ -756,4 +803,4 @@ abhikarta/
 
 ---
 
-*Version 1.1.7 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
+*Version 1.2.0 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*

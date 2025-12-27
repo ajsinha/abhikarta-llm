@@ -358,6 +358,72 @@ class UserRoutes(AbstractRoutes):
                                    completed_steps=completed_steps,
                                    progress_percent=progress_percent)
         
+        @self.app.route('/user/executions/<execution_id>/trace')
+        @login_required
+        def execution_trace(execution_id):
+            """View execution trace with step-by-step details."""
+            user_id = session.get('user_id')
+            is_admin = session.get('is_admin', False)
+            
+            execution = None
+            try:
+                if is_admin:
+                    execution = self.db_facade.fetch_one(
+                        "SELECT * FROM executions WHERE execution_id = ?",
+                        (execution_id,)
+                    )
+                else:
+                    execution = self.db_facade.fetch_one(
+                        "SELECT * FROM executions WHERE execution_id = ? AND user_id = ?",
+                        (execution_id, user_id)
+                    )
+            except Exception as e:
+                logger.error(f"Error getting execution: {e}")
+            
+            if not execution:
+                flash('Execution not found', 'error')
+                return redirect(url_for('user_executions'))
+            
+            # Get execution steps/trace
+            trace_steps = []
+            try:
+                steps = self.db_facade.fetch_all(
+                    """SELECT * FROM execution_steps 
+                       WHERE execution_id = ? 
+                       ORDER BY step_number ASC""",
+                    (execution_id,)
+                ) or []
+                
+                for step in steps:
+                    trace_steps.append({
+                        'step_name': step.get('step_name', f"Step {step.get('step_number', '?')}"),
+                        'step_type': step.get('step_type', 'unknown'),
+                        'status': step.get('status', 'pending'),
+                        'message': step.get('message'),
+                        'input': step.get('input_data'),
+                        'output': step.get('output_data'),
+                        'error': step.get('error'),
+                        'timestamp': step.get('started_at'),
+                        'duration': step.get('duration')
+                    })
+            except Exception as e:
+                logger.error(f"Error getting execution steps: {e}")
+            
+            # Calculate statistics
+            success_count = len([s for s in trace_steps if s['status'] == 'completed'])
+            error_count = len([s for s in trace_steps if s['status'] == 'failed'])
+            tool_calls = len([s for s in trace_steps if s['step_type'] in ('tool', 'tool_call')])
+            
+            return render_template('user/execution_trace.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   execution=execution,
+                                   trace_steps=trace_steps,
+                                   success_count=success_count,
+                                   error_count=error_count,
+                                   tool_calls=tool_calls)
+        
         # =====================================================================
         # HITL (Human-in-the-Loop) Routes
         # =====================================================================
@@ -589,5 +655,276 @@ class UserRoutes(AbstractRoutes):
             
             flash(f'Task assigned to {assign_to}', 'success')
             return redirect(url_for('user_hitl_detail', task_id=task_id))
+        
+        # =====================================================================
+        # Tools Routes
+        # =====================================================================
+        
+        @self.app.route('/tools')
+        @login_required
+        def tools_list():
+            """List all available tools in the tools registry."""
+            from abhikarta.tools import get_tools_registry
+            from abhikarta.mcp import get_mcp_manager
+            
+            registry = get_tools_registry()
+            mcp_manager = get_mcp_manager()
+            
+            # Get all tools
+            all_tools = registry.list_tools()
+            
+            # Build tool data with source info
+            tools_data = []
+            for tool in all_tools:
+                source = tool.metadata.source if tool.metadata else 'built-in'
+                source_type = 'built-in'
+                source_server = None
+                
+                if source:
+                    if source.startswith('mcp:'):
+                        source_type = 'mcp'
+                        source_server = source.replace('mcp:', '')
+                    elif source.startswith('db:'):
+                        source_type = 'code_fragment'
+                    elif source.startswith('prebuilt:'):
+                        source_type = 'prebuilt'
+                
+                # Get schema for parameters
+                schema = tool.get_schema()
+                params_list = []
+                if schema and schema.parameters:
+                    for param in schema.parameters:
+                        params_list.append({
+                            'name': param.name,
+                            'type': param.param_type,
+                            'required': param.required,
+                            'description': param.description or ''
+                        })
+                
+                tools_data.append({
+                    'name': tool.name,
+                    'tool_id': tool.tool_id,
+                    'description': tool.description or '',
+                    'type': tool.tool_type.value if tool.tool_type else 'unknown',
+                    'category': tool.category.value if tool.category else 'general',
+                    'enabled': tool.is_enabled,
+                    'source_type': source_type,
+                    'source_server': source_server,
+                    'source': source or 'built-in',
+                    'parameters': params_list,
+                    'version': tool.metadata.version if tool.metadata else '1.0.0'
+                })
+            
+            # Get MCP server stats
+            mcp_stats = mcp_manager.get_stats()
+            
+            # Get registry stats
+            registry_stats = registry.get_stats()
+            
+            return render_template('user/tools.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   tools=tools_data,
+                                   mcp_stats=mcp_stats,
+                                   registry_stats=registry_stats)
+        
+        @self.app.route('/tools/<tool_name>')
+        @login_required
+        def tool_detail(tool_name):
+            """View detailed information about a specific tool."""
+            from abhikarta.tools import get_tools_registry
+            import json
+            
+            registry = get_tools_registry()
+            tool = registry.get(tool_name)
+            
+            if not tool:
+                flash(f'Tool "{tool_name}" not found', 'error')
+                return redirect(url_for('tools_list'))
+            
+            # Get source info - only from metadata
+            source = tool.metadata.source if tool.metadata else 'built-in'
+            source_type = 'built-in'
+            source_server = None
+            
+            if source:
+                if source.startswith('mcp:'):
+                    source_type = 'mcp'
+                    source_server = source.replace('mcp:', '')
+                elif source.startswith('db:'):
+                    source_type = 'code_fragment'
+                elif source.startswith('prebuilt:'):
+                    source_type = 'prebuilt'
+            
+            # Get schema and parameters
+            schema = tool.get_schema()
+            parameters = []
+            if schema and schema.parameters:
+                parameters = schema.parameters
+            
+            # Get JSON schema for display
+            schema_json = json.dumps(schema.to_json_schema() if schema else {}, indent=2)
+            
+            return render_template('user/tool_detail.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   tool=tool,
+                                   source_type=source_type,
+                                   source_server=source_server,
+                                   parameters=parameters,
+                                   schema_json=schema_json)
+        
+        @self.app.route('/tools/<tool_name>/test')
+        @login_required
+        def tool_test(tool_name):
+            """Test/execute a specific tool."""
+            from abhikarta.tools import get_tools_registry
+            
+            registry = get_tools_registry()
+            tool = registry.get(tool_name)
+            
+            if not tool:
+                flash(f'Tool "{tool_name}" not found', 'error')
+                return redirect(url_for('tools_list'))
+            
+            # Get source info - only from metadata
+            source = tool.metadata.source if tool.metadata else 'built-in'
+            source_type = 'built-in'
+            source_server = None
+            
+            if source:
+                if source.startswith('mcp:'):
+                    source_type = 'mcp'
+                    source_server = source.replace('mcp:', '')
+                elif source.startswith('db:'):
+                    source_type = 'code_fragment'
+                elif source.startswith('prebuilt:'):
+                    source_type = 'prebuilt'
+            
+            # Get schema and parameters
+            schema = tool.get_schema()
+            parameters = []
+            if schema and schema.parameters:
+                parameters = schema.parameters
+            
+            return render_template('user/tool_test.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   tool=tool,
+                                   source_type=source_type,
+                                   source_server=source_server,
+                                   parameters=parameters)
+        
+        @self.app.route('/api/tools')
+        @login_required
+        def api_tools_list():
+            """API endpoint to get all tools as JSON."""
+            from abhikarta.tools import get_tools_registry
+            import json
+            from flask import jsonify
+            
+            registry = get_tools_registry()
+            catalog = registry.export_catalog()
+            
+            return jsonify({
+                'success': True,
+                'tools': catalog,
+                'count': len(catalog)
+            })
+        
+        @self.app.route('/api/tools/<tool_name>')
+        @login_required
+        def api_tool_detail(tool_name):
+            """API endpoint to get tool details."""
+            from abhikarta.tools import get_tools_registry
+            from flask import jsonify
+            
+            registry = get_tools_registry()
+            tool = registry.get(tool_name)
+            
+            if not tool:
+                return jsonify({'success': False, 'error': 'Tool not found'}), 404
+            
+            schema = tool.get_schema()
+            
+            return jsonify({
+                'success': True,
+                'tool': {
+                    'name': tool.name,
+                    'tool_id': tool.tool_id,
+                    'description': tool.description,
+                    'type': tool.tool_type.value,
+                    'category': tool.category.value,
+                    'enabled': tool.is_enabled,
+                    'schema': schema.to_json_schema() if schema else None,
+                    'metadata': tool.metadata.to_dict() if tool.metadata else None
+                }
+            })
+        
+        @self.app.route('/api/tools/<tool_name>/execute', methods=['POST'])
+        @login_required
+        def api_tool_execute(tool_name):
+            """API endpoint to execute a tool."""
+            from abhikarta.tools import get_tools_registry
+            from flask import jsonify
+            
+            registry = get_tools_registry()
+            tool = registry.get(tool_name)
+            
+            if not tool:
+                return jsonify({'success': False, 'error': 'Tool not found'}), 404
+            
+            if not tool.is_enabled:
+                return jsonify({'success': False, 'error': 'Tool is disabled'}), 400
+            
+            params = request.get_json() or {}
+            
+            try:
+                result = registry.execute(tool_name, **params)
+                return jsonify({
+                    'success': result.success,
+                    'output': result.output,
+                    'error': result.error,
+                    'execution_time_ms': result.execution_time_ms
+                })
+            except Exception as e:
+                logger.error(f"Tool execution error: {e}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/tools/refresh-mcp', methods=['POST'])
+        @login_required
+        def api_refresh_mcp_tools():
+            """API endpoint to refresh MCP server tools."""
+            from abhikarta.mcp import get_mcp_manager
+            from flask import jsonify
+            
+            if not session.get('is_admin'):
+                return jsonify({'success': False, 'error': 'Admin access required'}), 403
+            
+            manager = get_mcp_manager()
+            
+            # Check health of all servers and reconnect if needed
+            results = {}
+            for server_id in manager.get_server_ids():
+                server = manager.get_server(server_id)
+                if server:
+                    healthy, latency = manager.check_health(server_id)
+                    if not healthy and server.config.auto_connect:
+                        manager.connect_server(server_id)
+                        healthy, latency = manager.check_health(server_id)
+                    results[server_id] = {
+                        'name': server.name,
+                        'healthy': healthy,
+                        'latency_ms': latency,
+                        'tool_count': server.state.tool_count
+                    }
+            
+            return jsonify({
+                'success': True,
+                'servers': results
+            })
         
         logger.info("User routes registered")

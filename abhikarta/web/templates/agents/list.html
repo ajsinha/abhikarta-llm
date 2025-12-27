@@ -19,9 +19,9 @@
             <a href="{{ url_for('new_agent_designer') }}" class="btn btn-outline-success">
                 <i class="bi bi-diagram-3 me-1"></i> Visual Designer
             </a>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAgentModal">
+            <a href="{{ url_for('agent_create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-1"></i> Create Agent
-            </button>
+            </a>
         </div>
     </div>
 
@@ -202,88 +202,15 @@
                             <td colspan="6" class="text-center py-5">
                                 <i class="bi bi-inbox display-4 text-muted"></i>
                                 <p class="mt-3 text-muted">No agents found. Create your first agent to get started!</p>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAgentModal">
+                                <a href="{{ url_for('agent_create') }}" class="btn btn-primary">
                                     <i class="bi bi-plus-circle me-1"></i> Create Agent
-                                </button>
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Create Agent Modal -->
-<div class="modal fade" id="createAgentModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Create New Agent</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="create-agent-form" method="POST" action="{{ url_for('create_agent') }}">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="mb-3">
-                                <label class="form-label">Agent Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="name" required
-                                       placeholder="Enter agent name">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label">Agent Type <span class="text-danger">*</span></label>
-                                <select class="form-select" name="agent_type" required>
-                                    {% for type in agent_types %}
-                                    <option value="{{ type.value }}">{{ type.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" name="description" rows="3"
-                                  placeholder="Describe what this agent does"></textarea>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">LLM Provider</label>
-                                <select class="form-select" name="llm_provider">
-                                    <option value="openai">OpenAI</option>
-                                    <option value="anthropic">Anthropic</option>
-                                    <option value="ollama">Ollama (Local)</option>
-                                    <option value="bedrock">AWS Bedrock</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Model</label>
-                                <input type="text" class="form-control" name="model" 
-                                       placeholder="e.g., gpt-4o" value="gpt-4o">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        After creation, you can configure the agent workflow in the Visual Designer.
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a href="{{ url_for('new_agent_designer') }}" class="btn btn-outline-success">
-                        <i class="bi bi-diagram-3 me-1"></i> Use Visual Designer
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-1"></i> Create Agent
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -352,4 +279,69 @@ function deleteAgent(agentId, agentName) {
     });
 }
 </script>
+{% endblock %}
+
+{% block page_glossary %}
+<div class="container-fluid py-4 bg-light border-top">
+    <div class="row">
+        <div class="col-12">
+            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Agent</strong>
+                            <p class="small text-muted mb-0">An autonomous AI entity that combines LLMs with tools to perform complex tasks.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Agent Type</strong>
+                            <p class="small text-muted mb-0">The architectural pattern (ReAct, Chain of Thought, Plan & Execute) defining how an agent reasons.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Published</strong>
+                            <p class="small text-muted mb-0">An agent status indicating it's ready for production use by end users.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">LLM (Large Language Model)</strong>
+                            <p class="small text-muted mb-0">An AI model that understands and generates human-like text (e.g., GPT-4, Claude).</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Visual Designer</strong>
+                            <p class="small text-muted mb-0">A drag-and-drop interface for creating agent workflows without coding.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 bg-white">
+                        <div class="card-body py-2">
+                            <strong class="text-primary">Template</strong>
+                            <p class="small text-muted mb-0">A pre-configured agent setup that can be used as a starting point.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i>View Full Glossary
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
