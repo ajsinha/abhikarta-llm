@@ -1119,4 +1119,515 @@ class AdminRoutes(AbstractRoutes):
                 flash('Error managing permissions', 'error')
                 return redirect(url_for('admin_llm_models'))
         
+        # ============================================
+        # MCP TOOL SERVERS MANAGEMENT ROUTES
+        # ============================================
+        
+        @self.app.route('/admin/mcp-tool-servers')
+        @admin_required
+        def admin_mcp_tool_servers():
+            """Display MCP Tool Servers management page."""
+            servers = []
+            try:
+                servers = self.db_facade.fetch_all(
+                    """SELECT * FROM mcp_tool_servers ORDER BY name"""
+                ) or []
+            except Exception as e:
+                logger.error(f"Error getting MCP tool servers: {e}")
+            
+            return render_template('admin/mcp_tool_servers.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   servers=servers)
+        
+        @self.app.route('/admin/mcp-tool-servers/add', methods=['GET', 'POST'])
+        @admin_required
+        def add_mcp_tool_server():
+            """Add a new MCP Tool Server."""
+            if request.method == 'POST':
+                import uuid
+                server_id = str(uuid.uuid4())[:8]
+                name = request.form.get('name', '').strip()
+                description = request.form.get('description', '').strip()
+                base_url = request.form.get('base_url', '').strip().rstrip('/')
+                tools_endpoint = request.form.get('tools_endpoint', '/api/tools/list').strip()
+                auth_type = request.form.get('auth_type', 'none')
+                auth_config = request.form.get('auth_config', '{}').strip()
+                timeout_seconds = int(request.form.get('timeout_seconds', 30))
+                auto_refresh = 1 if 'auto_refresh' in request.form else 0
+                refresh_interval = int(request.form.get('refresh_interval_minutes', 60))
+                is_active = 1 if 'is_active' in request.form else 0
+                
+                if not name or not base_url:
+                    flash('Name and Base URL are required', 'error')
+                    return redirect(url_for('add_mcp_tool_server'))
+                
+                try:
+                    # Validate auth_config is valid JSON
+                    json.loads(auth_config)
+                except:
+                    auth_config = '{}'
+                
+                try:
+                    self.db_facade.execute(
+                        """INSERT INTO mcp_tool_servers 
+                           (server_id, name, description, base_url, tools_endpoint, 
+                            auth_type, auth_config, is_active, auto_refresh,
+                            refresh_interval_minutes, timeout_seconds, created_by)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                        (server_id, name, description, base_url, tools_endpoint,
+                         auth_type, auth_config, is_active, auto_refresh,
+                         refresh_interval, timeout_seconds, session.get('user_id'))
+                    )
+                    self.log_audit('create', 'mcp_tool_server', server_id)
+                    flash(f'MCP Tool Server "{name}" added successfully', 'success')
+                    return redirect(url_for('admin_mcp_tool_servers'))
+                except Exception as e:
+                    logger.error(f"Error adding MCP tool server: {e}")
+                    flash(f'Error adding server: {str(e)}', 'error')
+            
+            return render_template('admin/add_mcp_tool_server.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []))
+        
+        @self.app.route('/admin/mcp-tool-servers/<server_id>/edit', methods=['GET', 'POST'])
+        @admin_required
+        def edit_mcp_tool_server(server_id):
+            """Edit an existing MCP Tool Server."""
+            server = self.db_facade.fetch_one(
+                "SELECT * FROM mcp_tool_servers WHERE server_id = ?",
+                (server_id,)
+            )
+            
+            if not server:
+                flash('Server not found', 'error')
+                return redirect(url_for('admin_mcp_tool_servers'))
+            
+            if request.method == 'POST':
+                name = request.form.get('name', '').strip()
+                description = request.form.get('description', '').strip()
+                base_url = request.form.get('base_url', '').strip().rstrip('/')
+                tools_endpoint = request.form.get('tools_endpoint', '/api/tools/list').strip()
+                auth_type = request.form.get('auth_type', 'none')
+                auth_config = request.form.get('auth_config', '{}').strip()
+                timeout_seconds = int(request.form.get('timeout_seconds', 30))
+                auto_refresh = 1 if 'auto_refresh' in request.form else 0
+                refresh_interval = int(request.form.get('refresh_interval_minutes', 60))
+                is_active = 1 if 'is_active' in request.form else 0
+                
+                if not name or not base_url:
+                    flash('Name and Base URL are required', 'error')
+                    return redirect(url_for('edit_mcp_tool_server', server_id=server_id))
+                
+                try:
+                    json.loads(auth_config)
+                except:
+                    auth_config = '{}'
+                
+                try:
+                    self.db_facade.execute(
+                        """UPDATE mcp_tool_servers SET
+                           name = ?, description = ?, base_url = ?, tools_endpoint = ?,
+                           auth_type = ?, auth_config = ?, is_active = ?, auto_refresh = ?,
+                           refresh_interval_minutes = ?, timeout_seconds = ?
+                           WHERE server_id = ?""",
+                        (name, description, base_url, tools_endpoint,
+                         auth_type, auth_config, is_active, auto_refresh,
+                         refresh_interval, timeout_seconds, server_id)
+                    )
+                    self.log_audit('update', 'mcp_tool_server', server_id)
+                    flash('Server updated successfully', 'success')
+                    return redirect(url_for('admin_mcp_tool_servers'))
+                except Exception as e:
+                    logger.error(f"Error updating MCP tool server: {e}")
+                    flash(f'Error updating server: {str(e)}', 'error')
+            
+            return render_template('admin/edit_mcp_tool_server.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   server=server)
+        
+        @self.app.route('/admin/mcp-tool-servers/<server_id>/delete', methods=['POST'])
+        @admin_required
+        def delete_mcp_tool_server(server_id):
+            """Delete an MCP Tool Server."""
+            try:
+                self.db_facade.execute(
+                    "DELETE FROM mcp_tool_servers WHERE server_id = ?",
+                    (server_id,)
+                )
+                self.log_audit('delete', 'mcp_tool_server', server_id)
+                flash('Server deleted successfully', 'success')
+            except Exception as e:
+                logger.error(f"Error deleting MCP tool server: {e}")
+                flash(f'Error deleting server: {str(e)}', 'error')
+            return redirect(url_for('admin_mcp_tool_servers'))
+        
+        @self.app.route('/admin/mcp-tool-servers/<server_id>/test', methods=['POST'])
+        @admin_required
+        def test_mcp_tool_server(server_id):
+            """Test connection to an MCP Tool Server and show debug info."""
+            import urllib.request
+            import urllib.error
+            
+            server = self.db_facade.fetch_one(
+                "SELECT * FROM mcp_tool_servers WHERE server_id = ?",
+                (server_id,)
+            )
+            
+            if not server:
+                return jsonify({'success': False, 'error': 'Server not found'})
+            
+            result = {
+                'success': False,
+                'server_name': server['name'],
+                'url': '',
+                'status_code': None,
+                'content_type': None,
+                'response_size': 0,
+                'response_preview': '',
+                'tools_found': 0,
+                'error': None
+            }
+            
+            try:
+                # Build the full URL
+                base_url = server['base_url'].rstrip('/')
+                endpoint = server['tools_endpoint']
+                if not endpoint.startswith('/'):
+                    endpoint = '/' + endpoint
+                full_url = f"{base_url}{endpoint}"
+                result['url'] = full_url
+                
+                timeout = server.get('timeout_seconds', 30) or 30
+                
+                # Create request
+                req = urllib.request.Request(full_url)
+                req.add_header('Accept', 'application/json')
+                req.add_header('Content-Type', 'application/json')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.1.0')
+                
+                # Add auth if configured
+                auth_type = server.get('auth_type', 'none')
+                if auth_type and auth_type != 'none':
+                    try:
+                        auth_config = json.loads(server.get('auth_config', '{}'))
+                        if auth_type == 'bearer' and 'token' in auth_config:
+                            req.add_header('Authorization', f"Bearer {auth_config['token']}")
+                        elif auth_type == 'api_key' and 'key' in auth_config and 'header' in auth_config:
+                            req.add_header(auth_config['header'], auth_config['key'])
+                        elif auth_type == 'basic' and 'username' in auth_config and 'password' in auth_config:
+                            import base64
+                            credentials = f"{auth_config['username']}:{auth_config['password']}"
+                            encoded = base64.b64encode(credentials.encode()).decode()
+                            req.add_header('Authorization', f"Basic {encoded}")
+                    except:
+                        pass
+                
+                # Make request
+                with urllib.request.urlopen(req, timeout=timeout) as response:
+                    result['status_code'] = response.getcode()
+                    result['content_type'] = response.headers.get('Content-Type', 'unknown')
+                    raw_data = response.read()
+                    result['response_size'] = len(raw_data)
+                    
+                    if raw_data:
+                        try:
+                            response_text = raw_data.decode('utf-8')
+                        except:
+                            response_text = raw_data.decode('latin-1')
+                        
+                        result['response_preview'] = response_text[:1000]
+                        
+                        # Try to parse JSON
+                        try:
+                            data = json.loads(response_text)
+                            
+                            # Count tools
+                            tools = []
+                            if isinstance(data, dict):
+                                for key in ['tools', 'data', 'items', 'results']:
+                                    if key in data and isinstance(data[key], list):
+                                        tools = data[key]
+                                        break
+                            elif isinstance(data, list):
+                                tools = data
+                            
+                            result['tools_found'] = len(tools)
+                            result['success'] = True
+                            
+                        except json.JSONDecodeError as je:
+                            result['error'] = f"Invalid JSON: {str(je)}"
+                    else:
+                        result['error'] = "Empty response from server"
+                        
+            except urllib.error.HTTPError as e:
+                result['status_code'] = e.code
+                result['error'] = f"HTTP {e.code}: {e.reason}"
+                try:
+                    result['response_preview'] = e.read().decode('utf-8')[:500]
+                except:
+                    pass
+            except urllib.error.URLError as e:
+                result['error'] = f"Connection failed: {str(e.reason)}"
+            except Exception as e:
+                result['error'] = f"{type(e).__name__}: {str(e)}"
+            
+            return jsonify(result)
+        
+        @self.app.route('/admin/mcp-tool-servers/<server_id>/refresh', methods=['POST'])
+        @admin_required
+        def refresh_mcp_tool_server(server_id):
+            """Refresh tools from an MCP Tool Server."""
+            import urllib.request
+            import urllib.error
+            
+            server = self.db_facade.fetch_one(
+                "SELECT * FROM mcp_tool_servers WHERE server_id = ?",
+                (server_id,)
+            )
+            
+            if not server:
+                flash('Server not found', 'error')
+                return redirect(url_for('admin_mcp_tool_servers'))
+            
+            try:
+                # Build the full URL
+                base_url = server['base_url'].rstrip('/')
+                endpoint = server['tools_endpoint']
+                if not endpoint.startswith('/'):
+                    endpoint = '/' + endpoint
+                full_url = f"{base_url}{endpoint}"
+                timeout = server.get('timeout_seconds', 30) or 30
+                
+                logger.info(f"Refreshing MCP tools from: {full_url}")
+                
+                # Create request with headers
+                req = urllib.request.Request(full_url)
+                req.add_header('Accept', 'application/json')
+                req.add_header('Content-Type', 'application/json')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.1.0')
+                
+                # Add auth headers if configured
+                auth_type = server.get('auth_type', 'none')
+                if auth_type and auth_type != 'none':
+                    try:
+                        auth_config = json.loads(server.get('auth_config', '{}'))
+                        if auth_type == 'bearer' and 'token' in auth_config:
+                            req.add_header('Authorization', f"Bearer {auth_config['token']}")
+                        elif auth_type == 'api_key' and 'key' in auth_config and 'header' in auth_config:
+                            req.add_header(auth_config['header'], auth_config['key'])
+                        elif auth_type == 'basic' and 'username' in auth_config and 'password' in auth_config:
+                            import base64
+                            credentials = f"{auth_config['username']}:{auth_config['password']}"
+                            encoded = base64.b64encode(credentials.encode()).decode()
+                            req.add_header('Authorization', f"Basic {encoded}")
+                    except Exception as auth_err:
+                        logger.warning(f"Auth config error: {auth_err}")
+                
+                # Fetch tools
+                with urllib.request.urlopen(req, timeout=timeout) as response:
+                    status_code = response.getcode()
+                    content_type = response.headers.get('Content-Type', '')
+                    raw_data = response.read()
+                    
+                    logger.info(f"Response status: {status_code}, Content-Type: {content_type}, Size: {len(raw_data)} bytes")
+                    
+                    if not raw_data:
+                        raise ValueError("Server returned empty response")
+                    
+                    # Decode response
+                    try:
+                        response_text = raw_data.decode('utf-8')
+                    except UnicodeDecodeError:
+                        response_text = raw_data.decode('latin-1')
+                    
+                    # Log first 500 chars for debugging
+                    logger.debug(f"Response preview: {response_text[:500]}")
+                    
+                    # Parse JSON
+                    try:
+                        data = json.loads(response_text)
+                    except json.JSONDecodeError as je:
+                        logger.error(f"JSON parse error. Response starts with: {response_text[:200]}")
+                        raise ValueError(f"Invalid JSON response: {str(je)[:100]}")
+                
+                # Extract tools list - handle different response formats
+                tools = []
+                if isinstance(data, dict):
+                    # Try common keys: tools, data, items, results
+                    for key in ['tools', 'data', 'items', 'results']:
+                        if key in data and isinstance(data[key], list):
+                            tools = data[key]
+                            break
+                    # If no list found, check if dict itself contains tool-like entries
+                    if not tools and 'name' in data and 'inputSchema' in data:
+                        tools = [data]  # Single tool response
+                elif isinstance(data, list):
+                    tools = data
+                else:
+                    raise ValueError(f"Unexpected response format: {type(data).__name__}")
+                
+                tool_count = len(tools)
+                logger.info(f"Parsed {tool_count} tools from {server['name']}")
+                
+                # Update database with cached tools
+                self.db_facade.execute(
+                    """UPDATE mcp_tool_servers SET
+                       cached_tools = ?, tool_count = ?,
+                       last_refresh = CURRENT_TIMESTAMP,
+                       last_refresh_status = 'success'
+                       WHERE server_id = ?""",
+                    (json.dumps(tools), tool_count, server_id)
+                )
+                
+                self.log_audit('refresh', 'mcp_tool_server', server_id)
+                flash(f'Successfully loaded {tool_count} tools from {server["name"]}', 'success')
+                
+            except urllib.error.HTTPError as e:
+                error_msg = f"HTTP {e.code}: {e.reason}"
+                try:
+                    error_body = e.read().decode('utf-8')[:200]
+                    error_msg += f" - {error_body}"
+                except:
+                    pass
+                logger.error(f"HTTP error refreshing MCP server: {error_msg}")
+                self.db_facade.execute(
+                    """UPDATE mcp_tool_servers SET
+                       last_refresh = CURRENT_TIMESTAMP,
+                       last_refresh_status = ?
+                       WHERE server_id = ?""",
+                    (error_msg[:500], server_id)
+                )
+                flash(f'HTTP Error: {error_msg}', 'error')
+                
+            except urllib.error.URLError as e:
+                error_msg = f"Connection error: {str(e.reason)}"
+                logger.error(f"URL error refreshing MCP server: {error_msg}")
+                self.db_facade.execute(
+                    """UPDATE mcp_tool_servers SET
+                       last_refresh = CURRENT_TIMESTAMP,
+                       last_refresh_status = ?
+                       WHERE server_id = ?""",
+                    (error_msg[:500], server_id)
+                )
+                flash(f'Connection Error: {error_msg}', 'error')
+                
+            except Exception as e:
+                error_msg = f"{type(e).__name__}: {str(e)}"
+                logger.error(f"Error refreshing MCP tool server: {error_msg}")
+                self.db_facade.execute(
+                    """UPDATE mcp_tool_servers SET
+                       last_refresh = CURRENT_TIMESTAMP,
+                       last_refresh_status = ?
+                       WHERE server_id = ?""",
+                    (error_msg[:500], server_id)
+                )
+                flash(f'Error: {error_msg}', 'error')
+            
+            return redirect(url_for('admin_mcp_tool_servers'))
+        
+        @self.app.route('/admin/mcp-tool-servers/<server_id>/tools')
+        @admin_required
+        def view_mcp_server_tools(server_id):
+            """View tools from an MCP Tool Server."""
+            server = self.db_facade.fetch_one(
+                "SELECT * FROM mcp_tool_servers WHERE server_id = ?",
+                (server_id,)
+            )
+            
+            if not server:
+                flash('Server not found', 'error')
+                return redirect(url_for('admin_mcp_tool_servers'))
+            
+            tools = []
+            try:
+                tools = json.loads(server.get('cached_tools', '[]'))
+            except:
+                pass
+            
+            return render_template('admin/mcp_server_tools.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   server=server,
+                                   tools=tools)
+        
+        @self.app.route('/admin/mcp-tool-servers/api/all-tools')
+        @admin_required
+        def api_all_mcp_tools():
+            """Internal API: Get all tools from active MCP Tool Servers (for Visual Designer)."""
+            try:
+                servers = self.db_facade.fetch_all(
+                    "SELECT server_id, name, tool_count FROM mcp_tool_servers WHERE is_active = 1"
+                ) or []
+                
+                all_tools = []
+                for server in self.db_facade.fetch_all(
+                    "SELECT * FROM mcp_tool_servers WHERE is_active = 1"
+                ) or []:
+                    try:
+                        cached_tools = json.loads(server.get('cached_tools', '[]'))
+                        for tool in cached_tools:
+                            tool['_server_id'] = server['server_id']
+                            tool['_server_name'] = server['name']
+                            all_tools.append(tool)
+                    except:
+                        pass
+                
+                return jsonify({
+                    'success': True,
+                    'tools': all_tools,
+                    'servers': [dict(s) for s in servers],
+                    'tool_count': len(all_tools)
+                })
+            except Exception as e:
+                logger.error(f"Error getting MCP tools: {e}")
+                return jsonify({'success': False, 'error': str(e)})
+        
+        @self.app.route('/admin/mcp-tool-servers/all-tools')
+        @admin_required
+        def view_all_mcp_tools():
+            """View all tools from all active MCP Tool Servers."""
+            servers = []
+            all_tools = []
+            tool_by_server = {}
+            
+            try:
+                servers = self.db_facade.fetch_all(
+                    "SELECT * FROM mcp_tool_servers WHERE is_active = 1 ORDER BY name"
+                ) or []
+                
+                for server in servers:
+                    try:
+                        cached_tools = json.loads(server.get('cached_tools', '[]'))
+                        tool_by_server[server['server_id']] = {
+                            'server': server,
+                            'tools': cached_tools
+                        }
+                        for tool in cached_tools:
+                            tool['_server_id'] = server['server_id']
+                            tool['_server_name'] = server['name']
+                            tool['_server_url'] = server['base_url']
+                            all_tools.append(tool)
+                    except:
+                        tool_by_server[server['server_id']] = {
+                            'server': server,
+                            'tools': []
+                        }
+            except Exception as e:
+                logger.error(f"Error getting all MCP tools: {e}")
+                flash(f'Error loading tools: {str(e)}', 'error')
+            
+            return render_template('admin/all_mcp_tools.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   servers=servers,
+                                   all_tools=all_tools,
+                                   tool_by_server=tool_by_server)
+        
         logger.info("Admin routes registered")

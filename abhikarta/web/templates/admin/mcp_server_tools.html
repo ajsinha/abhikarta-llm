@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Tools - {{ server.name }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tool-card {
+        transition: all 0.2s;
+        border-left: 4px solid var(--bmo-blue);
+    }
+    .tool-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+    .schema-viewer {
+        max-height: 300px;
+        overflow-y: auto;
+        font-size: 0.8rem;
+    }
+    .param-chip {
+        display: inline-block;
+        padding: 2px 8px;
+        margin: 2px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+    }
+    .param-required {
+        background: #dc3545;
+        color: white;
+    }
+    .param-optional {
+        background: #6c757d;
+        color: white;
+    }
+    .type-badge {
+        font-family: monospace;
+        font-size: 0.7rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-tools me-2"></i>{{ server.name }} - Tools</h2>
+            <p class="text-muted mb-0">
+                <code>{{ server.base_url }}{{ server.tools_endpoint }}</code>
+                • {{ tools|length }} tools available
+            </p>
+        </div>
+        <div>
+            <form method="POST" action="{{ url_for('refresh_mcp_tool_server', server_id=server.server_id) }}" 
+                  style="display: inline;">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                </button>
+            </form>
+            <a href="{{ url_for('admin_mcp_tool_servers') }}" class="btn btn-outline-secondary ms-2">
+                <i class="bi bi-arrow-left me-2"></i>Back
+            </a>
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    
+    <!-- Search and Filter -->
+    <div class="card mb-4">
+        <div class="card-body py-2">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="toolSearch" 
+                               placeholder="Search tools by name or description..." onkeyup="filterTools()">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted">
+                        Last refreshed: {{ server.last_refresh or 'Never' }}
+                    </small>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="expandAll()">
+                        <i class="bi bi-arrows-expand"></i> Expand All
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="collapseAll()">
+                        <i class="bi bi-arrows-collapse"></i> Collapse All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if tools %}
+    <div class="row" id="toolsContainer">
+        {% for tool in tools %}
+        <div class="col-lg-6 mb-4 tool-item" data-name="{{ tool.name|lower }}" data-desc="{{ tool.description|lower if tool.description else '' }}">
+            <div class="card tool-card h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">
+                            <i class="bi bi-gear me-2 text-primary"></i>
+                            <code>{{ tool.name }}</code>
+                        </h6>
+                        <small class="text-muted">{{ tool.description[:100] if tool.description else 'No description' }}{% if tool.description and tool.description|length > 100 %}...{% endif %}</small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary" type="button" 
+                            data-bs-toggle="collapse" data-bs-target="#tool-{{ loop.index }}"
+                            aria-expanded="false">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="collapse" id="tool-{{ loop.index }}">
+                    <div class="card-body">
+                        {% if tool.description %}
+                        <p class="small text-muted mb-3">{{ tool.description }}</p>
+                        {% endif %}
+                        
+                        {% if tool.inputSchema %}
+                        <h6 class="small fw-bold mb-2">
+                            <i class="bi bi-diagram-3 me-1"></i>Input Parameters
+                        </h6>
+                        
+                        {% set schema = tool.inputSchema %}
+                        {% if schema.properties %}
+                        <div class="mb-3">
+                            {% for prop_name, prop_def in schema.properties.items() %}
+                            <div class="d-flex align-items-start mb-2 ps-2 border-start">
+                                <div class="flex-grow-1">
+                                    <code class="me-2">{{ prop_name }}</code>
+                                    <span class="badge bg-secondary type-badge">{{ prop_def.type if prop_def.type else 'any' }}</span>
+                                    {% if schema.required and prop_name in schema.required %}
+                                    <span class="param-chip param-required">required</span>
+                                    {% else %}
+                                    <span class="param-chip param-optional">optional</span>
+                                    {% endif %}
+                                    {% if prop_def.enum %}
+                                    <br><small class="text-muted">Enum: {{ prop_def.enum|join(', ') }}</small>
+                                    {% endif %}
+                                    {% if prop_def.description %}
+                                    <br><small class="text-muted">{{ prop_def.description[:100] }}{% if prop_def.description|length > 100 %}...{% endif %}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <details class="mt-3">
+                            <summary class="small text-muted cursor-pointer">
+                                <i class="bi bi-code me-1"></i>View Full Schema (JSON)
+                            </summary>
+                            <pre class="schema-viewer bg-dark text-light p-2 rounded mt-2 small">{{ tool.inputSchema|tojson(indent=2) }}</pre>
+                        </details>
+                        {% else %}
+                        <p class="small text-muted mb-0">
+                            <i class="bi bi-info-circle me-1"></i>No input parameters defined
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <p class="mt-3 text-muted">No tools loaded from this server</p>
+        <form method="POST" action="{{ url_for('refresh_mcp_tool_server', server_id=server.server_id) }}">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-arrow-clockwise me-2"></i>Refresh Tools
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function filterTools() {
+    const search = document.getElementById('toolSearch').value.toLowerCase();
+    const items = document.querySelectorAll('.tool-item');
+    
+    items.forEach(item => {
+        const name = item.dataset.name;
+        const desc = item.dataset.desc;
+        if (name.includes(search) || desc.includes(search)) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function expandAll() {
+    document.querySelectorAll('.collapse').forEach(el => {
+        new bootstrap.Collapse(el, {show: true});
+    });
+}
+
+function collapseAll() {
+    document.querySelectorAll('.collapse.show').forEach(el => {
+        new bootstrap.Collapse(el, {toggle: true});
+    });
+}
+</script>
+{% endblock %}

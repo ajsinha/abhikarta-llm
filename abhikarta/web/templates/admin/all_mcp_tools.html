@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}All MCP Tools - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tool-card {
+        transition: all 0.2s;
+        border-left: 4px solid var(--bmo-blue);
+        margin-bottom: 1rem;
+    }
+    .tool-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .tool-card.expanded {
+        border-left-color: #28a745;
+    }
+    .schema-container {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        border-radius: 6px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.8rem;
+        max-height: 400px;
+        overflow: auto;
+    }
+    .param-table {
+        font-size: 0.85rem;
+    }
+    .param-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+    }
+    .param-name {
+        font-family: monospace;
+        color: #0d6efd;
+    }
+    .param-type {
+        font-family: monospace;
+        color: #6f42c1;
+    }
+    .param-required {
+        color: #dc3545;
+        font-weight: 600;
+    }
+    .param-optional {
+        color: #6c757d;
+    }
+    .server-badge {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+    }
+    .tool-header {
+        cursor: pointer;
+    }
+    .tool-header:hover {
+        background: #f8f9fa;
+    }
+    .enum-values {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    .filter-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .stats-card {
+        text-align: center;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--bmo-blue), var(--bmo-dark-blue));
+        color: white;
+        border-radius: 8px;
+    }
+    .stats-card .number {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    .stats-card .label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-tools me-2"></i>All MCP Tools</h2>
+            <p class="text-muted mb-0">Browse all tools from active MCP servers with full schema details</p>
+        </div>
+        <div>
+            <a href="{{ url_for('admin_mcp_tool_servers') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-server me-2"></i>Manage Servers
+            </a>
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="number">{{ servers|length }}</div>
+                <div class="label">Active Servers</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="number">{{ all_tools|length }}</div>
+                <div class="label">Total Tools</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="filter-section h-100 d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" id="toolSearch" 
+                                       placeholder="Search tools..." onkeyup="filterTools()">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="serverFilter" onchange="filterTools()">
+                                <option value="">All Servers</option>
+                                {% for server in servers %}
+                                <option value="{{ server.server_id }}">{{ server.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" onclick="toggleAllTools()">
+                                <i class="bi bi-arrows-expand" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if all_tools %}
+    <!-- Tools List -->
+    <div id="toolsContainer">
+        {% for tool in all_tools %}
+        <div class="card tool-card tool-item" 
+             data-name="{{ tool.name|lower }}" 
+             data-desc="{{ (tool.description or '')|lower }}"
+             data-server="{{ tool._server_id }}">
+            <div class="card-header tool-header py-2 d-flex justify-content-between align-items-center"
+                 data-bs-toggle="collapse" data-bs-target="#tool-detail-{{ loop.index }}">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-gear text-primary me-2"></i>
+                    <div>
+                        <h6 class="mb-0">
+                            <code class="fs-6">{{ tool.name }}</code>
+                        </h6>
+                        <small class="text-muted">{{ (tool.description or 'No description')[:80] }}{% if (tool.description or '')|length > 80 %}...{% endif %}</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-info server-badge me-2">{{ tool._server_name }}</span>
+                    {% if tool.inputSchema and tool.inputSchema.properties %}
+                    <span class="badge bg-secondary me-2">{{ tool.inputSchema.properties|length }} params</span>
+                    {% endif %}
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+            </div>
+            
+            <div class="collapse" id="tool-detail-{{ loop.index }}">
+                <div class="card-body">
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Description</h6>
+                        <p class="text-muted mb-0">{{ tool.description or 'No description available' }}</p>
+                    </div>
+                    
+                    <!-- Server Info -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold"><i class="bi bi-server me-2"></i>Server</h6>
+                        <p class="mb-0">
+                            <strong>{{ tool._server_name }}</strong>
+                            <br><code class="small">{{ tool._server_url }}</code>
+                        </p>
+                    </div>
+                    
+                    <!-- Parameters Table -->
+                    {% if tool.inputSchema and tool.inputSchema.properties %}
+                    <div class="mb-4">
+                        <h6 class="fw-bold"><i class="bi bi-sliders me-2"></i>Parameters</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered param-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 20%;">Name</th>
+                                        <th style="width: 12%;">Type</th>
+                                        <th style="width: 10%;">Required</th>
+                                        <th style="width: 58%;">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for prop_name, prop_def in tool.inputSchema.properties.items() %}
+                                    <tr>
+                                        <td>
+                                            <span class="param-name">{{ prop_name }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="param-type">{{ prop_def.type if prop_def.type else 'any' }}</span>
+                                            {% if prop_def.items and prop_def.items.type %}
+                                            <span class="param-type">[{{ prop_def.items.type }}]</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if tool.inputSchema.required and prop_name in tool.inputSchema.required %}
+                                            <span class="param-required">Yes</span>
+                                            {% else %}
+                                            <span class="param-optional">No</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ prop_def.description or '-' }}
+                                            {% if prop_def.enum %}
+                                            <br><span class="enum-values">
+                                                <strong>Allowed:</strong> {{ prop_def.enum|join(', ') }}
+                                            </span>
+                                            {% endif %}
+                                            {% if prop_def.default is defined %}
+                                            <br><span class="enum-values">
+                                                <strong>Default:</strong> {{ prop_def.default }}
+                                            </span>
+                                            {% endif %}
+                                            {% if prop_def.minimum is defined or prop_def.maximum is defined %}
+                                            <br><span class="enum-values">
+                                                <strong>Range:</strong> 
+                                                {% if prop_def.minimum is defined %}{{ prop_def.minimum }}{% else %}...{% endif %}
+                                                - 
+                                                {% if prop_def.maximum is defined %}{{ prop_def.maximum }}{% else %}...{% endif %}
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="mb-4">
+                        <h6 class="fw-bold"><i class="bi bi-sliders me-2"></i>Parameters</h6>
+                        <p class="text-muted mb-0"><em>No parameters required</em></p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Full JSON Schema -->
+                    <div>
+                        <h6 class="fw-bold">
+                            <i class="bi bi-code-square me-2"></i>Full JSON Schema
+                            <button class="btn btn-sm btn-outline-secondary ms-2" 
+                                    onclick="copySchema('{{ loop.index }}')" title="Copy Schema">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </h6>
+                        <div class="schema-container p-3" id="schema-{{ loop.index }}">
+                            <pre class="mb-0">{{ tool.inputSchema|tojson(indent=2) if tool.inputSchema else '{}' }}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- No Results Message -->
+    <div id="noResults" class="text-center py-5 d-none">
+        <i class="bi bi-search display-1 text-muted"></i>
+        <p class="mt-3 text-muted">No tools match your search criteria</p>
+    </div>
+    
+    {% else %}
+    <!-- Empty State -->
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-inbox display-1 text-muted"></i>
+            <h4 class="mt-3">No Tools Available</h4>
+            <p class="text-muted">
+                {% if servers %}
+                Active servers have no tools loaded. Try refreshing the servers.
+                {% else %}
+                No active MCP Tool Servers configured.
+                {% endif %}
+            </p>
+            <a href="{{ url_for('admin_mcp_tool_servers') }}" class="btn btn-primary">
+                <i class="bi bi-server me-2"></i>Manage Servers
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+let allExpanded = false;
+
+function filterTools() {
+    const search = document.getElementById('toolSearch').value.toLowerCase();
+    const serverFilter = document.getElementById('serverFilter').value;
+    const items = document.querySelectorAll('.tool-item');
+    let visibleCount = 0;
+    
+    items.forEach(item => {
+        const name = item.dataset.name;
+        const desc = item.dataset.desc;
+        const server = item.dataset.server;
+        
+        const matchesSearch = !search || name.includes(search) || desc.includes(search);
+        const matchesServer = !serverFilter || server === serverFilter;
+        
+        if (matchesSearch && matchesServer) {
+            item.style.display = '';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    // Show/hide no results message
+    document.getElementById('noResults').classList.toggle('d-none', visibleCount > 0);
+}
+
+function toggleAllTools() {
+    const collapses = document.querySelectorAll('.tool-item .collapse');
+    const icon = document.getElementById('toggleIcon');
+    
+    allExpanded = !allExpanded;
+    
+    collapses.forEach(collapse => {
+        if (allExpanded) {
+            collapse.classList.add('show');
+        } else {
+            collapse.classList.remove('show');
+        }
+    });
+    
+    icon.className = allExpanded ? 'bi bi-arrows-collapse' : 'bi bi-arrows-expand';
+}
+
+function copySchema(index) {
+    const schemaEl = document.querySelector('#schema-' + index + ' pre');
+    const text = schemaEl.textContent;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        // Show feedback
+        const btn = event.target.closest('button');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check"></i>';
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-outline-secondary');
+        
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-secondary');
+        }, 1500);
+    });
+}
+
+// Add chevron rotation on collapse toggle
+document.querySelectorAll('.tool-header').forEach(header => {
+    header.addEventListener('click', function() {
+        const chevron = this.querySelector('.bi-chevron-down, .bi-chevron-up');
+        const card = this.closest('.tool-card');
+        
+        setTimeout(() => {
+            const isExpanded = this.nextElementSibling.classList.contains('show');
+            chevron.className = isExpanded ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+            card.classList.toggle('expanded', isExpanded);
+        }, 50);
+    });
+});
+</script>
+{% endblock %}

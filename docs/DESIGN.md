@@ -1861,7 +1861,7 @@ volumes:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | Dec 2025 | Initial release with core functionality |
-| 1.1.0 | Dec 2025 | Visual Agent Designer with drag-drop canvas, LLM Provider/Model Management, RBAC for models, Code Fragments (db/file/s3 URIs), 22 database tables |
+| 1.1.0 | Dec 2025 | Visual Agent Designer with drag-drop canvas, LLM Provider/Model Management, RBAC for models, Code Fragments (db/file/s3 URIs), MCP Tool Servers for dynamic tool loading, 23 database tables |
 
 ---
 

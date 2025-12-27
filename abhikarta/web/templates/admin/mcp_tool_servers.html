@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}MCP Tool Servers - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-server me-2"></i>MCP Tool Servers</h2>
+            <p class="text-muted mb-0">Configure external MCP servers to dynamically load tools</p>
+        </div>
+        <div>
+            <a href="{{ url_for('view_all_mcp_tools') }}" class="btn btn-info me-2">
+                <i class="bi bi-tools me-2"></i>View All Tools
+            </a>
+            <a href="{{ url_for('add_mcp_tool_server') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-2"></i>Add Server
+            </a>
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    
+    <div class="card">
+        <div class="card-header bg-bmo-blue text-white">
+            <h5 class="mb-0"><i class="bi bi-list me-2"></i>Configured Servers ({{ servers|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% if servers %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Server</th>
+                            <th>URL</th>
+                            <th>Tools</th>
+                            <th>Last Refresh</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for server in servers %}
+                        <tr>
+                            <td>
+                                <strong>{{ server.name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ server.server_id }}</small>
+                                {% if server.description %}
+                                <br><small class="text-muted">{{ server.description[:50] }}{% if server.description|length > 50 %}...{% endif %}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <code class="small">{{ server.base_url }}</code>
+                                <br>
+                                <small class="text-muted">{{ server.tools_endpoint }}</small>
+                                {% if server.auth_type != 'none' %}
+                                <br><span class="badge bg-secondary">{{ server.auth_type }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-info fs-6">{{ server.tool_count }}</span>
+                                {% if server.tool_count > 0 %}
+                                <br>
+                                <a href="{{ url_for('view_mcp_server_tools', server_id=server.server_id) }}" 
+                                   class="small">View tools</a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if server.last_refresh %}
+                                <small>{{ server.last_refresh }}</small>
+                                <br>
+                                {% if server.last_refresh_status == 'success' %}
+                                <span class="badge bg-success">Success</span>
+                                {% elif server.last_refresh_status %}
+                                <span class="badge bg-danger" title="{{ server.last_refresh_status }}">Failed</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-muted">Never</span>
+                                {% endif %}
+                                {% if server.auto_refresh %}
+                                <br><small class="text-muted">Auto: {{ server.refresh_interval_minutes }}m</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if server.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                        onclick="testConnection('{{ server.server_id }}')" title="Test Connection">
+                                    <i class="bi bi-plug"></i>
+                                </button>
+                                <form method="POST" action="{{ url_for('refresh_mcp_tool_server', server_id=server.server_id) }}" 
+                                      style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Refresh Tools">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </form>
+                                <a href="{{ url_for('edit_mcp_tool_server', server_id=server.server_id) }}" 
+                                   class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('delete_mcp_tool_server', server_id=server.server_id) }}" 
+                                      style="display: inline;" onsubmit="return confirm('Delete this server?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-server display-1 text-muted"></i>
+                <p class="mt-3 text-muted">No MCP Tool Servers configured</p>
+                <a href="{{ url_for('add_mcp_tool_server') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Add First Server
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Help Card -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>About MCP Tool Servers</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>What are MCP Tool Servers?</h6>
+                    <p class="small text-muted">
+                        MCP (Model Context Protocol) Tool Servers are external services that expose tools
+                        via a REST API. These tools can be dynamically loaded into Abhikarta-LLM at runtime,
+                        allowing agents to use them without restarting the application.
+                    </p>
+                    <h6>Expected API Format</h6>
+                    <p class="small text-muted">
+                        The tools endpoint should return a JSON response with a <code>tools</code> array,
+                        where each tool has <code>name</code>, <code>description</code>, and <code>inputSchema</code>.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Authentication Types</h6>
+                    <ul class="small">
+                        <li><strong>None</strong> - No authentication required</li>
+                        <li><strong>Bearer</strong> - Bearer token in Authorization header</li>
+                        <li><strong>API Key</strong> - Custom header with API key</li>
+                        <li><strong>Basic</strong> - Basic HTTP authentication</li>
+                    </ul>
+                    <h6>Quick Actions</h6>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('view_all_mcp_tools') }}" class="btn btn-sm btn-info">
+                            <i class="bi bi-tools me-1"></i>View All Tools
+                        </a>
+                        <a href="{{ url_for('add_mcp_tool_server') }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-lg me-1"></i>Add Server
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test Connection Modal -->
+<div class="modal fade" id="testModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h6 class="modal-title"><i class="bi bi-plug me-2"></i>Test Connection</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="test-loading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Testing connection...</p>
+                </div>
+                <div id="test-result" class="d-none">
+                    <div class="alert" id="test-status-alert">
+                        <strong id="test-status-text"></strong>
+                    </div>
+                    
+                    <table class="table table-sm">
+                        <tr>
+                            <th style="width: 30%;">URL</th>
+                            <td><code id="test-url"></code></td>
+                        </tr>
+                        <tr>
+                            <th>HTTP Status</th>
+                            <td id="test-status-code"></td>
+                        </tr>
+                        <tr>
+                            <th>Content-Type</th>
+                            <td id="test-content-type"></td>
+                        </tr>
+                        <tr>
+                            <th>Response Size</th>
+                            <td id="test-response-size"></td>
+                        </tr>
+                        <tr>
+                            <th>Tools Found</th>
+                            <td id="test-tools-found"></td>
+                        </tr>
+                    </table>
+                    
+                    <div id="test-error-section" class="d-none">
+                        <h6 class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>Error</h6>
+                        <pre class="bg-danger bg-opacity-10 p-2 rounded small" id="test-error"></pre>
+                    </div>
+                    
+                    <div id="test-preview-section">
+                        <h6><i class="bi bi-code me-1"></i>Response Preview</h6>
+                        <pre class="bg-dark text-light p-2 rounded small" style="max-height: 300px; overflow: auto;" id="test-preview"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function testConnection(serverId) {
+    const modal = new bootstrap.Modal('#testModal');
+    modal.show();
+    
+    document.getElementById('test-loading').classList.remove('d-none');
+    document.getElementById('test-result').classList.add('d-none');
+    
+    fetch(`/admin/mcp-tool-servers/${serverId}/test`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('test-loading').classList.add('d-none');
+            document.getElementById('test-result').classList.remove('d-none');
+            
+            const statusAlert = document.getElementById('test-status-alert');
+            const statusText = document.getElementById('test-status-text');
+            
+            if (data.success) {
+                statusAlert.className = 'alert alert-success';
+                statusText.textContent = `✓ Connection successful - ${data.tools_found} tools found`;
+            } else {
+                statusAlert.className = 'alert alert-danger';
+                statusText.textContent = '✗ Connection failed';
+            }
+            
+            document.getElementById('test-url').textContent = data.url || '-';
+            document.getElementById('test-status-code').textContent = data.status_code || '-';
+            document.getElementById('test-content-type').textContent = data.content_type || '-';
+            document.getElementById('test-response-size').textContent = data.response_size ? `${data.response_size} bytes` : '-';
+            document.getElementById('test-tools-found').textContent = data.tools_found || '0';
+            
+            if (data.error) {
+                document.getElementById('test-error-section').classList.remove('d-none');
+                document.getElementById('test-error').textContent = data.error;
+            } else {
+                document.getElementById('test-error-section').classList.add('d-none');
+            }
+            
+            if (data.response_preview) {
+                document.getElementById('test-preview-section').classList.remove('d-none');
+                // Try to pretty print JSON
+                try {
+                    const parsed = JSON.parse(data.response_preview);
+                    document.getElementById('test-preview').textContent = JSON.stringify(parsed, null, 2);
+                } catch {
+                    document.getElementById('test-preview').textContent = data.response_preview;
+                }
+            } else {
+                document.getElementById('test-preview-section').classList.add('d-none');
+            }
+        })
+        .catch(err => {
+            document.getElementById('test-loading').classList.add('d-none');
+            document.getElementById('test-result').classList.remove('d-none');
+            
+            const statusAlert = document.getElementById('test-status-alert');
+            statusAlert.className = 'alert alert-danger';
+            document.getElementById('test-status-text').textContent = '✗ Request failed';
+            
+            document.getElementById('test-error-section').classList.remove('d-none');
+            document.getElementById('test-error').textContent = err.toString();
+        });
+}
+</script>
+{% endblock %}

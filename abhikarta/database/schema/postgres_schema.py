@@ -369,6 +369,31 @@ class PostgresSchema:
     );
     """
     
+    # MCP Tool Servers table (external MCP servers with tools)
+    CREATE_MCP_TOOL_SERVERS_TABLE = """
+    CREATE TABLE IF NOT EXISTS mcp_tool_servers (
+        id SERIAL PRIMARY KEY,
+        server_id VARCHAR(100) UNIQUE NOT NULL,
+        name VARCHAR(200) NOT NULL,
+        description TEXT,
+        base_url VARCHAR(500) NOT NULL,
+        tools_endpoint VARCHAR(200) DEFAULT '/api/tools/list',
+        auth_type VARCHAR(50) DEFAULT 'none',
+        auth_config JSONB DEFAULT '{}'::jsonb,
+        is_active BOOLEAN DEFAULT TRUE,
+        auto_refresh BOOLEAN DEFAULT TRUE,
+        refresh_interval_minutes INTEGER DEFAULT 60,
+        last_refresh TIMESTAMP WITH TIME ZONE,
+        last_refresh_status TEXT,
+        tool_count INTEGER DEFAULT 0,
+        cached_tools JSONB DEFAULT '[]'::jsonb,
+        timeout_seconds INTEGER DEFAULT 30,
+        created_by VARCHAR(100) NOT NULL REFERENCES users(user_id),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+    
     # Audit logs table
     CREATE_AUDIT_LOGS_TABLE = """
     CREATE TABLE IF NOT EXISTS audit_logs (
@@ -693,6 +718,7 @@ class PostgresSchema:
             self.CREATE_WORKFLOW_NODES_TABLE,
             self.CREATE_HITL_TASKS_TABLE,
             self.CREATE_MCP_PLUGINS_TABLE,
+            self.CREATE_MCP_TOOL_SERVERS_TABLE,
             self.CREATE_AUDIT_LOGS_TABLE,
             self.CREATE_SESSIONS_TABLE,
             self.CREATE_API_KEYS_TABLE,

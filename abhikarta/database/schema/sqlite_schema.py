@@ -330,6 +330,32 @@ class SQLiteSchema:
     );
     """
     
+    # MCP Tool Servers table (external MCP servers with tools)
+    CREATE_MCP_TOOL_SERVERS_TABLE = """
+    CREATE TABLE IF NOT EXISTS mcp_tool_servers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        server_id TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        base_url TEXT NOT NULL,
+        tools_endpoint TEXT DEFAULT '/api/tools/list',
+        auth_type TEXT DEFAULT 'none',
+        auth_config TEXT DEFAULT '{}',
+        is_active INTEGER DEFAULT 1,
+        auto_refresh INTEGER DEFAULT 1,
+        refresh_interval_minutes INTEGER DEFAULT 60,
+        last_refresh TIMESTAMP,
+        last_refresh_status TEXT,
+        tool_count INTEGER DEFAULT 0,
+        cached_tools TEXT DEFAULT '[]',
+        timeout_seconds INTEGER DEFAULT 30,
+        created_by TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (created_by) REFERENCES users(user_id)
+    );
+    """
+    
     # Audit logs table
     CREATE_AUDIT_LOGS_TABLE = """
     CREATE TABLE IF NOT EXISTS audit_logs (
@@ -526,6 +552,7 @@ class SQLiteSchema:
         "CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at);",
         "CREATE INDEX IF NOT EXISTS idx_api_keys_user_id ON api_keys(user_id);",
         "CREATE INDEX IF NOT EXISTS idx_mcp_plugins_status ON mcp_plugins(status);",
+        "CREATE INDEX IF NOT EXISTS idx_mcp_tool_servers_is_active ON mcp_tool_servers(is_active);",
         "CREATE INDEX IF NOT EXISTS idx_code_fragments_category ON code_fragments(category);",
         "CREATE INDEX IF NOT EXISTS idx_code_fragments_language ON code_fragments(language);",
         "CREATE INDEX IF NOT EXISTS idx_code_fragments_is_active ON code_fragments(is_active);",
@@ -646,6 +673,14 @@ class SQLiteSchema:
             UPDATE mcp_plugins SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
         END;
         """,
+        # Update timestamp trigger for mcp_tool_servers
+        """
+        CREATE TRIGGER IF NOT EXISTS update_mcp_tool_servers_timestamp 
+        AFTER UPDATE ON mcp_tool_servers
+        BEGIN
+            UPDATE mcp_tool_servers SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+        END;
+        """,
     ]
     
     # ==========================================================================
@@ -669,6 +704,7 @@ class SQLiteSchema:
             self.CREATE_WORKFLOW_NODES_TABLE,
             self.CREATE_HITL_TASKS_TABLE,
             self.CREATE_MCP_PLUGINS_TABLE,
+            self.CREATE_MCP_TOOL_SERVERS_TABLE,
             self.CREATE_AUDIT_LOGS_TABLE,
             self.CREATE_SESSIONS_TABLE,
             self.CREATE_API_KEYS_TABLE,

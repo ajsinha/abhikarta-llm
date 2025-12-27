@@ -1,126 +1,260 @@
-2025-12-27 00:52:11,480 - __main__ - INFO - Properties configuration initialized
-2025-12-27 00:52:11,497 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
-2025-12-27 00:52:11,498 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
-2025-12-27 00:52:11,498 - abhikarta.database.db_facade - INFO - Database connected
-2025-12-27 00:52:11,498 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
-2025-12-27 00:52:11,542 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
-2025-12-27 00:52:11,600 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
-2025-12-27 00:52:11,603 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
-2025-12-27 00:52:11,605 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.1.0)
-2025-12-27 00:52:11,605 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
-2025-12-27 00:52:11,605 - abhikarta.database.db_facade - INFO - Database schema initialized
-2025-12-27 00:52:11,605 - __main__ - INFO - Database initialized: sqlite
-2025-12-27 00:52:11,608 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
-2025-12-27 00:52:11,608 - __main__ - INFO - User management initialized
-2025-12-27 00:52:11,679 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
-2025-12-27 00:52:11,679 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
-2025-12-27 00:52:11,679 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
-2025-12-27 00:52:11,708 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
-2025-12-27 00:52:11,708 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
-2025-12-27 00:52:11,710 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
-2025-12-27 00:52:11,710 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
-2025-12-27 00:52:11,710 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
-2025-12-27 00:52:11,717 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
-2025-12-27 00:52:11,717 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
-2025-12-27 00:52:11,717 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
-2025-12-27 00:52:11,719 - abhikarta.web.routes.user_routes - INFO - User routes registered
-2025-12-27 00:52:11,719 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
-2025-12-27 00:52:11,719 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
-2025-12-27 00:52:11,721 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
-2025-12-27 00:52:11,722 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
-2025-12-27 00:52:11,722 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
-2025-12-27 00:52:11,724 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
-2025-12-27 00:52:11,724 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
-2025-12-27 00:52:11,724 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
-2025-12-27 00:52:11,728 - abhikarta.web.routes.api_routes - INFO - API routes registered
-2025-12-27 00:52:11,728 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
-2025-12-27 00:52:11,731 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
-2025-12-27 00:52:11,731 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
-2025-12-27 00:52:11,731 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
-2025-12-27 00:52:11,731 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
-2025-12-27 00:55:32,650 - abhikarta.database.db_facade - INFO - Database disconnected
-2025-12-27 00:55:32,650 - __main__ - INFO - Database connection closed
-2025-12-27 00:55:32,650 - __main__ - INFO - Properties auto-reload stopped
-2025-12-27 01:10:31,144 - __main__ - INFO - Properties configuration initialized
-2025-12-27 01:10:31,168 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
-2025-12-27 01:10:31,168 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
-2025-12-27 01:10:31,168 - abhikarta.database.db_facade - INFO - Database connected
-2025-12-27 01:10:31,168 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
-2025-12-27 01:10:31,169 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
-2025-12-27 01:10:31,169 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
-2025-12-27 01:10:31,169 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
-2025-12-27 01:10:31,171 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.1.0)
-2025-12-27 01:10:31,171 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
-2025-12-27 01:10:31,171 - abhikarta.database.db_facade - INFO - Database schema initialized
-2025-12-27 01:10:31,171 - __main__ - INFO - Database initialized: sqlite
-2025-12-27 01:10:31,177 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
-2025-12-27 01:10:31,177 - __main__ - INFO - User management initialized
-2025-12-27 01:10:31,268 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
-2025-12-27 01:10:31,268 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
-2025-12-27 01:10:31,268 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
-2025-12-27 01:10:31,299 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
-2025-12-27 01:10:31,299 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
-2025-12-27 01:10:31,301 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
-2025-12-27 01:10:31,301 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
-2025-12-27 01:10:31,301 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
-2025-12-27 01:10:31,309 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
-2025-12-27 01:10:31,309 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
-2025-12-27 01:10:31,309 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
-2025-12-27 01:10:31,311 - abhikarta.web.routes.user_routes - INFO - User routes registered
-2025-12-27 01:10:31,311 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
-2025-12-27 01:10:31,311 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
-2025-12-27 01:10:31,314 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
-2025-12-27 01:10:31,314 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
-2025-12-27 01:10:31,314 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
-2025-12-27 01:10:31,316 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
-2025-12-27 01:10:31,316 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
-2025-12-27 01:10:31,316 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
-2025-12-27 01:10:31,321 - abhikarta.web.routes.api_routes - INFO - API routes registered
-2025-12-27 01:10:31,321 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
-2025-12-27 01:10:31,324 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
-2025-12-27 01:10:31,324 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
-2025-12-27 01:10:31,324 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
-2025-12-27 01:10:31,324 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
-2025-12-27 01:11:02,399 - abhikarta.database.db_facade - INFO - Database disconnected
-2025-12-27 01:11:02,400 - __main__ - INFO - Database connection closed
-2025-12-27 01:11:02,400 - __main__ - INFO - Properties auto-reload stopped
-2025-12-27 01:11:04,356 - __main__ - INFO - Properties configuration initialized
-2025-12-27 01:11:04,374 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
-2025-12-27 01:11:04,374 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
-2025-12-27 01:11:04,375 - abhikarta.database.db_facade - INFO - Database connected
-2025-12-27 01:11:04,375 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
-2025-12-27 01:11:04,375 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
-2025-12-27 01:11:04,376 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
-2025-12-27 01:11:04,376 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
-2025-12-27 01:11:04,380 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.1.0)
-2025-12-27 01:11:04,380 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
-2025-12-27 01:11:04,380 - abhikarta.database.db_facade - INFO - Database schema initialized
-2025-12-27 01:11:04,380 - __main__ - INFO - Database initialized: sqlite
-2025-12-27 01:11:04,383 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
-2025-12-27 01:11:04,383 - __main__ - INFO - User management initialized
-2025-12-27 01:11:04,458 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
-2025-12-27 01:11:04,458 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
-2025-12-27 01:11:04,458 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
-2025-12-27 01:11:04,485 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
-2025-12-27 01:11:04,485 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
-2025-12-27 01:11:04,488 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
-2025-12-27 01:11:04,488 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
-2025-12-27 01:11:04,488 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
-2025-12-27 01:11:04,495 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
-2025-12-27 01:11:04,495 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
-2025-12-27 01:11:04,495 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
-2025-12-27 01:11:04,496 - abhikarta.web.routes.user_routes - INFO - User routes registered
-2025-12-27 01:11:04,496 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
-2025-12-27 01:11:04,496 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
-2025-12-27 01:11:04,499 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
-2025-12-27 01:11:04,499 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
-2025-12-27 01:11:04,499 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
-2025-12-27 01:11:04,501 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
-2025-12-27 01:11:04,501 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
-2025-12-27 01:11:04,501 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
-2025-12-27 01:11:04,506 - abhikarta.web.routes.api_routes - INFO - API routes registered
-2025-12-27 01:11:04,506 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
-2025-12-27 01:11:04,508 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
-2025-12-27 01:11:04,508 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
-2025-12-27 01:11:04,508 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
-2025-12-27 01:11:04,508 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2025-12-27 01:32:35,790 - __main__ - INFO - Properties configuration initialized
+2025-12-27 01:32:35,809 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2025-12-27 01:32:35,809 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2025-12-27 01:32:35,809 - abhikarta.database.db_facade - INFO - Database connected
+2025-12-27 01:32:35,809 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2025-12-27 01:32:35,854 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2025-12-27 01:32:35,914 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2025-12-27 01:32:35,919 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2025-12-27 01:32:35,922 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.1.0)
+2025-12-27 01:32:35,922 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2025-12-27 01:32:35,922 - abhikarta.database.db_facade - INFO - Database schema initialized
+2025-12-27 01:32:35,922 - __main__ - INFO - Database initialized: sqlite
+2025-12-27 01:32:35,927 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2025-12-27 01:32:35,927 - __main__ - INFO - User management initialized
+2025-12-27 01:32:36,007 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2025-12-27 01:32:36,007 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
+2025-12-27 01:32:36,007 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
+2025-12-27 01:32:36,038 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2025-12-27 01:32:36,038 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
+2025-12-27 01:32:36,040 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
+2025-12-27 01:32:36,041 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2025-12-27 01:32:36,041 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
+2025-12-27 01:32:36,049 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
+2025-12-27 01:32:36,049 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2025-12-27 01:32:36,049 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
+2025-12-27 01:32:36,051 - abhikarta.web.routes.user_routes - INFO - User routes registered
+2025-12-27 01:32:36,051 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2025-12-27 01:32:36,051 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
+2025-12-27 01:32:36,054 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
+2025-12-27 01:32:36,054 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2025-12-27 01:32:36,054 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
+2025-12-27 01:32:36,056 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
+2025-12-27 01:32:36,056 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2025-12-27 01:32:36,056 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
+2025-12-27 01:32:36,061 - abhikarta.web.routes.api_routes - INFO - API routes registered
+2025-12-27 01:32:36,061 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2025-12-27 01:32:36,063 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
+2025-12-27 01:32:36,063 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
+2025-12-27 01:32:36,063 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
+2025-12-27 01:32:36,063 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2025-12-27 01:38:18,179 - abhikarta.database.db_facade - INFO - Database disconnected
+2025-12-27 01:38:18,180 - __main__ - INFO - Database connection closed
+2025-12-27 01:38:18,180 - __main__ - INFO - Properties auto-reload stopped
+2025-12-27 01:38:18,353 - __main__ - INFO - Properties configuration initialized
+2025-12-27 01:38:18,366 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2025-12-27 01:38:18,366 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2025-12-27 01:38:18,366 - abhikarta.database.db_facade - INFO - Database connected
+2025-12-27 01:38:18,366 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2025-12-27 01:38:18,367 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2025-12-27 01:38:18,367 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2025-12-27 01:38:18,367 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2025-12-27 01:38:18,377 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.1.0)
+2025-12-27 01:38:18,377 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2025-12-27 01:38:18,377 - abhikarta.database.db_facade - INFO - Database schema initialized
+2025-12-27 01:38:18,377 - __main__ - INFO - Database initialized: sqlite
+2025-12-27 01:38:18,378 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2025-12-27 01:38:18,378 - __main__ - INFO - User management initialized
+2025-12-27 01:38:18,454 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2025-12-27 01:38:18,454 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
+2025-12-27 01:38:18,454 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
+2025-12-27 01:38:18,468 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2025-12-27 01:38:18,468 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
+2025-12-27 01:38:18,470 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
+2025-12-27 01:38:18,470 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2025-12-27 01:38:18,470 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
+2025-12-27 01:38:18,479 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
+2025-12-27 01:38:18,479 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2025-12-27 01:38:18,479 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
+2025-12-27 01:38:18,480 - abhikarta.web.routes.user_routes - INFO - User routes registered
+2025-12-27 01:38:18,480 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2025-12-27 01:38:18,480 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
+2025-12-27 01:38:18,483 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
+2025-12-27 01:38:18,483 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2025-12-27 01:38:18,483 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
+2025-12-27 01:38:18,485 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
+2025-12-27 01:38:18,485 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2025-12-27 01:38:18,485 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
+2025-12-27 01:38:18,490 - abhikarta.web.routes.api_routes - INFO - API routes registered
+2025-12-27 01:38:18,490 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2025-12-27 01:38:18,493 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
+2025-12-27 01:38:18,493 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
+2025-12-27 01:38:18,493 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
+2025-12-27 01:38:18,493 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2025-12-27 01:38:54,374 - abhikarta.web.routes.admin_routes - ERROR - Error refreshing MCP tool server: Expecting value: line 1 column 1 (char 0)
+2025-12-27 01:39:01,860 - abhikarta.web.routes.admin_routes - ERROR - Error refreshing MCP tool server: Expecting value: line 1 column 1 (char 0)
+2025-12-27 01:42:45,698 - abhikarta.database.db_facade - INFO - Database disconnected
+2025-12-27 01:42:45,698 - __main__ - INFO - Database connection closed
+2025-12-27 01:42:45,698 - __main__ - INFO - Properties auto-reload stopped
+2025-12-27 01:42:45,805 - __main__ - INFO - Properties configuration initialized
+2025-12-27 01:42:45,818 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2025-12-27 01:42:45,818 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2025-12-27 01:42:45,819 - abhikarta.database.db_facade - INFO - Database connected
+2025-12-27 01:42:45,819 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2025-12-27 01:42:45,819 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2025-12-27 01:42:45,820 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2025-12-27 01:42:45,820 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2025-12-27 01:42:45,829 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.1.0)
+2025-12-27 01:42:45,829 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2025-12-27 01:42:45,829 - abhikarta.database.db_facade - INFO - Database schema initialized
+2025-12-27 01:42:45,829 - __main__ - INFO - Database initialized: sqlite
+2025-12-27 01:42:45,830 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2025-12-27 01:42:45,830 - __main__ - INFO - User management initialized
+2025-12-27 01:42:45,906 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2025-12-27 01:42:45,906 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
+2025-12-27 01:42:45,906 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
+2025-12-27 01:42:45,912 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2025-12-27 01:42:45,912 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
+2025-12-27 01:42:45,914 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
+2025-12-27 01:42:45,914 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2025-12-27 01:42:45,914 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
+2025-12-27 01:42:45,923 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
+2025-12-27 01:42:45,923 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2025-12-27 01:42:45,923 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
+2025-12-27 01:42:45,925 - abhikarta.web.routes.user_routes - INFO - User routes registered
+2025-12-27 01:42:45,925 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2025-12-27 01:42:45,925 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
+2025-12-27 01:42:45,928 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
+2025-12-27 01:42:45,928 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2025-12-27 01:42:45,928 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
+2025-12-27 01:42:45,930 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
+2025-12-27 01:42:45,930 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2025-12-27 01:42:45,930 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
+2025-12-27 01:42:45,936 - abhikarta.web.routes.api_routes - INFO - API routes registered
+2025-12-27 01:42:45,936 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2025-12-27 01:42:45,938 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
+2025-12-27 01:42:45,938 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
+2025-12-27 01:42:45,938 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
+2025-12-27 01:42:45,938 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2025-12-27 01:42:47,553 - abhikarta.database.db_facade - INFO - Database disconnected
+2025-12-27 01:42:47,553 - __main__ - INFO - Database connection closed
+2025-12-27 01:42:47,554 - __main__ - INFO - Properties auto-reload stopped
+2025-12-27 01:42:50,524 - __main__ - INFO - Properties configuration initialized
+2025-12-27 01:42:50,615 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2025-12-27 01:42:50,615 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2025-12-27 01:42:50,616 - abhikarta.database.db_facade - INFO - Database connected
+2025-12-27 01:42:50,616 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2025-12-27 01:42:50,617 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2025-12-27 01:42:50,617 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2025-12-27 01:42:50,617 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2025-12-27 01:42:50,620 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.1.0)
+2025-12-27 01:42:50,620 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2025-12-27 01:42:50,620 - abhikarta.database.db_facade - INFO - Database schema initialized
+2025-12-27 01:42:50,621 - __main__ - INFO - Database initialized: sqlite
+2025-12-27 01:42:50,628 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2025-12-27 01:42:50,628 - __main__ - INFO - User management initialized
+2025-12-27 01:42:51,229 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2025-12-27 01:42:51,230 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
+2025-12-27 01:42:51,230 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
+2025-12-27 01:42:51,277 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2025-12-27 01:42:51,277 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
+2025-12-27 01:42:51,282 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
+2025-12-27 01:42:51,282 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2025-12-27 01:42:51,282 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
+2025-12-27 01:42:51,304 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
+2025-12-27 01:42:51,304 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2025-12-27 01:42:51,304 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
+2025-12-27 01:42:51,307 - abhikarta.web.routes.user_routes - INFO - User routes registered
+2025-12-27 01:42:51,307 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2025-12-27 01:42:51,307 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
+2025-12-27 01:42:51,314 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
+2025-12-27 01:42:51,315 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2025-12-27 01:42:51,315 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
+2025-12-27 01:42:51,319 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
+2025-12-27 01:42:51,319 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2025-12-27 01:42:51,320 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
+2025-12-27 01:42:51,332 - abhikarta.web.routes.api_routes - INFO - API routes registered
+2025-12-27 01:42:51,333 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2025-12-27 01:42:51,342 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
+2025-12-27 01:42:51,342 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
+2025-12-27 01:42:51,342 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
+2025-12-27 01:42:51,342 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2025-12-27 01:45:26,265 - abhikarta.database.db_facade - INFO - Database disconnected
+2025-12-27 01:45:26,265 - __main__ - INFO - Database connection closed
+2025-12-27 01:45:26,266 - __main__ - INFO - Properties auto-reload stopped
+2025-12-27 01:47:03,284 - __main__ - INFO - Properties configuration initialized
+2025-12-27 01:47:03,297 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2025-12-27 01:47:03,297 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2025-12-27 01:47:03,297 - abhikarta.database.db_facade - INFO - Database connected
+2025-12-27 01:47:03,297 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2025-12-27 01:47:03,298 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2025-12-27 01:47:03,298 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2025-12-27 01:47:03,298 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2025-12-27 01:47:03,309 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.1.0)
+2025-12-27 01:47:03,309 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2025-12-27 01:47:03,309 - abhikarta.database.db_facade - INFO - Database schema initialized
+2025-12-27 01:47:03,309 - __main__ - INFO - Database initialized: sqlite
+2025-12-27 01:47:03,310 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2025-12-27 01:47:03,310 - __main__ - INFO - User management initialized
+2025-12-27 01:47:03,382 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2025-12-27 01:47:03,382 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
+2025-12-27 01:47:03,382 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
+2025-12-27 01:47:03,387 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2025-12-27 01:47:03,387 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
+2025-12-27 01:47:03,389 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
+2025-12-27 01:47:03,389 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2025-12-27 01:47:03,390 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
+2025-12-27 01:47:03,398 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
+2025-12-27 01:47:03,398 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2025-12-27 01:47:03,399 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
+2025-12-27 01:47:03,400 - abhikarta.web.routes.user_routes - INFO - User routes registered
+2025-12-27 01:47:03,400 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2025-12-27 01:47:03,400 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
+2025-12-27 01:47:03,403 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
+2025-12-27 01:47:03,403 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2025-12-27 01:47:03,403 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
+2025-12-27 01:47:03,405 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
+2025-12-27 01:47:03,405 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2025-12-27 01:47:03,405 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
+2025-12-27 01:47:03,410 - abhikarta.web.routes.api_routes - INFO - API routes registered
+2025-12-27 01:47:03,410 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2025-12-27 01:47:03,413 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
+2025-12-27 01:47:03,413 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
+2025-12-27 01:47:03,413 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
+2025-12-27 01:47:03,413 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2025-12-27 01:48:58,833 - abhikarta.database.db_facade - INFO - Database disconnected
+2025-12-27 01:48:58,833 - __main__ - INFO - Database connection closed
+2025-12-27 01:48:58,833 - __main__ - INFO - Properties auto-reload stopped
+2025-12-27 01:49:48,300 - __main__ - INFO - Properties configuration initialized
+2025-12-27 01:49:48,312 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2025-12-27 01:49:48,312 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2025-12-27 01:49:48,312 - abhikarta.database.db_facade - INFO - Database connected
+2025-12-27 01:49:48,312 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2025-12-27 01:49:48,313 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2025-12-27 01:49:48,313 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2025-12-27 01:49:48,313 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2025-12-27 01:49:48,340 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.1.0)
+2025-12-27 01:49:48,340 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2025-12-27 01:49:48,340 - abhikarta.database.db_facade - INFO - Database schema initialized
+2025-12-27 01:49:48,340 - __main__ - INFO - Database initialized: sqlite
+2025-12-27 01:49:48,342 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2025-12-27 01:49:48,342 - __main__ - INFO - User management initialized
+2025-12-27 01:49:48,420 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2025-12-27 01:49:48,420 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
+2025-12-27 01:49:48,420 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
+2025-12-27 01:49:48,435 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2025-12-27 01:49:48,435 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
+2025-12-27 01:49:48,437 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
+2025-12-27 01:49:48,437 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2025-12-27 01:49:48,437 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
+2025-12-27 01:49:48,446 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
+2025-12-27 01:49:48,446 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2025-12-27 01:49:48,446 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
+2025-12-27 01:49:48,448 - abhikarta.web.routes.user_routes - INFO - User routes registered
+2025-12-27 01:49:48,448 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2025-12-27 01:49:48,448 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
+2025-12-27 01:49:48,451 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
+2025-12-27 01:49:48,451 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2025-12-27 01:49:48,451 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
+2025-12-27 01:49:48,453 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
+2025-12-27 01:49:48,453 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2025-12-27 01:49:48,453 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
+2025-12-27 01:49:48,458 - abhikarta.web.routes.api_routes - INFO - API routes registered
+2025-12-27 01:49:48,458 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2025-12-27 01:49:48,461 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
+2025-12-27 01:49:48,461 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
+2025-12-27 01:49:48,461 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
+2025-12-27 01:49:48,461 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2025-12-27 01:50:24,021 - abhikarta.web.routes.admin_routes - INFO - Refreshing MCP tools from: http://localhost:3002/api/tools/list
+2025-12-27 01:50:24,026 - abhikarta.web.routes.admin_routes - INFO - Response status: 200, Content-Type: application/json, Size: 89170 bytes
+2025-12-27 01:50:24,027 - abhikarta.web.routes.admin_routes - INFO - Parsed 150 tools from sajha-local

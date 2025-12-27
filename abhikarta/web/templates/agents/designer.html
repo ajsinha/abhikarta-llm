@@ -544,6 +544,15 @@
                     <span>RAG Retrieval</span>
                 </div>
             </div>
+            
+            <!-- MCP Tools Section -->
+            <div class="palette-section">
+                <h6><i class="bi bi-server me-1"></i>MCP Tools</h6>
+                <button class="btn btn-sm btn-outline-primary w-100" onclick="showMCPToolsModal()">
+                    <i class="bi bi-plus-circle me-1"></i>Browse Tools
+                </button>
+                <div id="mcp-tools-preview" class="mt-2 small text-muted"></div>
+            </div>
         </div>
         
         <!-- Canvas Area -->
@@ -709,6 +718,52 @@
                     <i class="bi bi-info-circle me-1"></i>
                     <span id="json-stats">0 nodes, 0 edges</span>
                 </small>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MCP Tools Browser Modal -->
+<div class="modal fade" id="mcpToolsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white py-2">
+                <h6 class="modal-title"><i class="bi bi-server me-2"></i>MCP Tool Servers - Available Tools</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="d-flex justify-content-between align-items-center px-3 py-2 bg-light border-bottom">
+                    <div class="input-group" style="max-width: 400px;">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control form-control-sm" id="mcp-tool-search" 
+                               placeholder="Search tools..." onkeyup="filterMCPTools()">
+                    </div>
+                    <div>
+                        <select class="form-select form-select-sm" id="mcp-server-filter" onchange="filterMCPTools()">
+                            <option value="">All Servers</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="mcp-tools-loading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading tools from MCP servers...</p>
+                </div>
+                <div id="mcp-tools-empty" class="text-center py-5 d-none">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                    <p class="mt-3 text-muted">No MCP Tool Servers configured</p>
+                    <a href="{{ url_for('admin_mcp_tool_servers') }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-lg me-1"></i>Add MCP Server
+                    </a>
+                </div>
+                <div id="mcp-tools-list" class="d-none" style="max-height: 60vh; overflow-y: auto;">
+                    <!-- Tools will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer py-2 bg-light">
+                <small class="text-muted me-auto" id="mcp-tools-count">0 tools available</small>
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -1628,6 +1683,142 @@ function downloadJSON() {
     a.href = URL.createObjectURL(blob);
     a.download = filename;
     a.click();
+}
+
+// ============================================
+// MCP TOOLS BROWSER
+// ============================================
+let mcpToolsData = [];
+let mcpServersData = [];
+
+function showMCPToolsModal() {
+    $('#mcp-tools-loading').removeClass('d-none');
+    $('#mcp-tools-empty').addClass('d-none');
+    $('#mcp-tools-list').addClass('d-none');
+    
+    new bootstrap.Modal('#mcpToolsModal').show();
+    loadMCPTools();
+}
+
+function loadMCPTools() {
+    // Fetch tools from the server (internal route, no API key needed)
+    fetch('/admin/mcp-tool-servers/api/all-tools')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mcpToolsData = data.tools || [];
+                mcpServersData = data.servers || [];
+                
+                // Populate server filter
+                const serverFilter = $('#mcp-server-filter');
+                serverFilter.html('<option value="">All Servers</option>');
+                mcpServersData.forEach(server => {
+                    serverFilter.append(`<option value="${server.server_id}">${server.name}</option>`);
+                });
+                
+                if (mcpToolsData.length === 0) {
+                    $('#mcp-tools-loading').addClass('d-none');
+                    $('#mcp-tools-empty').removeClass('d-none');
+                } else {
+                    renderMCPTools(mcpToolsData);
+                }
+            } else {
+                $('#mcp-tools-loading').addClass('d-none');
+                $('#mcp-tools-empty').removeClass('d-none');
+            }
+        })
+        .catch(err => {
+            console.error('Error loading MCP tools:', err);
+            $('#mcp-tools-loading').addClass('d-none');
+            $('#mcp-tools-empty').removeClass('d-none');
+        });
+}
+
+function renderMCPTools(tools) {
+    $('#mcp-tools-loading').addClass('d-none');
+    $('#mcp-tools-empty').addClass('d-none');
+    
+    const container = $('#mcp-tools-list');
+    container.empty().removeClass('d-none');
+    
+    let html = '<div class="list-group list-group-flush">';
+    tools.forEach((tool, idx) => {
+        const params = tool.inputSchema?.properties 
+            ? Object.keys(tool.inputSchema.properties).slice(0, 3).join(', ')
+            : 'No parameters';
+        
+        html += `
+        <div class="list-group-item list-group-item-action mcp-tool-item" 
+             data-name="${(tool.name || '').toLowerCase()}" 
+             data-desc="${(tool.description || '').toLowerCase()}"
+             data-server="${tool._server_id || ''}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1 me-3">
+                    <h6 class="mb-1">
+                        <i class="bi bi-gear text-primary me-2"></i>
+                        <code>${tool.name}</code>
+                    </h6>
+                    <p class="small text-muted mb-1">${(tool.description || 'No description').substring(0, 150)}${(tool.description || '').length > 150 ? '...' : ''}</p>
+                    <small class="text-muted">
+                        <span class="badge bg-secondary me-1">${tool._server_name || 'Unknown'}</span>
+                        Params: ${params}${Object.keys(tool.inputSchema?.properties || {}).length > 3 ? '...' : ''}
+                    </small>
+                </div>
+                <button class="btn btn-sm btn-primary" onclick="addMCPToolToCanvas(${idx})">
+                    <i class="bi bi-plus-lg me-1"></i>Add
+                </button>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    container.html(html);
+    
+    $('#mcp-tools-count').text(`${tools.length} tools available`);
+}
+
+function filterMCPTools() {
+    const search = $('#mcp-tool-search').val().toLowerCase();
+    const serverFilter = $('#mcp-server-filter').val();
+    
+    let filtered = mcpToolsData;
+    
+    if (serverFilter) {
+        filtered = filtered.filter(t => t._server_id === serverFilter);
+    }
+    
+    if (search) {
+        filtered = filtered.filter(t => 
+            (t.name || '').toLowerCase().includes(search) ||
+            (t.description || '').toLowerCase().includes(search)
+        );
+    }
+    
+    renderMCPTools(filtered);
+}
+
+function addMCPToolToCanvas(idx) {
+    const tool = mcpToolsData[idx];
+    if (!tool) return;
+    
+    // Create an MCP Tool node
+    const node = createNode('tool', 400, 200 + (designer.nodes.length * 100));
+    node.config = {
+        tool_name: tool.name,
+        tool_description: tool.description,
+        input_schema: tool.inputSchema,
+        server_id: tool._server_id,
+        server_name: tool._server_name
+    };
+    node.label = tool.name;
+    
+    renderNode(node);
+    selectNode(node);
+    updateMinimap();
+    
+    // Close modal
+    bootstrap.Modal.getInstance('#mcpToolsModal').hide();
+    
+    showToast(`Added MCP tool: ${tool.name}`, 'success');
 }
 
 // Scroll handler for minimap

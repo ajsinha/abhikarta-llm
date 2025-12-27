@@ -715,4 +715,85 @@ class APIRoutes(AbstractRoutes):
                 'database': self.app.config.get('SETTINGS').database.type
             })
         
+        # ==================== MCP Tool Servers ====================
+        
+        @self.app.route('/api/mcp-tools', methods=['GET'])
+        @api_login_required
+        def api_get_mcp_tools():
+            """Get all tools from active MCP Tool Servers."""
+            try:
+                servers = self.db_facade.fetch_all(
+                    "SELECT * FROM mcp_tool_servers WHERE is_active = 1"
+                ) or []
+                
+                all_tools = []
+                for server in servers:
+                    try:
+                        cached_tools = json.loads(server.get('cached_tools', '[]'))
+                        for tool in cached_tools:
+                            tool['_server_id'] = server['server_id']
+                            tool['_server_name'] = server['name']
+                            all_tools.append(tool)
+                    except:
+                        pass
+                
+                return self._success_response({
+                    'tools': all_tools,
+                    'server_count': len(servers),
+                    'tool_count': len(all_tools)
+                })
+            except Exception as e:
+                logger.error(f"Error getting MCP tools: {e}")
+                return self._error_response('MCP_TOOLS_001', 'Failed to get tools', 500)
+        
+        @self.app.route('/api/mcp-tool-servers', methods=['GET'])
+        @api_login_required
+        def api_get_mcp_tool_servers():
+            """Get list of MCP Tool Servers."""
+            try:
+                active_only = request.args.get('active_only', 'true').lower() == 'true'
+                
+                if active_only:
+                    servers = self.db_facade.fetch_all(
+                        "SELECT server_id, name, description, base_url, tool_count, is_active, last_refresh FROM mcp_tool_servers WHERE is_active = 1 ORDER BY name"
+                    ) or []
+                else:
+                    servers = self.db_facade.fetch_all(
+                        "SELECT server_id, name, description, base_url, tool_count, is_active, last_refresh FROM mcp_tool_servers ORDER BY name"
+                    ) or []
+                
+                return self._success_response({
+                    'servers': servers,
+                    'count': len(servers)
+                })
+            except Exception as e:
+                logger.error(f"Error getting MCP tool servers: {e}")
+                return self._error_response('MCP_SERVERS_001', 'Failed to get servers', 500)
+        
+        @self.app.route('/api/mcp-tool-servers/<server_id>/tools', methods=['GET'])
+        @api_login_required
+        def api_get_server_tools(server_id):
+            """Get tools from a specific MCP Tool Server."""
+            try:
+                server = self.db_facade.fetch_one(
+                    "SELECT * FROM mcp_tool_servers WHERE server_id = ?",
+                    (server_id,)
+                )
+                
+                if not server:
+                    return self._error_response('MCP_SERVERS_002', 'Server not found', 404)
+                
+                tools = json.loads(server.get('cached_tools', '[]'))
+                
+                return self._success_response({
+                    'server_id': server_id,
+                    'server_name': server['name'],
+                    'tools': tools,
+                    'tool_count': len(tools),
+                    'last_refresh': server.get('last_refresh')
+                })
+            except Exception as e:
+                logger.error(f"Error getting server tools: {e}")
+                return self._error_response('MCP_SERVERS_003', 'Failed to get tools', 500)
+        
         logger.info("API routes registered")
