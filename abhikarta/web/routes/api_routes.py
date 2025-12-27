@@ -511,6 +511,52 @@ class APIRoutes(AbstractRoutes):
                 logger.error(f"Error getting execution: {e}")
                 return self._error_response('EXEC_002', 'Failed to get execution', 500)
         
+        @self.app.route('/api/executions/<execution_id>/status', methods=['GET'])
+        @api_login_required
+        def api_get_execution_status(execution_id):
+            """Get execution status for progress monitoring."""
+            user_id = session.get('user_id')
+            is_admin = session.get('is_admin', False)
+            
+            try:
+                if is_admin:
+                    execution = self.db_facade.fetch_one(
+                        "SELECT status, duration_ms, total_tokens, error_message FROM executions WHERE execution_id = ?",
+                        (execution_id,)
+                    )
+                else:
+                    execution = self.db_facade.fetch_one(
+                        "SELECT status, duration_ms, total_tokens, error_message FROM executions WHERE execution_id = ? AND user_id = ?",
+                        (execution_id, user_id)
+                    )
+                
+                if not execution:
+                    return jsonify({'status': 'not_found'})
+                
+                # Get step counts
+                steps = self.db_facade.fetch_all(
+                    "SELECT status FROM execution_steps WHERE execution_id = ?",
+                    (execution_id,)
+                ) or []
+                
+                total_steps = len(steps)
+                completed_steps = len([s for s in steps if s.get('status') == 'completed'])
+                progress = int((completed_steps / total_steps) * 100) if total_steps > 0 else 0
+                
+                return jsonify({
+                    'status': execution.get('status'),
+                    'progress': progress,
+                    'completed_steps': completed_steps,
+                    'total_steps': total_steps,
+                    'duration_ms': execution.get('duration_ms'),
+                    'total_tokens': execution.get('total_tokens'),
+                    'error_message': execution.get('error_message')
+                })
+                
+            except Exception as e:
+                logger.error(f"Error getting execution status: {e}")
+                return jsonify({'status': 'error', 'error': str(e)})
+        
         @self.app.route('/api/executions/<execution_id>/trace', methods=['GET'])
         @api_login_required
         def api_get_execution_trace(execution_id):

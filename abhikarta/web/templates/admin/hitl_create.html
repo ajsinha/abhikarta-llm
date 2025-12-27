@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Create HITL Task - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_hitl_tasks') }}">HITL Management</a></li>
+            <li class="breadcrumb-item active">Create Task</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create HITL Task</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Title <span class="text-danger">*</span></label>
+                            <input type="text" name="title" class="form-control" required
+                                   placeholder="Brief description of what needs review">
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Task Type</label>
+                                <select name="task_type" class="form-select">
+                                    <option value="approval">Approval (Yes/No)</option>
+                                    <option value="data_input">Data Input (Requires data entry)</option>
+                                    <option value="review">Review (Provide feedback)</option>
+                                    <option value="decision">Decision (Choose from options)</option>
+                                    <option value="verification">Verification (Verify information)</option>
+                                    <option value="escalation">Escalation (Escalated issue)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Priority</label>
+                                <select name="priority" class="form-select">
+                                    <option value="1">1 - Critical</option>
+                                    <option value="3">3 - High</option>
+                                    <option value="5" selected>5 - Medium</option>
+                                    <option value="7">7 - Low</option>
+                                    <option value="9">9 - Minimal</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="4"
+                                      placeholder="Detailed description of the task and what action is needed..."></textarea>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Assign To</label>
+                                <select name="assigned_to" class="form-select">
+                                    <option value="">Leave unassigned</option>
+                                    {% for user in users %}
+                                    <option value="{{ user.user_id }}">{{ user.fullname }} ({{ user.user_id }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Timeout (minutes)</label>
+                                <input type="number" name="timeout_minutes" class="form-control" 
+                                       value="1440" min="30" max="43200">
+                                <small class="text-muted">Default: 1440 (24 hours)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tags</label>
+                            <input type="text" name="tags" class="form-control" 
+                                   placeholder="comma, separated, tags">
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>Create Task
+                            </button>
+                            <a href="{{ url_for('admin_hitl_tasks') }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Help</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Task Types</h6>
+                    <ul class="small">
+                        <li><strong>Approval:</strong> Simple yes/no decision</li>
+                        <li><strong>Data Input:</strong> Requires entering data</li>
+                        <li><strong>Review:</strong> Review content and provide feedback</li>
+                        <li><strong>Decision:</strong> Choose from multiple options</li>
+                        <li><strong>Verification:</strong> Verify correctness of data</li>
+                        <li><strong>Escalation:</strong> Issue requiring attention</li>
+                    </ul>
+                    
+                    <h6 class="mt-3">Priority Levels</h6>
+                    <ul class="small">
+                        <li><strong>1-2:</strong> Critical - immediate attention</li>
+                        <li><strong>3-4:</strong> High - within hours</li>
+                        <li><strong>5-6:</strong> Medium - within a day</li>
+                        <li><strong>7-9:</strong> Low - when available</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,13 +1,33 @@
 """
 HITL Module - Human-in-the-Loop framework.
 
+Provides functionality for:
+- Creating HITL tasks during workflow/agent execution
+- Assigning tasks to users
+- Managing task lifecycle (pending -> in_progress -> approved/rejected)
+- Adding comments and responses
+- Tracking assignment history
+
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
-Email: ajsinha@gmail.com
 """
 
-# This module will contain:
-# - hitl_manager.py - HITL workflow management
-# - hitl_queue.py - Intervention request queue
+from .hitl_manager import (
+    HITLManager,
+    HITLTask,
+    HITLComment,
+    HITLStatus,
+    HITLTaskType,
+    HITLPriority,
+    create_hitl_from_execution
+)
 
-__all__ = []
+__all__ = [
+    'HITLManager',
+    'HITLTask',
+    'HITLComment',
+    'HITLStatus',
+    'HITLTaskType',
+    'HITLPriority',
+    'create_hitl_from_execution'
+]

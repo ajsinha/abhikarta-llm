@@ -1,6 +1,10 @@
 """
 Workflow Executor - Execute DAG-based workflows.
 
+Supports two execution modes:
+1. Native execution (original implementation)
+2. LangGraph execution (recommended for complex workflows)
+
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 """
@@ -81,30 +85,183 @@ class WorkflowExecutor:
     Execute DAG-based workflows with support for:
     - Sequential and parallel node execution
     - Python code execution
-    - LLM integration
+    - LLM integration via LangChain
     - HTTP calls
     - Condition branching
     - Step-by-step execution tracking
+    - LangGraph execution mode for complex workflows
     """
     
-    def __init__(self, db_facade=None, llm_facade=None, user_id: str = None):
+    def __init__(self, db_facade=None, llm_facade=None, user_id: str = None,
+                 use_langgraph: bool = True):
         """
         Initialize workflow executor.
         
         Args:
             db_facade: Database facade for logging executions
-            llm_facade: LLM facade for LLM node execution
+            llm_facade: LLM facade for LLM node execution (legacy)
             user_id: User ID for audit logging
+            use_langgraph: Whether to use LangGraph for execution (default: True)
         """
         self.db_facade = db_facade
         self.llm_facade = llm_facade
         self.user_id = user_id or 'system'
         self.parser = DAGParser()
         self.max_workers = 4
+        self.use_langgraph = use_langgraph
         self._execution_callbacks: List[Callable] = []
+        
+        # Initialize LangGraph executor if enabled
+        self._langgraph_executor = None
+        if use_langgraph and db_facade:
+            try:
+                from ..langchain.workflow_graph import WorkflowGraphExecutor
+                self._langgraph_executor = WorkflowGraphExecutor(db_facade)
+                logger.info("LangGraph workflow executor initialized")
+            except ImportError as e:
+                logger.warning(f"LangGraph not available, using native execution: {e}")
+                self.use_langgraph = False
     
     def execute_workflow(self, workflow: DAGWorkflow, 
                         input_data: Dict[str, Any] = None) -> WorkflowExecution:
+        """
+        Execute a complete workflow.
+        
+        Args:
+            workflow: DAGWorkflow to execute
+            input_data: Input data for the workflow
+            
+        Returns:
+            WorkflowExecution with results
+        """
+        # Use LangGraph if available and enabled
+        if self.use_langgraph and self._langgraph_executor:
+            return self._execute_with_langgraph(workflow, input_data)
+        
+        # Fall back to native execution
+        return self._execute_native(workflow, input_data)
+    
+    def _execute_with_langgraph(self, workflow: DAGWorkflow,
+                                input_data: Dict[str, Any] = None) -> WorkflowExecution:
+        """Execute workflow using LangGraph."""
+        execution = WorkflowExecution(
+            execution_id=str(uuid.uuid4()),
+            workflow_id=workflow.workflow_id,
+            status='running',
+            input_data=input_data,
+            started_at=datetime.now(),
+            metadata={'execution_mode': 'langgraph'}
+        )
+        
+        logger.info(f"Starting LangGraph workflow execution: {execution.execution_id}")
+        
+        try:
+            # Convert workflow to LangGraph config format
+            workflow_config = self._workflow_to_langgraph_config(workflow)
+            
+            # Create and execute graph
+            from ..langchain.workflow_graph import create_workflow_graph
+            
+            graph = create_workflow_graph(
+                workflow_config,
+                self.db_facade
+            )
+            
+            # Prepare initial state
+            initial_state = {
+                "input": input_data or {},
+                "output": None,
+                "current_node": "",
+                "executed_nodes": [],
+                "node_outputs": {},
+                "error": None,
+                "status": "running",
+                "context": {},
+                "variables": {},
+                "hitl_pending": False,
+                "hitl_message": None,
+                "hitl_response": None,
+                "execution_id": execution.execution_id,
+                "workflow_id": workflow.workflow_id,
+                "started_at": datetime.now().isoformat(),
+                "messages": []
+            }
+            
+            # Execute graph
+            start_time = time.time()
+            final_state = graph.invoke(initial_state)
+            execution.duration_ms = int((time.time() - start_time) * 1000)
+            
+            # Extract results
+            execution.output_data = final_state.get('output')
+            execution.metadata['node_outputs'] = final_state.get('node_outputs', {})
+            execution.metadata['executed_nodes'] = final_state.get('executed_nodes', [])
+            
+            # Create execution steps from executed nodes
+            for i, node_id in enumerate(final_state.get('executed_nodes', [])):
+                step = ExecutionStep(
+                    step_number=i + 1,
+                    node_id=node_id,
+                    node_type='langgraph_node',
+                    status='completed',
+                    output_data=final_state.get('node_outputs', {}).get(node_id),
+                    completed_at=datetime.now()
+                )
+                execution.steps.append(step)
+            
+            if final_state.get('error'):
+                execution.status = 'failed'
+                execution.error_message = final_state['error']
+            elif final_state.get('hitl_pending'):
+                execution.status = 'waiting_for_human'
+                execution.metadata['hitl_message'] = final_state.get('hitl_message')
+            else:
+                execution.status = 'completed'
+            
+            execution.completed_at = datetime.now()
+            
+        except Exception as e:
+            logger.error(f"LangGraph workflow execution failed: {e}", exc_info=True)
+            execution.status = 'failed'
+            execution.error_message = str(e)
+            execution.completed_at = datetime.now()
+            execution.duration_ms = int((datetime.now() - execution.started_at).total_seconds() * 1000)
+        
+        # Log execution to database
+        self._save_execution(execution)
+        
+        return execution
+    
+    def _workflow_to_langgraph_config(self, workflow: DAGWorkflow) -> Dict:
+        """Convert DAGWorkflow to LangGraph configuration format."""
+        nodes = []
+        edges = []
+        
+        for node in workflow.nodes.values():
+            node_config = {
+                'id': node.node_id,
+                'type': node.node_type,
+                'config': node.config or {}
+            }
+            nodes.append(node_config)
+        
+        for edge in workflow.edges:
+            edge_config = {
+                'source': edge.source_id,
+                'target': edge.target_id
+            }
+            if edge.condition:
+                edge_config['condition'] = edge.condition
+            edges.append(edge_config)
+        
+        return {
+            'nodes': nodes,
+            'edges': edges,
+            'metadata': workflow.metadata
+        }
+    
+    def _execute_native(self, workflow: DAGWorkflow,
+                       input_data: Dict[str, Any] = None) -> WorkflowExecution:
         """
         Execute a complete workflow.
         

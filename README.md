@@ -2,7 +2,7 @@
 
 ## AI Agent Design & Orchestration Platform
 
-**Version:** 1.1.0  
+**Version:** 1.1.6  
 **Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.**
 
 ---
@@ -14,14 +14,21 @@ Abhikarta-LLM is an enterprise-grade AI agent design and orchestration platform 
 ## Features
 
 - **Visual Agent Designer** - Drag-and-drop interface for building AI agents
-- **Multi-LLM Support** - 11+ providers: OpenAI, Anthropic, Google, Mistral, Groq, and more
+- **Visual Workflow Designer** - Design workflows with node-based canvas
+- **LangChain Integration** - Agent execution using LangChain (ReAct, Tool-Calling, Structured Chat)
+- **LangGraph Workflows** - DAG workflow execution with state management and conditional branching
+- **Multi-LLM Support** - 11+ providers: OpenAI, Anthropic, Google, Mistral, Groq, Ollama, and more
 - **LLM Provider Management** - Configure providers, models, and access via Admin UI
 - **Model RBAC** - Role-based access control for models with usage limits
+- **Centralized Tools System** - BaseTool abstraction with FunctionTool, MCPTool, HTTPTool, CodeFragmentTool
+- **ToolsRegistry** - Centralized tool management with automatic discovery and registration
+- **MCP Server Manager** - Centralized MCP server lifecycle management with auto-connect and health monitoring
+- **MCP Tool Servers** - Dynamic tool loading from external MCP servers at runtime
 - **Code Fragments** - Reusable code modules via db://, file://, s3:// URIs
 - **MCP Plugin Framework** - Extensible tool integration via Model Context Protocol
 - **Enterprise RBAC** - Role-based access control with fine-grained permissions
-- **Human-in-the-Loop** - Configurable human oversight at critical decision points
-- **Workflow DAGs** - JSON-defined multi-step pipelines with Python modules
+- **Human-in-the-Loop (HITL)** - Full task management with assignment, comments, approval/rejection workflow
+- **Execution Progress Tracking** - Real-time visual execution monitoring
 - **Dual Database Support** - SQLite for development, PostgreSQL for production
 - **Admin Portal** - Comprehensive management interface
 - **Complete LLM Logging** - Track tokens, costs, and latency for all calls
@@ -39,8 +46,8 @@ Abhikarta-LLM is an enterprise-grade AI agent design and orchestration platform 
 
 1. **Clone or extract the project:**
    ```bash
-   unzip abhikarta-llm-v1.1.0.zip
-   cd abhikarta-llm-v1.1.0
+   unzip abhikarta-llm-v1.1.6.zip
+   cd abhikarta-llm-v1.1.6
    ```
 
 2. **Create virtual environment:**
@@ -127,7 +134,7 @@ Properties can be overridden with precedence (highest to lowest):
 ## Project Structure
 
 ```
-abhikarta-llm-v1.1.0/
+abhikarta-llm-v1.1.6/
 ├── abhikarta/                  # Main package
 │   ├── core/                   # Core utilities
 │   │   └── config/             # PropertiesConfigurator (singleton)
@@ -135,8 +142,25 @@ abhikarta-llm-v1.1.0/
 │   ├── database/               # Database facade (SQLite/PostgreSQL)
 │   ├── user_management/        # User facade (users.json)
 │   ├── rbac/                   # Role-based access control
-│   ├── llm_provider/           # LLM abstraction layer
-│   ├── mcp/                    # MCP plugin framework
+│   ├── llm_provider/           # LLM abstraction layer (legacy)
+│   ├── tools/                  # Centralized Tools System
+│   │   ├── base_tool.py        # BaseTool abstract class
+│   │   ├── function_tool.py    # Python function tools
+│   │   ├── mcp_tool.py         # MCP server tools
+│   │   ├── http_tool.py        # HTTP/REST API tools
+│   │   ├── code_fragment_tool.py  # Database code fragment tools
+│   │   ├── langchain_tool.py   # LangChain tool wrappers
+│   │   └── registry.py         # ToolsRegistry singleton
+│   ├── langchain/              # LangChain & LangGraph integration
+│   │   ├── llm_factory.py      # LangChain LLM creation
+│   │   ├── tools.py            # Tool creation & MCP integration
+│   │   ├── agents.py           # Agent execution
+│   │   └── workflow_graph.py   # LangGraph workflow execution
+│   ├── mcp/                    # MCP Server Management
+│   │   ├── server.py           # MCPServer, MCPServerConfig models
+│   │   ├── client.py           # HTTP & WebSocket MCP clients
+│   │   └── manager.py          # MCPServerManager singleton
+│   ├── workflow/               # Workflow execution
 │   ├── agent/                  # Agent management
 │   ├── hitl/                   # Human-in-the-loop
 │   ├── web/                    # Flask web application
@@ -147,6 +171,7 @@ abhikarta-llm-v1.1.0/
 │   │   │   ├── admin/          # Admin dashboard pages
 │   │   │   ├── user/           # User dashboard pages
 │   │   │   ├── agents/         # Agent management pages
+│   │   │   ├── workflows/      # Workflow designer pages
 │   │   │   ├── mcp/            # MCP plugin pages
 │   │   │   ├── help/           # Help & About pages
 │   │   │   └── errors/         # Error pages

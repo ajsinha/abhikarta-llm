@@ -1308,7 +1308,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.1.0')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.1.6')
                 
                 # Add auth if configured
                 auth_type = server.get('auth_type', 'none')
@@ -1409,7 +1409,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.1.0')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.1.6')
                 
                 # Add auth headers if configured
                 auth_type = server.get('auth_type', 'none')
@@ -1629,5 +1629,191 @@ class AdminRoutes(AbstractRoutes):
                                    servers=servers,
                                    all_tools=all_tools,
                                    tool_by_server=tool_by_server)
+        
+        # =====================================================================
+        # HITL Administration Routes
+        # =====================================================================
+        
+        @self.app.route('/admin/hitl')
+        @admin_required
+        def admin_hitl_tasks():
+            """Admin view of all HITL tasks."""
+            from abhikarta.hitl import HITLManager
+            
+            status_filter = request.args.get('status', '')
+            manager = HITLManager(self.db_facade)
+            
+            if status_filter:
+                tasks = manager.get_all_tasks(status=status_filter, limit=200)
+            else:
+                tasks = manager.get_all_tasks(limit=200)
+            
+            stats = manager.get_stats()
+            
+            # Get users for assignment dropdown
+            users = self.db_facade.fetch_all(
+                "SELECT user_id, fullname FROM users WHERE is_active = 1 ORDER BY fullname"
+            ) or []
+            
+            return render_template('admin/hitl_tasks.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   tasks=tasks,
+                                   stats=stats,
+                                   users=users,
+                                   status_filter=status_filter)
+        
+        @self.app.route('/admin/hitl/create', methods=['GET', 'POST'])
+        @admin_required
+        def admin_hitl_create():
+            """Create a new HITL task."""
+            from abhikarta.hitl import HITLManager
+            from datetime import datetime, timedelta
+            
+            if request.method == 'POST':
+                title = request.form.get('title', '').strip()
+                task_type = request.form.get('task_type', 'approval')
+                description = request.form.get('description', '').strip()
+                priority = int(request.form.get('priority', 5))
+                assigned_to = request.form.get('assigned_to') or None
+                timeout_minutes = int(request.form.get('timeout_minutes', 1440))
+                tags = request.form.get('tags', '').strip()
+                
+                if not title:
+                    flash('Title is required', 'error')
+                else:
+                    manager = HITLManager(self.db_facade)
+                    
+                    task = manager.create_task(
+                        title=title,
+                        task_type=task_type,
+                        description=description,
+                        priority=priority,
+                        assigned_to=assigned_to,
+                        timeout_minutes=timeout_minutes,
+                        created_by=session.get('user_id'),
+                        tags=[t.strip() for t in tags.split(',') if t.strip()]
+                    )
+                    
+                    self.log_audit('create_hitl', 'hitl_task', task.task_id)
+                    flash(f'HITL task created: {task.task_id}', 'success')
+                    return redirect(url_for('admin_hitl_tasks'))
+            
+            # Get users for assignment
+            users = self.db_facade.fetch_all(
+                "SELECT user_id, fullname FROM users WHERE is_active = 1 ORDER BY fullname"
+            ) or []
+            
+            return render_template('admin/hitl_create.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   users=users)
+        
+        @self.app.route('/admin/hitl/<task_id>')
+        @admin_required
+        def admin_hitl_detail(task_id):
+            """Admin view of HITL task detail."""
+            from abhikarta.hitl import HITLManager
+            
+            manager = HITLManager(self.db_facade)
+            task = manager.get_task(task_id)
+            
+            if not task:
+                flash('Task not found', 'error')
+                return redirect(url_for('admin_hitl_tasks'))
+            
+            comments = manager.get_comments(task_id, include_internal=True)
+            
+            # Get assignment history
+            assignments = self.db_facade.fetch_all(
+                """SELECT * FROM hitl_assignments 
+                   WHERE task_id = ? 
+                   ORDER BY assigned_at DESC""",
+                (task_id,)
+            ) or []
+            
+            # Get users for reassignment
+            users = self.db_facade.fetch_all(
+                "SELECT user_id, fullname FROM users WHERE is_active = 1 ORDER BY fullname"
+            ) or []
+            
+            return render_template('admin/hitl_detail.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   task=task,
+                                   comments=comments,
+                                   assignments=assignments,
+                                   users=users)
+        
+        @self.app.route('/admin/hitl/<task_id>/cancel', methods=['POST'])
+        @admin_required
+        def admin_hitl_cancel(task_id):
+            """Cancel a HITL task."""
+            from abhikarta.hitl import HITLManager
+            
+            reason = request.form.get('reason', '')
+            
+            manager = HITLManager(self.db_facade)
+            manager.cancel_task(task_id, session.get('user_id'), reason)
+            
+            self.log_audit('cancel_hitl', 'hitl_task', task_id, {'reason': reason})
+            flash('Task cancelled', 'warning')
+            
+            return redirect(url_for('admin_hitl_tasks'))
+        
+        @self.app.route('/admin/hitl/<task_id>/assign', methods=['POST'])
+        @admin_required
+        def admin_hitl_assign(task_id):
+            """Assign a HITL task."""
+            from abhikarta.hitl import HITLManager
+            
+            assign_to = request.form.get('assign_to')
+            reason = request.form.get('reason', '')
+            
+            if not assign_to:
+                flash('Please select a user', 'error')
+                return redirect(url_for('admin_hitl_detail', task_id=task_id))
+            
+            manager = HITLManager(self.db_facade)
+            manager.assign_task(task_id, assign_to, session.get('user_id'), reason)
+            
+            self.log_audit('assign_hitl', 'hitl_task', task_id, 
+                          {'assigned_to': assign_to, 'reason': reason})
+            flash(f'Task assigned to {assign_to}', 'success')
+            
+            return redirect(url_for('admin_hitl_detail', task_id=task_id))
+        
+        @self.app.route('/admin/hitl/<task_id>/resolve', methods=['POST'])
+        @admin_required
+        def admin_hitl_resolve(task_id):
+            """Admin resolve a HITL task."""
+            from abhikarta.hitl import HITLManager
+            import json
+            
+            resolution = request.form.get('resolution')
+            comment = request.form.get('comment', '')
+            response_data_str = request.form.get('response_data', '{}')
+            
+            try:
+                response_data = json.loads(response_data_str) if response_data_str else {}
+            except:
+                response_data = {'raw_input': response_data_str}
+            
+            manager = HITLManager(self.db_facade)
+            user_id = session.get('user_id')
+            
+            if resolution == 'approve':
+                manager.approve_task(task_id, user_id, response_data, comment)
+                flash('Task approved', 'success')
+            elif resolution == 'reject':
+                manager.reject_task(task_id, user_id, response_data, comment)
+                flash('Task rejected', 'warning')
+            
+            self.log_audit(f'{resolution}_hitl', 'hitl_task', task_id)
+            
+            return redirect(url_for('admin_hitl_tasks'))
         
         logger.info("Admin routes registered")

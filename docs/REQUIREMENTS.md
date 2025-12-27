@@ -270,10 +270,10 @@ pydantic>=2.5.0
 redis>=5.0.0
 celery>=5.3.0
 confluent-kafka>=2.3.0
-openai>=1.1.0
+openai>=1.1.6
 anthropic>=0.18.0
 boto3>=1.34.0
-mcp>=1.1.0
+mcp>=1.1.6
 pyjwt>=2.8.0
 prometheus-client>=0.19.0
 psycopg2-binary>=2.9.9
@@ -657,9 +657,9 @@ database:
 
 ---
 
-### 17.3 Version 1.1.0 Implementation Notes
+### 17.3 Version 1.1.6 Implementation Notes
 
-The following features have been implemented in version 1.1.0:
+The following features have been implemented in version 1.1.6:
 
 #### LLM Provider & Model Management (NEW)
 - Admin UI for managing LLM providers (/admin/llm-providers)

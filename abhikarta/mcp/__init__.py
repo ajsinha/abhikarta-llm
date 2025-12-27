@@ -1,14 +1,61 @@
 """
-MCP Module - Model Context Protocol plugin framework.
+Abhikarta MCP Module - Model Context Protocol integration.
 
+This module provides:
+- MCP server configuration and state management
+- HTTP and WebSocket clients for MCP communication
+- Centralized MCPServerManager for server lifecycle
+- Automatic tool discovery and registration
+
+Version: 1.1.6
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
-Email: ajsinha@gmail.com
 """
 
-# This module will contain:
-# - mcp_facade.py - MCP abstraction
-# - mcp_server_manager.py - Server lifecycle management
-# - mcp_plugin_registry.py - Plugin registration and discovery
+# Server models
+from .server import (
+    MCPServer,
+    MCPServerConfig,
+    MCPServerState,
+    MCPServerStatus,
+    MCPTransportType,
+    MCPAuthType,
+    MCPToolDefinition
+)
 
-__all__ = []
+# Clients
+from .client import (
+    MCPClientBase,
+    HTTPMCPClient,
+    WebSocketMCPClient,
+    create_mcp_client
+)
+
+# Manager
+from .manager import (
+    MCPServerManager,
+    get_mcp_manager
+)
+
+__all__ = [
+    # Server
+    'MCPServer',
+    'MCPServerConfig',
+    'MCPServerState',
+    'MCPServerStatus',
+    'MCPTransportType',
+    'MCPAuthType',
+    'MCPToolDefinition',
+    
+    # Clients
+    'MCPClientBase',
+    'HTTPMCPClient',
+    'WebSocketMCPClient',
+    'create_mcp_client',
+    
+    # Manager
+    'MCPServerManager',
+    'get_mcp_manager',
+]
+
+__version__ = '1.1.6'

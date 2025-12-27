@@ -51,7 +51,7 @@ class Settings:
     """
     # Application settings
     app_name: str = "Abhikarta-LLM"
-    app_version: str = "1.1.0"
+    app_version: str = "1.1.6"
     debug: bool = False
     secret_key: str = "change-this-secret-key-in-production"
     

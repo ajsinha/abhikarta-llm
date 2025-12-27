@@ -31,7 +31,7 @@ class PostgresSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.1.0"
+    SCHEMA_VERSION = "1.1.6"
     
     # ==========================================================================
     # EXTENSIONS
@@ -326,23 +326,64 @@ class PostgresSchema:
     CREATE TABLE IF NOT EXISTS hitl_tasks (
         id SERIAL PRIMARY KEY,
         task_id VARCHAR(100) UNIQUE NOT NULL,
-        execution_id VARCHAR(100) NOT NULL REFERENCES executions(execution_id),
-        agent_id VARCHAR(100) NOT NULL REFERENCES agents(agent_id),
-        task_type VARCHAR(50) NOT NULL,
+        execution_id VARCHAR(100) REFERENCES executions(execution_id),
+        workflow_id VARCHAR(100),
+        agent_id VARCHAR(100) REFERENCES agents(agent_id),
+        node_id VARCHAR(100),
+        task_type VARCHAR(50) NOT NULL DEFAULT 'approval',
+        title VARCHAR(500) NOT NULL,
+        description TEXT,
         status hitl_status DEFAULT 'pending',
         priority INTEGER DEFAULT 5 CHECK (priority >= 1 AND priority <= 10),
         context JSONB DEFAULT '{}'::jsonb,
         request_data JSONB,
+        input_schema JSONB DEFAULT '{}'::jsonb,
         response_data JSONB,
+        resolution VARCHAR(50),
         assigned_to VARCHAR(100) REFERENCES users(user_id),
         assigned_at TIMESTAMP WITH TIME ZONE,
         due_at TIMESTAMP WITH TIME ZONE,
         completed_at TIMESTAMP WITH TIME ZONE,
         completed_by VARCHAR(100) REFERENCES users(user_id),
+        created_by VARCHAR(100),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        timeout_minutes INTEGER DEFAULT 30,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        timeout_minutes INTEGER DEFAULT 1440,
         notification_sent BOOLEAN DEFAULT FALSE,
+        reminder_count INTEGER DEFAULT 0,
+        last_reminder_at TIMESTAMP WITH TIME ZONE,
+        tags JSONB DEFAULT '[]'::jsonb,
         metadata JSONB DEFAULT '{}'::jsonb
+    );
+    """
+    
+    # HITL comments table
+    CREATE_HITL_COMMENTS_TABLE = """
+    CREATE TABLE IF NOT EXISTS hitl_comments (
+        id SERIAL PRIMARY KEY,
+        comment_id VARCHAR(100) UNIQUE NOT NULL,
+        task_id VARCHAR(100) NOT NULL REFERENCES hitl_tasks(task_id) ON DELETE CASCADE,
+        user_id VARCHAR(100) NOT NULL REFERENCES users(user_id),
+        comment TEXT NOT NULL,
+        comment_type VARCHAR(50) DEFAULT 'comment',
+        attachments JSONB DEFAULT '[]'::jsonb,
+        is_internal BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+    
+    # HITL assignments history table
+    CREATE_HITL_ASSIGNMENTS_TABLE = """
+    CREATE TABLE IF NOT EXISTS hitl_assignments (
+        id SERIAL PRIMARY KEY,
+        assignment_id VARCHAR(100) UNIQUE NOT NULL,
+        task_id VARCHAR(100) NOT NULL REFERENCES hitl_tasks(task_id) ON DELETE CASCADE,
+        assigned_from VARCHAR(100),
+        assigned_to VARCHAR(100) NOT NULL REFERENCES users(user_id),
+        assigned_by VARCHAR(100) NOT NULL REFERENCES users(user_id),
+        reason TEXT,
+        assigned_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
     """
     
@@ -717,6 +758,8 @@ class PostgresSchema:
             self.CREATE_WORKFLOWS_TABLE,
             self.CREATE_WORKFLOW_NODES_TABLE,
             self.CREATE_HITL_TASKS_TABLE,
+            self.CREATE_HITL_COMMENTS_TABLE,
+            self.CREATE_HITL_ASSIGNMENTS_TABLE,
             self.CREATE_MCP_PLUGINS_TABLE,
             self.CREATE_MCP_TOOL_SERVERS_TABLE,
             self.CREATE_AUDIT_LOGS_TABLE,

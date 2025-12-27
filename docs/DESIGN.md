@@ -1,7 +1,7 @@
 # Abhikarta-LLM
 ## Detailed Design Document
 
-**Version:** 1.1.0  
+**Version:** 1.1.6  
 **Date:** December 2025  
 **Classification:** CONFIDENTIAL
 
@@ -30,12 +30,14 @@ This document and the associated software architecture are proprietary and confi
 5. [User Management & Authentication](#5-user-management--authentication)
 6. [Web Application Design](#6-web-application-design)
 7. [LLM Facade Design](#7-llm-facade-design)
-8. [MCP Plugin Framework Design](#8-mcp-plugin-framework-design)
-9. [UI/UX Design](#9-uiux-design)
-10. [Configuration Management](#10-configuration-management)
-11. [Security Design](#11-security-design)
-12. [API Specifications](#12-api-specifications)
-13. [Deployment Architecture](#13-deployment-architecture)
+8. [LangChain & LangGraph Integration](#8-langchain--langgraph-integration)
+9. [Tools System Design](#9-tools-system-design-new-in-v116)
+10. [MCP Plugin Framework Design](#10-mcp-plugin-framework-design)
+11. [UI/UX Design](#11-uiux-design)
+12. [Configuration Management](#12-configuration-management)
+13. [Security Design](#13-security-design)
+14. [API Specifications](#14-api-specifications)
+15. [Deployment Architecture](#15-deployment-architecture)
 
 ---
 
@@ -147,7 +149,7 @@ class Settings:
     
     # Application
     APP_NAME: str = "Abhikarta-LLM"
-    APP_VERSION: str = "1.1.0"
+    APP_VERSION: str = "1.1.6"
     DEBUG: bool = False
     SECRET_KEY: str
     
@@ -1285,9 +1287,551 @@ if is_valid(input_data):
 
 ---
 
-## 8. MCP Plugin Framework Design
+## 8. LangChain & LangGraph Integration
 
-### 8.1 Plugin Registration
+Abhikarta-LLM uses **LangChain** for LLM abstraction and agent execution, and **LangGraph** for workflow orchestration. This provides a robust, industry-standard foundation for AI agent development.
+
+### 8.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Abhikarta-LLM Application                         │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │                    LangChain Layer                            │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐   │   │
+│  │  │ LLM Factory │  │    Tools    │  │   Agent Executor    │   │   │
+│  │  │             │  │   Factory   │  │   (ReAct, Tool-     │   │   │
+│  │  │ - OpenAI    │  │             │  │    calling, etc)    │   │   │
+│  │  │ - Anthropic │  │ - MCP Tools │  │                     │   │   │
+│  │  │ - Google    │  │ - Code Frags│  │                     │   │   │
+│  │  │ - Ollama    │  │ - Built-ins │  │                     │   │   │
+│  │  │ - etc.      │  │             │  │                     │   │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────────────┘   │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │                    LangGraph Layer                            │   │
+│  │  ┌─────────────────────────────────────────────────────────┐ │   │
+│  │  │              Workflow Graph Executor                     │ │   │
+│  │  │                                                          │ │   │
+│  │  │  ┌─────────┐    ┌─────────┐    ┌─────────┐             │ │   │
+│  │  │  │  Node   │───▶│  Node   │───▶│  Node   │             │ │   │
+│  │  │  │ (LLM)   │    │ (Tool)  │    │ (Code)  │             │ │   │
+│  │  │  └─────────┘    └─────────┘    └─────────┘             │ │   │
+│  │  │       │              │                                  │ │   │
+│  │  │       ▼              ▼                                  │ │   │
+│  │  │  ┌─────────────────────────────────────────────────┐   │ │   │
+│  │  │  │              State Management                    │   │ │   │
+│  │  │  │  - Input/Output tracking                        │   │ │   │
+│  │  │  │  - Node outputs                                 │   │ │   │
+│  │  │  │  - Conditional branching                        │   │ │   │
+│  │  │  │  - HITL checkpoints                            │   │ │   │
+│  │  │  └─────────────────────────────────────────────────┘   │ │   │
+│  │  └─────────────────────────────────────────────────────────┘ │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 8.2 LangChain LLM Factory
+
+The LLM Factory creates LangChain LLM instances from database configurations:
+
+```python
+from abhikarta.langchain import LLMFactory, get_langchain_llm
+
+# Create LLM from database configuration
+llm = get_langchain_llm(db_facade, model_id='gpt-4o')
+
+# Or create directly with factory
+llm = LLMFactory.create_llm(provider_config, model_config)
+
+# Supported providers:
+# - OpenAI (ChatOpenAI)
+# - Anthropic (ChatAnthropic)
+# - Google (ChatGoogleGenerativeAI)
+# - Azure OpenAI (AzureChatOpenAI)
+# - AWS Bedrock (ChatBedrock)
+# - Ollama (ChatOllama)
+# - Mistral (ChatMistralAI)
+# - Cohere (ChatCohere)
+# - Together AI (ChatTogether)
+# - Groq (ChatGroq)
+# - HuggingFace (ChatHuggingFace)
+```
+
+### 8.3 LangChain Tools Integration
+
+Tools from MCP servers are automatically converted to LangChain tools:
+
+```python
+from abhikarta.langchain import ToolFactory, MCPToolAdapter
+
+# Get all tools from active MCP servers
+factory = ToolFactory(db_facade)
+tools = factory.get_mcp_tools()
+
+# Get tools from specific server
+tools = factory.get_mcp_tools(server_id='my-server')
+
+# Get code fragment as tool
+tool = factory.get_code_fragment_tool('fragment-id')
+
+# Get built-in tools
+tools = factory.get_builtin_tools(['wikipedia', 'web_search'])
+
+# Create custom tool
+from pydantic import BaseModel, Field
+
+class SearchInput(BaseModel):
+    query: str = Field(description="Search query")
+
+tool = factory.create_custom_tool(
+    name="search",
+    description="Search the web",
+    func=my_search_function,
+    args_schema=SearchInput
+)
+```
+
+### 8.4 LangChain Agent Execution
+
+Agents are executed using LangChain's agent framework:
+
+```python
+from abhikarta.langchain import AgentExecutor, create_react_agent, create_tool_calling_agent
+
+# Create agent with tools
+llm = get_langchain_llm(db_facade, model_id='claude-3-5-sonnet')
+tools = factory.get_all_tools()
+
+# ReAct agent (reasoning + acting)
+agent = create_react_agent(llm, tools, system_prompt="You are a helpful assistant")
+
+# Tool-calling agent (native function calling)
+agent = create_tool_calling_agent(llm, tools, system_prompt="You are a helpful assistant")
+
+# Execute agent
+result = agent.invoke({"input": "What is the weather in NYC?"})
+print(result["output"])
+
+# Or use the high-level executor with database integration
+executor = AgentExecutor(db_facade)
+result = executor.execute_agent(agent_id='my-agent', input_data="Hello")
+print(result.output)
+print(result.tool_calls)
+print(result.intermediate_steps)
+```
+
+**Agent Types:**
+| Type | Description | Best For |
+|------|-------------|----------|
+| `react` | Reasoning + Acting | General purpose, any LLM |
+| `tool_calling` | Native function calling | OpenAI, Anthropic, Gemini |
+| `structured_chat` | Structured output format | Multi-turn conversations |
+
+### 8.5 LangGraph Workflow Execution
+
+Workflows are executed using LangGraph's StateGraph:
+
+```python
+from abhikarta.langchain import WorkflowGraphExecutor, create_workflow_graph
+
+# Execute workflow from database
+executor = WorkflowGraphExecutor(db_facade)
+result = executor.execute_workflow(
+    workflow_id='my-workflow',
+    input_data={'query': 'Analyze this data'},
+    variables={'user_name': 'John'}
+)
+
+print(result.status)        # 'completed', 'failed', 'waiting_for_human'
+print(result.output)        # Final output
+print(result.node_outputs)  # Output from each node
+print(result.executed_nodes) # List of executed node IDs
+
+# Create custom workflow graph
+workflow_config = {
+    'nodes': [
+        {'id': 'start', 'type': 'start'},
+        {'id': 'llm1', 'type': 'llm', 'config': {'model_id': 'gpt-4o'}},
+        {'id': 'tool1', 'type': 'tool', 'config': {'tool_name': 'search'}},
+        {'id': 'end', 'type': 'end'}
+    ],
+    'edges': [
+        {'source': 'start', 'target': 'llm1'},
+        {'source': 'llm1', 'target': 'tool1'},
+        {'source': 'tool1', 'target': 'end'}
+    ]
+}
+
+graph = create_workflow_graph(workflow_config, db_facade)
+result = graph.invoke({'input': 'Hello'})
+```
+
+### 8.6 Workflow State Management
+
+LangGraph workflows use a typed state dictionary:
+
+```python
+class WorkflowState(TypedDict, total=False):
+    # Input/Output
+    input: Any
+    output: Any
+    
+    # Execution tracking
+    current_node: str
+    executed_nodes: List[str]
+    node_outputs: Dict[str, Any]
+    
+    # Error handling
+    error: Optional[str]
+    status: str  # running, completed, failed, waiting_for_human
+    
+    # Context
+    context: Dict[str, Any]
+    variables: Dict[str, Any]
+    
+    # Human-in-the-loop
+    hitl_pending: bool
+    hitl_message: Optional[str]
+    hitl_response: Optional[str]
+    
+    # Metadata
+    execution_id: str
+    workflow_id: str
+    started_at: str
+    messages: List[Dict]
+```
+
+### 8.7 Node Types
+
+LangGraph workflow nodes support various types:
+
+| Node Type | Description | Configuration |
+|-----------|-------------|---------------|
+| `start` | Entry point | - |
+| `end` | Exit point | - |
+| `llm` | LLM call | `model_id`, `system_prompt`, `prompt_template` |
+| `agent` | Agent execution | `agent_id` |
+| `tool` | Tool execution | `tool_name`, `server_id` |
+| `code` | Python code | `code` (Python code string) |
+| `condition` | Conditional branch | `condition` (Python expression) |
+| `hitl` | Human-in-the-loop | `message` |
+| `rag` | RAG retrieval | `collection_id`, `k` |
+
+### 8.8 Conditional Branching
+
+LangGraph supports conditional edges:
+
+```python
+workflow_config = {
+    'nodes': [
+        {'id': 'check', 'type': 'condition', 'config': {'condition': 'len(input) > 100'}},
+        {'id': 'short_path', 'type': 'llm', 'config': {...}},
+        {'id': 'long_path', 'type': 'llm', 'config': {...}},
+    ],
+    'edges': [
+        {'source': 'check', 'target': 'short_path', 'condition': 'not node_outputs["check"]'},
+        {'source': 'check', 'target': 'long_path', 'condition': 'node_outputs["check"]'},
+    ]
+}
+```
+
+### 8.9 Module Structure
+
+```
+abhikarta/langchain/
+├── __init__.py           # Module exports
+├── llm_factory.py        # LangChain LLM creation
+├── tools.py              # Tool creation and MCP integration
+├── agents.py             # Agent execution
+└── workflow_graph.py     # LangGraph workflow execution
+```
+
+### 8.10 Dependencies
+
+Required packages for LangChain/LangGraph:
+
+```
+# Core
+langchain>=0.3.0
+langgraph>=0.2.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+
+# Providers (install as needed)
+langchain-openai>=0.2.0
+langchain-anthropic>=0.2.0
+langchain-google-genai>=2.0.0
+langchain-ollama>=0.2.0
+langchain-mistralai>=0.2.0
+langchain-cohere>=0.3.0
+langchain-groq>=0.2.0
+langchain-aws>=0.2.0
+langchain-huggingface>=0.1.0
+```
+
+---
+
+## 9. Tools System Design (New in v1.1.6)
+
+### 9.1 Overview
+
+The Tools System provides a unified, centralized approach to tool management in Abhikarta-LLM. All tools extend the abstract `BaseTool` class, enabling consistent interfaces for agents, workflows, and LLM integrations.
+
+### 9.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     ToolsRegistry                            │
+│   (Singleton - Centralized Tool Management)                 │
+├─────────────────────────────────────────────────────────────┤
+│   register() / unregister() / get() / execute()            │
+│   list_tools() / search() / to_openai_functions()          │
+├─────────────────────────────────────────────────────────────┤
+│                     BaseTool (Abstract)                      │
+│   - tool_id, name, description, category                    │
+│   - execute() / get_schema() / validate_input()            │
+├─────────────────────────────────────────────────────────────┤
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐      │
+│  │ Function │ │   MCP    │ │   HTTP   │ │  Code    │      │
+│  │   Tool   │ │   Tool   │ │   Tool   │ │ Fragment │      │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘      │
+│  ┌──────────┐ ┌──────────┐                                  │
+│  │LangChain │ │  Async   │                                  │
+│  │   Tool   │ │   Tool   │                                  │
+│  └──────────┘ └──────────┘                                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 9.3 BaseTool Abstract Class
+
+```python
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Dict, Any, List
+from enum import Enum
+
+class ToolType(Enum):
+    FUNCTION = "function"
+    MCP = "mcp"
+    CODE_FRAGMENT = "code_fragment"
+    HTTP = "http"
+    LANGCHAIN = "langchain"
+    PLUGIN = "plugin"
+    CUSTOM = "custom"
+
+class ToolCategory(Enum):
+    UTILITY = "utility"
+    DATA = "data"
+    AI = "ai"
+    INTEGRATION = "integration"
+    FILE = "file"
+    COMMUNICATION = "communication"
+    SEARCH = "search"
+    DATABASE = "database"
+    CUSTOM = "custom"
+
+@dataclass
+class ToolResult:
+    success: bool
+    output: Any = None
+    error: str = None
+    execution_time_ms: float = 0
+
+class BaseTool(ABC):
+    """Abstract base class for all tools."""
+    
+    @abstractmethod
+    def execute(self, **kwargs) -> ToolResult:
+        """Execute the tool with parameters."""
+        pass
+    
+    @abstractmethod
+    def get_schema(self) -> ToolSchema:
+        """Return parameter schema."""
+        pass
+    
+    def to_openai_function(self) -> Dict[str, Any]:
+        """Convert to OpenAI function format."""
+        pass
+    
+    def to_anthropic_tool(self) -> Dict[str, Any]:
+        """Convert to Anthropic tool format."""
+        pass
+    
+    def to_langchain_tool(self):
+        """Convert to LangChain StructuredTool."""
+        pass
+```
+
+### 9.4 Tool Implementations
+
+#### 9.4.1 FunctionTool
+
+```python
+from abhikarta.tools import FunctionTool, tool
+
+# Method 1: Using from_function
+def search(query: str, limit: int = 10) -> str:
+    """Search for items."""
+    return f"Found {limit} results for {query}"
+
+tool = FunctionTool.from_function(search)
+
+# Method 2: Using decorator
+@tool(name="calculator")
+def calculate(expression: str) -> float:
+    return eval(expression)
+```
+
+#### 9.4.2 MCPTool
+
+```python
+from abhikarta.tools import MCPTool
+
+# Automatically created when MCP server connects
+tool = MCPTool.from_mcp_tool_definition(
+    tool_def={"name": "fetch", "description": "..."},
+    server_url="http://localhost:8000",
+    server_name="my_server"
+)
+```
+
+#### 9.4.3 HTTPTool
+
+```python
+from abhikarta.tools import HTTPTool, HTTPMethod
+
+weather_tool = HTTPTool.create(
+    name="get_weather",
+    description="Get current weather",
+    url="https://api.weather.com/v1/current",
+    method=HTTPMethod.GET,
+    parameters=[
+        {"name": "city", "type": "string", "required": True}
+    ]
+)
+```
+
+#### 9.4.4 CodeFragmentTool
+
+```python
+from abhikarta.tools import CodeFragmentTool
+
+tool = CodeFragmentTool.create(
+    name="calculate_tax",
+    code="result = input_data['amount'] * 0.1",
+    parameters=[{"name": "amount", "type": "number"}]
+)
+```
+
+### 9.5 ToolsRegistry
+
+```python
+from abhikarta.tools import get_tools_registry
+
+registry = get_tools_registry()
+
+# Register tools
+registry.register(my_tool)
+registry.register_function(my_function)
+
+# Discovery
+tool = registry.get("tool_name")
+tools = registry.list_tools()
+matching = registry.search("weather")
+
+# Execution
+result = registry.execute("tool_name", param1="value")
+
+# LLM Format Conversion
+openai_functions = registry.to_openai_functions()
+anthropic_tools = registry.to_anthropic_tools()
+langchain_tools = registry.to_langchain_tools()
+
+# MCP Integration
+registry.register_from_mcp_server(
+    server_url="http://localhost:8000",
+    server_name="my_server"
+)
+
+# Statistics
+stats = registry.get_stats()
+```
+
+### 9.6 Module Structure
+
+```
+abhikarta/tools/
+├── __init__.py           # Exports all components
+├── base_tool.py          # BaseTool, ToolMetadata, ToolSchema, ToolResult
+├── function_tool.py      # FunctionTool, AsyncFunctionTool, @tool decorator
+├── mcp_tool.py           # MCPTool, MCPPluginTool
+├── http_tool.py          # HTTPTool, WebhookTool, HTTPMethod
+├── code_fragment_tool.py # CodeFragmentTool, PythonExpressionTool
+├── langchain_tool.py     # LangChainToolWrapper, wrap_langchain_tools
+└── registry.py           # ToolsRegistry singleton
+```
+
+---
+
+## 10. MCP Plugin Framework Design
+
+### 10.1 Overview (Enhanced in v1.1.6)
+
+The MCP (Model Context Protocol) module now includes centralized server management with automatic tool registration.
+
+### 10.2 MCPServerManager
+
+```python
+from abhikarta.mcp import get_mcp_manager, MCPServerConfig
+
+# Get singleton instance
+manager = get_mcp_manager()
+
+# Add a server
+config = MCPServerConfig(
+    server_id="weather-server",
+    name="Weather API",
+    url="http://localhost:8080",
+    auto_connect=True,
+    auth_type=MCPAuthType.BEARER_TOKEN,
+    auth_token="secret"
+)
+manager.add_server(config)
+
+# Connect and load tools
+manager.connect_server("weather-server")
+
+# Health monitoring
+manager.start_health_monitor(interval_seconds=30)
+
+# Get statistics
+stats = manager.get_stats()
+```
+
+### 10.3 MCPServerConfig
+
+```python
+@dataclass
+class MCPServerConfig:
+    server_id: str
+    name: str
+    url: str
+    description: str = ""
+    transport: MCPTransportType = MCPTransportType.HTTP
+    auth_type: MCPAuthType = MCPAuthType.NONE
+    auth_token: str = ""
+    timeout_seconds: int = 30
+    auto_connect: bool = True
+    retry_count: int = 3
+```
+
+### 10.4 Plugin Registration
 
 ```python
 # MCP Plugin configuration structure
@@ -1308,50 +1852,38 @@ if is_valid(input_data):
 }
 ```
 
-### 8.2 MCP Facade Interface
+### 10.5 MCP Module Structure
+
+```
+abhikarta/mcp/
+├── __init__.py    # Exports all components
+├── server.py      # MCPServer, MCPServerConfig, MCPServerState
+├── client.py      # HTTPMCPClient, WebSocketMCPClient
+└── manager.py     # MCPServerManager singleton
+```
+
+### 10.6 Tool Integration
+
+When an MCP server connects, all its tools are:
+1. Wrapped as `MCPTool` instances (extending `BaseTool`)
+2. Automatically registered with `ToolsRegistry`
+3. Available for use by agents, workflows, and API
 
 ```python
-class MCPFacade:
-    """Unified interface for MCP operations."""
-    
-    def list_plugins(self) -> List[Dict]:
-        """Get all registered plugins."""
-        pass
-    
-    def get_plugin(self, plugin_id: str) -> Optional[Dict]:
-        """Get plugin by ID."""
-        pass
-    
-    def register_plugin(self, config: Dict) -> bool:
-        """Register a new plugin."""
-        pass
-    
-    def unregister_plugin(self, plugin_id: str) -> bool:
-        """Unregister a plugin."""
-        pass
-    
-    def list_tools(self, plugin_id: str) -> List[Dict]:
-        """List tools from a plugin."""
-        pass
-    
-    def call_tool(self, plugin_id: str, tool_name: str, args: Dict) -> Any:
-        """Execute a tool."""
-        pass
-    
-    def start_plugin(self, plugin_id: str) -> bool:
-        """Start a plugin server."""
-        pass
-    
-    def stop_plugin(self, plugin_id: str) -> bool:
-        """Stop a plugin server."""
-        pass
+# Tools are auto-registered when server connects
+manager.connect_server("weather-server")
+
+# Access via ToolsRegistry
+registry = get_tools_registry()
+tool = registry.get("weather-server_get_weather")
+result = tool.execute(city="London")
 ```
 
 ---
 
-## 9. UI/UX Design
+## 11. UI/UX Design
 
-### 9.1 Color Palette (BMO-Inspired)
+### 11.1 Color Palette (BMO-Inspired)
 
 ```css
 :root {
@@ -1382,7 +1914,7 @@ class MCPFacade:
 }
 ```
 
-### 9.2 Base Template Structure
+### 10.2 Base Template Structure
 
 ```html
 <!-- templates/base.html -->
@@ -1429,7 +1961,7 @@ class MCPFacade:
 </html>
 ```
 
-### 9.3 Page Layouts
+### 10.3 Page Layouts
 
 #### Admin Dashboard
 ```
@@ -1455,17 +1987,17 @@ class MCPFacade:
 
 ---
 
-## 10. Configuration Management
+## 12. Configuration Management
 
-### 10.1 config.yaml Structure
+### 11.1 config.yaml Structure
 
 ```yaml
 # Abhikarta-LLM Configuration
-# Version: 1.1.0
+# Version: 1.1.6
 
 app:
   name: "Abhikarta-LLM"
-  version: "1.1.0"
+  version: "1.1.6"
   debug: false
   secret_key: "${SECRET_KEY}"
 
@@ -1530,9 +2062,9 @@ server:
 
 ---
 
-## 11. Security Design
+## 13. Security Design
 
-### 11.1 Authentication Flow
+### 12.1 Authentication Flow
 
 ```
 1. User submits credentials (user_id, password)
@@ -1542,7 +2074,7 @@ server:
 5. On failure: Return error, log attempt
 ```
 
-### 11.2 Authorization (RBAC)
+### 12.2 Authorization (RBAC)
 
 ```python
 # Role hierarchy
@@ -1574,7 +2106,7 @@ ROLES = {
 }
 ```
 
-### 11.3 Audit Logging
+### 12.3 Audit Logging
 
 ```python
 def log_audit(user_id: str, action: str, resource_type: str, 
@@ -1597,9 +2129,9 @@ def log_audit(user_id: str, action: str, resource_type: str,
 
 ---
 
-## 12. API Specifications
+## 14. API Specifications
 
-### 12.1 REST API Endpoints
+### 13.1 REST API Endpoints
 
 #### Authentication
 | Method | Endpoint | Description |
@@ -1637,7 +2169,7 @@ def log_audit(user_id: str, action: str, resource_type: str,
 | GET | /api/mcp/plugins/{id}/tools | List tools |
 | POST | /api/mcp/plugins/{id}/tools/{name} | Execute tool |
 
-### 12.2 Response Format
+### 13.2 Response Format
 
 ```json
 {
@@ -1648,7 +2180,7 @@ def log_audit(user_id: str, action: str, resource_type: str,
 }
 ```
 
-### 12.3 Error Response
+### 13.3 Error Response
 
 ```json
 {
@@ -1663,9 +2195,9 @@ def log_audit(user_id: str, action: str, resource_type: str,
 
 ---
 
-## 13. Deployment Architecture
+## 15. Deployment Architecture
 
-### 13.1 Directory Structure
+### 14.1 Directory Structure
 
 ```
 abhikarta-llm/
@@ -1697,7 +2229,7 @@ abhikarta-llm/
 └── LICENSE
 ```
 
-### 13.2 Docker Deployment
+### 14.2 Docker Deployment
 
 ```dockerfile
 FROM python:3.11-slim
@@ -1714,7 +2246,7 @@ EXPOSE 5000
 CMD ["python", "run.py"]
 ```
 
-### 13.3 Docker Compose
+### 14.3 Docker Compose
 
 ```yaml
 version: '3.8'
@@ -1756,7 +2288,7 @@ volumes:
 
 | File | Purpose |
 |------|---------|
-| abhikarta/__init__.py | Package initialization (v1.1.0) |
+| abhikarta/__init__.py | Package initialization (v1.1.6) |
 | abhikarta/config/settings.py | Settings management |
 | run_server.py | Application entry point |
 
@@ -1861,7 +2393,16 @@ volumes:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | Dec 2025 | Initial release with core functionality |
-| 1.1.0 | Dec 2025 | Visual Agent Designer with drag-drop canvas, LLM Provider/Model Management, RBAC for models, Code Fragments (db/file/s3 URIs), MCP Tool Servers for dynamic tool loading, 23 database tables |
+| 1.0.1 | Dec 2025 | Code Fragments (db/file/s3 URIs), 19 database tables |
+| 1.1.6 | Dec 2025 | Visual Agent Designer with drag-drop canvas, LLM Provider/Model Management, RBAC for models, MCP Tool Servers for dynamic tool loading, **LangChain & LangGraph integration** for agent and workflow execution, 23 database tables |
+
+### v1.1.6 LangChain/LangGraph Features
+
+- **LangChain LLM Factory**: Create LangChain LLM instances from database configurations (OpenAI, Anthropic, Google, Ollama, Mistral, Cohere, Together, Groq, HuggingFace, AWS Bedrock)
+- **LangChain Tools**: MCP Tool Server integration, Code Fragment tools, Built-in tools (Wikipedia, Web Search, Python REPL)
+- **LangChain Agents**: ReAct, Tool-Calling, and Structured Chat agent types
+- **LangGraph Workflows**: StateGraph-based workflow execution with state management, conditional branching, and HITL support
+- **Execution Logging**: Full logging of agent and workflow executions with intermediate steps and tool calls
 
 ---
 

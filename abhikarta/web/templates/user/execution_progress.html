@@ -1,0 +1,653 @@
+{% extends "base.html" %}
+
+{% block title %}Execution Progress - {{ execution.execution_id[:8] }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .execution-container {
+        display: flex;
+        gap: 1rem;
+        height: calc(100vh - 180px);
+    }
+    
+    /* Left Panel - Progress Graph */
+    .progress-panel {
+        flex: 2;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .progress-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--bmo-blue) 0%, var(--bmo-dark-blue) 100%);
+        color: white;
+    }
+    
+    .progress-header h5 {
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .progress-canvas {
+        flex: 1;
+        position: relative;
+        overflow: auto;
+        background: 
+            linear-gradient(rgba(0,117,190,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,117,190,0.03) 1px, transparent 1px);
+        background-size: 20px 20px;
+        padding: 2rem;
+    }
+    
+    /* Workflow Graph Visualization */
+    .workflow-graph {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .graph-node {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        min-width: 200px;
+        position: relative;
+        transition: all 0.3s;
+    }
+    
+    .graph-node.pending {
+        border-color: #adb5bd;
+        background: #f8f9fa;
+    }
+    
+    .graph-node.running {
+        border-color: #0d6efd;
+        background: #e7f1ff;
+        animation: pulse 1.5s infinite;
+    }
+    
+    .graph-node.completed {
+        border-color: #198754;
+        background: #d1e7dd;
+    }
+    
+    .graph-node.failed {
+        border-color: #dc3545;
+        background: #f8d7da;
+    }
+    
+    .graph-node.waiting {
+        border-color: #ffc107;
+        background: #fff3cd;
+    }
+    
+    .graph-node.skipped {
+        border-color: #6c757d;
+        background: #e9ecef;
+        opacity: 0.6;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4); }
+        50% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+    }
+    
+    .node-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+    }
+    
+    .node-icon.pending { background: #adb5bd; color: white; }
+    .node-icon.running { background: #0d6efd; color: white; }
+    .node-icon.completed { background: #198754; color: white; }
+    .node-icon.failed { background: #dc3545; color: white; }
+    .node-icon.waiting { background: #ffc107; color: #000; }
+    
+    .node-content {
+        flex: 1;
+    }
+    
+    .node-name {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .node-type {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+    }
+    
+    .node-duration {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .node-status {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .graph-connector {
+        width: 2px;
+        height: 30px;
+        background: #dee2e6;
+        position: relative;
+    }
+    
+    .graph-connector.active {
+        background: linear-gradient(to bottom, #198754, #0d6efd);
+    }
+    
+    .graph-connector::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #dee2e6;
+    }
+    
+    .graph-connector.active::after {
+        border-top-color: #0d6efd;
+    }
+    
+    /* Right Panel - Details */
+    .details-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        min-width: 350px;
+    }
+    
+    .status-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 1rem;
+    }
+    
+    .status-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .status-header h6 {
+        margin: 0;
+        color: var(--bmo-dark-blue);
+        font-weight: 600;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+    
+    .status-badge.running { background: #e7f1ff; color: #0d6efd; }
+    .status-badge.completed { background: #d1e7dd; color: #198754; }
+    .status-badge.failed { background: #f8d7da; color: #dc3545; }
+    .status-badge.waiting_for_human { background: #fff3cd; color: #856404; }
+    
+    .progress-bar-container {
+        background: #e9ecef;
+        border-radius: 10px;
+        height: 10px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #198754, #20c997);
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+    
+    .progress-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--bmo-blue);
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+    }
+    
+    /* Steps Timeline */
+    .steps-timeline {
+        flex: 1;
+        overflow-y: auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .timeline-header {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+    }
+    
+    .timeline-body {
+        padding: 1rem;
+    }
+    
+    .timeline-item {
+        display: flex;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .timeline-item:last-child {
+        border-bottom: none;
+    }
+    
+    .timeline-marker {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .timeline-marker.completed { background: #d1e7dd; color: #198754; }
+    .timeline-marker.running { background: #e7f1ff; color: #0d6efd; }
+    .timeline-marker.failed { background: #f8d7da; color: #dc3545; }
+    .timeline-marker.pending { background: #e9ecef; color: #6c757d; }
+    
+    .timeline-content {
+        flex: 1;
+    }
+    
+    .timeline-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .timeline-meta {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    /* Output Panel */
+    .output-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        max-height: 300px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .output-header {
+        padding: 0.75rem 1rem;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        font-weight: 600;
+    }
+    
+    .output-body {
+        flex: 1;
+        overflow: auto;
+        padding: 1rem;
+    }
+    
+    .output-body pre {
+        margin: 0;
+        white-space: pre-wrap;
+        font-size: 0.85rem;
+    }
+    
+    /* Auto-refresh indicator */
+    .refresh-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .refresh-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #198754;
+        animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .execution-container {
+            flex-direction: column;
+            height: auto;
+        }
+        
+        .progress-panel {
+            min-height: 400px;
+        }
+        
+        .details-panel {
+            min-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('user_executions') }}">Executions</a></li>
+                    <li class="breadcrumb-item active">{{ execution.execution_id[:12] }}...</li>
+                </ol>
+            </nav>
+            <h4 class="mb-0">
+                {% if execution.execution_type == 'workflow' %}
+                <i class="bi bi-diagram-3 me-2"></i>{{ workflow.name if workflow else 'Workflow' }}
+                {% else %}
+                <i class="bi bi-robot me-2"></i>{{ agent.name if agent else 'Agent' }}
+                {% endif %}
+                Execution
+            </h4>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="refresh-indicator" id="refreshIndicator" style="display: none;">
+                <div class="refresh-dot"></div>
+                <span>Auto-refreshing</span>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+        </div>
+    </div>
+    
+    <div class="execution-container">
+        <!-- Left Panel - Progress Visualization -->
+        <div class="progress-panel">
+            <div class="progress-header">
+                <h5><i class="bi bi-activity me-2"></i>Execution Flow</h5>
+            </div>
+            <div class="progress-canvas">
+                <div class="workflow-graph" id="workflowGraph">
+                    <!-- Start Node -->
+                    <div class="graph-node completed">
+                        <div class="node-icon completed">
+                            <i class="bi bi-play-fill"></i>
+                        </div>
+                        <div class="node-content">
+                            <div class="node-name">Start</div>
+                            <div class="node-type">Entry Point</div>
+                        </div>
+                    </div>
+                    
+                    {% for step in steps %}
+                    <div class="graph-connector {% if step.status == 'completed' %}active{% endif %}"></div>
+                    <div class="graph-node {{ step.status }}" data-step-id="{{ step.step_id }}">
+                        <div class="node-icon {{ step.status }}">
+                            {% if step.status == 'running' %}
+                            <i class="bi bi-hourglass-split"></i>
+                            {% elif step.status == 'completed' %}
+                            <i class="bi bi-check-lg"></i>
+                            {% elif step.status == 'failed' %}
+                            <i class="bi bi-x-lg"></i>
+                            {% elif step.status == 'waiting' %}
+                            <i class="bi bi-person-check"></i>
+                            {% else %}
+                            <i class="bi bi-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="node-content">
+                            <div class="node-name">{{ step.node_id }}</div>
+                            <div class="node-type">{{ step.node_type }}</div>
+                            {% if step.duration_ms %}
+                            <div class="node-duration">{{ step.duration_ms }}ms</div>
+                            {% endif %}
+                        </div>
+                        <div class="node-status">
+                            {% if step.status == 'running' %}
+                            <span class="spinner-border spinner-border-sm text-primary"></span>
+                            {% elif step.status == 'completed' %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            {% elif step.status == 'failed' %}
+                            <i class="bi bi-x-circle-fill text-danger"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- End Node -->
+                    <div class="graph-connector {% if execution.status == 'completed' %}active{% endif %}"></div>
+                    <div class="graph-node {% if execution.status == 'completed' %}completed{% elif execution.status == 'failed' %}failed{% else %}pending{% endif %}">
+                        <div class="node-icon {% if execution.status == 'completed' %}completed{% elif execution.status == 'failed' %}failed{% else %}pending{% endif %}">
+                            <i class="bi bi-stop-fill"></i>
+                        </div>
+                        <div class="node-content">
+                            <div class="node-name">End</div>
+                            <div class="node-type">Exit Point</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Panel - Details -->
+        <div class="details-panel">
+            <!-- Status Card -->
+            <div class="status-card">
+                <div class="status-header">
+                    <h6><i class="bi bi-speedometer2 me-2"></i>Status</h6>
+                    <span class="status-badge {{ execution.status }}">{{ execution.status }}</span>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progressBar" style="width: {{ progress_percent }}%"></div>
+                </div>
+                
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="completedCount">{{ completed_steps }}</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCount">{{ total_steps }}</div>
+                        <div class="stat-label">Total Steps</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="duration">{{ execution.duration_ms or 0 }}</div>
+                        <div class="stat-label">Duration (ms)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="tokens">{{ execution.total_tokens or 0 }}</div>
+                        <div class="stat-label">Tokens</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Steps Timeline -->
+            <div class="steps-timeline">
+                <div class="timeline-header">
+                    <h6 class="mb-0"><i class="bi bi-list-check me-2"></i>Execution Steps</h6>
+                </div>
+                <div class="timeline-body" id="stepsTimeline">
+                    {% for step in steps %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker {{ step.status }}">
+                            {% if step.status == 'completed' %}
+                            <i class="bi bi-check"></i>
+                            {% elif step.status == 'running' %}
+                            <i class="bi bi-hourglass-split"></i>
+                            {% elif step.status == 'failed' %}
+                            <i class="bi bi-x"></i>
+                            {% else %}
+                            <i class="bi bi-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">{{ step.node_id }}</div>
+                            <div class="timeline-meta">
+                                <span class="badge bg-secondary me-2">{{ step.node_type }}</span>
+                                {% if step.duration_ms %}{{ step.duration_ms }}ms{% endif %}
+                                {% if step.started_at %} • {{ step.started_at[:19] }}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-hourglass-split me-2"></i>Waiting for execution to start...
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Output/Error Card -->
+            <div class="output-card">
+                <div class="output-header">
+                    {% if execution.status == 'failed' %}
+                    <i class="bi bi-exclamation-triangle text-danger me-2"></i>Error
+                    {% else %}
+                    <i class="bi bi-box-arrow-right me-2"></i>Output
+                    {% endif %}
+                </div>
+                <div class="output-body">
+                    {% if execution.error_message %}
+                    <pre class="text-danger">{{ execution.error_message }}</pre>
+                    {% elif execution.output_data %}
+                    <pre>{{ execution.output_data | tojson(indent=2) if execution.output_data is mapping else execution.output_data }}</pre>
+                    {% else %}
+                    <div class="text-muted text-center py-3">
+                        <i class="bi bi-hourglass me-2"></i>Output will appear here...
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="d-flex gap-2">
+                {% if execution.status == 'waiting_for_human' %}
+                <a href="{{ url_for('user_hitl_tasks') }}" class="btn btn-warning flex-fill">
+                    <i class="bi bi-person-check me-1"></i>View HITL Task
+                </a>
+                {% endif %}
+                {% if execution.status == 'failed' %}
+                <button class="btn btn-outline-primary flex-fill" onclick="retryExecution()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Retry
+                </button>
+                {% endif %}
+                <a href="{{ url_for('user_executions') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const executionId = '{{ execution.execution_id }}';
+const isRunning = '{{ execution.status }}' === 'running';
+
+// Auto-refresh for running executions
+let refreshInterval;
+
+function startAutoRefresh() {
+    document.getElementById('refreshIndicator').style.display = 'flex';
+    refreshInterval = setInterval(checkStatus, 2000);
+}
+
+function stopAutoRefresh() {
+    document.getElementById('refreshIndicator').style.display = 'none';
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+    }
+}
+
+function checkStatus() {
+    fetch(`/api/executions/${executionId}/status`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.status !== 'running') {
+                stopAutoRefresh();
+                location.reload();
+            }
+            // Update progress
+            if (data.progress) {
+                document.getElementById('progressBar').style.width = data.progress + '%';
+                document.getElementById('completedCount').textContent = data.completed_steps || 0;
+            }
+        })
+        .catch(() => stopAutoRefresh());
+}
+
+function retryExecution() {
+    if (confirm('Retry this execution with the same input?')) {
+        fetch(`/api/executions/${executionId}/retry`, {method: 'POST'})
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = `/user/executions/${data.execution_id}/progress`;
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+    }
+}
+
+// Start auto-refresh if execution is running
+if (isRunning) {
+    startAutoRefresh();
+}
+</script>
+{% endblock %}

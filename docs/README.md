@@ -1,6 +1,6 @@
 # Abhikarta-LLM Documentation
 
-**Version:** 1.1.0  
+**Version:** 1.1.6  
 **Date:** December 2025
 
 ---
@@ -76,7 +76,7 @@ Detailed Technical Design Document including:
 
 ---
 
-## Version 1.1.0 Features
+## Version 1.1.6 Features
 
 ### Visual Agent Designer
 Drag-and-drop workflow builder with:
@@ -133,7 +133,7 @@ When updating documentation:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | Dec 2025 | Initial documentation |
-| 1.1.0 | Dec 2025 | Added QUICKSTART.md, updated REQUIREMENTS.md and DESIGN.md with new features |
+| 1.1.6 | Dec 2025 | Added QUICKSTART.md, updated REQUIREMENTS.md and DESIGN.md with new features |
 
 ---
 

@@ -377,3 +377,132 @@ class WorkflowRoutes(AbstractRoutes):
                     
             except Exception as e:
                 return jsonify({'valid': False, 'errors': [str(e)]})
+        
+        # =====================================================================
+        # Workflow Designer Routes
+        # =====================================================================
+        
+        @self.app.route('/workflows/designer')
+        @login_required
+        def workflow_designer_new():
+            """Create a new workflow with visual designer."""
+            return render_template('workflows/designer.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   workflow=None)
+        
+        @self.app.route('/workflows/<workflow_id>/designer')
+        @login_required
+        def workflow_designer(workflow_id):
+            """Edit workflow with visual designer."""
+            workflow = self.db_facade.fetch_one(
+                "SELECT * FROM workflows WHERE workflow_id = ?",
+                (workflow_id,)
+            )
+            
+            if not workflow:
+                return render_template('errors/404.html'), 404
+            
+            return render_template('workflows/designer.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   workflow=workflow)
+        
+        @self.app.route('/api/workflows/design', methods=['POST'])
+        @login_required
+        def save_workflow_design():
+            """Save workflow from visual designer."""
+            import uuid
+            
+            try:
+                data = request.get_json()
+                
+                workflow_id = data.get('workflow_id')
+                name = data.get('name', 'Untitled Workflow')
+                description = data.get('description', '')
+                nodes = data.get('nodes', [])
+                edges = data.get('edges', [])
+                
+                # Build dag_definition
+                dag_definition = json.dumps({
+                    'name': name,
+                    'description': description,
+                    'nodes': nodes,
+                    'edges': edges
+                })
+                
+                if workflow_id:
+                    # Update existing
+                    self.db_facade.execute("""
+                        UPDATE workflows SET 
+                            name = ?, description = ?, dag_definition = ?, updated_at = CURRENT_TIMESTAMP
+                        WHERE workflow_id = ?
+                    """, (name, description, dag_definition, workflow_id))
+                else:
+                    # Create new
+                    workflow_id = str(uuid.uuid4())[:8]
+                    self.db_facade.execute("""
+                        INSERT INTO workflows (workflow_id, name, description, dag_definition, 
+                                             status, created_by, created_at)
+                        VALUES (?, ?, ?, ?, 'active', ?, CURRENT_TIMESTAMP)
+                    """, (workflow_id, name, description, dag_definition, session.get('user_id')))
+                
+                self.log_audit('save_workflow_design', 'workflow', workflow_id)
+                
+                return jsonify({
+                    'success': True,
+                    'workflow_id': workflow_id
+                })
+                
+            except Exception as e:
+                logger.error(f"Error saving workflow design: {e}")
+                return jsonify({'success': False, 'error': str(e)})
+        
+        # =====================================================================
+        # Execution Progress Routes
+        # =====================================================================
+        
+        @self.app.route('/workflows/<workflow_id>/executions/<execution_id>/progress')
+        @login_required
+        def workflow_execution_progress(workflow_id, execution_id):
+            """View workflow execution progress with visual feedback."""
+            workflow = self.db_facade.fetch_one(
+                "SELECT * FROM workflows WHERE workflow_id = ?",
+                (workflow_id,)
+            )
+            
+            execution = self.db_facade.fetch_one(
+                "SELECT * FROM executions WHERE execution_id = ?",
+                (execution_id,)
+            )
+            
+            if not workflow or not execution:
+                return render_template('errors/404.html'), 404
+            
+            # Get execution steps
+            steps = self.db_facade.fetch_all(
+                """SELECT * FROM execution_steps 
+                   WHERE execution_id = ? 
+                   ORDER BY step_number ASC""",
+                (execution_id,)
+            ) or []
+            
+            # Calculate progress
+            total_steps = len(steps) if steps else 1
+            completed_steps = len([s for s in steps if s.get('status') == 'completed'])
+            progress_percent = int((completed_steps / total_steps) * 100) if total_steps > 0 else 0
+            
+            return render_template('user/execution_progress.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   workflow=workflow,
+                                   execution=execution,
+                                   steps=steps,
+                                   total_steps=total_steps,
+                                   completed_steps=completed_steps,
+                                   progress_percent=progress_percent)
+        
+        logger.info("Workflow routes registered")

@@ -1,6 +1,6 @@
 # Abhikarta-LLM Quick Start Guide
 
-**Version:** 1.1.0  
+**Version:** 1.1.6  
 **Date:** December 2025
 
 ---
@@ -31,8 +31,8 @@ This guide will help you get Abhikarta-LLM up and running in minutes.
 ### Step 1: Extract the Archive
 
 ```bash
-unzip abhikarta-llm-v1.1.0.zip
-cd abhikarta-llm-v1.1.0
+unzip abhikarta-llm-v1.1.6.zip
+cd abhikarta-llm-v1.1.6
 ```
 
 ### Step 2: Create Virtual Environment (Recommended)
@@ -87,7 +87,11 @@ After login, you'll see the Admin Dashboard with:
 | Feature | URL | Description |
 |---------|-----|-------------|
 | **Agent Management** | `/admin/agents` | Create, edit, and manage agents |
-| **Visual Designer** | `/admin/agents/<id>/designer` | Drag-and-drop workflow builder |
+| **Visual Agent Designer** | `/admin/agents/<id>/designer` | Drag-and-drop agent workflow builder |
+| **Visual Workflow Designer** | `/workflows/designer` | Design DAG workflows visually |
+| **Execution Progress** | `/user/executions/<id>/progress` | Real-time execution monitoring |
+| **MCP Tool Servers** | `/admin/mcp/tool-servers` | Manage MCP server connections |
+| **HITL Tasks** | `/user/hitl` | Human-in-the-loop task management |
 | **Template Library** | `/admin/agents/templates` | Pre-built agent templates |
 | **User Management** | `/admin/users` | Manage users and roles |
 | **Help & Docs** | `/help` | Built-in documentation |
@@ -266,13 +270,21 @@ server.debug=true
 ## File Structure
 
 ```
-abhikarta-llm-v1.1.0/
+abhikarta-llm-v1.1.6/
 ├── abhikarta/           # Main application package
 │   ├── agent/           # Agent management
 │   ├── config/          # Configuration
 │   ├── core/            # Core utilities
 │   ├── database/        # Database layer
 │   │   └── schema/      # SQL schema definitions
+│   ├── tools/           # Centralized Tools System (NEW)
+│   │   ├── base_tool.py # BaseTool abstract class
+│   │   ├── registry.py  # ToolsRegistry singleton
+│   │   └── ...          # FunctionTool, MCPTool, HTTPTool
+│   ├── mcp/             # MCP Server Management (Enhanced)
+│   │   ├── manager.py   # MCPServerManager singleton
+│   │   ├── client.py    # HTTP/WebSocket clients
+│   │   └── server.py    # MCPServer models
 │   ├── user_management/ # User management
 │   └── web/             # Web application
 │       ├── routes/      # Route handlers

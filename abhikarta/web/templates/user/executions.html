@@ -154,6 +154,10 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('execution_progress', execution_id=exec.execution_id) }}" 
+                                           class="btn btn-outline-success" title="View Progress">
+                                            <i class="bi bi-activity"></i>
+                                        </a>
                                         <button class="btn btn-outline-primary" title="View Details" 
                                                 onclick="viewExecution('{{ exec.execution_id }}')">
                                             <i class="bi bi-eye"></i>
@@ -167,6 +171,9 @@
                                                 onclick="retryExecution('{{ exec.execution_id }}')">
                                             <i class="bi bi-arrow-repeat"></i>
                                         </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
                                         {% endif %}
                                     </div>
                                 </td>

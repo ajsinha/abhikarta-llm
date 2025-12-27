@@ -30,7 +30,7 @@ class SQLiteSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.1.0"
+    SCHEMA_VERSION = "1.1.6"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -283,26 +283,73 @@ class SQLiteSchema:
     CREATE TABLE IF NOT EXISTS hitl_tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         task_id TEXT UNIQUE NOT NULL,
-        execution_id TEXT NOT NULL,
-        agent_id TEXT NOT NULL,
-        task_type TEXT NOT NULL,
+        execution_id TEXT,
+        workflow_id TEXT,
+        agent_id TEXT,
+        node_id TEXT,
+        task_type TEXT NOT NULL DEFAULT 'approval',
+        title TEXT NOT NULL,
+        description TEXT,
         status TEXT DEFAULT 'pending',
         priority INTEGER DEFAULT 5,
         context TEXT DEFAULT '{}',
         request_data TEXT,
+        input_schema TEXT DEFAULT '{}',
         response_data TEXT,
+        resolution TEXT,
         assigned_to TEXT,
         assigned_at TIMESTAMP,
         due_at TIMESTAMP,
         completed_at TIMESTAMP,
         completed_by TEXT,
+        created_by TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        timeout_minutes INTEGER DEFAULT 30,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        timeout_minutes INTEGER DEFAULT 1440,
         notification_sent INTEGER DEFAULT 0,
+        reminder_count INTEGER DEFAULT 0,
+        last_reminder_at TIMESTAMP,
+        tags TEXT DEFAULT '[]',
+        metadata TEXT DEFAULT '{}',
         FOREIGN KEY (execution_id) REFERENCES executions(execution_id),
         FOREIGN KEY (agent_id) REFERENCES agents(agent_id),
         FOREIGN KEY (assigned_to) REFERENCES users(user_id),
         FOREIGN KEY (completed_by) REFERENCES users(user_id)
+    );
+    """
+    
+    # HITL comments table
+    CREATE_HITL_COMMENTS_TABLE = """
+    CREATE TABLE IF NOT EXISTS hitl_comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        comment_id TEXT UNIQUE NOT NULL,
+        task_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        comment TEXT NOT NULL,
+        comment_type TEXT DEFAULT 'comment',
+        attachments TEXT DEFAULT '[]',
+        is_internal INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (task_id) REFERENCES hitl_tasks(task_id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+    );
+    """
+    
+    # HITL assignments history table
+    CREATE_HITL_ASSIGNMENTS_TABLE = """
+    CREATE TABLE IF NOT EXISTS hitl_assignments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        assignment_id TEXT UNIQUE NOT NULL,
+        task_id TEXT NOT NULL,
+        assigned_from TEXT,
+        assigned_to TEXT NOT NULL,
+        assigned_by TEXT NOT NULL,
+        reason TEXT,
+        assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (task_id) REFERENCES hitl_tasks(task_id) ON DELETE CASCADE,
+        FOREIGN KEY (assigned_to) REFERENCES users(user_id),
+        FOREIGN KEY (assigned_by) REFERENCES users(user_id)
     );
     """
     
@@ -703,6 +750,8 @@ class SQLiteSchema:
             self.CREATE_WORKFLOWS_TABLE,
             self.CREATE_WORKFLOW_NODES_TABLE,
             self.CREATE_HITL_TASKS_TABLE,
+            self.CREATE_HITL_COMMENTS_TABLE,
+            self.CREATE_HITL_ASSIGNMENTS_TABLE,
             self.CREATE_MCP_PLUGINS_TABLE,
             self.CREATE_MCP_TOOL_SERVERS_TABLE,
             self.CREATE_AUDIT_LOGS_TABLE,

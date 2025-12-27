@@ -1,0 +1,354 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Tools System" %}
+{% set description = "Centralized tool management and execution" %}
+{% set icon = "bi-tools" %}
+{% set header_color = "#fd7e14" %}
+{% set header_color_dark = "#d96a0b" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#base-tool">BaseTool Class</a>
+<a href="#tool-types">Tool Types</a>
+<a href="#registry">ToolsRegistry</a>
+<a href="#usage">Usage Examples</a>
+<a href="#integration">LLM Integration</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Tools System Overview</h2>
+<p class="lead">Abhikarta v1.1.6 introduces a comprehensive centralized tools system for unified tool management.</p>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Key Features:</strong>
+    <ul class="mb-0 mt-2">
+        <li>Abstract <code>BaseTool</code> class for all tools</li>
+        <li>Multiple tool type implementations (Function, MCP, HTTP, Code Fragment)</li>
+        <li>Centralized <code>ToolsRegistry</code> singleton for discovery and execution</li>
+        <li>Automatic conversion to OpenAI, Anthropic, and LangChain formats</li>
+        <li>Integration with MCP servers via <code>MCPServerManager</code></li>
+    </ul>
+</div>
+
+<pre><code class="language-text">┌─────────────────────────────────────────────────────────────┐
+│                     ToolsRegistry                            │
+│   (Singleton - Centralized Tool Management)                 │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   register() / unregister() / get() / execute()            │
+│   list_tools() / search() / to_openai_functions()          │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│                     BaseTool (Abstract)                      │
+│   - tool_id, name, description, category                    │
+│   - execute() / get_schema() / validate_input()            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐      │
+│  │ Function │ │   MCP    │ │   HTTP   │ │  Code    │      │
+│  │   Tool   │ │   Tool   │ │   Tool   │ │ Fragment │      │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+
+<hr class="my-5">
+
+<h2 id="base-tool">BaseTool Abstract Class</h2>
+<p>All tools must extend <code>BaseTool</code> to be usable in the system.</p>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Required Methods</h5>
+            </div>
+            <div class="card-body">
+<pre><code class="language-python">from abc import ABC, abstractmethod
+
+class BaseTool(ABC):
+    @abstractmethod
+    def execute(self, **kwargs) -> ToolResult:
+        """Execute the tool with parameters."""
+        pass
+    
+    @abstractmethod
+    def get_schema(self) -> ToolSchema:
+        """Return parameter schema."""
+        pass</code></pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Provided Methods</h5>
+            </div>
+            <div class="card-body">
+<pre><code class="language-python"># Validation
+tool.validate_input(**kwargs)
+
+# Safe execution with error handling
+tool.safe_execute(**kwargs)
+
+# Format conversion
+tool.to_openai_function()
+tool.to_anthropic_tool()
+tool.to_langchain_tool()</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="tool-types">Tool Types</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>FunctionTool</h5>
+            </div>
+            <div class="card-body">
+                <p>Wrap any Python function as a tool.</p>
+<pre><code class="language-python">from abhikarta.tools import FunctionTool, tool
+
+# Method 1: Using from_function
+def search(query: str, limit: int = 10) -> str:
+    """Search for items."""
+    return f"Found {limit} results for {query}"
+
+tool = FunctionTool.from_function(search)
+
+# Method 2: Using decorator
+@tool(name="calculator", description="Math operations")
+def calculate(expression: str) -> float:
+    return eval(expression)</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100 border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-plug me-2"></i>MCPTool</h5>
+            </div>
+            <div class="card-body">
+                <p>Wrap tools from MCP servers.</p>
+<pre><code class="language-python">from abhikarta.tools import MCPTool
+
+# Created automatically when MCP server connects
+tool = MCPTool.from_mcp_tool_definition(
+    tool_def={"name": "fetch", "description": "..."},
+    server_url="http://localhost:8000",
+    server_name="my_mcp_server",
+    auth_token="secret"
+)
+
+# Execute
+result = tool.execute(url="https://example.com")</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-globe me-2"></i>HTTPTool</h5>
+            </div>
+            <div class="card-body">
+                <p>Wrap REST API endpoints as tools.</p>
+<pre><code class="language-python">from abhikarta.tools import HTTPTool, HTTPMethod
+
+weather_tool = HTTPTool.create(
+    name="get_weather",
+    description="Get current weather",
+    url="https://api.weather.com/v1/current",
+    method=HTTPMethod.GET,
+    parameters=[
+        {"name": "city", "type": "string", "required": True},
+        {"name": "units", "type": "string", "default": "metric"}
+    ],
+    auth_token="api_key_here"
+)</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-database me-2"></i>CodeFragmentTool</h5>
+            </div>
+            <div class="card-body">
+                <p>Execute code fragments from database.</p>
+<pre><code class="language-python">from abhikarta.tools import CodeFragmentTool
+
+# From database record
+tool = CodeFragmentTool.from_db_fragment({
+    "fragment_id": "calc_001",
+    "name": "calculate_tax",
+    "code": "result = input_data['amount'] * 0.1",
+    "input_schema": {
+        "properties": {"amount": {"type": "number"}}
+    }
+})
+
+# Execute
+result = tool.execute(amount=1000)
+# result.output = 100.0</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="registry">ToolsRegistry</h2>
+<p>Centralized singleton for managing all tools in the system.</p>
+
+<pre><code class="language-python">from abhikarta.tools import get_tools_registry, FunctionTool
+
+# Get registry instance
+registry = get_tools_registry()
+
+# Register a tool
+@tool(name="greet")
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
+
+registry.register(greet)
+
+# Or register a function directly
+registry.register_function(my_function)
+
+# Get a tool
+tool = registry.get("greet")
+
+# Execute a tool by name
+result = registry.execute("greet", name="World")
+
+# List all tools
+tools = registry.list_tools()
+
+# Search tools
+matching = registry.search("weather")
+
+# Get tools by type
+mcp_tools = registry.list_by_type(ToolType.MCP)
+
+# Get tools by category
+search_tools = registry.list_by_category(ToolCategory.SEARCH)
+
+# Register from MCP server
+count = registry.register_from_mcp_server(
+    server_url="http://localhost:8000",
+    server_name="my_server",
+    auth_token="secret"
+)
+
+# Export for LLM
+openai_functions = registry.to_openai_functions()
+anthropic_tools = registry.to_anthropic_tools()
+langchain_tools = registry.to_langchain_tools()</code></pre>
+
+<hr class="my-5">
+
+<h2 id="usage">Usage Examples</h2>
+
+<h4>Creating a Custom Tool</h4>
+<pre><code class="language-python">from abhikarta.tools import (
+    BaseTool, ToolMetadata, ToolSchema, ToolParameter,
+    ToolResult, ToolType, ToolCategory
+)
+
+class DatabaseQueryTool(BaseTool):
+    """Custom tool for database queries."""
+    
+    def __init__(self, db_connection):
+        metadata = ToolMetadata(
+            tool_id="db_query_001",
+            name="database_query",
+            description="Execute SQL queries",
+            tool_type=ToolType.CUSTOM,
+            category=ToolCategory.DATABASE,
+            tags=["sql", "database"]
+        )
+        super().__init__(metadata)
+        self.db = db_connection
+    
+    def execute(self, query: str, **kwargs) -> ToolResult:
+        try:
+            result = self.db.execute(query)
+            return ToolResult.success_result(result)
+        except Exception as e:
+            return ToolResult.error_result(str(e))
+    
+    def get_schema(self) -> ToolSchema:
+        return ToolSchema(parameters=[
+            ToolParameter(
+                name="query",
+                param_type="string",
+                description="SQL query to execute",
+                required=True
+            )
+        ])</code></pre>
+
+<h4>Using with Agents</h4>
+<pre><code class="language-python"># Tools are automatically available to agents
+from abhikarta.langchain import create_agent
+
+# Agent will have access to all registered tools
+agent = create_agent(
+    agent_id="my_agent",
+    model_id="gpt-4",
+    tools=registry.to_langchain_tools()
+)</code></pre>
+
+<hr class="my-5">
+
+<h2 id="integration">LLM Integration</h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>LLM Provider</th>
+                <th>Conversion Method</th>
+                <th>Output Format</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>OpenAI</strong></td>
+                <td><code>to_openai_function()</code></td>
+                <td>Function calling format</td>
+            </tr>
+            <tr>
+                <td><strong>Anthropic</strong></td>
+                <td><code>to_anthropic_tool()</code></td>
+                <td>Tool use format</td>
+            </tr>
+            <tr>
+                <td><strong>LangChain</strong></td>
+                <td><code>to_langchain_tool()</code></td>
+                <td>StructuredTool</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-success mt-4">
+    <h5><i class="bi bi-check-circle me-2"></i>Best Practices</h5>
+    <ul class="mb-0">
+        <li>Always extend <code>BaseTool</code> for custom tools</li>
+        <li>Use meaningful names and descriptions for better LLM understanding</li>
+        <li>Define complete schemas with proper types and descriptions</li>
+        <li>Handle errors gracefully with <code>ToolResult.error_result()</code></li>
+        <li>Use the <code>ToolsRegistry</code> singleton for centralized management</li>
+        <li>Tools from MCP servers are automatically wrapped and registered</li>
+    </ul>
+</div>
+
+{% endblock %}

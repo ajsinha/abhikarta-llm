@@ -34,13 +34,34 @@
 ├─────────────────────────────────────────────────────────────────────┤
 │                     CORE SERVICES                                    │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
-│  │   Agent    │ │  Workflow  │ │    LLM     │ │    MCP     │       │
+│  │   Agent    │ │  Workflow  │ │    LLM     │ │   HITL     │       │
 │  │  Manager   │ │  Executor  │ │   Facade   │ │  Manager   │       │
 │  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
 │  │   User     │ │   RBAC     │ │   Code     │ │   Audit    │       │
 │  │  Manager   │ │  Manager   │ │  Loader    │ │   Logger   │       │
 │  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
+├─────────────────────────────────────────────────────────────────────┤
+│                     TOOLS LAYER (NEW IN 1.1.6)                       │
+│  ┌──────────────────────────────────────────────────────────┐       │
+│  │                    ToolsRegistry                          │       │
+│  │   (Centralized Tool Management & Discovery)              │       │
+│  └──────────────────────────────────────────────────────────┘       │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
+│  │ Function   │ │   MCP      │ │   HTTP     │ │   Code     │       │
+│  │   Tool     │ │   Tool     │ │   Tool     │ │  Fragment  │       │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
+│                         ▲ BaseTool (Abstract)                        │
+├─────────────────────────────────────────────────────────────────────┤
+│                      MCP LAYER (ENHANCED)                            │
+│  ┌──────────────────────────────────────────────────────────┐       │
+│  │                  MCPServerManager                         │       │
+│  │   (Server Lifecycle, Health Monitoring, Auto-Connect)    │       │
+│  └──────────────────────────────────────────────────────────┘       │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐                       │
+│  │   HTTP     │ │ WebSocket  │ │   SSE      │                       │
+│  │  Client    │ │  Client    │ │  Client    │                       │
+│  └────────────┘ └────────────┘ └────────────┘                       │
 ├─────────────────────────────────────────────────────────────────────┤
 │                  EXTERNAL CODE SOURCES                               │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐                       │
@@ -84,8 +105,43 @@
                     <li><strong>Agent Manager:</strong> Agent CRUD and lifecycle</li>
                     <li><strong>Workflow Executor:</strong> DAG parsing and execution</li>
                     <li><strong>LLM Facade:</strong> Unified LLM interface with logging</li>
+                    <li><strong>HITL Manager:</strong> Human-in-the-loop task management</li>
                     <li><strong>Code Loader:</strong> URI-based code resolution</li>
-                    <li><strong>MCP Manager:</strong> Plugin registry and invocation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Tools Layer (v1.1.6)</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>ToolsRegistry:</strong> Centralized tool management singleton</li>
+                    <li><strong>BaseTool:</strong> Abstract base class for all tools</li>
+                    <li><strong>FunctionTool:</strong> Python function wrappers</li>
+                    <li><strong>MCPTool:</strong> MCP server tool wrappers</li>
+                    <li><strong>HTTPTool:</strong> REST API tool wrappers</li>
+                    <li><strong>CodeFragmentTool:</strong> Database code fragments</li>
+                    <li><strong>LangChainTool:</strong> LangChain integration</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">MCP Layer (Enhanced)</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>MCPServerManager:</strong> Server lifecycle management</li>
+                    <li><strong>MCPServerConfig:</strong> Server configuration model</li>
+                    <li><strong>HTTPMCPClient:</strong> HTTP protocol client</li>
+                    <li><strong>WebSocketMCPClient:</strong> WebSocket protocol client</li>
+                    <li><strong>Auto-connect:</strong> Automatic server connection on startup</li>
+                    <li><strong>Health Monitoring:</strong> Background health checks</li>
                 </ul>
             </div>
         </div>
@@ -119,7 +175,7 @@ code_fragments     -- Reusable code modules (db:// URIs)
                    -- category, tags, dependencies
                    -- usage_count, is_active
 
--- LLM Management (NEW in v1.1.0)
+-- LLM Management (NEW in v1.1.6)
 llm_providers      -- Provider configurations
                    -- provider_id, name, provider_type
                    -- api_endpoint, api_key_name, rate_limits

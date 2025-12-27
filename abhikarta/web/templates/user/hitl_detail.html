@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task.title }} - HITL Task{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user_hitl_tasks') }}">HITL Tasks</a></li>
+            <li class="breadcrumb-item active">{{ task.task_id[:16] }}...</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Task Header -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">{{ task.title }}</h5>
+                        <small class="text-muted">{{ task.task_id }}</small>
+                    </div>
+                    <div>
+                        {% if task.status == 'pending' %}
+                        <span class="badge bg-warning text-dark fs-6">Pending</span>
+                        {% elif task.status == 'assigned' %}
+                        <span class="badge bg-info fs-6">Assigned</span>
+                        {% elif task.status == 'in_progress' %}
+                        <span class="badge bg-primary fs-6">In Progress</span>
+                        {% elif task.status == 'approved' %}
+                        <span class="badge bg-success fs-6">Approved</span>
+                        {% elif task.status == 'rejected' %}
+                        <span class="badge bg-danger fs-6">Rejected</span>
+                        {% else %}
+                        <span class="badge bg-secondary fs-6">{{ task.status }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if task.description %}
+                    <div class="mb-4">
+                        <h6 class="text-muted">Description</h6>
+                        <p>{{ task.description }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Request Data -->
+                    {% if task.request_data %}
+                    <div class="mb-4">
+                        <h6 class="text-muted">Request Data</h6>
+                        <div class="bg-light p-3 rounded">
+                            <pre class="mb-0" style="white-space: pre-wrap;">{{ task.request_data | tojson(indent=2) if task.request_data is mapping else task.request_data }}</pre>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Context -->
+                    {% if task.context %}
+                    <div class="mb-4">
+                        <h6 class="text-muted">Context</h6>
+                        <div class="bg-light p-3 rounded">
+                            <pre class="mb-0" style="white-space: pre-wrap; max-height: 200px; overflow: auto;">{{ task.context | tojson(indent=2) }}</pre>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Response Data (if resolved) -->
+                    {% if task.response_data %}
+                    <div class="mb-4">
+                        <h6 class="text-muted">Response Data</h6>
+                        <div class="bg-success bg-opacity-10 p-3 rounded border border-success">
+                            <pre class="mb-0" style="white-space: pre-wrap;">{{ task.response_data | tojson(indent=2) if task.response_data is mapping else task.response_data }}</pre>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Action Buttons (if not resolved) -->
+            {% if task.status not in ['approved', 'rejected', 'cancelled', 'expired'] %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-check2-square me-2"></i>Take Action</h6>
+                </div>
+                <div class="card-body">
+                    {% if not task.assigned_to %}
+                    <!-- Claim task -->
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        This task is not assigned. Claim it to start working.
+                    </div>
+                    <form method="POST" action="{{ url_for('user_hitl_claim', task_id=task.task_id) }}">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-hand-index me-2"></i>Claim This Task
+                        </button>
+                    </form>
+                    
+                    {% elif task.assigned_to == userid %}
+                    <!-- Start or Resolve -->
+                    {% if task.status == 'assigned' %}
+                    <form method="POST" action="{{ url_for('user_hitl_start', task_id=task.task_id) }}" class="mb-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-play-fill me-2"></i>Start Working
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <!-- Resolution Form -->
+                    <form method="POST" action="{{ url_for('user_hitl_resolve', task_id=task.task_id) }}">
+                        {% if task.input_schema and task.input_schema.properties %}
+                        <div class="mb-3">
+                            <label class="form-label">Required Input</label>
+                            <textarea name="response_data" class="form-control" rows="4" 
+                                      placeholder="Enter JSON data or plain text..."></textarea>
+                            <small class="text-muted">
+                                Expected fields: {{ task.input_schema.properties.keys() | list | join(', ') }}
+                            </small>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Comment (optional)</label>
+                            <textarea name="comment" class="form-control" rows="2" 
+                                      placeholder="Add any notes about your decision..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" name="resolution" value="approve" 
+                                    class="btn btn-success">
+                                <i class="bi bi-check-lg me-1"></i>Approve
+                            </button>
+                            <button type="submit" name="resolution" value="reject" 
+                                    class="btn btn-danger">
+                                <i class="bi bi-x-lg me-1"></i>Reject
+                            </button>
+                        </div>
+                    </form>
+                    
+                    {% else %}
+                    <!-- Not assigned to current user -->
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        This task is assigned to <strong>{{ task.assigned_to }}</strong>.
+                        {% if is_reviewer or is_admin %}
+                        You can reassign it below.
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Comments Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Comments & Activity</h6>
+                </div>
+                <div class="card-body">
+                    {% if comments %}
+                    <div class="comments-list mb-4">
+                        {% for comment in comments %}
+                        <div class="d-flex mb-3 {% if comment.comment_type == 'system' %}opacity-75{% endif %}">
+                            <div class="flex-shrink-0">
+                                {% if comment.comment_type == 'system' %}
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="bi bi-gear"></i>
+                                </div>
+                                {% else %}
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    {{ comment.user_id[0] | upper }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ comment.user_id }}</strong>
+                                    <small class="text-muted">{{ comment.created_at[:16] }}</small>
+                                </div>
+                                <p class="mb-0 {% if comment.comment_type == 'system' %}text-muted fst-italic{% endif %}">
+                                    {{ comment.comment }}
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No comments yet.</p>
+                    {% endif %}
+                    
+                    <!-- Add Comment Form -->
+                    <form method="POST" action="{{ url_for('user_hitl_comment', task_id=task.task_id) }}">
+                        <div class="input-group">
+                            <input type="text" name="comment" class="form-control" 
+                                   placeholder="Add a comment..." required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Task Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Task Information</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted">Type</td>
+                            <td><span class="badge bg-secondary">{{ task.task_type }}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Priority</td>
+                            <td>
+                                {% if task.priority <= 2 %}
+                                <span class="badge bg-danger">Critical ({{ task.priority }})</span>
+                                {% elif task.priority <= 4 %}
+                                <span class="badge bg-warning text-dark">High ({{ task.priority }})</span>
+                                {% elif task.priority <= 6 %}
+                                <span class="badge bg-info">Medium ({{ task.priority }})</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Low ({{ task.priority }})</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Assigned To</td>
+                            <td>
+                                {% if task.assigned_to %}
+                                {{ task.assigned_to }}
+                                {% if task.assigned_to == userid %}
+                                <span class="badge bg-success">You</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Created</td>
+                            <td>{{ task.created_at[:16] if task.created_at else '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Due</td>
+                            <td>
+                                {% if task.due_at %}
+                                {{ task.due_at[:16] }}
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if task.completed_at %}
+                        <tr>
+                            <td class="text-muted">Completed</td>
+                            <td>{{ task.completed_at[:16] }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Completed By</td>
+                            <td>{{ task.completed_by }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Resolution</td>
+                            <td>
+                                {% if task.resolution == 'approved' %}
+                                <span class="badge bg-success">Approved</span>
+                                {% elif task.resolution == 'rejected' %}
+                                <span class="badge bg-danger">Rejected</span>
+                                {% else %}
+                                {{ task.resolution or '-' }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Related Items -->
+            {% if agent or workflow or execution %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Related</h6>
+                </div>
+                <div class="card-body">
+                    {% if agent %}
+                    <div class="mb-2">
+                        <small class="text-muted d-block">Agent</small>
+                        <a href="{{ url_for('user_agent_detail', agent_id=agent.agent_id) }}">
+                            {{ agent.name }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if workflow %}
+                    <div class="mb-2">
+                        <small class="text-muted d-block">Workflow</small>
+                        <a href="{{ url_for('workflow_detail', workflow_id=workflow.workflow_id) }}">
+                            {{ workflow.name }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if execution %}
+                    <div class="mb-2">
+                        <small class="text-muted d-block">Execution</small>
+                        <a href="{{ url_for('execution_detail', execution_id=execution.execution_id) }}">
+                            {{ execution.execution_id[:20] }}...
+                        </a>
+                        <span class="badge bg-secondary">{{ execution.status }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Reassignment (Reviewers/Admins) -->
+            {% if (is_reviewer or is_admin) and task.status not in ['approved', 'rejected', 'cancelled', 'expired'] %}
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-people me-2"></i>Reassign Task</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('user_hitl_assign', task_id=task.task_id) }}">
+                        <div class="mb-3">
+                            <label class="form-label">Assign To</label>
+                            <select name="assign_to" class="form-select" required>
+                                <option value="">Select user...</option>
+                                {% for user in users %}
+                                <option value="{{ user.user_id }}" 
+                                        {% if user.user_id == task.assigned_to %}selected{% endif %}>
+                                    {{ user.fullname }} ({{ user.user_id }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Reason</label>
+                            <input type="text" name="reason" class="form-control" 
+                                   placeholder="Optional reason...">
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-person-plus me-1"></i>Reassign
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
