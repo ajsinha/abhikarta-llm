@@ -317,7 +317,7 @@ function previewTemplate(templateId) {
                     ${workflowHtml}
                     
                     <h6>LLM Configuration</h6>
-                    <pre class="bg-dark text-light p-3 rounded">${JSON.stringify(template.llm_config, null, 2)}</pre>
+                    <pre class="json-viewer">${JSON.stringify(template.llm_config, null, 2)}</pre>
                     
                     <h6>Tools</h6>
                     <div class="mb-3">

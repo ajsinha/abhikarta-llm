@@ -1,6 +1,6 @@
 # Abhikarta-LLM Documentation
 
-**Version:** 1.2.1  
+**Version:** 1.2.2  
 **Copyright:** © 2025-2030 Ashutosh Sinha. All Rights Reserved.
 
 ## Documentation Index
@@ -12,9 +12,21 @@
 | [DESIGN.md](DESIGN.md) | Architecture and design |
 | [REQUIREMENTS.md](REQUIREMENTS.md) | Requirements specification |
 
-## Version 1.2.1 Features
+## Version 1.2.2 Features
 
-### Tool View & Test Pages (NEW)
+### Actor System (NEW - Pekko-Inspired)
+- **ActorSystem**: Complete runtime for creating and managing millions of actors
+- **Actor Base Classes**: `Actor`, `TypedActor` with decorator-based handlers
+- **Message Patterns**: Tell (fire-and-forget), Ask (request-response), Forward
+- **Supervision Strategies**: OneForOneStrategy, AllForOneStrategy, ExponentialBackoff
+- **Dispatchers**: Default, Pinned, ForkJoin for different workloads
+- **Mailboxes**: Unbounded, Bounded (backpressure), Priority, ControlAware
+- **Patterns**: Router (load balancing), EventBus (pub/sub), CircuitBreaker, Stashing
+- **Scheduling**: Delayed and periodic message delivery
+- **Fault Tolerance**: Automatic restart, supervision hierarchies, death watch
+- **Acknowledgement**: Inspired by Apache Pekko (incubating)
+
+### Tool View & Test Pages
 - **Tool Detail Page** (`/tools/{name}`): Complete tool information with parameters, schema, and metadata
 - **Tool Test Page** (`/tools/{name}/test`): Form-based parameter input with type-specific controls
 - **JSON Schema Display**: View and copy complete tool schema
@@ -128,7 +140,7 @@
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.2.1 | Jan 2025 | Modular Database Delegates (9 delegates), DatabaseDelegate abstract class |
+| 1.2.2 | Jan 2025 | Modular Database Delegates (9 delegates), DatabaseDelegate abstract class |
 | 1.2.0 | Jan 2025 | Database Schema docs (22 tables), Page glossaries, Enhanced help |
 | 1.1.8 | Jan 2025 | Tool View/Test pages, dedicated tool detail UI, form-based testing |
 | 1.1.7 | Jan 2025 | Pre-built tools (85), Tools page, General tools, MCP auto-sync |

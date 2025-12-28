@@ -1,0 +1,1740 @@
+{% extends "help/help_base.html" %}
+
+{% block title %}Actor System - {{ app_name }}{% endblock %}
+
+{% block help_content %}
+<div class="help-content">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('help') }}">Help</a></li>
+            <li class="breadcrumb-item active">Actor System</li>
+        </ol>
+    </nav>
+
+    <h1><i class="bi bi-broadcast me-2"></i>Actor System</h1>
+    <p class="lead">
+        Build highly concurrent, distributed, and fault-tolerant AI agents using our Pekko-inspired actor framework.
+        Scale to millions of agents with message-driven, real-time processing.
+    </p>
+
+    <!-- Acknowledgement Alert -->
+    <div class="alert alert-info d-flex align-items-start" role="alert">
+        <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+        <div>
+            <h5 class="alert-heading mb-1">Apache Pekko Acknowledgement</h5>
+            <p class="mb-0 small">
+                This actor system is inspired by <strong>Apache Pekko</strong> (incubating), the open-source fork of Akka, 
+                licensed under the Apache License 2.0. We gratefully acknowledge the Apache Software Foundation and the 
+                Pekko community for their pioneering work in actor-based concurrency.
+                <a href="https://pekko.apache.org/" target="_blank" class="alert-link">Learn more about Apache Pekko →</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Key Benefits -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card h-100 border-0 bg-light">
+                <div class="card-body text-center">
+                    <i class="bi bi-lightning-charge text-warning fs-1 mb-3"></i>
+                    <h5>High Concurrency</h5>
+                    <p class="small text-muted mb-0">Run millions of actors concurrently with lightweight message passing</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 bg-light">
+                <div class="card-body text-center">
+                    <i class="bi bi-shield-check text-success fs-1 mb-3"></i>
+                    <h5>Fault Tolerant</h5>
+                    <p class="small text-muted mb-0">Supervision hierarchies automatically recover from failures</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 bg-light">
+                <div class="card-body text-center">
+                    <i class="bi bi-lock text-primary fs-1 mb-3"></i>
+                    <h5>Thread Safe</h5>
+                    <p class="small text-muted mb-0">No shared state, no locks, no race conditions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 bg-light">
+                <div class="card-body text-center">
+                    <i class="bi bi-arrows-expand text-info fs-1 mb-3"></i>
+                    <h5>Scalable</h5>
+                    <p class="small text-muted mb-0">Location-transparent actors scale across threads and machines</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Concepts -->
+    <h2 class="mt-5"><i class="bi bi-book me-2"></i>Core Concepts</h2>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Component</th>
+                    <th>Description</th>
+                    <th>Key Methods</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>Actor</code></td>
+                    <td>Base class for all actors. Processes messages one at a time with private state.</td>
+                    <td><code>receive()</code>, <code>pre_start()</code>, <code>post_stop()</code></td>
+                </tr>
+                <tr>
+                    <td><code>ActorRef</code></td>
+                    <td>Immutable, serializable reference to an actor for sending messages.</td>
+                    <td><code>tell()</code>, <code>ask()</code>, <code>forward()</code></td>
+                </tr>
+                <tr>
+                    <td><code>ActorSystem</code></td>
+                    <td>Container managing actors, dispatchers, and lifecycle.</td>
+                    <td><code>actor_of()</code>, <code>terminate()</code></td>
+                </tr>
+                <tr>
+                    <td><code>Props</code></td>
+                    <td>Immutable configuration for actor creation.</td>
+                    <td><code>with_dispatcher()</code>, <code>with_mailbox()</code></td>
+                </tr>
+                <tr>
+                    <td><code>Mailbox</code></td>
+                    <td>Message queue holding messages until actor processes them.</td>
+                    <td>Unbounded, Bounded, Priority</td>
+                </tr>
+                <tr>
+                    <td><code>Dispatcher</code></td>
+                    <td>Thread pool executing actor message processing.</td>
+                    <td>Default, Pinned, ForkJoin</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Quick Start -->
+    <h2 class="mt-5"><i class="bi bi-rocket-takeoff me-2"></i>Quick Start</h2>
+    
+    <h4>Hello World Actor</h4>
+    <pre><code class="language-python">from abhikarta.actor import Actor, ActorSystem, Props
+
+# 1. Define an Actor
+class GreeterActor(Actor):
+    def receive(self, message):
+        print(f"Hello, {message}!")
+
+# 2. Create an ActorSystem
+system = ActorSystem()
+
+# 3. Create an Actor
+greeter = system.actor_of(Props(GreeterActor), "greeter")
+
+# 4. Send a Message
+greeter.tell("World")  # Output: Hello, World!
+
+# 5. Cleanup
+system.terminate()</code></pre>
+
+    <h4 class="mt-4">Stateful Counter Actor</h4>
+    <pre><code class="language-python">from dataclasses import dataclass
+from abhikarta.actor import Actor, ActorSystem, Props
+
+@dataclass(frozen=True)
+class Increment:
+    amount: int = 1
+
+@dataclass(frozen=True)
+class GetCount:
+    pass
+
+class CounterActor(Actor):
+    def __init__(self, initial: int = 0):
+        super().__init__()
+        self.count = initial
+    
+    def receive(self, message):
+        if isinstance(message, Increment):
+            self.count += message.amount
+        elif isinstance(message, GetCount):
+            if self.sender:
+                self.sender.tell(self.count)
+
+# Usage
+with ActorSystem() as system:
+    counter = system.actor_of(Props(CounterActor), "counter")
+    counter.tell(Increment(5))
+    counter.tell(Increment(3))
+    
+    # Ask pattern (request-response)
+    future = counter.ask(GetCount())
+    print(f"Count: {future.result()}")  # Output: Count: 8</code></pre>
+
+    <h4 class="mt-4">TypedActor with Decorators</h4>
+    <pre><code class="language-python">from dataclasses import dataclass
+from abhikarta.actor import TypedActor, Props
+
+@dataclass(frozen=True)
+class Deposit:
+    amount: float
+
+@dataclass(frozen=True)
+class Withdraw:
+    amount: float
+
+class BankAccount(TypedActor):
+    def __init__(self):
+        super().__init__()
+        self.balance = 0.0
+    
+    @TypedActor.handler(Deposit)
+    def handle_deposit(self, msg: Deposit):
+        self.balance += msg.amount
+        print(f"Deposited ${msg.amount}, balance: ${self.balance}")
+    
+    @TypedActor.handler(Withdraw)
+    def handle_withdraw(self, msg: Withdraw):
+        if self.balance >= msg.amount:
+            self.balance -= msg.amount
+            print(f"Withdrew ${msg.amount}, balance: ${self.balance}")
+        else:
+            print(f"Insufficient funds!")</code></pre>
+
+    <!-- Supervision & Fault Tolerance -->
+    <h2 class="mt-5"><i class="bi bi-heart-pulse me-2"></i>Supervision & Fault Tolerance</h2>
+    <p>Actors are organized in hierarchies where parent actors supervise their children. When a child fails, the parent decides what to do.</p>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Supervision Strategies</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <td><code>OneForOneStrategy</code></td>
+                            <td>Only restart the failed child</td>
+                        </tr>
+                        <tr>
+                            <td><code>AllForOneStrategy</code></td>
+                            <td>Restart all children on any failure</td>
+                        </tr>
+                        <tr>
+                            <td><code>ExponentialBackoffStrategy</code></td>
+                            <td>Restart with increasing delays</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Directives</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <td><code>RESUME</code></td>
+                            <td>Continue processing, keep state</td>
+                        </tr>
+                        <tr>
+                            <td><code>RESTART</code></td>
+                            <td>Restart actor, clear state</td>
+                        </tr>
+                        <tr>
+                            <td><code>STOP</code></td>
+                            <td>Stop actor permanently</td>
+                        </tr>
+                        <tr>
+                            <td><code>ESCALATE</code></td>
+                            <td>Escalate to parent supervisor</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <pre><code class="language-python">from abhikarta.actor import OneForOneStrategy, Directive, Props
+
+# Create supervision strategy
+strategy = OneForOneStrategy(
+    max_restarts=10,
+    within_time=60.0,
+    decider=lambda exception: Directive.RESTART
+)
+
+# Apply to actor props
+props = Props(MyWorkerActor).with_supervisor(strategy)</code></pre>
+
+    <!-- Common Patterns -->
+    <h2 class="mt-5"><i class="bi bi-puzzle me-2"></i>Common Patterns</h2>
+
+    <div class="accordion" id="patternsAccordion">
+        <!-- Router Pattern -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#routerPattern">
+                    <i class="bi bi-diagram-3 me-2"></i>Router (Load Balancing)
+                </button>
+            </h2>
+            <div id="routerPattern" class="accordion-collapse collapse show" data-bs-parent="#patternsAccordion">
+                <div class="accordion-body">
+                    <p>Distribute work across a pool of worker actors.</p>
+                    <pre><code>from abhikarta.actor import RouterActor, RoundRobinLogic, Props
+
+# Create router with 8 workers
+router = system.actor_of(
+    Props(RouterActor, args=(
+        Props(WorkerActor),  # Worker props
+        8,                    # Number of workers
+        RoundRobinLogic()    # Routing: RoundRobin, Random, Broadcast
+    )),
+    "router"
+)
+
+# Messages distributed to workers
+for task in tasks:
+    router.tell(task)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Bus Pattern -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#eventBusPattern">
+                    <i class="bi bi-rss me-2"></i>Event Bus (Pub/Sub)
+                </button>
+            </h2>
+            <div id="eventBusPattern" class="accordion-collapse collapse" data-bs-parent="#patternsAccordion">
+                <div class="accordion-body">
+                    <p>Publish-subscribe messaging for decoupled communication.</p>
+                    <pre><code>from abhikarta.actor import EventBus
+
+bus = EventBus()
+
+# Subscribe actors to event types
+bus.subscribe(order_processor, OrderEvent)
+bus.subscribe(notification_sender, OrderEvent)
+bus.subscribe(analytics_collector, OrderEvent)
+
+# Publish events - all subscribers notified
+bus.publish(OrderEvent(order_id=123, amount=99.99))</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Circuit Breaker Pattern -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#circuitBreakerPattern">
+                    <i class="bi bi-lightning me-2"></i>Circuit Breaker
+                </button>
+            </h2>
+            <div id="circuitBreakerPattern" class="accordion-collapse collapse" data-bs-parent="#patternsAccordion">
+                <div class="accordion-body">
+                    <p>Protect against cascading failures by failing fast when a service is unhealthy.</p>
+                    <pre><code>from abhikarta.actor import CircuitBreaker
+
+breaker = CircuitBreaker(
+    max_failures=5,
+    reset_timeout=30.0
+)
+
+if breaker.allow_request():
+    try:
+        result = call_external_service()
+        breaker.record_success()
+    except Exception:
+        breaker.record_failure()
+else:
+    # Circuit open - fail fast
+    return fallback_response()</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Agent Pattern -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#aiAgentPattern">
+                    <i class="bi bi-robot me-2"></i>AI Agent as Actor
+                </button>
+            </h2>
+            <div id="aiAgentPattern" class="accordion-collapse collapse" data-bs-parent="#patternsAccordion">
+                <div class="accordion-body">
+                    <p>Implement AI agents as actors for concurrent LLM processing.</p>
+                    <pre><code>from abhikarta.actor import Actor, Props, StashingActor
+
+class LLMAgentActor(StashingActor):
+    """AI Agent that processes queries using LLM."""
+    
+    def __init__(self, llm_facade, model):
+        super().__init__()
+        self.llm = llm_facade
+        self.model = model
+        self.processing = False
+    
+    def receive(self, message):
+        if isinstance(message, AgentQuery):
+            if self.processing:
+                self.stash()  # Queue while busy
+            else:
+                self.process_query(message)
+        elif isinstance(message, LLMResponse):
+            self.complete_query(message)
+    
+    def process_query(self, query):
+        self.processing = True
+        # Async LLM call
+        response = self.llm.complete(self.model, query.prompt)
+        if self.sender:
+            self.sender.tell(AgentResponse(response))
+        self.processing = False
+        self.unstash()  # Process next queued message</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dispatcher & Mailbox Selection -->
+    <h2 class="mt-5"><i class="bi bi-sliders me-2"></i>Configuration Options</h2>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Dispatcher Types</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>Default</code></td>
+                                <td>General purpose, shared thread pool</td>
+                            </tr>
+                            <tr>
+                                <td><code>Pinned</code></td>
+                                <td>Blocking I/O, dedicated thread per actor</td>
+                            </tr>
+                            <tr>
+                                <td><code>ForkJoin</code></td>
+                                <td>CPU-bound, work-stealing</td>
+                            </tr>
+                            <tr>
+                                <td><code>CallingThread</code></td>
+                                <td>Testing, synchronous execution</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Mailbox Types</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>Unbounded</code></td>
+                                <td>Default, unlimited queue size</td>
+                            </tr>
+                            <tr>
+                                <td><code>Bounded</code></td>
+                                <td>Backpressure, fixed capacity</td>
+                            </tr>
+                            <tr>
+                                <td><code>Priority</code></td>
+                                <td>High-priority messages first</td>
+                            </tr>
+                            <tr>
+                                <td><code>ControlAware</code></td>
+                                <td>System messages prioritized</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Practices -->
+    <h2 class="mt-5"><i class="bi bi-check2-square me-2"></i>Best Practices</h2>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-check-circle me-2"></i>Do
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="bi bi-check text-success me-2"></i>Use immutable messages (<code>@dataclass(frozen=True)</code>)</li>
+                    <li class="list-group-item"><i class="bi bi-check text-success me-2"></i>Keep actor state private</li>
+                    <li class="list-group-item"><i class="bi bi-check text-success me-2"></i>Prefer <code>tell</code> over <code>ask</code></li>
+                    <li class="list-group-item"><i class="bi bi-check text-success me-2"></i>Let actors crash, use supervision</li>
+                    <li class="list-group-item"><i class="bi bi-check text-success me-2"></i>Use Props for configuration</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-x-circle me-2"></i>Avoid
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="bi bi-x text-danger me-2"></i>Shared mutable state between actors</li>
+                    <li class="list-group-item"><i class="bi bi-x text-danger me-2"></i>Blocking calls inside <code>receive()</code></li>
+                    <li class="list-group-item"><i class="bi bi-x text-danger me-2"></i>Swallowing exceptions silently</li>
+                    <li class="list-group-item"><i class="bi bi-x text-danger me-2"></i>Synchronous <code>ask</code> in actor code</li>
+                    <li class="list-group-item"><i class="bi bi-x text-danger me-2"></i>Global state or singletons</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integration with Abhikarta -->
+    <h2 class="mt-5"><i class="bi bi-plug me-2"></i>Integration with Abhikarta</h2>
+    <p class="lead">The Actor System integrates seamlessly with Abhikarta's workflow engine and agent framework to provide concurrent, fault-tolerant execution at scale.</p>
+
+    <!-- Workflow as Actor Example -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-diagram-2 me-2"></i>Running Workflows with Actors</h5>
+        </div>
+        <div class="card-body">
+            <p>Each workflow node can be executed as an independent actor, enabling parallel execution of independent branches, fault isolation per node, and automatic retry with supervision.</p>
+            
+            <h6 class="mt-3"><i class="bi bi-info-circle me-2"></i>How It Works</h6>
+            <ol>
+                <li><strong>Workflow Coordinator Actor</strong> - Manages overall workflow state and orchestrates node execution</li>
+                <li><strong>Node Actors</strong> - Each DAG node runs as an independent actor processing its task</li>
+                <li><strong>Message Passing</strong> - Nodes communicate results via messages, not shared state</li>
+                <li><strong>Supervision</strong> - Failed nodes can be restarted or escalated without affecting other nodes</li>
+            </ol>
+
+            <h6 class="mt-4"><i class="bi bi-code-slash me-2"></i>Complete Example: Loan Application Workflow</h6>
+<pre><code>"""
+Workflow Execution Using Actor System
+
+This example demonstrates running a loan application workflow where each
+processing step runs as an independent actor. The actor model provides:
+- Parallel execution of independent steps (e.g., credit check + income verification)
+- Fault isolation (a failing step doesn't crash the entire workflow)
+- Automatic retry with supervision strategies
+- Real-time progress tracking via messages
+"""
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
+from enum import Enum
+import asyncio
+
+from abhikarta.actor import (
+    Actor, TypedActor, ActorSystem, ActorRef, Props,
+    get_actor_system, OneForOneStrategy, Directive,
+    PoisonPill, Terminated
+)
+
+
+# =============================================================================
+# Message Definitions (Immutable)
+# =============================================================================
+
+class NodeStatus(Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+@dataclass(frozen=True)
+class StartWorkflow:
+    """Message to initiate workflow execution"""
+    workflow_id: str
+    input_data: Dict[str, Any]
+    reply_to: Optional[ActorRef] = None
+
+
+@dataclass(frozen=True)
+class ExecuteNode:
+    """Message to execute a specific workflow node"""
+    node_id: str
+    node_type: str
+    config: Dict[str, Any]
+    input_data: Dict[str, Any]
+
+
+@dataclass(frozen=True)
+class NodeCompleted:
+    """Message sent when a node completes successfully"""
+    node_id: str
+    output_data: Dict[str, Any]
+    execution_time_ms: float
+
+
+@dataclass(frozen=True)
+class NodeFailed:
+    """Message sent when a node fails"""
+    node_id: str
+    error: str
+    retry_count: int
+
+
+@dataclass(frozen=True)
+class WorkflowCompleted:
+    """Message sent when entire workflow completes"""
+    workflow_id: str
+    final_output: Dict[str, Any]
+    total_time_ms: float
+
+
+# =============================================================================
+# Node Actors - Each workflow node type is an actor
+# =============================================================================
+
+class CreditCheckActor(Actor):
+    """
+    Actor that performs credit score verification.
+    
+    This actor simulates calling an external credit bureau API.
+    In production, this would make actual API calls.
+    """
+    
+    def receive(self, message):
+        if isinstance(message, ExecuteNode):
+            self.log.info(f"Performing credit check for: {message.input_data.get('applicant_name')}")
+            
+            try:
+                # Simulate credit check processing
+                import time
+                start = time.time()
+                
+                # In production: call credit bureau API
+                ssn = message.input_data.get('ssn', '')
+                credit_score = self._check_credit(ssn)
+                
+                elapsed = (time.time() - start) * 1000
+                
+                # Send result back to coordinator
+                self.sender.tell(NodeCompleted(
+                    node_id=message.node_id,
+                    output_data={
+                        'credit_score': credit_score,
+                        'credit_tier': 'excellent' if credit_score >= 750 else 'good' if credit_score >= 700 else 'fair',
+                        'approved_for_credit': credit_score >= 650
+                    },
+                    execution_time_ms=elapsed
+                ))
+                
+            except Exception as e:
+                self.sender.tell(NodeFailed(
+                    node_id=message.node_id,
+                    error=str(e),
+                    retry_count=getattr(self, 'retry_count', 0)
+                ))
+    
+    def _check_credit(self, ssn: str) -> int:
+        """Simulate credit score lookup"""
+        import hashlib
+        # Generate deterministic score based on SSN hash
+        hash_val = int(hashlib.md5(ssn.encode()).hexdigest()[:8], 16)
+        return 550 + (hash_val % 300)  # Score between 550-850
+
+
+class IncomeVerificationActor(Actor):
+    """
+    Actor that verifies applicant income.
+    
+    Runs in parallel with credit check since they're independent.
+    """
+    
+    def receive(self, message):
+        if isinstance(message, ExecuteNode):
+            self.log.info(f"Verifying income for: {message.input_data.get('applicant_name')}")
+            
+            try:
+                import time
+                start = time.time()
+                
+                stated_income = message.input_data.get('annual_income', 0)
+                employer = message.input_data.get('employer', '')
+                
+                # Simulate income verification
+                verified_income = self._verify_income(employer, stated_income)
+                
+                elapsed = (time.time() - start) * 1000
+                
+                self.sender.tell(NodeCompleted(
+                    node_id=message.node_id,
+                    output_data={
+                        'stated_income': stated_income,
+                        'verified_income': verified_income,
+                        'income_verified': abs(verified_income - stated_income) / stated_income < 0.1,
+                        'debt_to_income_ratio': message.input_data.get('monthly_debt', 0) * 12 / verified_income
+                    },
+                    execution_time_ms=elapsed
+                ))
+                
+            except Exception as e:
+                self.sender.tell(NodeFailed(
+                    node_id=message.node_id,
+                    error=str(e),
+                    retry_count=0
+                ))
+    
+    def _verify_income(self, employer: str, stated: float) -> float:
+        """Simulate income verification with employer"""
+        import random
+        variance = random.uniform(0.95, 1.05)
+        return stated * variance
+
+
+class DecisionEngineActor(Actor):
+    """
+    Actor that makes the final loan decision.
+    
+    Waits for both credit check and income verification to complete
+    before making a decision.
+    """
+    
+    def receive(self, message):
+        if isinstance(message, ExecuteNode):
+            self.log.info("Running decision engine")
+            
+            try:
+                import time
+                start = time.time()
+                
+                credit_data = message.input_data.get('credit_check', {})
+                income_data = message.input_data.get('income_verification', {})
+                loan_amount = message.input_data.get('loan_amount', 0)
+                
+                # Make decision based on aggregated data
+                decision = self._make_decision(credit_data, income_data, loan_amount)
+                
+                elapsed = (time.time() - start) * 1000
+                
+                self.sender.tell(NodeCompleted(
+                    node_id=message.node_id,
+                    output_data=decision,
+                    execution_time_ms=elapsed
+                ))
+                
+            except Exception as e:
+                self.sender.tell(NodeFailed(
+                    node_id=message.node_id,
+                    error=str(e),
+                    retry_count=0
+                ))
+    
+    def _make_decision(self, credit: dict, income: dict, amount: float) -> dict:
+        """Apply business rules to make loan decision"""
+        approved = (
+            credit.get('approved_for_credit', False) and
+            income.get('income_verified', False) and
+            income.get('debt_to_income_ratio', 1.0) < 0.43
+        )
+        
+        # Calculate interest rate based on credit tier
+        tier = credit.get('credit_tier', 'fair')
+        base_rate = {'excellent': 5.5, 'good': 7.0, 'fair': 9.5}.get(tier, 12.0)
+        
+        return {
+            'approved': approved,
+            'loan_amount': amount if approved else 0,
+            'interest_rate': base_rate if approved else None,
+            'decision_reason': 'All criteria met' if approved else 'Does not meet lending criteria',
+            'conditions': ['Proof of insurance required', 'Auto-debit enrollment'] if approved else []
+        }
+
+
+# =============================================================================
+# Workflow Coordinator Actor
+# =============================================================================
+
+class WorkflowCoordinatorActor(Actor):
+    """
+    Coordinator actor that orchestrates the entire workflow.
+    
+    Responsibilities:
+    - Parse workflow DAG and identify node dependencies
+    - Spawn node actors and track their lifecycle
+    - Route messages between nodes
+    - Handle node failures with retry logic
+    - Aggregate results and report workflow completion
+    """
+    
+    def pre_start(self):
+        """Initialize coordinator state"""
+        self.workflow_id = None
+        self.input_data = {}
+        self.reply_to = None
+        self.node_actors = {}  # node_id -> ActorRef
+        self.node_status = {}  # node_id -> NodeStatus
+        self.node_results = {}  # node_id -> output_data
+        self.pending_dependencies = {}  # node_id -> set of dependency node_ids
+        self.start_time = None
+    
+    def receive(self, message):
+        if isinstance(message, StartWorkflow):
+            self._start_workflow(message)
+        elif isinstance(message, NodeCompleted):
+            self._handle_node_completed(message)
+        elif isinstance(message, NodeFailed):
+            self._handle_node_failed(message)
+        elif isinstance(message, Terminated):
+            self._handle_actor_terminated(message)
+    
+    def _start_workflow(self, msg: StartWorkflow):
+        """Initialize and start the workflow"""
+        import time
+        self.workflow_id = msg.workflow_id
+        self.input_data = msg.input_data
+        self.reply_to = msg.reply_to
+        self.start_time = time.time()
+        
+        self.log.info(f"Starting workflow: {self.workflow_id}")
+        
+        # Define workflow DAG (in production, loaded from database)
+        # This loan workflow has parallel branches that merge at decision
+        workflow_dag = {
+            'credit_check': {
+                'actor_class': CreditCheckActor,
+                'dependencies': [],
+                'config': {}
+            },
+            'income_verification': {
+                'actor_class': IncomeVerificationActor,
+                'dependencies': [],
+                'config': {}
+            },
+            'decision_engine': {
+                'actor_class': DecisionEngineActor,
+                'dependencies': ['credit_check', 'income_verification'],
+                'config': {}
+            }
+        }
+        
+        # Initialize tracking structures
+        for node_id, node_def in workflow_dag.items():
+            self.node_status[node_id] = NodeStatus.PENDING
+            self.pending_dependencies[node_id] = set(node_def['dependencies'])
+            
+            # Create node actor with supervision
+            props = Props(
+                actor_class=node_def['actor_class'],
+                dispatcher='io-dispatcher'  # Use I/O dispatcher for external calls
+            )
+            actor_ref = self.context.actor_of(props, node_id)
+            self.node_actors[node_id] = actor_ref
+            
+            # Watch for actor termination
+            self.context.watch(actor_ref)
+        
+        # Start nodes with no dependencies
+        self._execute_ready_nodes()
+    
+    def _execute_ready_nodes(self):
+        """Execute all nodes whose dependencies are satisfied"""
+        for node_id, deps in self.pending_dependencies.items():
+            if len(deps) == 0 and self.node_status[node_id] == NodeStatus.PENDING:
+                self._execute_node(node_id)
+    
+    def _execute_node(self, node_id: str):
+        """Send execution message to a node actor"""
+        self.node_status[node_id] = NodeStatus.RUNNING
+        
+        # Gather input from dependencies
+        node_input = dict(self.input_data)
+        for completed_node, result in self.node_results.items():
+            node_input[completed_node] = result
+        
+        # Send execute message
+        self.node_actors[node_id].tell(ExecuteNode(
+            node_id=node_id,
+            node_type='processor',
+            config={},
+            input_data=node_input
+        ), sender=self.self)
+        
+        self.log.info(f"Executing node: {node_id}")
+    
+    def _handle_node_completed(self, msg: NodeCompleted):
+        """Handle successful node completion"""
+        self.node_status[msg.node_id] = NodeStatus.COMPLETED
+        self.node_results[msg.node_id] = msg.output_data
+        
+        self.log.info(f"Node completed: {msg.node_id} ({msg.execution_time_ms:.1f}ms)")
+        
+        # Update dependencies for downstream nodes
+        for node_id, deps in self.pending_dependencies.items():
+            deps.discard(msg.node_id)
+        
+        # Check if workflow is complete
+        if all(s == NodeStatus.COMPLETED for s in self.node_status.values()):
+            self._complete_workflow()
+        else:
+            # Execute newly ready nodes
+            self._execute_ready_nodes()
+    
+    def _handle_node_failed(self, msg: NodeFailed):
+        """Handle node failure with potential retry"""
+        self.log.error(f"Node failed: {msg.node_id} - {msg.error}")
+        
+        if msg.retry_count < 3:
+            # Retry the node
+            self.log.info(f"Retrying node: {msg.node_id} (attempt {msg.retry_count + 1})")
+            self.node_status[msg.node_id] = NodeStatus.PENDING
+            self._execute_node(msg.node_id)
+        else:
+            # Mark as failed and abort workflow
+            self.node_status[msg.node_id] = NodeStatus.FAILED
+            self._abort_workflow(f"Node {msg.node_id} failed after 3 retries: {msg.error}")
+    
+    def _handle_actor_terminated(self, msg: Terminated):
+        """Handle unexpected actor termination"""
+        for node_id, ref in self.node_actors.items():
+            if ref == msg.actor_ref:
+                self.log.error(f"Node actor terminated unexpectedly: {node_id}")
+                self.node_status[node_id] = NodeStatus.FAILED
+                break
+    
+    def _complete_workflow(self):
+        """Finalize successful workflow completion"""
+        import time
+        elapsed = (time.time() - self.start_time) * 1000
+        
+        # Final output is the decision engine result
+        final_output = self.node_results.get('decision_engine', {})
+        
+        self.log.info(f"Workflow completed: {self.workflow_id} ({elapsed:.1f}ms)")
+        
+        if self.reply_to:
+            self.reply_to.tell(WorkflowCompleted(
+                workflow_id=self.workflow_id,
+                final_output=final_output,
+                total_time_ms=elapsed
+            ))
+        
+        # Cleanup: stop all node actors
+        for actor in self.node_actors.values():
+            actor.tell(PoisonPill())
+    
+    def _abort_workflow(self, reason: str):
+        """Abort workflow due to unrecoverable failure"""
+        self.log.error(f"Workflow aborted: {self.workflow_id} - {reason}")
+        
+        # Cleanup
+        for actor in self.node_actors.values():
+            actor.tell(PoisonPill())
+
+
+# =============================================================================
+# Usage Example
+# =============================================================================
+
+def run_loan_workflow():
+    """
+    Run the loan application workflow using the actor system.
+    """
+    # Get the global actor system (started by run_server.py)
+    system = get_actor_system()
+    
+    # Create coordinator with supervision strategy
+    strategy = OneForOneStrategy(
+        max_retries=3,
+        within_time_range=60.0,
+        decider=lambda e: Directive.RESTART if isinstance(e, ConnectionError) else Directive.STOP
+    )
+    
+    props = Props(
+        actor_class=WorkflowCoordinatorActor,
+        supervision_strategy=strategy
+    )
+    coordinator = system.actor_of(props, "loan-workflow-coordinator")
+    
+    # Start the workflow
+    coordinator.tell(StartWorkflow(
+        workflow_id="LOAN-2024-001",
+        input_data={
+            'applicant_name': 'John Doe',
+            'ssn': '123-45-6789',
+            'annual_income': 85000,
+            'employer': 'Acme Corp',
+            'monthly_debt': 1500,
+            'loan_amount': 250000
+        }
+    ))
+    
+    return coordinator
+
+
+# Run it
+if __name__ == '__main__':
+    coordinator = run_loan_workflow()</code></pre>
+
+            <div class="alert alert-success mt-3">
+                <h6><i class="bi bi-lightning-charge me-2"></i>Key Benefits</h6>
+                <ul class="mb-0">
+                    <li><strong>Parallel Execution:</strong> Credit check and income verification run simultaneously</li>
+                    <li><strong>Fault Isolation:</strong> A failed credit check doesn't affect income verification</li>
+                    <li><strong>Automatic Retry:</strong> Supervision strategy handles transient failures</li>
+                    <li><strong>Progress Tracking:</strong> Each node reports completion via messages</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent as Actor Example -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-robot me-2"></i>Running AI Agents with Actors</h5>
+        </div>
+        <div class="card-body">
+            <p>AI agents benefit tremendously from the actor model. Each agent runs in isolation with its own conversation state, tool access, and LLM connection, enabling massive concurrent agent execution.</p>
+            
+            <h6 class="mt-3"><i class="bi bi-info-circle me-2"></i>Architecture</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul>
+                        <li><strong>Agent Actor</strong> - Encapsulates agent logic, conversation state, and tool execution</li>
+                        <li><strong>LLM Pool Actor</strong> - Manages concurrent LLM API calls with rate limiting</li>
+                        <li><strong>Tool Executor Actor</strong> - Runs tool calls in isolated actors</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul>
+                        <li><strong>Session Manager</strong> - Routes user messages to appropriate agent actors</li>
+                        <li><strong>Circuit Breaker</strong> - Protects against LLM API failures</li>
+                        <li><strong>Event Bus</strong> - Broadcasts agent events for monitoring</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h6 class="mt-4"><i class="bi bi-code-slash me-2"></i>Complete Example: Customer Service Agent</h6>
+<pre><code>"""
+AI Agent Execution Using Actor System
+
+This example demonstrates running AI agents as actors, providing:
+- Isolated conversation state per user session
+- Concurrent tool execution
+- LLM API rate limiting and circuit breaking
+- Real-time streaming responses
+- Automatic recovery from failures
+"""
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Callable
+from enum import Enum
+import asyncio
+import time
+
+from abhikarta.actor import (
+    Actor, TypedActor, ActorSystem, ActorRef, Props,
+    get_actor_system, OneForOneStrategy, Directive,
+    CircuitBreaker, EventBus, StashingActor,
+    PoisonPill, ReceiveTimeout
+)
+
+
+# =============================================================================
+# Message Definitions
+# =============================================================================
+
+@dataclass(frozen=True)
+class UserMessage:
+    """Incoming message from user"""
+    session_id: str
+    content: str
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class AgentResponse:
+    """Response from agent to user"""
+    session_id: str
+    content: str
+    tool_calls: List[Dict[str, Any]] = field(default_factory=list)
+    thinking: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class StreamChunk:
+    """Streaming response chunk"""
+    session_id: str
+    chunk: str
+    is_final: bool = False
+
+
+@dataclass(frozen=True)
+class ExecuteTool:
+    """Request to execute a tool"""
+    tool_name: str
+    arguments: Dict[str, Any]
+    request_id: str
+
+
+@dataclass(frozen=True)
+class ToolResult:
+    """Result from tool execution"""
+    request_id: str
+    tool_name: str
+    result: Any
+    success: bool
+    error: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class LLMRequest:
+    """Request to call LLM API"""
+    messages: List[Dict[str, str]]
+    model: str
+    temperature: float = 0.7
+    max_tokens: int = 4096
+    tools: Optional[List[Dict]] = None
+    stream: bool = False
+
+
+@dataclass(frozen=True)
+class LLMResponse:
+    """Response from LLM API"""
+    content: str
+    tool_calls: List[Dict[str, Any]] = field(default_factory=list)
+    usage: Dict[str, int] = field(default_factory=dict)
+
+
+# =============================================================================
+# Tool Executor Actor
+# =============================================================================
+
+class ToolExecutorActor(Actor):
+    """
+    Actor that executes tool calls in isolation.
+    
+    Each tool call runs in its own actor, providing:
+    - Fault isolation (failing tool doesn't crash agent)
+    - Timeout handling
+    - Automatic retry for transient failures
+    """
+    
+    def __init__(self, tools_registry):
+        super().__init__()
+        self.tools_registry = tools_registry
+    
+    def receive(self, message):
+        if isinstance(message, ExecuteTool):
+            self._execute_tool(message)
+    
+    def _execute_tool(self, msg: ExecuteTool):
+        """Execute the requested tool"""
+        try:
+            self.log.info(f"Executing tool: {msg.tool_name}")
+            
+            # Get tool from registry
+            tool = self.tools_registry.get_tool(msg.tool_name)
+            if not tool:
+                raise ValueError(f"Unknown tool: {msg.tool_name}")
+            
+            # Execute tool
+            result = tool.execute(**msg.arguments)
+            
+            self.sender.tell(ToolResult(
+                request_id=msg.request_id,
+                tool_name=msg.tool_name,
+                result=result,
+                success=True
+            ))
+            
+        except Exception as e:
+            self.log.error(f"Tool execution failed: {msg.tool_name} - {e}")
+            self.sender.tell(ToolResult(
+                request_id=msg.request_id,
+                tool_name=msg.tool_name,
+                result=None,
+                success=False,
+                error=str(e)
+            ))
+
+
+# =============================================================================
+# LLM Pool Actor with Circuit Breaker
+# =============================================================================
+
+class LLMPoolActor(Actor):
+    """
+    Actor pool for LLM API calls with built-in circuit breaker.
+    
+    Features:
+    - Rate limiting to avoid API throttling
+    - Circuit breaker for API outages
+    - Request queuing during rate limits
+    - Automatic failover to backup models
+    """
+    
+    def __init__(self, llm_facade, max_concurrent: int = 10):
+        super().__init__()
+        self.llm_facade = llm_facade
+        self.max_concurrent = max_concurrent
+        self.active_requests = 0
+        self.request_queue = []
+        
+        # Circuit breaker: opens after 5 failures, resets after 30s
+        self.circuit_breaker = CircuitBreaker(
+            max_failures=5,
+            call_timeout=30.0,
+            reset_timeout=30.0
+        )
+    
+    def receive(self, message):
+        if isinstance(message, LLMRequest):
+            self._handle_llm_request(message)
+    
+    def _handle_llm_request(self, msg: LLMRequest):
+        """Process LLM request with circuit breaker protection"""
+        
+        # Check circuit breaker
+        if not self.circuit_breaker.allow_request():
+            self.log.warning("Circuit breaker open, queueing request")
+            self.request_queue.append((msg, self.sender))
+            return
+        
+        # Check rate limit
+        if self.active_requests >= self.max_concurrent:
+            self.log.info("Rate limit reached, queueing request")
+            self.request_queue.append((msg, self.sender))
+            return
+        
+        self._execute_llm_call(msg, self.sender)
+    
+    def _execute_llm_call(self, msg: LLMRequest, reply_to: ActorRef):
+        """Execute the actual LLM API call"""
+        self.active_requests += 1
+        
+        try:
+            # Call LLM via facade
+            response = self.llm_facade.generate(
+                messages=msg.messages,
+                model=msg.model,
+                temperature=msg.temperature,
+                max_tokens=msg.max_tokens,
+                tools=msg.tools
+            )
+            
+            self.circuit_breaker.record_success()
+            
+            reply_to.tell(LLMResponse(
+                content=response.content,
+                tool_calls=response.tool_calls or [],
+                usage=response.usage or {}
+            ))
+            
+        except Exception as e:
+            self.log.error(f"LLM call failed: {e}")
+            self.circuit_breaker.record_failure()
+            
+            # Return error response
+            reply_to.tell(LLMResponse(
+                content=f"Error: {str(e)}",
+                tool_calls=[],
+                usage={}
+            ))
+        
+        finally:
+            self.active_requests -= 1
+            self._process_queue()
+    
+    def _process_queue(self):
+        """Process queued requests"""
+        if self.request_queue and self.active_requests < self.max_concurrent:
+            msg, reply_to = self.request_queue.pop(0)
+            self._execute_llm_call(msg, reply_to)
+
+
+# =============================================================================
+# AI Agent Actor
+# =============================================================================
+
+class CustomerServiceAgentActor(StashingActor):
+    """
+    AI Agent implemented as an actor.
+    
+    This agent handles customer service inquiries with:
+    - Persistent conversation state
+    - Tool calling (account lookup, order status, etc.)
+    - Streaming responses
+    - Graceful handling of LLM failures
+    
+    Uses StashingActor to queue messages while waiting for LLM/tool responses.
+    """
+    
+    def __init__(self, llm_pool: ActorRef, tool_executor: ActorRef, agent_config: dict):
+        super().__init__()
+        self.llm_pool = llm_pool
+        self.tool_executor = tool_executor
+        self.config = agent_config
+        
+        # Conversation state
+        self.session_id = None
+        self.conversation_history = []
+        self.pending_tool_calls = {}
+        self.waiting_for_llm = False
+        self.reply_to = None
+        
+        # Agent configuration
+        self.system_prompt = agent_config.get('system_prompt', self._default_system_prompt())
+        self.model = agent_config.get('model', 'gpt-4o')
+        self.tools = agent_config.get('tools', [])
+    
+    def _default_system_prompt(self) -> str:
+        return """You are a helpful customer service agent for Acme Corporation.
+        
+Your responsibilities:
+- Help customers with order inquiries and status updates
+- Assist with account-related questions
+- Handle product returns and exchanges
+- Escalate complex issues to human agents when needed
+
+Always be polite, professional, and helpful. If you need to look up information,
+use the available tools. If you cannot help with something, apologize and offer
+to connect them with a human agent."""
+    
+    def receive(self, message):
+        if isinstance(message, UserMessage):
+            self._handle_user_message(message)
+        elif isinstance(message, LLMResponse):
+            self._handle_llm_response(message)
+        elif isinstance(message, ToolResult):
+            self._handle_tool_result(message)
+        elif isinstance(message, ReceiveTimeout):
+            self._handle_timeout()
+    
+    def _handle_user_message(self, msg: UserMessage):
+        """Process incoming user message"""
+        self.session_id = msg.session_id
+        self.reply_to = self.sender
+        
+        # Add to conversation history
+        self.conversation_history.append({
+            'role': 'user',
+            'content': msg.content
+        })
+        
+        self.log.info(f"[{self.session_id}] User: {msg.content[:50]}...")
+        
+        # If waiting for LLM, stash this message
+        if self.waiting_for_llm:
+            self.stash()
+            return
+        
+        # Request LLM response
+        self._request_llm_response()
+    
+    def _request_llm_response(self):
+        """Send request to LLM pool"""
+        self.waiting_for_llm = True
+        
+        # Build messages with system prompt
+        messages = [{'role': 'system', 'content': self.system_prompt}]
+        messages.extend(self.conversation_history)
+        
+        # Convert tools to OpenAI format
+        tool_definitions = [
+            {
+                'type': 'function',
+                'function': {
+                    'name': t['name'],
+                    'description': t['description'],
+                    'parameters': t.get('parameters', {})
+                }
+            }
+            for t in self.tools
+        ]
+        
+        self.llm_pool.tell(LLMRequest(
+            messages=messages,
+            model=self.model,
+            temperature=0.7,
+            tools=tool_definitions if tool_definitions else None
+        ), sender=self.self)
+        
+        # Set timeout for LLM response
+        self.context.set_receive_timeout(60.0)
+    
+    def _handle_llm_response(self, msg: LLMResponse):
+        """Process LLM response, potentially with tool calls"""
+        self.waiting_for_llm = False
+        self.context.cancel_receive_timeout()
+        
+        # Check for tool calls
+        if msg.tool_calls:
+            self.log.info(f"[{self.session_id}] Agent requesting {len(msg.tool_calls)} tool calls")
+            
+            # Execute each tool call
+            for tool_call in msg.tool_calls:
+                request_id = tool_call.get('id', str(time.time()))
+                self.pending_tool_calls[request_id] = tool_call
+                
+                self.tool_executor.tell(ExecuteTool(
+                    tool_name=tool_call['function']['name'],
+                    arguments=tool_call['function'].get('arguments', {}),
+                    request_id=request_id
+                ), sender=self.self)
+            
+            # Stash incoming messages while waiting for tools
+            return
+        
+        # No tool calls - send response to user
+        self._send_response(msg.content)
+    
+    def _handle_tool_result(self, msg: ToolResult):
+        """Process tool execution result"""
+        if msg.request_id not in self.pending_tool_calls:
+            return
+        
+        tool_call = self.pending_tool_calls.pop(msg.request_id)
+        
+        # Add tool result to conversation
+        self.conversation_history.append({
+            'role': 'assistant',
+            'content': None,
+            'tool_calls': [tool_call]
+        })
+        self.conversation_history.append({
+            'role': 'tool',
+            'tool_call_id': msg.request_id,
+            'content': str(msg.result) if msg.success else f"Error: {msg.error}"
+        })
+        
+        self.log.info(f"[{self.session_id}] Tool {msg.tool_name}: {'success' if msg.success else 'failed'}")
+        
+        # If all tools complete, request another LLM response
+        if not self.pending_tool_calls:
+            self._request_llm_response()
+    
+    def _handle_timeout(self):
+        """Handle LLM response timeout"""
+        self.log.error(f"[{self.session_id}] LLM response timeout")
+        self.waiting_for_llm = False
+        self._send_response("I apologize, but I'm experiencing technical difficulties. Please try again in a moment.")
+    
+    def _send_response(self, content: str):
+        """Send final response to user"""
+        # Add to history
+        self.conversation_history.append({
+            'role': 'assistant',
+            'content': content
+        })
+        
+        self.log.info(f"[{self.session_id}] Agent: {content[:50]}...")
+        
+        # Send response
+        if self.reply_to:
+            self.reply_to.tell(AgentResponse(
+                session_id=self.session_id,
+                content=content
+            ))
+        
+        # Process any stashed messages
+        self.unstash_all()
+
+
+# =============================================================================
+# Session Manager Actor
+# =============================================================================
+
+class SessionManagerActor(Actor):
+    """
+    Manages user sessions and routes messages to appropriate agent actors.
+    
+    Features:
+    - Creates agent actor per session on first message
+    - Routes subsequent messages to existing agents
+    - Handles session expiration and cleanup
+    - Load balancing across agent actors
+    """
+    
+    def __init__(self, llm_pool: ActorRef, tool_executor: ActorRef, agent_config: dict):
+        super().__init__()
+        self.llm_pool = llm_pool
+        self.tool_executor = tool_executor
+        self.agent_config = agent_config
+        self.sessions = {}  # session_id -> ActorRef
+        self.session_last_active = {}  # session_id -> timestamp
+    
+    def receive(self, message):
+        if isinstance(message, UserMessage):
+            self._route_to_agent(message)
+        elif isinstance(message, AgentResponse):
+            # Forward response back to original sender
+            pass  # Response already sent by agent
+    
+    def _route_to_agent(self, msg: UserMessage):
+        """Route message to appropriate agent actor"""
+        session_id = msg.session_id
+        
+        # Get or create agent for this session
+        if session_id not in self.sessions:
+            self.sessions[session_id] = self._create_agent(session_id)
+        
+        self.session_last_active[session_id] = time.time()
+        
+        # Forward message to agent
+        self.sessions[session_id].tell(msg, sender=self.sender)
+    
+    def _create_agent(self, session_id: str) -> ActorRef:
+        """Create new agent actor for session"""
+        self.log.info(f"Creating agent for session: {session_id}")
+        
+        props = Props(
+            actor_class=CustomerServiceAgentActor,
+            args=(self.llm_pool, self.tool_executor, self.agent_config),
+            dispatcher='io-dispatcher'  # Agents do I/O operations
+        )
+        
+        return self.context.actor_of(props, f"agent-{session_id}")
+
+
+# =============================================================================
+# Usage Example
+# =============================================================================
+
+def create_agent_system():
+    """
+    Set up the complete agent system with all components.
+    """
+    from abhikarta.actor import get_actor_system
+    from abhikarta.tools import get_tools_registry
+    from abhikarta.llm_provider import get_llm_facade
+    
+    system = get_actor_system()
+    tools_registry = get_tools_registry()
+    llm_facade = get_llm_facade()
+    
+    # Create LLM pool actor
+    llm_pool = system.actor_of(
+        Props(LLMPoolActor, args=(llm_facade, 10)),
+        "llm-pool"
+    )
+    
+    # Create tool executor actor
+    tool_executor = system.actor_of(
+        Props(ToolExecutorActor, args=(tools_registry,)),
+        "tool-executor"
+    )
+    
+    # Agent configuration
+    agent_config = {
+        'model': 'gpt-4o',
+        'system_prompt': 'You are a helpful customer service agent...',
+        'tools': [
+            {
+                'name': 'lookup_order',
+                'description': 'Look up order status by order ID',
+                'parameters': {
+                    'type': 'object',
+                    'properties': {
+                        'order_id': {'type': 'string', 'description': 'The order ID'}
+                    },
+                    'required': ['order_id']
+                }
+            },
+            {
+                'name': 'lookup_account',
+                'description': 'Look up customer account information',
+                'parameters': {
+                    'type': 'object',
+                    'properties': {
+                        'email': {'type': 'string', 'description': 'Customer email'}
+                    },
+                    'required': ['email']
+                }
+            }
+        ]
+    }
+    
+    # Create session manager
+    session_manager = system.actor_of(
+        Props(
+            SessionManagerActor,
+            args=(llm_pool, tool_executor, agent_config)
+        ),
+        "session-manager"
+    )
+    
+    return session_manager
+
+
+def handle_user_request(session_id: str, message: str) -> str:
+    """
+    Handle a user message through the agent system.
+    
+    This function is called by the Flask route handlers.
+    """
+    from abhikarta.actor import get_actor_system
+    
+    system = get_actor_system()
+    session_manager = system.actor_selection("/user/session-manager")
+    
+    # Send message and wait for response (using ask pattern)
+    future = session_manager.ask(
+        UserMessage(session_id=session_id, content=message),
+        timeout=120.0
+    )
+    
+    response = future.result()
+    return response.content
+
+
+# Example Flask integration
+"""
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    data = request.json
+    session_id = data.get('session_id', str(uuid.uuid4()))
+    message = data.get('message', '')
+    
+    response = handle_user_request(session_id, message)
+    
+    return jsonify({
+        'session_id': session_id,
+        'response': response
+    })
+"""</code></pre>
+
+            <div class="alert alert-info mt-3">
+                <h6><i class="bi bi-graph-up me-2"></i>Scaling Benefits</h6>
+                <ul class="mb-0">
+                    <li><strong>Millions of Sessions:</strong> Each user session runs in a lightweight actor (~300 bytes)</li>
+                    <li><strong>Concurrent LLM Calls:</strong> LLM pool manages rate limiting across all agents</li>
+                    <li><strong>Tool Isolation:</strong> Failed tool calls don't crash the agent conversation</li>
+                    <li><strong>Memory Efficient:</strong> Idle sessions can be passivated to storage</li>
+                    <li><strong>Real-time Monitoring:</strong> Event bus broadcasts all agent activities</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Startup -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-play-circle me-2"></i>Application Startup</h5>
+        </div>
+        <div class="card-body">
+            <p>The Actor System is automatically started when you run the Abhikarta-LLM server. It initializes <strong>before</strong> the Flask application to ensure actors are ready for incoming requests.</p>
+            
+            <h6 class="mt-3"><i class="bi bi-gear me-2"></i>Configuration (application.properties)</h6>
+<pre><code># Actor System Configuration
+actor.system.name=abhikarta-actors
+actor.dispatcher.default.threads=8
+actor.dispatcher.io.threads=16
+actor.deadletter.logging=true
+actor.supervision.max.retries=3
+actor.circuitbreaker.max.failures=5
+actor.circuitbreaker.reset.timeout.seconds=30</code></pre>
+
+            <h6 class="mt-3"><i class="bi bi-code-slash me-2"></i>Accessing the Actor System</h6>
+<pre><code>from abhikarta.actor import get_actor_system, Props
+
+# Get the global actor system (singleton)
+system = get_actor_system()
+
+# Create actors
+my_actor = system.actor_of(Props(MyActorClass), "my-actor")
+
+# Find existing actors
+existing = system.actor_selection("/user/my-actor")</code></pre>
+
+            <h6 class="mt-3"><i class="bi bi-terminal me-2"></i>Startup Output</h6>
+<pre class="terminal"><code>Starting server...
+Host: 0.0.0.0
+Port: 5000
+Debug: false
+Database: sqlite
+Actor System: abhikarta-actors     ← Actor system name
+Tools Loaded: 85
+MCP Servers: 0
+
+Access the application at: http://0.0.0.0:5000</code></pre>
+        </div>
+    </div>
+
+    <!-- Related Documentation -->
+    <h2 class="mt-5"><i class="bi bi-link-45deg me-2"></i>Related Documentation</h2>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <a href="{{ url_for('help_page', page='workflow-dags') }}" class="card text-decoration-none h-100">
+                <div class="card-body">
+                    <h5><i class="bi bi-diagram-2 me-2"></i>Workflow DAGs</h5>
+                    <p class="small text-muted mb-0">Design workflows with actor-based execution</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ url_for('help_page', page='banking-solutions') }}" class="card text-decoration-none h-100">
+                <div class="card-body">
+                    <h5><i class="bi bi-bank me-2"></i>Banking Solutions</h5>
+                    <p class="small text-muted mb-0">Pre-built banking agents as actors</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ url_for('help_page', page='tools-system') }}" class="card text-decoration-none h-100">
+                <div class="card-body">
+                    <h5><i class="bi bi-tools me-2"></i>Tools System</h5>
+                    <p class="small text-muted mb-0">Integrate tools with actor-based agents</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Page Glossary -->
+    <div class="card bg-light mt-5">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Page Glossary</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="mb-0">
+                        <dt>Actor</dt>
+                        <dd class="small text-muted">Lightweight concurrent entity that processes messages sequentially</dd>
+                        <dt>ActorRef</dt>
+                        <dd class="small text-muted">Handle for sending messages to an actor without direct reference</dd>
+                        <dt>Tell</dt>
+                        <dd class="small text-muted">Fire-and-forget message send (async, no response expected)</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="mb-0">
+                        <dt>Ask</dt>
+                        <dd class="small text-muted">Request-response pattern returning a Future</dd>
+                        <dt>Supervision</dt>
+                        <dd class="small text-muted">Parent actor handling child failures with restart strategies</dd>
+                        <dt>Mailbox</dt>
+                        <dd class="small text-muted">Queue storing messages until actor processes them</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

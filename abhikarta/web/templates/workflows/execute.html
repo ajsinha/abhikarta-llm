@@ -136,7 +136,7 @@ function executeWorkflow() {
                 resultHtml += `
                     <div class="mt-3">
                         <strong>Output:</strong>
-                        <pre class="bg-dark text-light p-3 rounded mt-2" style="max-height: 300px; overflow: auto;">${JSON.stringify(exec.output_data, null, 2)}</pre>
+                        <pre class="json-viewer mt-2" style="max-height: 300px; overflow: auto;">${JSON.stringify(exec.output_data, null, 2)}</pre>
                     </div>
                 `;
             }

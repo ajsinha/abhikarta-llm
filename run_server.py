@@ -200,6 +200,62 @@ def prepare_mcp_manager(prop_conf, db_facade, tools_registry):
     return manager
 
 
+def prepare_actor_system(prop_conf):
+    """
+    Initialize the Actor System for running agents and workflows concurrently.
+    
+    The Actor System provides:
+    - Lightweight actor-based concurrency for millions of agents
+    - Message-driven communication between components
+    - Supervision hierarchies for fault tolerance
+    - Thread-safe execution without locks
+    
+    Args:
+        prop_conf: PropertiesConfigurator instance
+        
+    Returns:
+        ActorSystem instance (also accessible via get_actor_system())
+    """
+    from abhikarta.actor import (
+        ActorSystem,
+        ActorSystemConfig,
+        OneForOneStrategy,
+        Directive,
+    )
+    from abhikarta.actor.dispatcher import DispatcherConfig
+    
+    logger = logging.getLogger(__name__)
+    
+    # Get configuration from properties
+    system_name = prop_conf.get('actor.system.name', 'abhikarta-actors')
+    default_dispatcher_threads = prop_conf.get_int('actor.dispatcher.default.threads', 8)
+    io_dispatcher_threads = prop_conf.get_int('actor.dispatcher.io.threads', 16)
+    dead_letter_logging = prop_conf.get_bool('actor.deadletter.logging', True)
+    
+    # Create dispatcher configuration
+    dispatcher_config = DispatcherConfig(
+        thread_pool_size=default_dispatcher_threads,
+        throughput=5
+    )
+    
+    # Create system configuration
+    config = ActorSystemConfig(
+        name=system_name,
+        default_dispatcher=dispatcher_config,
+        log_dead_letters=dead_letter_logging,
+    )
+    
+    # Create the actor system directly with config
+    actor_system = ActorSystem(config)
+    
+    logger.info(f"Actor system '{system_name}' started")
+    logger.info(f"  Default dispatcher threads: {default_dispatcher_threads}")
+    logger.info(f"  I/O dispatcher threads: {io_dispatcher_threads}")
+    logger.info(f"  Dead letter logging: {dead_letter_logging}")
+    
+    return actor_system
+
+
 def run_webserver(prop_conf, user_facade, db_facade, tools_registry, mcp_manager):
     """
     Initialize and run the web server.
@@ -235,7 +291,7 @@ def run_webserver(prop_conf, user_facade, db_facade, tools_registry, mcp_manager
     aweb.run(host=host, port=port, debug=debug)
 
 
-def print_banner(prop_conf, tools_count=0, mcp_count=0):
+def print_banner(prop_conf, tools_count=0, mcp_count=0, actor_system_name=''):
     """Print application startup banner."""
     version = prop_conf.get('app.version', '1.0.0')
     host = prop_conf.get('server.host', '0.0.0.0')
@@ -272,6 +328,7 @@ def print_banner(prop_conf, tools_count=0, mcp_count=0):
   Port: {port}
   Debug: {debug}
   Database: {db_type}
+  Actor System: {actor_system_name}
   Tools Loaded: {tools_count}
   MCP Servers: {mcp_count}
   
@@ -287,6 +344,7 @@ def main():
     
     tools_registry = None
     mcp_manager = None
+    actor_system = None
     
     try:
         # 1. Initialize properties configuration
@@ -314,10 +372,15 @@ def main():
         mcp_count = len(mcp_manager.list_servers())
         logger.info(f"MCP manager initialized with {mcp_count} servers")
         
-        # 7. Print startup banner
-        print_banner(prop_conf, tools_count, mcp_count)
+        # 7. Initialize Actor System (BEFORE Flask for concurrent agent/workflow execution)
+        actor_system = prepare_actor_system(prop_conf)
+        actor_system_name = prop_conf.get('actor.system.name', 'abhikarta-actors')
+        logger.info(f"Actor system '{actor_system_name}' ready for concurrent execution")
         
-        # 8. Run web server
+        # 8. Print startup banner
+        print_banner(prop_conf, tools_count, mcp_count, actor_system_name)
+        
+        # 9. Run web server (blocking call)
         run_webserver(prop_conf, user_facade, db_facade, tools_registry, mcp_manager)
         
     except KeyboardInterrupt:
@@ -328,15 +391,28 @@ def main():
         print(f"\nError: {e}")
         sys.exit(1)
     finally:
-        # Cleanup
+        # Cleanup in reverse order of initialization
+        
+        # Shutdown actor system first (allows actors to complete gracefully)
+        if actor_system:
+            try:
+                logger.info("Terminating actor system...")
+                actor_system.terminate(timeout=5.0)
+                logger.info("Actor system terminated")
+            except Exception as e:
+                logger.warning(f"Error terminating actor system: {e}")
+        
+        # Shutdown MCP manager
         if mcp_manager:
             mcp_manager.shutdown()
             logger.info("MCP manager shutdown")
         
+        # Close database connection
         if 'db_facade' in locals():
             db_facade.disconnect()
             logger.info("Database connection closed")
         
+        # Stop properties auto-reload
         if 'prop_conf' in locals():
             prop_conf.stop_reload()
             logger.info("Properties auto-reload stopped")

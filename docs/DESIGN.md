@@ -1,19 +1,20 @@
-# Abhikarta-LLM v1.2.1 - Architecture Design Document
+# Abhikarta-LLM v1.2.2 - Architecture Design Document
 
 ## Table of Contents
 
 1. [Overview](#1-overview)
 2. [System Architecture](#2-system-architecture)
-3. [Database Design](#3-database-design)
-4. [Agent System Design](#4-agent-system-design)
-5. [Workflow Engine Design](#5-workflow-engine-design)
-6. [LLM Provider Integration](#6-llm-provider-integration)
-7. [Human-in-the-Loop System](#7-human-in-the-loop-system)
-8. [Tools System Design](#8-tools-system-design)
-9. [MCP Plugin Framework](#9-mcp-plugin-framework)
-10. [Pre-built Solutions](#10-pre-built-solutions)
-11. [Security Architecture](#11-security-architecture)
-12. [API Design](#12-api-design)
+3. [Actor System (NEW)](#3-actor-system)
+4. [Database Design](#4-database-design)
+5. [Agent System Design](#5-agent-system-design)
+6. [Workflow Engine Design](#6-workflow-engine-design)
+7. [LLM Provider Integration](#7-llm-provider-integration)
+8. [Human-in-the-Loop System](#8-human-in-the-loop-system)
+9. [Tools System Design](#9-tools-system-design)
+10. [MCP Plugin Framework](#10-mcp-plugin-framework)
+11. [Pre-built Solutions](#11-pre-built-solutions)
+12. [Security Architecture](#12-security-architecture)
+13. [API Design](#13-api-design)
 
 ---
 
@@ -67,6 +68,18 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 │  │ Manager      │ │ Engine       │ │ Manager      │             │
 │  └──────────────┘ └──────────────┘ └──────────────┘             │
 ├─────────────────────────────────────────────────────────────────┤
+│                   ACTOR SYSTEM LAYER (NEW in v1.2.2)             │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │                    ActorSystem                             │  │
+│  │  ┌─────────┐ ┌─────────────┐ ┌────────────┐ ┌──────────┐  │  │
+│  │  │ Actors  │ │ Dispatchers │ │ Supervision│ │ Scheduler│  │  │
+│  │  │ Props   │ │ Mailboxes   │ │ Strategies │ │ EventBus │  │  │
+│  │  └─────────┘ └─────────────┘ └────────────┘ └──────────┘  │  │
+│  │  ┌──────────────────────────────────────────────────────┐ │  │
+│  │  │ Patterns: Routers │ CircuitBreaker │ Aggregator      │ │  │
+│  │  └──────────────────────────────────────────────────────┘ │  │
+│  └───────────────────────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────────────┤
 │                        TOOLS LAYER                               │
 │  ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌─────────────────┐  │
 │  │ BaseTool  │ │ MCPTool   │ │ HTTPTool  │ │ ToolsRegistry   │  │
@@ -84,8 +97,8 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 ├─────────────────────────────────────────────────────────────────┤
 │                        DATA LAYER                                │
 │  ┌────────────────────────────────────────────────────────────┐ │
-│  │           PostgreSQL / SQLite (22 Tables)                  │ │
-│  │  Core │ Users │ LLM │ Tools │ HITL │ Audit │ Config       │ │
+│  │  DatabaseFacade │ 9 Delegates │ PostgreSQL/SQLite (22 Tbl) │ │
+│  │  Core │ Users │ LLM │ Tools │ HITL │ Audit │ Config        │ │
 │  └────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -124,9 +137,169 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 
 ---
 
-## 3. Database Design
+## 3. Actor System
 
-### 3.1 Schema Overview (22 Tables)
+### 3.1 Overview
+
+The Actor System provides a Pekko-inspired framework for highly concurrent, distributed, and fault-tolerant agent execution. It enables running millions of agents and workflows in real-time, message-driven fashion.
+
+**Acknowledgement**: Inspired by Apache Pekko (incubating), the open-source fork of Akka.
+
+### 3.2 Actor System Architecture
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                        ActorSystem                                  │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                    Actor Hierarchy                            │  │
+│  │         /system                /user                          │  │
+│  │            │                      │                           │  │
+│  │      ┌─────┴─────┐         ┌──────┴──────┐                   │  │
+│  │      │           │         │             │                    │  │
+│  │   guardian   scheduler   router     orchestrator              │  │
+│  │                          /    \          │                    │  │
+│  │                    worker-1  worker-n  agent-pool             │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                     │
+│  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────┐  │
+│  │  Dispatchers  │  │   Mailboxes   │  │    Supervision        │  │
+│  │  ┌─────────┐  │  │  ┌─────────┐  │  │  ┌─────────────────┐  │  │
+│  │  │Default  │  │  │  │Unbounded│  │  │  │OneForOneStrategy│  │  │
+│  │  │Pinned   │  │  │  │Bounded  │  │  │  │AllForOneStrategy│  │  │
+│  │  │ForkJoin │  │  │  │Priority │  │  │  │BackoffStrategy  │  │  │
+│  │  └─────────┘  │  │  └─────────┘  │  │  └─────────────────┘  │  │
+│  └───────────────┘  └───────────────┘  └───────────────────────┘  │
+│                                                                     │
+│  ┌────────────────────────────────────────────────────────────┐    │
+│  │                      Patterns                               │    │
+│  │   Router │ EventBus │ Aggregator │ CircuitBreaker │ Stash  │    │
+│  └────────────────────────────────────────────────────────────┘    │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+### 3.3 Core Components
+
+| Component | Description |
+|-----------|-------------|
+| **Actor** | Lightweight entity processing messages sequentially |
+| **ActorRef** | Immutable, location-transparent reference to an actor |
+| **ActorSystem** | Container managing actors, dispatchers, lifecycle |
+| **Props** | Immutable configuration for actor creation |
+| **Mailbox** | Message queue for each actor |
+| **Dispatcher** | Thread pool executing actor message processing |
+| **Supervision** | Fault-tolerance strategy for child failures |
+
+### 3.4 Message Flow
+
+```
+Sender                    Mailbox                    Actor
+  │                          │                         │
+  │  tell(message)           │                         │
+  │────────────────────────▶│                         │
+  │                          │  enqueue(envelope)     │
+  │                          │────────────────────────▶│
+  │                          │                         │ process
+  │                          │                         │ message
+  │                          │◀────────────────────────│
+  │                          │  dequeue next           │
+  │◀ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│                         │
+  │  reply (optional)        │                         │
+```
+
+### 3.5 Dispatcher Types
+
+| Type | Thread Model | Use Case |
+|------|--------------|----------|
+| **DefaultDispatcher** | Shared thread pool | General-purpose actors |
+| **PinnedDispatcher** | One thread per actor | Blocking I/O operations |
+| **ForkJoinDispatcher** | Work-stealing pool | CPU-bound computations |
+| **CallingThreadDispatcher** | Caller's thread | Testing/debugging |
+| **BalancingDispatcher** | Multi-pool balancing | High-throughput systems |
+
+### 3.6 Supervision Strategies
+
+```python
+# OneForOne: Only restart failed child
+strategy = OneForOneStrategy(
+    max_restarts=10,
+    within_time=60.0,
+    decider=lambda e: Directive.RESTART
+)
+
+# AllForOne: Restart all children on any failure
+strategy = AllForOneStrategy(
+    max_restarts=5,
+    decider=lambda e: Directive.RESTART
+)
+
+# Exponential Backoff: Delay between restarts
+strategy = ExponentialBackoffStrategy(
+    min_backoff=0.1,
+    max_backoff=30.0,
+    max_restarts=10
+)
+```
+
+### 3.7 Router Patterns
+
+```
+                    ┌─────────────┐
+                    │   Router    │
+                    └──────┬──────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+   ┌────▼────┐       ┌────▼────┐       ┌────▼────┐
+   │ Worker1 │       │ Worker2 │       │ Worker3 │
+   └─────────┘       └─────────┘       └─────────┘
+
+Routing Strategies:
+- RoundRobin: Sequential distribution
+- Random: Random selection
+- Broadcast: Send to all
+- ConsistentHashing: Hash-based routing
+- SmallestMailbox: Route to least busy
+```
+
+### 3.8 Actor Example
+
+```python
+from abhikarta.actor import Actor, ActorSystem, Props
+
+class AgentActor(Actor):
+    def __init__(self, model: str):
+        super().__init__()
+        self._model = model
+        self._tasks_completed = 0
+    
+    def receive(self, message):
+        if isinstance(message, AgentTask):
+            result = self._process_task(message)
+            self._tasks_completed += 1
+            if self.sender:
+                self.sender.tell(result)
+
+# Create system with 1000 agents
+system = ActorSystem()
+agents = [
+    system.actor_of(Props(AgentActor, args=("gpt-4",)), f"agent-{i}")
+    for i in range(1000)
+]
+```
+
+### 3.9 Scalability Features
+
+- **Lightweight**: Millions of actors in single process
+- **Non-blocking**: Async message passing, no locks
+- **Location Transparent**: Same API for local/remote actors
+- **Backpressure**: Bounded mailboxes for flow control
+- **Fault Isolation**: Actor failures don't crash system
+
+---
+
+## 4. Database Design
+
+### 4.1 Schema Overview (22 Tables)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -169,7 +342,7 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 └─────────────────┴───────────────────────────────────────────────┘
 ```
 
-### 3.2 Key Table Schemas
+### 4.2 Key Table Schemas
 
 #### agents
 ```sql
@@ -534,7 +707,7 @@ class ToolsRegistry:
 - List/Array: 5 tools
 - Workflow: 3 tools
 
-#### General Tools (24) - NEW in v1.2.1
+#### General Tools (24) - NEW in v1.2.2
 - Web/Search: 4 tools (web_search, web_fetch, intranet_search, news_search)
 - Document Handling: 4 tools (read_document, write_document, convert_document, extract_document_metadata)
 - File Operations: 4 tools (list_files, copy_file, move_file, delete_file)
@@ -803,4 +976,4 @@ abhikarta/
 
 ---
 
-*Version 1.2.1 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
+*Version 1.2.2 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*

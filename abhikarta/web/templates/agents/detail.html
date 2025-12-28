@@ -104,7 +104,7 @@
                 </div>
                 <div class="card-body">
                     {% if agent.llm_config %}
-                    <pre class="bg-dark text-light p-3 rounded mb-0">{{ agent.llm_config | tojson(indent=2) }}</pre>
+                    <pre class="json-viewer mb-0">{{ agent.llm_config | tojson(indent=2) }}</pre>
                     {% else %}
                     <p class="text-muted mb-0">No LLM configuration</p>
                     {% endif %}

@@ -1,6 +1,6 @@
-# Abhikarta-LLM v1.2.1
+# Abhikarta-LLM v1.2.2
 
-[![Version](https://img.shields.io/badge/version-1.2.1-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.2.2-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
@@ -10,9 +10,21 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ---
 
-## 🚀 What's New in v1.2.1
+## 🚀 What's New in v1.2.2
 
-### Modular Database Delegate Architecture
+### Actor System - Pekko-Inspired Concurrency Framework
+- **ActorSystem**: Complete runtime for creating and managing actors
+- **Actor Base Classes**: `Actor`, `TypedActor` with type-safe message handlers
+- **Message Patterns**: Tell (fire-and-forget), Ask (request-response), Forward
+- **Supervision Strategies**: OneForOne, AllForOne, ExponentialBackoff
+- **Dispatchers**: Default, Pinned, ForkJoin, CallingThread for different workloads
+- **Mailboxes**: Unbounded, Bounded (backpressure), Priority, ControlAware
+- **Patterns**: Router (load balancing), EventBus (pub/sub), CircuitBreaker, Stashing
+- **Scheduling**: Delayed and periodic message delivery
+- **Fault Tolerance**: Automatic restart, supervision hierarchies, death watch
+- **Acknowledgement**: Inspired by Apache Pekko (incubating)
+
+### Modular Database Delegate Architecture (from v1.2.1)
 - **DatabaseDelegate Abstract Base**: New abstract class for domain-specific database operations
 - **9 Specialized Delegates**: Modular handlers for each database domain
   - `UserDelegate`: Users, Roles, Sessions, API Keys
@@ -64,6 +76,13 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ## ✨ Key Features
 
+### ⚡ Actor System (v1.2.2 NEW)
+- **Pekko-Inspired Design**: Lightweight actors for massive concurrency
+- **Message-Driven**: Fire-and-forget (tell) and request-response (ask) patterns
+- **Fault Tolerance**: Supervision strategies with automatic recovery
+- **Routers**: Round-robin, random, broadcast, consistent hashing
+- **Patterns**: Circuit breaker, event bus, aggregator, stashing
+
 ### 🤖 Agent Management
 - **Visual Agent Designer**: Drag-and-drop interface with 14 node types
 - **Multiple Agent Types**: ReAct, Chain-of-Thought, Plan-and-Execute, Custom
@@ -99,7 +118,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Workflow Integration**: HITL nodes pause execution for human input
 - **User & Admin Interfaces**: Separate views for different roles
 
-### 🏦 Banking Solutions (v1.2.1+)
+### 🏦 Banking Solutions (v1.2.2+)
 - **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
 - **Credit Assessment**: Credit scoring, DTI calculation, eligibility
 - **Loan Processing**: EMI calculation, amortization schedules
@@ -132,7 +151,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.2.1/
+abhikarta-llm-v1.2.2/
 ├── abhikarta/
 │   ├── __init__.py
 │   ├── agent/                    # Agent management
@@ -170,7 +189,7 @@ abhikarta-llm-v1.2.1/
 │   │   ├── code_fragment_tool.py # CodeFragmentTool
 │   │   ├── langchain_tool.py     # LangChain integration
 │   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.2.1)
+│   │   └── prebuilt/             # Pre-built tools (v1.2.2)
 │   │       ├── common_tools.py   # 28 common utilities
 │   │       ├── banking_tools.py  # 13 banking tools
 │   │       ├── integration_tools.py  # 20 integration tools
@@ -206,7 +225,7 @@ abhikarta-llm-v1.2.1/
 ├── config/
 │   └── application.properties    # Configuration file
 ├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.2.1)
+│   └── prebuilt/                 # Pre-built solutions (v1.2.2)
 │       ├── agents/
 │       │   └── banking/          # 10 banking agents
 │       └── workflows/
@@ -383,7 +402,7 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.2.1 | 2025-01 | Modular Database Delegates (9 delegates), DatabaseDelegate abstract class, refactored DB layer |
+| 1.2.2 | 2025-01 | Modular Database Delegates (9 delegates), DatabaseDelegate abstract class, refactored DB layer |
 | 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |
 | 1.1.8 | 2025-01 | Tool View/Test pages, dedicated tool detail UI, form-based testing |
 | 1.1.7 | 2025-01 | Pre-built tools (85), Tools page, General tools, MCP auto-sync, Banking solutions |

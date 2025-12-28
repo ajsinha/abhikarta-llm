@@ -3,6 +3,8 @@
 {% block title %}{{ title }} - Help - {{ app_name }}{% endblock %}
 
 {% block extra_css %}
+<!-- Highlight.js One Dark Theme -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 <style>
     .help-page-header {
         background: linear-gradient(135deg, {{ header_color | default('#0066b3') }} 0%, {{ header_color_dark | default('#003d6b') }} 100%);
@@ -33,17 +35,120 @@
         border-left-color: #0066b3;
         background: #f8f9fa;
     }
-    /* Code blocks with highlight.js */
-    pre code.hljs {
-        border-radius: 8px;
-        padding: 1.25rem;
-        font-size: 0.85rem;
-        line-height: 1.6;
+    
+    /* Enhanced Code Block Styling */
+    .help-content pre {
+        background: linear-gradient(135deg, #1e2127 0%, #282c34 100%);
+        color: #abb2bf;
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+        font-size: 0.875rem;
+        line-height: 1.7;
+        overflow-x: auto;
+        border: 1px solid #3e4451;
+        position: relative;
+        margin: 1.25rem 0;
+        box-shadow: 
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
-    .hljs {
-        background: #282c34;
+    
+    .help-content pre::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, 
+            #61afef 0%, 
+            #98c379 25%, 
+            #e5c07b 50%, 
+            #c678dd 75%, 
+            #e06c75 100%
+        );
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .help-content pre code {
+        background: none !important;
+        padding: 0 !important;
+        border: none !important;
+        color: inherit;
+        font-size: inherit;
+    }
+    
+    /* Override highlight.js background */
+    .help-content pre code.hljs {
+        background: transparent !important;
+        padding: 0 !important;
+    }
+    
+    /* Terminal/Console Output Style */
+    .help-content pre.terminal {
+        background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+        color: #c9d1d9;
+        border-color: #30363d;
+        padding-top: 2.5rem;
+    }
+    
+    .help-content pre.terminal::before {
+        content: '●  ●  ●';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 8px 12px;
+        background: #21262d;
+        color: #484f58;
+        font-size: 0.7rem;
+        letter-spacing: 4px;
+        border-radius: 12px 12px 0 0;
+        border-bottom: 1px solid #30363d;
+        height: auto;
+    }
+    
+    /* Scrollbar styling */
+    .help-content pre::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+    }
+    
+    .help-content pre::-webkit-scrollbar-track {
+        background: #21252b;
+        border-radius: 4px;
+    }
+    
+    .help-content pre::-webkit-scrollbar-thumb {
+        background: #4b5263;
+        border-radius: 4px;
+    }
+    
+    .help-content pre::-webkit-scrollbar-thumb:hover {
+        background: #5c6370;
     }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Highlight.js for Syntax Highlighting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/properties.min.js"></script>
+<script>
+    // Initialize syntax highlighting
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.help-content pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+    });
+</script>
 {% endblock %}
 
 {% block content %}

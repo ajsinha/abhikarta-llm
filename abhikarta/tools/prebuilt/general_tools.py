@@ -91,7 +91,7 @@ def web_fetch(url: str, include_html: bool = False, timeout: int = 30) -> Dict[s
             return {"success": False, "error": "Invalid URL format"}
         
         headers = {
-            "User-Agent": "Abhikarta-LLM/1.2.1 (Web Fetch Tool)"
+            "User-Agent": "Abhikarta-LLM/1.2.2 (Web Fetch Tool)"
         }
         
         response = requests.get(url, headers=headers, timeout=timeout)

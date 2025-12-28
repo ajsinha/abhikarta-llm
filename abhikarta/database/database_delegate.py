@@ -9,7 +9,7 @@ Legal Notice:
 This software and associated documentation are proprietary and confidential.
 Unauthorized copying, distribution, modification, or use is strictly prohibited.
 
-Version: 1.2.1
+Version: 1.2.2
 """
 
 from abc import ABC, abstractmethod

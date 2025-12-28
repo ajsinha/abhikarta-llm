@@ -207,6 +207,7 @@ class AuthRoutes(AbstractRoutes):
                 'tools-system': 'help/pages/tools_system.html',
                 'prebuilt-tools': 'help/pages/prebuilt_tools.html',
                 'banking-solutions': 'help/pages/banking_solutions.html',
+                'actors': 'help/pages/actors.html',
                 'hitl': 'help/pages/hitl.html',
                 'executions-logging': 'help/pages/executions_logging.html',
                 'api-reference': 'help/pages/api_reference.html',

@@ -371,132 +371,350 @@ main {
     background-color: white;
 }
 
-/* ===== Code/JSON Display ===== */
-.code-block {
-    background-color: #1e1e1e;
-    color: #d4d4d4;
-    border-radius: var(--border-radius);
-    padding: 1.25rem;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 0.85rem;
-    line-height: 1.6;
+/* ===== Code/JSON Display - Professional Syntax Theme ===== */
+/* 
+ * Inspired by One Dark Pro and GitHub themes
+ * Easy on the eyes with carefully chosen colors
+ */
+
+/* Code Block Container */
+.code-block,
+pre.code-block,
+pre[class*="language-"],
+.help-content pre {
+    background: linear-gradient(135deg, #1e2127 0%, #282c34 100%);
+    color: #abb2bf;
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem 1.5rem;
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+    font-size: 0.875rem;
+    line-height: 1.7;
     overflow-x: auto;
     white-space: pre;
-    border: 1px solid #333;
+    border: 1px solid #3e4451;
     position: relative;
-    margin: 1rem 0;
+    margin: 1.25rem 0;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    tab-size: 4;
+    -moz-tab-size: 4;
 }
 
-.code-block::before {
+/* Top accent bar */
+.code-block::before,
+pre.code-block::before,
+.help-content pre::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #569cd6, #4ec9b0, #ce9178);
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    background: linear-gradient(90deg, 
+        #61afef 0%, 
+        #98c379 25%, 
+        #e5c07b 50%, 
+        #c678dd 75%, 
+        #e06c75 100%
+    );
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
 }
 
-/* Syntax Highlighting Colors (VS Code Dark+ Theme) */
-.code-block .keyword { color: #569cd6; font-weight: 500; }
-.code-block .string { color: #ce9178; }
-.code-block .number { color: #b5cea8; }
-.code-block .comment { color: #6a9955; font-style: italic; }
-.code-block .function { color: #dcdcaa; }
-.code-block .class { color: #4ec9b0; }
-.code-block .variable { color: #9cdcfe; }
-.code-block .operator { color: #d4d4d4; }
-.code-block .property { color: #9cdcfe; }
-.code-block .boolean { color: #569cd6; }
-.code-block .null { color: #569cd6; }
-.code-block .type { color: #4ec9b0; }
-.code-block .decorator { color: #dcdcaa; }
-.code-block .tag { color: #569cd6; }
-.code-block .attr { color: #9cdcfe; }
-.code-block .value { color: #ce9178; }
+/* Language label badge */
+.code-block[data-language]::after,
+pre[data-language]::after {
+    content: attr(data-language);
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 0.7rem;
+    font-family: var(--bs-font-sans-serif);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #5c6370;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
 
-/* JSON Specific */
-.code-block .json-key { color: #9cdcfe; }
-.code-block .json-string { color: #ce9178; }
-.code-block .json-number { color: #b5cea8; }
-.code-block .json-boolean { color: #569cd6; }
-.code-block .json-null { color: #569cd6; }
+/* Scrollbar styling for code blocks */
+.code-block::-webkit-scrollbar,
+pre::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
 
-/* SQL Specific */
-.code-block .sql-keyword { color: #569cd6; text-transform: uppercase; }
-.code-block .sql-function { color: #dcdcaa; }
-.code-block .sql-string { color: #ce9178; }
+.code-block::-webkit-scrollbar-track,
+pre::-webkit-scrollbar-track {
+    background: #21252b;
+    border-radius: 4px;
+}
 
-/* Bash/Shell Specific */
-.code-block .bash-command { color: #dcdcaa; }
-.code-block .bash-flag { color: #9cdcfe; }
-.code-block .bash-variable { color: #4ec9b0; }
+.code-block::-webkit-scrollbar-thumb,
+pre::-webkit-scrollbar-thumb {
+    background: #4b5263;
+    border-radius: 4px;
+}
 
-/* Code block with line numbers */
+.code-block::-webkit-scrollbar-thumb:hover,
+pre::-webkit-scrollbar-thumb:hover {
+    background: #5c6370;
+}
+
+/* ===== Syntax Highlighting - One Dark Pro Inspired ===== */
+
+/* Keywords (if, else, for, while, def, class, import, from, return, etc.) */
+.code-block .keyword,
+.hljs-keyword,
+.token.keyword {
+    color: #c678dd;
+    font-weight: 500;
+}
+
+/* Strings */
+.code-block .string,
+.hljs-string,
+.token.string {
+    color: #98c379;
+}
+
+/* Numbers */
+.code-block .number,
+.hljs-number,
+.token.number {
+    color: #d19a66;
+}
+
+/* Comments */
+.code-block .comment,
+.hljs-comment,
+.token.comment {
+    color: #5c6370;
+    font-style: italic;
+}
+
+/* Function names */
+.code-block .function,
+.hljs-function,
+.token.function,
+.hljs-title.function_ {
+    color: #61afef;
+}
+
+/* Class names */
+.code-block .class,
+.hljs-class,
+.token.class-name,
+.hljs-title.class_ {
+    color: #e5c07b;
+    font-weight: 500;
+}
+
+/* Variables and parameters */
+.code-block .variable,
+.hljs-variable,
+.token.variable,
+.hljs-params {
+    color: #e06c75;
+}
+
+/* Operators */
+.code-block .operator,
+.hljs-operator,
+.token.operator {
+    color: #56b6c2;
+}
+
+/* Properties and attributes */
+.code-block .property,
+.hljs-property,
+.token.property,
+.hljs-attr {
+    color: #e06c75;
+}
+
+/* Boolean and null */
+.code-block .boolean,
+.code-block .null,
+.hljs-literal,
+.token.boolean,
+.token.null {
+    color: #d19a66;
+}
+
+/* Types */
+.code-block .type,
+.hljs-type,
+.token.builtin {
+    color: #e5c07b;
+}
+
+/* Decorators */
+.code-block .decorator,
+.hljs-decorator,
+.token.decorator {
+    color: #61afef;
+}
+
+/* Built-in functions */
+.code-block .builtin,
+.hljs-built_in {
+    color: #56b6c2;
+}
+
+/* Self/this */
+.code-block .self,
+.hljs-variable.language_ {
+    color: #e06c75;
+    font-style: italic;
+}
+
+/* ===== JSON Specific Highlighting ===== */
+.code-block .json-key,
+.hljs-attr {
+    color: #e06c75;
+}
+
+.code-block .json-string {
+    color: #98c379;
+}
+
+.code-block .json-number {
+    color: #d19a66;
+}
+
+.code-block .json-boolean,
+.code-block .json-null {
+    color: #d19a66;
+}
+
+.code-block .json-bracket {
+    color: #abb2bf;
+}
+
+/* ===== SQL Specific ===== */
+.code-block .sql-keyword {
+    color: #c678dd;
+    text-transform: uppercase;
+}
+
+.code-block .sql-function {
+    color: #61afef;
+}
+
+.code-block .sql-string {
+    color: #98c379;
+}
+
+/* ===== Bash/Shell Specific ===== */
+.code-block .bash-command,
+.hljs-built_in {
+    color: #61afef;
+}
+
+.code-block .bash-flag {
+    color: #d19a66;
+}
+
+.code-block .bash-variable {
+    color: #e06c75;
+}
+
+/* ===== YAML Specific ===== */
+.hljs-bullet {
+    color: #56b6c2;
+}
+
+/* ===== Code Block with Line Numbers ===== */
 .code-block.with-lines {
-    padding-left: 3.5rem;
+    padding-left: 4rem;
     counter-reset: line;
+}
+
+.code-block.with-lines .line {
+    display: block;
+    position: relative;
 }
 
 .code-block.with-lines .line::before {
     counter-increment: line;
     content: counter(line);
     position: absolute;
-    left: 0;
+    left: -3.5rem;
     width: 2.5rem;
     text-align: right;
-    padding-right: 0.75rem;
-    color: #858585;
-    border-right: 1px solid #333;
+    padding-right: 1rem;
+    color: #4b5263;
+    border-right: 1px solid #3e4451;
     user-select: none;
+    font-size: 0.8em;
 }
 
-/* Inline code */
-code:not(.code-block code) {
-    background-color: #f1f5f9;
-    color: #be185d;
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+/* Line highlighting */
+.code-block .line.highlighted {
+    background: rgba(97, 175, 239, 0.1);
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem;
+    display: block;
+}
+
+/* ===== Inline Code ===== */
+code:not(pre code),
+.inline-code {
+    background: linear-gradient(135deg, #f0f4f8 0%, #e8eef3 100%);
+    color: #c41d7f;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Consolas', monospace;
     font-size: 0.875em;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #d9e2ec;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
-/* Pre tag inside cards */
-pre {
-    margin: 0;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
+/* Dark mode inline code (inside code blocks) */
+.code-block code,
 pre code {
     background: none;
     border: none;
     padding: 0;
     color: inherit;
     font-size: inherit;
+    font-weight: inherit;
+    white-space: inherit;
 }
 
-/* JSON Viewer Specific */
+/* ===== Pre tag defaults ===== */
+pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* ===== JSON Viewer Component ===== */
 .json-viewer {
-    background-color: #1e1e1e;
-    border-radius: var(--border-radius);
-    padding: 1rem;
-    font-family: 'JetBrains Mono', 'Consolas', monospace;
-    font-size: 0.85rem;
-    color: #d4d4d4;
+    background: linear-gradient(135deg, #1e2127 0%, #282c34 100%);
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.875rem;
+    color: #abb2bf;
     overflow-x: auto;
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
+    border: 1px solid #3e4451;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.json-viewer .json-key { color: #9cdcfe; }
-.json-viewer .json-string { color: #ce9178; }
-.json-viewer .json-number { color: #b5cea8; }
-.json-viewer .json-boolean { color: #569cd6; }
-.json-viewer .json-null { color: #569cd6; }
-.json-viewer .json-bracket { color: #ffd700; }
+.json-viewer .json-key { color: #e06c75; }
+.json-viewer .json-string { color: #98c379; }
+.json-viewer .json-number { color: #d19a66; }
+.json-viewer .json-boolean { color: #d19a66; }
+.json-viewer .json-null { color: #d19a66; font-style: italic; }
+.json-viewer .json-bracket { color: #abb2bf; }
 
 /* Collapsible JSON */
 .json-collapsible {
@@ -507,7 +725,8 @@ pre code {
 .json-collapsible::before {
     content: '▼ ';
     font-size: 0.7em;
-    color: #888;
+    color: #5c6370;
+    transition: transform 0.2s ease;
 }
 
 .json-collapsible.collapsed::before {
@@ -518,38 +737,192 @@ pre code {
     display: none;
 }
 
-/* Copy button for code blocks */
+/* ===== Code Block Wrapper with Copy Button ===== */
 .code-block-wrapper {
     position: relative;
 }
 
 .code-copy-btn {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: #333;
-    border: 1px solid #555;
-    color: #aaa;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    top: 12px;
+    right: 12px;
+    background: rgba(60, 64, 72, 0.8);
+    backdrop-filter: blur(4px);
+    border: 1px solid #4b5263;
+    color: #abb2bf;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
     font-size: 0.75rem;
+    font-weight: 500;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
-.code-block-wrapper:hover .code-copy-btn {
+.code-copy-btn i {
+    font-size: 0.85rem;
+}
+
+.code-block-wrapper:hover .code-copy-btn,
+pre:hover + .code-copy-btn,
+.code-copy-btn:focus {
     opacity: 1;
 }
 
 .code-copy-btn:hover {
-    background: #444;
+    background: rgba(75, 82, 99, 0.95);
     color: #fff;
+    border-color: #5c6370;
 }
 
 .code-copy-btn.copied {
-    background: var(--success);
-    color: white;
+    background: rgba(152, 195, 121, 0.9);
+    color: #1e2127;
+    border-color: #98c379;
+}
+
+/* ===== Terminal/Console Output Style ===== */
+.terminal-output,
+pre.terminal {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
+    padding: 1rem 1.25rem;
+    border-radius: var(--border-radius-lg);
+    position: relative;
+}
+
+.terminal-output::before,
+pre.terminal::before {
+    content: '●  ●  ●';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 12px;
+    background: #21262d;
+    color: #484f58;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    border-bottom: 1px solid #30363d;
+}
+
+.terminal-output {
+    padding-top: 2.5rem;
+}
+
+pre.terminal {
+    padding-top: 2.5rem;
+}
+
+/* Terminal prompt */
+.terminal-output .prompt,
+.terminal .prompt {
+    color: #7ee787;
+}
+
+.terminal-output .command,
+.terminal .command {
+    color: #c9d1d9;
+}
+
+.terminal-output .output,
+.terminal .output {
+    color: #8b949e;
+}
+
+/* ===== Configuration/Properties File Style ===== */
+pre.config,
+.config-block {
+    background: linear-gradient(135deg, #fafbfc 0%, #f6f8fa 100%);
+    color: #24292f;
+    border: 1px solid #d0d7de;
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 0.875rem;
+}
+
+pre.config::before,
+.config-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0969da, #1a7f37);
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.config-block .config-key {
+    color: #0550ae;
+    font-weight: 500;
+}
+
+.config-block .config-value {
+    color: #0a3069;
+}
+
+.config-block .config-comment {
+    color: #6e7781;
+    font-style: italic;
+}
+
+/* ===== Diff/Comparison Style ===== */
+.diff-block {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 0.875rem;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    border: 1px solid #d0d7de;
+}
+
+.diff-block .diff-add {
+    background: #dafbe1;
+    color: #116329;
+    border-left: 4px solid #1a7f37;
+    padding: 0.25rem 1rem;
+}
+
+.diff-block .diff-remove {
+    background: #ffebe9;
+    color: #82071e;
+    border-left: 4px solid #cf222e;
+    padding: 0.25rem 1rem;
+}
+
+.diff-block .diff-neutral {
+    background: #f6f8fa;
+    color: #24292f;
+    padding: 0.25rem 1rem;
+}
+
+/* ===== Responsive Code Blocks ===== */
+@media (max-width: 768px) {
+    .code-block,
+    pre.code-block,
+    pre[class*="language-"],
+    .help-content pre {
+        padding: 1rem;
+        font-size: 0.8rem;
+        border-radius: var(--border-radius);
+    }
+    
+    .code-copy-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    code:not(pre code) {
+        font-size: 0.8em;
+        padding: 0.15rem 0.35rem;
+    }
 }
 
 /* ===== Loading Spinner ===== */
