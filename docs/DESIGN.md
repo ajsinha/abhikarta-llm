@@ -814,7 +814,27 @@ MCP Server Connect
 
 ## 10. Pre-built Solutions
 
-### 10.1 Banking Agents (10)
+### 10.1 Template Libraries
+
+The platform includes comprehensive template libraries for rapid deployment:
+
+| Library | Count | Categories |
+|---------|-------|------------|
+| **Agent Templates** | 36 | 15 categories (Analytics, Banking, Development, Healthcare, Legal, etc.) |
+| **Workflow Templates** | 33 | 11 industries (Finance, Healthcare, HR, Legal, Technology, etc.) |
+| **Code Fragment Templates** | 25 | 16 workflows + 9 agents with URI-based code references |
+
+### 10.2 Code Fragment URI Schemes
+
+Templates reference code fragments using standardized URI schemes:
+
+| Scheme | Format | Example | Use Case |
+|--------|--------|---------|----------|
+| `db://` | `db://code_fragments/<id>` | `db://code_fragments/data_validator` | Database-managed code |
+| `s3://` | `s3://<bucket>/<key>` | `s3://ml-models/fraud_detector.py` | Cloud-stored code |
+| `file://` | `file:///<path>` | `file:///opt/abhikarta/fragments/custom.py` | Local file system |
+
+### 10.3 Banking Agents (10)
 
 | Agent | Description | Tools Used |
 |-------|-------------|------------|

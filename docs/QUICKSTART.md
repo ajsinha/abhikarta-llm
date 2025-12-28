@@ -207,33 +207,47 @@ After login, you'll see the main dashboard with:
 
 ---
 
-## Use Pre-built Banking Solutions
+## Use Pre-built Template Solutions
 
-### Clone a Banking Agent
+### Browse Agent Templates
 
 1. Go to **Agents → Templates**
-2. Browse banking agents:
-   - KYC Verification Agent
-   - Loan Processing Agent
-   - Fraud Detection Agent
-   - Customer Service Agent
-   - Credit Risk Agent
-   - And 5 more...
-3. Click **Clone** to create your copy
+2. Browse 36 templates across 15 categories:
+   - **Analytics**: Data Pipeline, ML Inference, Report Generator
+   - **Banking**: KYC Verification, Loan Processing, Fraud Detection
+   - **Development**: Code Reviewer, Debug Assistant, API Tester
+   - **Healthcare**: Medical Assistant, Claims Processor
+   - **Legal**: Contract Analyst, Compliance Monitor
+   - **Customer Service**: Support Agent, FAQ Bot
+   - And more...
+3. Click **Use Template** to create your copy
 4. Customize as needed
 
-### Clone a Banking Workflow
+### Browse Workflow Templates
 
 1. Go to **Workflows → Templates**
-2. Browse banking workflows:
-   - Loan Application Processing
-   - Customer Onboarding
-   - Transaction Monitoring
-   - Mortgage Application
-   - Credit Card Application
-   - Wire Transfer
-   - Dispute Resolution
-3. Click **Clone** and customize
+2. Browse 33 templates across 11 industries:
+   - **Document Processing**: PDF Extraction, Invoice Processing
+   - **Data Processing**: ETL Pipeline, CSV Analyzer, Data Quality
+   - **Financial Processing**: Loan Application, Fraud Detection
+   - **Healthcare**: Claims Processing, Patient Intake
+   - **Human Resources**: Resume Screening, Onboarding
+   - **Legal**: Contract Review, Compliance Check
+   - **Technology**: Code Review, API Testing
+3. Click **Use Template** and customize
+
+### Code Fragment URIs
+
+Templates reference reusable code using URI schemes:
+```json
+{
+  "code_fragments": [
+    "db://code_fragments/data_validator",
+    "s3://abhikarta-fragments/ml_processor.py",
+    "file:///opt/abhikarta/fragments/custom.py"
+  ]
+}
+```
 
 ### Banking Tools Available
 
@@ -383,12 +397,14 @@ Add tool names to agent configuration:
 | **MCP Integration** | External tool servers | v1.1.6 |
 | **Pre-built Tools** | 85 ready-to-use tools | v1.1.7 |
 | **Tools Page** | Browse, search, filter tools | v1.1.7 |
-| **Banking Solutions** | 10 agents, 7 workflows | v1.1.7 |
 | **Tool View/Test Pages** | Dedicated tool detail & testing UI | v1.1.8 |
 | **Database Schema Docs** | 22 tables documented with ER diagram | v1.2.0 |
 | **Page Glossaries** | Contextual help on 22 templates | v1.2.0 |
 | **Database Delegates** | 9 modular delegates for DB operations | v1.2.1 |
 | **Actor System** | Pekko-inspired concurrency (millions of actors) | v1.2.3 |
+| **Agent Templates** | 36 templates across 15 categories | v1.2.3 |
+| **Workflow Templates** | 33 templates across 11 industries | v1.2.3 |
+| **Code Fragment URIs** | Templates use db://, s3://, file:// URIs | v1.2.3 |
 
 ### Architecture Layers
 

@@ -169,7 +169,35 @@ aws.region=us-east-1</code></pre>
 
 <hr class="my-5">
 
-<h2 id="workflow-usage">Using in Workflows</h2>
+<h2 id="workflow-usage">Using in Workflows & Templates</h2>
+
+<h5>In Template Definitions</h5>
+<p>Agent and workflow templates now reference code fragments using URIs:</p>
+<pre><code class="language-json">{
+  "template_id": "tpl_api_integration_agent",
+  "code_fragments": [
+    "db://code_fragments/oauth_handler",
+    "s3://abhikarta-fragments/api_client.py",
+    "db://code_fragments/response_parser"
+  ],
+  "workflow": {
+    "nodes": [
+      {
+        "node_id": "auth",
+        "node_type": "code_fragment",
+        "name": "Authenticate",
+        "config": {
+          "fragment_uri": "db://code_fragments/oauth_handler"
+        }
+      }
+    ]
+  }
+}</code></pre>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Template Statistics:</strong> 16 workflow templates and 9 agent templates include code fragment references using URI schemes.
+</div>
 
 <h5>In python_modules Section</h5>
 <pre><code class="language-json">{

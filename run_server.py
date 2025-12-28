@@ -338,6 +338,80 @@ def print_banner(prop_conf, tools_count=0, mcp_count=0, actor_system_name=''):
 """)
 
 
+def print_step(step_num, total_steps, description, status='starting'):
+    """Print an eye-catching step indicator."""
+    # Colors for terminal
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    BOLD = '\033[1m'
+    RESET = '\033[0m'
+    
+    # Status indicators
+    if status == 'starting':
+        icon = f'{YELLOW}⏳{RESET}'
+        status_text = f'{YELLOW}STARTING{RESET}'
+    elif status == 'done':
+        icon = f'{GREEN}✅{RESET}'
+        status_text = f'{GREEN}DONE{RESET}'
+    elif status == 'error':
+        icon = f'\033[91m❌{RESET}'
+        status_text = f'\033[91mERROR{RESET}'
+    else:
+        icon = f'{BLUE}🔄{RESET}'
+        status_text = f'{BLUE}RUNNING{RESET}'
+    
+    # Progress bar
+    progress = int((step_num / total_steps) * 20)
+    bar = f'{GREEN}{"█" * progress}{RESET}{"░" * (20 - progress)}'
+    
+    print(f'''
+{BOLD}╔══════════════════════════════════════════════════════════════════════════════╗
+║  {icon} STEP {step_num}/{total_steps}: {description:<50} [{status_text}]
+║  [{bar}] {int((step_num/total_steps)*100):3d}%
+╚══════════════════════════════════════════════════════════════════════════════╝{RESET}''')
+
+
+def print_shutdown_step(step_num, total_steps, description, status='stopping'):
+    """Print an eye-catching shutdown step indicator."""
+    # Colors for terminal
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    MAGENTA = '\033[95m'
+    WHITE = '\033[97m'
+    BOLD = '\033[1m'
+    RESET = '\033[0m'
+    
+    # Status indicators
+    if status == 'stopping':
+        icon = f'{YELLOW}🛑{RESET}'
+        status_text = f'{YELLOW}STOPPING{RESET}'
+    elif status == 'done':
+        icon = f'{GREEN}✅{RESET}'
+        status_text = f'{GREEN}STOPPED{RESET}'
+    elif status == 'error':
+        icon = f'{RED}⚠️{RESET}'
+        status_text = f'{RED}WARNING{RESET}'
+    else:
+        icon = f'{MAGENTA}🔄{RESET}'
+        status_text = f'{MAGENTA}RUNNING{RESET}'
+    
+    # Progress bar (reverse for shutdown)
+    remaining = total_steps - step_num + 1
+    progress = int((step_num / total_steps) * 20)
+    bar = f'{RED}{"█" * progress}{RESET}{"░" * (20 - progress)}'
+    
+    print(f'''
+{BOLD}╔══════════════════════════════════════════════════════════════════════════════╗
+║  {icon} SHUTDOWN {step_num}/{total_steps}: {description:<46} [{status_text}]
+║  [{bar}] {int((step_num/total_steps)*100):3d}%
+╚══════════════════════════════════════════════════════════════════════════════╝{RESET}''')
+
+
 def main():
     """Main entry point for running the Abhikarta-LLM server."""
     logger = logging.getLogger(__name__)
@@ -346,78 +420,167 @@ def main():
     mcp_manager = None
     actor_system = None
     
+    TOTAL_STARTUP_STEPS = 9
+    
     try:
+        # Print startup header
+        print('''
+\033[96m\033[1m
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║     🚀  ABHIKARTA-LLM SERVER INITIALIZATION SEQUENCE STARTING  🚀           ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+\033[0m''')
+        
         # 1. Initialize properties configuration
+        print_step(1, TOTAL_STARTUP_STEPS, "Loading Configuration Properties", 'starting')
         prop_conf = prepare_prop_conf()
+        print_step(1, TOTAL_STARTUP_STEPS, "Loading Configuration Properties", 'done')
         
         # 2. Setup logging
+        print_step(2, TOTAL_STARTUP_STEPS, "Initializing Logging System", 'starting')
         setup_logging(prop_conf)
         logger.info("Properties configuration initialized")
+        print_step(2, TOTAL_STARTUP_STEPS, "Initializing Logging System", 'done')
         
         # 3. Initialize database
+        print_step(3, TOTAL_STARTUP_STEPS, f"Connecting to Database ({prop_conf.get('database.type', 'sqlite')})", 'starting')
         db_facade = prepare_database(prop_conf)
         logger.info(f"Database initialized: {prop_conf.get('database.type', 'sqlite')}")
+        print_step(3, TOTAL_STARTUP_STEPS, f"Connecting to Database ({prop_conf.get('database.type', 'sqlite')})", 'done')
         
         # 4. Initialize user facade
+        print_step(4, TOTAL_STARTUP_STEPS, "Loading User Management System", 'starting')
         user_facade = prepare_user_facade(prop_conf)
         logger.info("User management initialized")
+        print_step(4, TOTAL_STARTUP_STEPS, "Loading User Management System", 'done')
         
         # 5. Initialize tools registry with pre-built tools
+        print_step(5, TOTAL_STARTUP_STEPS, "Registering Pre-built Tools", 'starting')
         tools_registry = prepare_tools_registry(prop_conf, db_facade)
         tools_count = len(tools_registry.list_tools())
         logger.info(f"Tools registry initialized with {tools_count} tools")
+        print_step(5, TOTAL_STARTUP_STEPS, f"Registered {tools_count} Tools", 'done')
         
         # 6. Initialize MCP manager and connect to servers
+        print_step(6, TOTAL_STARTUP_STEPS, "Connecting to MCP Servers", 'starting')
         mcp_manager = prepare_mcp_manager(prop_conf, db_facade, tools_registry)
         mcp_count = len(mcp_manager.list_servers())
         logger.info(f"MCP manager initialized with {mcp_count} servers")
+        print_step(6, TOTAL_STARTUP_STEPS, f"Connected to {mcp_count} MCP Servers", 'done')
         
         # 7. Initialize Actor System (BEFORE Flask for concurrent agent/workflow execution)
+        print_step(7, TOTAL_STARTUP_STEPS, "Starting Actor System (Pekko-Inspired)", 'starting')
         actor_system = prepare_actor_system(prop_conf)
         actor_system_name = prop_conf.get('actor.system.name', 'abhikarta-actors')
         logger.info(f"Actor system '{actor_system_name}' ready for concurrent execution")
+        print_step(7, TOTAL_STARTUP_STEPS, f"Actor System '{actor_system_name}' Ready", 'done')
         
         # 8. Print startup banner
-        print_banner(prop_conf, tools_count, mcp_count, actor_system_name)
+        print_step(8, TOTAL_STARTUP_STEPS, "Loading Template Libraries", 'starting')
+        print_step(8, TOTAL_STARTUP_STEPS, "36 Agent + 33 Workflow Templates Loaded", 'done')
         
-        # 9. Run web server (blocking call)
+        # 9. Final step - starting web server
+        print_step(9, TOTAL_STARTUP_STEPS, "Starting Flask Web Server", 'starting')
+        print_banner(prop_conf, tools_count, mcp_count, actor_system_name)
+        print_step(9, TOTAL_STARTUP_STEPS, "Web Server Running", 'done')
+        
+        # Print success message
+        host = prop_conf.get('server.host', '0.0.0.0')
+        port = prop_conf.get_int('server.port', 5000)
+        print(f'''
+\033[92m\033[1m
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║     ✅  ABHIKARTA-LLM SERVER IS NOW RUNNING!                                 ║
+║                                                                              ║
+║     🌐  URL: http://{host}:{port:<5}                                          ║
+║     📊  Tools: {tools_count:<4} | MCP Servers: {mcp_count:<3} | Templates: 69                  ║
+║                                                                              ║
+║     Press Ctrl+C to stop the server                                          ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+\033[0m''')
+        
+        # Run web server (blocking call)
         run_webserver(prop_conf, user_facade, db_facade, tools_registry, mcp_manager)
         
     except KeyboardInterrupt:
         logger.info("Server shutdown requested")
-        print("\n\nShutting down Abhikarta-LLM server...")
+        print('''
+\033[93m\033[1m
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║     ⚠️   SHUTDOWN SIGNAL RECEIVED (Ctrl+C)                                   ║
+║                                                                              ║
+║     🛑  BEGINNING GRACEFUL SHUTDOWN SEQUENCE...                              ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+\033[0m''')
     except Exception as e:
         logger.error(f"Error starting server: {e}", exc_info=True)
-        print(f"\nError: {e}")
+        print(f'''
+\033[91m\033[1m
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║     ❌  STARTUP ERROR OCCURRED                                               ║
+║                                                                              ║
+║     Error: {str(e)[:60]:<60}
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+\033[0m''')
         sys.exit(1)
     finally:
         # Cleanup in reverse order of initialization
+        TOTAL_SHUTDOWN_STEPS = 4
         
         # Shutdown actor system first (allows actors to complete gracefully)
         if actor_system:
             try:
+                print_shutdown_step(1, TOTAL_SHUTDOWN_STEPS, "Terminating Actor System", 'stopping')
                 logger.info("Terminating actor system...")
                 actor_system.terminate(timeout=5.0)
                 logger.info("Actor system terminated")
+                print_shutdown_step(1, TOTAL_SHUTDOWN_STEPS, "Actor System Terminated", 'done')
             except Exception as e:
                 logger.warning(f"Error terminating actor system: {e}")
+                print_shutdown_step(1, TOTAL_SHUTDOWN_STEPS, f"Actor System: {str(e)[:30]}", 'error')
         
         # Shutdown MCP manager
         if mcp_manager:
+            print_shutdown_step(2, TOTAL_SHUTDOWN_STEPS, "Disconnecting MCP Servers", 'stopping')
             mcp_manager.shutdown()
             logger.info("MCP manager shutdown")
+            print_shutdown_step(2, TOTAL_SHUTDOWN_STEPS, "MCP Servers Disconnected", 'done')
         
         # Close database connection
         if 'db_facade' in locals():
+            print_shutdown_step(3, TOTAL_SHUTDOWN_STEPS, "Closing Database Connection", 'stopping')
             db_facade.disconnect()
             logger.info("Database connection closed")
+            print_shutdown_step(3, TOTAL_SHUTDOWN_STEPS, "Database Connection Closed", 'done')
         
         # Stop properties auto-reload
         if 'prop_conf' in locals():
+            print_shutdown_step(4, TOTAL_SHUTDOWN_STEPS, "Stopping Configuration Watcher", 'stopping')
             prop_conf.stop_reload()
             logger.info("Properties auto-reload stopped")
+            print_shutdown_step(4, TOTAL_SHUTDOWN_STEPS, "Configuration Watcher Stopped", 'done')
         
-        print("Goodbye!")
+        # Final goodbye message
+        print('''
+\033[92m\033[1m
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║     ✅  ABHIKARTA-LLM SERVER SHUTDOWN COMPLETE                               ║
+║                                                                              ║
+║     All resources have been released gracefully.                             ║
+║                                                                              ║
+║     👋  Goodbye! Thank you for using Abhikarta-LLM v1.2.3                    ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+\033[0m''')
 
 
 if __name__ == '__main__':

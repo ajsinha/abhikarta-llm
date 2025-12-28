@@ -4,55 +4,152 @@
 
 {% block content %}
 <div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('mcp_plugins') }}">MCP Plugins</a></li>
+            <li class="breadcrumb-item active">Add Plugin</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1"><i class="bi bi-plug me-2"></i>Add MCP Plugin</h4>
+            <p class="text-muted mb-0">Register a new Model Context Protocol plugin</p>
+        </div>
+        <div>
+            <a href="{{ url_for('mcp_plugins') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Plugins
+            </a>
+        </div>
+    </div>
+
     <div class="row">
-        <div class="col-lg-8 mx-auto">
+        <div class="col-lg-8">
             <div class="card">
-                <div class="card-header bg-bmo-blue text-white">
-                    <h5 class="mb-0"><i class="bi bi-plug me-2"></i>Add MCP Plugin</h5>
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Plugin Configuration</h5>
                 </div>
                 <div class="card-body">
                     {% if error %}
-                    <div class="alert alert-danger">{{ error }}</div>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                     {% endif %}
                     
                     <form method="POST">
-                        <div class="mb-3">
-                            <label for="plugin_id" class="form-label">Plugin ID</label>
-                            <input type="text" class="form-control" id="plugin_id" name="plugin_id" required pattern="[a-z0-9-]+" placeholder="my-plugin">
-                            <div class="form-text">Lowercase letters, numbers, and hyphens only</div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="plugin_id" class="form-label">Plugin ID <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="plugin_id" name="plugin_id" required 
+                                       pattern="[a-z0-9-]+" placeholder="my-plugin">
+                                <div class="form-text">Lowercase letters, numbers, and hyphens only</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Display Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required placeholder="My Plugin">
+                            </div>
+                            <div class="col-12">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" 
+                                          placeholder="What does this plugin do? What tools does it provide?"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="plugin_type" class="form-label">Connection Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="plugin_type" name="plugin_type" required>
+                                    <option value="http">HTTP/SSE (Remote Server)</option>
+                                    <option value="stdio">STDIO (Local Process)</option>
+                                </select>
+                                <div class="form-text">How to communicate with the MCP server</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4 pt-2">
+                                    <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
+                                    <label class="form-check-label" for="is_active">
+                                        <strong>Active</strong> - Enable immediately after adding
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- HTTP Configuration -->
+                            <div class="col-12" id="http_config">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title"><i class="bi bi-globe me-2"></i>HTTP/SSE Configuration</h6>
+                                        <div class="mb-3">
+                                            <label for="base_url" class="form-label">Base URL <span class="text-danger">*</span></label>
+                                            <input type="url" class="form-control" id="base_url" name="base_url" 
+                                                   placeholder="http://localhost:8080">
+                                            <div class="form-text">The MCP server's base URL (e.g., http://localhost:3000)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- STDIO Configuration -->
+                            <div class="col-12" id="stdio_config" style="display:none;">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title"><i class="bi bi-terminal me-2"></i>STDIO Configuration</h6>
+                                        <div class="mb-3">
+                                            <label for="command" class="form-label">Command <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="command" name="command" 
+                                                   placeholder="npx @modelcontextprotocol/server-filesystem /path/to/allowed/dir">
+                                            <div class="form-text">Command to start the MCP server process</div>
+                                        </div>
+                                        <div class="mb-0">
+                                            <label for="args" class="form-label">Additional Arguments</label>
+                                            <input type="text" class="form-control" id="args" name="args" 
+                                                   placeholder="--verbose --port 8080">
+                                            <div class="form-text">Optional command-line arguments (space-separated)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Display Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required placeholder="My Plugin">
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="2" placeholder="What does this plugin do?"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="plugin_type" class="form-label">Plugin Type</label>
-                            <select class="form-select" id="plugin_type" name="plugin_type" required>
-                                <option value="http">HTTP/SSE</option>
-                                <option value="stdio">STDIO (Local Process)</option>
-                            </select>
-                        </div>
-                        <div class="mb-3" id="http_config">
-                            <label for="base_url" class="form-label">Base URL</label>
-                            <input type="url" class="form-control" id="base_url" name="base_url" placeholder="http://localhost:8080">
-                        </div>
-                        <div class="mb-3" id="stdio_config" style="display:none;">
-                            <label for="command" class="form-label">Command</label>
-                            <input type="text" class="form-control" id="command" name="command" placeholder="python /path/to/server.py">
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
-                            <label class="form-check-label" for="is_active">Active</label>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Add Plugin</button>
-                            <a href="{{ url_for('mcp_plugins') }}" class="btn btn-secondary">Cancel</a>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ url_for('mcp_plugins') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i>Add Plugin
+                            </button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Help Sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Quick Help</h6>
+                </div>
+                <div class="card-body">
+                    <h6>What is MCP?</h6>
+                    <p class="small text-muted">Model Context Protocol (MCP) is an open protocol that enables AI assistants to connect with external tools and data sources.</p>
+                    
+                    <h6>Connection Types</h6>
+                    <ul class="small text-muted">
+                        <li><strong>HTTP/SSE</strong>: Connect to a remote MCP server running on a URL</li>
+                        <li><strong>STDIO</strong>: Launch a local MCP server process</li>
+                    </ul>
+                    
+                    <h6>Example STDIO Commands</h6>
+                    <pre class="small bg-light p-2 rounded"><code>npx @modelcontextprotocol/server-filesystem /path
+python mcp_server.py
+node mcp-server.js</code></pre>
+                    
+                    <a href="{{ url_for('help_page', page='mcp_plugins') }}" class="btn btn-outline-info btn-sm w-100">
+                        <i class="bi bi-book me-1"></i>Read Full Documentation
+                    </a>
                 </div>
             </div>
         </div>
@@ -61,8 +158,13 @@
 
 <script>
 document.getElementById('plugin_type').addEventListener('change', function() {
-    document.getElementById('http_config').style.display = this.value === 'http' ? 'block' : 'none';
-    document.getElementById('stdio_config').style.display = this.value === 'stdio' ? 'block' : 'none';
+    const isHttp = this.value === 'http';
+    document.getElementById('http_config').style.display = isHttp ? 'block' : 'none';
+    document.getElementById('stdio_config').style.display = isHttp ? 'none' : 'block';
+    
+    // Update required attributes
+    document.getElementById('base_url').required = isHttp;
+    document.getElementById('command').required = !isHttp;
 });
 </script>
 {% endblock %}

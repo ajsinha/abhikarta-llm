@@ -8,8 +8,10 @@
 
 {% block help_nav %}
 <a href="#workflow-dags">Workflow DAGs</a>
+<a href="#code-fragments">Code Fragments</a>
 <a href="#tools-system">Tools System</a>
 <a href="#prebuilt-tools">Pre-built Tools</a>
+<a href="#template-libraries">Template Libraries</a>
 <a href="#banking-solutions">Banking Solutions</a>
 <a href="#llm-management">LLM Management</a>
 <a href="#hitl">Human-in-the-Loop</a>
@@ -120,11 +122,12 @@ openai_funcs = registry.to_openai_functions()</code></pre>
 <h2 id="prebuilt-tools">Pre-built Tools Library <span class="badge bg-success">v1.2.3</span></h2>
 <div class="row align-items-center mb-5">
     <div class="col-lg-6 order-lg-2">
-        <p class="lead">60+ ready-to-use tools across common categories.</p>
+        <p class="lead">85+ ready-to-use tools across common categories.</p>
         <ul>
             <li><strong>Common Tools (28):</strong> Date/time, math, text, validation, conversion</li>
             <li><strong>Banking Tools (13):</strong> KYC, credit, loan, transaction, compliance</li>
             <li><strong>Integration Tools (20):</strong> HTTP, notifications, data transformation</li>
+            <li><strong>General Tools (24):</strong> Web, document, file, system, network</li>
             <li>All tools follow BaseTool architecture</li>
             <li>Automatically registered on startup</li>
             <li>Compatible with all LLM providers</li>
@@ -150,6 +153,56 @@ analyze_transaction(transaction={
     "type": "wire_transfer",
     "is_international": True
 })</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="template-libraries">Template Libraries <span class="badge bg-success">v1.2.3</span></h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6">
+        <p class="lead">Comprehensive template libraries for rapid deployment.</p>
+        <h6>Agent Templates (36)</h6>
+        <ul class="list-unstyled">
+            <li><i class="bi bi-robot text-primary me-2"></i><strong>Analytics (6):</strong> Data Pipeline, ML Inference, Report Generator</li>
+            <li><i class="bi bi-code-slash text-info me-2"></i><strong>Development (4):</strong> Code Reviewer, Debug Assistant, API Tester</li>
+            <li><i class="bi bi-bank text-success me-2"></i><strong>Banking (3):</strong> KYC, Loan Processor, Fraud Detector</li>
+            <li><i class="bi bi-heart-pulse text-danger me-2"></i><strong>Healthcare (2):</strong> Medical Assistant, Claims Processor</li>
+            <li><i class="bi bi-briefcase text-warning me-2"></i><strong>+ 11 more categories...</strong></li>
+        </ul>
+        <h6>Workflow Templates (33)</h6>
+        <ul class="list-unstyled">
+            <li><i class="bi bi-file-earmark-text text-primary me-2"></i><strong>Document Processing (4):</strong> PDF Extraction, Invoice Processing</li>
+            <li><i class="bi bi-database text-info me-2"></i><strong>Data Processing (4):</strong> ETL Pipeline, Data Quality</li>
+            <li><i class="bi bi-currency-dollar text-success me-2"></i><strong>Financial (4):</strong> Loan Application, Fraud Detection</li>
+            <li><i class="bi bi-diagram-3 text-warning me-2"></i><strong>+ 8 more categories...</strong></li>
+        </ul>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">Code Fragment URIs</div>
+            <div class="card-body">
+                <p>Templates reference code using URI schemes:</p>
+                <pre><code class="language-json">{
+  "code_fragments": [
+    "db://code_fragments/data_validator",
+    "s3://ml-models/fraud_detector.py",
+    "file:///opt/fragments/custom.py"
+  ],
+  "workflow": {
+    "nodes": [
+      {
+        "node_id": "validate",
+        "node_type": "code_fragment",
+        "config": {
+          "fragment_uri": "db://code_fragments/data_validator"
+        }
+      }
+    ]
+  }
+}</code></pre>
+            </div>
+        </div>
     </div>
 </div>
 

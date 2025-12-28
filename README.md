@@ -6,11 +6,17 @@
 
 **Enterprise-grade AI Agent & Workflow Orchestration Platform**
 
-Abhikarta-LLM is a comprehensive platform for building, deploying, and managing AI agents and workflows with multi-provider LLM support, visual designers, human-in-the-loop controls, and banking industry solutions.
+Abhikarta-LLM is a comprehensive platform for building, deploying, and managing AI agents and workflows with multi-provider LLM support, visual designers, human-in-the-loop controls, and industry-specific solutions.
 
 ---
 
 ## 🚀 What's New in v1.2.3
+
+### Expanded Template Libraries
+- **36 Agent Templates** across 15 categories (Analytics, Banking, Development, Healthcare, Legal, etc.)
+- **33 Workflow Templates** across 11 industries (Finance, Healthcare, HR, Legal, Sales, Technology, etc.)
+- **Code Fragment URI Support**: Templates now reference code fragments using proper URIs (`db://`, `s3://`, `file://`)
+- **Industry-Specific Solutions**: Ready-to-use templates for Banking, Healthcare, Legal, HR, and more
 
 ### Actor System - Pekko-Inspired Concurrency Framework
 - **ActorSystem**: Complete runtime for creating and managing actors
@@ -62,9 +68,10 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Quick Actions**: View details or test directly from listing
 - **Auto-Refresh**: MCP server tools automatically sync on connect/disconnect
 
-### Banking Industry Solutions
-- **10 Pre-built Agents**: KYC, Loan Processing, Fraud Detection, Credit Risk, Customer Service, etc.
-- **7 Production-Ready Workflows**: Loan Application, Customer Onboarding, Transaction Monitoring, Mortgage, Wire Transfer
+### Industry Template Solutions
+- **36 Agent Templates**: Across 15 categories including Analytics, Banking, Development, Healthcare, Legal, HR
+- **33 Workflow Templates**: Across 11 industries including Finance, Healthcare, HR, Legal, Technology
+- **Code Fragment Support**: 16 workflow templates and 9 agent templates with URI-based code fragments
 - **Clone & Customize**: All solutions can be cloned, modified, and deployed immediately
 
 ### Auto-initialization at Startup
@@ -87,13 +94,14 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Visual Agent Designer**: Drag-and-drop interface with 14 node types
 - **Multiple Agent Types**: ReAct, Chain-of-Thought, Plan-and-Execute, Custom
 - **Tool Integration**: Function tools, MCP tools, HTTP tools, code fragments
-- **Pre-built Agents**: 10+ banking agents ready for deployment
+- **36 Pre-built Templates**: Across 15 categories ready for deployment
+- **Code Fragment URIs**: Reference code via `db://`, `s3://`, `file://` schemes
 
 ### 📊 Workflow Orchestration
 - **Visual Workflow Designer**: 10 node types (Start, End, LLM, Agent, Tool, Code, RAG, Condition, Passthrough, HITL)
 - **DAG Execution Engine**: JSON-defined workflows with Python execution
 - **Parallel Processing**: Fork/join patterns, conditional routing
-- **Pre-built Workflows**: 7+ banking workflows with HITL integration
+- **33 Pre-built Templates**: Across 11 industries with HITL integration
 
 ### 🔧 Tools System (v1.1.6+)
 - **BaseTool Architecture**: Abstract base class for all tool types
@@ -124,6 +132,30 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Loan Processing**: EMI calculation, amortization schedules
 - **Fraud Detection**: Transaction analysis, pattern detection
 - **Compliance**: AML reporting, regulatory validation
+
+### 🏭 Industry Template Categories
+
+#### Workflow Templates (33 total)
+| Category | Count | Examples |
+|----------|-------|----------|
+| Document Processing | 4 | PDF Extraction, Invoice Processing, Classification |
+| Data Processing | 4 | ETL Pipeline, CSV Analyzer, Data Quality |
+| Automation | 5 | Email Routing, Report Generator, Web Scraper |
+| Financial Processing | 4 | Loan Application, Fraud Detection, KYC |
+| Healthcare | 2 | Claims Processing, Patient Intake |
+| Human Resources | 3 | Resume Screening, Onboarding, Performance Review |
+| Legal | 2 | Contract Review, Compliance Check |
+| Technology | 3 | Code Review, Incident Response, API Testing |
+
+#### Agent Templates (36 total)
+| Category | Count | Examples |
+|----------|-------|----------|
+| Analytics | 6 | Data Pipeline, ML Inference, Report Generator |
+| Development | 4 | Code Reviewer, Debug Assistant, API Tester |
+| Banking | 3 | Loan Processor, Fraud Detector, KYC Verification |
+| Healthcare | 2 | Medical Assistant, Claims Processor |
+| Legal | 2 | Contract Analyst, Compliance Monitor |
+| Customer Service | 3 | Support Agent, FAQ Bot, Complaint Handler |
 
 ### 🔐 Security & RBAC
 - **Role-Based Access**: Super Admin, Domain Admin, Agent Developer, Agent User
@@ -402,7 +434,7 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.2.3 | 2025-01 | Modular Database Delegates (9 delegates), DatabaseDelegate abstract class, refactored DB layer |
+| 1.2.3 | 2025-01 | Template Libraries (36 agent, 33 workflow), Code Fragment URIs, Actor System, Modular Database Delegates |
 | 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |
 | 1.1.8 | 2025-01 | Tool View/Test pages, dedicated tool detail UI, form-based testing |
 | 1.1.7 | 2025-01 | Pre-built tools (85), Tools page, General tools, MCP auto-sync, Banking solutions |
