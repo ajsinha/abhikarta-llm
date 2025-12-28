@@ -1,6 +1,6 @@
-# Abhikarta-LLM v1.2.0
+# Abhikarta-LLM v1.2.1
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.2.1-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
@@ -10,23 +10,27 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ---
 
-## 🚀 What's New in v1.2.0
+## 🚀 What's New in v1.2.1
 
-### Database Schema Documentation
+### Modular Database Delegate Architecture
+- **DatabaseDelegate Abstract Base**: New abstract class for domain-specific database operations
+- **9 Specialized Delegates**: Modular handlers for each database domain
+  - `UserDelegate`: Users, Roles, Sessions, API Keys
+  - `LLMDelegate`: Providers, Models, Permissions, Calls
+  - `AgentDelegate`: Agents, Versions, Templates
+  - `WorkflowDelegate`: Workflows, Nodes
+  - `ExecutionDelegate`: Executions, Steps
+  - `HITLDelegate`: Tasks, Comments, Assignments
+  - `MCPDelegate`: Plugins, Tool Servers
+  - `AuditDelegate`: Audit Logs, Settings
+  - `CodeFragmentDelegate`: Code Fragments
+- **Clean API**: `db_facade.users.get_user_by_id()`, `db_facade.agents.create_agent()`, etc.
+- **Encapsulated SQL**: All database queries confined to delegate layer
+
+### Database Schema Documentation (from v1.2.0)
 - **Comprehensive ER Diagram**: Visual representation of all 22 database tables
 - **Table Reference Guide**: Detailed column descriptions for every table
 - **Relationship Mapping**: Entity relationships clearly documented
-- **Index & Trigger Documentation**: Performance optimization details
-
-### Page-Specific Glossaries
-- **Contextual Help**: 6 relevant terms displayed on each page
-- **22 Templates Enhanced**: User, admin, agent, workflow pages updated
-- **Quick Links**: Direct access to full glossary from every page
-
-### Enhanced Help System
-- **New Help Card**: Database Schema added to documentation hub
-- **Improved Navigation**: Better organization of help topics
-- **Version 1.2.0 Branding**: Updated throughout all documentation
 
 ### Tool View & Test Pages (from v1.1.8)
 - **Dedicated Tool Detail Page**: Full tool information with parameters, schema, metadata
@@ -95,7 +99,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Workflow Integration**: HITL nodes pause execution for human input
 - **User & Admin Interfaces**: Separate views for different roles
 
-### 🏦 Banking Solutions (v1.2.0+)
+### 🏦 Banking Solutions (v1.2.1+)
 - **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
 - **Credit Assessment**: Credit scoring, DTI calculation, eligibility
 - **Loan Processing**: EMI calculation, amortization schedules
@@ -128,7 +132,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.2.0/
+abhikarta-llm-v1.2.1/
 ├── abhikarta/
 │   ├── __init__.py
 │   ├── agent/                    # Agent management
@@ -166,7 +170,7 @@ abhikarta-llm-v1.2.0/
 │   │   ├── code_fragment_tool.py # CodeFragmentTool
 │   │   ├── langchain_tool.py     # LangChain integration
 │   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.2.0)
+│   │   └── prebuilt/             # Pre-built tools (v1.2.1)
 │   │       ├── common_tools.py   # 28 common utilities
 │   │       ├── banking_tools.py  # 13 banking tools
 │   │       ├── integration_tools.py  # 20 integration tools
@@ -202,7 +206,7 @@ abhikarta-llm-v1.2.0/
 ├── config/
 │   └── application.properties    # Configuration file
 ├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.2.0)
+│   └── prebuilt/                 # Pre-built solutions (v1.2.1)
 │       ├── agents/
 │       │   └── banking/          # 10 banking agents
 │       └── workflows/
@@ -379,6 +383,7 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.2.1 | 2025-01 | Modular Database Delegates (9 delegates), DatabaseDelegate abstract class, refactored DB layer |
 | 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |
 | 1.1.8 | 2025-01 | Tool View/Test pages, dedicated tool detail UI, form-based testing |
 | 1.1.7 | 2025-01 | Pre-built tools (85), Tools page, General tools, MCP auto-sync, Banking solutions |

@@ -7,7 +7,7 @@ This module provides:
 - ToolsRegistry for centralized tool management
 - Tool format converters for LLM integrations
 
-Version: 1.2.0
+Version: 1.2.1
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 """
@@ -104,4 +104,4 @@ __all__ = [
     'get_tools_registry',
 ]
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'

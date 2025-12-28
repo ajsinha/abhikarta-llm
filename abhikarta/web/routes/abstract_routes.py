@@ -90,21 +90,17 @@ class AbstractRoutes(ABC):
         """
         if self.db_facade:
             import json
-            import uuid
-            self.db_facade.execute(
-                """INSERT INTO audit_logs 
-                   (log_id, user_id, action, entity_type, entity_id, metadata, user_ip)
-                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    str(uuid.uuid4()),
-                    session.get('user_id'),
-                    action,
-                    resource_type,
-                    resource_id,
-                    json.dumps(details) if details else '{}',
-                    request.remote_addr
+            try:
+                self.db_facade.audit.log_action(
+                    action=action,
+                    entity_type=resource_type,
+                    entity_id=resource_id,
+                    user_id=session.get('user_id'),
+                    user_ip=request.remote_addr,
+                    metadata=json.dumps(details) if details else '{}'
                 )
-            )
+            except Exception as e:
+                logger.error(f"Error logging audit: {e}")
 
 
 def login_required(f):

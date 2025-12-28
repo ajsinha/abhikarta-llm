@@ -1,4 +1,4 @@
-# Abhikarta-LLM v1.2.0 - Architecture Design Document
+# Abhikarta-LLM v1.2.1 - Architecture Design Document
 
 ## Table of Contents
 
@@ -534,7 +534,7 @@ class ToolsRegistry:
 - List/Array: 5 tools
 - Workflow: 3 tools
 
-#### General Tools (24) - NEW in v1.2.0
+#### General Tools (24) - NEW in v1.2.1
 - Web/Search: 4 tools (web_search, web_fetch, intranet_search, news_search)
 - Document Handling: 4 tools (read_document, write_document, convert_document, extract_document_metadata)
 - File Operations: 4 tools (list_files, copy_file, move_file, delete_file)
@@ -803,4 +803,4 @@ abhikarta/
 
 ---
 
-*Version 1.2.0 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
+*Version 1.2.1 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*

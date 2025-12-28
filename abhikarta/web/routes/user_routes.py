@@ -60,19 +60,14 @@ class UserRoutes(AbstractRoutes):
             # Get published agents available to this user
             agents = []
             try:
-                agents = self.db_facade.fetch_all(
-                    "SELECT * FROM agents WHERE status = 'published' ORDER BY name"
-                )
+                agents = self.db_facade.agents.get_all_agents(status='published')
             except Exception as e:
                 logger.error(f"Error getting agents: {e}")
             
             # Get user's recent executions
             executions = []
             try:
-                executions = self.db_facade.fetch_all(
-                    "SELECT * FROM executions WHERE user_id = ? ORDER BY started_at DESC LIMIT 10",
-                    (user_id,)
-                )
+                executions = self.db_facade.executions.get_recent_executions(user_id=user_id, limit=10)
             except Exception as e:
                 logger.error(f"Error getting executions: {e}")
             
@@ -90,9 +85,7 @@ class UserRoutes(AbstractRoutes):
             # Get published agents
             agents = []
             try:
-                agents = self.db_facade.fetch_all(
-                    "SELECT * FROM agents WHERE status = 'published' ORDER BY name"
-                )
+                agents = self.db_facade.agents.get_all_agents(status='published')
             except Exception as e:
                 logger.error(f"Error getting agents: {e}")
             
@@ -236,10 +229,7 @@ class UserRoutes(AbstractRoutes):
             
             executions = []
             try:
-                executions = self.db_facade.fetch_all(
-                    "SELECT * FROM executions WHERE user_id = ? ORDER BY started_at DESC",
-                    (user_id,)
-                )
+                executions = self.db_facade.executions.get_all_executions(user_id=user_id)
             except Exception as e:
                 logger.error(f"Error getting executions: {e}")
             
@@ -258,16 +248,10 @@ class UserRoutes(AbstractRoutes):
             
             execution = None
             try:
-                if is_admin:
-                    execution = self.db_facade.fetch_one(
-                        "SELECT * FROM executions WHERE execution_id = ?",
-                        (execution_id,)
-                    )
-                else:
-                    execution = self.db_facade.fetch_one(
-                        "SELECT * FROM executions WHERE execution_id = ? AND user_id = ?",
-                        (execution_id, user_id)
-                    )
+                execution = self.db_facade.executions.get_execution(execution_id)
+                # Check access - non-admins can only see their own
+                if execution and not is_admin and execution.get('user_id') != user_id:
+                    execution = None
             except Exception as e:
                 logger.error(f"Error getting execution: {e}")
             
@@ -275,13 +259,10 @@ class UserRoutes(AbstractRoutes):
                 flash('Execution not found', 'error')
                 return redirect(url_for('user_executions'))
             
-            # Get agent info
+            # Get agent info using delegate
             agent = None
             try:
-                agent = self.db_facade.fetch_one(
-                    "SELECT * FROM agents WHERE agent_id = ?",
-                    (execution['agent_id'],)
-                )
+                agent = self.db_facade.agents.get_agent(execution['agent_id'])
             except Exception as e:
                 logger.error(f"Error getting agent: {e}")
             

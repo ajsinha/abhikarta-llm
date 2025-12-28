@@ -60,36 +60,31 @@ class AdminRoutes(AbstractRoutes):
             # Get user statistics
             stats = self.user_facade.get_statistics()
             
-            # Get agent count
+            # Get agent count using delegate
             agent_count = 0
             try:
-                result = self.db_facade.fetch_one("SELECT COUNT(*) as count FROM agents")
-                agent_count = result['count'] if result else 0
+                agent_count = self.db_facade.agents.get_agents_count()
             except Exception as e:
                 logger.error(f"Error getting agent count: {e}")
             
-            # Get execution count
+            # Get execution count using delegate
             execution_count = 0
             try:
-                result = self.db_facade.fetch_one("SELECT COUNT(*) as count FROM executions")
-                execution_count = result['count'] if result else 0
+                execution_count = self.db_facade.executions.get_executions_count()
             except Exception as e:
                 logger.error(f"Error getting execution count: {e}")
             
-            # Get MCP plugin count
+            # Get MCP plugin count using delegate
             mcp_count = 0
             try:
-                result = self.db_facade.fetch_one("SELECT COUNT(*) as count FROM mcp_plugins")
-                mcp_count = result['count'] if result else 0
+                mcp_count = self.db_facade.mcp.get_plugins_count()
             except Exception as e:
                 logger.error(f"Error getting MCP plugin count: {e}")
             
-            # Get recent audit logs
+            # Get recent audit logs using delegate
             audit_logs = []
             try:
-                audit_logs = self.db_facade.fetch_all(
-                    "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
-                )
+                audit_logs = self.db_facade.audit.get_recent_logs(limit=10)
             except Exception as e:
                 logger.error(f"Error getting audit logs: {e}")
             
@@ -294,19 +289,16 @@ class AdminRoutes(AbstractRoutes):
             per_page = 50
             offset = (page - 1) * per_page
             
-            # Get total count
+            # Get total count using delegate
             try:
-                result = self.db_facade.fetch_one("SELECT COUNT(*) as count FROM audit_logs")
-                total_count = result['count'] if result else 0
+                total_count = self.db_facade.audit.get_audit_logs_count()
             except:
                 total_count = 0
             
-            # Get logs
+            # Get logs using delegate
             logs = []
             try:
-                logs = self.db_facade.fetch_all(
-                    f"SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT {per_page} OFFSET {offset}"
-                )
+                logs = self.db_facade.audit.get_audit_logs(limit=per_page, offset=offset)
             except Exception as e:
                 logger.error(f"Error getting audit logs: {e}")
             
@@ -546,10 +538,7 @@ class AdminRoutes(AbstractRoutes):
             categories = set()
             
             try:
-                result = self.db_facade.fetch_all(
-                    "SELECT * FROM code_fragments ORDER BY category, name"
-                )
-                fragments = result if result else []
+                fragments = self.db_facade.code_fragments.get_all_fragments()
                 
                 # Extract unique categories
                 for f in fragments:
@@ -592,17 +581,23 @@ class AdminRoutes(AbstractRoutes):
                 deps_list = [d.strip() for d in dependencies.split(',') if d.strip()] if dependencies else []
                 
                 try:
-                    self.db_facade.execute(
-                        """INSERT INTO code_fragments 
-                           (fragment_id, name, description, language, code, category, tags, dependencies, created_by)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                        (fragment_id, name, description, language, code, category,
-                         json.dumps(tags_list), json.dumps(deps_list), session.get('user_id'))
+                    result = self.db_facade.code_fragments.create_fragment(
+                        name=name,
+                        code=code,
+                        created_by=session.get('user_id'),
+                        description=description,
+                        language=language,
+                        category=category,
+                        tags=json.dumps(tags_list),
+                        dependencies=json.dumps(deps_list)
                     )
                     
-                    self.log_audit('create_code_fragment', 'code_fragment', fragment_id)
-                    flash(f'Code fragment "{name}" created successfully', 'success')
-                    return redirect(url_for('admin_code_fragments'))
+                    if result:
+                        self.log_audit('create_code_fragment', 'code_fragment', fragment_id)
+                        flash(f'Code fragment "{name}" created successfully', 'success')
+                        return redirect(url_for('admin_code_fragments'))
+                    else:
+                        flash('Error creating code fragment', 'error')
                     
                 except Exception as e:
                     logger.error(f"Error creating code fragment: {e}")
@@ -620,10 +615,7 @@ class AdminRoutes(AbstractRoutes):
             import json
             
             try:
-                fragment = self.db_facade.fetch_one(
-                    "SELECT * FROM code_fragments WHERE fragment_id = ?",
-                    (fragment_id,)
-                )
+                fragment = self.db_facade.code_fragments.get_fragment(fragment_id)
                 
                 if not fragment:
                     flash('Code fragment not found', 'error')
@@ -651,10 +643,7 @@ class AdminRoutes(AbstractRoutes):
             import json
             
             try:
-                fragment = self.db_facade.fetch_one(
-                    "SELECT * FROM code_fragments WHERE fragment_id = ?",
-                    (fragment_id,)
-                )
+                fragment = self.db_facade.code_fragments.get_fragment(fragment_id)
                 
                 if not fragment:
                     flash('Code fragment not found', 'error')
@@ -684,15 +673,18 @@ class AdminRoutes(AbstractRoutes):
                     parts[-1] = str(int(parts[-1]) + 1)
                     new_version = '.'.join(parts)
                     
-                    self.db_facade.execute(
-                        """UPDATE code_fragments 
-                           SET name=?, description=?, language=?, code=?, category=?, 
-                               tags=?, dependencies=?, is_active=?, version=?, 
-                               updated_at=CURRENT_TIMESTAMP, updated_by=?
-                           WHERE fragment_id=?""",
-                        (name, description, language, code, category,
-                         json.dumps(tags_list), json.dumps(deps_list), is_active, new_version,
-                         session.get('user_id'), fragment_id)
+                    self.db_facade.code_fragments.update_fragment(
+                        fragment_id,
+                        updated_by=session.get('user_id'),
+                        name=name,
+                        description=description,
+                        language=language,
+                        code=code,
+                        category=category,
+                        tags=json.dumps(tags_list),
+                        dependencies=json.dumps(deps_list),
+                        is_active=is_active,
+                        version=new_version
                     )
                     
                     self.log_audit('update_code_fragment', 'code_fragment', fragment_id)
@@ -720,19 +712,13 @@ class AdminRoutes(AbstractRoutes):
             """Delete a code fragment."""
             try:
                 # Check if it's a system fragment
-                fragment = self.db_facade.fetch_one(
-                    "SELECT is_system FROM code_fragments WHERE fragment_id = ?",
-                    (fragment_id,)
-                )
+                fragment = self.db_facade.code_fragments.get_fragment(fragment_id)
                 
                 if fragment and fragment.get('is_system'):
                     flash('Cannot delete system code fragments', 'error')
                     return redirect(url_for('admin_code_fragments'))
                 
-                self.db_facade.execute(
-                    "DELETE FROM code_fragments WHERE fragment_id = ?",
-                    (fragment_id,)
-                )
+                self.db_facade.code_fragments.delete_fragment(fragment_id)
                 
                 self.log_audit('delete_code_fragment', 'code_fragment', fragment_id)
                 flash('Code fragment deleted successfully', 'success')
@@ -748,20 +734,17 @@ class AdminRoutes(AbstractRoutes):
         def toggle_code_fragment(fragment_id):
             """Toggle code fragment active status."""
             try:
-                fragment = self.db_facade.fetch_one(
-                    "SELECT is_active FROM code_fragments WHERE fragment_id = ?",
-                    (fragment_id,)
-                )
+                fragment = self.db_facade.code_fragments.get_fragment(fragment_id)
                 
                 if not fragment:
                     return jsonify({'error': 'Fragment not found'}), 404
                 
-                new_status = 0 if fragment.get('is_active') else 1
-                
-                self.db_facade.execute(
-                    "UPDATE code_fragments SET is_active = ? WHERE fragment_id = ?",
-                    (new_status, fragment_id)
-                )
+                if fragment.get('is_active'):
+                    self.db_facade.code_fragments.deactivate_fragment(fragment_id)
+                    new_status = 0
+                else:
+                    self.db_facade.code_fragments.activate_fragment(fragment_id)
+                    new_status = 1
                 
                 self.log_audit('toggle_code_fragment', 'code_fragment', fragment_id, {'is_active': new_status})
                 return jsonify({'success': True, 'is_active': new_status})
@@ -780,9 +763,7 @@ class AdminRoutes(AbstractRoutes):
             """Display LLM providers management page."""
             providers = []
             try:
-                providers = self.db_facade.fetch_all(
-                    "SELECT * FROM llm_providers ORDER BY is_default DESC, name"
-                ) or []
+                providers = self.db_facade.llm.get_all_providers()
             except Exception as e:
                 logger.error(f"Error getting LLM providers: {e}")
             
@@ -812,18 +793,24 @@ class AdminRoutes(AbstractRoutes):
                     return redirect(url_for('add_llm_provider'))
                 
                 try:
-                    self.db_facade.execute(
-                        """INSERT INTO llm_providers 
-                           (provider_id, name, description, provider_type, api_endpoint, 
-                            api_key_name, rate_limit_rpm, rate_limit_tpm, is_active, created_by)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                        (provider_id, name, description, provider_type, api_endpoint,
-                         api_key_name, rate_limit_rpm, rate_limit_tpm, is_active,
-                         session.get('user_id'))
+                    result = self.db_facade.llm.create_provider(
+                        provider_id=provider_id,
+                        name=name,
+                        provider_type=provider_type,
+                        description=description,
+                        api_endpoint=api_endpoint,
+                        api_key_name=api_key_name,
+                        rate_limit_rpm=rate_limit_rpm,
+                        rate_limit_tpm=rate_limit_tpm,
+                        is_active=is_active,
+                        created_by=session.get('user_id')
                     )
-                    self.log_audit('create_llm_provider', 'llm_provider', provider_id)
-                    flash(f'LLM Provider "{name}" created successfully', 'success')
-                    return redirect(url_for('admin_llm_providers'))
+                    if result:
+                        self.log_audit('create_llm_provider', 'llm_provider', provider_id)
+                        flash(f'LLM Provider "{name}" created successfully', 'success')
+                        return redirect(url_for('admin_llm_providers'))
+                    else:
+                        flash('Error creating provider', 'error')
                 except Exception as e:
                     logger.error(f"Error creating LLM provider: {e}")
                     flash(f'Error creating provider: {str(e)}', 'error')
@@ -838,10 +825,7 @@ class AdminRoutes(AbstractRoutes):
         def edit_llm_provider(provider_id):
             """Edit an LLM provider."""
             try:
-                provider = self.db_facade.fetch_one(
-                    "SELECT * FROM llm_providers WHERE provider_id = ?",
-                    (provider_id,)
-                )
+                provider = self.db_facade.llm.get_provider(provider_id)
                 if not provider:
                     flash('Provider not found', 'error')
                     return redirect(url_for('admin_llm_providers'))
@@ -888,18 +872,12 @@ class AdminRoutes(AbstractRoutes):
             """Delete an LLM provider."""
             try:
                 # Check if provider has models
-                models = self.db_facade.fetch_all(
-                    "SELECT model_id FROM llm_models WHERE provider_id = ?",
-                    (provider_id,)
-                )
+                models = self.db_facade.llm.get_provider_models(provider_id)
                 if models:
                     flash('Cannot delete provider with existing models. Delete models first.', 'error')
                     return redirect(url_for('admin_llm_providers'))
                 
-                self.db_facade.execute(
-                    "DELETE FROM llm_providers WHERE provider_id = ?",
-                    (provider_id,)
-                )
+                self.db_facade.llm.delete_provider(provider_id)
                 self.log_audit('delete_llm_provider', 'llm_provider', provider_id)
                 flash('Provider deleted successfully', 'success')
             except Exception as e:
@@ -923,26 +901,12 @@ class AdminRoutes(AbstractRoutes):
             try:
                 # Filter by provider if specified
                 if selected_provider:
-                    models = self.db_facade.fetch_all(
-                        """SELECT m.*, p.name as provider_name 
-                           FROM llm_models m 
-                           LEFT JOIN llm_providers p ON m.provider_id = p.provider_id
-                           WHERE m.provider_id = ?
-                           ORDER BY m.display_name""",
-                        (selected_provider,)
-                    ) or []
+                    models = self.db_facade.llm.get_all_models(provider_id=selected_provider)
                 else:
-                    models = self.db_facade.fetch_all(
-                        """SELECT m.*, p.name as provider_name 
-                           FROM llm_models m 
-                           LEFT JOIN llm_providers p ON m.provider_id = p.provider_id
-                           ORDER BY p.name, m.display_name"""
-                    ) or []
+                    models = self.db_facade.llm.get_all_models()
                 
                 # Get ALL providers for filter (not just active ones)
-                providers = self.db_facade.fetch_all(
-                    "SELECT provider_id, name, is_active FROM llm_providers ORDER BY name"
-                ) or []
+                providers = self.db_facade.llm.get_all_providers()
             except Exception as e:
                 logger.error(f"Error getting LLM models: {e}")
             
@@ -1157,9 +1121,7 @@ class AdminRoutes(AbstractRoutes):
             """Display MCP Tool Servers management page."""
             servers = []
             try:
-                servers = self.db_facade.fetch_all(
-                    """SELECT * FROM mcp_tool_servers ORDER BY name"""
-                ) or []
+                servers = self.db_facade.mcp.get_all_servers()
             except Exception as e:
                 logger.error(f"Error getting MCP tool servers: {e}")
             
@@ -1198,17 +1160,23 @@ class AdminRoutes(AbstractRoutes):
                     auth_config = '{}'
                 
                 try:
-                    self.db_facade.execute(
-                        """INSERT INTO mcp_tool_servers 
-                           (server_id, name, description, base_url, tools_endpoint, 
-                            auth_type, auth_config, is_active, auto_refresh,
-                            refresh_interval_minutes, timeout_seconds, created_by)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                        (server_id, name, description, base_url, tools_endpoint,
-                         auth_type, auth_config, is_active, auto_refresh,
-                         refresh_interval, timeout_seconds, session.get('user_id'))
+                    result = self.db_facade.mcp.create_server(
+                        name=name,
+                        base_url=base_url,
+                        created_by=session.get('user_id'),
+                        description=description,
+                        tools_endpoint=tools_endpoint,
+                        auth_type=auth_type,
+                        auth_config=auth_config,
+                        is_active=is_active,
+                        auto_refresh=auto_refresh,
+                        refresh_interval_minutes=refresh_interval,
+                        timeout_seconds=timeout_seconds
                     )
-                    self.log_audit('create', 'mcp_tool_server', server_id)
+                    
+                    if result:
+                        server_id = result
+                        self.log_audit('create', 'mcp_tool_server', server_id)
                     
                     # Connect to MCP manager and load tools if active
                     if is_active:
@@ -1400,7 +1368,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.0')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.1')
                 
                 # Add auth if configured
                 auth_type = server.get('auth_type', 'none')
@@ -1501,7 +1469,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.0')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.1')
                 
                 # Add auth headers if configured
                 auth_type = server.get('auth_type', 'none')

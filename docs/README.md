@@ -1,6 +1,6 @@
 # Abhikarta-LLM Documentation
 
-**Version:** 1.2.0  
+**Version:** 1.2.1  
 **Copyright:** © 2025-2030 Ashutosh Sinha. All Rights Reserved.
 
 ## Documentation Index
@@ -12,7 +12,7 @@
 | [DESIGN.md](DESIGN.md) | Architecture and design |
 | [REQUIREMENTS.md](REQUIREMENTS.md) | Requirements specification |
 
-## Version 1.2.0 Features
+## Version 1.2.1 Features
 
 ### Tool View & Test Pages (NEW)
 - **Tool Detail Page** (`/tools/{name}`): Complete tool information with parameters, schema, and metadata
@@ -128,6 +128,7 @@
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.2.1 | Jan 2025 | Modular Database Delegates (9 delegates), DatabaseDelegate abstract class |
 | 1.2.0 | Jan 2025 | Database Schema docs (22 tables), Page glossaries, Enhanced help |
 | 1.1.8 | Jan 2025 | Tool View/Test pages, dedicated tool detail UI, form-based testing |
 | 1.1.7 | Jan 2025 | Pre-built tools (85), Tools page, General tools, MCP auto-sync |

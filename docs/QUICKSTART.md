@@ -1,4 +1,4 @@
-# Abhikarta-LLM v1.2.0 - Quick Start Guide
+# Abhikarta-LLM v1.2.1 - Quick Start Guide
 
 This guide will help you get started with Abhikarta-LLM in under 15 minutes.
 
@@ -387,6 +387,7 @@ Add tool names to agent configuration:
 | **Tool View/Test Pages** | Dedicated tool detail & testing UI | v1.1.8 |
 | **Database Schema Docs** | 22 tables documented with ER diagram | v1.2.0 |
 | **Page Glossaries** | Contextual help on 22 templates | v1.2.0 |
+| **Database Delegates** | 9 modular delegates for DB operations | v1.2.1 |
 
 ### Architecture Layers
 
@@ -404,8 +405,8 @@ Add tool names to agent configuration:
 │                   Integration Layer                          │
 │    LangChain │ LangGraph │ MCP Clients │ LLM Providers      │
 ├─────────────────────────────────────────────────────────────┤
-│                      Data Layer                              │
-│         PostgreSQL/SQLite │ 22 Tables │ Audit Logs          │
+│                      Data Layer (v1.2.1)                     │
+│  DatabaseFacade │ 9 Delegates │ SQLite/PostgreSQL │ 22 Tables│
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -444,7 +445,7 @@ Add tool names to agent configuration:
 ## File Structure Reference
 
 ```
-abhikarta-llm-v1.2.0/
+abhikarta-llm-v1.2.1/
 ├── abhikarta/
 │   ├── agent/          # Agent management
 │   ├── config/         # Configuration
@@ -466,4 +467,4 @@ abhikarta-llm-v1.2.0/
 
 ---
 
-*Version 1.2.0 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
+*Version 1.2.1 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
