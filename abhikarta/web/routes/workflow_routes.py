@@ -410,6 +410,127 @@ class WorkflowRoutes(AbstractRoutes):
                                    roles=session.get('roles', []),
                                    workflow=workflow)
         
+        # =====================================================================
+        # Workflow Template Routes
+        # =====================================================================
+        
+        @self.app.route('/workflows/templates')
+        @login_required
+        def workflow_templates():
+            """Browse workflow template library."""
+            from abhikarta.workflow.workflow_template import WorkflowTemplateManager
+            
+            template_manager = WorkflowTemplateManager()
+            templates = template_manager.list_templates()
+            categories = template_manager.get_categories()
+            industries = template_manager.get_industries()
+            
+            return render_template('workflows/templates.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   templates=templates,
+                                   categories=categories,
+                                   industries=industries)
+        
+        @self.app.route('/workflows/templates/<template_id>')
+        @login_required
+        def workflow_template_detail(template_id):
+            """View workflow template details."""
+            from abhikarta.workflow.workflow_template import WorkflowTemplateManager
+            
+            template_manager = WorkflowTemplateManager()
+            template = template_manager.get_template(template_id)
+            
+            if not template:
+                from flask import flash
+                flash('Template not found', 'error')
+                return redirect(url_for('workflow_templates'))
+            
+            return render_template('workflows/template_detail.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   template=template)
+        
+        @self.app.route('/workflows/templates/<template_id>/create')
+        @login_required
+        def create_workflow_from_template_page(template_id):
+            """Show create workflow from template page."""
+            from abhikarta.workflow.workflow_template import WorkflowTemplateManager
+            
+            template_manager = WorkflowTemplateManager()
+            template = template_manager.get_template(template_id)
+            
+            if not template:
+                from flask import flash
+                flash('Template not found', 'error')
+                return redirect(url_for('workflow_templates'))
+            
+            return render_template('workflows/create_from_template.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   template=template)
+        
+        @self.app.route('/workflows/templates/create', methods=['POST'])
+        @login_required
+        def create_workflow_from_template():
+            """Create a new workflow from a template."""
+            from flask import flash
+            from abhikarta.workflow.workflow_template import WorkflowTemplateManager
+            import uuid
+            from datetime import datetime
+            
+            template_id = request.form.get('template_id')
+            workflow_name = request.form.get('workflow_name', '').strip()
+            description = request.form.get('description', '').strip()
+            
+            if not template_id or not workflow_name:
+                flash('Template and workflow name are required', 'error')
+                return redirect(url_for('workflow_templates'))
+            
+            try:
+                template_manager = WorkflowTemplateManager()
+                template = template_manager.get_template(template_id)
+                
+                if not template:
+                    flash('Template not found', 'error')
+                    return redirect(url_for('workflow_templates'))
+                
+                # Create new workflow from template
+                workflow_id = f"wf_{uuid.uuid4().hex[:12]}"
+                
+                self.db_facade.execute(
+                    """INSERT INTO workflows 
+                       (workflow_id, name, description, dag_definition, python_modules, status, created_by, created_at)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        workflow_id,
+                        workflow_name,
+                        description or template.description,
+                        json.dumps(template.dag_definition),
+                        json.dumps(template.python_modules),
+                        'draft',
+                        session.get('user_id'),
+                        datetime.utcnow().isoformat()
+                    )
+                )
+                
+                # Increment template use count
+                template.use_count += 1
+                
+                flash(f'Workflow "{workflow_name}" created from template!', 'success')
+                logger.info(f"Created workflow {workflow_id} from template {template_id}")
+                
+                return redirect(url_for('workflow_designer', workflow_id=workflow_id))
+                
+            except Exception as e:
+                logger.error(f"Error creating workflow from template: {e}")
+                flash(f'Error: {str(e)}', 'error')
+            
+            return redirect(url_for('workflow_templates'))
+
         @self.app.route('/api/workflows/design', methods=['POST'])
         @login_required
         def save_workflow_design():

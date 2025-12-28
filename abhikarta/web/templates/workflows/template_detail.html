@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+
+{% block title %}{{ template.name }} - Workflow Template - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .template-header {
+        background: linear-gradient(135deg, #e8f4fc, #d4eaf7);
+        border-bottom: 3px solid var(--bmo-blue);
+    }
+    .template-icon-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        background: white;
+        color: var(--bmo-blue);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .difficulty-badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+    }
+    .difficulty-beginner { background-color: #d4edda; color: #155724; }
+    .difficulty-intermediate { background-color: #fff3cd; color: #856404; }
+    .difficulty-advanced { background-color: #f8d7da; color: #721c24; }
+    .workflow-preview {
+        background: linear-gradient(135deg, #1e2127, #282c34);
+        border-radius: 12px;
+        padding: 2rem;
+        min-height: 300px;
+        position: relative;
+    }
+    .workflow-node {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        margin: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .workflow-node i {
+        color: var(--bmo-blue);
+        font-size: 1.1rem;
+    }
+    .workflow-node.node-input { border-left: 4px solid #28a745; }
+    .workflow-node.node-output { border-left: 4px solid #dc3545; }
+    .workflow-node.node-llm { border-left: 4px solid #6f42c1; }
+    .workflow-node.node-tool { border-left: 4px solid #fd7e14; }
+    .workflow-node.node-transform { border-left: 4px solid #17a2b8; }
+    .workflow-node.node-condition { border-left: 4px solid #ffc107; }
+    .workflow-node.node-hitl { border-left: 4px solid #e83e8c; }
+    .sample-input {
+        background: #f8f9fa;
+        border-left: 4px solid var(--bmo-blue);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0 8px 8px 0;
+        font-family: monospace;
+        font-size: 0.85rem;
+    }
+    .expected-output {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+        padding: 0.5rem 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 0 8px 8px 0;
+    }
+    .tag-badge {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        background: #e9ecef;
+        color: #495057;
+        margin: 0.15rem;
+    }
+    .prereq-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .prereq-item:last-child {
+        border-bottom: none;
+    }
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--bmo-blue);
+    }
+    .stat-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .industry-badge {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+    }
+    .node-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    .node-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    .node-legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('list_workflows') }}">Workflows</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('workflow_templates') }}">Templates</a></li>
+            <li class="breadcrumb-item active">{{ template.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Template Header -->
+    <div class="card mb-4 template-header">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <div class="template-icon-large">
+                        <i class="{{ template.icon }}"></i>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <h2 class="mb-0">{{ template.name }}</h2>
+                        <span class="difficulty-badge difficulty-{{ template.difficulty }}">
+                            {{ template.difficulty|capitalize }}
+                        </span>
+                        <span class="industry-badge">{{ template.industry }}</span>
+                    </div>
+                    <p class="text-muted mb-2">{{ template.description }}</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-primary">{{ template.category }}</span>
+                        {% for tag in template.tags %}
+                        <span class="tag-badge">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="{{ url_for('create_workflow_from_template_page', template_id=template.template_id) }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>Use This Template
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Workflow DAG Preview -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Workflow DAG Structure</h5>
+                    <span class="badge bg-secondary">
+                        {{ template.dag_definition.nodes|length if template.dag_definition.nodes else 0 }} nodes,
+                        {{ template.dag_definition.edges|length if template.dag_definition.edges else 0 }} edges
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="workflow-preview">
+                        {% if template.dag_definition and template.dag_definition.nodes %}
+                        <div class="d-flex flex-wrap justify-content-center align-items-center">
+                            {% for node in template.dag_definition.nodes %}
+                            <div class="workflow-node node-{{ node.node_type }}">
+                                <i class="bi bi-{% if node.node_type == 'input' %}box-arrow-in-right{% elif node.node_type == 'output' %}box-arrow-right{% elif node.node_type == 'llm' %}cpu{% elif node.node_type == 'tool' %}tools{% elif node.node_type == 'transform' %}arrow-repeat{% elif node.node_type == 'condition' %}signpost-split{% elif node.node_type == 'hitl' %}person-check{% else %}circle{% endif %}"></i>
+                                <span>{{ node.name or node.node_type }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-white text-center mb-0">No DAG definition available</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Node Legend -->
+                    <div class="node-legend">
+                        <div class="node-legend-item">
+                            <div class="node-legend-color" style="background: #28a745;"></div>
+                            <span>Input</span>
+                        </div>
+                        <div class="node-legend-item">
+                            <div class="node-legend-color" style="background: #dc3545;"></div>
+                            <span>Output</span>
+                        </div>
+                        <div class="node-legend-item">
+                            <div class="node-legend-color" style="background: #6f42c1;"></div>
+                            <span>LLM</span>
+                        </div>
+                        <div class="node-legend-item">
+                            <div class="node-legend-color" style="background: #fd7e14;"></div>
+                            <span>Tool</span>
+                        </div>
+                        <div class="node-legend-item">
+                            <div class="node-legend-color" style="background: #17a2b8;"></div>
+                            <span>Transform</span>
+                        </div>
+                        <div class="node-legend-item">
+                            <div class="node-legend-color" style="background: #ffc107;"></div>
+                            <span>Condition</span>
+                        </div>
+                        <div class="node-legend-item">
+                            <div class="node-legend-color" style="background: #e83e8c;"></div>
+                            <span>Human-in-the-Loop</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sample Inputs -->
+            {% if template.sample_inputs %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-input-cursor me-2"></i>Sample Inputs</h5>
+                </div>
+                <div class="card-body">
+                    {% for sample in template.sample_inputs %}
+                    <div class="sample-input">
+                        <pre class="mb-0">{{ sample | tojson(indent=2) }}</pre>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Expected Outputs -->
+            {% if template.expected_outputs %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-box-arrow-right me-2"></i>Expected Outputs</h5>
+                </div>
+                <div class="card-body">
+                    {% for output in template.expected_outputs %}
+                    <div class="expected-output">
+                        <i class="bi bi-check-circle text-success me-2"></i>{{ output }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- DAG Definition (JSON) -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>DAG Definition</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyDAG()">
+                        <i class="bi bi-clipboard me-1"></i>Copy JSON
+                    </button>
+                </div>
+                <div class="card-body">
+                    <pre><code class="language-json" id="dag-json">{{ template.dag_definition | tojson(indent=2) }}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Stats -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 stat-item">
+                            <div class="stat-value">{{ template.use_count }}</div>
+                            <div class="stat-label">Uses</div>
+                        </div>
+                        <div class="col-6 stat-item">
+                            <div class="stat-value">{{ template.dag_definition.nodes|length if template.dag_definition.nodes else 0 }}</div>
+                            <div class="stat-label">Nodes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prerequisites -->
+            {% if template.prerequisites %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Prerequisites</h5>
+                </div>
+                <div class="card-body">
+                    {% for prereq in template.prerequisites %}
+                    <div class="prereq-item">
+                        <i class="bi bi-check-circle text-success me-2"></i>{{ prereq }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Python Modules -->
+            {% if template.python_modules %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-code me-2"></i>Python Modules</h5>
+                </div>
+                <div class="card-body">
+                    {% for module in template.python_modules %}
+                    <code class="d-block mb-2">{{ module }}</code>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Template Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Template Info</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted">ID</td>
+                            <td><code>{{ template.template_id }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Category</td>
+                            <td>{{ template.category }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Industry</td>
+                            <td>{{ template.industry }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Difficulty</td>
+                            <td>
+                                <span class="difficulty-badge difficulty-{{ template.difficulty }}">
+                                    {{ template.difficulty|capitalize }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Est. Duration</td>
+                            <td>{{ template.estimated_duration }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Created By</td>
+                            <td>{{ template.created_by }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('create_workflow_from_template_page', template_id=template.template_id) }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Create Workflow from Template
+                        </a>
+                        <a href="{{ url_for('workflow_templates') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Templates
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Template Definition -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>Full Template Definition (JSON)</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyTemplateJSON()">
+                        <i class="bi bi-clipboard me-1"></i>Copy Full JSON
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <pre class="mb-0 p-3" style="background: #282c34; color: #abb2bf; border-radius: 0 0 8px 8px; max-height: 600px; overflow: auto;"><code id="template-json">{{ template.to_dict() | tojson(indent=2) }}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyDAG() {
+    const dagJson = document.getElementById('dag-json').textContent;
+    navigator.clipboard.writeText(dagJson).then(() => {
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-success');
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-secondary');
+        }, 2000);
+    });
+}
+
+function copyTemplateJSON() {
+    const json = document.getElementById('template-json').textContent;
+    navigator.clipboard.writeText(json).then(() => {
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check me-1"></i>Copied!';
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-success');
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-secondary');
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

@@ -10,11 +10,11 @@ This software and associated documentation are proprietary and confidential.
 Unauthorized copying, distribution, modification, or use is strictly prohibited.
 """
 
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 __author__ = "Ashutosh Sinha"
 __email__ = "ajsinha@gmail.com"
 
-# Actor System exports (v1.2.2)
+# Actor System exports (v1.2.3)
 from abhikarta.actor import (
     Actor,
     TypedActor,

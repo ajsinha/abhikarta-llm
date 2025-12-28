@@ -233,6 +233,50 @@ class AgentRoutes(AbstractRoutes):
                                    categories=categories,
                                    get_color=get_color)
         
+        @self.app.route('/admin/agents/templates/<template_id>')
+        @admin_required
+        def agent_template_detail(template_id):
+            """View template details."""
+            self._ensure_managers()
+            
+            template = self.template_manager.get_template(template_id)
+            if not template:
+                flash('Template not found', 'error')
+                return redirect(url_for('agent_templates'))
+            
+            # Helper function for template colors
+            def get_color(agent_type):
+                return AGENT_TYPE_COLORS.get(agent_type, '#6c757d')
+            
+            return render_template('agents/template_detail.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   template=template,
+                                   get_color=get_color)
+        
+        @self.app.route('/admin/agents/templates/<template_id>/create')
+        @admin_required
+        def create_agent_from_template_page(template_id):
+            """Show create agent from template page."""
+            self._ensure_managers()
+            
+            template = self.template_manager.get_template(template_id)
+            if not template:
+                flash('Template not found', 'error')
+                return redirect(url_for('agent_templates'))
+            
+            # Helper function for template colors
+            def get_color(agent_type):
+                return AGENT_TYPE_COLORS.get(agent_type, '#6c757d')
+            
+            return render_template('agents/create_from_template.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   template=template,
+                                   get_color=get_color)
+        
         @self.app.route('/admin/agents/templates/create', methods=['POST'])
         @admin_required
         def create_agent_from_template():

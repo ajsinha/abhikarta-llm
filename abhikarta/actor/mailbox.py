@@ -13,7 +13,7 @@ This implementation is inspired by Apache Pekko (incubating).
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha - ajsinha@gmail.com
 
-Version: 1.2.2
+Version: 1.2.3
 """
 
 from abc import ABC, abstractmethod

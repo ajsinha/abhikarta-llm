@@ -1,6 +1,6 @@
-# Abhikarta-LLM v1.2.2
+# Abhikarta-LLM v1.2.3
 
-[![Version](https://img.shields.io/badge/version-1.2.2-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.2.3-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
@@ -10,7 +10,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ---
 
-## 🚀 What's New in v1.2.2
+## 🚀 What's New in v1.2.3
 
 ### Actor System - Pekko-Inspired Concurrency Framework
 - **ActorSystem**: Complete runtime for creating and managing actors
@@ -76,7 +76,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ## ✨ Key Features
 
-### ⚡ Actor System (v1.2.2 NEW)
+### ⚡ Actor System (v1.2.3 NEW)
 - **Pekko-Inspired Design**: Lightweight actors for massive concurrency
 - **Message-Driven**: Fire-and-forget (tell) and request-response (ask) patterns
 - **Fault Tolerance**: Supervision strategies with automatic recovery
@@ -118,7 +118,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Workflow Integration**: HITL nodes pause execution for human input
 - **User & Admin Interfaces**: Separate views for different roles
 
-### 🏦 Banking Solutions (v1.2.2+)
+### 🏦 Banking Solutions (v1.2.3+)
 - **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
 - **Credit Assessment**: Credit scoring, DTI calculation, eligibility
 - **Loan Processing**: EMI calculation, amortization schedules
@@ -151,7 +151,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.2.2/
+abhikarta-llm-v1.2.3/
 ├── abhikarta/
 │   ├── __init__.py
 │   ├── agent/                    # Agent management
@@ -189,7 +189,7 @@ abhikarta-llm-v1.2.2/
 │   │   ├── code_fragment_tool.py # CodeFragmentTool
 │   │   ├── langchain_tool.py     # LangChain integration
 │   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.2.2)
+│   │   └── prebuilt/             # Pre-built tools (v1.2.3)
 │   │       ├── common_tools.py   # 28 common utilities
 │   │       ├── banking_tools.py  # 13 banking tools
 │   │       ├── integration_tools.py  # 20 integration tools
@@ -225,7 +225,7 @@ abhikarta-llm-v1.2.2/
 ├── config/
 │   └── application.properties    # Configuration file
 ├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.2.2)
+│   └── prebuilt/                 # Pre-built solutions (v1.2.3)
 │       ├── agents/
 │       │   └── banking/          # 10 banking agents
 │       └── workflows/
@@ -402,7 +402,7 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.2.2 | 2025-01 | Modular Database Delegates (9 delegates), DatabaseDelegate abstract class, refactored DB layer |
+| 1.2.3 | 2025-01 | Modular Database Delegates (9 delegates), DatabaseDelegate abstract class, refactored DB layer |
 | 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |
 | 1.1.8 | 2025-01 | Tool View/Test pages, dedicated tool detail UI, form-based testing |
 | 1.1.7 | 2025-01 | Pre-built tools (85), Tools page, General tools, MCP auto-sync, Banking solutions |

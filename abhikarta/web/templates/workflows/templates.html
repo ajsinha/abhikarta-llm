@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}Workflow Templates - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .template-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        height: 100%;
+    }
+    .template-card:hover {
+        border-color: var(--bmo-blue);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .template-card.uses-code-fragments {
+        border: 2px solid #6f42c1;
+        background: linear-gradient(135deg, rgba(111, 66, 193, 0.03), rgba(111, 66, 193, 0.08));
+    }
+    .template-card.uses-code-fragments:hover {
+        border-color: #6f42c1;
+        box-shadow: 0 10px 30px rgba(111, 66, 193, 0.25);
+    }
+    .template-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #e8f4fc, #d4eaf7);
+        color: var(--bmo-blue);
+    }
+    .uses-code-fragments .template-icon {
+        background: linear-gradient(135deg, #e8d5f7, #d4c4f7);
+        color: #6f42c1;
+    }
+    .template-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    .code-fragment-ribbon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: linear-gradient(135deg, #6f42c1, #8b5cf6);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.7rem;
+        font-weight: bold;
+        border-radius: 0 0 8px 0;
+        z-index: 1;
+    }
+    .code-fragment-ribbon i { margin-right: 0.25rem; }
+    .difficulty-beginner { background-color: #28a745; }
+    .difficulty-intermediate { background-color: #ffc107; color: #333; }
+    .difficulty-advanced { background-color: #dc3545; }
+    .category-filter { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .category-filter .btn { border-radius: 20px; }
+    .category-filter .btn.active { background-color: var(--bmo-blue); border-color: var(--bmo-blue); }
+    .btn-outline-purple { color: #6f42c1; border-color: #6f42c1; }
+    .btn-outline-purple:hover, .btn-outline-purple.active { background-color: #6f42c1; border-color: #6f42c1; color: white; }
+    .template-tags { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    .template-tags .badge { font-weight: normal; }
+    .industry-badge { background: linear-gradient(135deg, #667eea, #764ba2); color: white; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; }
+    .duration-badge { background: #e9ecef; color: #495057; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; }
+    .code-fragment-badge { background: linear-gradient(135deg, #6f42c1, #8b5cf6); color: white; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; }
+    .stats-cards { margin-bottom: 1.5rem; }
+    .stat-card { padding: 1rem; border-radius: 10px; text-align: center; }
+    .stat-card.total { background: linear-gradient(135deg, #0078d4, #00a0dc); color: white; }
+    .stat-card.code-fragment { background: linear-gradient(135deg, #6f42c1, #8b5cf6); color: white; }
+    .stat-card.categories { background: linear-gradient(135deg, #28a745, #34ce57); color: white; }
+    .stat-card.industries { background: linear-gradient(135deg, #fd7e14, #ffc107); color: white; }
+    .stat-number { font-size: 2rem; font-weight: bold; }
+    .stat-label { font-size: 0.85rem; opacity: 0.9; }
+    .legend-box { background: #f8f9fa; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    .legend-item { display: inline-flex; align-items: center; margin-right: 1.5rem; margin-bottom: 0.5rem; }
+    .legend-color { width: 20px; height: 20px; border-radius: 4px; margin-right: 0.5rem; }
+    .legend-color.code-fragment { background: linear-gradient(135deg, #6f42c1, #8b5cf6); }
+    .legend-color.standard { background: linear-gradient(135deg, #0078d4, #00a0dc); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1"><i class="bi bi-collection me-2"></i>Workflow Template Library</h4>
+            <p class="text-muted mb-0">Pre-built workflow DAGs for common business processes</p>
+        </div>
+        <div>
+            <a href="{{ url_for('list_workflows') }}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left me-1"></i> All Workflows
+            </a>
+            <a href="{{ url_for('workflow_designer_new') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Create New
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row stats-cards g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card total">
+                <div class="stat-number">{{ templates|length }}</div>
+                <div class="stat-label">Total Templates</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card code-fragment">
+                <div class="stat-number">{{ templates|selectattr('uses_code_fragments')|list|length }}</div>
+                <div class="stat-label">Code Fragment Examples</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card categories">
+                <div class="stat-number">{{ categories|length }}</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card industries">
+                <div class="stat-number">{{ industries|length }}</div>
+                <div class="stat-label">Industries</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend-box">
+        <strong class="me-3"><i class="bi bi-info-circle me-1"></i>Template Types:</strong>
+        <span class="legend-item">
+            <span class="legend-color code-fragment"></span>
+            <span>Uses Code Fragments - Advanced examples with custom Python code</span>
+        </span>
+        <span class="legend-item">
+            <span class="legend-color standard"></span>
+            <span>Standard Templates - Ready to use with built-in components</span>
+        </span>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filter">
+        <button class="btn btn-outline-secondary active" data-category="all">
+            <i class="bi bi-grid me-1"></i> All
+        </button>
+        <button class="btn btn-outline-purple" data-category="code-fragments">
+            <i class="bi bi-code-square me-1"></i> Code Fragment Examples
+        </button>
+        {% for category in categories %}
+        <button class="btn btn-outline-secondary" data-category="{{ category|lower|replace(' ', '-') }}">
+            {{ category }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="template-search" placeholder="Search templates...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="difficulty-filter">
+                <option value="">All Difficulty Levels</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="industry-filter">
+                <option value="">All Industries</option>
+                {% for industry in industries %}
+                <option value="{{ industry|lower }}">{{ industry }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <span class="badge bg-primary fs-6 w-100 py-2" id="template-count">{{ templates|length }} templates</span>
+        </div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="row g-4" id="templates-grid">
+        {% for template in templates %}
+        <div class="col-md-6 col-lg-4 template-item" 
+             data-category="{{ template.category|lower|replace(' ', '-') }}"
+             data-difficulty="{{ template.difficulty }}"
+             data-industry="{{ template.industry|lower }}"
+             data-name="{{ template.name|lower }}"
+             data-uses-code-fragments="{{ 'true' if template.uses_code_fragments else 'false' }}">
+            <div class="card template-card h-100 position-relative {% if template.uses_code_fragments %}uses-code-fragments{% endif %}">
+                {% if template.uses_code_fragments %}
+                <div class="code-fragment-ribbon"><i class="bi bi-code-square"></i>Code Fragment</div>
+                {% endif %}
+                <span class="template-badge badge difficulty-{{ template.difficulty }}">{{ template.difficulty|capitalize }}</span>
+                <div class="card-body">
+                    <div class="template-icon"><i class="{{ template.icon }}"></i></div>
+                    <h5 class="card-title">{{ template.name }}</h5>
+                    <p class="card-text text-muted small">{{ template.description[:120] }}{% if template.description|length > 120 %}...{% endif %}</p>
+                    
+                    <div class="d-flex gap-2 mb-2 flex-wrap">
+                        <span class="industry-badge">{{ template.industry }}</span>
+                        <span class="duration-badge"><i class="bi bi-clock me-1"></i>{{ template.estimated_duration }}</span>
+                        {% if template.uses_code_fragments %}
+                        <span class="code-fragment-badge"><i class="bi bi-code-square me-1"></i>{{ template.code_fragments|length }} fragments</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="template-tags">
+                        <span class="badge bg-secondary">{{ template.category }}</span>
+                        {% for tag in template.tags[:2] %}
+                        <span class="badge bg-light text-dark">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="text-muted small"><i class="bi bi-download me-1"></i>{{ template.use_count }} uses</span>
+                        <span class="text-muted small"><i class="bi bi-diagram-3 me-1"></i>{{ template.dag_definition.nodes|length if template.dag_definition.nodes else 0 }} nodes</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('workflow_template_detail', template_id=template.template_id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye me-1"></i> View Details
+                        </a>
+                        <a href="{{ url_for('create_workflow_from_template_page', template_id=template.template_id) }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i> Use Template
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Empty State -->
+    <div class="text-center py-5 d-none" id="no-templates">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h5 class="mt-3">No templates found</h5>
+        <p class="text-muted">Try adjusting your filters or search terms</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('.category-filter .btn').click(function() {
+        $('.category-filter .btn').removeClass('active');
+        $(this).addClass('active');
+        filterTemplates();
+    });
+    $('#template-search').on('input', filterTemplates);
+    $('#difficulty-filter, #industry-filter').change(filterTemplates);
+});
+
+function filterTemplates() {
+    const category = $('.category-filter .btn.active').data('category');
+    const search = $('#template-search').val().toLowerCase();
+    const difficulty = $('#difficulty-filter').val();
+    const industry = $('#industry-filter').val();
+    let visibleCount = 0;
+    
+    $('.template-item').each(function() {
+        const $item = $(this);
+        const itemCategory = $item.data('category');
+        const itemDifficulty = $item.data('difficulty');
+        const itemIndustry = $item.data('industry');
+        const itemName = $item.data('name');
+        const usesCodeFragments = $item.data('uses-code-fragments');
+        let visible = true;
+        
+        if (category === 'code-fragments') {
+            if (usesCodeFragments !== true && usesCodeFragments !== 'true') visible = false;
+        } else if (category !== 'all' && itemCategory !== category) {
+            visible = false;
+        }
+        if (difficulty && itemDifficulty !== difficulty) visible = false;
+        if (industry && itemIndustry !== industry) visible = false;
+        if (search && !itemName.includes(search)) visible = false;
+        
+        $item.toggle(visible);
+        if (visible) visibleCount++;
+    });
+    
+    $('#no-templates').toggleClass('d-none', visibleCount > 0);
+    $('#template-count').text(visibleCount + ' templates');
+}
+</script>
+{% endblock %}

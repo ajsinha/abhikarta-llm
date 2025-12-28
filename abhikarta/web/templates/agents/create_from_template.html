@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Create Agent from Template - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .template-summary {
+        background: linear-gradient(135deg, {{ get_color(template.agent_type) }}15, {{ get_color(template.agent_type) }}05);
+        border-left: 4px solid {{ get_color(template.agent_type) }};
+        border-radius: 0 8px 8px 0;
+    }
+    .template-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        background: {{ get_color(template.agent_type) }}20;
+        color: {{ get_color(template.agent_type) }};
+    }
+    .difficulty-badge {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 20px;
+    }
+    .difficulty-beginner { background-color: #d4edda; color: #155724; }
+    .difficulty-intermediate { background-color: #fff3cd; color: #856404; }
+    .difficulty-advanced { background-color: #f8d7da; color: #721c24; }
+    .config-preview {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.85rem;
+    }
+    .tool-badge {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 6px;
+        background: #fff3cd;
+        color: #856404;
+        margin: 0.15rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_agents') }}">Agents</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('agent_templates') }}">Templates</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('agent_template_detail', template_id=template.template_id) }}">{{ template.name }}</a></li>
+            <li class="breadcrumb-item active">Create Agent</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Main Form -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Agent from Template</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('create_agent_from_template') }}">
+                        <input type="hidden" name="template_id" value="{{ template.template_id }}">
+                        
+                        <!-- Agent Name -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Agent Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg" name="agent_name" required
+                                   placeholder="Enter a unique name for your agent"
+                                   autofocus>
+                            <div class="form-text">Choose a descriptive name that reflects the agent's purpose.</div>
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Description</label>
+                            <textarea class="form-control" name="description" rows="4"
+                                      placeholder="Describe what this agent will do...">{{ template.description }}</textarea>
+                            <div class="form-text">You can customize the description or keep the template default.</div>
+                        </div>
+                        
+                        <!-- Configuration Options -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Configuration</label>
+                            <div class="config-preview">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><strong>Agent Type:</strong> {{ template.agent_type }}</p>
+                                        <p class="mb-2"><strong>LLM Provider:</strong> {{ template.llm_config.provider|default('openai') }}</p>
+                                        <p class="mb-0"><strong>Model:</strong> {{ template.llm_config.model|default('gpt-4o') }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><strong>Temperature:</strong> {{ template.llm_config.temperature|default(0.7) }}</p>
+                                        <p class="mb-2"><strong>Max Tokens:</strong> {{ template.llm_config.max_tokens|default(2000) }}</p>
+                                        <p class="mb-0"><strong>HITL Enabled:</strong> {{ 'Yes' if template.hitl_config and template.hitl_config.enabled else 'No' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-text">These settings are inherited from the template. You can modify them after creation in the Agent Designer.</div>
+                        </div>
+                        
+                        <!-- Tools Preview -->
+                        {% if template.tools %}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Included Tools</label>
+                            <div>
+                                {% for tool in template.tools %}
+                                <span class="tool-badge">{{ tool }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text">These tools will be available to your agent.</div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Form Actions -->
+                        <hr class="my-4">
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('agent_template_detail', template_id=template.template_id) }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Template
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle me-2"></i>Create Agent
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template Summary Sidebar -->
+        <div class="col-lg-4">
+            <div class="card template-summary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="template-icon me-3">
+                            <i class="{{ template.icon }}"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ template.name }}</h5>
+                            <span class="difficulty-badge difficulty-{{ template.difficulty }}">
+                                {{ template.difficulty|capitalize }}
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">{{ template.description[:150] }}{% if template.description|length > 150 %}...{% endif %}</p>
+                    
+                    <hr>
+                    
+                    <h6 class="mb-2">What You Get</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Pre-configured {{ template.agent_type }} agent
+                        </li>
+                        {% if template.workflow and template.workflow.nodes %}
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {{ template.workflow.nodes|length }}-node workflow ready to use
+                        </li>
+                        {% endif %}
+                        {% if template.tools %}
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {{ template.tools|length }} tools pre-assigned
+                        </li>
+                        {% endif %}
+                        {% if template.hitl_config and template.hitl_config.enabled %}
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Human-in-the-loop configured
+                        </li>
+                        {% endif %}
+                        <li class="mb-0">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Optimized LLM settings
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Sample Prompts -->
+            {% if template.sample_prompts %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-chat-quote me-2"></i>Sample Prompts</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small mb-0">
+                        {% for prompt in template.sample_prompts[:3] %}
+                        <li class="mb-2 pb-2 {% if not loop.last %}border-bottom{% endif %}">
+                            <i class="bi bi-chat-left-text text-muted me-2"></i>{{ prompt[:80] }}{% if prompt|length > 80 %}...{% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Prerequisites -->
+            {% if template.prerequisites %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Prerequisites</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small mb-0">
+                        {% for prereq in template.prerequisites %}
+                        <li class="mb-1">
+                            <i class="bi bi-arrow-right text-warning me-2"></i>{{ prereq }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
