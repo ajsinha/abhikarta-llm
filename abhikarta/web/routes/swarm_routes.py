@@ -122,6 +122,101 @@ class SwarmRoutes(AbstractRoutes):
                 logger.error(f"Error viewing swarm: {e}")
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('list_swarms'))
+        
+        @self.app.route('/swarms/new', methods=['GET', 'POST'])
+        @login_required
+        def swarm_create():
+            """Simple form to create a new swarm."""
+            if request.method == 'POST':
+                try:
+                    import uuid
+                    swarm_id = str(uuid.uuid4())
+                    name = request.form.get('name', 'New Swarm')
+                    description = request.form.get('description', '')
+                    
+                    # Parse agent selections
+                    agent_ids = request.form.getlist('agents')
+                    
+                    # Parse trigger config
+                    trigger_type = request.form.get('trigger_type', 'user_query')
+                    trigger_config = {}
+                    if trigger_type == 'kafka':
+                        trigger_config = {
+                            'topic': request.form.get('kafka_topic', 'swarm-events'),
+                            'group': request.form.get('kafka_group', 'swarm-consumer')
+                        }
+                    elif trigger_type == 'schedule':
+                        trigger_config = {
+                            'cron': request.form.get('cron_expression', '0 * * * *')
+                        }
+                    elif trigger_type == 'http':
+                        trigger_config = {
+                            'endpoint': request.form.get('http_endpoint', f'/api/swarm/{swarm_id}/webhook')
+                        }
+                    
+                    # Build config
+                    config = {
+                        'triggers': [{
+                            'type': trigger_type,
+                            'name': f'{trigger_type.title()} Trigger',
+                            'config': trigger_config
+                        }],
+                        'agents': []
+                    }
+                    
+                    # Create swarm
+                    self.db_facade.execute(
+                        """INSERT INTO swarms 
+                           (swarm_id, name, description, status, config, created_by)
+                           VALUES (?, ?, ?, 'draft', ?, ?)""",
+                        (swarm_id, name, description, json.dumps(config), session.get('user_id'))
+                    )
+                    
+                    # Add trigger
+                    self.db_facade.execute(
+                        """INSERT INTO swarm_triggers 
+                           (trigger_id, swarm_id, trigger_type, name, config)
+                           VALUES (?, ?, ?, ?, ?)""",
+                        (str(uuid.uuid4()), swarm_id, trigger_type, 
+                         f'{trigger_type.title()} Trigger', json.dumps(trigger_config))
+                    )
+                    
+                    # Add selected agents
+                    for agent_id in agent_ids:
+                        agent = self.db_facade.fetch_one(
+                            "SELECT name FROM agents WHERE agent_id = ?", (agent_id,)
+                        )
+                        if agent:
+                            self.db_facade.execute(
+                                """INSERT INTO swarm_agents 
+                                   (membership_id, swarm_id, agent_id, agent_name, role, subscriptions_json)
+                                   VALUES (?, ?, ?, ?, 'worker', '["task.*"]')""",
+                                (str(uuid.uuid4()), swarm_id, agent_id, agent['name'])
+                            )
+                    
+                    flash(f"Swarm '{name}' created successfully!", "success")
+                    return redirect(url_for('view_swarm', swarm_id=swarm_id))
+                    
+                except Exception as e:
+                    logger.error(f"Error creating swarm: {e}")
+                    flash(f"Error creating swarm: {e}", "danger")
+            
+            # GET - show form
+            try:
+                agents = self.db_facade.fetch_all(
+                    "SELECT agent_id, name, description FROM agents WHERE status = 'active' ORDER BY name"
+                ) or []
+            except:
+                agents = []
+            
+            return render_template(
+                'swarms/create.html',
+                agents=agents,
+                fullname=session.get('fullname'),
+                userid=session.get('user_id'),
+                roles=session.get('roles', []),
+                is_admin=session.get('is_admin', False)
+            )
     
     # =========================================================================
     # DESIGNER ROUTES

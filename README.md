@@ -37,10 +37,24 @@ New abstraction layer for message brokers with consistent interface:
 - Schema version updated to 1.3.0
 
 ### Navigation Enhancement
-- New **Swarms** menu in navbar with quick access to:
-  - All Swarms list
-  - Swarm Visual Designer
-  - Swarm monitoring
+- New **Playground** mega-menu combining Agents, Workflows, and Swarms:
+  - **Agents Section**: Browse Agents, Visual Designer, Template Library
+  - **Workflows Section**: All Workflows, Visual Designer, Template Library, Upload
+  - **Swarms Section**: All Swarms, Swarm Designer (NEW in v1.3.0)
+- Streamlined navigation with categorized dropdown menu
+
+### Execution Logging & Viewing
+- **Swarm Executions**: Full DB logging like agents and workflows
+  - Execution records stored in `swarm_executions` table
+  - Events logged in `swarm_events` table
+  - Master Actor decisions logged in `swarm_decisions` table
+- **Unified Executions View**: Tabbed interface showing:
+  - Agent/Workflow executions
+  - Swarm executions with trigger type, status, and duration
+- **Swarm Execution Detail Page**: 
+  - Status overview with trigger info and timing
+  - Master Actor decisions timeline
+  - Event log with source agents and payloads
 
 ---
 

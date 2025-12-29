@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Create Swarm - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-hive me-2 text-warning"></i>Create New Swarm</h2>
+                    <p class="text-muted mb-0">Configure a new agent swarm using the simple form</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('swarm_designer_new') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-palette me-1"></i>Visual Designer
+                    </a>
+                </div>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning bg-opacity-10">
+                    <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Swarm Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('swarm_create') }}">
+                        <!-- Basic Info -->
+                        <div class="mb-4">
+                            <h6 class="text-muted border-bottom pb-2 mb-3">
+                                <i class="bi bi-info-circle me-1"></i>Basic Information
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Swarm Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" class="form-control" required
+                                           placeholder="e.g., Customer Support Swarm, Data Processing Team">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Description</label>
+                                    <textarea name="description" class="form-control" rows="3"
+                                              placeholder="Describe what this swarm does..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trigger Configuration -->
+                        <div class="mb-4">
+                            <h6 class="text-muted border-bottom pb-2 mb-3">
+                                <i class="bi bi-lightning me-1"></i>Trigger Configuration
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Trigger Type</label>
+                                    <select name="trigger_type" class="form-select" id="triggerType" onchange="showTriggerConfig()">
+                                        <option value="user_query">User Query (Manual)</option>
+                                        <option value="http">HTTP Webhook</option>
+                                        <option value="schedule">Schedule (Cron)</option>
+                                        <option value="kafka">Kafka Topic</option>
+                                        <option value="rabbitmq">RabbitMQ Queue</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Trigger-specific config -->
+                            <div id="triggerConfig" class="mt-3">
+                                <!-- User Query - no extra config needed -->
+                                <div id="config-user_query" class="trigger-config">
+                                    <div class="alert alert-info mb-0">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        User Query trigger allows manual execution through the UI or API.
+                                    </div>
+                                </div>
+                                
+                                <!-- HTTP Webhook -->
+                                <div id="config-http" class="trigger-config d-none">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label">Webhook Endpoint</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">/api/swarm/</span>
+                                                <input type="text" name="http_endpoint" class="form-control" 
+                                                       placeholder="webhook" value="webhook">
+                                            </div>
+                                            <small class="text-muted">POST requests to this endpoint will trigger the swarm</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Schedule -->
+                                <div id="config-schedule" class="trigger-config d-none">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label">Cron Expression</label>
+                                            <input type="text" name="cron_expression" class="form-control" 
+                                                   placeholder="0 * * * *" value="0 * * * *">
+                                            <small class="text-muted">
+                                                Format: minute hour day month weekday (e.g., "0 9 * * 1-5" = 9 AM weekdays)
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Kafka -->
+                                <div id="config-kafka" class="trigger-config d-none">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Kafka Topic</label>
+                                            <input type="text" name="kafka_topic" class="form-control" 
+                                                   placeholder="swarm-events" value="swarm-events">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Consumer Group</label>
+                                            <input type="text" name="kafka_group" class="form-control" 
+                                                   placeholder="swarm-consumer" value="swarm-consumer">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- RabbitMQ -->
+                                <div id="config-rabbitmq" class="trigger-config d-none">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label">Queue Name</label>
+                                            <input type="text" name="rabbitmq_queue" class="form-control" 
+                                                   placeholder="swarm-queue" value="swarm-queue">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent Selection -->
+                        <div class="mb-4">
+                            <h6 class="text-muted border-bottom pb-2 mb-3">
+                                <i class="bi bi-robot me-1"></i>Select Agents
+                            </h6>
+                            {% if agents %}
+                            <div class="row g-3">
+                                {% for agent in agents %}
+                                <div class="col-md-6">
+                                    <div class="form-check card p-3 h-100">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="agents" value="{{ agent.agent_id }}" 
+                                               id="agent-{{ agent.agent_id }}">
+                                        <label class="form-check-label w-100 ms-2" for="agent-{{ agent.agent_id }}">
+                                            <strong>{{ agent.name }}</strong>
+                                            {% if agent.description %}
+                                            <br><small class="text-muted">{{ agent.description[:60] }}{% if agent.description|length > 60 %}...{% endif %}</small>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                No agents available. <a href="{{ url_for('agent_create') }}">Create an agent</a> first.
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-flex gap-2 justify-content-end pt-3 border-top">
+                            <a href="{{ url_for('list_swarms') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-hive me-1"></i>Create Swarm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card mt-4 border-info">
+                <div class="card-header bg-info bg-opacity-10">
+                    <h6 class="mb-0"><i class="bi bi-lightbulb me-2 text-info"></i>Tips</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0 small">
+                        <li><strong>User Query:</strong> Best for interactive, on-demand tasks</li>
+                        <li><strong>HTTP Webhook:</strong> Ideal for external system integrations</li>
+                        <li><strong>Schedule:</strong> Perfect for recurring automated tasks</li>
+                        <li><strong>Kafka/RabbitMQ:</strong> For event-driven, high-volume processing</li>
+                        <li>Select multiple agents to create a collaborative swarm</li>
+                        <li>Use the <a href="{{ url_for('swarm_designer_new') }}">Visual Designer</a> for more advanced configurations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showTriggerConfig() {
+    const triggerType = document.getElementById('triggerType').value;
+    
+    // Hide all config sections
+    document.querySelectorAll('.trigger-config').forEach(el => {
+        el.classList.add('d-none');
+    });
+    
+    // Show selected config
+    const configEl = document.getElementById('config-' + triggerType);
+    if (configEl) {
+        configEl.classList.remove('d-none');
+    }
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', showTriggerConfig);
+</script>
+{% endblock %}

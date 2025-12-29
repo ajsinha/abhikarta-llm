@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2><i class="bi bi-play-circle me-2"></i>My Executions</h2>
-            <p class="text-muted mb-0">View your agent and workflow execution history</p>
+            <p class="text-muted mb-0">View your agent, workflow, and swarm execution history</p>
         </div>
         <div>
             <button class="btn btn-outline-secondary" onclick="refreshExecutions()">
@@ -21,8 +21,16 @@
         <div class="col-md-3">
             <div class="card bg-primary text-white">
                 <div class="card-body">
-                    <h6 class="text-white-50">Total Executions</h6>
+                    <h6 class="text-white-50">Agent/Workflow Executions</h6>
                     <h3 class="mb-0">{{ executions|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h6 class="text-dark opacity-75">Swarm Executions</h6>
+                    <h3 class="mb-0">{{ swarm_executions|length if swarm_executions else 0 }}</h3>
                 </div>
             </div>
         </div>
@@ -31,14 +39,6 @@
                 <div class="card-body">
                     <h6 class="text-white-50">Completed</h6>
                     <h3 class="mb-0">{{ executions|selectattr('status', 'equalto', 'completed')|list|length }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <h6 class="text-white-50">Failed</h6>
-                    <h3 class="mb-0">{{ executions|selectattr('status', 'equalto', 'failed')|list|length }}</h3>
                 </div>
             </div>
         </div>
@@ -52,141 +52,263 @@
         </div>
     </div>
 
-    <!-- Filters -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" id="filterStatus" onchange="applyFilters()">
-                        <option value="">All Statuses</option>
-                        <option value="completed">Completed</option>
-                        <option value="failed">Failed</option>
-                        <option value="running">Running</option>
-                        <option value="pending">Pending</option>
-                    </select>
+    <!-- Execution Type Tabs -->
+    <ul class="nav nav-tabs mb-4" id="executionTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="agent-tab" data-bs-toggle="tab" data-bs-target="#agent-executions" 
+                    type="button" role="tab">
+                <i class="bi bi-robot me-1"></i>Agents & Workflows
+                <span class="badge bg-primary ms-1">{{ executions|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="swarm-tab" data-bs-toggle="tab" data-bs-target="#swarm-executions" 
+                    type="button" role="tab">
+                <i class="bi bi-hive me-1 text-warning"></i>Swarms
+                <span class="badge bg-warning text-dark ms-1">{{ swarm_executions|length if swarm_executions else 0 }}</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="executionTabsContent">
+        <!-- Agent/Workflow Executions Tab -->
+        <div class="tab-pane fade show active" id="agent-executions" role="tabpanel">
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="filterStatus" onchange="applyFilters()">
+                                <option value="">All Statuses</option>
+                                <option value="completed">Completed</option>
+                                <option value="failed">Failed</option>
+                                <option value="running">Running</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Agent/Workflow</label>
+                            <input type="text" class="form-control" id="filterAgent" placeholder="Search by name..." oninput="applyFilters()">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date Range</label>
+                            <select class="form-select" id="filterDate" onchange="applyFilters()">
+                                <option value="">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="bi bi-x-lg me-1"></i>Clear Filters
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Agent/Workflow</label>
-                    <input type="text" class="form-control" id="filterAgent" placeholder="Search by name..." oninput="applyFilters()">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Date Range</label>
-                    <select class="form-select" id="filterDate" onchange="applyFilters()">
-                        <option value="">All Time</option>
-                        <option value="today">Today</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-                        <i class="bi bi-x-lg me-1"></i>Clear Filters
-                    </button>
+            </div>
+
+            <!-- Executions Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="executionsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Type</th>
+                                    <th>Agent/Workflow</th>
+                                    <th>Status</th>
+                                    <th>Tokens</th>
+                                    <th>Cost</th>
+                                    <th>Started</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exec in executions %}
+                                    <tr data-status="{{ exec.status }}" 
+                                        data-agent="{{ exec.agent_name or exec.workflow_name or '' }}"
+                                        data-date="{{ exec.started_at }}">
+                                        <td>
+                                            <a href="{{ url_for('execution_detail', execution_id=exec.execution_id) }}" class="text-decoration-none">
+                                                <code>{{ exec.execution_id[:8] }}...</code>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if exec.agent_id %}
+                                            <span class="badge bg-primary">Agent</span>
+                                            {% else %}
+                                            <span class="badge bg-info">Workflow</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <strong>{{ exec.agent_name or exec.workflow_name or 'Unknown' }}</strong>
+                                        </td>
+                                        <td>
+                                            {% if exec.status == 'completed' %}
+                                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Completed</span>
+                                            {% elif exec.status == 'failed' %}
+                                            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Failed</span>
+                                            {% elif exec.status == 'running' %}
+                                            <span class="badge bg-primary"><i class="bi bi-play-circle me-1"></i>Running</span>
+                                            {% elif exec.status == 'pending' %}
+                                            <span class="badge bg-secondary"><i class="bi bi-hourglass me-1"></i>Pending</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">{{ exec.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">{{ exec.tokens_used or 0 }}</span>
+                                        </td>
+                                        <td>
+                                            {% if exec.cost_usd %}
+                                            ${{ "%.4f"|format(exec.cost_usd) }}
+                                            {% else %}
+                                            -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small>{{ exec.started_at.strftime('%Y-%m-%d %H:%M') if exec.started_at is not string else exec.started_at[:16] }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ url_for('execution_detail', execution_id=exec.execution_id) }}" 
+                                                   class="btn btn-outline-primary" title="View Details">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="{{ url_for('execution_progress', execution_id=exec.execution_id) }}" 
+                                                   class="btn btn-outline-success" title="View Progress">
+                                                    <i class="bi bi-activity"></i>
+                                                </a>
+                                                <a href="{{ url_for('execution_trace', execution_id=exec.execution_id) }}" 
+                                                   class="btn btn-outline-info" title="View Trace">
+                                                    <i class="bi bi-diagram-3"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-5">
+                                            <i class="bi bi-play-circle display-4 text-muted"></i>
+                                            <p class="text-muted mt-2">No agent/workflow executions yet</p>
+                                            <a href="{{ url_for('user_agents') }}" class="btn btn-primary btn-sm">
+                                                <i class="bi bi-robot me-1"></i>Run an Agent
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Executions Table -->
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover" id="executionsTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Type</th>
-                            <th>Agent/Workflow</th>
-                            <th>Status</th>
-                            <th>Tokens</th>
-                            <th>Cost</th>
-                            <th>Started</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for exec in executions %}
-                            <tr data-status="{{ exec.status }}" 
-                                data-agent="{{ exec.agent_name or exec.workflow_name or '' }}"
-                                data-date="{{ exec.started_at }}">
-                                <td>
-                                    <a href="{{ url_for('user_execution_detail', execution_id=exec.execution_id) }}" class="text-decoration-none">
-                                        <code>{{ exec.execution_id[:8] }}...</code>
-                                    </a>
-                                </td>
-                                <td>
-                                    {% if exec.agent_id %}
-                                    <span class="badge bg-primary">Agent</span>
-                                    {% else %}
-                                    <span class="badge bg-info">Workflow</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <strong>{{ exec.agent_name or exec.workflow_name or 'Unknown' }}</strong>
-                                </td>
-                                <td>
-                                    {% if exec.status == 'completed' %}
-                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Completed</span>
-                                    {% elif exec.status == 'failed' %}
-                                    <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Failed</span>
-                                    {% elif exec.status == 'running' %}
-                                    <span class="badge bg-primary"><i class="bi bi-play-circle me-1"></i>Running</span>
-                                    {% elif exec.status == 'pending' %}
-                                    <span class="badge bg-secondary"><i class="bi bi-hourglass me-1"></i>Pending</span>
-                                    {% else %}
-                                    <span class="badge bg-secondary">{{ exec.status }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <span class="text-muted">{{ exec.tokens_used or 0 }}</span>
-                                </td>
-                                <td>
-                                    {% if exec.cost_usd %}
-                                    ${{ "%.4f"|format(exec.cost_usd) }}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <small>{{ exec.started_at.strftime('%Y-%m-%d %H:%M') if exec.started_at is not string else exec.started_at[:16] }}</small>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{{ url_for('user_execution_detail', execution_id=exec.execution_id) }}" 
-                                           class="btn btn-outline-primary" title="View Details">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ url_for('execution_progress', execution_id=exec.execution_id) }}" 
-                                           class="btn btn-outline-success" title="View Progress">
-                                            <i class="bi bi-activity"></i>
-                                        </a>
-                                        <a href="{{ url_for('execution_trace', execution_id=exec.execution_id) }}" 
-                                           class="btn btn-outline-info" title="View Trace">
-                                            <i class="bi bi-diagram-3"></i>
-                                        </a>
-                                        {% if exec.status == 'failed' %}
-                                        <button class="btn btn-outline-warning" title="Retry" 
-                                                onclick="retryExecution('{{ exec.execution_id }}')">
-                                            <i class="bi bi-arrow-repeat"></i>
-                                        </button>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="8" class="text-center py-5">
-                                    <i class="bi bi-play-circle display-4 text-muted"></i>
-                                    <p class="text-muted mt-2">No executions yet</p>
-                                    <a href="{{ url_for('user_agents') }}" class="btn btn-primary btn-sm">
-                                        <i class="bi bi-robot me-1"></i>Run an Agent
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <!-- Swarm Executions Tab -->
+        <div class="tab-pane fade" id="swarm-executions" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-warning bg-opacity-10">
+                    <h6 class="mb-0"><i class="bi bi-hive me-2 text-warning"></i>Swarm Executions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="swarmExecutionsTable">
+                            <thead>
+                                <tr>
+                                    <th>Execution ID</th>
+                                    <th>Swarm</th>
+                                    <th>Trigger</th>
+                                    <th>Status</th>
+                                    <th>Agents Used</th>
+                                    <th>Started</th>
+                                    <th>Duration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exec in swarm_executions %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('view_swarm_execution', swarm_id=exec.swarm_id, execution_id=exec.execution_id) }}" class="text-decoration-none">
+                                                <code>{{ exec.execution_id[:8] }}...</code>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('view_swarm', swarm_id=exec.swarm_id) }}" class="text-decoration-none">
+                                                <i class="bi bi-hive text-warning me-1"></i>
+                                                {{ exec.swarm_name or exec.swarm_id[:8] }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if exec.trigger_type == 'kafka' %}
+                                            <span class="badge bg-dark"><i class="bi bi-broadcast me-1"></i>Kafka</span>
+                                            {% elif exec.trigger_type == 'http' %}
+                                            <span class="badge bg-success"><i class="bi bi-globe me-1"></i>HTTP</span>
+                                            {% elif exec.trigger_type == 'schedule' %}
+                                            <span class="badge bg-info"><i class="bi bi-clock me-1"></i>Schedule</span>
+                                            {% elif exec.trigger_type == 'user_query' %}
+                                            <span class="badge bg-primary"><i class="bi bi-chat me-1"></i>User Query</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">{{ exec.trigger_type or 'Manual' }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if exec.status == 'completed' %}
+                                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Completed</span>
+                                            {% elif exec.status == 'failed' %}
+                                            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Failed</span>
+                                            {% elif exec.status == 'running' %}
+                                            <span class="badge bg-primary"><i class="bi bi-play-circle me-1"></i>Running</span>
+                                            {% elif exec.status == 'pending' %}
+                                            <span class="badge bg-secondary"><i class="bi bi-hourglass me-1"></i>Pending</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">{{ exec.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">{{ exec.agents_used or '-' }}</span>
+                                        </td>
+                                        <td>
+                                            <small>{{ exec.created_at[:16] if exec.created_at else '-' }}</small>
+                                        </td>
+                                        <td>
+                                            {% if exec.completed_at and exec.created_at %}
+                                            <small class="text-muted">{{ exec.duration_ms // 1000 if exec.duration_ms else '-' }}s</small>
+                                            {% else %}
+                                            <small class="text-muted">-</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ url_for('view_swarm_execution', swarm_id=exec.swarm_id, execution_id=exec.execution_id) }}" 
+                                                   class="btn btn-outline-warning" title="View Details">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="{{ url_for('view_swarm', swarm_id=exec.swarm_id) }}" 
+                                                   class="btn btn-outline-secondary" title="View Swarm">
+                                                    <i class="bi bi-hive"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-5">
+                                            <i class="bi bi-hive display-4 text-warning opacity-50"></i>
+                                            <p class="text-muted mt-2">No swarm executions yet</p>
+                                            <a href="{{ url_for('list_swarms') }}" class="btn btn-warning btn-sm">
+                                                <i class="bi bi-hive me-1"></i>View Swarms
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -210,7 +332,7 @@ function applyFilters() {
     const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
     
     document.querySelectorAll('#executionsTable tbody tr').forEach(row => {
-        if (!row.dataset.status) return; // Skip empty row
+        if (!row.dataset.status) return;
         
         const rowStatus = row.dataset.status || '';
         const rowAgent = row.dataset.agent || '';
@@ -237,9 +359,7 @@ function clearFilters() {
 
 function retryExecution(executionId) {
     if (confirm('Are you sure you want to retry this execution?')) {
-        fetch(`/api/executions/${executionId}/retry`, {
-            method: 'POST'
-        })
+        fetch(`/api/executions/${executionId}/retry`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -249,9 +369,7 @@ function retryExecution(executionId) {
                 alert('Error: ' + (data.error || 'Unknown error'));
             }
         })
-        .catch(error => {
-            alert('Error: ' + error.message);
-        });
+        .catch(error => alert('Error: ' + error.message));
     }
 }
 </script>
@@ -267,47 +385,23 @@ function retryExecution(executionId) {
                     <div class="card h-100 border-0 bg-white">
                         <div class="card-body py-2">
                             <strong class="text-primary">Execution</strong>
-                            <p class="small text-muted mb-0">A single run of an agent or workflow with unique ID, status, inputs, and outputs.</p>
+                            <p class="small text-muted mb-0">A single run of an agent, workflow, or swarm with unique ID, status, inputs, and outputs.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 border-0 bg-white">
                         <div class="card-body py-2">
-                            <strong class="text-primary">Token</strong>
-                            <p class="small text-muted mb-0">The basic unit of text that LLMs process. ~1 token ≈ 4 characters in English.</p>
+                            <strong class="text-warning">Swarm</strong>
+                            <p class="small text-muted mb-0">A coordinated group of agents orchestrated by a Master Actor using LLM-powered choreography.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 border-0 bg-white">
                         <div class="card-body py-2">
-                            <strong class="text-primary">Trace</strong>
-                            <p class="small text-muted mb-0">A detailed log of all steps, tool calls, and LLM interactions during execution.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Status</strong>
-                            <p class="small text-muted mb-0">Execution state: Pending, Running, Completed, or Failed.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Cost</strong>
-                            <p class="small text-muted mb-0">The monetary cost of LLM API usage based on tokens processed.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Workflow</strong>
-                            <p class="small text-muted mb-0">A defined sequence of steps represented as a DAG that accomplishes a task.</p>
+                            <strong class="text-primary">Trigger</strong>
+                            <p class="small text-muted mb-0">The event that initiates a swarm execution: Kafka, HTTP, Schedule, or User Query.</p>
                         </div>
                     </div>
                 </div>

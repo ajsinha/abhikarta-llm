@@ -90,60 +90,57 @@
                             <i class="bi bi-house me-1"></i> Dashboard
                         </a>
                     </li>
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown playground-dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-robot me-1"></i> Agents
+                            <i class="bi bi-grid-3x3-gap me-1"></i> Playground
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu dropdown-menu-playground">
+                            <!-- Agents Section -->
+                            <li class="dropdown-header text-primary fw-bold">
+                                <i class="bi bi-robot me-1"></i>Agents
+                            </li>
                             <li><a class="dropdown-item" href="{{ url_for('user_agents') }}">
                                 <i class="bi bi-collection me-2"></i>Browse Agents
                             </a></li>
-                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('new_agent_designer') }}">
                                 <i class="bi bi-diagram-3 me-2"></i>Visual Designer
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('agent_templates') }}">
                                 <i class="bi bi-file-earmark-code me-2"></i>Template Library
                             </a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-diagram-3 me-1"></i> Workflows
-                        </a>
-                        <ul class="dropdown-menu">
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Workflows Section -->
+                            <li class="dropdown-header text-success fw-bold">
+                                <i class="bi bi-diagram-3 me-1"></i>Workflows
+                            </li>
                             <li><a class="dropdown-item" href="{{ url_for('list_workflows') }}">
                                 <i class="bi bi-list me-2"></i>All Workflows
                             </a></li>
-                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('workflow_designer_new') }}">
                                 <i class="bi bi-pencil-square me-2"></i>Visual Designer
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('workflow_templates') }}">
                                 <i class="bi bi-file-earmark-code me-2"></i>Template Library
                             </a></li>
-                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('upload_workflow') }}">
                                 <i class="bi bi-upload me-2"></i>Upload Workflow
                             </a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-hive me-1 text-warning"></i> Swarms
-                        </a>
-                        <ul class="dropdown-menu">
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Swarms Section -->
+                            <li class="dropdown-header text-warning fw-bold">
+                                <i class="bi bi-hive me-1"></i>Swarms
+                                <span class="badge bg-warning text-dark ms-1" style="font-size: 0.6rem;">v1.3.0</span>
+                            </li>
                             <li><a class="dropdown-item" href="{{ url_for('list_swarms') }}">
                                 <i class="bi bi-list me-2"></i>All Swarms
                             </a></li>
-                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('swarm_designer_new') }}">
                                 <i class="bi bi-palette me-2"></i>Swarm Designer
                             </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li class="dropdown-header">
-                                <small class="text-warning">NEW in v1.3.0</small>
-                            </li>
                         </ul>
                     </li>
                     <li class="nav-item">

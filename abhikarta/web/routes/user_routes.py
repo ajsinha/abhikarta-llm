@@ -224,20 +224,38 @@ class UserRoutes(AbstractRoutes):
         @self.app.route('/user/executions')
         @login_required
         def user_executions():
-            """List user's execution history."""
+            """List user's execution history including swarm executions."""
             user_id = session.get('user_id')
             
             executions = []
+            swarm_executions = []
+            
             try:
+                # Get agent/workflow executions
                 executions = self.db_facade.executions.get_all_executions(user_id=user_id)
             except Exception as e:
                 logger.error(f"Error getting executions: {e}")
+            
+            try:
+                # Get swarm executions
+                swarm_executions = self.db_facade.fetch_all(
+                    """SELECT se.*, s.name as swarm_name 
+                       FROM swarm_executions se
+                       LEFT JOIN swarms s ON se.swarm_id = s.swarm_id
+                       WHERE se.user_id = ?
+                       ORDER BY se.created_at DESC
+                       LIMIT 100""",
+                    (user_id,)
+                ) or []
+            except Exception as e:
+                logger.error(f"Error getting swarm executions: {e}")
             
             return render_template('user/executions.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('user_id'),
                                    roles=session.get('roles', []),
-                                   executions=executions)
+                                   executions=executions,
+                                   swarm_executions=swarm_executions)
         
         @self.app.route('/user/executions/<execution_id>')
         @login_required

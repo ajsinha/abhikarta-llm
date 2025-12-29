@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Swarm Execution - {{ execution.execution_id[:8] }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('list_swarms') }}">Swarms</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('view_swarm', swarm_id=swarm_id) }}">{{ swarm_id[:8] }}...</a></li>
+            <li class="breadcrumb-item active">Execution {{ execution.execution_id[:8] }}...</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>
+                <i class="bi bi-hive me-2 text-warning"></i>
+                Swarm Execution
+            </h2>
+            <p class="text-muted mb-0">
+                <code class="bg-light px-2 py-1 rounded">{{ execution.execution_id }}</code>
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if execution.status == 'running' %}
+            <button class="btn btn-danger" onclick="stopExecution()">
+                <i class="bi bi-stop-circle me-1"></i>Stop
+            </button>
+            {% endif %}
+            <a href="{{ url_for('view_swarm', swarm_id=swarm_id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Swarm
+            </a>
+        </div>
+    </div>
+
+    <!-- Status Overview -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-2">Status</h6>
+                    {% if execution.status == 'completed' %}
+                    <span class="badge bg-success fs-5 px-4 py-2">
+                        <i class="bi bi-check-circle me-1"></i>Completed
+                    </span>
+                    {% elif execution.status == 'failed' %}
+                    <span class="badge bg-danger fs-5 px-4 py-2">
+                        <i class="bi bi-x-circle me-1"></i>Failed
+                    </span>
+                    {% elif execution.status == 'running' %}
+                    <span class="badge bg-primary fs-5 px-4 py-2">
+                        <i class="bi bi-play-circle me-1"></i>Running
+                    </span>
+                    {% elif execution.status == 'pending' %}
+                    <span class="badge bg-secondary fs-5 px-4 py-2">
+                        <i class="bi bi-hourglass me-1"></i>Pending
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary fs-5 px-4 py-2">{{ execution.status }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-2">Trigger</h6>
+                    {% if execution.trigger_type == 'kafka' %}
+                    <span class="badge bg-dark fs-6"><i class="bi bi-broadcast me-1"></i>Kafka</span>
+                    {% elif execution.trigger_type == 'http' %}
+                    <span class="badge bg-success fs-6"><i class="bi bi-globe me-1"></i>HTTP</span>
+                    {% elif execution.trigger_type == 'schedule' %}
+                    <span class="badge bg-info fs-6"><i class="bi bi-clock me-1"></i>Schedule</span>
+                    {% elif execution.trigger_type == 'user_query' %}
+                    <span class="badge bg-primary fs-6"><i class="bi bi-chat me-1"></i>User Query</span>
+                    {% else %}
+                    <span class="badge bg-secondary fs-6">{{ execution.trigger_type or 'Manual' }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-2">Started</h6>
+                    <p class="mb-0 fs-6">{{ execution.created_at[:19] if execution.created_at else '-' }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-2">Duration</h6>
+                    <p class="mb-0 fs-6">
+                        {% if execution.duration_ms %}
+                        {{ (execution.duration_ms / 1000)|round(2) }}s
+                        {% elif execution.status == 'running' %}
+                        <span class="text-primary">In Progress...</span>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column: Execution Details -->
+        <div class="col-lg-6">
+            <!-- Trigger Data -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary bg-opacity-10">
+                    <h6 class="mb-0"><i class="bi bi-lightning me-2"></i>Trigger Data</h6>
+                </div>
+                <div class="card-body">
+                    {% if execution.trigger_data %}
+                    <pre class="bg-light p-3 rounded mb-0" style="max-height: 200px; overflow: auto;"><code>{{ execution.trigger_data }}</code></pre>
+                    {% else %}
+                    <p class="text-muted mb-0">No trigger data</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Result -->
+            <div class="card mb-4">
+                <div class="card-header bg-success bg-opacity-10">
+                    <h6 class="mb-0"><i class="bi bi-check2-square me-2"></i>Result</h6>
+                </div>
+                <div class="card-body">
+                    {% if execution.result %}
+                    <pre class="bg-light p-3 rounded mb-0" style="max-height: 300px; overflow: auto;"><code>{{ execution.result }}</code></pre>
+                    {% else %}
+                    <p class="text-muted mb-0">
+                        {% if execution.status == 'running' %}
+                        <i class="bi bi-hourglass-split me-1"></i>Execution in progress...
+                        {% elif execution.status == 'pending' %}
+                        <i class="bi bi-pause-circle me-1"></i>Waiting to start...
+                        {% else %}
+                        No result available
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Error (if failed) -->
+            {% if execution.status == 'failed' and execution.error %}
+            <div class="card mb-4 border-danger">
+                <div class="card-header bg-danger bg-opacity-10">
+                    <h6 class="mb-0 text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Error</h6>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3 rounded mb-0 text-danger" style="max-height: 200px; overflow: auto;"><code>{{ execution.error }}</code></pre>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column: Events & Decisions -->
+        <div class="col-lg-6">
+            <!-- Master Actor Decisions -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning bg-opacity-10">
+                    <h6 class="mb-0">
+                        <i class="bi bi-stars me-2 text-warning"></i>Master Actor Decisions
+                        <span class="badge bg-warning text-dark ms-2">{{ decisions|length }}</span>
+                    </h6>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    {% if decisions %}
+                    <div class="timeline">
+                        {% for decision in decisions %}
+                        <div class="timeline-item mb-3 pb-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="badge bg-{{ 'success' if decision.decision_type == 'delegate' else 'info' if decision.decision_type == 'plan' else 'secondary' }} me-2">
+                                        {{ decision.decision_type or 'decision' }}
+                                    </span>
+                                    <small class="text-muted">{{ decision.created_at[:19] if decision.created_at else '' }}</small>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                {% if decision.target_agent %}
+                                <p class="mb-1"><strong>Target Agent:</strong> {{ decision.target_agent }}</p>
+                                {% endif %}
+                                {% if decision.reasoning %}
+                                <p class="mb-1 small text-muted"><strong>Reasoning:</strong> {{ decision.reasoning[:200] }}{% if decision.reasoning|length > 200 %}...{% endif %}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0 text-center py-4">
+                        <i class="bi bi-inbox display-6 d-block mb-2 opacity-50"></i>
+                        No decisions recorded yet
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Event Log -->
+            <div class="card mb-4">
+                <div class="card-header bg-info bg-opacity-10">
+                    <h6 class="mb-0">
+                        <i class="bi bi-list-ul me-2 text-info"></i>Event Log
+                        <span class="badge bg-info ms-2">{{ events|length }}</span>
+                    </h6>
+                </div>
+                <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                    {% if events %}
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Source</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td><small>{{ event.created_at[11:19] if event.created_at else '' }}</small></td>
+                                <td>
+                                    <span class="badge bg-{{ 'primary' if 'task' in (event.event_type or '') else 'success' if 'result' in (event.event_type or '') else 'danger' if 'error' in (event.event_type or '') else 'secondary' }}">
+                                        {{ event.event_type or 'event' }}
+                                    </span>
+                                </td>
+                                <td><small>{{ event.source_agent or 'system' }}</small></td>
+                                <td>
+                                    <small class="text-muted">
+                                        {% if event.payload %}
+                                        {{ event.payload[:50] }}{% if event.payload|length > 50 %}...{% endif %}
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted mb-0 text-center py-4">
+                        <i class="bi bi-inbox display-6 d-block mb-2 opacity-50"></i>
+                        No events recorded yet
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Execution Metadata -->
+    <div class="card">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Execution Metadata</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <p class="mb-1"><strong>Execution ID:</strong></p>
+                    <code class="small">{{ execution.execution_id }}</code>
+                </div>
+                <div class="col-md-3">
+                    <p class="mb-1"><strong>Swarm ID:</strong></p>
+                    <code class="small">{{ execution.swarm_id }}</code>
+                </div>
+                <div class="col-md-3">
+                    <p class="mb-1"><strong>User ID:</strong></p>
+                    <code class="small">{{ execution.user_id or '-' }}</code>
+                </div>
+                <div class="col-md-3">
+                    <p class="mb-1"><strong>Completed At:</strong></p>
+                    <span class="small">{{ execution.completed_at[:19] if execution.completed_at else '-' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{% if execution.status == 'running' %}
+// Auto-refresh for running executions
+setTimeout(() => location.reload(), 5000);
+{% endif %}
+
+function stopExecution() {
+    if (!confirm('Are you sure you want to stop this execution?')) return;
+    
+    fetch('/api/swarms/{{ swarm_id }}/stop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Failed to stop'));
+        }
+    })
+    .catch(err => alert('Error: ' + err.message));
+}
+</script>
+{% endblock %}

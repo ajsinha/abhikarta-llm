@@ -3,6 +3,7 @@
 {% block title %}Swarm Designer - {{ swarm.name if swarm else 'New Swarm' }} - {{ app_name }}{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css">
 <style>
 /* ============================================
    DESIGNER LAYOUT
@@ -10,18 +11,18 @@
 .designer-container {
     display: flex;
     height: calc(100vh - 140px);
-    gap: 12px;
+    gap: 0;
     padding: 0;
+    background: #f0f2f5;
 }
 
 /* ============================================
    LEFT SIDEBAR - COMPONENT PALETTE
    ============================================ */
 .component-palette {
-    width: 280px;
+    width: 260px;
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border-right: 1px solid #e0e0e0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -29,228 +30,270 @@
 }
 
 .palette-header {
-    padding: 15px;
-    background: linear-gradient(135deg, #6f42c1 0%, #8b5cf6 100%);
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
     font-weight: 600;
     font-size: 0.95rem;
-}
-
-.palette-header i {
-    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .palette-body {
     flex: 1;
     overflow-y: auto;
-    padding: 10px;
+    padding: 15px;
 }
 
 .palette-section {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .palette-section-title {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    color: #888;
+    color: #999;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 10px;
-    padding-left: 5px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    padding-left: 4px;
 }
 
-/* Draggable palette items */
 .palette-item {
     display: flex;
     align-items: center;
-    padding: 12px;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
     cursor: grab;
     transition: all 0.2s ease;
     user-select: none;
 }
 
 .palette-item:hover {
-    border-color: #6f42c1;
-    transform: translateX(5px);
-    box-shadow: 0 2px 8px rgba(111, 66, 193, 0.15);
+    border-color: #667eea;
+    background: #f8f9ff;
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
 }
 
-.palette-item:active {
-    cursor: grabbing;
-    transform: translateX(5px) scale(0.98);
-}
+.palette-item:active { cursor: grabbing; }
 
 .palette-item .icon-wrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 18px;
+    font-size: 16px;
     margin-right: 12px;
     flex-shrink: 0;
 }
 
-.palette-item .item-info {
-    flex: 1;
-    min-width: 0;
-}
-
+.palette-item .item-info { flex: 1; min-width: 0; }
 .palette-item .item-name {
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #333;
-}
-
-.palette-item .item-desc {
-    font-size: 0.75rem;
-    color: #888;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.palette-item .item-desc {
+    font-size: 0.7rem;
+    color: #888;
+}
 
-/* Drag ghost */
 .drag-ghost {
     position: fixed;
+    z-index: 9999;
     pointer-events: none;
-    z-index: 10000;
-    opacity: 0.9;
-    transform: rotate(-2deg);
+    opacity: 0.85;
+    transform: scale(1.05);
     box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
 /* ============================================
-   MAIN CANVAS AREA
+   CENTER: CANVAS AREA
    ============================================ */
 .canvas-container {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     min-width: 0;
 }
 
 .canvas-toolbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
+    justify-content: space-between;
+    padding: 10px 20px;
     background: #fff;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .swarm-name-input {
+    border: none;
     font-size: 1.1rem;
     font-weight: 600;
-    border: none;
+    color: #333;
     background: transparent;
-    width: 300px;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 5px 0;
+    width: 250px;
 }
 
 .swarm-name-input:focus {
     outline: none;
-    background: #f8f9fa;
+    border-bottom: 2px solid #667eea;
 }
 
-.canvas-wrapper {
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f5f5f5;
+    padding: 4px;
+    border-radius: 6px;
+    margin-right: 15px;
+}
+
+.zoom-controls button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    transition: all 0.15s;
+}
+
+.zoom-controls button:hover { background: #e0e0e0; }
+
+.zoom-level {
+    font-size: 0.75rem;
+    color: #666;
+    padding: 0 8px;
+    min-width: 45px;
+    text-align: center;
+}
+
+#canvas-wrapper {
     flex: 1;
-    background: 
-        linear-gradient(90deg, #f0f0f0 1px, transparent 1px),
-        linear-gradient(#f0f0f0 1px, transparent 1px);
-    background-size: 25px 25px;
-    background-color: #fafbfc;
-    border-radius: 10px;
     overflow: auto;
     position: relative;
-    box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+    background: 
+        linear-gradient(90deg, #f0f0f0 1px, transparent 1px),
+        linear-gradient(#f0f0f0 1px, transparent 1px),
+        linear-gradient(90deg, #e8e8e8 1px, transparent 1px),
+        linear-gradient(#e8e8e8 1px, transparent 1px);
+    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+    background-position: -1px -1px;
+    background-color: #fafafa;
 }
 
-.canvas-wrapper.drag-over {
-    background-color: #f0f7ff;
-    box-shadow: inset 0 0 0 3px #0d6efd;
-}
+#canvas-wrapper.drag-over { background-color: #f0f4ff; }
 
 #design-canvas {
     position: relative;
-    width: 2500px;
+    width: 2000px;
     height: 1500px;
-    min-width: 100%;
-    min-height: 100%;
+    transform-origin: 0 0;
 }
 
 /* ============================================
-   FIXED ELEMENTS - MASTER ACTOR & EVENT BUS
+   MASTER ACTOR - DRAGGABLE & RESIZABLE
    ============================================ */
 .master-actor {
     position: absolute;
     left: 50%;
-    top: 150px;
+    top: 80px;
     transform: translateX(-50%);
-    width: 220px;
-    background: linear-gradient(135deg, #6f42c1 0%, #9f7aea 100%);
+    min-width: 200px;
+    min-height: 120px;
+    background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
     border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(111, 66, 193, 0.35);
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
     color: #fff;
-    text-align: center;
+    z-index: 100;
+    cursor: move;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+
+.master-actor:hover { box-shadow: 0 15px 50px rgba(102, 126, 234, 0.5); }
+.master-actor.selected { box-shadow: 0 0 0 3px #fff, 0 0 0 6px #667eea, 0 15px 50px rgba(102, 126, 234, 0.5); }
+
+.master-actor-content {
     padding: 20px;
-    z-index: 50;
+    text-align: center;
 }
 
 .master-actor-icon {
-    font-size: 42px;
-    margin-bottom: 10px;
+    font-size: 38px;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
-.master-actor-title {
-    font-weight: 700;
-    font-size: 1.15rem;
-    margin-bottom: 4px;
+.master-actor-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
+.master-actor-subtitle { font-size: 0.8rem; opacity: 0.9; }
+
+.master-actor .ui-resizable-handle {
+    background: rgba(255,255,255,0.3);
 }
 
-.master-actor-subtitle {
-    font-size: 0.85rem;
-    opacity: 0.9;
-}
-
+/* ============================================
+   EVENT BUS - DRAGGABLE & RESIZABLE
+   ============================================ */
 .event-bus {
     position: absolute;
     left: 50%;
     top: 320px;
     transform: translateX(-50%);
-    width: 700px;
-    height: 65px;
-    background: linear-gradient(90deg, #0dcaf0 0%, #17a2b8 50%, #0dcaf0 100%);
-    border-radius: 35px;
+    min-width: 500px;
+    min-height: 60px;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border-radius: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 15px;
     color: #fff;
     font-weight: 600;
     font-size: 1rem;
-    box-shadow: 0 6px 25px rgba(13, 202, 240, 0.35);
-    z-index: 40;
+    box-shadow: 0 8px 30px rgba(17, 153, 142, 0.4);
+    z-index: 90;
+    cursor: move;
+    transition: box-shadow 0.2s;
+    padding: 0 30px;
 }
+
+.event-bus:hover { box-shadow: 0 12px 40px rgba(17, 153, 142, 0.5); }
+.event-bus.selected { box-shadow: 0 0 0 3px #fff, 0 0 0 6px #11998e, 0 12px 40px rgba(17, 153, 142, 0.5); }
 
 .event-bus i {
-    font-size: 26px;
-    margin-right: 12px;
-    animation: pulse-icon 2s infinite;
+    font-size: 24px;
+    animation: pulse-glow 2s ease-in-out infinite;
 }
 
-@keyframes pulse-icon {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.95); }
+@keyframes pulse-glow {
+    0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+    50% { opacity: 0.7; text-shadow: 0 0 20px rgba(255,255,255,0.8); }
 }
 
 /* ============================================
@@ -263,39 +306,38 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 10;
+    z-index: 50;
 }
 
 .connection-path {
     fill: none;
-    stroke-width: 3;
     stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .connection-path.trigger-to-master {
-    stroke: #ffc107;
-    stroke-dasharray: 8, 4;
-    animation: dash-flow 1s linear infinite;
+    stroke: url(#gradient-trigger);
+    stroke-width: 3;
+    stroke-dasharray: 8 4;
+    animation: flow-down 0.8s linear infinite;
 }
 
 .connection-path.master-to-bus {
-    stroke: #6f42c1;
-    stroke-width: 4;
+    stroke: url(#gradient-master-bus);
+    stroke-width: 5;
+    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
 }
 
 .connection-path.bus-to-agent {
-    stroke: #17a2b8;
-    stroke-dasharray: 8, 4;
-    animation: dash-flow 1s linear infinite reverse;
+    stroke: url(#gradient-bus-agent);
+    stroke-width: 3;
+    stroke-dasharray: 6 4;
+    animation: flow-down 0.8s linear infinite;
 }
 
-@keyframes dash-flow {
-    to { stroke-dashoffset: -12; }
-}
-
-/* Arrow markers */
-.arrow-marker {
-    fill: currentColor;
+@keyframes flow-down {
+    0% { stroke-dashoffset: 12; }
+    100% { stroke-dashoffset: 0; }
 }
 
 /* ============================================
@@ -303,49 +345,43 @@
    ============================================ */
 .trigger-node {
     position: absolute;
-    width: 160px;
+    min-width: 150px;
     background: #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     cursor: move;
     transition: transform 0.15s, box-shadow 0.15s;
-    z-index: 60;
+    z-index: 110;
     overflow: hidden;
 }
 
 .trigger-node:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
 }
 
-.trigger-node.selected {
-    box-shadow: 0 0 0 3px #6f42c1, 0 8px 25px rgba(0,0,0,0.15);
-}
-
+.trigger-node.selected { box-shadow: 0 0 0 3px #667eea, 0 8px 30px rgba(0,0,0,0.15); }
 .trigger-node.ui-draggable-dragging {
     z-index: 1000;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+    transform: scale(1.02);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
 }
 
 .trigger-node-header {
-    padding: 12px;
+    padding: 12px 14px;
     color: #fff;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
-.trigger-node-header i {
-    font-size: 18px;
-}
-
+.trigger-node-header i { font-size: 18px; }
 .trigger-node-body {
-    padding: 10px 12px;
-    font-size: 0.8rem;
+    padding: 10px 14px;
+    font-size: 0.75rem;
     color: #666;
-    border-top: 3px solid currentColor;
     background: #fafafa;
 }
 
@@ -354,27 +390,25 @@
    ============================================ */
 .agent-node {
     position: absolute;
-    width: 180px;
+    min-width: 170px;
     background: #fff;
     border-radius: 14px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     cursor: move;
     transition: transform 0.15s, box-shadow 0.15s;
-    z-index: 60;
+    z-index: 110;
     overflow: hidden;
 }
 
 .agent-node:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
 }
 
-.agent-node.selected {
-    box-shadow: 0 0 0 3px #6f42c1, 0 8px 28px rgba(0,0,0,0.15);
-}
-
+.agent-node.selected { box-shadow: 0 0 0 3px #667eea, 0 8px 30px rgba(0,0,0,0.15); }
 .agent-node.ui-draggable-dragging {
     z-index: 1000;
+    transform: scale(1.02);
     box-shadow: 0 15px 40px rgba(0,0,0,0.2);
 }
 
@@ -386,23 +420,10 @@
     gap: 10px;
 }
 
-.agent-node-header i {
-    font-size: 22px;
-}
-
-.agent-node-header .agent-info {
-    flex: 1;
-}
-
-.agent-node-header .agent-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-}
-
-.agent-node-header .agent-role {
-    font-size: 0.75rem;
-    opacity: 0.9;
-}
+.agent-node-header i { font-size: 20px; }
+.agent-node-header .agent-info { flex: 1; }
+.agent-node-header .agent-name { font-weight: 600; font-size: 0.9rem; }
+.agent-node-header .agent-role { font-size: 0.7rem; opacity: 0.9; }
 
 .agent-node-body {
     padding: 12px;
@@ -414,23 +435,20 @@
     align-items: center;
     gap: 4px;
     padding: 3px 8px;
-    background: #e9ecef;
+    background: #e8f5e9;
     border-radius: 4px;
-    font-size: 0.75rem;
-    color: #555;
+    font-size: 0.7rem;
+    color: #2e7d32;
     margin: 2px;
 }
 
-.agent-subscription-tag i {
-    font-size: 10px;
-    color: #ffc107;
-}
+.agent-subscription-tag i { font-size: 10px; }
 
 .agent-pool-info {
     margin-top: 8px;
     padding-top: 8px;
     border-top: 1px solid #eee;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #888;
     display: flex;
     align-items: center;
@@ -443,8 +461,7 @@
 .properties-panel {
     width: 300px;
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border-left: 1px solid #e0e0e0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -452,65 +469,118 @@
 }
 
 .properties-header {
-    padding: 15px;
-    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
     font-weight: 600;
     font-size: 0.95rem;
-}
-
-.properties-header i {
-    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .properties-body {
     flex: 1;
     overflow-y: auto;
-    padding: 15px;
+    padding: 20px;
 }
 
-.prop-group {
-    margin-bottom: 15px;
-}
+.property-group { margin-bottom: 20px; }
 
-.prop-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 6px;
-}
-
-.prop-input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.prop-input:focus {
-    outline: none;
-    border-color: #6f42c1;
-    box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.1);
-}
-
-.prop-input:disabled {
-    background: #f5f5f5;
-    color: #888;
-}
-
-.prop-hint {
-    font-size: 0.75rem;
+.property-group-title {
+    font-size: 11px;
+    font-weight: 700;
     color: #999;
-    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
 }
 
-/* ============================================
-   TOAST NOTIFICATIONS
-   ============================================ */
-.toast-container {
-    z-index: 9999;
+.property-row { margin-bottom: 12px; }
+.property-row label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.property-row input,
+.property-row select,
+.property-row textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: border-color 0.2s;
+}
+
+.property-row input:focus,
+.property-row select:focus,
+.property-row textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.property-row textarea { min-height: 80px; resize: vertical; }
+
+.btn-remove {
+    width: 100%;
+    padding: 10px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-remove:hover { background: #fecaca; }
+
+.btn-save {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-save:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Toast */
+.toast-notification {
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease;
+    margin-bottom: 8px;
+}
+
+.toast-notification.success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+.toast-notification.error { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); }
+.toast-notification.warning { background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%); color: #333; }
+.toast-notification.info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 </style>
 {% endblock %}
@@ -520,82 +590,48 @@
     <!-- LEFT: Component Palette -->
     <div class="component-palette">
         <div class="palette-header">
-            <i class="bi bi-grid-3x3-gap-fill"></i>Components
+            <i class="bi bi-grid-3x3-gap"></i>Components
         </div>
         <div class="palette-body">
-            <!-- Triggers Section -->
             <div class="palette-section">
                 <div class="palette-section-title">External Triggers</div>
                 
                 <div class="palette-item" data-type="trigger" data-trigger-type="kafka">
-                    <div class="icon-wrapper" style="background: #231f20;">
-                        <i class="bi bi-broadcast"></i>
-                    </div>
-                    <div class="item-info">
-                        <div class="item-name">Kafka</div>
-                        <div class="item-desc">Message queue trigger</div>
-                    </div>
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #232526, #414345);"><i class="bi bi-broadcast"></i></div>
+                    <div class="item-info"><div class="item-name">Kafka</div><div class="item-desc">Topic subscription</div></div>
                 </div>
                 
                 <div class="palette-item" data-type="trigger" data-trigger-type="rabbitmq">
-                    <div class="icon-wrapper" style="background: #ff6600;">
-                        <i class="bi bi-envelope-fill"></i>
-                    </div>
-                    <div class="item-info">
-                        <div class="item-name">RabbitMQ</div>
-                        <div class="item-desc">AMQP queue trigger</div>
-                    </div>
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #ff6600, #ff8533);"><i class="bi bi-envelope-fill"></i></div>
+                    <div class="item-info"><div class="item-name">RabbitMQ</div><div class="item-desc">Queue listener</div></div>
                 </div>
                 
                 <div class="palette-item" data-type="trigger" data-trigger-type="schedule">
-                    <div class="icon-wrapper" style="background: #fd7e14;">
-                        <i class="bi bi-clock-fill"></i>
-                    </div>
-                    <div class="item-info">
-                        <div class="item-name">Schedule</div>
-                        <div class="item-desc">Cron-based trigger</div>
-                    </div>
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #f7971e, #ffd200);"><i class="bi bi-clock-fill"></i></div>
+                    <div class="item-info"><div class="item-name">Schedule</div><div class="item-desc">Cron expression</div></div>
                 </div>
                 
                 <div class="palette-item" data-type="trigger" data-trigger-type="http">
-                    <div class="icon-wrapper" style="background: #198754;">
-                        <i class="bi bi-globe"></i>
-                    </div>
-                    <div class="item-info">
-                        <div class="item-name">HTTP Webhook</div>
-                        <div class="item-desc">REST API trigger</div>
-                    </div>
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #11998e, #38ef7d);"><i class="bi bi-globe"></i></div>
+                    <div class="item-info"><div class="item-name">HTTP Webhook</div><div class="item-desc">REST endpoint</div></div>
                 </div>
                 
                 <div class="palette-item" data-type="trigger" data-trigger-type="user_query">
-                    <div class="icon-wrapper" style="background: #0d6efd;">
-                        <i class="bi bi-chat-dots-fill"></i>
-                    </div>
-                    <div class="item-info">
-                        <div class="item-name">User Query</div>
-                        <div class="item-desc">Direct user input</div>
-                    </div>
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #667eea, #764ba2);"><i class="bi bi-chat-dots-fill"></i></div>
+                    <div class="item-info"><div class="item-name">User Query</div><div class="item-desc">Direct input</div></div>
                 </div>
             </div>
             
-            <!-- Agents Section -->
             <div class="palette-section">
                 <div class="palette-section-title">Available Agents</div>
-                
                 {% for agent in agents %}
                 <div class="palette-item" data-type="agent" data-agent-id="{{ agent.agent_id }}" data-agent-name="{{ agent.name }}">
-                    <div class="icon-wrapper" style="background: #0d6efd;">
-                        <i class="bi bi-robot"></i>
-                    </div>
-                    <div class="item-info">
-                        <div class="item-name">{{ agent.name }}</div>
-                        <div class="item-desc">{{ (agent.description or 'AI Agent')[:25] }}...</div>
-                    </div>
+                    <div class="icon-wrapper" style="background: linear-gradient(135deg, #667eea, #764ba2);"><i class="bi bi-robot"></i></div>
+                    <div class="item-info"><div class="item-name">{{ agent.name }}</div><div class="item-desc">{{ (agent.description or 'AI Agent')[:20] }}...</div></div>
                 </div>
                 {% else %}
                 <div class="text-muted small text-center py-3">
-                    <i class="bi bi-info-circle me-1"></i>
-                    No agents available.<br>
+                    <i class="bi bi-info-circle me-1"></i>No agents available.<br>
                     <a href="{{ url_for('agent_create') }}">Create an agent</a> first.
                 </div>
                 {% endfor %}
@@ -603,815 +639,432 @@
         </div>
     </div>
     
-    <!-- CENTER: Canvas Area -->
+    <!-- CENTER: Canvas -->
     <div class="canvas-container">
         <div class="canvas-toolbar">
             <div class="d-flex align-items-center">
-                <input type="text" class="swarm-name-input" id="swarm-name" 
-                       value="{{ swarm.name if swarm else 'New Swarm' }}" 
-                       placeholder="Swarm Name">
-                <span class="badge bg-secondary ms-2" id="status-badge">{{ swarm.status if swarm else 'draft' }}</span>
+                <input type="text" class="swarm-name-input" id="swarm-name" value="{{ swarm.name if swarm else 'New Swarm' }}" placeholder="Swarm Name">
+                <span class="badge bg-secondary ms-2">{{ swarm.status if swarm else 'draft' }}</span>
             </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary btn-sm" onclick="centerCanvas()">
-                    <i class="bi bi-arrows-fullscreen"></i>
-                </button>
-                <button class="btn btn-primary btn-sm" onclick="saveSwarm()">
-                    <i class="bi bi-save me-1"></i>Save Swarm
-                </button>
-                <a href="{{ url_for('list_swarms') }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-x-lg me-1"></i>Close
+            <div class="toolbar-actions">
+                <a href="{{ url_for('swarm_create') }}" class="btn btn-outline-secondary btn-sm" title="Switch to Simple Form">
+                    <i class="bi bi-card-text me-1"></i>Simple Form
                 </a>
+                <div class="zoom-controls">
+                    <button onclick="zoomOut()" title="Zoom Out"><i class="bi bi-dash"></i></button>
+                    <span class="zoom-level" id="zoom-level">100%</span>
+                    <button onclick="zoomIn()" title="Zoom In"><i class="bi bi-plus"></i></button>
+                    <button onclick="resetZoom()" title="Reset"><i class="bi bi-aspect-ratio"></i></button>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="autoLayout()"><i class="bi bi-grid-3x3 me-1"></i>Auto Layout</button>
+                <button class="btn-save" onclick="saveSwarm()"><i class="bi bi-check-lg"></i>Save Swarm</button>
             </div>
         </div>
         
-        <div class="canvas-wrapper" id="canvas-wrapper">
+        <div id="canvas-wrapper">
             <div id="design-canvas">
-                <!-- SVG Layer for Connections -->
                 <svg id="connections-svg">
                     <defs>
-                        <marker id="arrow-yellow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                            <path d="M0,0 L0,6 L9,3 z" fill="#ffc107"/>
-                        </marker>
-                        <marker id="arrow-purple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                            <path d="M0,0 L0,6 L9,3 z" fill="#6f42c1"/>
-                        </marker>
-                        <marker id="arrow-cyan" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                            <path d="M0,0 L0,6 L9,3 z" fill="#17a2b8"/>
-                        </marker>
+                        <linearGradient id="gradient-trigger" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f7971e"/><stop offset="100%" style="stop-color:#ffd200"/>
+                        </linearGradient>
+                        <linearGradient id="gradient-master-bus" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea"/><stop offset="100%" style="stop-color:#11998e"/>
+                        </linearGradient>
+                        <linearGradient id="gradient-bus-agent" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#11998e"/><stop offset="100%" style="stop-color:#38ef7d"/>
+                        </linearGradient>
+                        <marker id="arrow-trigger" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L0,12 L12,6 z" fill="#ffd200"/></marker>
+                        <marker id="arrow-master" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L0,12 L12,6 z" fill="#11998e"/></marker>
+                        <marker id="arrow-agent" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L0,12 L12,6 z" fill="#38ef7d"/></marker>
                     </defs>
                 </svg>
                 
-                <!-- Master Actor (Fixed Position) -->
                 <div class="master-actor" id="master-actor">
-                    <div class="master-actor-icon"><i class="bi bi-stars"></i></div>
-                    <div class="master-actor-title">Master Actor</div>
-                    <div class="master-actor-subtitle">LLM Choreographer</div>
+                    <div class="master-actor-content">
+                        <div class="master-actor-icon"><i class="bi bi-stars"></i></div>
+                        <div class="master-actor-title">Master Actor</div>
+                        <div class="master-actor-subtitle">LLM Choreographer</div>
+                    </div>
                 </div>
                 
-                <!-- Event Bus (Fixed Position) -->
                 <div class="event-bus" id="event-bus">
                     <i class="bi bi-broadcast-pin"></i>
-                    Swarm Event Bus
+                    <span>Swarm Event Bus</span>
                 </div>
-                
-                <!-- Dynamic nodes will be added here -->
             </div>
         </div>
     </div>
     
-    <!-- RIGHT: Properties Panel -->
+    <!-- RIGHT: Properties -->
     <div class="properties-panel">
-        <div class="properties-header">
-            <i class="bi bi-sliders"></i>Properties
-        </div>
+        <div class="properties-header"><i class="bi bi-sliders"></i>Properties</div>
         <div class="properties-body" id="properties-content">
             <div class="text-center py-5">
-                <i class="bi bi-hand-index-thumb text-muted" style="font-size: 3rem;"></i>
-                <p class="text-muted mt-3">
-                    Drag components from the left<br>
-                    onto the canvas to get started
-                </p>
-                <p class="small text-muted">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Connections are drawn automatically
-                </p>
+                <i class="bi bi-hand-index-thumb text-muted" style="font-size: 2.5rem;"></i>
+                <p class="text-muted mt-3 mb-2">Drag components onto the canvas</p>
+                <p class="small text-muted">Click any element to edit its properties</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Toast Container -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toast-container"></div>
 {% endblock %}
 
 {% block extra_js %}
-<!-- jQuery UI for draggable -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
 <script>
-// ============================================
-// SWARM DESIGNER - COMPLETE REWRITE
-// ============================================
-
 const Designer = {
     swarmId: '{{ swarm.swarm_id if swarm else "" }}',
     triggers: [],
     agents: [],
     selected: null,
     counter: 0,
-    
+    zoom: 1,
+    masterPos: { x: 0, y: 80, w: 200, h: 130 },
+    busPos: { x: 0, y: 320, w: 600, h: 60 },
     colors: {
         trigger: {
-            kafka: '#231f20',
-            rabbitmq: '#ff6600',
-            activemq: '#e42025',
-            schedule: '#fd7e14',
-            http: '#198754',
-            user_query: '#0d6efd'
+            kafka: ['#232526', '#414345'], rabbitmq: ['#ff6600', '#ff8533'],
+            schedule: ['#f7971e', '#ffd200'], http: ['#11998e', '#38ef7d'],
+            user_query: ['#667eea', '#764ba2']
         },
-        agents: ['#0d6efd', '#198754', '#dc3545', '#6f42c1', '#fd7e14', '#20c997', '#6610f2', '#d63384']
+        agents: [['#667eea','#764ba2'],['#11998e','#38ef7d'],['#eb3349','#f45c43'],['#ff6600','#ff8533'],['#232526','#414345']]
     }
 };
 
-// ============================================
-// INITIALIZATION
-// ============================================
 $(document).ready(function() {
-    console.log('🚀 Swarm Designer initializing...');
-    
     initPaletteDragDrop();
-    loadExistingData();
+    initMasterActor();
+    initEventBus();
     initCanvasEvents();
-    
-    // Initial render
-    setTimeout(() => {
-        drawAllConnections();
-        centerCanvas();
-    }, 100);
-    
-    console.log('✅ Swarm Designer ready');
+    loadExistingData();
+    setTimeout(() => { centerElements(); drawAllConnections(); }, 100);
 });
 
-// ============================================
-// PALETTE DRAG & DROP
-// ============================================
+function initMasterActor() {
+    $('#master-actor').draggable({
+        containment: '#design-canvas',
+        drag: function(e, ui) {
+            Designer.masterPos.x = ui.position.left;
+            Designer.masterPos.y = ui.position.top;
+            drawAllConnections();
+        }
+    }).resizable({
+        minWidth: 180, minHeight: 100,
+        resize: function(e, ui) {
+            Designer.masterPos.w = ui.size.width;
+            Designer.masterPos.h = ui.size.height;
+            drawAllConnections();
+        }
+    }).on('click', function(e) { e.stopPropagation(); selectElement('master', 'master-actor'); });
+}
+
+function initEventBus() {
+    $('#event-bus').draggable({
+        containment: '#design-canvas',
+        drag: function(e, ui) {
+            Designer.busPos.x = ui.position.left;
+            Designer.busPos.y = ui.position.top;
+            drawAllConnections();
+        }
+    }).resizable({
+        minWidth: 400, minHeight: 50, handles: 'e, w',
+        resize: function(e, ui) {
+            Designer.busPos.w = ui.size.width;
+            $(this).css('border-radius', Math.min(30, ui.size.height / 2) + 'px');
+            drawAllConnections();
+        }
+    }).on('click', function(e) { e.stopPropagation(); selectElement('bus', 'event-bus'); });
+}
+
+function centerElements() {
+    const wrapper = document.getElementById('canvas-wrapper');
+    const cx = wrapper.clientWidth / 2;
+    const $m = $('#master-actor'), $b = $('#event-bus');
+    Designer.masterPos.x = cx - $m.outerWidth() / 2;
+    Designer.busPos.x = cx - $b.outerWidth() / 2;
+    $m.css({ left: Designer.masterPos.x, top: Designer.masterPos.y, transform: 'none' });
+    $b.css({ left: Designer.busPos.x, top: Designer.busPos.y, transform: 'none' });
+}
+
+function drawAllConnections() {
+    const svg = document.getElementById('connections-svg');
+    const defs = svg.querySelector('defs');
+    svg.innerHTML = '';
+    svg.appendChild(defs);
+    
+    const $m = $('#master-actor'), $b = $('#event-bus');
+    const mRect = { x: $m.position().left, y: $m.position().top, w: $m.outerWidth(), h: $m.outerHeight() };
+    const bRect = { x: $b.position().left, y: $b.position().top, w: $b.outerWidth(), h: $b.outerHeight() };
+    
+    // Master -> Bus
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', createVerticalPath(mRect.x + mRect.w/2, mRect.y + mRect.h, bRect.x + bRect.w/2, bRect.y));
+    path.setAttribute('class', 'connection-path master-to-bus');
+    path.setAttribute('marker-end', 'url(#arrow-master)');
+    svg.appendChild(path);
+    
+    // Triggers -> Master
+    Designer.triggers.forEach(t => {
+        const $t = $(`#${t.id}`);
+        if (!$t.length) return;
+        const tRect = { x: $t.position().left, y: $t.position().top, w: $t.outerWidth(), h: $t.outerHeight() };
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', createVerticalPath(tRect.x + tRect.w/2, tRect.y + tRect.h, mRect.x + mRect.w/2, mRect.y));
+        p.setAttribute('class', 'connection-path trigger-to-master');
+        p.setAttribute('marker-end', 'url(#arrow-trigger)');
+        svg.appendChild(p);
+    });
+    
+    // Bus -> Agents
+    Designer.agents.forEach((a, i) => {
+        const $a = $(`#${a.id}`);
+        if (!$a.length) return;
+        const aRect = { x: $a.position().left, y: $a.position().top, w: $a.outerWidth(), h: $a.outerHeight() };
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const bx = bRect.x + (bRect.w / (Designer.agents.length + 1)) * (i + 1);
+        p.setAttribute('d', createVerticalPath(bx, bRect.y + bRect.h, aRect.x + aRect.w/2, aRect.y));
+        p.setAttribute('class', 'connection-path bus-to-agent');
+        p.setAttribute('marker-end', 'url(#arrow-agent)');
+        svg.appendChild(p);
+    });
+}
+
+function createVerticalPath(x1, y1, x2, y2) {
+    const offset = Math.abs(y2 - y1) * 0.4;
+    return `M ${x1} ${y1} C ${x1} ${y1 + offset}, ${x2} ${y2 - offset}, ${x2} ${y2}`;
+}
+
 function initPaletteDragDrop() {
-    let dragData = null;
-    let $ghost = null;
+    let dragData = null, $ghost = null;
     
     $('.palette-item').on('mousedown', function(e) {
         if (e.button !== 0) return;
         e.preventDefault();
-        
         const $item = $(this);
-        
-        // Store drag data
-        dragData = {
-            type: $item.data('type'),
-            triggerType: $item.data('trigger-type'),
-            agentId: $item.data('agent-id'),
-            agentName: $item.data('agent-name')
-        };
-        
-        // Create ghost element
-        $ghost = $item.clone()
-            .addClass('drag-ghost')
-            .css({
-                width: $item.outerWidth(),
-                left: e.pageX - 50,
-                top: e.pageY - 25
-            })
-            .appendTo('body');
-        
-        // Bind move/up handlers
-        $(document).on('mousemove.drag', onDragMove);
-        $(document).on('mouseup.drag', onDragEnd);
+        dragData = { type: $item.data('type'), triggerType: $item.data('trigger-type'), agentId: $item.data('agent-id'), agentName: $item.data('agent-name') };
+        $ghost = $item.clone().addClass('drag-ghost').css({ width: $item.outerWidth(), left: e.pageX - 50, top: e.pageY - 25 }).appendTo('body');
+        $(document).on('mousemove.drag', onDragMove).on('mouseup.drag', onDragEnd);
     });
     
     function onDragMove(e) {
-        if (!$ghost) return;
-        
-        $ghost.css({
-            left: e.pageX - 50,
-            top: e.pageY - 25
-        });
-        
-        // Highlight canvas when hovering
-        const wrapper = document.getElementById('canvas-wrapper');
-        const rect = wrapper.getBoundingClientRect();
-        
-        if (e.clientX >= rect.left && e.clientX <= rect.right &&
-            e.clientY >= rect.top && e.clientY <= rect.bottom) {
-            $('#canvas-wrapper').addClass('drag-over');
-        } else {
-            $('#canvas-wrapper').removeClass('drag-over');
-        }
+        if ($ghost) $ghost.css({ left: e.pageX - 50, top: e.pageY - 25 });
+        const wrapper = document.getElementById('canvas-wrapper'), rect = wrapper.getBoundingClientRect();
+        $('#canvas-wrapper').toggleClass('drag-over', e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom);
     }
     
     function onDragEnd(e) {
         $(document).off('.drag');
         $('#canvas-wrapper').removeClass('drag-over');
-        
-        if ($ghost) {
-            $ghost.remove();
-            $ghost = null;
-        }
-        
+        if ($ghost) { $ghost.remove(); $ghost = null; }
         if (!dragData) return;
-        
-        // Check if dropped on canvas
-        const wrapper = document.getElementById('canvas-wrapper');
-        const canvas = document.getElementById('design-canvas');
-        const wrapperRect = wrapper.getBoundingClientRect();
-        
-        if (e.clientX >= wrapperRect.left && e.clientX <= wrapperRect.right &&
-            e.clientY >= wrapperRect.top && e.clientY <= wrapperRect.bottom) {
-            
-            // Calculate position on canvas
-            const x = e.clientX - wrapperRect.left + wrapper.scrollLeft;
-            const y = e.clientY - wrapperRect.top + wrapper.scrollTop;
-            
-            // Create node
-            if (dragData.type === 'trigger') {
-                createTrigger(dragData.triggerType, x, Math.min(y, 100));
-            } else if (dragData.type === 'agent') {
-                createAgent(dragData.agentId, dragData.agentName, x, Math.max(y, 450));
-            }
+        const wrapper = document.getElementById('canvas-wrapper'), rect = wrapper.getBoundingClientRect();
+        if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+            const x = e.clientX - rect.left + wrapper.scrollLeft, y = e.clientY - rect.top + wrapper.scrollTop;
+            if (dragData.type === 'trigger') createTrigger(dragData.triggerType, x, Math.min(y, 60));
+            else if (dragData.type === 'agent') createAgent(dragData.agentId, dragData.agentName, x, Math.max(y, 450));
         }
-        
         dragData = null;
     }
 }
 
-// ============================================
-// CREATE TRIGGER NODE
-// ============================================
 function createTrigger(type, x, y) {
     Designer.counter++;
     const id = 'trigger-' + Designer.counter;
-    
-    const trigger = {
-        id: id,
-        type: type,
-        name: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ') + ' Trigger',
-        config: getDefaultConfig(type),
-        x: x - 80,
-        y: y
-    };
-    
+    const names = { kafka: 'Kafka Trigger', rabbitmq: 'RabbitMQ Trigger', schedule: 'Schedule Trigger', http: 'HTTP Webhook', user_query: 'User Query' };
+    const configs = { kafka: { topic: 'swarm-events', group: 'swarm-consumer' }, rabbitmq: { queue: 'swarm-queue' }, schedule: { cron: '0 * * * *' }, http: { endpoint: '/api/swarm/webhook' }, user_query: { prompt_template: '' } };
+    const trigger = { id, type, name: names[type] || type, config: configs[type] || {}, x: x - 75, y: Math.min(y, 60) };
     Designer.triggers.push(trigger);
     renderTriggerNode(trigger);
-    selectNode('trigger', id);
+    selectElement('trigger', id);
     drawAllConnections();
-    
     showToast('success', 'Added ' + trigger.name);
 }
 
-function getDefaultConfig(type) {
-    const configs = {
-        kafka: { topic: 'swarm-events', group: 'swarm-consumer', bootstrap_servers: 'localhost:9092' },
-        rabbitmq: { queue: 'swarm-queue', host: 'localhost', port: 5672 },
-        schedule: { cron: '0 * * * *', timezone: 'UTC' },
-        http: { endpoint: '/api/swarm/webhook', method: 'POST' },
-        user_query: { prompt_template: '' }
-    };
-    return configs[type] || {};
-}
-
-function renderTriggerNode(trigger) {
-    const color = Designer.colors.trigger[trigger.type] || '#ffc107';
-    const icons = {
-        kafka: 'bi-broadcast',
-        rabbitmq: 'bi-envelope-fill',
-        activemq: 'bi-broadcast',
-        schedule: 'bi-clock-fill',
-        http: 'bi-globe',
-        user_query: 'bi-chat-dots-fill'
-    };
-    
-    const html = `
-        <div class="trigger-node" id="${trigger.id}" style="left: ${trigger.x}px; top: ${trigger.y}px;">
-            <div class="trigger-node-header" style="background: ${color};">
-                <i class="bi ${icons[trigger.type] || 'bi-lightning-fill'}"></i>
-                <span>${trigger.name}</span>
-            </div>
-            <div class="trigger-node-body" style="border-top-color: ${color};">
-                ${trigger.type.toUpperCase()}
-            </div>
-        </div>
-    `;
-    
+function renderTriggerNode(t) {
+    const colors = Designer.colors.trigger[t.type] || ['#667eea', '#764ba2'];
+    const icons = { kafka: 'bi-broadcast', rabbitmq: 'bi-envelope-fill', schedule: 'bi-clock-fill', http: 'bi-globe', user_query: 'bi-chat-dots-fill' };
+    const html = `<div class="trigger-node" id="${t.id}" style="left:${t.x}px;top:${t.y}px;">
+        <div class="trigger-node-header" style="background:linear-gradient(135deg,${colors[0]},${colors[1]});">
+            <i class="bi ${icons[t.type] || 'bi-lightning-fill'}"></i><span>${t.name}</span>
+        </div><div class="trigger-node-body">${t.type.toUpperCase()}</div></div>`;
     $('#design-canvas').append(html);
-    makeNodeDraggable(trigger.id, 'trigger');
+    makeNodeDraggable(t.id, 'trigger');
 }
 
-// ============================================
-// CREATE AGENT NODE
-// ============================================
 function createAgent(agentId, agentName, x, y) {
-    // Check if already added
-    if (Designer.agents.find(a => a.agentId === agentId)) {
-        showToast('warning', 'Agent already in swarm');
-        return;
-    }
-    
+    if (Designer.agents.find(a => a.agentId === agentId)) { showToast('warning', 'Agent already added'); return; }
     Designer.counter++;
     const id = 'agent-' + Designer.counter;
-    
-    const agent = {
-        id: id,
-        agentId: agentId,
-        name: agentName,
-        role: 'worker',
-        subscriptions: ['task.*'],
-        minInstances: 1,
-        maxInstances: 5,
-        autoScale: true,
-        x: x - 90,
-        y: y
-    };
-    
+    const colorIdx = Designer.agents.length % Designer.colors.agents.length;
+    const agent = { id, agentId, name: agentName, role: 'Worker', subscriptions: ['task.*'], poolSize: { min: 1, max: 3 }, x: x - 85, y: Math.max(y, 450), colorIdx };
     Designer.agents.push(agent);
     renderAgentNode(agent);
-    selectNode('agent', id);
+    selectElement('agent', id);
     drawAllConnections();
-    
     showToast('success', 'Added agent: ' + agentName);
 }
 
-function renderAgentNode(agent) {
-    const colorIndex = Designer.agents.indexOf(agent) % Designer.colors.agents.length;
-    const color = Designer.colors.agents[colorIndex];
-    
-    const subTags = agent.subscriptions.map(s => 
-        `<span class="agent-subscription-tag"><i class="bi bi-lightning-charge-fill"></i>${s}</span>`
-    ).join('');
-    
-    const html = `
-        <div class="agent-node" id="${agent.id}" style="left: ${agent.x}px; top: ${agent.y}px;">
-            <div class="agent-node-header" style="background: ${color};">
-                <i class="bi bi-robot"></i>
-                <div class="agent-info">
-                    <div class="agent-name">${agent.name}</div>
-                    <div class="agent-role">${agent.role}</div>
-                </div>
-            </div>
-            <div class="agent-node-body">
-                <div class="agent-subscriptions">${subTags || '<span class="text-muted small">No subscriptions</span>'}</div>
-                <div class="agent-pool-info">
-                    <i class="bi bi-layers-fill"></i>
-                    Pool: ${agent.minInstances} - ${agent.maxInstances}
-                    ${agent.autoScale ? '<i class="bi bi-arrow-repeat ms-1" title="Auto-scale"></i>' : ''}
-                </div>
-            </div>
-        </div>
-    `;
-    
+function renderAgentNode(a) {
+    const colors = Designer.colors.agents[a.colorIdx];
+    const html = `<div class="agent-node" id="${a.id}" style="left:${a.x}px;top:${a.y}px;">
+        <div class="agent-node-header" style="background:linear-gradient(135deg,${colors[0]},${colors[1]});">
+            <i class="bi bi-robot"></i><div class="agent-info"><div class="agent-name">${a.name}</div><div class="agent-role">${a.role}</div></div>
+        </div><div class="agent-node-body">
+            ${a.subscriptions.map(s => `<span class="agent-subscription-tag"><i class="bi bi-lightning-fill"></i>${s}</span>`).join('')}
+            <div class="agent-pool-info"><i class="bi bi-layers"></i>Pool: ${a.poolSize.min}-${a.poolSize.max}</div>
+        </div></div>`;
     $('#design-canvas').append(html);
-    makeNodeDraggable(agent.id, 'agent');
+    makeNodeDraggable(a.id, 'agent');
 }
 
-// ============================================
-// MAKE NODES DRAGGABLE
-// ============================================
-function makeNodeDraggable(nodeId, nodeType) {
-    const $node = $('#' + nodeId);
-    
-    $node.draggable({
+function makeNodeDraggable(id, type) {
+    $(`#${id}`).draggable({
         containment: '#design-canvas',
-        scroll: true,
-        start: function() {
-            $(this).addClass('ui-draggable-dragging');
-        },
-        drag: function() {
-            drawAllConnections();
-        },
-        stop: function(e, ui) {
-            $(this).removeClass('ui-draggable-dragging');
-            
-            // Update position in state
-            const item = nodeType === 'trigger' 
-                ? Designer.triggers.find(t => t.id === nodeId)
-                : Designer.agents.find(a => a.id === nodeId);
-            
-            if (item) {
-                item.x = ui.position.left;
-                item.y = ui.position.top;
-            }
-            
+        drag: function(e, ui) {
+            const data = type === 'trigger' ? Designer.triggers.find(t => t.id === id) : Designer.agents.find(a => a.id === id);
+            if (data) { data.x = ui.position.left; data.y = ui.position.top; }
             drawAllConnections();
         }
-    });
-    
-    $node.on('click', function(e) {
-        e.stopPropagation();
-        selectNode(nodeType, nodeId);
-    });
+    }).resizable({ minWidth: 140, minHeight: 60, resize: () => drawAllConnections() })
+    .on('click', function(e) { e.stopPropagation(); selectElement(type, id); });
 }
 
-// ============================================
-// DRAW ALL CONNECTIONS
-// ============================================
-function drawAllConnections() {
-    const svg = document.getElementById('connections-svg');
-    if (!svg) return;
-    
-    // Clear existing paths (keep defs)
-    const paths = svg.querySelectorAll('path.connection-path');
-    paths.forEach(p => p.remove());
-    
-    const master = document.getElementById('master-actor');
-    const eventBus = document.getElementById('event-bus');
-    
-    if (!master || !eventBus) return;
-    
-    // Get master and bus positions
-    const masterX = master.offsetLeft + master.offsetWidth / 2;
-    const masterTop = master.offsetTop;
-    const masterBottom = master.offsetTop + master.offsetHeight;
-    
-    const busX = eventBus.offsetLeft + eventBus.offsetWidth / 2;
-    const busTop = eventBus.offsetTop;
-    const busBottom = eventBus.offsetTop + eventBus.offsetHeight;
-    
-    // Draw: Master -> Event Bus
-    drawConnection(svg, masterX, masterBottom, busX, busTop, 'master-to-bus', 'arrow-purple');
-    
-    // Draw: Triggers -> Master
-    Designer.triggers.forEach(trigger => {
-        const el = document.getElementById(trigger.id);
-        if (el) {
-            const x = el.offsetLeft + el.offsetWidth / 2;
-            const y = el.offsetTop + el.offsetHeight;
-            drawConnection(svg, x, y, masterX, masterTop, 'trigger-to-master', 'arrow-yellow');
-        }
-    });
-    
-    // Draw: Event Bus -> Agents
-    Designer.agents.forEach(agent => {
-        const el = document.getElementById(agent.id);
-        if (el) {
-            const x = el.offsetLeft + el.offsetWidth / 2;
-            const y = el.offsetTop;
-            drawConnection(svg, busX, busBottom, x, y, 'bus-to-agent', 'arrow-cyan');
-        }
-    });
-}
-
-function drawConnection(svg, x1, y1, x2, y2, className, markerId) {
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    
-    // Calculate control points for smooth curve
-    const midY = (y1 + y2) / 2;
-    const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
-    
-    path.setAttribute('d', d);
-    path.setAttribute('class', 'connection-path ' + className);
-    path.setAttribute('marker-end', 'url(#' + markerId + ')');
-    
-    svg.appendChild(path);
-}
-
-// ============================================
-// SELECTION & PROPERTIES
-// ============================================
-function selectNode(type, id) {
-    // Deselect previous
-    $('.trigger-node, .agent-node').removeClass('selected');
-    
-    // Select new
-    $('#' + id).addClass('selected');
+function selectElement(type, id) {
+    $('.trigger-node, .agent-node, .master-actor, .event-bus').removeClass('selected');
+    $(`#${id}`).addClass('selected');
     Designer.selected = { type, id };
-    
-    // Show properties
-    if (type === 'trigger') {
-        const trigger = Designer.triggers.find(t => t.id === id);
-        showTriggerProperties(trigger);
-    } else if (type === 'agent') {
-        const agent = Designer.agents.find(a => a.id === id);
-        showAgentProperties(agent);
-    }
+    showProperties(type, id);
 }
 
-function showTriggerProperties(trigger) {
-    let configFields = '';
-    
-    if (trigger.type === 'kafka') {
-        configFields = `
-            <div class="prop-group">
-                <div class="prop-label">Kafka Topic</div>
-                <input type="text" class="prop-input" value="${trigger.config.topic || ''}" 
-                       onchange="updateTriggerConfig('${trigger.id}', 'topic', this.value)">
-            </div>
-            <div class="prop-group">
-                <div class="prop-label">Consumer Group</div>
-                <input type="text" class="prop-input" value="${trigger.config.group || ''}" 
-                       onchange="updateTriggerConfig('${trigger.id}', 'group', this.value)">
-            </div>
-        `;
-    } else if (trigger.type === 'schedule') {
-        configFields = `
-            <div class="prop-group">
-                <div class="prop-label">Cron Expression</div>
-                <input type="text" class="prop-input" value="${trigger.config.cron || '0 * * * *'}" 
-                       onchange="updateTriggerConfig('${trigger.id}', 'cron', this.value)">
-                <div class="prop-hint">Format: minute hour day month weekday</div>
-            </div>
-        `;
-    } else if (trigger.type === 'http') {
-        configFields = `
-            <div class="prop-group">
-                <div class="prop-label">Webhook Endpoint</div>
-                <input type="text" class="prop-input" value="${trigger.config.endpoint || ''}" 
-                       onchange="updateTriggerConfig('${trigger.id}', 'endpoint', this.value)">
-            </div>
-        `;
-    } else if (trigger.type === 'rabbitmq') {
-        configFields = `
-            <div class="prop-group">
-                <div class="prop-label">Queue Name</div>
-                <input type="text" class="prop-input" value="${trigger.config.queue || ''}" 
-                       onchange="updateTriggerConfig('${trigger.id}', 'queue', this.value)">
-            </div>
-        `;
-    }
-    
-    const html = `
-        <h6 class="mb-3"><i class="bi bi-lightning-fill me-2 text-warning"></i>Trigger Properties</h6>
-        
-        <div class="prop-group">
-            <div class="prop-label">Trigger Name</div>
-            <input type="text" class="prop-input" value="${trigger.name}" 
-                   onchange="updateTrigger('${trigger.id}', 'name', this.value)">
-        </div>
-        
-        <div class="prop-group">
-            <div class="prop-label">Trigger Type</div>
-            <input type="text" class="prop-input" value="${trigger.type.toUpperCase()}" disabled>
-        </div>
-        
-        ${configFields}
-        
-        <hr class="my-3">
-        
-        <button class="btn btn-outline-danger btn-sm w-100" onclick="removeTrigger('${trigger.id}')">
-            <i class="bi bi-trash me-1"></i>Remove Trigger
-        </button>
-    `;
-    
-    $('#properties-content').html(html);
-}
-
-function showAgentProperties(agent) {
-    const html = `
-        <h6 class="mb-3"><i class="bi bi-robot me-2 text-primary"></i>Agent Properties</h6>
-        
-        <div class="prop-group">
-            <div class="prop-label">Agent Name</div>
-            <input type="text" class="prop-input" value="${agent.name}" disabled>
-        </div>
-        
-        <div class="prop-group">
-            <div class="prop-label">Role</div>
-            <select class="prop-input" onchange="updateAgent('${agent.id}', 'role', this.value)">
-                <option value="worker" ${agent.role === 'worker' ? 'selected' : ''}>Worker</option>
-                <option value="specialist" ${agent.role === 'specialist' ? 'selected' : ''}>Specialist</option>
-                <option value="coordinator" ${agent.role === 'coordinator' ? 'selected' : ''}>Coordinator</option>
-            </select>
-        </div>
-        
-        <div class="prop-group">
-            <div class="prop-label">Event Subscriptions</div>
-            <input type="text" class="prop-input" value="${agent.subscriptions.join(', ')}" 
-                   onchange="updateAgentSubscriptions('${agent.id}', this.value)">
-            <div class="prop-hint">Comma-separated patterns: task.*, result.search</div>
-        </div>
-        
-        <div class="prop-group">
-            <div class="prop-label">Instance Pool Size</div>
-            <div class="d-flex gap-2 align-items-center">
-                <input type="number" class="prop-input" style="width: 70px;" value="${agent.minInstances}" 
-                       min="0" max="50" onchange="updateAgent('${agent.id}', 'minInstances', parseInt(this.value))">
-                <span class="text-muted">to</span>
-                <input type="number" class="prop-input" style="width: 70px;" value="${agent.maxInstances}" 
-                       min="1" max="100" onchange="updateAgent('${agent.id}', 'maxInstances', parseInt(this.value))">
-            </div>
-        </div>
-        
-        <div class="prop-group">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="autoScale" 
-                       ${agent.autoScale ? 'checked' : ''} 
-                       onchange="updateAgent('${agent.id}', 'autoScale', this.checked)">
-                <label class="form-check-label" for="autoScale">Enable auto-scaling</label>
-            </div>
-        </div>
-        
-        <hr class="my-3">
-        
-        <button class="btn btn-outline-danger btn-sm w-100" onclick="removeAgent('${agent.id}')">
-            <i class="bi bi-trash me-1"></i>Remove Agent
-        </button>
-    `;
-    
-    $('#properties-content').html(html);
-}
-
-// ============================================
-// UPDATE FUNCTIONS
-// ============================================
-function updateTrigger(id, prop, value) {
-    const trigger = Designer.triggers.find(t => t.id === id);
-    if (trigger) {
-        trigger[prop] = value;
-        refreshNode(id, 'trigger', trigger);
-    }
-}
-
-function updateTriggerConfig(id, key, value) {
-    const trigger = Designer.triggers.find(t => t.id === id);
-    if (trigger) {
-        trigger.config[key] = value;
-    }
-}
-
-function updateAgent(id, prop, value) {
-    const agent = Designer.agents.find(a => a.id === id);
-    if (agent) {
-        agent[prop] = value;
-        refreshNode(id, 'agent', agent);
-    }
-}
-
-function updateAgentSubscriptions(id, value) {
-    const agent = Designer.agents.find(a => a.id === id);
-    if (agent) {
-        agent.subscriptions = value.split(',').map(s => s.trim()).filter(s => s);
-        refreshNode(id, 'agent', agent);
-    }
-}
-
-function refreshNode(id, type, data) {
-    const $node = $('#' + id);
-    const x = $node.position().left;
-    const y = $node.position().top;
-    
-    data.x = x;
-    data.y = y;
-    
-    $node.remove();
-    
-    if (type === 'trigger') {
-        renderTriggerNode(data);
-    } else {
-        renderAgentNode(data);
-    }
-    
-    drawAllConnections();
-}
-
-// ============================================
-// REMOVE FUNCTIONS
-// ============================================
-function removeTrigger(id) {
-    Designer.triggers = Designer.triggers.filter(t => t.id !== id);
-    $('#' + id).remove();
-    drawAllConnections();
-    clearProperties();
-    showToast('info', 'Trigger removed');
-}
-
-function removeAgent(id) {
-    Designer.agents = Designer.agents.filter(a => a.id !== id);
-    $('#' + id).remove();
-    drawAllConnections();
-    clearProperties();
-    showToast('info', 'Agent removed');
-}
-
-function clearProperties() {
-    Designer.selected = null;
-    $('#properties-content').html(`
-        <div class="text-center py-5">
-            <i class="bi bi-hand-index-thumb text-muted" style="font-size: 3rem;"></i>
-            <p class="text-muted mt-3">Select a node to edit properties</p>
-        </div>
-    `);
-}
-
-// ============================================
-// CANVAS EVENTS
-// ============================================
 function initCanvasEvents() {
     $('#design-canvas').on('click', function(e) {
-        if (e.target === this) {
-            $('.trigger-node, .agent-node').removeClass('selected');
-            clearProperties();
-        }
-    });
-    
-    // Keyboard shortcuts
-    $(document).on('keydown', function(e) {
-        if (e.key === 'Delete' && Designer.selected) {
-            if (Designer.selected.type === 'trigger') {
-                removeTrigger(Designer.selected.id);
-            } else if (Designer.selected.type === 'agent') {
-                removeAgent(Designer.selected.id);
-            }
-        }
+        if (e.target === this || e.target.id === 'connections-svg') clearSelection();
     });
 }
 
-function centerCanvas() {
-    const wrapper = document.getElementById('canvas-wrapper');
-    const master = document.getElementById('master-actor');
-    
-    if (wrapper && master) {
-        const scrollX = master.offsetLeft - wrapper.clientWidth / 2 + master.offsetWidth / 2;
-        wrapper.scrollTo({ left: Math.max(0, scrollX), top: 0, behavior: 'smooth' });
+function clearSelection() {
+    $('.trigger-node, .agent-node, .master-actor, .event-bus').removeClass('selected');
+    Designer.selected = null;
+    showDefaultProperties();
+}
+
+function showProperties(type, id) {
+    let html = '';
+    if (type === 'trigger') {
+        const t = Designer.triggers.find(x => x.id === id);
+        if (!t) return;
+        html = `<div class="property-group"><div class="property-group-title">Trigger Settings</div>
+            <div class="property-row"><label>Name</label><input type="text" value="${t.name}" onchange="updateTrigger('${id}','name',this.value)"></div>
+            <div class="property-row"><label>Type</label><input type="text" value="${t.type.toUpperCase()}" disabled></div></div>
+            <div class="property-group"><div class="property-group-title">Configuration</div>${renderTriggerConfig(t)}</div>
+            <div class="property-group"><button class="btn-remove" onclick="removeTrigger('${id}')"><i class="bi bi-trash me-2"></i>Remove Trigger</button></div>`;
+    } else if (type === 'agent') {
+        const a = Designer.agents.find(x => x.id === id);
+        if (!a) return;
+        html = `<div class="property-group"><div class="property-group-title">Agent Settings</div>
+            <div class="property-row"><label>Agent</label><input type="text" value="${a.name}" disabled></div>
+            <div class="property-row"><label>Role</label><input type="text" value="${a.role}" onchange="updateAgent('${id}','role',this.value)"></div></div>
+            <div class="property-group"><div class="property-group-title">Subscriptions</div>
+            <div class="property-row"><label>Event Patterns</label><input type="text" value="${a.subscriptions.join(', ')}" onchange="updateAgentSubs('${id}',this.value)"></div></div>
+            <div class="property-group"><div class="property-group-title">Pool Size</div>
+            <div class="property-row"><label>Min Instances</label><input type="number" min="0" max="10" value="${a.poolSize.min}" onchange="updatePool('${id}','min',this.value)"></div>
+            <div class="property-row"><label>Max Instances</label><input type="number" min="1" max="20" value="${a.poolSize.max}" onchange="updatePool('${id}','max',this.value)"></div></div>
+            <div class="property-group"><button class="btn-remove" onclick="removeAgent('${id}')"><i class="bi bi-trash me-2"></i>Remove Agent</button></div>`;
+    } else if (type === 'master') {
+        html = `<div class="property-group"><div class="property-group-title">Master Actor</div>
+            <div class="property-row"><label>LLM Provider</label><select><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="ollama">Ollama</option></select></div>
+            <div class="property-row"><label>Model</label><input type="text" value="gpt-4o"></div></div>
+            <p class="small text-muted mt-3"><i class="bi bi-info-circle me-1"></i>The Master Actor uses LLM to choreograph agents.</p>`;
+    } else if (type === 'bus') {
+        html = `<div class="property-group"><div class="property-group-title">Event Bus</div>
+            <p class="small text-muted">Internal message routing between Master Actor and Agents.</p>
+            <div class="property-row"><label>Topics</label><input type="text" value="task.*, result.*, error.*" disabled></div></div>`;
     }
+    $('#properties-content').html(html);
 }
 
-// ============================================
-// LOAD EXISTING DATA
-// ============================================
-function loadExistingData() {
-    {% for membership in memberships %}
-    Designer.agents.push({
-        id: 'agent-existing-{{ loop.index }}',
-        agentId: '{{ membership.agent_id }}',
-        name: '{{ membership.agent_name }}',
-        role: '{{ membership.role }}',
-        subscriptions: {{ membership.subscriptions | map(attribute='event_pattern') | list | tojson | safe if membership.subscriptions else '["task.*"]' }},
-        minInstances: {{ membership.min_instances }},
-        maxInstances: {{ membership.max_instances }},
-        autoScale: {{ 'true' if membership.auto_scale else 'false' }},
-        x: {{ 200 + loop.index0 * 220 }},
-        y: 480
-    });
-    {% endfor %}
-    
-    {% for trigger in triggers %}
-    Designer.triggers.push({
-        id: 'trigger-existing-{{ loop.index }}',
-        type: '{{ trigger.trigger_type }}',
-        name: '{{ trigger.name or trigger.trigger_type }}',
-        config: {{ trigger.config | tojson | safe if trigger.config else '{}' }},
-        x: {{ 200 + loop.index0 * 200 }},
-        y: 30
-    });
-    {% endfor %}
-    
-    // Render existing nodes
-    Designer.agents.forEach(a => renderAgentNode(a));
-    Designer.triggers.forEach(t => renderTriggerNode(t));
+function renderTriggerConfig(t) {
+    const cfgs = {
+        kafka: `<div class="property-row"><label>Topic</label><input type="text" value="${t.config.topic||''}" onchange="updateTriggerCfg('${t.id}','topic',this.value)"></div>
+                <div class="property-row"><label>Consumer Group</label><input type="text" value="${t.config.group||''}" onchange="updateTriggerCfg('${t.id}','group',this.value)"></div>`,
+        rabbitmq: `<div class="property-row"><label>Queue</label><input type="text" value="${t.config.queue||''}" onchange="updateTriggerCfg('${t.id}','queue',this.value)"></div>`,
+        schedule: `<div class="property-row"><label>Cron</label><input type="text" value="${t.config.cron||''}" onchange="updateTriggerCfg('${t.id}','cron',this.value)"></div>`,
+        http: `<div class="property-row"><label>Endpoint</label><input type="text" value="${t.config.endpoint||''}" onchange="updateTriggerCfg('${t.id}','endpoint',this.value)"></div>`,
+        user_query: `<div class="property-row"><label>Prompt Template</label><textarea onchange="updateTriggerCfg('${t.id}','prompt_template',this.value)">${t.config.prompt_template||''}</textarea></div>`
+    };
+    return cfgs[t.type] || '';
 }
 
-// ============================================
-// SAVE SWARM
-// ============================================
+function showDefaultProperties() {
+    $('#properties-content').html(`<div class="text-center py-5"><i class="bi bi-hand-index-thumb text-muted" style="font-size:2.5rem;"></i>
+        <p class="text-muted mt-3 mb-2">Drag components onto the canvas</p><p class="small text-muted">Click any element to edit</p></div>`);
+}
+
+function updateTrigger(id, f, v) { const t = Designer.triggers.find(x => x.id === id); if (t) { t[f] = v; refreshNode(id); } }
+function updateTriggerCfg(id, f, v) { const t = Designer.triggers.find(x => x.id === id); if (t) t.config[f] = v; }
+function updateAgent(id, f, v) { const a = Designer.agents.find(x => x.id === id); if (a) { a[f] = v; refreshNode(id); } }
+function updateAgentSubs(id, v) { const a = Designer.agents.find(x => x.id === id); if (a) { a.subscriptions = v.split(',').map(s => s.trim()).filter(s => s); refreshNode(id); } }
+function updatePool(id, f, v) { const a = Designer.agents.find(x => x.id === id); if (a) { a.poolSize[f] = parseInt(v) || 1; refreshNode(id); } }
+
+function refreshNode(id) {
+    const $n = $(`#${id}`), pos = $n.position();
+    let t = Designer.triggers.find(x => x.id === id);
+    if (t) { t.x = pos.left; t.y = pos.top; $n.remove(); renderTriggerNode(t); return; }
+    let a = Designer.agents.find(x => x.id === id);
+    if (a) { a.x = pos.left; a.y = pos.top; $n.remove(); renderAgentNode(a); }
+}
+
+function removeTrigger(id) { Designer.triggers = Designer.triggers.filter(t => t.id !== id); $(`#${id}`).remove(); clearSelection(); drawAllConnections(); showToast('info', 'Trigger removed'); }
+function removeAgent(id) { Designer.agents = Designer.agents.filter(a => a.id !== id); $(`#${id}`).remove(); clearSelection(); drawAllConnections(); showToast('info', 'Agent removed'); }
+
+function zoomIn() { Designer.zoom = Math.min(Designer.zoom + 0.1, 2); applyZoom(); }
+function zoomOut() { Designer.zoom = Math.max(Designer.zoom - 0.1, 0.5); applyZoom(); }
+function resetZoom() { Designer.zoom = 1; applyZoom(); }
+function applyZoom() { $('#design-canvas').css('transform', `scale(${Designer.zoom})`); $('#zoom-level').text(Math.round(Designer.zoom * 100) + '%'); }
+
+function autoLayout() {
+    const wrapper = document.getElementById('canvas-wrapper'), cx = wrapper.clientWidth / 2;
+    const ts = 180, as = 200;
+    Designer.triggers.forEach((t, i) => { t.x = cx - ((Designer.triggers.length - 1) * ts) / 2 + i * ts - 75; t.y = 30; $(`#${t.id}`).css({ left: t.x, top: t.y }); });
+    Designer.masterPos.x = cx - 100; Designer.masterPos.y = 180; $('#master-actor').css({ left: Designer.masterPos.x, top: Designer.masterPos.y });
+    Designer.busPos.x = cx - 300; Designer.busPos.y = 350; $('#event-bus').css({ left: Designer.busPos.x, top: Designer.busPos.y });
+    Designer.agents.forEach((a, i) => { a.x = cx - ((Designer.agents.length - 1) * as) / 2 + i * as - 85; a.y = 480; $(`#${a.id}`).css({ left: a.x, top: a.y }); });
+    drawAllConnections();
+    showToast('success', 'Layout applied');
+}
+
 function saveSwarm() {
     const data = {
+        swarm_id: Designer.swarmId,
         name: $('#swarm-name').val(),
-        agents: Designer.agents.map(a => ({
-            agent_id: a.agentId,
-            agent_name: a.name,
-            role: a.role,
-            subscriptions: a.subscriptions.map(s => ({ event_pattern: s })),
-            min_instances: a.minInstances,
-            max_instances: a.maxInstances,
-            auto_scale: a.autoScale
-        })),
-        triggers: Designer.triggers.map(t => ({
-            trigger_type: t.type,
-            name: t.name,
-            config: t.config
-        }))
+        triggers: Designer.triggers.map(t => ({ type: t.type, name: t.name, config: t.config })),
+        agents: Designer.agents.map(a => ({ agent_id: a.agentId, name: a.name, role: a.role, subscriptions: a.subscriptions, pool_size: a.poolSize })),
+        layout: { master: Designer.masterPos, bus: Designer.busPos }
     };
-    
-    $.ajax({
-        url: '/api/swarms/' + Designer.swarmId + '/save',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: function(response) {
-            if (response.success) {
-                showToast('success', 'Swarm saved successfully!');
-            } else {
-                showToast('error', 'Save failed: ' + (response.error || 'Unknown error'));
-            }
-        },
-        error: function(xhr) {
-            showToast('error', 'Failed to save swarm');
-        }
-    });
+    fetch('/api/swarms/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+    .then(r => r.json()).then(d => {
+        if (d.success) { Designer.swarmId = d.swarm_id; showToast('success', 'Swarm saved!'); }
+        else showToast('error', d.error || 'Failed to save');
+    }).catch(() => showToast('error', 'Error saving swarm'));
 }
 
-// ============================================
-// TOAST NOTIFICATIONS
-// ============================================
-function showToast(type, message) {
-    const bgClass = {
-        success: 'bg-success',
-        error: 'bg-danger',
-        warning: 'bg-warning text-dark',
-        info: 'bg-info text-dark'
-    }[type] || 'bg-secondary';
-    
-    const toast = $(`
-        <div class="toast align-items-center ${bgClass} text-white border-0" role="alert">
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    `);
-    
-    $('#toast-container').append(toast);
-    const bsToast = new bootstrap.Toast(toast[0], { delay: 3000 });
-    bsToast.show();
-    
-    toast.on('hidden.bs.toast', () => toast.remove());
+function loadExistingData() {
+    {% if swarm and swarm.config %}
+    const cfg = {{ swarm.config | tojson | safe }};
+    if (cfg.triggers) cfg.triggers.forEach((t, i) => { Designer.counter++; const tr = { id: 'trigger-' + Designer.counter, type: t.type, name: t.name || t.type, config: t.config || {}, x: 100 + i * 180, y: 30 }; Designer.triggers.push(tr); renderTriggerNode(tr); });
+    if (cfg.agents) cfg.agents.forEach((a, i) => { Designer.counter++; const ag = { id: 'agent-' + Designer.counter, agentId: a.agent_id, name: a.name, role: a.role || 'Worker', subscriptions: a.subscriptions || ['task.*'], poolSize: a.pool_size || { min: 1, max: 3 }, x: 100 + i * 200, y: 480, colorIdx: i % Designer.colors.agents.length }; Designer.agents.push(ag); renderAgentNode(ag); });
+    setTimeout(() => autoLayout(), 200);
+    {% endif %}
+}
+
+function showToast(type, msg) {
+    const icons = { success: 'check-circle', error: 'x-circle', warning: 'exclamation-triangle', info: 'info-circle' };
+    const t = $(`<div class="toast-notification ${type}"><i class="bi bi-${icons[type]}"></i>${msg}</div>`);
+    $('#toast-container').append(t);
+    setTimeout(() => t.fadeOut(300, function() { $(this).remove(); }), 3000);
 }
 </script>
 {% endblock %}

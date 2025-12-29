@@ -638,6 +638,94 @@ response = await generate("Tell me a joke", provider='openai')
 
 ---
 
+### 6.5 Playground Navigation (v1.3.0 - NEW)
+
+The navigation has been streamlined with a unified **Playground** mega-menu combining Agents, Workflows, and Swarms:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Abhikarta-LLM  │ Admin │ Dashboard │ Playground ▼ │ ...│
+└─────────────────────────────────────┬───────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │     PLAYGROUND MEGA-MENU          │
+                    ├───────────────────────────────────┤
+                    │ 🤖 AGENTS                         │
+                    │   • Browse Agents                 │
+                    │   • Visual Designer               │
+                    │   • Template Library              │
+                    ├───────────────────────────────────┤
+                    │ 📊 WORKFLOWS                      │
+                    │   • All Workflows                 │
+                    │   • Visual Designer               │
+                    │   • Template Library              │
+                    │   • Upload Workflow               │
+                    ├───────────────────────────────────┤
+                    │ 🐝 SWARMS (v1.3.0)                │
+                    │   • All Swarms                    │
+                    │   • Swarm Designer                │
+                    └───────────────────────────────────┘
+```
+
+### 6.6 Swarm Execution Logging (v1.3.0 - NEW)
+
+Swarm executions are fully logged to the database, similar to agent and workflow executions:
+
+**Database Tables:**
+```
+swarm_executions
+├── execution_id (UUID)
+├── swarm_id (FK → swarms)
+├── trigger_type (kafka/http/schedule/user_query)
+├── trigger_data (JSON)
+├── status (pending/running/completed/failed)
+├── result (JSON)
+├── error (text)
+├── user_id (FK → users)
+├── duration_ms (integer)
+├── created_at, completed_at
+
+swarm_events
+├── event_id (UUID)
+├── swarm_id, execution_id
+├── event_type (task.*/result.*/error.*)
+├── source_agent, target_agent
+├── payload (JSON)
+├── created_at
+
+swarm_decisions
+├── decision_id (UUID)
+├── swarm_id, execution_id
+├── decision_type (delegate/plan/respond)
+├── target_agent
+├── reasoning (text)
+├── created_at
+```
+
+**Unified Executions View:**
+```
+┌─────────────────────────────────────────────────────────┐
+│ My Executions                                           │
+├─────────────────────────────────────────────────────────┤
+│ ┌───────────────────────┐ ┌───────────────────────────┐ │
+│ │ Agents & Workflows    │ │ Swarms                    │ │
+│ │ [Tab - Active]        │ │ [Tab]                     │ │
+│ └───────────────────────┘ └───────────────────────────┘ │
+├─────────────────────────────────────────────────────────┤
+│ ID      │ Type   │ Name    │ Status │ Tokens │ Started │
+│ abc123  │ Agent  │ Analyst │ ✓ Done │ 1,234  │ 10:30   │
+│ def456  │ Wrkflw │ ETL     │ ✗ Fail │   892  │ 10:15   │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Swarm Execution Detail Page:**
+- Status overview with trigger info and timing
+- Master Actor decisions timeline with reasoning
+- Event log showing inter-agent communication
+- Trigger data and result display
+
+---
+
 ## 7. Human-in-the-Loop System
 
 ### 7.1 HITL Architecture

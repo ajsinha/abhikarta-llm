@@ -939,6 +939,49 @@ pre.config::before,
     z-index: 9999;
 }
 
+/* ===== Playground Mega Menu ===== */
+.playground-dropdown .dropdown-menu-playground {
+    min-width: 280px;
+    padding: 10px 0;
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+.playground-dropdown .dropdown-header {
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    margin-bottom: 4px;
+}
+
+.playground-dropdown .dropdown-item {
+    padding: 8px 16px 8px 28px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    transition: all 0.15s ease;
+}
+
+.playground-dropdown .dropdown-item:hover {
+    background: var(--bg-light-blue);
+    color: var(--bmo-blue);
+    padding-left: 32px;
+}
+
+.playground-dropdown .dropdown-item i {
+    width: 20px;
+    color: var(--text-muted);
+    transition: color 0.15s;
+}
+
+.playground-dropdown .dropdown-item:hover i {
+    color: var(--bmo-blue);
+}
+
+.playground-dropdown .dropdown-divider {
+    margin: 8px 16px;
+    border-color: var(--border-color);
+}
+
 /* ===== Utility Classes ===== */
 .text-bmo {
     color: var(--bmo-blue) !important;
