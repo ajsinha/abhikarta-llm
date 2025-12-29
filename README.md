@@ -1,18 +1,52 @@
-# Abhikarta-LLM v1.2.5
+# Abhikarta-LLM v1.3.0
 
-[![Version](https://img.shields.io/badge/version-1.2.5-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
-**Enterprise-grade AI Agent & Workflow Orchestration Platform**
+**Enterprise-grade AI Agent & Workflow Orchestration Platform with Agent Swarms**
 
-Abhikarta-LLM is a comprehensive platform for building, deploying, and managing AI agents and workflows with multi-provider LLM support, visual designers, human-in-the-loop controls, and industry-specific solutions.
+Abhikarta-LLM is a comprehensive platform for building, deploying, and managing AI agents, workflows, and intelligent agent swarms with multi-provider LLM support, visual designers, human-in-the-loop controls, and industry-specific solutions.
 
 ---
 
-## 🚀 What's New in v1.2.5
+## 🚀 What's New in v1.3.0
 
-### Visual Designers - Major Enhancement
+### 🐝 Agent Swarms - Major New Feature
+Introducing **Agent Swarms** - a powerful framework for coordinating multiple AI agents through event-driven choreography:
+
+- **Master Actor Choreography**: LLM-powered master actor that intelligently coordinates agent activities
+- **Event-Driven Architecture**: Internal event bus for decoupled agent communication
+- **On-Demand Agent Scaling**: Agents spawn when needed, only master stays resident
+- **External Triggers**: Kafka, RabbitMQ, ActiveMQ, HTTP webhooks, schedules, or user queries
+- **Visual Swarm Designer**: Design swarms visually with drag-and-drop interface
+- **Real-time Monitoring**: Watch events flow through your swarm in real-time
+
+### 📡 Messaging Module - Unified Pub/Sub
+New abstraction layer for message brokers with consistent interface:
+
+- **Unified Interface**: Same API for Kafka, RabbitMQ, ActiveMQ, or in-memory
+- **Backpressure Handling**: Configurable strategies (block, drop oldest/newest, sample)
+- **Dead Letter Queues**: Automatic DLQ routing for failed messages
+- **Message Priorities**: Critical, high, normal, low priority support
+- **Factory Pattern**: Easy broker creation and connection pooling
+
+### Database Schema Updates
+- 6 new swarm tables: `swarms`, `swarm_agents`, `swarm_triggers`, `swarm_executions`, `swarm_events`, `swarm_decisions`
+- Comprehensive indexing for swarm queries
+- Schema version updated to 1.3.0
+
+### Navigation Enhancement
+- New **Swarms** menu in navbar with quick access to:
+  - All Swarms list
+  - Swarm Visual Designer
+  - Swarm monitoring
+
+---
+
+## 📋 Previous Version Highlights
+
+### v1.3.0 - Visual Designer Enhancements
 - **Workflow Visual Designer**: Complete rewrite matching Agent Visual Designer look and feel
   - Same node styles, connectors, canvas, and minimap as Agent Designer
   - Tool namespacing support (`builtin:toolname`, `mcp:server:toolname`)
@@ -108,7 +142,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ## ✨ Key Features
 
-### ⚡ Actor System (v1.2.5 NEW)
+### ⚡ Actor System (v1.3.0 NEW)
 - **Pekko-Inspired Design**: Lightweight actors for massive concurrency
 - **Message-Driven**: Fire-and-forget (tell) and request-response (ask) patterns
 - **Fault Tolerance**: Supervision strategies with automatic recovery
@@ -151,7 +185,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Workflow Integration**: HITL nodes pause execution for human input
 - **User & Admin Interfaces**: Separate views for different roles
 
-### 🏦 Banking Solutions (v1.2.5+)
+### 🏦 Banking Solutions (v1.3.0+)
 - **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
 - **Credit Assessment**: Credit scoring, DTI calculation, eligibility
 - **Loan Processing**: EMI calculation, amortization schedules
@@ -208,7 +242,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.2.5/
+abhikarta-llm-v1.3.0/
 ├── abhikarta/
 │   ├── __init__.py
 │   ├── agent/                    # Agent management
@@ -230,6 +264,9 @@ abhikarta-llm-v1.2.5/
 │   │   ├── llm_factory.py        # LLM provider factory
 │   │   ├── tools.py              # Tool adapters
 │   │   └── workflow_graph.py     # LangGraph integration
+│   ├── llm/                      # LLM Adapter (v1.3.0) NEW!
+│   │   ├── __init__.py           # Module exports
+│   │   └── adapter.py            # LLMAdapter, async interface
 │   ├── llm_provider/             # LLM abstraction
 │   │   └── llm_facade.py         # Multi-provider facade
 │   ├── mcp/                      # MCP Integration (v1.1.6)
@@ -246,7 +283,7 @@ abhikarta-llm-v1.2.5/
 │   │   ├── code_fragment_tool.py # CodeFragmentTool
 │   │   ├── langchain_tool.py     # LangChain integration
 │   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.2.5)
+│   │   └── prebuilt/             # Pre-built tools (v1.3.0)
 │   │       ├── common_tools.py   # 28 common utilities
 │   │       ├── banking_tools.py  # 13 banking tools
 │   │       ├── integration_tools.py  # 20 integration tools
@@ -282,7 +319,7 @@ abhikarta-llm-v1.2.5/
 ├── config/
 │   └── application.properties    # Configuration file
 ├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.2.5)
+│   └── prebuilt/                 # Pre-built solutions (v1.3.0)
 │       ├── agents/
 │       │   └── banking/          # 10 banking agents
 │       └── workflows/
@@ -459,7 +496,7 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.2.5 | 2025-01 | Visual Designer bug fixes (MCP tool nodes), Tool selection in properties, Agent Designer How-To Guide |
+| 1.3.0 | 2025-01 | Visual Designer bug fixes (MCP tool nodes), Tool selection in properties, Agent Designer How-To Guide |
 | 1.2.3 | 2025-01 | Template Libraries (36 agent, 33 workflow), Code Fragment URIs, Actor System, Modular Database Delegates |
 | 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |
 | 1.1.8 | 2025-01 | Tool View/Test pages, dedicated tool detail UI, form-based testing |

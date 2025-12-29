@@ -128,6 +128,24 @@
                             </a></li>
                         </ul>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-hive me-1 text-warning"></i> Swarms
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('list_swarms') }}">
+                                <i class="bi bi-list me-2"></i>All Swarms
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('swarm_designer_new') }}">
+                                <i class="bi bi-palette me-2"></i>Swarm Designer
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="dropdown-header">
+                                <small class="text-warning">NEW in v1.3.0</small>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('user_executions') }}">
                             <i class="bi bi-play-circle me-1"></i> Executions

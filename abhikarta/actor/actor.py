@@ -18,7 +18,7 @@ the Pekko community for their pioneering work in actor-based concurrency.
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha - ajsinha@gmail.com
 
-Version: 1.2.5
+Version: 1.3.0
 """
 
 from abc import ABC, abstractmethod

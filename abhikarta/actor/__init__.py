@@ -50,10 +50,10 @@ Example Usage:
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha - ajsinha@gmail.com
 
-Version: 1.2.5
+Version: 1.3.0
 """
 
-__version__ = '1.2.5'
+__version__ = '1.3.0'
 
 # Core actor classes
 from .actor import (

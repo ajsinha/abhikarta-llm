@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}Messaging Module - Help - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .help-hero {
+        background: linear-gradient(135deg, #17a2b8 0%, #0dcaf0 100%);
+        color: #fff;
+        padding: 3rem 0;
+    }
+    .feature-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        height: 100%;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .code-block {
+        background: #1e1e1e;
+        border-radius: 8px;
+        padding: 1rem;
+        color: #d4d4d4;
+        font-family: 'Fira Code', monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+    }
+    .code-block .keyword { color: #569cd6; }
+    .code-block .string { color: #ce9178; }
+    .code-block .comment { color: #6a9955; }
+    .code-block .class { color: #4ec9b0; }
+    .code-block .function { color: #dcdcaa; }
+    .broker-card {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        transition: border-color 0.2s;
+    }
+    .broker-card:hover {
+        border-color: #17a2b8;
+    }
+    .broker-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #fff;
+    }
+    .backpressure-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="help-hero">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{{ url_for('help') }}" class="text-white-50">Help</a></li>
+                <li class="breadcrumb-item active text-white">Messaging Module</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-bold mb-3">
+            <i class="bi bi-broadcast-pin me-3"></i>Messaging Module
+        </h1>
+        <p class="lead mb-0">
+            Unified pub/sub abstraction for Kafka, RabbitMQ, and ActiveMQ
+        </p>
+        <span class="badge bg-light text-dark mt-2">v1.3.0 Feature</span>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Introduction -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h2 class="mb-4">What is the Messaging Module?</h2>
+            <p class="lead">
+                The Messaging Module provides a unified interface for interacting with different 
+                message brokers. Write your code once, and switch between Kafka, RabbitMQ, or 
+                ActiveMQ with just a configuration change.
+            </p>
+            <p>
+                It includes built-in support for <strong>backpressure handling</strong>, 
+                <strong>dead letter queues</strong>, <strong>message priorities</strong>, and 
+                <strong>delivery guarantees</strong>. Perfect for building reliable, scalable 
+                event-driven systems.
+            </p>
+        </div>
+        <div class="col-lg-4">
+            <div class="card bg-info-subtle border-0">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-check2-all me-2"></i>Key Features</h5>
+                    <ul class="mb-0">
+                        <li>Unified MessageBroker interface</li>
+                        <li>Kafka, RabbitMQ, ActiveMQ support</li>
+                        <li>Configurable backpressure</li>
+                        <li>Dead letter queue support</li>
+                        <li>Message priorities</li>
+                        <li>Async-native with asyncio</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supported Brokers -->
+    <h2 class="mb-4"><i class="bi bi-collection me-2"></i>Supported Message Brokers</h2>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="broker-card p-3">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="broker-logo bg-dark">
+                        <i class="bi bi-broadcast"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-0">Apache Kafka</h5>
+                        <small class="text-muted">aiokafka</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0">
+                    High-throughput, distributed streaming platform. Best for 
+                    event sourcing and real-time analytics.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="broker-card p-3">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="broker-logo" style="background: #ff6600;">
+                        <i class="bi bi-envelope-fill"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-0">RabbitMQ</h5>
+                        <small class="text-muted">aio-pika</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0">
+                    Feature-rich AMQP broker with flexible routing. 
+                    Great for task queues and RPC patterns.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="broker-card p-3">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="broker-logo bg-danger">
+                        <i class="bi bi-broadcast"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-0">ActiveMQ</h5>
+                        <small class="text-muted">stomp.py</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0">
+                    Enterprise-grade JMS broker with multi-protocol support. 
+                    Ideal for enterprise integration.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="broker-card p-3">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="broker-logo bg-secondary">
+                        <i class="bi bi-memory"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-0">In-Memory</h5>
+                        <small class="text-muted">asyncio</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0">
+                    Lightweight in-process broker for testing and 
+                    internal swarm communication.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Example -->
+    <h2 class="mb-4"><i class="bi bi-code-slash me-2"></i>Usage Example</h2>
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-body">
+            <div class="code-block">
+<span class="comment"># Create a broker using the factory</span>
+<span class="keyword">from</span> abhikarta.messaging <span class="keyword">import</span> BrokerFactory, BrokerConfig
+
+config = <span class="class">BrokerConfig</span>(
+    broker_type=<span class="string">'kafka'</span>,         <span class="comment"># or 'rabbitmq', 'activemq', 'memory'</span>
+    hosts=[<span class="string">'localhost:9092'</span>],
+    compression=<span class="string">'gzip'</span>,
+    backpressure_strategy=<span class="string">'BLOCK'</span>,
+    buffer_size=<span class="number">10000</span>
+)
+
+broker = <span class="class">BrokerFactory</span>.<span class="function">create</span>(config)
+<span class="keyword">await</span> broker.<span class="function">connect</span>()
+
+<span class="comment"># Publish a message</span>
+<span class="keyword">from</span> abhikarta.messaging <span class="keyword">import</span> Message, MessagePriority
+
+message = <span class="class">Message</span>(
+    topic=<span class="string">'events.user.created'</span>,
+    payload={<span class="string">'user_id'</span>: <span class="string">'123'</span>, <span class="string">'email'</span>: <span class="string">'user@example.com'</span>},
+    priority=<span class="class">MessagePriority</span>.HIGH,
+    headers={<span class="string">'source'</span>: <span class="string">'api'</span>}
+)
+
+result = <span class="keyword">await</span> broker.<span class="function">publish</span>(message)
+<span class="keyword">print</span>(<span class="string">f"Published: {result.message_id}"</span>)
+
+<span class="comment"># Subscribe to messages</span>
+<span class="keyword">async def</span> <span class="function">handler</span>(msg):
+    <span class="keyword">print</span>(<span class="string">f"Received: {msg.payload}"</span>)
+    <span class="keyword">await</span> msg.<span class="function">ack</span>()
+
+subscription = <span class="class">Subscription</span>(
+    topics=[<span class="string">'events.user.*'</span>],  <span class="comment"># Wildcard patterns supported</span>
+    handler=handler,
+    group=<span class="string">'my-consumer-group'</span>
+)
+
+<span class="keyword">await</span> broker.<span class="function">subscribe</span>(subscription)
+            </div>
+        </div>
+    </div>
+
+    <!-- Backpressure Strategies -->
+    <h2 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>Backpressure Strategies</h2>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <h5><span class="backpressure-badge bg-primary text-white">BLOCK</span></h5>
+                    <p class="text-muted mb-2">
+                        Block the publisher until buffer space becomes available. 
+                        Guarantees no message loss but may slow down producers.
+                    </p>
+                    <small class="text-success"><i class="bi bi-check-circle me-1"></i>Best for: Critical messages that must not be lost</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <h5><span class="backpressure-badge bg-warning text-dark">DROP_OLDEST</span></h5>
+                    <p class="text-muted mb-2">
+                        Remove the oldest messages from the buffer when full. 
+                        Keeps the newest data at the cost of older messages.
+                    </p>
+                    <small class="text-info"><i class="bi bi-info-circle me-1"></i>Best for: Real-time data where latest matters most</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <h5><span class="backpressure-badge bg-danger text-white">DROP_NEWEST</span></h5>
+                    <p class="text-muted mb-2">
+                        Discard new messages when the buffer is full. 
+                        Preserves older data, rejects overflow.
+                    </p>
+                    <small class="text-muted"><i class="bi bi-exclamation-triangle me-1"></i>Best for: Systems where order matters</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <h5><span class="backpressure-badge bg-secondary text-white">SAMPLE</span></h5>
+                    <p class="text-muted mb-2">
+                        Accept only 1 in N messages during overload. 
+                        Provides statistical representation under pressure.
+                    </p>
+                    <small class="text-muted"><i class="bi bi-bar-chart me-1"></i>Best for: Metrics and telemetry data</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Guarantees -->
+    <h2 class="mb-4"><i class="bi bi-shield-check me-2"></i>Delivery Guarantees</h2>
+    <div class="table-responsive mb-5">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Guarantee</th>
+                    <th>Description</th>
+                    <th>Use Case</th>
+                    <th>Trade-off</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>AT_MOST_ONCE</code></td>
+                    <td>Fire and forget, no retries</td>
+                    <td>Logs, metrics, telemetry</td>
+                    <td>Fastest, may lose messages</td>
+                </tr>
+                <tr>
+                    <td><code>AT_LEAST_ONCE</code></td>
+                    <td>Retry until acknowledged, may duplicate</td>
+                    <td>Most business events</td>
+                    <td>Reliable, consumers need idempotency</td>
+                </tr>
+                <tr>
+                    <td><code>EXACTLY_ONCE</code></td>
+                    <td>Transactional delivery (where supported)</td>
+                    <td>Financial transactions</td>
+                    <td>Slowest, highest resource usage</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Message Priorities -->
+    <h2 class="mb-4"><i class="bi bi-sort-up me-2"></i>Message Priorities</h2>
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h5 class="text-danger">CRITICAL</h5>
+                    <p class="small text-muted mb-0">Processed immediately, bypasses queue</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h5 class="text-warning">HIGH</h5>
+                    <p class="small text-muted mb-0">Processed before normal messages</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h5 class="text-primary">NORMAL</h5>
+                    <p class="small text-muted mb-0">Default priority, standard processing</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-secondary">
+                <div class="card-body text-center">
+                    <h5 class="text-secondary">LOW</h5>
+                    <p class="small text-muted mb-0">Processed when queue is empty</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integration with Swarms -->
+    <div class="card border-0 shadow-sm mb-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4><i class="bi bi-hive me-2 text-warning"></i>Integration with Agent Swarms</h4>
+                    <p class="mb-3">
+                        The Messaging Module powers the external triggers for Agent Swarms. 
+                        Kafka, RabbitMQ, and ActiveMQ topics can all trigger swarm execution.
+                    </p>
+                    <ul class="mb-0">
+                        <li>Swarm Event Bus uses the in-memory broker internally</li>
+                        <li>External triggers use configured broker (Kafka, RabbitMQ, etc.)</li>
+                        <li>Same Message API for internal and external events</li>
+                        <li>Seamless integration with round-robin agent pools</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 text-center">
+                    <a href="{{ url_for('help_page', page='swarms') }}" class="btn btn-warning btn-lg">
+                        <i class="bi bi-hive me-2"></i>Learn About Swarms
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Example -->
+    <h2 class="mb-4"><i class="bi bi-gear me-2"></i>Configuration</h2>
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-light">
+            <code>config/application.properties</code>
+        </div>
+        <div class="card-body">
+            <div class="code-block">
+<span class="comment"># Messaging Configuration</span>
+messaging.default.broker_type=kafka
+
+<span class="comment"># Kafka Configuration</span>
+messaging.kafka.bootstrap_servers=localhost:9092
+messaging.kafka.consumer_group=abhikarta-swarm
+messaging.kafka.compression=gzip
+messaging.kafka.acks=all
+
+<span class="comment"># RabbitMQ Configuration</span>
+messaging.rabbitmq.host=localhost
+messaging.rabbitmq.port=5672
+messaging.rabbitmq.username=guest
+messaging.rabbitmq.password=guest
+messaging.rabbitmq.virtual_host=/
+
+<span class="comment"># ActiveMQ Configuration</span>
+messaging.activemq.host=localhost
+messaging.activemq.port=61613
+messaging.activemq.username=admin
+messaging.activemq.password=admin
+
+<span class="comment"># Backpressure Settings</span>
+messaging.backpressure.strategy=BLOCK
+messaging.backpressure.buffer_size=10000
+messaging.backpressure.max_retries=3
+
+<span class="comment"># Dead Letter Queue</span>
+messaging.dlq.enabled=true
+messaging.dlq.topic=dead-letter-queue
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Topics -->
+    <div class="card bg-light border-0">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-link-45deg me-2"></i>Related Topics</h5>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('help_page', page='swarms') }}" class="btn btn-outline-warning btn-sm">
+                    <i class="bi bi-hive me-1"></i>Agent Swarms
+                </a>
+                <a href="{{ url_for('help_page', page='actors') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-broadcast me-1"></i>Actor System
+                </a>
+                <a href="{{ url_for('help_page', page='configuration') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-gear me-1"></i>Configuration
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

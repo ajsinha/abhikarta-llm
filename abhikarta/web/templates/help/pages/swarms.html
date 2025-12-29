@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+
+{% block title %}Agent Swarms - Help - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .help-hero {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        color: #000;
+        padding: 3rem 0;
+    }
+    .feature-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        height: 100%;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .code-block {
+        background: #1e1e1e;
+        border-radius: 8px;
+        padding: 1rem;
+        color: #d4d4d4;
+        font-family: 'Fira Code', monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+    }
+    .architecture-diagram {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 2rem;
+        font-family: monospace;
+        white-space: pre;
+        overflow-x: auto;
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
+    .step-number {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="help-hero">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{{ url_for('help') }}" class="text-dark">Help</a></li>
+                <li class="breadcrumb-item active text-dark">Agent Swarms</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-bold mb-3">
+            <i class="bi bi-hive me-3"></i>Agent Swarms
+        </h1>
+        <p class="lead mb-0">
+            LLM-powered choreography with event-driven multi-agent coordination
+        </p>
+        <span class="badge bg-dark mt-2">v1.3.0 Feature</span>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Introduction -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h2 class="mb-4">What are Agent Swarms?</h2>
+            <p class="lead">
+                Agent Swarms enable multiple AI agents to work together on complex tasks through 
+                intelligent event-driven choreography. A Master Actor uses an LLM to coordinate 
+                agent activities, making dynamic decisions based on context and results.
+            </p>
+            <p>
+                Unlike traditional orchestration where workflows are predefined, swarms use 
+                <strong>choreography</strong> - the Master Actor observes and reacts, publishing 
+                events that agents subscribe to. This creates flexible, adaptive multi-agent systems.
+            </p>
+        </div>
+        <div class="col-lg-4">
+            <div class="card bg-warning-subtle border-0">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-lightbulb me-2"></i>Key Benefits</h5>
+                    <ul class="mb-0">
+                        <li>Intelligent task distribution</li>
+                        <li>Dynamic agent scaling</li>
+                        <li>Event-driven decoupling</li>
+                        <li>Round-robin load balancing</li>
+                        <li>External trigger support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture Diagram -->
+    <div class="mb-5">
+        <h2 class="mb-4"><i class="bi bi-diagram-3 me-2"></i>Swarm Architecture</h2>
+        <div class="architecture-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              SWARM BOUNDARY                                  │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         EXTERNAL TRIGGERS                            │   │
+│  │   ┌───────┐  ┌───────────┐  ┌──────────┐  ┌──────────┐  ┌────────┐ │   │
+│  │   │ Kafka │  │ RabbitMQ  │  │ Schedule │  │   HTTP   │  │  User  │ │   │
+│  │   │ Topic │  │  Queue    │  │  (Cron)  │  │ Webhook  │  │ Query  │ │   │
+│  │   └───┬───┘  └─────┬─────┘  └────┬─────┘  └────┬─────┘  └───┬────┘ │   │
+│  └───────┼────────────┼─────────────┼─────────────┼────────────┼──────┘   │
+│          └────────────┴─────────────┴─────────────┴────────────┘          │
+│                                     │                                      │
+│                                     ▼                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │                    🎭 MASTER ACTOR (Always Resident)                 │  │
+│  │  • Receives external triggers                                        │  │
+│  │  • Uses LLM to analyze and decide                                   │  │
+│  │  • Publishes tasks to Event Bus                                     │  │
+│  │  • Aggregates results from agents                                   │  │
+│  │  • Uses Round-Robin to select agent instances                       │  │
+│  └─────────────────────────────────┬───────────────────────────────────┘  │
+│                                    │                                       │
+│                                    ▼                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │                    📡 SWARM EVENT BUS (Internal)                     │  │
+│  │  Topics: task.* | query.* | result.* | error.* | control.*          │  │
+│  └───────┬─────────────┬─────────────┬─────────────┬───────────────────┘  │
+│          │             │             │             │                       │
+│          ▼             ▼             ▼             ▼                       │
+│  ┌──────────────────────────────────────────────────────────────────────┐ │
+│  │                      AGENT POOLS (On-Demand)                          │ │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐     │ │
+│  │  │  Search    │  │  Analyze   │  │   Write    │  │   Custom   │     │ │
+│  │  │   Pool     │  │   Pool     │  │   Pool     │  │   Pool     │     │ │
+│  │  │ min:1 max:5│  │ min:1 max:3│  │ min:2 max:5│  │ min:0 max:2│     │ │
+│  │  │ task.search│  │ task.anal* │  │ task.write │  │ query.*    │     │ │
+│  │  └────────────┘  └────────────┘  └────────────┘  └────────────┘     │ │
+│  └──────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+        </div>
+    </div>
+
+    <!-- Key Components -->
+    <h2 class="mb-4"><i class="bi bi-puzzle me-2"></i>Key Components</h2>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <div class="feature-icon bg-warning text-dark">
+                        <i class="bi bi-stars"></i>
+                    </div>
+                    <h5>Master Actor</h5>
+                    <p class="text-muted">
+                        The intelligent choreographer that stays resident in memory. Uses an LLM 
+                        to analyze incoming triggers, decide what tasks to publish, and aggregate 
+                        results from agents.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <div class="feature-icon bg-info text-white">
+                        <i class="bi bi-broadcast-pin"></i>
+                    </div>
+                    <h5>Event Bus</h5>
+                    <p class="text-muted">
+                        Internal pub/sub system that decouples agents from the master. Supports 
+                        topic patterns with wildcards (task.*, result.#), priority queuing, 
+                        and message history.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <div class="feature-icon bg-primary text-white">
+                        <i class="bi bi-layers"></i>
+                    </div>
+                    <h5>Agent Pools</h5>
+                    <p class="text-muted">
+                        Pre-warmed pools of agent instances with configurable min/max sizes. 
+                        Round-robin selection ensures fair distribution. Auto-scaling based 
+                        on demand.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <div class="feature-icon bg-success text-white">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+                    <h5>External Triggers</h5>
+                    <p class="text-muted">
+                        Swarms can be triggered by Kafka topics, RabbitMQ queues, HTTP webhooks, 
+                        cron schedules, or direct user queries. Multiple triggers per swarm.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <div class="feature-icon bg-secondary text-white">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </div>
+                    <h5>Round-Robin Selection</h5>
+                    <p class="text-muted">
+                        Database-backed instance tracking ensures fair load distribution. 
+                        Selects idle instances by least-recently-used and use-count criteria.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card card h-100">
+                <div class="card-body">
+                    <div class="feature-icon bg-danger text-white">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h5>Real-time Monitoring</h5>
+                    <p class="text-muted">
+                        Watch events flow through your swarm in real-time. Track execution 
+                        history, agent metrics, and pool status. Debug with correlation IDs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Round-Robin Explanation -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-arrow-repeat me-2"></i>Round-Robin Agent Pool Selection</h5>
+        </div>
+        <div class="card-body">
+            <p>
+                When the Master Actor needs to dispatch a task, it uses round-robin selection 
+                to pick an agent instance from the pool:
+            </p>
+            <div class="code-block">
+<span style="color: #569cd6;">SELECT</span> * <span style="color: #569cd6;">FROM</span> swarm_agent_instances
+<span style="color: #569cd6;">WHERE</span> swarm_id = ? <span style="color: #569cd6;">AND</span> agent_id = ? <span style="color: #569cd6;">AND</span> status = <span style="color: #ce9178;">'idle'</span>
+<span style="color: #569cd6;">ORDER BY</span> COALESCE(last_used, <span style="color: #ce9178;">'1970-01-01'</span>) <span style="color: #569cd6;">ASC</span>, use_count <span style="color: #569cd6;">ASC</span>
+<span style="color: #569cd6;">LIMIT</span> 1
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <h6><i class="bi bi-check-circle text-success me-2"></i>Benefits</h6>
+                    <ul class="small">
+                        <li>Zero startup latency</li>
+                        <li>Fair load distribution</li>
+                        <li>Prevents instance overload</li>
+                        <li>Automatic failover</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6><i class="bi bi-gear text-primary me-2"></i>Pool Config</h6>
+                    <ul class="small">
+                        <li><code>min_instances</code>: Always keep warm</li>
+                        <li><code>max_instances</code>: Scale limit</li>
+                        <li><code>auto_scale</code>: Enable scaling</li>
+                        <li><code>idle_timeout</code>: Reclaim idle</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6><i class="bi bi-database text-info me-2"></i>Tracking</h6>
+                    <ul class="small">
+                        <li><code>status</code>: idle/busy</li>
+                        <li><code>last_used</code>: Timestamp</li>
+                        <li><code>use_count</code>: Total uses</li>
+                        <li><code>tasks_completed</code>: Success count</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Designer -->
+    <div class="mb-5">
+        <h2 class="mb-4"><i class="bi bi-brush me-2"></i>Visual Swarm Designer</h2>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h4>Drag-and-Drop Design</h4>
+                        <p>
+                            Create swarms visually with our intuitive designer:
+                        </p>
+                        <ul>
+                            <li>Drag triggers from the palette (Kafka, HTTP, Schedule, etc.)</li>
+                            <li>Add agents to the swarm from your agent library</li>
+                            <li>Configure pool sizes and subscriptions in the properties panel</li>
+                            <li>Connections are drawn automatically between components</li>
+                            <li>Save and deploy directly from the designer</li>
+                        </ul>
+                        <a href="{{ url_for('list_swarms') }}" class="btn btn-warning">
+                            <i class="bi bi-hive me-1"></i>Go to Swarms
+                        </a>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="bg-light rounded p-3 text-center">
+                            <div class="mb-2">
+                                <span class="badge bg-dark">Trigger</span>
+                                <i class="bi bi-arrow-down mx-2"></i>
+                                <span class="badge bg-warning text-dark">Master Actor</span>
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-arrow-down"></i>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-info">Event Bus</span>
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-arrow-down-left mx-2"></i>
+                                <i class="bi bi-arrow-down mx-2"></i>
+                                <i class="bi bi-arrow-down-right mx-2"></i>
+                            </div>
+                            <div>
+                                <span class="badge bg-primary">Agent 1</span>
+                                <span class="badge bg-success mx-2">Agent 2</span>
+                                <span class="badge bg-secondary">Agent 3</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Getting Started Steps -->
+    <h2 class="mb-4"><i class="bi bi-rocket-takeoff me-2"></i>Getting Started</h2>
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <div class="d-flex gap-3 align-items-start mb-4">
+                <div class="step-number">1</div>
+                <div>
+                    <h5>Create Agents</h5>
+                    <p class="mb-0 text-muted">
+                        First, create the AI agents that will participate in your swarm. Each agent 
+                        should have a specific role (e.g., SearchAgent, AnalysisAgent, WriterAgent).
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex gap-3 align-items-start mb-4">
+                <div class="step-number">2</div>
+                <div>
+                    <h5>Create a New Swarm</h5>
+                    <p class="mb-0 text-muted">
+                        Go to Swarms → Create Swarm. Give it a name and description. The Master 
+                        Actor will be automatically configured with an LLM provider.
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex gap-3 align-items-start mb-4">
+                <div class="step-number">3</div>
+                <div>
+                    <h5>Add Agents to the Swarm</h5>
+                    <p class="mb-0 text-muted">
+                        In the Visual Designer, drag agents from the palette onto the canvas. 
+                        Configure their event subscriptions (e.g., task.search, task.analyze) 
+                        and pool sizes.
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex gap-3 align-items-start mb-4">
+                <div class="step-number">4</div>
+                <div>
+                    <h5>Configure Triggers</h5>
+                    <p class="mb-0 text-muted">
+                        Add external triggers to start the swarm. Options include Kafka topics, 
+                        HTTP webhooks, cron schedules, or direct user queries.
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex gap-3 align-items-start">
+                <div class="step-number">5</div>
+                <div>
+                    <h5>Save and Test</h5>
+                    <p class="mb-0 text-muted">
+                        Save your swarm and test it with a sample query. Monitor the event flow 
+                        and agent responses in real-time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Topics -->
+    <div class="card bg-light border-0">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-link-45deg me-2"></i>Related Topics</h5>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('help_page', page='messaging') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-broadcast-pin me-1"></i>Messaging Module
+                </a>
+                <a href="{{ url_for('help_page', page='actors') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-broadcast me-1"></i>Actor System
+                </a>
+                <a href="{{ url_for('help_page', page='agent_visual_designer') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-robot me-1"></i>Agent Visual Designer
+                </a>
+                <a href="{{ url_for('markdown_viewer', filename='PATENT_APPLICATION') }}" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-file-earmark-text me-1"></i>Patent Application
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -17,7 +17,7 @@ Patent Pending: Certain architectural patterns and implementations described in 
 document may be subject to patent applications.
 """
 
-from flask import render_template, request, redirect, url_for, session, flash
+from flask import render_template, request, redirect, url_for, session, flash, jsonify
 from datetime import datetime
 import logging
 
@@ -210,6 +210,8 @@ class AuthRoutes(AbstractRoutes):
                 'prebuilt-tools': 'help/pages/prebuilt_tools.html',
                 'banking-solutions': 'help/pages/banking_solutions.html',
                 'actors': 'help/pages/actors.html',
+                'swarms': 'help/pages/swarms.html',
+                'messaging': 'help/pages/messaging.html',
                 'hitl': 'help/pages/hitl.html',
                 'executions-logging': 'help/pages/executions_logging.html',
                 'api-reference': 'help/pages/api_reference.html',
@@ -290,5 +292,73 @@ class AuthRoutes(AbstractRoutes):
                                    userid=session.get('user_id'),
                                    roles=session.get('roles', []),
                                    is_admin=session.get('is_admin', False))
+        
+        # =========================================================
+        # MARKDOWN DOCUMENTATION ROUTES
+        # =========================================================
+        
+        @self.app.route('/docs')
+        def markdown_docs():
+            """Display list of markdown documentation files."""
+            return render_template('help/markdown_docs.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   is_admin=session.get('is_admin', False))
+        
+        @self.app.route('/docs/<filename>')
+        def markdown_viewer(filename):
+            """Display markdown file rendered as HTML."""
+            # Map of allowed markdown files with their titles
+            doc_titles = {
+                'README': 'README - Project Overview',
+                'QUICKSTART': 'Quick Start Guide',
+                'DESIGN': 'Architecture Design',
+                'ACTORS': 'Actor System',
+                'PATENT_APPLICATION': 'Patent Application',
+                'PATENT_WORTHINESS_ANALYSIS': 'Patent Worthiness Analysis',
+                'LEGAL_NOTICE': 'Legal Notice',
+            }
+            
+            title = doc_titles.get(filename, filename)
+            
+            return render_template('help/markdown_viewer.html',
+                                   filename=filename,
+                                   title=title,
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   is_admin=session.get('is_admin', False))
+        
+        @self.app.route('/api/markdown/<filename>')
+        def api_markdown(filename):
+            """API endpoint to serve markdown content."""
+            import os
+            
+            # Base path for the project
+            base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+            
+            # Map of allowed files and their paths
+            file_map = {
+                'README': os.path.join(base_path, 'README.md'),
+                'QUICKSTART': os.path.join(base_path, 'docs', 'QUICKSTART.md'),
+                'DESIGN': os.path.join(base_path, 'docs', 'DESIGN.md'),
+                'ACTORS': os.path.join(base_path, 'docs', 'ACTORS.md'),
+                'PATENT_APPLICATION': os.path.join(base_path, 'docs', 'PATENT_APPLICATION.md'),
+                'PATENT_WORTHINESS_ANALYSIS': os.path.join(base_path, 'docs', 'PATENT_WORTHINESS_ANALYSIS.md'),
+                'LEGAL_NOTICE': os.path.join(base_path, 'LEGAL_NOTICE.md'),
+            }
+            
+            file_path = file_map.get(filename)
+            
+            if not file_path or not os.path.exists(file_path):
+                return jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+            
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                return jsonify({'success': True, 'content': content, 'filename': filename})
+            except Exception as e:
+                return jsonify({'success': False, 'error': str(e)}), 500
         
         logger.info("Auth routes registered")

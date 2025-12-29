@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}{{ swarm.name }} - Swarm Details - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{{ url_for('list_swarms') }}">Swarms</a></li>
+                    <li class="breadcrumb-item active">{{ swarm.name }}</li>
+                </ol>
+            </nav>
+            <h2>
+                <i class="bi bi-hive me-2 text-warning"></i>{{ swarm.name }}
+                {% if is_running %}
+                <span class="badge bg-success ms-2">Running</span>
+                {% else %}
+                <span class="badge bg-secondary ms-2">{{ swarm.status }}</span>
+                {% endif %}
+            </h2>
+            <p class="text-muted mb-0">{{ swarm.description or 'No description' }}</p>
+        </div>
+        <div class="btn-group">
+            {% if is_running %}
+            <form action="{{ url_for('stop_swarm', swarm_id=swarm.swarm_id) }}" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-stop-circle me-1"></i>Stop
+                </button>
+            </form>
+            {% else %}
+            <form action="{{ url_for('start_swarm', swarm_id=swarm.swarm_id) }}" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-play-circle me-1"></i>Start
+                </button>
+            </form>
+            {% endif %}
+            <a href="{{ url_for('swarm_designer', swarm_id=swarm.swarm_id) }}" class="btn btn-primary">
+                <i class="bi bi-palette me-1"></i>Designer
+            </a>
+            <a href="{{ url_for('monitor_swarm', swarm_id=swarm.swarm_id) }}" class="btn btn-info">
+                <i class="bi bi-activity me-1"></i>Monitor
+            </a>
+            <a href="{{ url_for('edit_swarm', swarm_id=swarm.swarm_id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-pencil me-1"></i>Edit
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Stats -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card border-success">
+                        <div class="card-body text-center py-3">
+                            <h3 class="text-success mb-0">{{ swarm.successful_executions }}</h3>
+                            <small class="text-muted">Successful</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-danger">
+                        <div class="card-body text-center py-3">
+                            <h3 class="text-danger mb-0">{{ swarm.failed_executions }}</h3>
+                            <small class="text-muted">Failed</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-info">
+                        <div class="card-body text-center py-3">
+                            <h3 class="text-info mb-0">{{ swarm.total_events_processed }}</h3>
+                            <small class="text-muted">Events</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-warning">
+                        <div class="card-body text-center py-3">
+                            <h3 class="text-warning mb-0">{{ "%.1f"|format(swarm.avg_execution_time or 0) }}s</h3>
+                            <small class="text-muted">Avg Time</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent Memberships -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-robot me-2"></i>Agent Pool ({{ memberships|length }} agents)
+                </div>
+                <div class="card-body">
+                    {% if memberships %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Agent</th>
+                                    <th>Role</th>
+                                    <th>Subscriptions</th>
+                                    <th>Pool Size</th>
+                                    <th>Tasks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in memberships %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ m.agent_name }}</strong>
+                                        <br><small class="text-muted">{{ m.agent_id[:8] }}...</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if m.role == 'coordinator' else 'info' if m.role == 'specialist' else 'secondary' }}">
+                                            {{ m.role }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% for sub in m.subscriptions %}
+                                        <span class="badge bg-light text-dark">{{ sub.event_pattern }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>{{ m.min_instances }} - {{ m.max_instances }}</td>
+                                    <td>{{ m.total_tasks_processed }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No agents in this swarm yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Recent Executions -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-clock-history me-2"></i>Recent Executions</span>
+                    <a href="{{ url_for('swarm_executions', swarm_id=swarm.swarm_id) }}" class="btn btn-sm btn-outline-primary">
+                        View All
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if executions %}
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Trigger</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Events</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for e in executions %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('view_execution', swarm_id=swarm.swarm_id, execution_id=e.execution_id) }}">
+                                            {{ e.start_time[:16] if e.start_time else '-' }}
+                                        </a>
+                                    </td>
+                                    <td>{{ e.trigger_type }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if e.status == 'success' else 'danger' if e.status == 'failed' else 'warning' }}">
+                                            {{ e.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ "%.2f"|format(e.duration_seconds or 0) }}s</td>
+                                    <td>{{ e.events_processed }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No executions yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Configuration -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-gear me-2"></i>Configuration
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <th>Event Bus</th>
+                            <td>{{ swarm.config.event_bus_type if swarm.config else 'memory' }}</td>
+                        </tr>
+                        <tr>
+                            <th>LLM Provider</th>
+                            <td>{{ swarm.config.llm_provider if swarm.config else 'openai' }}</td>
+                        </tr>
+                        <tr>
+                            <th>LLM Model</th>
+                            <td>{{ swarm.config.llm_model if swarm.config else 'gpt-4o' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Master Timeout</th>
+                            <td>{{ swarm.config.master_timeout if swarm.config else 120 }}s</td>
+                        </tr>
+                        <tr>
+                            <th>Swarm Timeout</th>
+                            <td>{{ swarm.config.swarm_timeout if swarm.config else 600 }}s</td>
+                        </tr>
+                        <tr>
+                            <th>Max Agents</th>
+                            <td>{{ swarm.config.max_agents if swarm.config else 50 }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Triggers -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-lightning-charge me-2"></i>Triggers ({{ triggers|length }})
+                </div>
+                <div class="card-body">
+                    {% if triggers %}
+                    <ul class="list-group list-group-flush">
+                        {% for t in triggers %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-{{ 'broadcast' if t.trigger_type == 'kafka' else 'clock' if t.trigger_type == 'schedule' else 'globe' if t.trigger_type == 'http' else 'chat-dots' }} me-2"></i>
+                                {{ t.name or t.trigger_type }}
+                                <br><small class="text-muted">{{ t.trigger_type }}</small>
+                            </div>
+                            <span class="badge bg-{{ 'success' if t.is_active else 'secondary' }}">
+                                {{ t.trigger_count }} fires
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No triggers configured.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-lightning me-2"></i>Quick Test
+                </div>
+                <div class="card-body">
+                    {% if is_running %}
+                    <form id="test-form">
+                        <div class="mb-3">
+                            <label class="form-label">Enter a query:</label>
+                            <textarea class="form-control" id="test-query" rows="3" placeholder="Ask something..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-play me-1"></i>Execute
+                        </button>
+                    </form>
+                    <div id="test-result" class="mt-3" style="display: none;">
+                        <label class="form-label">Result:</label>
+                        <pre id="test-output" class="bg-light p-2 rounded" style="max-height: 200px; overflow-y: auto;"></pre>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">Start the swarm to test queries.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$('#test-form').on('submit', function(e) {
+    e.preventDefault();
+    
+    const query = $('#test-query').val().trim();
+    if (!query) return;
+    
+    $.ajax({
+        url: '{{ url_for("execute_swarm", swarm_id=swarm.swarm_id) }}',
+        method: 'POST',
+        data: { query: query },
+        success: function(response) {
+            $('#test-result').show();
+            $('#test-output').text(JSON.stringify(response, null, 2));
+        },
+        error: function() {
+            $('#test-result').show();
+            $('#test-output').text('Error executing query');
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -106,7 +106,7 @@
                     <div class="icon bg-success text-white mx-auto">
                         <i class="bi bi-robot"></i>
                     </div>
-                    <h5>Agent Visual Designer <span class="badge bg-danger">v1.2.5</span></h5>
+                    <h5>Agent Visual Designer <span class="badge bg-danger">v1.3.0</span></h5>
                     <p>Drag-and-drop AI agent builder with tool integration</p>
                 </div>
             </a>
@@ -119,8 +119,34 @@
                     <div class="icon bg-info text-white mx-auto">
                         <i class="bi bi-diagram-2"></i>
                     </div>
-                    <h5>Workflow Visual Designer <span class="badge bg-danger">v1.2.5</span></h5>
+                    <h5>Workflow Visual Designer <span class="badge bg-danger">v1.3.0</span></h5>
                     <p>Build multi-step workflow DAGs with visual editor</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Agent Swarms (v1.3.0 - NEW!) -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='swarms') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%); color: #000;">
+                        <i class="bi bi-hive"></i>
+                    </div>
+                    <h5>Agent Swarms <span class="badge bg-warning text-dark">v1.3.0</span></h5>
+                    <p>LLM-powered choreography with event-driven multi-agent coordination</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Messaging Module (v1.3.0 - NEW!) -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='messaging') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: linear-gradient(135deg, #17a2b8 0%, #0dcaf0 100%); color: #fff;">
+                        <i class="bi bi-broadcast-pin"></i>
+                    </div>
+                    <h5>Messaging Module <span class="badge bg-info">v1.3.0</span></h5>
+                    <p>Unified pub/sub for Kafka, RabbitMQ, ActiveMQ with backpressure</p>
                 </div>
             </a>
         </div>
@@ -216,14 +242,14 @@
             </a>
         </div>
 
-        <!-- Template Libraries (v1.2.5) -->
+        <!-- Template Libraries (v1.3.0) -->
         <div class="col-md-6 col-lg-4">
             <a href="{{ url_for('workflow_templates') }}" class="help-card card">
                 <div class="card-body text-center p-4">
                     <div class="icon mx-auto" style="background: #6610f2; color: white;">
                         <i class="bi bi-collection"></i>
                     </div>
-                    <h5>Template Libraries <span class="badge bg-danger">v1.2.5</span></h5>
+                    <h5>Template Libraries <span class="badge bg-danger">v1.3.0</span></h5>
                     <p>36 agent + 33 workflow templates across 15 industries</p>
                 </div>
             </a>
@@ -242,14 +268,14 @@
             </a>
         </div>
 
-        <!-- Actor System (v1.2.5) -->
+        <!-- Actor System (v1.3.0) -->
         <div class="col-md-6 col-lg-4">
             <a href="{{ url_for('help_page', page='actors') }}" class="help-card card">
                 <div class="card-body text-center p-4">
                     <div class="icon mx-auto" style="background: #dc3545; color: white;">
                         <i class="bi bi-broadcast"></i>
                     </div>
-                    <h5>Actor System <span class="badge bg-danger">v1.2.5</span></h5>
+                    <h5>Actor System <span class="badge bg-danger">v1.3.0</span></h5>
                     <p>Pekko-inspired concurrency for millions of actors</p>
                 </div>
             </a>
@@ -368,6 +394,32 @@
                     </div>
                     <h5>Glossary of Terms</h5>
                     <p>Dictionary of terms and concepts used in the platform</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Markdown Documentation -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('markdown_docs') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: linear-gradient(135deg, #6f42c1 0%, #d63384 100%); color: white;">
+                        <i class="bi bi-markdown"></i>
+                    </div>
+                    <h5>Project Documentation <span class="badge bg-warning text-dark">Live</span></h5>
+                    <p>README, DESIGN, QUICKSTART & more rendered from Markdown</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Patent & Legal -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('markdown_viewer', filename='PATENT_APPLICATION') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white;">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <h5>Patent Application <span class="badge bg-danger">Pending</span></h5>
+                    <p>Full patent documentation with claims and prior art analysis</p>
                 </div>
             </a>
         </div>

@@ -12,7 +12,7 @@ Unauthorized copying, distribution, modification, or use is strictly prohibited.
 Patent Pending: Certain architectural patterns and implementations described in this
 software may be subject to patent applications.
 
-Version: 1.2.5
+Version: 1.3.0
 """
 
 import json

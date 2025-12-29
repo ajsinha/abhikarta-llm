@@ -30,7 +30,7 @@ class SQLiteSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.2.5"
+    SCHEMA_VERSION = "1.3.0"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -563,6 +563,141 @@ class SQLiteSchema:
     """
     
     # ==========================================================================
+    # SWARM TABLES (v1.3.0)
+    # ==========================================================================
+    
+    # Swarms table - Main swarm definitions
+    CREATE_SWARMS_TABLE = """
+    CREATE TABLE IF NOT EXISTS swarms (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        swarm_id TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        version TEXT DEFAULT '1.0.0',
+        status TEXT DEFAULT 'draft',
+        category TEXT DEFAULT 'general',
+        tags TEXT DEFAULT '[]',
+        definition_json TEXT,
+        config_json TEXT,
+        created_by TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        total_executions INTEGER DEFAULT 0,
+        successful_executions INTEGER DEFAULT 0,
+        failed_executions INTEGER DEFAULT 0,
+        total_events_processed INTEGER DEFAULT 0,
+        FOREIGN KEY (created_by) REFERENCES users(user_id)
+    );
+    """
+    
+    # Swarm agents membership table
+    CREATE_SWARM_AGENTS_TABLE = """
+    CREATE TABLE IF NOT EXISTS swarm_agents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        membership_id TEXT UNIQUE NOT NULL,
+        swarm_id TEXT NOT NULL,
+        agent_id TEXT NOT NULL,
+        agent_name TEXT,
+        role TEXT DEFAULT 'worker',
+        description TEXT,
+        subscriptions_json TEXT DEFAULT '[]',
+        max_instances INTEGER DEFAULT 10,
+        min_instances INTEGER DEFAULT 0,
+        auto_scale INTEGER DEFAULT 1,
+        idle_timeout INTEGER DEFAULT 300,
+        is_active INTEGER DEFAULT 1,
+        current_instances INTEGER DEFAULT 0,
+        total_tasks_processed INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (swarm_id) REFERENCES swarms(swarm_id) ON DELETE CASCADE,
+        FOREIGN KEY (agent_id) REFERENCES agents(agent_id)
+    );
+    """
+    
+    # Swarm triggers table
+    CREATE_SWARM_TRIGGERS_TABLE = """
+    CREATE TABLE IF NOT EXISTS swarm_triggers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        trigger_id TEXT UNIQUE NOT NULL,
+        swarm_id TEXT NOT NULL,
+        trigger_type TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        config_json TEXT DEFAULT '{}',
+        filter_expression TEXT,
+        is_active INTEGER DEFAULT 1,
+        last_triggered TIMESTAMP,
+        trigger_count INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (swarm_id) REFERENCES swarms(swarm_id) ON DELETE CASCADE
+    );
+    """
+    
+    # Swarm executions table
+    CREATE_SWARM_EXECUTIONS_TABLE = """
+    CREATE TABLE IF NOT EXISTS swarm_executions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        execution_id TEXT UNIQUE NOT NULL,
+        swarm_id TEXT NOT NULL,
+        trigger_type TEXT,
+        trigger_data TEXT,
+        correlation_id TEXT,
+        status TEXT DEFAULT 'pending',
+        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        completed_at TIMESTAMP,
+        duration_ms INTEGER,
+        iterations INTEGER DEFAULT 0,
+        events_processed INTEGER DEFAULT 0,
+        result_json TEXT,
+        error_message TEXT,
+        user_id TEXT,
+        FOREIGN KEY (swarm_id) REFERENCES swarms(swarm_id),
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+    );
+    """
+    
+    # Swarm events log table
+    CREATE_SWARM_EVENTS_TABLE = """
+    CREATE TABLE IF NOT EXISTS swarm_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id TEXT UNIQUE NOT NULL,
+        swarm_id TEXT NOT NULL,
+        execution_id TEXT,
+        event_type TEXT NOT NULL,
+        source TEXT,
+        target TEXT,
+        payload_json TEXT,
+        headers_json TEXT DEFAULT '{}',
+        priority INTEGER DEFAULT 1,
+        correlation_id TEXT,
+        parent_id TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (swarm_id) REFERENCES swarms(swarm_id),
+        FOREIGN KEY (execution_id) REFERENCES swarm_executions(execution_id)
+    );
+    """
+    
+    # Swarm decisions log table (Master Actor decisions)
+    CREATE_SWARM_DECISIONS_TABLE = """
+    CREATE TABLE IF NOT EXISTS swarm_decisions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        decision_id TEXT UNIQUE NOT NULL,
+        swarm_id TEXT NOT NULL,
+        execution_id TEXT,
+        decision_type TEXT NOT NULL,
+        trigger_event_id TEXT,
+        event_type TEXT,
+        target_agents TEXT DEFAULT '[]',
+        payload_json TEXT,
+        reasoning TEXT,
+        confidence REAL DEFAULT 1.0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (swarm_id) REFERENCES swarms(swarm_id),
+        FOREIGN KEY (execution_id) REFERENCES swarm_executions(execution_id)
+    );
+    """
+    
+    # ==========================================================================
     # INDEXES
     # ==========================================================================
     
@@ -608,6 +743,23 @@ class SQLiteSchema:
         "CREATE INDEX IF NOT EXISTS idx_llm_models_is_active ON llm_models(is_active);",
         "CREATE INDEX IF NOT EXISTS idx_model_permissions_model_id ON model_permissions(model_id);",
         "CREATE INDEX IF NOT EXISTS idx_model_permissions_role_name ON model_permissions(role_name);",
+        # Swarm indexes (v1.3.0)
+        "CREATE INDEX IF NOT EXISTS idx_swarms_status ON swarms(status);",
+        "CREATE INDEX IF NOT EXISTS idx_swarms_created_by ON swarms(created_by);",
+        "CREATE INDEX IF NOT EXISTS idx_swarms_category ON swarms(category);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_agents_swarm_id ON swarm_agents(swarm_id);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_agents_agent_id ON swarm_agents(agent_id);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_triggers_swarm_id ON swarm_triggers(swarm_id);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_triggers_trigger_type ON swarm_triggers(trigger_type);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_executions_swarm_id ON swarm_executions(swarm_id);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_executions_status ON swarm_executions(status);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_executions_correlation_id ON swarm_executions(correlation_id);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_events_swarm_id ON swarm_events(swarm_id);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_events_execution_id ON swarm_events(execution_id);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_events_event_type ON swarm_events(event_type);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_events_correlation_id ON swarm_events(correlation_id);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_decisions_swarm_id ON swarm_decisions(swarm_id);",
+        "CREATE INDEX IF NOT EXISTS idx_swarm_decisions_execution_id ON swarm_decisions(execution_id);",
     ]
     
     # ==========================================================================
@@ -762,6 +914,13 @@ class SQLiteSchema:
             self.CREATE_LLM_PROVIDERS_TABLE,
             self.CREATE_LLM_MODELS_TABLE,
             self.CREATE_MODEL_PERMISSIONS_TABLE,
+            # Swarm tables (v1.3.0)
+            self.CREATE_SWARMS_TABLE,
+            self.CREATE_SWARM_AGENTS_TABLE,
+            self.CREATE_SWARM_TRIGGERS_TABLE,
+            self.CREATE_SWARM_EXECUTIONS_TABLE,
+            self.CREATE_SWARM_EVENTS_TABLE,
+            self.CREATE_SWARM_DECISIONS_TABLE,
         ]
     
     def get_all_index_statements(self) -> list:
@@ -849,4 +1008,11 @@ class SQLiteSchema:
             'llm_providers',
             'llm_models',
             'model_permissions',
+            # Swarm tables (v1.3.0)
+            'swarms',
+            'swarm_agents',
+            'swarm_triggers',
+            'swarm_executions',
+            'swarm_events',
+            'swarm_decisions',
         ]

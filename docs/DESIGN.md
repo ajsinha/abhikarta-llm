@@ -1,4 +1,4 @@
-# Abhikarta-LLM v1.2.5 - Architecture Design Document
+# Abhikarta-LLM v1.3.0 - Architecture Design Document
 
 ## Table of Contents
 
@@ -68,7 +68,7 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 │  │ Manager      │ │ Engine       │ │ Manager      │             │
 │  └──────────────┘ └──────────────┘ └──────────────┘             │
 ├─────────────────────────────────────────────────────────────────┤
-│                   ACTOR SYSTEM LAYER (NEW in v1.2.5)             │
+│                   ACTOR SYSTEM LAYER (NEW in v1.3.0)             │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │                    ActorSystem                             │  │
 │  │  ┌─────────┐ ┌─────────────┐ ┌────────────┐ ┌──────────┐  │  │
@@ -571,6 +571,71 @@ graph = create_workflow_graph(workflow_definition)
 result = graph.invoke(input_data)
 ```
 
+### 6.4 LLM Adapter (v1.3.0 - NEW)
+
+The LLM Adapter provides an async-first interface for making LLM calls,
+designed for use in the swarm and agent modules.
+
+```python
+from abhikarta.llm import LLMAdapter, LLMResponse, LLMConfig
+
+# Simple usage
+adapter = LLMAdapter(provider='openai', model='gpt-4o')
+response = await adapter.generate(
+    prompt="Hello, world!",
+    system_prompt="You are a helpful assistant."
+)
+print(response.content)
+
+# With configuration
+config = LLMConfig(
+    provider='anthropic',
+    model='claude-3-5-sonnet-20241022',
+    temperature=0.5,
+    max_tokens=4000
+)
+adapter = LLMAdapter(config=config)
+
+# Multi-turn chat
+messages = [
+    {'role': 'system', 'content': 'You are a helpful assistant.'},
+    {'role': 'user', 'content': 'Hello!'},
+    {'role': 'assistant', 'content': 'Hi! How can I help?'},
+    {'role': 'user', 'content': 'Tell me about swarms.'}
+]
+response = await adapter.chat(messages)
+
+# Quick one-off call
+from abhikarta.llm import generate
+response = await generate("Tell me a joke", provider='openai')
+```
+
+#### LLM Adapter Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      LLM Adapter                             │
+│                                                             │
+│   ┌────────────┐    ┌────────────┐    ┌────────────┐      │
+│   │ generate() │    │  chat()    │    │ direct_call│      │
+│   └─────┬──────┘    └─────┬──────┘    └─────┬──────┘      │
+│         │                 │                 │              │
+│         └────────┬────────┴────────┬────────┘              │
+│                  │                 │                        │
+│         ┌────────▼────────┐        │                       │
+│         │   LLMFacade     │◄───────┘ (fallback)            │
+│         └────────┬────────┘                                │
+│                  │                                         │
+└──────────────────┼─────────────────────────────────────────┘
+                   │
+    ┌──────────────┼──────────────┐
+    │              │              │
+    ▼              ▼              ▼
+┌────────┐   ┌────────┐   ┌────────┐
+│ OpenAI │   │Anthropic│   │ Ollama │  ... (10+ providers)
+└────────┘   └────────┘   └────────┘
+```
+
 ---
 
 ## 7. Human-in-the-Loop System
@@ -707,7 +772,7 @@ class ToolsRegistry:
 - List/Array: 5 tools
 - Workflow: 3 tools
 
-#### General Tools (24) - NEW in v1.2.5
+#### General Tools (24) - NEW in v1.3.0
 - Web/Search: 4 tools (web_search, web_fetch, intranet_search, news_search)
 - Document Handling: 4 tools (read_document, write_document, convert_document, extract_document_metadata)
 - File Operations: 4 tools (list_files, copy_file, move_file, delete_file)
@@ -996,4 +1061,4 @@ abhikarta/
 
 ---
 
-*Version 1.2.5 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
+*Version 1.3.0 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*

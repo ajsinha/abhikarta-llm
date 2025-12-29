@@ -9,7 +9,7 @@ Legal Notice:
 This software and associated documentation are proprietary and confidential.
 Unauthorized copying, distribution, modification, or use is strictly prohibited.
 
-Version: 1.2.5
+Version: 1.3.0
 
 This package provides specialized delegates for different database domains:
 - UserDelegate: Users, Roles, UserRoles, Sessions, API Keys
@@ -21,6 +21,7 @@ This package provides specialized delegates for different database domains:
 - MCPDelegate: MCP Plugins, MCP Tool Servers
 - AuditDelegate: Audit Logs, System Settings
 - CodeFragmentDelegate: Code Fragments
+- SwarmDelegate: Swarms, Agent Pools, Triggers, Executions
 """
 
 from .user_delegate import UserDelegate
@@ -32,6 +33,7 @@ from .hitl_delegate import HITLDelegate
 from .mcp_delegate import MCPDelegate
 from .audit_delegate import AuditDelegate
 from .code_fragment_delegate import CodeFragmentDelegate
+from .swarm_delegate import SwarmDelegate
 
 __all__ = [
     'UserDelegate',
@@ -43,6 +45,7 @@ __all__ = [
     'MCPDelegate',
     'AuditDelegate',
     'CodeFragmentDelegate',
+    'SwarmDelegate',
 ]
 
-__version__ = '1.2.5'
+__version__ = '1.3.0'

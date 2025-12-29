@@ -7,7 +7,7 @@ various strategies. Useful for scaling and load balancing.
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha - ajsinha@gmail.com
 
-Version: 1.2.5
+Version: 1.3.0
 """
 
 from abc import ABC, abstractmethod

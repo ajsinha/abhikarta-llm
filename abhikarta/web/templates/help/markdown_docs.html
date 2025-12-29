@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Project Documentation - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .docs-hero {
+        background: linear-gradient(135deg, #6f42c1 0%, #d63384 100%);
+        color: white;
+        padding: 3rem 0;
+    }
+    
+    .doc-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .doc-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateY(-5px);
+    }
+    
+    .doc-card .card-header {
+        padding: 1rem 1.25rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .doc-card .card-header i {
+        font-size: 1.25rem;
+    }
+    
+    .doc-card .card-body {
+        padding: 1rem 1.25rem;
+    }
+    
+    .doc-card .doc-meta {
+        font-size: 0.8rem;
+        color: #888;
+        margin-bottom: 0.75rem;
+    }
+    
+    .doc-card .doc-description {
+        font-size: 0.9rem;
+        color: #555;
+    }
+    
+    .doc-category {
+        margin-bottom: 2rem;
+    }
+    
+    .doc-category-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #6f42c1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .badge-live {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: #fff;
+        animation: pulse-badge 2s infinite;
+    }
+    
+    @keyframes pulse-badge {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="docs-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="bi bi-markdown me-3"></i>Project Documentation
+                </h1>
+                <p class="lead mb-0">
+                    Live markdown documentation rendered beautifully in your browser
+                </p>
+            </div>
+            <div class="col-lg-4 text-end">
+                <span class="badge badge-live fs-6 px-3 py-2">
+                    <i class="bi bi-broadcast-pin me-1"></i>Live Rendering
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Core Documentation -->
+    <div class="doc-category">
+        <div class="doc-category-title">
+            <i class="bi bi-file-earmark-text text-primary"></i>
+            Core Documentation
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-book"></i>
+                        README
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>README.md
+                        </div>
+                        <p class="doc-description">
+                            Main project documentation including features, installation, and quick start guide.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='README') }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-eye me-1"></i>View Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header bg-info text-white">
+                        <i class="bi bi-rocket-takeoff"></i>
+                        Quick Start
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/QUICKSTART.md
+                        </div>
+                        <p class="doc-description">
+                            Get up and running quickly with step-by-step installation and first agent creation.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='QUICKSTART') }}" class="btn btn-info btn-sm">
+                            <i class="bi bi-eye me-1"></i>View Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header bg-success text-white">
+                        <i class="bi bi-diagram-3"></i>
+                        Architecture Design
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/DESIGN.md
+                        </div>
+                        <p class="doc-description">
+                            System architecture, component diagrams, and design decisions explained.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='DESIGN') }}" class="btn btn-success btn-sm">
+                            <i class="bi bi-eye me-1"></i>View Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header" style="background: #6f42c1; color: white;">
+                        <i class="bi bi-robot"></i>
+                        Actor System
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/ACTORS.md
+                        </div>
+                        <p class="doc-description">
+                            Pekko-inspired actor system for concurrency, supervision, and dispatchers.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='ACTORS') }}" class="btn btn-sm" style="background: #6f42c1; color: white;">
+                            <i class="bi bi-eye me-1"></i>View Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Legal & Patent Documentation -->
+    <div class="doc-category">
+        <div class="doc-category-title">
+            <i class="bi bi-shield-check text-danger"></i>
+            Legal & Patent Documentation
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header bg-danger text-white">
+                        <i class="bi bi-file-earmark-text"></i>
+                        Patent Application
+                        <span class="badge bg-warning text-dark ms-auto">Pending</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/PATENT_APPLICATION.md
+                        </div>
+                        <p class="doc-description">
+                            Complete USPTO-format patent application with 15 claims and prior art analysis.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='PATENT_APPLICATION') }}" class="btn btn-danger btn-sm">
+                            <i class="bi bi-eye me-1"></i>View Patent Application
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header" style="background: #fd7e14; color: white;">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Patent Worthiness Analysis
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/PATENT_WORTHINESS_ANALYSIS.md
+                        </div>
+                        <p class="doc-description">
+                            Executive summary of patentable innovations and recommended filing strategy.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='PATENT_WORTHINESS_ANALYSIS') }}" class="btn btn-sm" style="background: #fd7e14; color: white;">
+                            <i class="bi bi-eye me-1"></i>View Analysis
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header bg-dark text-white">
+                        <i class="bi bi-shield-lock"></i>
+                        Legal Notice
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>LEGAL_NOTICE.md
+                        </div>
+                        <p class="doc-description">
+                            Intellectual property declaration, trade secrets, and legal protections.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='LEGAL_NOTICE') }}" class="btn btn-dark btn-sm">
+                            <i class="bi bi-eye me-1"></i>View Legal Notice
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Feature Highlight -->
+    <div class="card mt-4" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-2"><i class="bi bi-magic me-2 text-primary"></i>Live Markdown Rendering</h5>
+                    <p class="mb-0 text-muted">
+                        All documentation is rendered in real-time from source Markdown files using 
+                        <strong>marked.js</strong>. Changes to .md files are immediately reflected without 
+                        any build step. Syntax highlighting powered by <strong>highlight.js</strong>.
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-success fs-6 px-3 py-2">
+                        <i class="bi bi-check-circle me-1"></i>No Build Required
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
