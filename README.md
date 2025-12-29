@@ -1,6 +1,6 @@
-# Abhikarta-LLM v1.2.3
+# Abhikarta-LLM v1.2.5
 
-[![Version](https://img.shields.io/badge/version-1.2.3-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.2.5-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
@@ -10,25 +10,50 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ---
 
-## 🚀 What's New in v1.2.3
+## 🚀 What's New in v1.2.5
 
-### Expanded Template Libraries
+### Visual Designers - Major Enhancement
+- **Workflow Visual Designer**: Complete rewrite matching Agent Visual Designer look and feel
+  - Same node styles, connectors, canvas, and minimap as Agent Designer
+  - Tool namespacing support (`builtin:toolname`, `mcp:server:toolname`)
+  - Browse Tools modal for adding tool nodes
+  - All node types: Start, End, Condition, Loop, Parallel, LLM, Agent, Tool, Code, Transform, RAG Query, Memory, HITL Review
+- **Dynamic LLM Provider/Model Dropdowns**: Both designers now load providers and models from backend
+  - No more hardcoded provider/model lists
+  - Only active providers shown
+  - Models dynamically filtered by selected provider
+  - Default provider/model selection supported
+
+### Agent Visual Designer Improvements
+- **Bug Fixes**: MCP Tool nodes from Browse modal now properly draggable and connectable
+- **Tool Selection**: MCP Tool nodes now have a dropdown to select available tools in Properties Panel
+- **Enhanced Editor**: Full tool configuration in node edit modal with schema preview
+- **Better UX**: Nodes from MCP modal now appear in center of visible canvas area
+
+### Comprehensive Designer Documentation
+- **Agent Visual Designer Guide**: Step-by-step tutorials, node reference, workflow patterns
+- **Workflow Visual Designer Guide**: Complete how-to documentation with examples
+- **Keyboard shortcuts** and best practices for both designers
+
+### New API Endpoints
+- `GET /api/llm/providers` - List all active LLM providers
+- `GET /api/llm/providers/<id>/models` - List models for a specific provider
+- `GET /api/llm/models` - List all models grouped by provider
+
+### Additional Enhancements
+- Extended properties panel for all node types (Loop, Transform, Parallel, Memory, Retrieval)
+- Improved MCP plugin page (separate add page instead of modal)
+- Fixed `agents_list` endpoint reference error
+
+---
+
+## 📋 Previous Version Highlights
+
+### v1.2.4 - Template Libraries & Actor System
 - **36 Agent Templates** across 15 categories (Analytics, Banking, Development, Healthcare, Legal, etc.)
 - **33 Workflow Templates** across 11 industries (Finance, Healthcare, HR, Legal, Sales, Technology, etc.)
 - **Code Fragment URI Support**: Templates now reference code fragments using proper URIs (`db://`, `s3://`, `file://`)
-- **Industry-Specific Solutions**: Ready-to-use templates for Banking, Healthcare, Legal, HR, and more
-
-### Actor System - Pekko-Inspired Concurrency Framework
-- **ActorSystem**: Complete runtime for creating and managing actors
-- **Actor Base Classes**: `Actor`, `TypedActor` with type-safe message handlers
-- **Message Patterns**: Tell (fire-and-forget), Ask (request-response), Forward
-- **Supervision Strategies**: OneForOne, AllForOne, ExponentialBackoff
-- **Dispatchers**: Default, Pinned, ForkJoin, CallingThread for different workloads
-- **Mailboxes**: Unbounded, Bounded (backpressure), Priority, ControlAware
-- **Patterns**: Router (load balancing), EventBus (pub/sub), CircuitBreaker, Stashing
-- **Scheduling**: Delayed and periodic message delivery
-- **Fault Tolerance**: Automatic restart, supervision hierarchies, death watch
-- **Acknowledgement**: Inspired by Apache Pekko (incubating)
+- **Actor System**: Pekko-inspired concurrency framework with supervision, dispatchers, mailboxes
 
 ### Modular Database Delegate Architecture (from v1.2.1)
 - **DatabaseDelegate Abstract Base**: New abstract class for domain-specific database operations
@@ -83,7 +108,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ## ✨ Key Features
 
-### ⚡ Actor System (v1.2.3 NEW)
+### ⚡ Actor System (v1.2.5 NEW)
 - **Pekko-Inspired Design**: Lightweight actors for massive concurrency
 - **Message-Driven**: Fire-and-forget (tell) and request-response (ask) patterns
 - **Fault Tolerance**: Supervision strategies with automatic recovery
@@ -126,7 +151,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 - **Workflow Integration**: HITL nodes pause execution for human input
 - **User & Admin Interfaces**: Separate views for different roles
 
-### 🏦 Banking Solutions (v1.2.3+)
+### 🏦 Banking Solutions (v1.2.5+)
 - **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
 - **Credit Assessment**: Credit scoring, DTI calculation, eligibility
 - **Loan Processing**: EMI calculation, amortization schedules
@@ -183,7 +208,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.2.3/
+abhikarta-llm-v1.2.5/
 ├── abhikarta/
 │   ├── __init__.py
 │   ├── agent/                    # Agent management
@@ -221,7 +246,7 @@ abhikarta-llm-v1.2.3/
 │   │   ├── code_fragment_tool.py # CodeFragmentTool
 │   │   ├── langchain_tool.py     # LangChain integration
 │   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.2.3)
+│   │   └── prebuilt/             # Pre-built tools (v1.2.5)
 │   │       ├── common_tools.py   # 28 common utilities
 │   │       ├── banking_tools.py  # 13 banking tools
 │   │       ├── integration_tools.py  # 20 integration tools
@@ -257,7 +282,7 @@ abhikarta-llm-v1.2.3/
 ├── config/
 │   └── application.properties    # Configuration file
 ├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.2.3)
+│   └── prebuilt/                 # Pre-built solutions (v1.2.5)
 │       ├── agents/
 │       │   └── banking/          # 10 banking agents
 │       └── workflows/
@@ -434,6 +459,7 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.2.5 | 2025-01 | Visual Designer bug fixes (MCP tool nodes), Tool selection in properties, Agent Designer How-To Guide |
 | 1.2.3 | 2025-01 | Template Libraries (36 agent, 33 workflow), Code Fragment URIs, Actor System, Modular Database Delegates |
 | 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |
 | 1.1.8 | 2025-01 | Tool View/Test pages, dedicated tool detail UI, form-based testing |

@@ -5,7 +5,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.2.3
+Version: 1.2.5
 """
 
 from typing import Any, Dict, List, Optional

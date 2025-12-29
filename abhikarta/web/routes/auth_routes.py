@@ -201,6 +201,8 @@ class AuthRoutes(AbstractRoutes):
             page_map = {
                 'getting-started': 'help/pages/getting_started.html',
                 'agent-designer': 'help/pages/agent_designer.html',
+                'agent_visual_designer': 'help/pages/agent_visual_designer.html',
+                'workflow_visual_designer': 'help/pages/workflow_visual_designer.html',
                 'workflow-dags': 'help/pages/workflow_dags.html',
                 'llm-providers': 'help/pages/llm_providers.html',
                 'mcp-plugins': 'help/pages/mcp_plugins.html',

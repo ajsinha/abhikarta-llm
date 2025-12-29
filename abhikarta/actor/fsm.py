@@ -10,7 +10,7 @@ FSM actors provide structured state machine behavior with:
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha - ajsinha@gmail.com
 
-Version: 1.2.3
+Version: 1.2.5
 """
 
 from abc import abstractmethod

@@ -430,24 +430,12 @@
             </div>
             <div class="col-md-2">
                 <select class="form-select" id="agent-provider-select">
-                    {% for provider in providers %}
-                    <option value="{{ provider.provider_id }}">{{ provider.name }}</option>
-                    {% endfor %}
-                    {% if not providers %}
-                    <option value="openai">OpenAI</option>
-                    <option value="anthropic">Anthropic</option>
-                    {% endif %}
+                    <option value="">Loading providers...</option>
                 </select>
             </div>
             <div class="col-md-2">
                 <select class="form-select" id="agent-model-select">
-                    {% for model in models %}
-                    <option value="{{ model.model_id }}" data-provider="{{ model.provider_id }}">{{ model.display_name or model.name }}</option>
-                    {% endfor %}
-                    {% if not models %}
-                    <option value="gpt-4o">GPT-4o</option>
-                    <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
-                    {% endif %}
+                    <option value="">Select provider first</option>
                 </select>
             </div>
             <div class="col-md-3 text-end">
@@ -811,9 +799,225 @@ const nodeTypes = {
 // ============================================
 $(document).ready(function() {
     initDesigner();
+    loadLLMProviders();
     loadExistingWorkflow();
     updateMinimap();
 });
+
+// ============================================
+// LLM PROVIDER/MODEL DYNAMIC LOADING
+// ============================================
+var llmProvidersCache = null;
+
+function loadLLMProviders() {
+    fetch('/api/llm/providers')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.providers) {
+                llmProvidersCache = data.providers;
+                var select = $('#agent-provider-select');
+                select.empty();
+                
+                var defaultProvider = null;
+                data.providers.forEach(function(p) {
+                    var isDefault = p.is_default ? ' (default)' : '';
+                    select.append('<option value="' + p.provider_id + '">' + p.name + isDefault + '</option>');
+                    if (p.is_default) defaultProvider = p.provider_id;
+                });
+                
+                // Load existing agent's provider or use default
+                var existingProvider = '{{ agent.provider_id if agent and agent.provider_id else "" }}';
+                if (existingProvider && select.find('option[value="' + existingProvider + '"]').length) {
+                    select.val(existingProvider);
+                } else if (defaultProvider) {
+                    select.val(defaultProvider);
+                }
+                
+                // Load models for selected provider
+                loadModelsForProvider(select.val());
+            }
+        })
+        .catch(function(err) {
+            console.error('Error loading LLM providers:', err);
+        });
+    
+    // Add change handler for provider select
+    $('#agent-provider-select').on('change', function() {
+        loadModelsForProvider($(this).val());
+    });
+}
+
+function loadModelsForProvider(providerId) {
+    if (!providerId) return;
+    
+    var select = $('#agent-model-select');
+    select.empty();
+    select.append('<option value="">Loading...</option>');
+    
+    fetch('/api/llm/providers/' + providerId + '/models')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            select.empty();
+            if (data.success && data.models && data.models.length > 0) {
+                var defaultModel = null;
+                data.models.forEach(function(m) {
+                    var isDefault = m.is_default ? ' (default)' : '';
+                    select.append('<option value="' + m.model_id + '">' + (m.display_name || m.name) + isDefault + '</option>');
+                    if (m.is_default) defaultModel = m.model_id;
+                });
+                
+                // Load existing agent's model or use default
+                var existingModel = '{{ agent.model_id if agent and agent.model_id else "" }}';
+                if (existingModel && select.find('option[value="' + existingModel + '"]').length) {
+                    select.val(existingModel);
+                } else if (defaultModel) {
+                    select.val(defaultModel);
+                }
+            } else {
+                select.append('<option value="">No models available</option>');
+            }
+        })
+        .catch(function(err) {
+            console.error('Error loading models:', err);
+            select.empty();
+            select.append('<option value="">Error loading models</option>');
+        });
+}
+
+// Load providers for LLM node in properties panel
+function loadLLMNodeProviders(nodeId, currentProvider, currentModel) {
+    var provSelect = $('#llm-provider-' + nodeId);
+    var modelSelect = $('#llm-model-' + nodeId);
+    
+    if (!provSelect.length) return;
+    
+    if (llmProvidersCache) {
+        provSelect.empty();
+        llmProvidersCache.forEach(function(p) {
+            provSelect.append('<option value="' + p.provider_id + '">' + p.name + '</option>');
+        });
+        
+        if (currentProvider) {
+            provSelect.val(currentProvider);
+        } else if (llmProvidersCache.length > 0) {
+            var defaultProv = llmProvidersCache.find(function(p) { return p.is_default; });
+            if (defaultProv) provSelect.val(defaultProv.provider_id);
+        }
+        
+        loadLLMNodeModels(nodeId, provSelect.val(), currentModel);
+    } else {
+        fetch('/api/llm/providers')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success && data.providers) {
+                    llmProvidersCache = data.providers;
+                    provSelect.empty();
+                    data.providers.forEach(function(p) {
+                        provSelect.append('<option value="' + p.provider_id + '">' + p.name + '</option>');
+                    });
+                    
+                    if (currentProvider) {
+                        provSelect.val(currentProvider);
+                    }
+                    
+                    loadLLMNodeModels(nodeId, provSelect.val(), currentModel);
+                }
+            });
+    }
+}
+
+function loadLLMNodeModels(nodeId, providerId, currentModel) {
+    var modelSelect = $('#llm-model-' + nodeId);
+    if (!modelSelect.length || !providerId) return;
+    
+    modelSelect.empty();
+    modelSelect.append('<option value="">Loading...</option>');
+    
+    fetch('/api/llm/providers/' + providerId + '/models')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            modelSelect.empty();
+            if (data.success && data.models && data.models.length > 0) {
+                data.models.forEach(function(m) {
+                    modelSelect.append('<option value="' + m.model_id + '">' + (m.display_name || m.name) + '</option>');
+                });
+                
+                if (currentModel && modelSelect.find('option[value="' + currentModel + '"]').length) {
+                    modelSelect.val(currentModel);
+                } else {
+                    // Update node config with first available model
+                    var firstModel = data.models[0].model_id;
+                    modelSelect.val(firstModel);
+                    updateConfig(nodeId, 'model', firstModel);
+                }
+            } else {
+                modelSelect.append('<option value="">No models available</option>');
+            }
+        });
+}
+
+function updateLLMNodeProvider(nodeId, providerId) {
+    updateConfig(nodeId, 'provider', providerId);
+    loadLLMNodeModels(nodeId, providerId, null);
+}
+
+// Edit modal helpers for LLM provider/model
+function loadEditModalProviders(currentProvider, currentModel) {
+    var provSelect = $('#edit-provider');
+    if (!provSelect.length) return;
+    
+    if (llmProvidersCache) {
+        provSelect.empty();
+        llmProvidersCache.forEach(function(p) {
+            provSelect.append('<option value="' + p.provider_id + '">' + p.name + '</option>');
+        });
+        
+        if (currentProvider) {
+            provSelect.val(currentProvider);
+        }
+        loadEditModalModels(provSelect.val(), currentModel);
+    } else {
+        fetch('/api/llm/providers')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success && data.providers) {
+                    llmProvidersCache = data.providers;
+                    provSelect.empty();
+                    data.providers.forEach(function(p) {
+                        provSelect.append('<option value="' + p.provider_id + '">' + p.name + '</option>');
+                    });
+                    if (currentProvider) {
+                        provSelect.val(currentProvider);
+                    }
+                    loadEditModalModels(provSelect.val(), currentModel);
+                }
+            });
+    }
+}
+
+function loadEditModalModels(providerId, currentModel) {
+    var modelSelect = $('#edit-model');
+    if (!modelSelect.length || !providerId) return;
+    
+    modelSelect.empty();
+    modelSelect.append('<option value="">Loading...</option>');
+    
+    fetch('/api/llm/providers/' + providerId + '/models')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            modelSelect.empty();
+            if (data.success && data.models && data.models.length > 0) {
+                data.models.forEach(function(m) {
+                    modelSelect.append('<option value="' + m.model_id + '">' + (m.display_name || m.name) + '</option>');
+                });
+                if (currentModel && modelSelect.find('option[value="' + currentModel + '"]').length) {
+                    modelSelect.val(currentModel);
+                }
+            } else {
+                modelSelect.append('<option value="">No models available</option>');
+            }
+        });
+}
 
 function initDesigner() {
     // Palette drag
@@ -958,7 +1162,7 @@ function getNodeSummary(node) {
         case 'http': return `${node.config.method || 'GET'} ${(node.config.url || '').substring(0,15)}...`;
         case 'condition': return (node.config.expression || '').substring(0,20) + '...';
         case 'hitl': return node.config.task_type || 'review';
-        case 'tool': return node.config.tool_name || 'select tool';
+        case 'tool': return node.config.display_name || node.config.tool_name || 'select tool';
         default: return node.node_type;
     }
 }
@@ -1148,20 +1352,23 @@ function showNodeProperties(node) {
 function getTypeProperties(node) {
     switch(node.node_type) {
         case 'llm':
-            return `
-                <div class="property-group">
-                    <label>Model</label>
-                    <select class="form-select form-select-sm" onchange="updateConfig('${node.node_id}','model',this.value)">
-                        <option ${node.config.model==='gpt-4o'?'selected':''}>gpt-4o</option>
-                        <option ${node.config.model==='gpt-4o-mini'?'selected':''}>gpt-4o-mini</option>
-                        <option ${node.config.model==='claude-3-5-sonnet-20241022'?'selected':''}>claude-3-5-sonnet</option>
-                    </select>
-                </div>
-                <div class="property-group">
-                    <label>Temp: ${node.config.temperature||0.7}</label>
-                    <input type="range" class="form-range" min="0" max="1" step="0.1" value="${node.config.temperature||0.7}"
-                           onchange="updateConfig('${node.node_id}','temperature',parseFloat(this.value));$(this).prev().text('Temp: '+this.value)">
-                </div>`;
+            var modelSelectId = 'llm-model-' + node.node_id;
+            var providerSelectId = 'llm-provider-' + node.node_id;
+            setTimeout(function() { loadLLMNodeProviders(node.node_id, node.config.provider, node.config.model); }, 50);
+            return '<div class="property-group">' +
+                '<label>Provider</label>' +
+                '<select class="form-select form-select-sm" id="' + providerSelectId + '" ' +
+                'onchange="updateLLMNodeProvider(\'' + node.node_id + '\', this.value)">' +
+                '<option value="">Loading...</option></select></div>' +
+                '<div class="property-group">' +
+                '<label>Model</label>' +
+                '<select class="form-select form-select-sm" id="' + modelSelectId + '" ' +
+                'onchange="updateConfig(\'' + node.node_id + '\',\'model\',this.value)">' +
+                '<option value="">Select provider first</option></select></div>' +
+                '<div class="property-group">' +
+                '<label>Temp: ' + (node.config.temperature||0.7) + '</label>' +
+                '<input type="range" class="form-range" min="0" max="1" step="0.1" value="' + (node.config.temperature||0.7) + '" ' +
+                'onchange="updateConfig(\'' + node.node_id + '\',\'temperature\',parseFloat(this.value));$(this).prev().text(\'Temp: \'+this.value)"></div>';
         case 'python':
             return `
                 <div class="property-group">
@@ -1202,6 +1409,87 @@ function getTypeProperties(node) {
                         <option ${node.config.task_type==='edit'?'selected':''} value="edit">Edit</option>
                     </select>
                 </div>`;
+        case 'tool':
+            var displayName = node.config.display_name || node.config.tool_name || '';
+            var toolSource = node.config.tool_source || (node.config.server_id === 'builtin' ? 'builtin' : 'mcp');
+            var toolHtml = '<div class="property-group">' +
+                '<label>Tool</label>' +
+                '<select class="form-select form-select-sm tool-selector" id="tool-select-' + node.node_id + '" ' +
+                'onchange="selectToolForNode(\'' + node.node_id + '\', this.value)">' +
+                '<option value="">-- Select Tool --</option>' +
+                '</select>' +
+                '<div class="form-text small text-muted mt-1" id="tool-loading-' + node.node_id + '">Loading tools...</div>' +
+                '</div>';
+            if (displayName) {
+                toolHtml += '<div class="property-group">' +
+                    '<label>Selected Tool</label>' +
+                    '<div class="small"><code>' + displayName + '</code></div>' +
+                    '</div>';
+                toolHtml += '<div class="property-group">' +
+                    '<label>Source</label>' +
+                    '<div class="small">' +
+                    '<span class="badge ' + (toolSource === 'builtin' ? 'bg-success' : 'bg-info') + '">' + 
+                    toolSource + '</span> ' +
+                    (node.config.server_name || '') +
+                    '</div></div>';
+            }
+            // Schedule tool loading after DOM update
+            setTimeout(function() { 
+                loadToolsForNode(node.node_id, displayName || ''); 
+            }, 50);
+            return toolHtml;
+        case 'loop':
+            var maxIter = node.config.max_iterations || 10;
+            var loopCond = node.config.condition || 'True';
+            return '<div class="property-group">' +
+                '<label>Max Iterations</label>' +
+                '<input type="number" class="form-control form-control-sm" value="' + maxIter + '" min="1" max="100" ' +
+                'onchange="updateConfig(\'' + node.node_id + '\',\'max_iterations\',parseInt(this.value))">' +
+                '</div>' +
+                '<div class="property-group">' +
+                '<label>Condition</label>' +
+                '<input type="text" class="form-control form-control-sm" value="' + loopCond + '" ' +
+                'onchange="updateConfig(\'' + node.node_id + '\',\'condition\',this.value)">' +
+                '</div>';
+        case 'transform':
+            return '<div class="property-group">' +
+                '<label>Transform Expression</label>' +
+                '<input type="text" class="form-control form-control-sm" value="' + (node.config.expression||'') + '" ' +
+                'placeholder="input_data[\'key\']" onchange="updateConfig(\'' + node.node_id + '\',\'expression\',this.value)">' +
+                '</div>';
+        case 'parallel':
+            var branches = node.config.branches || 2;
+            return '<div class="property-group">' +
+                '<label>Branches</label>' +
+                '<input type="number" class="form-control form-control-sm" value="' + branches + '" min="2" max="10" ' +
+                'onchange="updateConfig(\'' + node.node_id + '\',\'branches\',parseInt(this.value))">' +
+                '</div>';
+        case 'memory':
+            return '<div class="property-group">' +
+                '<label>Memory Key</label>' +
+                '<input type="text" class="form-control form-control-sm" value="' + (node.config.key||'context') + '" ' +
+                'onchange="updateConfig(\'' + node.node_id + '\',\'key\',this.value)">' +
+                '</div>' +
+                '<div class="property-group">' +
+                '<label>Operation</label>' +
+                '<select class="form-select form-select-sm" onchange="updateConfig(\'' + node.node_id + '\',\'operation\',this.value)">' +
+                '<option ' + (node.config.operation==='read'?'selected':'') + ' value="read">Read</option>' +
+                '<option ' + (node.config.operation==='write'?'selected':'') + ' value="write">Write</option>' +
+                '<option ' + (node.config.operation==='append'?'selected':'') + ' value="append">Append</option>' +
+                '</select>' +
+                '</div>';
+        case 'retrieval':
+            var topK = node.config.top_k || 5;
+            return '<div class="property-group">' +
+                '<label>Index/Collection</label>' +
+                '<input type="text" class="form-control form-control-sm" value="' + (node.config.index||'') + '" ' +
+                'placeholder="my_knowledge_base" onchange="updateConfig(\'' + node.node_id + '\',\'index\',this.value)">' +
+                '</div>' +
+                '<div class="property-group">' +
+                '<label>Top K</label>' +
+                '<input type="number" class="form-control form-control-sm" value="' + topK + '" min="1" max="20" ' +
+                'onchange="updateConfig(\'' + node.node_id + '\',\'top_k\',parseInt(this.value))">' +
+                '</div>';
         default:
             return '<p class="small text-muted">No additional properties</p>';
     }
@@ -1253,39 +1541,73 @@ function editNode(nodeId) {
                 <textarea class="form-control font-monospace" id="edit-code" rows="10">${node.config.code||''}</textarea>
             </div>`;
     } else if (node.node_type === 'llm') {
-        editor = `
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Provider</label>
-                    <select class="form-select" id="edit-provider">
-                        <option ${node.config.provider==='openai'?'selected':''} value="openai">OpenAI</option>
-                        <option ${node.config.provider==='anthropic'?'selected':''} value="anthropic">Anthropic</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Model</label>
-                    <input type="text" class="form-control" id="edit-model" value="${node.config.model||'gpt-4o'}">
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">System Prompt</label>
-                <textarea class="form-control" id="edit-system" rows="3">${node.config.system_prompt||''}</textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">User Prompt Template</label>
-                <textarea class="form-control" id="edit-prompt" rows="4">${node.config.prompt||''}</textarea>
-                <div class="form-text">Use {variable} for substitution</div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Temperature</label>
-                    <input type="number" class="form-control" id="edit-temp" value="${node.config.temperature||0.7}" min="0" max="2" step="0.1">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Max Tokens</label>
-                    <input type="number" class="form-control" id="edit-max-tokens" value="${node.config.max_tokens||1000}">
-                </div>
-            </div>`;
+        editor = '<div class="row">' +
+            '<div class="col-md-6 mb-3">' +
+            '<label class="form-label">Provider</label>' +
+            '<select class="form-select" id="edit-provider" onchange="loadEditModalModels(this.value, null)">' +
+            '<option value="">Loading...</option></select></div>' +
+            '<div class="col-md-6 mb-3">' +
+            '<label class="form-label">Model</label>' +
+            '<select class="form-select" id="edit-model">' +
+            '<option value="">Select provider first</option></select></div></div>' +
+            '<div class="mb-3">' +
+            '<label class="form-label">System Prompt</label>' +
+            '<textarea class="form-control" id="edit-system" rows="3">' + (node.config.system_prompt||'') + '</textarea></div>' +
+            '<div class="mb-3">' +
+            '<label class="form-label">User Prompt Template</label>' +
+            '<textarea class="form-control" id="edit-prompt" rows="4">' + (node.config.prompt||'') + '</textarea>' +
+            '<div class="form-text">Use {variable} for substitution</div></div>' +
+            '<div class="row">' +
+            '<div class="col-md-6 mb-3">' +
+            '<label class="form-label">Temperature</label>' +
+            '<input type="number" class="form-control" id="edit-temp" value="' + (node.config.temperature||0.7) + '" min="0" max="2" step="0.1"></div>' +
+            '<div class="col-md-6 mb-3">' +
+            '<label class="form-label">Max Tokens</label>' +
+            '<input type="number" class="form-control" id="edit-max-tokens" value="' + (node.config.max_tokens||1000) + '"></div></div>';
+        
+        // Schedule provider/model loading after modal renders
+        setTimeout(function() { loadEditModalProviders(node.config.provider, node.config.model); }, 100);
+    } else if (node.node_type === 'tool') {
+        const schemaJson = node.config.input_schema ? JSON.stringify(node.config.input_schema, null, 2) : '{}';
+        const paramsJson = JSON.stringify(node.config.parameters||{}, null, 2);
+        const toolName = node.config.tool_name || '';
+        const serverName = node.config.server_name || '';
+        const toolDesc = node.config.tool_description || '';
+        editor = '<div class="mb-3">' +
+            '<label class="form-label">Select Tool</label>' +
+            '<select class="form-select" id="edit-tool-select">' +
+            '<option value="">-- Select Tool --</option>' +
+            '</select>' +
+            '<div id="edit-tool-loading" class="small text-muted mt-1">Loading available tools...</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col-md-6 mb-3">' +
+            '<label class="form-label">Tool Name</label>' +
+            '<input type="text" class="form-control" id="edit-tool-name" value="' + toolName + '" readonly>' +
+            '</div>' +
+            '<div class="col-md-6 mb-3">' +
+            '<label class="form-label">Server</label>' +
+            '<input type="text" class="form-control" id="edit-server-name" value="' + serverName + '" readonly>' +
+            '</div>' +
+            '</div>' +
+            '<div class="mb-3">' +
+            '<label class="form-label">Description</label>' +
+            '<textarea class="form-control" id="edit-tool-desc" rows="2" readonly>' + toolDesc + '</textarea>' +
+            '</div>' +
+            '<div class="mb-3">' +
+            '<label class="form-label">Input Schema (JSON)</label>' +
+            '<textarea class="form-control font-monospace" id="edit-tool-schema" rows="6" readonly>' + schemaJson + '</textarea>' +
+            '</div>' +
+            '<div class="mb-3">' +
+            '<label class="form-label">Parameters Override (JSON)</label>' +
+            '<textarea class="form-control font-monospace" id="edit-tool-params" rows="4" placeholder=\'{"param1": "value1"}\'>' + paramsJson + '</textarea>' +
+            '<div class="form-text">Optional: Pre-fill parameters for this tool</div>' +
+            '</div>';
+        
+        // Load tools after modal is shown
+        setTimeout(function() {
+            loadToolsForEditModal(toolName);
+        }, 200);
     } else {
         editor = `
             <div class="mb-3">
@@ -1331,6 +1653,25 @@ function saveNodeEdit() {
         node.config.prompt = $('#edit-prompt').val();
         node.config.temperature = parseFloat($('#edit-temp').val());
         node.config.max_tokens = parseInt($('#edit-max-tokens').val());
+    } else if (nodeType === 'tool') {
+        node.config.tool_name = $('#edit-tool-name').val();
+        node.config.server_name = $('#edit-server-name').val();
+        node.config.tool_description = $('#edit-tool-desc').val();
+        try {
+            node.config.input_schema = JSON.parse($('#edit-tool-schema').val() || '{}');
+        } catch(e) {
+            node.config.input_schema = {};
+        }
+        try {
+            node.config.parameters = JSON.parse($('#edit-tool-params').val() || '{}');
+        } catch(e) {
+            alert('Invalid parameters JSON');
+            return;
+        }
+        // Update node name to match tool name
+        if (node.config.tool_name) {
+            node.name = node.config.tool_name;
+        }
     } else {
         try {
             node.config = JSON.parse($('#edit-json').val());
@@ -1686,6 +2027,257 @@ function downloadJSON() {
 }
 
 // ============================================
+// TOOL SELECTION FOR NODES
+// ============================================
+let allAvailableTools = null;  // Cache for tools
+
+function loadToolsForNode(nodeId, selectedTool) {
+    const select = $(`#tool-select-${nodeId}`);
+    const loadingText = $(`#tool-loading-${nodeId}`);
+    
+    if (!select.length) return;  // Element doesn't exist yet
+    
+    // If we already have cached tools, use them
+    if (allAvailableTools !== null) {
+        populateToolSelect(select, allAvailableTools, selectedTool);
+        loadingText.hide();
+        return;
+    }
+    
+    // Fetch from API
+    fetch('/admin/mcp-tool-servers/api/all-tools')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                allAvailableTools = data.tools || [];
+                populateToolSelect(select, allAvailableTools, selectedTool);
+            } else {
+                allAvailableTools = [];
+                loadingText.text('No tools available');
+            }
+            loadingText.hide();
+        })
+        .catch(err => {
+            console.error('Error loading tools:', err);
+            loadingText.text('Error loading tools');
+            allAvailableTools = [];
+        });
+}
+
+function loadToolsForEditModal(selectedTool) {
+    const select = document.getElementById('edit-tool-select');
+    const loadingEl = document.getElementById('edit-tool-loading');
+    
+    if (!select) return;
+    
+    fetch('/admin/mcp-tool-servers/api/all-tools')
+        .then(r => r.json())
+        .then(data => {
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (data.success && data.tools) {
+                allAvailableTools = data.tools;  // Cache tools
+                
+                // Group by source type
+                const builtinTools = data.tools.filter(t => t._source === 'builtin');
+                const mcpTools = data.tools.filter(t => t._source === 'mcp');
+                
+                // Add built-in tools grouped by category
+                if (builtinTools.length > 0) {
+                    const byCategory = {};
+                    builtinTools.forEach(t => {
+                        const cat = t._category || 'general';
+                        if (!byCategory[cat]) byCategory[cat] = [];
+                        byCategory[cat].push(t);
+                    });
+                    
+                    Object.keys(byCategory).sort().forEach(category => {
+                        const grp = document.createElement('optgroup');
+                        grp.label = 'Built-in: ' + category.charAt(0).toUpperCase() + category.slice(1);
+                        byCategory[category].forEach(tool => {
+                            const displayName = tool.display_name || ('builtin:' + tool.name);
+                            const opt = document.createElement('option');
+                            opt.value = displayName;
+                            opt.text = displayName;
+                            opt.dataset.toolName = tool.name;
+                            opt.dataset.source = 'builtin';
+                            opt.dataset.serverId = 'builtin';
+                            opt.dataset.serverName = 'Built-in Tools';
+                            opt.dataset.description = tool.description || '';
+                            opt.dataset.schema = JSON.stringify(tool.inputSchema || {});
+                            if (displayName === selectedTool || tool.name === selectedTool) opt.selected = true;
+                            grp.appendChild(opt);
+                        });
+                        select.appendChild(grp);
+                    });
+                }
+                
+                // Add MCP tools grouped by server
+                if (mcpTools.length > 0) {
+                    const byServer = {};
+                    mcpTools.forEach(t => {
+                        const s = t._server_name || 'Unknown';
+                        if (!byServer[s]) byServer[s] = [];
+                        byServer[s].push(t);
+                    });
+                    
+                    Object.keys(byServer).sort().forEach(server => {
+                        const grp = document.createElement('optgroup');
+                        grp.label = 'MCP: ' + server;
+                        byServer[server].forEach(tool => {
+                            const displayName = tool.display_name || ('mcp:' + server + ':' + tool.name);
+                            const opt = document.createElement('option');
+                            opt.value = displayName;
+                            opt.text = displayName;
+                            opt.dataset.toolName = tool.name;
+                            opt.dataset.source = 'mcp';
+                            opt.dataset.serverId = tool._server_id || '';
+                            opt.dataset.serverName = tool._server_name || '';
+                            opt.dataset.description = tool.description || '';
+                            opt.dataset.schema = JSON.stringify(tool.inputSchema || {});
+                            if (displayName === selectedTool || tool.name === selectedTool) opt.selected = true;
+                            grp.appendChild(opt);
+                        });
+                        select.appendChild(grp);
+                    });
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Error loading tools for edit modal:', err);
+            if (loadingEl) loadingEl.textContent = 'Error loading tools';
+        });
+    
+    // Add change handler
+    select.addEventListener('change', function() {
+        const opt = this.options[this.selectedIndex];
+        if (opt && opt.value) {
+            // Store display name but show actual tool name
+            document.getElementById('edit-tool-name').value = opt.dataset.toolName || opt.value;
+            document.getElementById('edit-server-name').value = opt.dataset.serverName || '';
+            document.getElementById('edit-tool-desc').value = opt.dataset.description || '';
+            try {
+                const schema = opt.dataset.schema ? JSON.parse(opt.dataset.schema) : {};
+                document.getElementById('edit-tool-schema').value = JSON.stringify(schema, null, 2);
+            } catch(e) {
+                document.getElementById('edit-tool-schema').value = '{}';
+            }
+        }
+    });
+}
+
+function populateToolSelect(select, tools, selectedTool) {
+    select.empty();
+    select.append('<option value="">-- Select Tool --</option>');
+    
+    // Group tools by source type first, then by server/category
+    const builtinTools = tools.filter(t => t._source === 'builtin');
+    const mcpTools = tools.filter(t => t._source === 'mcp');
+    
+    // Add built-in tools group
+    if (builtinTools.length > 0) {
+        // Group built-in by category
+        const byCategory = {};
+        builtinTools.forEach(tool => {
+            const category = tool._category || 'general';
+            if (!byCategory[category]) byCategory[category] = [];
+            byCategory[category].push(tool);
+        });
+        
+        Object.keys(byCategory).sort().forEach(category => {
+            const groupLabel = 'Built-in: ' + category.charAt(0).toUpperCase() + category.slice(1);
+            const group = $('<optgroup label="' + groupLabel + '"></optgroup>');
+            byCategory[category].forEach(tool => {
+                const displayName = tool.display_name || ('builtin:' + tool.name);
+                const isSelected = (tool.display_name === selectedTool || tool.name === selectedTool) ? 'selected' : '';
+                const descSnippet = (tool.description || '').substring(0, 100).replace(/"/g, '&quot;');
+                group.append('<option value="' + displayName + '" ' +
+                    'data-tool-name="' + tool.name + '" ' +
+                    'data-source="builtin" ' +
+                    'data-server-id="builtin" ' +
+                    'data-server-name="Built-in Tools" ' +
+                    'data-description="' + descSnippet + '" ' +
+                    'data-schema=\'' + JSON.stringify(tool.inputSchema || {}) + '\' ' +
+                    isSelected + '>' + displayName + '</option>');
+            });
+            select.append(group);
+        });
+    }
+    
+    // Add MCP tools grouped by server
+    if (mcpTools.length > 0) {
+        const byServer = {};
+        mcpTools.forEach(tool => {
+            const server = tool._server_name || 'Unknown Server';
+            if (!byServer[server]) byServer[server] = [];
+            byServer[server].push(tool);
+        });
+        
+        Object.keys(byServer).sort().forEach(server => {
+            const groupLabel = 'MCP: ' + server;
+            const group = $('<optgroup label="' + groupLabel + '"></optgroup>');
+            byServer[server].forEach(tool => {
+                const displayName = tool.display_name || ('mcp:' + server + ':' + tool.name);
+                const isSelected = (tool.display_name === selectedTool || tool.name === selectedTool) ? 'selected' : '';
+                const descSnippet = (tool.description || '').substring(0, 100).replace(/"/g, '&quot;');
+                group.append('<option value="' + displayName + '" ' +
+                    'data-tool-name="' + tool.name + '" ' +
+                    'data-source="mcp" ' +
+                    'data-server-id="' + (tool._server_id || '') + '" ' +
+                    'data-server-name="' + (tool._server_name || '') + '" ' +
+                    'data-description="' + descSnippet + '" ' +
+                    'data-schema=\'' + JSON.stringify(tool.inputSchema || {}) + '\' ' +
+                    isSelected + '>' + displayName + '</option>');
+            });
+            select.append(group);
+        });
+    }
+}
+
+function selectToolForNode(nodeId, toolDisplayName) {
+    const node = designer.nodes.find(n => n.node_id === nodeId);
+    if (!node) return;
+    
+    if (!toolDisplayName) {
+        // Clear selection
+        node.config.tool_name = '';
+        node.config.display_name = '';
+        node.config.tool_description = '';
+        node.config.tool_source = '';
+        node.config.server_id = '';
+        node.config.server_name = '';
+        node.config.input_schema = {};
+    } else {
+        // Find the tool in cached data by display_name or name
+        const tool = (allAvailableTools || []).find(t => 
+            t.display_name === toolDisplayName || t.name === toolDisplayName
+        );
+        if (tool) {
+            node.config.tool_name = tool.name;
+            node.config.display_name = tool.display_name || toolDisplayName;
+            node.config.tool_description = tool.description || '';
+            node.config.tool_source = tool._source || 'unknown';
+            node.config.server_id = tool._server_id || '';
+            node.config.server_name = tool._server_name || '';
+            node.config.input_schema = tool.inputSchema || {};
+        } else {
+            // Just set the name if tool not found
+            node.config.tool_name = toolDisplayName;
+            node.config.display_name = toolDisplayName;
+        }
+    }
+    
+    // Update display - use display_name for title, short version for body
+    const displayName = node.config.display_name || toolDisplayName || 'MCP Tool';
+    const shortName = displayName.split(':').pop() || displayName;  // Get last part after colon
+    node.name = shortName;
+    $(`#${nodeId} .node-title`).text(shortName);
+    $(`#${nodeId} .node-body`).text(displayName || 'select tool');
+    
+    // Refresh properties panel
+    showNodeProperties(node);
+}
+
+// ============================================
 // MCP TOOLS BROWSER
 // ============================================
 let mcpToolsData = [];
@@ -1709,12 +2301,16 @@ function loadMCPTools() {
                 mcpToolsData = data.tools || [];
                 mcpServersData = data.servers || [];
                 
-                // Populate server filter
+                // Populate server filter with source options
                 const serverFilter = $('#mcp-server-filter');
-                serverFilter.html('<option value="">All Servers</option>');
+                serverFilter.html('<option value="">All Tools</option>');
+                serverFilter.append('<option value="builtin">Built-in Tools</option>');
+                serverFilter.append('<option value="mcp-all">All MCP Servers</option>');
+                serverFilter.append('<optgroup label="MCP Servers">');
                 mcpServersData.forEach(server => {
-                    serverFilter.append(`<option value="${server.server_id}">${server.name}</option>`);
+                    serverFilter.append('<option value="' + server.server_id + '">' + server.name + '</option>');
                 });
+                serverFilter.append('</optgroup>');
                 
                 if (mcpToolsData.length === 0) {
                     $('#mcp-tools-loading').addClass('d-none');
@@ -1741,39 +2337,84 @@ function renderMCPTools(tools) {
     const container = $('#mcp-tools-list');
     container.empty().removeClass('d-none');
     
+    // Separate built-in and MCP tools
+    const builtinTools = tools.filter(t => t._source === 'builtin');
+    const mcpTools = tools.filter(t => t._source === 'mcp');
+    
     let html = '<div class="list-group list-group-flush">';
-    tools.forEach((tool, idx) => {
-        const params = tool.inputSchema?.properties 
-            ? Object.keys(tool.inputSchema.properties).slice(0, 3).join(', ')
-            : 'No parameters';
-        
-        html += `
-        <div class="list-group-item list-group-item-action mcp-tool-item" 
-             data-name="${(tool.name || '').toLowerCase()}" 
-             data-desc="${(tool.description || '').toLowerCase()}"
-             data-server="${tool._server_id || ''}">
-            <div class="d-flex justify-content-between align-items-start">
-                <div class="flex-grow-1 me-3">
-                    <h6 class="mb-1">
-                        <i class="bi bi-gear text-primary me-2"></i>
-                        <code>${tool.name}</code>
-                    </h6>
-                    <p class="small text-muted mb-1">${(tool.description || 'No description').substring(0, 150)}${(tool.description || '').length > 150 ? '...' : ''}</p>
-                    <small class="text-muted">
-                        <span class="badge bg-secondary me-1">${tool._server_name || 'Unknown'}</span>
-                        Params: ${params}${Object.keys(tool.inputSchema?.properties || {}).length > 3 ? '...' : ''}
-                    </small>
-                </div>
-                <button class="btn btn-sm btn-primary" onclick="addMCPToolToCanvas(${idx})">
-                    <i class="bi bi-plus-lg me-1"></i>Add
-                </button>
-            </div>
-        </div>`;
-    });
+    
+    // Render built-in tools first
+    if (builtinTools.length > 0) {
+        html += '<div class="list-group-item bg-light border-0"><strong><i class="bi bi-box-seam me-2"></i>Built-in Tools (' + builtinTools.length + ')</strong></div>';
+        builtinTools.forEach((tool, idx) => {
+            const origIdx = tools.indexOf(tool);
+            const displayName = tool.display_name || ('builtin:' + tool.name);
+            const params = tool.inputSchema?.properties 
+                ? Object.keys(tool.inputSchema.properties).slice(0, 3).join(', ')
+                : 'No parameters';
+            
+            html += '<div class="list-group-item list-group-item-action mcp-tool-item" ' +
+                'data-name="' + (tool.name || '').toLowerCase() + '" ' +
+                'data-desc="' + (tool.description || '').toLowerCase() + '" ' +
+                'data-server="builtin" data-source="builtin">' +
+                '<div class="d-flex justify-content-between align-items-start">' +
+                '<div class="flex-grow-1 me-3">' +
+                '<h6 class="mb-1">' +
+                '<i class="bi bi-box-seam text-success me-2"></i>' +
+                '<code>' + displayName + '</code>' +
+                '</h6>' +
+                '<p class="small text-muted mb-1">' + (tool.description || 'No description').substring(0, 150) + (tool.description && tool.description.length > 150 ? '...' : '') + '</p>' +
+                '<small class="text-muted">' +
+                '<span class="badge bg-success me-1">builtin</span>' +
+                '<span class="badge bg-secondary me-1">' + (tool._category || 'general') + '</span> ' +
+                'Params: ' + params + (Object.keys(tool.inputSchema?.properties || {}).length > 3 ? '...' : '') +
+                '</small>' +
+                '</div>' +
+                '<button class="btn btn-sm btn-primary" onclick="addMCPToolToCanvas(' + origIdx + ')">' +
+                '<i class="bi bi-plus-lg me-1"></i>Add' +
+                '</button>' +
+                '</div></div>';
+        });
+    }
+    
+    // Render MCP tools grouped by server
+    if (mcpTools.length > 0) {
+        html += '<div class="list-group-item bg-light border-0 mt-2"><strong><i class="bi bi-server me-2"></i>MCP Tools (' + mcpTools.length + ')</strong></div>';
+        mcpTools.forEach((tool, idx) => {
+            const origIdx = tools.indexOf(tool);
+            const displayName = tool.display_name || ('mcp:' + (tool._server_name || 'unknown') + ':' + tool.name);
+            const params = tool.inputSchema?.properties 
+                ? Object.keys(tool.inputSchema.properties).slice(0, 3).join(', ')
+                : 'No parameters';
+            
+            html += '<div class="list-group-item list-group-item-action mcp-tool-item" ' +
+                'data-name="' + (tool.name || '').toLowerCase() + '" ' +
+                'data-desc="' + (tool.description || '').toLowerCase() + '" ' +
+                'data-server="' + (tool._server_id || '') + '" data-source="mcp">' +
+                '<div class="d-flex justify-content-between align-items-start">' +
+                '<div class="flex-grow-1 me-3">' +
+                '<h6 class="mb-1">' +
+                '<i class="bi bi-gear text-info me-2"></i>' +
+                '<code>' + displayName + '</code>' +
+                '</h6>' +
+                '<p class="small text-muted mb-1">' + (tool.description || 'No description').substring(0, 150) + (tool.description && tool.description.length > 150 ? '...' : '') + '</p>' +
+                '<small class="text-muted">' +
+                '<span class="badge bg-info me-1">mcp</span>' +
+                '<span class="badge bg-secondary me-1">' + (tool._server_name || 'Unknown') + '</span> ' +
+                'Params: ' + params + (Object.keys(tool.inputSchema?.properties || {}).length > 3 ? '...' : '') +
+                '</small>' +
+                '</div>' +
+                '<button class="btn btn-sm btn-primary" onclick="addMCPToolToCanvas(' + origIdx + ')">' +
+                '<i class="bi bi-plus-lg me-1"></i>Add' +
+                '</button>' +
+                '</div></div>';
+        });
+    }
+    
     html += '</div>';
     container.html(html);
     
-    $('#mcp-tools-count').text(`${tools.length} tools available`);
+    $('#mcp-tools-count').text(tools.length + ' tools available (' + builtinTools.length + ' built-in, ' + mcpTools.length + ' MCP)');
 }
 
 function filterMCPTools() {
@@ -1782,13 +2423,20 @@ function filterMCPTools() {
     
     let filtered = mcpToolsData;
     
-    if (serverFilter) {
+    // Apply source/server filter
+    if (serverFilter === 'builtin') {
+        filtered = filtered.filter(t => t._source === 'builtin');
+    } else if (serverFilter === 'mcp-all') {
+        filtered = filtered.filter(t => t._source === 'mcp');
+    } else if (serverFilter) {
         filtered = filtered.filter(t => t._server_id === serverFilter);
     }
     
+    // Apply search filter
     if (search) {
         filtered = filtered.filter(t => 
             (t.name || '').toLowerCase().includes(search) ||
+            (t.display_name || '').toLowerCase().includes(search) ||
             (t.description || '').toLowerCase().includes(search)
         );
     }
@@ -1800,25 +2448,44 @@ function addMCPToolToCanvas(idx) {
     const tool = mcpToolsData[idx];
     if (!tool) return;
     
-    // Create an MCP Tool node
-    const node = createNode('tool', 400, 200 + (designer.nodes.length * 100));
-    node.config = {
-        tool_name: tool.name,
-        tool_description: tool.description,
-        input_schema: tool.inputSchema,
-        server_id: tool._server_id,
-        server_name: tool._server_name
-    };
-    node.label = tool.name;
+    // Calculate position - center of visible canvas area
+    const wrapper = document.getElementById('canvas-wrapper');
+    const scrollLeft = wrapper.scrollLeft;
+    const scrollTop = wrapper.scrollTop;
+    const centerX = (scrollLeft + wrapper.clientWidth / 2) / designer.zoom - 70;
+    const centerY = (scrollTop + wrapper.clientHeight / 2) / designer.zoom - 25;
     
-    renderNode(node);
-    selectNode(node);
-    updateMinimap();
+    // Build display name based on source
+    const displayName = tool.display_name || (tool._source === 'builtin' 
+        ? 'builtin:' + tool.name 
+        : 'mcp:' + (tool._server_name || 'unknown') + ':' + tool.name);
+    const shortName = tool.name;  // Just the tool name for title
+    
+    // Create a Tool node with pre-populated config
+    const existingConfig = {
+        config: {
+            tool_name: tool.name,
+            display_name: displayName,
+            tool_description: tool.description,
+            tool_source: tool._source || 'unknown',
+            input_schema: tool.inputSchema,
+            server_id: tool._server_id,
+            server_name: tool._server_name
+        }
+    };
+    
+    const node = createNode('tool', centerX, centerY, existingConfig);
+    node.name = shortName;  // Update node name to match tool
+    
+    // Update the rendered node's display
+    $(`#${node.node_id} .node-title`).text(shortName);
+    $(`#${node.node_id} .node-body`).text(displayName);
     
     // Close modal
     bootstrap.Modal.getInstance('#mcpToolsModal').hide();
     
-    showToast(`Added MCP tool: ${tool.name}`, 'success');
+    const sourceLabel = tool._source === 'builtin' ? 'Built-in' : 'MCP';
+    showToast('Added ' + sourceLabel + ' tool: ' + displayName, 'success');
 }
 
 // Scroll handler for minimap

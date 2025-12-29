@@ -1,0 +1,814 @@
+{% extends "help/help_base.html" %}
+
+{% block title %}Workflow Visual Designer Guide - {{ app_name }}{% endblock %}
+
+{% block help_content %}
+<div class="help-article">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1><i class="bi bi-diagram-2 me-3 text-primary"></i>Workflow Visual Designer</h1>
+            <p class="lead text-muted">Design and orchestrate complex multi-step workflows with visual drag-and-drop interface</p>
+        </div>
+        <a href="{{ url_for('new_workflow_designer') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Open Designer
+        </a>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="card bg-light border-0 mb-4">
+        <div class="card-body">
+            <h6 class="card-title"><i class="bi bi-signpost-split me-2"></i>Quick Navigation</h6>
+            <div class="row">
+                <div class="col-md-3">
+                    <ul class="list-unstyled mb-0">
+                        <li><a href="#overview">Overview</a></li>
+                        <li><a href="#interface">Interface Layout</a></li>
+                        <li><a href="#getting-started">Getting Started</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <ul class="list-unstyled mb-0">
+                        <li><a href="#node-types">Node Types</a></li>
+                        <li><a href="#connections">Connections</a></li>
+                        <li><a href="#properties">Properties Panel</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <ul class="list-unstyled mb-0">
+                        <li><a href="#tools">Tools (Built-in & MCP)</a></li>
+                        <li><a href="#workflow-patterns">Workflow Patterns</a></li>
+                        <li><a href="#testing">Testing & Validation</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <ul class="list-unstyled mb-0">
+                        <li><a href="#keyboard-shortcuts">Keyboard Shortcuts</a></li>
+                        <li><a href="#export-import">Export & Import</a></li>
+                        <li><a href="#best-practices">Best Practices</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Section -->
+    <section id="overview" class="mb-5">
+        <h2><i class="bi bi-info-circle me-2"></i>Overview</h2>
+        <p>The Workflow Visual Designer is a powerful drag-and-drop interface for building complex workflow DAGs (Directed Acyclic Graphs). Unlike agents which handle autonomous decision-making, workflows define explicit step-by-step processes with deterministic execution paths.</p>
+        
+        <div class="row g-4 mt-3">
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <i class="bi bi-mouse display-4 text-primary"></i>
+                        <h5 class="mt-3">Drag & Drop</h5>
+                        <p class="text-muted small mb-0">Simply drag nodes from the palette and drop them onto the canvas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-success">
+                    <div class="card-body text-center">
+                        <i class="bi bi-diagram-2 display-4 text-success"></i>
+                        <h5 class="mt-3">Visual Flow Design</h5>
+                        <p class="text-muted small mb-0">Connect nodes to define workflow execution order with visual connections</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-info">
+                    <div class="card-body text-center">
+                        <i class="bi bi-sliders display-4 text-info"></i>
+                        <h5 class="mt-3">Real-time Configuration</h5>
+                        <p class="text-muted small mb-0">Configure each node's properties with instant visual feedback</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-4">
+            <i class="bi bi-lightbulb me-2"></i>
+            <strong>Workflow vs Agent:</strong> Workflows are deterministic step-by-step processes. Agents are autonomous decision-makers. Use workflows when you need predictable, repeatable execution paths.
+        </div>
+    </section>
+
+    <!-- Interface Layout Section -->
+    <section id="interface" class="mb-5">
+        <h2><i class="bi bi-layout-three-columns me-2"></i>Interface Layout</h2>
+        <p>The designer interface is divided into three main areas:</p>
+        
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 text-center border-end">
+                        <i class="bi bi-collection display-5 text-primary"></i>
+                        <h6 class="mt-2">Node Palette</h6>
+                        <p class="small text-muted mb-0">Left sidebar with draggable node types organized by category</p>
+                    </div>
+                    <div class="col-md-8 text-center border-end">
+                        <i class="bi bi-easel display-5 text-success"></i>
+                        <h6 class="mt-2">Design Canvas</h6>
+                        <p class="small text-muted mb-0">Main workspace where you build your workflow. Supports zoom, pan, and minimap navigation</p>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <i class="bi bi-sliders display-5 text-info"></i>
+                        <h6 class="mt-2">Properties Panel</h6>
+                        <p class="small text-muted mb-0">Right sidebar showing selected node's configuration options</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h5>Workflow Header Bar</h5>
+        <p>At the top, you'll find the workflow header bar with:</p>
+        <ul>
+            <li><strong>Back Button</strong> - Return to workflows list</li>
+            <li><strong>Workflow Name</strong> - Editable name for your workflow</li>
+            <li><strong>Validate</strong> - Check workflow for errors</li>
+            <li><strong>Test</strong> - Execute the workflow</li>
+            <li><strong>JSON</strong> - View/import workflow JSON</li>
+            <li><strong>Save</strong> - Save changes</li>
+        </ul>
+        
+        <h5>Canvas Toolbar</h5>
+        <p>The toolbar above the canvas provides:</p>
+        <ul>
+            <li><strong>Node Count</strong> - Total nodes in workflow</li>
+            <li><strong>Edge Count</strong> - Total connections</li>
+            <li><strong>Zoom Level</strong> - Current zoom percentage</li>
+            <li><strong>Clear</strong> - Remove all nodes</li>
+            <li><strong>Auto Layout</strong> - Arrange nodes automatically</li>
+            <li><strong>Zoom Controls</strong> - Zoom in/out/reset</li>
+        </ul>
+    </section>
+
+    <!-- Getting Started Section -->
+    <section id="getting-started" class="mb-5">
+        <h2><i class="bi bi-rocket-takeoff me-2"></i>Getting Started</h2>
+        
+        <div class="alert alert-info">
+            <i class="bi bi-lightbulb me-2"></i>
+            <strong>Tip:</strong> Every workflow must have exactly one Start node and at least one End node.
+        </div>
+        
+        <h5>Step 1: Create Start and End Nodes</h5>
+        <p>Every workflow needs exactly one Start node (where execution begins) and at least one End node (where execution completes).</p>
+        <ol>
+            <li>Drag a <span class="badge bg-success">Start</span> node from Flow Control onto the canvas</li>
+            <li>Drag an <span class="badge bg-danger">End</span> node and place it to the right</li>
+        </ol>
+        
+        <h5>Step 2: Add Processing Nodes</h5>
+        <p>Add nodes between Start and End to process data:</p>
+        <ol>
+            <li>Drag an <span class="badge" style="background:#6f42c1;">LLM Call</span> node between them</li>
+            <li>Or drag a <span class="badge bg-warning text-dark">Tool</span> node to call external tools</li>
+            <li>Click on any node to configure its settings in the Properties panel</li>
+        </ol>
+        
+        <h5>Step 3: Connect Nodes</h5>
+        <p>Create the execution flow by connecting nodes:</p>
+        <ol>
+            <li>Click on the <strong>output connector</strong> (right side circle) of the source node</li>
+            <li>Drag to the <strong>input connector</strong> (left side circle) of the target node</li>
+            <li>Release to create the connection</li>
+            <li>A blue curved line shows the connection</li>
+        </ol>
+        
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Important:</strong> 
+            <ul class="mb-0">
+                <li>Start nodes only have output connectors</li>
+                <li>End nodes only have input connectors</li>
+                <li>Condition nodes have two outputs: green (true) and red (false)</li>
+            </ul>
+        </div>
+        
+        <h5>Step 4: Configure and Save</h5>
+        <ol>
+            <li>Click on each node to configure its properties</li>
+            <li>Click <strong>Validate</strong> to check for errors</li>
+            <li>Click <strong>Save</strong> to save your workflow</li>
+            <li>Click <strong>Test</strong> to execute the workflow</li>
+        </ol>
+    </section>
+
+    <!-- Node Types Section -->
+    <section id="node-types" class="mb-5">
+        <h2><i class="bi bi-boxes me-2"></i>Node Types</h2>
+        <p>The workflow designer provides various node types organized by category:</p>
+        
+        <h5 class="mt-4"><i class="bi bi-signpost me-2 text-success"></i>Flow Control</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Node</th>
+                        <th>Description</th>
+                        <th style="width:120px;">Connectors</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-success"><i class="bi bi-play-circle me-1"></i>Start</span></td>
+                        <td>Entry point for workflow execution. Every workflow must have exactly one Start node.</td>
+                        <td>Output only</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-danger"><i class="bi bi-stop-circle me-1"></i>End</span></td>
+                        <td>Termination point. Workflow completes when an End node is reached.</td>
+                        <td>Input only</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-warning text-dark"><i class="bi bi-signpost-split me-1"></i>Condition</span></td>
+                        <td>Branches workflow based on a boolean expression. Green output for true, red for false.</td>
+                        <td>Input + 2 Outputs</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge" style="background:#6610f2;"><i class="bi bi-arrow-repeat me-1"></i>Loop</span></td>
+                        <td>Repeats a section of the workflow until condition is met or max iterations reached.</td>
+                        <td>Input + Output</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-info"><i class="bi bi-diagram-3 me-1"></i>Parallel</span></td>
+                        <td>Executes multiple branches simultaneously and waits for all to complete.</td>
+                        <td>Input + Output</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h5 class="mt-4"><i class="bi bi-cpu me-2 text-purple"></i>Processing</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Node</th>
+                        <th>Description</th>
+                        <th style="width:200px;">Key Properties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge" style="background:#6f42c1;"><i class="bi bi-chat-dots me-1"></i>LLM Call</span></td>
+                        <td>Invokes a Large Language Model with a prompt template.</td>
+                        <td>Provider, Model, Temperature, Prompt</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-primary"><i class="bi bi-robot me-1"></i>Agent</span></td>
+                        <td>Delegates processing to a pre-configured AI agent.</td>
+                        <td>Agent ID</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-warning"><i class="bi bi-tools me-1"></i>Tool</span></td>
+                        <td>Calls a built-in or MCP tool with specified parameters.</td>
+                        <td>Tool Name, Parameters</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge" style="background:#20c997;"><i class="bi bi-code-slash me-1"></i>Python Code</span></td>
+                        <td>Executes custom Python code with access to input data.</td>
+                        <td>Python Code</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge" style="background:#20c997;"><i class="bi bi-shuffle me-1"></i>Transform</span></td>
+                        <td>Transforms data using a Python expression.</td>
+                        <td>Expression</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h5 class="mt-4"><i class="bi bi-database me-2 text-info"></i>Data</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Node</th>
+                        <th>Description</th>
+                        <th style="width:200px;">Key Properties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-info"><i class="bi bi-search me-1"></i>RAG Query</span></td>
+                        <td>Retrieves relevant documents from a vector database.</td>
+                        <td>Index, Query, Top K</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-secondary"><i class="bi bi-database me-1"></i>Memory</span></td>
+                        <td>Reads/writes data to workflow memory for state persistence.</td>
+                        <td>Key, Operation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h5 class="mt-4"><i class="bi bi-person-check me-2 text-pink"></i>Human Interaction</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Node</th>
+                        <th>Description</th>
+                        <th style="width:200px;">Key Properties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge" style="background:#e83e8c;"><i class="bi bi-person-check me-1"></i>HITL Review</span></td>
+                        <td>Pauses workflow for human approval, review, or data input.</td>
+                        <td>Task Type, Message, Priority</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Connections Section -->
+    <section id="connections" class="mb-5">
+        <h2><i class="bi bi-link-45deg me-2"></i>Connections</h2>
+        <p>Connections define the execution flow between nodes. Data flows from source node's output to target node's input.</p>
+        
+        <h5>Creating Connections</h5>
+        <ol>
+            <li>Hover over a node's output connector (small circle on the right)</li>
+            <li>Click and drag towards the target node</li>
+            <li>Release on the target's input connector (left side)</li>
+            <li>A blue curved line confirms the connection</li>
+        </ol>
+        
+        <h5>Connection Rules</h5>
+        <ul>
+            <li><strong>Direction:</strong> Connections flow left-to-right (output → input)</li>
+            <li><strong>No Cycles:</strong> Cannot create loops that would cause infinite execution</li>
+            <li><strong>Multiple Outputs:</strong> One output can connect to multiple inputs (parallel branches)</li>
+            <li><strong>Multiple Inputs:</strong> One input can receive from multiple outputs (merge point)</li>
+        </ul>
+        
+        <h5>Deleting Connections</h5>
+        <ol>
+            <li>Click on the connection line</li>
+            <li>Confirm deletion when prompted</li>
+        </ol>
+        
+        <h5>Condition Node Connections</h5>
+        <p>Condition nodes have two output connectors:</p>
+        <ul>
+            <li><span class="badge bg-success">Green</span> - Connects to the path executed when condition is <code>True</code></li>
+            <li><span class="badge bg-danger">Red</span> - Connects to the path executed when condition is <code>False</code></li>
+        </ul>
+    </section>
+
+    <!-- Properties Panel Section -->
+    <section id="properties" class="mb-5">
+        <h2><i class="bi bi-sliders me-2"></i>Properties Panel</h2>
+        <p>The Properties Panel (right sidebar) shows configuration options for the selected node.</p>
+        
+        <h5>Common Properties</h5>
+        <ul>
+            <li><strong>Node ID:</strong> Auto-generated unique identifier (read-only)</li>
+            <li><strong>Name:</strong> Display name for the node (editable)</li>
+        </ul>
+        
+        <h5>Type-Specific Properties</h5>
+        <p>Each node type has specific configuration options:</p>
+        
+        <div class="accordion" id="propertiesAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#llmProps">
+                        LLM Call Properties
+                    </button>
+                </h2>
+                <div id="llmProps" class="accordion-collapse collapse" data-bs-parent="#propertiesAccordion">
+                    <div class="accordion-body">
+                        <ul>
+                            <li><strong>Provider:</strong> Select from active LLM providers (dynamically loaded from backend)</li>
+                            <li><strong>Model:</strong> Select from models available for the chosen provider (automatically updates when provider changes)</li>
+                            <li><strong>Temperature:</strong> Creativity level (0.0 = deterministic, 1.0 = creative)</li>
+                            <li><strong>Max Tokens:</strong> Maximum response length</li>
+                            <li><strong>Prompt:</strong> Template with placeholders like <code>{input}</code></li>
+                        </ul>
+                        <div class="alert alert-info small mt-2 mb-0">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Provider and model lists are dynamically populated from your configured LLM providers. Only active providers and their available models are shown.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#toolProps">
+                        Tool Properties
+                    </button>
+                </h2>
+                <div id="toolProps" class="accordion-collapse collapse" data-bs-parent="#propertiesAccordion">
+                    <div class="accordion-body">
+                        <ul>
+                            <li><strong>Tool:</strong> Select from dropdown showing <code>builtin:name</code> or <code>mcp:server:name</code></li>
+                            <li><strong>Selected:</strong> Shows the full tool identifier</li>
+                            <li><strong>Source:</strong> Badge indicating builtin (green) or MCP (blue)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#conditionProps">
+                        Condition Properties
+                    </button>
+                </h2>
+                <div id="conditionProps" class="accordion-collapse collapse" data-bs-parent="#propertiesAccordion">
+                    <div class="accordion-body">
+                        <ul>
+                            <li><strong>Expression:</strong> Python expression evaluating to True/False</li>
+                            <li>Example: <code>output.score > 0.8</code></li>
+                            <li>Example: <code>len(results) > 0</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#loopProps">
+                        Loop Properties
+                    </button>
+                </h2>
+                <div id="loopProps" class="accordion-collapse collapse" data-bs-parent="#propertiesAccordion">
+                    <div class="accordion-body">
+                        <ul>
+                            <li><strong>Max Iterations:</strong> Safety limit (1-100)</li>
+                            <li><strong>Condition:</strong> Continue while condition is True</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hitlProps">
+                        HITL Review Properties
+                    </button>
+                </h2>
+                <div id="hitlProps" class="accordion-collapse collapse" data-bs-parent="#propertiesAccordion">
+                    <div class="accordion-body">
+                        <ul>
+                            <li><strong>Task Type:</strong> Approval, Review, or Data Input</li>
+                            <li><strong>Message:</strong> Instructions for the human reviewer</li>
+                            <li><strong>Priority:</strong> 1 (lowest) to 10 (highest)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section id="tools" class="mb-5">
+        <h2><i class="bi bi-tools me-2"></i>Tools (Built-in & MCP)</h2>
+        <p>Tool nodes can call both built-in tools and external tools via MCP (Model Context Protocol) servers.</p>
+        
+        <h5>Tool Naming Convention</h5>
+        <p>Tools are displayed with a namespace prefix for clarity:</p>
+        <ul>
+            <li><code class="text-success">builtin:tool_name</code> - Built-in tools bundled with Abhikarta</li>
+            <li><code class="text-info">mcp:server_name:tool_name</code> - Tools from MCP servers</li>
+        </ul>
+        
+        <h5>Selecting Tools</h5>
+        <p>There are two ways to add tool nodes:</p>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">Method 1: Drag & Configure</div>
+                    <div class="card-body">
+                        <ol>
+                            <li>Drag a Tool node from the palette</li>
+                            <li>Click on the node to select it</li>
+                            <li>Use the dropdown in Properties to select a tool</li>
+                            <li>Tools are grouped by source (Built-in, MCP servers)</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">Method 2: Browse Tools</div>
+                    <div class="card-body">
+                        <ol>
+                            <li>Click <strong>Browse Tools</strong> in the palette</li>
+                            <li>Search or filter by source</li>
+                            <li>Click <strong>Add</strong> to place on canvas</li>
+                            <li>Node is pre-configured with tool settings</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h5 class="mt-4">Tool Sources</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Source</th>
+                        <th>Description</th>
+                        <th>Examples</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-success">builtin</span></td>
+                        <td>Pre-installed tools available without configuration</td>
+                        <td>web_search, calculate, file_read, send_email</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-info">mcp</span></td>
+                        <td>Tools from connected MCP servers</td>
+                        <td>GitHub tools, Slack tools, Database tools</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Workflow Patterns Section -->
+    <section id="workflow-patterns" class="mb-5">
+        <h2><i class="bi bi-diagram-3 me-2"></i>Common Workflow Patterns</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-light">
+                        <strong>Sequential Processing</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Simple linear workflow where each step follows the previous.</p>
+                        <pre class="bg-light p-2 rounded small">Start → LLM → Tool → End</pre>
+                        <p class="small text-muted mb-0">Use for: Document processing, simple transformations</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-light">
+                        <strong>Conditional Branching</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Different paths based on conditions.</p>
+                        <pre class="bg-light p-2 rounded small">Start → LLM → Condition
+               ├─True→ Approve → End
+               └─False→ Reject → End</pre>
+                        <p class="small text-muted mb-0">Use for: Approval workflows, classification</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-light">
+                        <strong>Human-in-the-Loop</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Workflow pauses for human review/approval.</p>
+                        <pre class="bg-light p-2 rounded small">Start → LLM → HITL Review → 
+       Condition → Process → End</pre>
+                        <p class="small text-muted mb-0">Use for: Content moderation, sensitive decisions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-light">
+                        <strong>Iterative Processing</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Repeat until condition is met.</p>
+                        <pre class="bg-light p-2 rounded small">Start → Loop ─┬─→ LLM → Check
+              └──────────┘
+              → End</pre>
+                        <p class="small text-muted mb-0">Use for: Refinement, validation loops</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-light">
+                        <strong>RAG-Enhanced Processing</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Retrieval-augmented generation pattern.</p>
+                        <pre class="bg-light p-2 rounded small">Start → RAG Query → LLM → End</pre>
+                        <p class="small text-muted mb-0">Use for: Q&A, knowledge-based responses</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-light">
+                        <strong>Multi-Agent Orchestration</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Coordinate multiple AI agents.</p>
+                        <pre class="bg-light p-2 rounded small">Start → Agent1 → Agent2 → 
+       Merge → Agent3 → End</pre>
+                        <p class="small text-muted mb-0">Use for: Complex tasks, specialist agents</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testing & Validation Section -->
+    <section id="testing" class="mb-5">
+        <h2><i class="bi bi-check-circle me-2"></i>Testing & Validation</h2>
+        
+        <h5>Validation</h5>
+        <p>Click <strong>Validate</strong> to check your workflow for common errors:</p>
+        <ul>
+            <li><i class="bi bi-check text-success"></i> Exactly one Start node</li>
+            <li><i class="bi bi-check text-success"></i> At least one End node</li>
+            <li><i class="bi bi-check text-success"></i> All nodes connected (no orphans)</li>
+            <li><i class="bi bi-check text-success"></i> No cycles in the graph</li>
+            <li><i class="bi bi-check text-success"></i> Required properties configured</li>
+        </ul>
+        
+        <h5>Testing</h5>
+        <p>Click <strong>Test</strong> to execute your workflow:</p>
+        <ol>
+            <li>Save your workflow first</li>
+            <li>Opens execution page in new tab</li>
+            <li>Provide input data</li>
+            <li>Watch real-time execution progress</li>
+            <li>Review results and execution trace</li>
+        </ol>
+        
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Note:</strong> HITL nodes will pause execution and create tasks in the HITL queue.
+        </div>
+    </section>
+
+    <!-- Keyboard Shortcuts Section -->
+    <section id="keyboard-shortcuts" class="mb-5">
+        <h2><i class="bi bi-keyboard me-2"></i>Keyboard Shortcuts</h2>
+        
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Key</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><kbd>Delete</kbd></td>
+                        <td>Delete selected node</td>
+                    </tr>
+                    <tr>
+                        <td><kbd>Escape</kbd></td>
+                        <td>Deselect all / Cancel connection</td>
+                    </tr>
+                    <tr>
+                        <td><kbd>Double-click</kbd></td>
+                        <td>Open node edit modal</td>
+                    </tr>
+                    <tr>
+                        <td><kbd>Scroll</kbd></td>
+                        <td>Pan canvas</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Export & Import Section -->
+    <section id="export-import" class="mb-5">
+        <h2><i class="bi bi-arrow-left-right me-2"></i>Export & Import</h2>
+        
+        <h5>Export to JSON</h5>
+        <ol>
+            <li>Click the <strong>JSON</strong> button in the header</li>
+            <li>The modal shows the complete workflow definition</li>
+            <li>Click <strong>Copy</strong> to copy to clipboard</li>
+            <li>Save to a <code>.json</code> file for backup</li>
+        </ol>
+        
+        <h5>Import from JSON</h5>
+        <ol>
+            <li>Click the <strong>JSON</strong> button</li>
+            <li>Paste your workflow JSON into the editor</li>
+            <li>Click <strong>Import</strong></li>
+            <li>The canvas updates with imported nodes and connections</li>
+        </ol>
+        
+        <h5>JSON Structure</h5>
+        <pre class="bg-light p-3 rounded"><code>{
+  "name": "My Workflow",
+  "description": "",
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "start",
+      "title": "Start",
+      "config": {},
+      "position": {"x": 100, "y": 100}
+    }
+  ],
+  "edges": [
+    {
+      "from": "node_1",
+      "to": "node_2",
+      "fromPort": "output",
+      "toPort": "input"
+    }
+  ]
+}</code></pre>
+    </section>
+
+    <!-- Best Practices Section -->
+    <section id="best-practices" class="mb-5">
+        <h2><i class="bi bi-star me-2"></i>Best Practices</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 border-success">
+                    <div class="card-header bg-success text-white">
+                        <i class="bi bi-check-lg me-2"></i>Do
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>Name nodes descriptively</li>
+                            <li>Use Auto Layout for clean organization</li>
+                            <li>Validate before saving</li>
+                            <li>Add HITL nodes for sensitive decisions</li>
+                            <li>Use conditions for error handling</li>
+                            <li>Keep workflows modular and focused</li>
+                            <li>Test with sample data</li>
+                            <li>Document complex expressions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <i class="bi bi-x-lg me-2"></i>Don't
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>Create workflows without End nodes</li>
+                            <li>Leave nodes disconnected</li>
+                            <li>Use infinite loops without conditions</li>
+                            <li>Skip validation</li>
+                            <li>Hardcode sensitive data</li>
+                            <li>Create overly complex single workflows</li>
+                            <li>Ignore HITL task timeouts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h5 class="mt-4">Performance Tips</h5>
+        <ul>
+            <li><strong>Parallel execution:</strong> Use Parallel nodes when steps are independent</li>
+            <li><strong>Loop limits:</strong> Always set reasonable max_iterations</li>
+            <li><strong>Early termination:</strong> Add conditions to skip unnecessary processing</li>
+            <li><strong>Memory management:</strong> Use Memory nodes sparingly for large data</li>
+        </ul>
+    </section>
+
+    <!-- Related Documentation -->
+    <section class="mb-4">
+        <h2><i class="bi bi-book me-2"></i>Related Documentation</h2>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <a href="{{ url_for('help_page', page='agent_visual_designer') }}" class="card text-decoration-none h-100">
+                    <div class="card-body">
+                        <h6><i class="bi bi-diagram-3 me-2 text-primary"></i>Agent Visual Designer</h6>
+                        <p class="small text-muted mb-0">Build AI agents with visual design</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('help_page', page='workflow_dags') }}" class="card text-decoration-none h-100">
+                    <div class="card-body">
+                        <h6><i class="bi bi-diagram-2 me-2 text-success"></i>Workflow DAGs</h6>
+                        <p class="small text-muted mb-0">Understanding workflow graphs</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('help_page', page='tools_system') }}" class="card text-decoration-none h-100">
+                    <div class="card-body">
+                        <h6><i class="bi bi-tools me-2 text-warning"></i>Tools System</h6>
+                        <p class="small text-muted mb-0">Built-in and MCP tools</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

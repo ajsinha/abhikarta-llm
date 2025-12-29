@@ -1,4 +1,4 @@
-# Abhikarta-LLM v1.2.3 - Quick Start Guide
+# Abhikarta-LLM v1.2.5 - Quick Start Guide
 
 This guide will help you get started with Abhikarta-LLM in under 15 minutes.
 
@@ -401,10 +401,10 @@ Add tool names to agent configuration:
 | **Database Schema Docs** | 22 tables documented with ER diagram | v1.2.0 |
 | **Page Glossaries** | Contextual help on 22 templates | v1.2.0 |
 | **Database Delegates** | 9 modular delegates for DB operations | v1.2.1 |
-| **Actor System** | Pekko-inspired concurrency (millions of actors) | v1.2.3 |
-| **Agent Templates** | 36 templates across 15 categories | v1.2.3 |
-| **Workflow Templates** | 33 templates across 11 industries | v1.2.3 |
-| **Code Fragment URIs** | Templates use db://, s3://, file:// URIs | v1.2.3 |
+| **Actor System** | Pekko-inspired concurrency (millions of actors) | v1.2.5 |
+| **Agent Templates** | 36 templates across 15 categories | v1.2.5 |
+| **Workflow Templates** | 33 templates across 11 industries | v1.2.5 |
+| **Code Fragment URIs** | Templates use db://, s3://, file:// URIs | v1.2.5 |
 
 ### Architecture Layers
 
@@ -416,7 +416,7 @@ Add tool names to agent configuration:
 │                    Application Layer                         │
 │    Agent Manager │ Workflow Engine │ HITL Manager            │
 ├─────────────────────────────────────────────────────────────┤
-│                 Actor System Layer (v1.2.3)                  │
+│                 Actor System Layer (v1.2.5)                  │
 │  ActorSystem │ Dispatchers │ Supervision │ Routers │ Events │
 ├─────────────────────────────────────────────────────────────┤
 │                      Tools Layer                             │
@@ -465,7 +465,7 @@ Add tool names to agent configuration:
 ## File Structure Reference
 
 ```
-abhikarta-llm-v1.2.3/
+abhikarta-llm-v1.2.5/
 ├── abhikarta/
 │   ├── agent/          # Agent management
 │   ├── config/         # Configuration
@@ -487,4 +487,4 @@ abhikarta-llm-v1.2.3/
 
 ---
 
-*Version 1.2.3 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
+*Version 1.2.5 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*

@@ -4,7 +4,7 @@
 
 The Abhikarta Actor System provides a powerful, Pekko-inspired framework for building highly concurrent, distributed, and fault-tolerant applications. This guide will help you get started with actors in minutes.
 
-**Version:** 1.2.3
+**Version:** 1.2.5
 
 ## Table of Contents
 

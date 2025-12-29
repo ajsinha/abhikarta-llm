@@ -23,7 +23,7 @@ import json
 import secrets
 import string
 
-from .abstract_routes import AbstractRoutes, admin_required
+from .abstract_routes import AbstractRoutes, admin_required, login_required
 
 logger = logging.getLogger(__name__)
 
@@ -887,6 +887,100 @@ class AdminRoutes(AbstractRoutes):
             return redirect(url_for('admin_llm_providers'))
         
         # ============================================
+        # LLM PROVIDERS & MODELS API (for Visual Designers)
+        # ============================================
+        
+        @self.app.route('/api/llm/providers')
+        @login_required
+        def api_llm_providers():
+            """Get all active LLM providers for dropdowns."""
+            try:
+                providers = self.db_facade.llm.get_all_providers(active_only=True)
+                return jsonify({
+                    'success': True,
+                    'providers': [
+                        {
+                            'provider_id': p.get('provider_id'),
+                            'name': p.get('name'),
+                            'provider_type': p.get('provider_type'),
+                            'description': p.get('description', ''),
+                            'is_default': p.get('is_default', 0)
+                        }
+                        for p in providers
+                    ]
+                })
+            except Exception as e:
+                logger.error(f"Error getting LLM providers: {e}")
+                return jsonify({'success': False, 'error': str(e)})
+        
+        @self.app.route('/api/llm/providers/<provider_id>/models')
+        @login_required
+        def api_llm_provider_models(provider_id):
+            """Get all active models for a specific provider."""
+            try:
+                models = self.db_facade.llm.get_provider_models(provider_id, active_only=True)
+                return jsonify({
+                    'success': True,
+                    'provider_id': provider_id,
+                    'models': [
+                        {
+                            'model_id': m.get('model_id'),
+                            'name': m.get('name'),
+                            'display_name': m.get('display_name') or m.get('name'),
+                            'model_type': m.get('model_type', 'chat'),
+                            'context_window': m.get('context_window', 4096),
+                            'supports_vision': m.get('supports_vision', 0),
+                            'supports_functions': m.get('supports_functions', 0),
+                            'is_default': m.get('is_default', 0)
+                        }
+                        for m in models
+                    ]
+                })
+            except Exception as e:
+                logger.error(f"Error getting models for provider {provider_id}: {e}")
+                return jsonify({'success': False, 'error': str(e)})
+        
+        @self.app.route('/api/llm/models')
+        @login_required
+        def api_llm_all_models():
+            """Get all active LLM models grouped by provider."""
+            try:
+                providers = self.db_facade.llm.get_all_providers(active_only=True)
+                result = []
+                
+                for provider in providers:
+                    provider_id = provider.get('provider_id')
+                    models = self.db_facade.llm.get_provider_models(provider_id, active_only=True)
+                    
+                    result.append({
+                        'provider_id': provider_id,
+                        'provider_name': provider.get('name'),
+                        'provider_type': provider.get('provider_type'),
+                        'is_default': provider.get('is_default', 0),
+                        'models': [
+                            {
+                                'model_id': m.get('model_id'),
+                                'name': m.get('name'),
+                                'display_name': m.get('display_name') or m.get('name'),
+                                'model_type': m.get('model_type', 'chat'),
+                                'context_window': m.get('context_window', 4096),
+                                'supports_vision': m.get('supports_vision', 0),
+                                'supports_functions': m.get('supports_functions', 0),
+                                'is_default': m.get('is_default', 0)
+                            }
+                            for m in models
+                        ]
+                    })
+                
+                return jsonify({
+                    'success': True,
+                    'providers': result
+                })
+            except Exception as e:
+                logger.error(f"Error getting all LLM models: {e}")
+                return jsonify({'success': False, 'error': str(e)})
+        
+        # ============================================
         # LLM MODELS MANAGEMENT
         # ============================================
         
@@ -1368,7 +1462,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.3')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.5')
                 
                 # Add auth if configured
                 auth_type = server.get('auth_type', 'none')
@@ -1469,7 +1563,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.3')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.2.5')
                 
                 # Add auth headers if configured
                 auth_type = server.get('auth_type', 'none')
@@ -1617,23 +1711,93 @@ class AdminRoutes(AbstractRoutes):
                                    tools=tools)
         
         @self.app.route('/admin/mcp-tool-servers/api/all-tools')
-        @admin_required
+        @login_required
         def api_all_mcp_tools():
-            """Internal API: Get all tools from active MCP Tool Servers (for Visual Designer)."""
+            """Internal API: Get all tools (built-in + MCP) for Visual Designer."""
             try:
+                all_tools = []
+                
+                # 1. Get built-in tools from ToolsRegistry
+                try:
+                    from abhikarta.tools.registry import ToolsRegistry
+                    registry = ToolsRegistry.get_instance()
+                    builtin_tools = registry.list_tools(enabled_only=True)
+                    
+                    logger.info(f"Found {len(builtin_tools)} enabled tools in registry")
+                    
+                    for tool in builtin_tools:
+                        try:
+                            # Skip MCP tools as we'll get them from servers below
+                            tool_type_val = getattr(tool.metadata, 'tool_type', None)
+                            if tool_type_val and hasattr(tool_type_val, 'value'):
+                                if tool_type_val.value in ['mcp', 'mcp_plugin']:
+                                    continue
+                            
+                            # Build tool entry with builtin namespace
+                            # Safely get schema using get_schema() method
+                            schema_dict = {}
+                            try:
+                                tool_schema = tool.get_schema()
+                                if tool_schema:
+                                    schema_dict = tool_schema.to_dict()
+                            except:
+                                schema_dict = {}
+                            
+                            # Safely get category
+                            category_val = 'general'
+                            if tool.metadata and tool.metadata.category:
+                                try:
+                                    category_val = tool.metadata.category.value
+                                except:
+                                    category_val = str(tool.metadata.category)
+                            
+                            # Safely get tool type
+                            tool_type_str = 'function'
+                            if tool.metadata and tool.metadata.tool_type:
+                                try:
+                                    tool_type_str = tool.metadata.tool_type.value
+                                except:
+                                    tool_type_str = str(tool.metadata.tool_type)
+                            
+                            tool_entry = {
+                                'name': tool.name,
+                                'display_name': f"builtin:{tool.name}",
+                                'description': tool.description or '',
+                                'inputSchema': schema_dict,
+                                '_source': 'builtin',
+                                '_source_type': 'builtin',
+                                '_server_id': 'builtin',
+                                '_server_name': 'Built-in Tools',
+                                '_category': category_val,
+                                '_tool_type': tool_type_str
+                            }
+                            all_tools.append(tool_entry)
+                        except Exception as te:
+                            logger.warning(f"Error processing tool {getattr(tool, 'name', 'unknown')}: {te}")
+                            continue
+                            
+                    logger.info(f"Added {len([t for t in all_tools if t.get('_source') == 'builtin'])} builtin tools")
+                except Exception as e:
+                    logger.error(f"Could not load built-in tools: {e}", exc_info=True)
+                
+                # 2. Get MCP tools from active servers
                 servers = self.db_facade.fetch_all(
                     "SELECT server_id, name, tool_count FROM mcp_tool_servers WHERE is_active = 1"
                 ) or []
                 
-                all_tools = []
                 for server in self.db_facade.fetch_all(
                     "SELECT * FROM mcp_tool_servers WHERE is_active = 1"
                 ) or []:
                     try:
                         cached_tools = json.loads(server.get('cached_tools', '[]'))
+                        server_name = server['name']
                         for tool in cached_tools:
+                            tool_name = tool.get('name', 'unknown')
+                            tool['display_name'] = f"mcp:{server_name}:{tool_name}"
+                            tool['_source'] = 'mcp'
+                            tool['_source_type'] = 'mcp'
                             tool['_server_id'] = server['server_id']
-                            tool['_server_name'] = server['name']
+                            tool['_server_name'] = server_name
                             all_tools.append(tool)
                     except:
                         pass
@@ -1642,10 +1806,12 @@ class AdminRoutes(AbstractRoutes):
                     'success': True,
                     'tools': all_tools,
                     'servers': [dict(s) for s in servers],
-                    'tool_count': len(all_tools)
+                    'tool_count': len(all_tools),
+                    'builtin_count': len([t for t in all_tools if t.get('_source') == 'builtin']),
+                    'mcp_count': len([t for t in all_tools if t.get('_source') == 'mcp'])
                 })
             except Exception as e:
-                logger.error(f"Error getting MCP tools: {e}")
+                logger.error(f"Error getting all tools: {e}")
                 return jsonify({'success': False, 'error': str(e)})
         
         @self.app.route('/admin/mcp-tool-servers/all-tools')

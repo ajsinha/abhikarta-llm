@@ -1,0 +1,632 @@
+{% extends "help/help_base.html" %}
+
+{% block title %}Agent Visual Designer Guide - {{ app_name }}{% endblock %}
+
+{% block help_content %}
+<div class="help-article">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1><i class="bi bi-diagram-3 me-3 text-primary"></i>Agent Visual Designer</h1>
+            <p class="lead text-muted">Build sophisticated AI agents with drag-and-drop workflow design</p>
+        </div>
+        <a href="{{ url_for('new_agent_designer') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Open Designer
+        </a>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="card bg-light border-0 mb-4">
+        <div class="card-body">
+            <h6 class="card-title"><i class="bi bi-signpost-split me-2"></i>Quick Navigation</h6>
+            <div class="row">
+                <div class="col-md-3">
+                    <ul class="list-unstyled mb-0">
+                        <li><a href="#overview">Overview</a></li>
+                        <li><a href="#interface">Interface Layout</a></li>
+                        <li><a href="#getting-started">Getting Started</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <ul class="list-unstyled mb-0">
+                        <li><a href="#node-types">Node Types</a></li>
+                        <li><a href="#connections">Connections</a></li>
+                        <li><a href="#properties">Properties Panel</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <ul class="list-unstyled mb-0">
+                        <li><a href="#mcp-tools">MCP Tools</a></li>
+                        <li><a href="#workflow-patterns">Workflow Patterns</a></li>
+                        <li><a href="#testing">Testing & Validation</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <ul class="list-unstyled mb-0">
+                        <li><a href="#keyboard-shortcuts">Keyboard Shortcuts</a></li>
+                        <li><a href="#export-import">Export & Import</a></li>
+                        <li><a href="#best-practices">Best Practices</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Section -->
+    <section id="overview" class="mb-5">
+        <h2><i class="bi bi-info-circle me-2"></i>Overview</h2>
+        <p>The Agent Visual Designer is a powerful drag-and-drop interface for building AI agent workflows. Instead of writing JSON configurations manually, you can visually design complex agent behaviors by connecting different types of nodes.</p>
+        
+        <div class="row g-4 mt-3">
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <i class="bi bi-mouse display-4 text-primary"></i>
+                        <h5 class="mt-3">Drag & Drop</h5>
+                        <p class="text-muted small mb-0">Simply drag nodes from the palette and drop them onto the canvas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-success">
+                    <div class="card-body text-center">
+                        <i class="bi bi-diagram-3 display-4 text-success"></i>
+                        <h5 class="mt-3">Visual Connections</h5>
+                        <p class="text-muted small mb-0">Connect nodes to define workflow execution order</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-info">
+                    <div class="card-body text-center">
+                        <i class="bi bi-sliders display-4 text-info"></i>
+                        <h5 class="mt-3">Real-time Configuration</h5>
+                        <p class="text-muted small mb-0">Configure each node's properties with live preview</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interface Layout Section -->
+    <section id="interface" class="mb-5">
+        <h2><i class="bi bi-layout-three-columns me-2"></i>Interface Layout</h2>
+        <p>The designer interface is divided into three main areas:</p>
+        
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 text-center border-end">
+                        <i class="bi bi-collection display-5 text-primary"></i>
+                        <h6 class="mt-2">Node Palette</h6>
+                        <p class="small text-muted mb-0">Left sidebar with draggable node types organized by category</p>
+                    </div>
+                    <div class="col-md-8 text-center border-end">
+                        <i class="bi bi-easel display-5 text-success"></i>
+                        <h6 class="mt-2">Design Canvas</h6>
+                        <p class="small text-muted mb-0">Main workspace where you build your workflow. Supports zoom, pan, and minimap navigation</p>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <i class="bi bi-sliders display-5 text-info"></i>
+                        <h6 class="mt-2">Properties Panel</h6>
+                        <p class="small text-muted mb-0">Right sidebar showing selected node's configuration options</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h5>Agent Header Bar</h5>
+        <p>At the top, you'll find the agent header bar with:</p>
+        <ul>
+            <li><strong>Agent Name</strong> - Editable name for your agent</li>
+            <li><strong>Agent Type</strong> - Select from ReAct, Plan & Execute, Tool Calling, etc.</li>
+            <li><strong>Provider & Model</strong> - Dynamically loaded from your configured LLM providers (only active providers are shown)</li>
+            <li><strong>Action Buttons</strong> - Validate, Test, and Save your agent</li>
+        </ul>
+        
+        <div class="alert alert-success mt-3">
+            <i class="bi bi-check-circle me-2"></i>
+            <strong>Dynamic Loading:</strong> Provider and model dropdowns are populated from your backend configuration. When you select a provider, the model dropdown automatically updates to show only models available for that provider.
+        </div>
+    </section>
+
+    <!-- Getting Started Section -->
+    <section id="getting-started" class="mb-5">
+        <h2><i class="bi bi-rocket-takeoff me-2"></i>Getting Started</h2>
+        
+        <div class="alert alert-info">
+            <i class="bi bi-lightbulb me-2"></i>
+            <strong>Tip:</strong> Start with a simple workflow using Input → LLM → Output, then expand as needed.
+        </div>
+        
+        <h5>Step 1: Create Input and Output Nodes</h5>
+        <p>Every workflow needs at least one Input node (where data enters) and one Output node (where results exit).</p>
+        <ol>
+            <li>Drag an <span class="badge bg-success">Input</span> node from the I/O section onto the canvas</li>
+            <li>Drag an <span class="badge bg-danger">Output</span> node and place it to the right</li>
+        </ol>
+        
+        <h5>Step 2: Add Processing Nodes</h5>
+        <p>Add nodes between Input and Output to process data:</p>
+        <ol>
+            <li>Drag an <span class="badge bg-purple" style="background:#6f42c1!important;">LLM Call</span> node between them</li>
+            <li>Click on the LLM node to configure its prompt and model settings</li>
+        </ol>
+        
+        <h5>Step 3: Connect Nodes</h5>
+        <p>Create the execution flow by connecting nodes:</p>
+        <ol>
+            <li>Click and drag from the <strong>output connector</strong> (right side) of the Input node</li>
+            <li>Release on the <strong>input connector</strong> (left side) of the LLM node</li>
+            <li>Repeat to connect LLM to Output</li>
+        </ol>
+        
+        <h5>Step 4: Save and Test</h5>
+        <ol>
+            <li>Click the <span class="badge bg-success">Save</span> button to save your agent</li>
+            <li>Click the <span class="badge bg-warning text-dark">Test</span> button to run a quick test</li>
+        </ol>
+    </section>
+
+    <!-- Node Types Section -->
+    <section id="node-types" class="mb-5">
+        <h2><i class="bi bi-boxes me-2"></i>Node Types</h2>
+        
+        <h5 class="mt-4">I/O Nodes</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Node</th>
+                        <th>Description</th>
+                        <th>Configuration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="bi bi-box-arrow-in-right text-success me-2"></i><strong>Input</strong></td>
+                        <td>Entry point for workflow data. Receives input from API calls or user messages.</td>
+                        <td>Input schema, validation rules</td>
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-box-arrow-right text-danger me-2"></i><strong>Output</strong></td>
+                        <td>Exit point for workflow results. Returns final response.</td>
+                        <td>Output format, response mapping</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h5 class="mt-4">Processing Nodes</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Node</th>
+                        <th>Description</th>
+                        <th>Configuration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="bi bi-robot me-2" style="color:#6f42c1;"></i><strong>LLM Call</strong></td>
+                        <td>Invokes an LLM with a prompt. Core processing node for AI reasoning.</td>
+                        <td>Provider, model, temperature, prompts</td>
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-code-slash me-2" style="color:#3776ab;"></i><strong>Python Code</strong></td>
+                        <td>Execute custom Python code. Supports code fragments via URI.</td>
+                        <td>Code, URI (db://, file://, s3://)</td>
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-tools me-2" style="color:#fd7e14;"></i><strong>MCP Tool</strong></td>
+                        <td>Call external tools via Model Context Protocol.</td>
+                        <td>Tool selection, parameters</td>
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-globe me-2" style="color:#e83e8c;"></i><strong>HTTP Request</strong></td>
+                        <td>Make HTTP API calls to external services.</td>
+                        <td>URL, method, headers, body</td>
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-arrow-left-right me-2" style="color:#20c997;"></i><strong>Transform</strong></td>
+                        <td>Transform data between nodes using expressions.</td>
+                        <td>Transform expression</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h5 class="mt-4">Flow Control Nodes</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Node</th>
+                        <th>Description</th>
+                        <th>Configuration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="bi bi-diamond me-2" style="color:#17a2b8;"></i><strong>Condition</strong></td>
+                        <td>Branch workflow based on conditions. Enables if/else logic.</td>
+                        <td>Python expression for condition</td>
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-arrow-repeat me-2" style="color:#6c757d;"></i><strong>Loop</strong></td>
+                        <td>Repeat a section of the workflow until condition is met.</td>
+                        <td>Max iterations, loop condition</td>
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-arrows-expand me-2" style="color:#0d6efd;"></i><strong>Parallel</strong></td>
+                        <td>Execute multiple branches simultaneously.</td>
+                        <td>Number of branches</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h5 class="mt-4">HITL Nodes (Human-in-the-Loop)</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Node</th>
+                        <th>Description</th>
+                        <th>Configuration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="bi bi-person-raised-hand me-2" style="color:#ffc107;"></i><strong>Human Review</strong></td>
+                        <td>Pause workflow for human review before continuing.</td>
+                        <td>Task type, timeout, assignee</td>
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-check2-square me-2" style="color:#28a745;"></i><strong>Approval</strong></td>
+                        <td>Require explicit human approval to proceed.</td>
+                        <td>Approval levels, escalation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h5 class="mt-4">Data Nodes</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px;">Node</th>
+                        <th>Description</th>
+                        <th>Configuration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="bi bi-memory me-2" style="color:#6f42c1;"></i><strong>Memory</strong></td>
+                        <td>Store or retrieve data from agent memory.</td>
+                        <td>Memory key, operation (read/write)</td>
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-search me-2" style="color:#17a2b8;"></i><strong>RAG Retrieval</strong></td>
+                        <td>Search vector database for relevant context.</td>
+                        <td>Index name, top_k results</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Connections Section -->
+    <section id="connections" class="mb-5">
+        <h2><i class="bi bi-bezier2 me-2"></i>Connections</h2>
+        
+        <p>Connections define the flow of data between nodes. Each node has connection points:</p>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-light">
+                        <strong>Input Connector</strong> (Left Side)
+                    </div>
+                    <div class="card-body">
+                        <p>Receives data from the previous node in the workflow.</p>
+                        <ul class="mb-0">
+                            <li>Most nodes have exactly one input connector</li>
+                            <li>Input nodes have no input connector</li>
+                            <li>A node can receive connections from multiple sources</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-light">
+                        <strong>Output Connector</strong> (Right Side)
+                    </div>
+                    <div class="card-body">
+                        <p>Sends data to the next node in the workflow.</p>
+                        <ul class="mb-0">
+                            <li>Most nodes have exactly one output connector</li>
+                            <li>Output nodes have no output connector</li>
+                            <li>One output can connect to multiple targets</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h5 class="mt-4">Creating Connections</h5>
+        <ol>
+            <li>Hover over a node's <strong>output connector</strong> (it will highlight)</li>
+            <li>Click and drag from the output connector</li>
+            <li>A dashed green line will follow your cursor</li>
+            <li>Release on the target node's <strong>input connector</strong></li>
+        </ol>
+        
+        <h5 class="mt-4">Deleting Connections</h5>
+        <p>Click on any connection line and confirm the deletion in the popup dialog.</p>
+    </section>
+
+    <!-- Properties Panel Section -->
+    <section id="properties" class="mb-5">
+        <h2><i class="bi bi-sliders me-2"></i>Properties Panel</h2>
+        
+        <p>When you select a node, the Properties Panel on the right shows its configuration:</p>
+        
+        <ul>
+            <li><strong>Node ID</strong> - Unique identifier (read-only)</li>
+            <li><strong>Name</strong> - Editable display name</li>
+            <li><strong>Type</strong> - The node type with its icon</li>
+            <li><strong>Type-Specific Settings</strong> - Configuration options that vary by node type</li>
+            <li><strong>Edit Button</strong> - Opens the full node editor modal</li>
+            <li><strong>Delete Button</strong> - Removes the node from the canvas</li>
+        </ul>
+        
+        <div class="alert alert-light">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Pro Tip:</strong> Double-click any node to open the full editor modal for more detailed configuration.
+        </div>
+    </section>
+
+    <!-- MCP Tools Section -->
+    <section id="mcp-tools" class="mb-5">
+        <h2><i class="bi bi-server me-2"></i>MCP Tools Integration</h2>
+        
+        <p>The designer provides two ways to add MCP (Model Context Protocol) tools to your workflow:</p>
+        
+        <h5>Method 1: Browse Tools Modal</h5>
+        <ol>
+            <li>Click <strong>"Browse Tools"</strong> in the MCP Tools section of the Node Palette</li>
+            <li>Search or filter tools by server</li>
+            <li>Click <strong>"Add"</strong> on any tool to add it to your canvas</li>
+            <li>The node will be pre-configured with the tool's settings</li>
+        </ol>
+        
+        <h5>Method 2: Drag MCP Tool Node</h5>
+        <ol>
+            <li>Drag the <strong>"MCP Tool"</strong> node from the Processing section</li>
+            <li>Select the node and use the Properties Panel to choose a tool</li>
+            <li>The tool dropdown shows all available tools grouped by server</li>
+        </ol>
+        
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Note:</strong> MCP Tool Servers must be configured in the Admin section before tools appear in the designer.
+        </div>
+    </section>
+
+    <!-- Workflow Patterns Section -->
+    <section id="workflow-patterns" class="mb-5">
+        <h2><i class="bi bi-diagram-2 me-2"></i>Common Workflow Patterns</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <strong>Simple Q&A Agent</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Basic conversational agent:</p>
+                        <code>Input → LLM → Output</code>
+                        <hr>
+                        <small class="text-muted">Configure the LLM node with a system prompt defining the agent's personality and capabilities.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <strong>RAG-Enhanced Agent</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Agent with knowledge retrieval:</p>
+                        <code>Input → RAG Retrieval → LLM → Output</code>
+                        <hr>
+                        <small class="text-muted">The RAG node adds context from your knowledge base before the LLM processes the query.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <strong>Tool-Augmented Agent</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Agent that uses external tools:</p>
+                        <code>Input → LLM (analyze) → MCP Tool → LLM (format) → Output</code>
+                        <hr>
+                        <small class="text-muted">First LLM decides which tool to use, then formats the result.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-dark">
+                        <strong>Human-in-the-Loop Agent</strong>
+                    </div>
+                    <div class="card-body">
+                        <p>Agent requiring human approval:</p>
+                        <code>Input → LLM → Human Review → Condition → Output</code>
+                        <hr>
+                        <small class="text-muted">Workflow pauses for human review before final output.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testing Section -->
+    <section id="testing" class="mb-5">
+        <h2><i class="bi bi-play-circle me-2"></i>Testing & Validation</h2>
+        
+        <h5>Workflow Validation</h5>
+        <p>Click the <strong>Validate</strong> button (checkmark icon) to check your workflow for:</p>
+        <ul>
+            <li>At least one Input and Output node</li>
+            <li>All nodes are connected (no orphans)</li>
+            <li>No circular dependencies</li>
+            <li>Required node configurations are complete</li>
+        </ul>
+        
+        <h5>Testing Your Agent</h5>
+        <ol>
+            <li>Click the <strong>Test</strong> button (play icon)</li>
+            <li>Enter test input in JSON format: <code>{"message": "Hello"}</code></li>
+            <li>Click <strong>Run</strong> to execute the workflow</li>
+            <li>View the results in the output panel</li>
+        </ol>
+        
+        <h5>Viewing JSON</h5>
+        <p>Click the <strong>View JSON</strong> button to see the generated workflow configuration:</p>
+        <ul>
+            <li><strong>Full Agent</strong> - Complete agent configuration with metadata</li>
+            <li><strong>Workflow Only</strong> - Just nodes, edges, entry/exit points</li>
+            <li><strong>Nodes</strong> - Array of all node configurations</li>
+            <li><strong>Edges</strong> - Array of all connections</li>
+        </ul>
+    </section>
+
+    <!-- Keyboard Shortcuts Section -->
+    <section id="keyboard-shortcuts" class="mb-5">
+        <h2><i class="bi bi-keyboard me-2"></i>Keyboard Shortcuts</h2>
+        
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:200px;">Shortcut</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><kbd>Delete</kbd> / <kbd>Backspace</kbd></td>
+                        <td>Delete selected node</td>
+                    </tr>
+                    <tr>
+                        <td><kbd>Escape</kbd></td>
+                        <td>Cancel current connection / Deselect all</td>
+                    </tr>
+                    <tr>
+                        <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
+                        <td>Save agent (when implemented)</td>
+                    </tr>
+                    <tr>
+                        <td>Double-click node</td>
+                        <td>Open node editor</td>
+                    </tr>
+                    <tr>
+                        <td>Scroll wheel</td>
+                        <td>Pan canvas</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Export Import Section -->
+    <section id="export-import" class="mb-5">
+        <h2><i class="bi bi-arrow-left-right me-2"></i>Export & Import</h2>
+        
+        <h5>Exporting Workflows</h5>
+        <p>Click the <strong>Export</strong> button (download icon) to download the workflow as a JSON file. This includes:</p>
+        <ul>
+            <li>All node configurations</li>
+            <li>Connection (edge) definitions</li>
+            <li>Entry and exit node references</li>
+        </ul>
+        
+        <h5>Importing Workflows</h5>
+        <p>Click the <strong>Import</strong> button (upload icon) to load a previously exported workflow JSON file.</p>
+        
+        <div class="alert alert-info">
+            <i class="bi bi-lightbulb me-2"></i>
+            <strong>Use Case:</strong> Export workflows to share with team members or to create backup copies before making changes.
+        </div>
+    </section>
+
+    <!-- Best Practices Section -->
+    <section id="best-practices" class="mb-5">
+        <h2><i class="bi bi-award me-2"></i>Best Practices</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 border-success">
+                    <div class="card-header bg-success text-white">
+                        <i class="bi bi-check-circle me-2"></i>Do
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>Give nodes descriptive names</li>
+                            <li>Use Transform nodes to clean data between steps</li>
+                            <li>Add Human Review for critical decisions</li>
+                            <li>Test workflows incrementally</li>
+                            <li>Use the minimap for large workflows</li>
+                            <li>Save frequently during design</li>
+                            <li>Validate before deploying</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <i class="bi bi-x-circle me-2"></i>Avoid
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>Creating circular connections</li>
+                            <li>Leaving nodes disconnected</li>
+                            <li>Overcomplicating simple workflows</li>
+                            <li>Missing error handling for HTTP calls</li>
+                            <li>Using infinite loops without exit conditions</li>
+                            <li>Hardcoding sensitive data in prompts</li>
+                            <li>Skipping validation before deployment</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Topics -->
+    <section class="mb-4">
+        <h2><i class="bi bi-link-45deg me-2"></i>Related Topics</h2>
+        <div class="list-group">
+            <a href="{{ url_for('help_page', page='workflow_dags') }}" class="list-group-item list-group-item-action">
+                <i class="bi bi-diagram-3 me-2"></i>Workflow DAGs - Understanding Directed Acyclic Graphs
+            </a>
+            <a href="{{ url_for('help_page', page='mcp_plugins') }}" class="list-group-item list-group-item-action">
+                <i class="bi bi-plug me-2"></i>MCP Plugins - Integrating External Tools
+            </a>
+            <a href="{{ url_for('help_page', page='hitl') }}" class="list-group-item list-group-item-action">
+                <i class="bi bi-person-check me-2"></i>Human-in-the-Loop - Adding Human Oversight
+            </a>
+            <a href="{{ url_for('help_page', page='code_fragments') }}" class="list-group-item list-group-item-action">
+                <i class="bi bi-code-square me-2"></i>Code Fragments - Reusable Python Code
+            </a>
+        </div>
+    </section>
+</div>
+{% endblock %}

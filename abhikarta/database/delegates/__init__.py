@@ -9,7 +9,7 @@ Legal Notice:
 This software and associated documentation are proprietary and confidential.
 Unauthorized copying, distribution, modification, or use is strictly prohibited.
 
-Version: 1.2.3
+Version: 1.2.5
 
 This package provides specialized delegates for different database domains:
 - UserDelegate: Users, Roles, UserRoles, Sessions, API Keys
@@ -45,4 +45,4 @@ __all__ = [
     'CodeFragmentDelegate',
 ]
 
-__version__ = '1.2.3'
+__version__ = '1.2.5'

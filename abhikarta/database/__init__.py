@@ -9,7 +9,7 @@ Legal Notice:
 This software and associated documentation are proprietary and confidential.
 Unauthorized copying, distribution, modification, or use is strictly prohibited.
 
-Version: 1.2.3
+Version: 1.2.5
 
 The database module provides:
 - DatabaseFacade: Unified interface for database operations
@@ -62,4 +62,4 @@ __all__ = [
     'CodeFragmentDelegate',
 ]
 
-__version__ = '1.2.3'
+__version__ = '1.2.5'
