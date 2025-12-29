@@ -607,50 +607,45 @@ result = engine.execute(workflow_id, input_data={"input": "Design a sustainable 
 
 ### 7.2 CoT Decision Node
 
-```yaml
-# workflow_with_cot.yaml
-name: Customer Support with CoT
-description: Uses CoT reasoning for complex support decisions
-
-nodes:
-  - node_id: analyze_ticket
-    node_type: llm
-    config:
-      system_prompt: |
-        Analyze this support ticket using step-by-step reasoning:
-        
-        1. CATEGORIZE: What type of issue is this?
-        2. URGENCY: How urgent is this (Low/Medium/High/Critical)?
-        3. COMPLEXITY: Simple fix or requires escalation?
-        4. SENTIMENT: How frustrated is the customer?
-        5. ACTION: What's the best next step?
-        
-        Think through each step carefully.
-      model: gpt-4
-      temperature: 0.3
+```json
+{
+  "name": "Customer Support with CoT",
+  "description": "Uses CoT reasoning for complex support decisions",
   
-  - node_id: route_ticket
-    node_type: condition
-    config:
-      conditions:
-        - expression: "'Critical' in analyze_ticket.output"
-          target: escalate_immediately
-        - expression: "'escalation' in analyze_ticket.output.lower()"
-          target: assign_specialist
-        - default: auto_respond
-    depends_on: [analyze_ticket]
-  
-  - node_id: auto_respond
-    node_type: llm
-    config:
-      system_prompt: |
-        Generate a helpful response based on this analysis:
-        {{analyze_ticket.output}}
-        
-        Be empathetic and solution-focused.
-      model: gpt-3.5-turbo
-      temperature: 0.5
-    depends_on: [route_ticket]
+  "nodes": [
+    {
+      "node_id": "analyze_ticket",
+      "node_type": "llm",
+      "config": {
+        "system_prompt": "Analyze this support ticket using step-by-step reasoning:\n\n1. CATEGORIZE: What type of issue is this?\n2. URGENCY: How urgent is this (Low/Medium/High/Critical)?\n3. COMPLEXITY: Simple fix or requires escalation?\n4. SENTIMENT: How frustrated is the customer?\n5. ACTION: What's the best next step?\n\nThink through each step carefully.",
+        "model": "gpt-4",
+        "temperature": 0.3
+      }
+    },
+    {
+      "node_id": "route_ticket",
+      "node_type": "condition",
+      "config": {
+        "conditions": [
+          {"expression": "'Critical' in analyze_ticket.output", "target": "escalate_immediately"},
+          {"expression": "'escalation' in analyze_ticket.output.lower()", "target": "assign_specialist"},
+          {"default": "auto_respond"}
+        ]
+      },
+      "depends_on": ["analyze_ticket"]
+    },
+    {
+      "node_id": "auto_respond",
+      "node_type": "llm",
+      "config": {
+        "system_prompt": "Generate a helpful response based on this analysis:\n{{analyze_ticket.output}}\n\nBe empathetic and solution-focused.",
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.5
+      },
+      "depends_on": ["route_ticket"]
+    }
+  ]
+}
 ```
 
 ---

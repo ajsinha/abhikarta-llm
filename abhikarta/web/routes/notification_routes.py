@@ -73,7 +73,7 @@ class NotificationRoutes(AbstractRoutes):
             except Exception as e:
                 logger.error(f"Error listing notification channels: {e}")
                 flash(f"Error: {e}", "danger")
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('user_dashboard'))
         
         @self.app.route('/admin/notifications/channels/new', methods=['GET', 'POST'])
         @login_required
@@ -279,7 +279,7 @@ class NotificationRoutes(AbstractRoutes):
             except Exception as e:
                 logger.error(f"Error listing webhook endpoints: {e}")
                 flash(f"Error: {e}", "danger")
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('user_dashboard'))
         
         @self.app.route('/admin/webhooks/new', methods=['GET', 'POST'])
         @login_required
@@ -381,6 +381,127 @@ class NotificationRoutes(AbstractRoutes):
                 )
             except Exception as e:
                 logger.error(f"Error viewing webhook endpoint: {e}")
+                flash(f"Error: {e}", "danger")
+                return redirect(url_for('webhook_endpoints'))
+        
+        @self.app.route('/admin/webhooks/<endpoint_id>/edit', methods=['GET', 'POST'])
+        @login_required
+        @admin_required
+        def webhook_edit(endpoint_id):
+            """Edit a webhook endpoint."""
+            try:
+                endpoint = self.db_facade.fetch_one(
+                    "SELECT * FROM webhook_endpoints WHERE endpoint_id = ?",
+                    (endpoint_id,)
+                )
+                
+                if not endpoint:
+                    flash("Webhook endpoint not found", "warning")
+                    return redirect(url_for('webhook_endpoints'))
+                
+                if request.method == 'POST':
+                    name = request.form.get('name')
+                    description = request.form.get('description', '')
+                    auth_method = request.form.get('auth_method', 'hmac')
+                    target_type = request.form.get('target_type') or None
+                    target_id = request.form.get('target_id') or None
+                    rate_limit = int(request.form.get('rate_limit', 100))
+                    is_active = 1 if request.form.get('is_active') else 0
+                    
+                    # Update secret if provided
+                    secret = request.form.get('secret')
+                    if secret:
+                        import hashlib
+                        secret_hash = hashlib.sha256(secret.encode()).hexdigest()
+                        self.db_facade.execute(
+                            """UPDATE webhook_endpoints 
+                               SET name = ?, description = ?, auth_method = ?, 
+                                   secret_hash = ?, target_type = ?, target_id = ?, 
+                                   rate_limit = ?, is_active = ?
+                               WHERE endpoint_id = ?""",
+                            (name, description, auth_method, secret_hash, 
+                             target_type, target_id, rate_limit, is_active, endpoint_id)
+                        )
+                    else:
+                        self.db_facade.execute(
+                            """UPDATE webhook_endpoints 
+                               SET name = ?, description = ?, auth_method = ?, 
+                                   target_type = ?, target_id = ?, rate_limit = ?, is_active = ?
+                               WHERE endpoint_id = ?""",
+                            (name, description, auth_method, target_type, 
+                             target_id, rate_limit, is_active, endpoint_id)
+                        )
+                    
+                    flash(f"Webhook endpoint '{name}' updated!", "success")
+                    return redirect(url_for('webhook_endpoints'))
+                
+                # Get available agents, workflows, swarms for target selection
+                agents = self.db_facade.fetch_all(
+                    "SELECT agent_id, name FROM agents WHERE status = 'active'"
+                ) or []
+                workflows = self.db_facade.fetch_all(
+                    "SELECT workflow_id, name FROM workflows WHERE status = 'active'"
+                ) or []
+                swarms = self.db_facade.fetch_all(
+                    "SELECT swarm_id, name FROM swarms WHERE status != 'deleted'"
+                ) or []
+                
+                return render_template(
+                    'notifications/webhook_edit.html',
+                    endpoint=endpoint,
+                    agents=agents,
+                    workflows=workflows,
+                    swarms=swarms,
+                    fullname=session.get('fullname'),
+                    userid=session.get('user_id'),
+                    roles=session.get('roles', []),
+                    is_admin=session.get('is_admin', False)
+                )
+            except Exception as e:
+                logger.error(f"Error editing webhook endpoint: {e}")
+                flash(f"Error: {e}", "danger")
+                return redirect(url_for('webhook_endpoints'))
+        
+        @self.app.route('/admin/webhooks/events')
+        @self.app.route('/admin/webhooks/<endpoint_id>/events')
+        @login_required
+        @admin_required
+        def webhook_events(endpoint_id=None):
+            """View webhook events."""
+            try:
+                endpoint = None
+                if endpoint_id:
+                    endpoint = self.db_facade.fetch_one(
+                        "SELECT * FROM webhook_endpoints WHERE endpoint_id = ?",
+                        (endpoint_id,)
+                    )
+                    events = self.db_facade.fetch_all(
+                        """SELECT we.*, wep.name as endpoint_name, wep.path 
+                           FROM webhook_events we
+                           JOIN webhook_endpoints wep ON we.endpoint_id = wep.endpoint_id
+                           WHERE we.endpoint_id = ?
+                           ORDER BY we.received_at DESC LIMIT 100""",
+                        (endpoint_id,)
+                    ) or []
+                else:
+                    events = self.db_facade.fetch_all(
+                        """SELECT we.*, wep.name as endpoint_name, wep.path 
+                           FROM webhook_events we
+                           JOIN webhook_endpoints wep ON we.endpoint_id = wep.endpoint_id
+                           ORDER BY we.received_at DESC LIMIT 100"""
+                    ) or []
+                
+                return render_template(
+                    'notifications/webhook_events.html',
+                    endpoint=endpoint,
+                    events=events,
+                    fullname=session.get('fullname'),
+                    userid=session.get('user_id'),
+                    roles=session.get('roles', []),
+                    is_admin=session.get('is_admin', False)
+                )
+            except Exception as e:
+                logger.error(f"Error listing webhook events: {e}")
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('webhook_endpoints'))
         
@@ -615,7 +736,7 @@ class NotificationRoutes(AbstractRoutes):
             except Exception as e:
                 logger.error(f"Error loading notification settings: {e}")
                 flash(f"Error: {e}", "danger")
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('user_dashboard'))
         
         @self.app.route('/user/notifications', methods=['POST'])
         @login_required

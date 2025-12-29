@@ -197,17 +197,24 @@ await notification_manager.send(
 
     <div class="card bg-light mb-4">
         <div class="card-body">
-            <pre class="mb-0"><code class="language-yaml">nodes:
-  - node_id: notify_complete
-    node_type: notification
-    config:
-      channels: ["slack", "teams"]
-      level: success
-      title: "ETL Pipeline Complete"
-      body: "Processed {{ context.record_count }} records"
-      metadata:
-        pipeline: "{{ workflow_id }}"
-        duration: "{{ execution_time }}"</code></pre>
+            <pre class="mb-0"><code class="language-json">{% raw %}{
+  "nodes": [
+    {
+      "node_id": "notify_complete",
+      "node_type": "notification",
+      "config": {
+        "channels": ["slack", "teams"],
+        "level": "success",
+        "title": "ETL Pipeline Complete",
+        "body": "Processed {{ context.record_count }} records",
+        "metadata": {
+          "pipeline": "{{ workflow_id }}",
+          "duration": "{{ execution_time }}"
+        }
+      }
+    }
+  ]
+}{% endraw %}</code></pre>
         </div>
     </div>
 

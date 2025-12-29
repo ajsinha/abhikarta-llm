@@ -180,40 +180,44 @@ export TEAMS_WEBHOOK_URL="https://outlook.office.com/webhook/..."
 export WEBHOOK_SECRET_KEY="your-secret-key"
 ```
 
-### 3.2 YAML Configuration
+### 3.2 JSON Configuration
 
-```yaml
-# config/notifications.yaml
-notifications:
-  enabled: true
-  default_channels:
-    - slack
-  
-  channels:
-    slack:
-      enabled: true
-      bot_token: ${SLACK_BOT_TOKEN}
-      default_channel: "#abhikarta-alerts"
-      rate_limit: 50  # per minute
-      
-    teams:
-      enabled: true
-      webhook_url: ${TEAMS_WEBHOOK_URL}
-      rate_limit: 30  # per minute
-      
-  webhooks:
-    enabled: true
-    default_auth: hmac
-    rate_limit: 100  # per minute
+```json
+{
+  "notifications": {
+    "enabled": true,
+    "default_channels": ["slack"],
+    
+    "channels": {
+      "slack": {
+        "enabled": true,
+        "bot_token": "${SLACK_BOT_TOKEN}",
+        "default_channel": "#abhikarta-alerts",
+        "rate_limit": 50
+      },
+      "teams": {
+        "enabled": true,
+        "webhook_url": "${TEAMS_WEBHOOK_URL}",
+        "rate_limit": 30
+      }
+    },
+    
+    "webhooks": {
+      "enabled": true,
+      "default_auth": "hmac",
+      "rate_limit": 100
+    }
+  }
+}
 ```
 
 ### 3.3 Load from Configuration
 
 ```python
-import yaml
+import json
 
-with open('config/notifications.yaml') as f:
-    config = yaml.safe_load(f)
+with open('config/notifications.json') as f:
+    config = json.load(f)
 
 manager.configure_from_dict(config['notifications']['channels'])
 ```
@@ -247,19 +251,25 @@ class MyAgent:
 
 ### 4.2 Workflow Notification Node
 
-```yaml
-# In workflow DAG definition
-nodes:
-  - node_id: notify_on_complete
-    node_type: notification
-    config:
-      channels: ["slack"]
-      level: success
-      title: "ETL Complete"
-      body: "Processed {{ context.record_count }} records"
-      fields:
-        duration: "{{ context.duration }}"
-        status: "{{ context.status }}"
+```json
+{
+  "nodes": [
+    {
+      "node_id": "notify_on_complete",
+      "node_type": "notification",
+      "config": {
+        "channels": ["slack"],
+        "level": "success",
+        "title": "ETL Complete",
+        "body": "Processed {{ context.record_count }} records",
+        "fields": {
+          "duration": "{{ context.duration }}",
+          "status": "{{ context.status }}"
+        }
+      }
+    }
+  ]
+}
 ```
 
 ### 4.3 Swarm Broadcast

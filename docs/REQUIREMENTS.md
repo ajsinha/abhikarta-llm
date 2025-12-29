@@ -582,18 +582,22 @@ The MCP Plugin Framework abstracts MCP servers behind a facade, allowing any MCP
 
 ### 13.2 Database Configuration
 
-```yaml
-# config.yaml
-database:
-  type: "sqlite"  # or "postgresql"
-  sqlite:
-    path: "./data/abhikarta.db"
-  postgresql:
-    host: "localhost"
-    port: 5432
-    database: "abhikarta"
-    user: "abhikarta_user"
-    password: "secure_password"
+```json
+{
+  "database": {
+    "type": "sqlite",
+    "sqlite": {
+      "path": "./data/abhikarta.db"
+    },
+    "postgresql": {
+      "host": "localhost",
+      "port": 5432,
+      "database": "abhikarta",
+      "user": "abhikarta_user",
+      "password": "secure_password"
+    }
+  }
+}
 ```
 
 ---

@@ -357,29 +357,27 @@ REFLECT_SYSTEM_PROMPT = """You are a Reflect agent that improves outputs through
 ### Step 1: GENERATE
 Create your initial response to the task.
 Format:
-```
-## Draft v{n}
-[Your content]
-```
+
+    ## Draft v{n}
+    [Your content]
 
 ### Step 2: CRITIQUE
 Analyze your draft critically.
 Format:
-```
-## Critique of v{n}
 
-### Strengths
-- [What works well]
-
-### Weaknesses
-- [What needs improvement]
-
-### Specific Issues
-1. [Issue]: [Location] - [How to fix]
-2. [Issue]: [Location] - [How to fix]
-
-### Quality Score: X/10
-```
+    ## Critique of v{n}
+    
+    ### Strengths
+    - [What works well]
+    
+    ### Weaknesses
+    - [What needs improvement]
+    
+    ### Specific Issues
+    1. [Issue]: [Location] - [How to fix]
+    2. [Issue]: [Location] - [How to fix]
+    
+    ### Quality Score: X/10
 
 ### Step 3: REVISE
 If score < 8, create improved version addressing all issues.
@@ -439,9 +437,7 @@ CODE_REFLECT_PROMPT = """You are a code review Reflect agent.
 ## Format
 
 ### Draft v{n}
-```python
-[code]
-```
+    [code block here]
 
 ### Code Critique
 | Dimension | Score | Issues |
@@ -548,20 +544,19 @@ Your job is to gather information on assigned topics.
 
 ## Output Format
 Always structure your research as:
-```
-## Research: [Topic]
 
-### Key Findings
-1. [Finding with source]
-2. [Finding with source]
-
-### Data Points
-- [Metric]: [Value] (Source: [link])
-
-### Sources
-- [Source 1]
-- [Source 2]
-```
+    ## Research: [Topic]
+    
+    ### Key Findings
+    1. [Finding with source]
+    2. [Finding with source]
+    
+    ### Data Points
+    - [Metric]: [Value] (Source: [link])
+    
+    ### Sources
+    - [Source 1]
+    - [Source 2]
 """,
     tools=["builtin:web_search", "builtin:web_fetch"],
     llm_config={"provider": "openai", "model": "gpt-4", "temperature": 0.3},
@@ -581,18 +576,17 @@ Your job is to analyze data and identify patterns.
 - Comparative analysis
 
 ## Output Format
-```
-## Analysis: [Topic]
 
-### Key Insights
-1. [Insight with supporting data]
-
-### Trends
-- [Trend description]
-
-### Recommendations
-- [Actionable recommendation]
-```
+    ## Analysis: [Topic]
+    
+    ### Key Insights
+    1. [Insight with supporting data]
+    
+    ### Trends
+    - [Trend description]
+    
+    ### Recommendations
+    - [Actionable recommendation]
 """,
     tools=["builtin:calculator", "builtin:data_transform"],
     llm_config={"provider": "openai", "model": "gpt-4", "temperature": 0.3},
@@ -641,30 +635,28 @@ MANAGER_SYSTEM_PROMPT = """You are a Manager Agent coordinating a team of specia
 5. Aggregate results into final deliverable
 
 ## Delegation Format
-```
-DELEGATE TO: [Worker Name]
-TASK: [Specific task description]
-CONTEXT: [Any relevant context from previous workers]
-EXPECTED OUTPUT: [What you need from them]
-```
+
+    DELEGATE TO: [Worker Name]
+    TASK: [Specific task description]
+    CONTEXT: [Any relevant context from previous workers]
+    EXPECTED OUTPUT: [What you need from them]
 
 ## Aggregation Format
 After all workers complete:
-```
-AGGREGATING RESULTS
 
-From Researcher:
-[Summary of key findings]
-
-From Analyst:
-[Summary of key insights]
-
-From Writer:
-[Summary of draft]
-
-FINAL SYNTHESIS:
-[Your integrated final output]
-```
+    AGGREGATING RESULTS
+    
+    From Researcher:
+    [Summary of key findings]
+    
+    From Analyst:
+    [Summary of key insights]
+    
+    From Writer:
+    [Summary of draft]
+    
+    FINAL SYNTHESIS:
+    [Your integrated final output]
 
 ## Rules
 1. Never do worker tasks yourself - always delegate
@@ -786,12 +778,11 @@ Once you have all information, enter Reflect mode:
 
 ## Mode Switching
 After Final Answer in ReAct, switch to Reflect:
-```
-[ENTERING REFLECT MODE]
-Draft v1: [your initial response]
-Critique: [self-evaluation]
-...
-```
+
+    [ENTERING REFLECT MODE]
+    Draft v1: [your initial response]
+    Critique: [self-evaluation]
+    ...
 """
 ```
 
@@ -827,15 +818,14 @@ hierarchical_react_system = {
 FULL_STACK_PROMPT = """You are an advanced agent combining all patterns.
 
 ## Architecture
-```
-[Manager - Hierarchical]
-    ├── [Researcher - ReAct]
-    │       └── Uses tools to gather info
-    ├── [Analyst - ReAct]  
-    │       └── Uses tools to analyze
-    └── [Writer - Reflect]
-            └── Iterates on quality
-```
+
+    [Manager - Hierarchical]
+        ├── [Researcher - ReAct]
+        │       └── Uses tools to gather info
+        ├── [Analyst - ReAct]  
+        │       └── Uses tools to analyze
+        └── [Writer - Reflect]
+                └── Iterates on quality
 
 ## Execution Flow
 1. Manager decomposes task (Hierarchical)
@@ -852,118 +842,106 @@ FULL_STACK_PROMPT = """You are an advanced agent combining all patterns.
 
 ### 7.1 ReAct Workflow Node
 
-```yaml
-# react_workflow.yaml
-name: ReAct Research Workflow
-nodes:
-  - node_id: react_research
-    node_type: agent
-    config:
-      agent_type: react
-      tools: [web_search, web_fetch, calculator]
-      max_iterations: 10
-      system_prompt: |
-        Use ReAct pattern to research: {{input.topic}}
-        
-        Thought: [reasoning]
-        Action: [tool(params)]
-        [Observation]
-        ...
-        Action: Final Answer: [comprehensive research]
+```json
+{
+  "name": "ReAct Research Workflow",
+  "nodes": [
+    {
+      "node_id": "react_research",
+      "node_type": "agent",
+      "config": {
+        "agent_type": "react",
+        "tools": ["web_search", "web_fetch", "calculator"],
+        "max_iterations": 10,
+        "system_prompt": "Use ReAct pattern to research: {{input.topic}}\n\nThought: [reasoning]\nAction: [tool(params)]\n[Observation]\n...\nAction: Final Answer: [comprehensive research]"
+      }
+    }
+  ]
+}
 ```
 
 ### 7.2 Reflect Workflow Node
 
-```yaml
-# reflect_workflow.yaml
-name: Reflect Quality Workflow
-nodes:
-  - node_id: initial_draft
-    node_type: llm
-    config:
-      prompt: "Write a first draft about {{input.topic}}"
-      model: gpt-4
-      temperature: 0.7
-  
-  - node_id: critique
-    node_type: llm
-    config:
-      prompt: |
-        Critique this draft:
-        {{initial_draft.output}}
-        
-        Rate each dimension 1-10:
-        - Accuracy
-        - Clarity
-        - Completeness
-        
-        Overall score and specific improvements needed.
-      model: gpt-4
-      temperature: 0.3
-    depends_on: [initial_draft]
-  
-  - node_id: revise
-    node_type: llm
-    config:
-      prompt: |
-        Revise this draft based on critique:
-        
-        DRAFT: {{initial_draft.output}}
-        CRITIQUE: {{critique.output}}
-        
-        Address all issues identified.
-      model: gpt-4
-      temperature: 0.5
-    depends_on: [critique]
+```json
+{
+  "name": "Reflect Quality Workflow",
+  "nodes": [
+    {
+      "node_id": "initial_draft",
+      "node_type": "llm",
+      "config": {
+        "prompt": "Write a first draft about {{input.topic}}",
+        "model": "gpt-4",
+        "temperature": 0.7
+      }
+    },
+    {
+      "node_id": "critique",
+      "node_type": "llm",
+      "config": {
+        "prompt": "Critique this draft:\n{{initial_draft.output}}\n\nRate each dimension 1-10:\n- Accuracy\n- Clarity\n- Completeness\n\nOverall score and specific improvements needed.",
+        "model": "gpt-4",
+        "temperature": 0.3
+      },
+      "depends_on": ["initial_draft"]
+    },
+    {
+      "node_id": "revise",
+      "node_type": "llm",
+      "config": {
+        "prompt": "Revise this draft based on critique:\n\nDRAFT: {{initial_draft.output}}\nCRITIQUE: {{critique.output}}\n\nAddress all issues identified.",
+        "model": "gpt-4",
+        "temperature": 0.5
+      },
+      "depends_on": ["critique"]
+    }
+  ]
+}
 ```
 
 ### 7.3 Hierarchical Workflow
 
-```yaml
-# hierarchical_workflow.yaml
-name: Hierarchical Analysis Workflow
-nodes:
-  - node_id: decompose
-    node_type: llm
-    config:
-      prompt: |
-        Decompose this task into subtasks for specialists:
-        {{input.task}}
-        
-        Available workers: Researcher, Analyst, Writer
-        
-        Output JSON:
-        {"subtasks": [
-          {"worker": "...", "task": "...", "priority": 1-3}
-        ]}
-      output_format: json
-  
-  - node_id: research_task
-    node_type: agent
-    config:
-      agent_id: "{{researcher_agent_id}}"
-      input: "{{decompose.output.subtasks[0].task}}"
-    depends_on: [decompose]
-    condition: "'Researcher' in decompose.output.subtasks[0].worker"
-  
-  - node_id: analysis_task
-    node_type: agent
-    config:
-      agent_id: "{{analyst_agent_id}}"
-      input: |
-        Analyze this data:
-        {{research_task.output}}
-    depends_on: [research_task]
-  
-  - node_id: aggregate
-    node_type: llm
-    config:
-      prompt: |
-        Aggregate these results into final output:
-        
-        Research: {{research_task.output}}
-        Analysis: {{analysis_task.output}}
-    depends_on: [analysis_task]
+```json
+{
+  "name": "Hierarchical Analysis Workflow",
+  "nodes": [
+    {
+      "node_id": "decompose",
+      "node_type": "llm",
+      "config": {
+        "prompt": "Decompose this task into subtasks for specialists:\n{{input.task}}\n\nAvailable workers: Researcher, Analyst, Writer\n\nOutput JSON:\n{\"subtasks\": [{\"worker\": \"...\", \"task\": \"...\", \"priority\": 1}]}",
+        "output_format": "json"
+      }
+    },
+    {
+      "node_id": "research_task",
+      "node_type": "agent",
+      "config": {
+        "agent_id": "{{researcher_agent_id}}",
+        "input": "{{decompose.output.subtasks[0].task}}"
+      },
+      "depends_on": ["decompose"],
+      "condition": "'Researcher' in decompose.output.subtasks[0].worker"
+    },
+    {
+      "node_id": "analysis_task",
+      "node_type": "agent",
+      "config": {
+        "agent_id": "{{analyst_agent_id}}",
+        "input": "Analyze this data:\n{{research_task.output}}"
+      },
+      "depends_on": ["research_task"]
+    },
+    {
+      "node_id": "aggregate",
+      "node_type": "llm",
+      "config": {
+        "prompt": "Aggregate these results into final output:\n\nResearch: {{research_task.output}}\nAnalysis: {{analysis_task.output}}"
+      },
+      "depends_on": ["analysis_task"]
+    }
+  ]
+}
 ```
 
 ---

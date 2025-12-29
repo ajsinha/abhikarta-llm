@@ -14,7 +14,7 @@
             <a href="{{ url_for('webhook_events') }}" class="btn btn-outline-secondary me-2">
                 <i class="bi bi-clock-history me-1"></i>View Events
             </a>
-            <a href="{{ url_for('webhook_endpoint_create') }}" class="btn btn-info">
+            <a href="{{ url_for('webhook_create') }}" class="btn btn-info">
                 <i class="bi bi-plus-lg me-1"></i>Add Endpoint
             </a>
         </div>
@@ -142,10 +142,10 @@
                                 <a href="{{ url_for('webhook_events', endpoint_id=endpoint.endpoint_id) }}" class="btn btn-sm btn-outline-info" title="View Events">
                                     <i class="bi bi-list"></i>
                                 </a>
-                                <a href="{{ url_for('webhook_endpoint_edit', endpoint_id=endpoint.endpoint_id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                <a href="{{ url_for('webhook_edit', endpoint_id=endpoint.endpoint_id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form method="POST" action="{{ url_for('webhook_endpoint_delete', endpoint_id=endpoint.endpoint_id) }}" class="d-inline" onsubmit="return confirm('Delete this endpoint?')">
+                                <form method="POST" action="{{ url_for('webhook_delete', endpoint_id=endpoint.endpoint_id) }}" class="d-inline" onsubmit="return confirm('Delete this endpoint?')">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -161,7 +161,7 @@
                 <i class="bi bi-link-slash display-1 text-muted"></i>
                 <h5 class="mt-3">No Webhook Endpoints</h5>
                 <p class="text-muted">Create an endpoint to receive external webhooks.</p>
-                <a href="{{ url_for('webhook_endpoint_create') }}" class="btn btn-info">
+                <a href="{{ url_for('webhook_create') }}" class="btn btn-info">
                     <i class="bi bi-plus-lg me-1"></i>Add Endpoint
                 </a>
             </div>

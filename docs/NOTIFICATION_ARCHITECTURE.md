@@ -393,18 +393,21 @@ class AgentNotificationMixin:
 
 Workflow nodes can include notification steps:
 
-```yaml
-# Notification node in workflow DAG
-- node_id: notify_success
-  node_type: notification
-  config:
-    channels: ["slack", "teams"]
-    level: success
-    title: "Workflow Complete"
-    body: "Data processing completed successfully"
-    fields:
-      records_processed: "{{ context.record_count }}"
-      duration: "{{ context.duration }}"
+```json
+{
+  "node_id": "notify_success",
+  "node_type": "notification",
+  "config": {
+    "channels": ["slack", "teams"],
+    "level": "success",
+    "title": "Workflow Complete",
+    "body": "Data processing completed successfully",
+    "fields": {
+      "records_processed": "{{ context.record_count }}",
+      "duration": "{{ context.duration }}"
+    }
+  }
+}
 ```
 
 ### 5.3 Swarm Integration
@@ -463,38 +466,42 @@ WEBHOOK_SECRET_KEY=your-secret-key
 WEBHOOK_RATE_LIMIT=100/minute
 ```
 
-### 6.2 YAML Configuration
+### 6.2 JSON Configuration
 
-```yaml
-# config/notifications.yaml
-notifications:
-  enabled: true
-  default_channels:
-    - slack
-  
-  channels:
-    slack:
-      enabled: true
-      bot_token: ${SLACK_BOT_TOKEN}
-      default_channel: "#abhikarta-notifications"
-      rate_limit: 50/minute
-      
-    teams:
-      enabled: true
-      webhook_url: ${TEAMS_WEBHOOK_URL}
-      rate_limit: 30/minute
-      
-    email:
-      enabled: true
-      smtp_host: ${SMTP_HOST}
-      smtp_port: ${SMTP_PORT}
-      from_address: notifications@abhikarta.ai
-      
-  webhooks:
-    enabled: true
-    base_path: /api/webhooks
-    default_auth: hmac
-    rate_limit: 100/minute
+```json
+{
+  "notifications": {
+    "enabled": true,
+    "default_channels": ["slack"],
+    
+    "channels": {
+      "slack": {
+        "enabled": true,
+        "bot_token": "${SLACK_BOT_TOKEN}",
+        "default_channel": "#abhikarta-notifications",
+        "rate_limit": "50/minute"
+      },
+      "teams": {
+        "enabled": true,
+        "webhook_url": "${TEAMS_WEBHOOK_URL}",
+        "rate_limit": "30/minute"
+      },
+      "email": {
+        "enabled": true,
+        "smtp_host": "${SMTP_HOST}",
+        "smtp_port": "${SMTP_PORT}",
+        "from_address": "notifications@abhikarta.ai"
+      }
+    },
+    
+    "webhooks": {
+      "enabled": true,
+      "base_path": "/api/webhooks",
+      "default_auth": "hmac",
+      "rate_limit": "100/minute"
+    }
+  }
+}
 ```
 
 ---

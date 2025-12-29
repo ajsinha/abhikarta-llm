@@ -409,14 +409,13 @@ When an action fails, follow this recovery process:
 - Generate new plan from current state
 
 ### Failure Response Template
-```
-FAILURE DETECTED
-- Action: [what was attempted]
-- Error: [what went wrong]
-- Analysis: [why it failed]
-- Recovery: [Level 1/2/3/4]
-- Next Action: [adjusted approach]
-```
+
+    FAILURE DETECTED
+    - Action: [what was attempted]
+    - Error: [what went wrong]
+    - Analysis: [why it failed]
+    - Recovery: [Level 1/2/3/4]
+    - Next Action: [adjusted approach]
 
 After 3 failures at Level 4, report to user with:
 1. What was accomplished
@@ -438,18 +437,16 @@ HIERARCHICAL_PLANNING_PROMPT = """
 ### Step 1: Goal Hierarchy Construction
 Given a goal, create a hierarchy:
 
-```
-MISSION: [Ultimate purpose]
-└── GOAL: [What success looks like]
-    ├── OBJECTIVE 1: [Major milestone]
-    │   ├── Task 1.1: [Actionable item]
-    │   ├── Task 1.2: [Actionable item]
-    │   └── Checkpoint: [How to verify]
-    ├── OBJECTIVE 2: [Major milestone]
-    │   ├── Task 2.1: [Actionable item]
-    │   └── Checkpoint: [How to verify]
-    └── SUCCESS CRITERIA: [How to measure completion]
-```
+    MISSION: [Ultimate purpose]
+    └── GOAL: [What success looks like]
+        ├── OBJECTIVE 1: [Major milestone]
+        │   ├── Task 1.1: [Actionable item]
+        │   ├── Task 1.2: [Actionable item]
+        │   └── Checkpoint: [How to verify]
+        ├── OBJECTIVE 2: [Major milestone]
+        │   ├── Task 2.1: [Actionable item]
+        │   └── Checkpoint: [How to verify]
+        └── SUCCESS CRITERIA: [How to measure completion]
 
 ### Step 2: Dependency Analysis
 Identify which tasks depend on others:
@@ -493,30 +490,27 @@ STATE_SPACE_REASONING_PROMPT = """
 
 ### Current State Assessment
 Before planning, assess:
-```
-CURRENT STATE:
-- Known facts: [What we know]
-- Unknown facts: [What we need to find out]
-- Available resources: [Tools, data, time]
-- Constraints: [Limitations]
-```
+
+    CURRENT STATE:
+    - Known facts: [What we know]
+    - Unknown facts: [What we need to find out]
+    - Available resources: [Tools, data, time]
+    - Constraints: [Limitations]
 
 ### Goal State Definition
-```
-GOAL STATE:
-- Required deliverables: [What must be produced]
-- Quality criteria: [How to measure success]
-- Completion indicators: [How to know we're done]
-```
+
+    GOAL STATE:
+    - Required deliverables: [What must be produced]
+    - Quality criteria: [How to measure success]
+    - Completion indicators: [How to know we're done]
 
 ### Gap Analysis
-```
-GAP: CURRENT → GOAL
-- Missing information: [What to research]
-- Missing resources: [What to acquire]
-- Transformation needed: [What to process]
-- Actions required: [What to do]
-```
+
+    GAP: CURRENT → GOAL
+    - Missing information: [What to research]
+    - Missing resources: [What to acquire]
+    - Transformation needed: [What to process]
+    - Actions required: [What to do]
 
 ### Action Selection
 For each gap, select the action that:
@@ -527,13 +521,12 @@ For each gap, select the action that:
 
 ### Progress Tracking
 After each action:
-```
-STATE UPDATE:
-- Action taken: [What was done]
-- New state: [Current situation]
-- Remaining gap: [What's left]
-- Next priority: [Most important remaining task]
-```
+
+    STATE UPDATE:
+    - Action taken: [What was done]
+    - New state: [Current situation]
+    - Remaining gap: [What's left]
+    - Next priority: [Most important remaining task]
 """
 ```
 
@@ -558,13 +551,12 @@ For promising actions:
 - Are there better A2 options from S1?
 
 ### Decision Matrix
-```
-| Action | Immediate Result | Future Options | Risk | Score |
-|--------|------------------|----------------|------|-------|
-| A1     | [result]         | [options]      | [risk]| [1-10]|
-| A2     | [result]         | [options]      | [risk]| [1-10]|
-| A3     | [result]         | [options]      | [risk]| [1-10]|
-```
+
+    | Action | Immediate Result | Future Options | Risk | Score |
+    |--------|------------------|----------------|------|-------|
+    | A1     | [result]         | [options]      | [risk]| [1-10]|
+    | A2     | [result]         | [options]      | [risk]| [1-10]|
+    | A3     | [result]         | [options]      | [risk]| [1-10]|
 
 Select action with highest score considering:
 - Goal proximity (40%)
@@ -608,23 +600,21 @@ Before planning, check:
 3. Are there relevant facts I learned?
 
 ### Memory Format
-```
-RELEVANT MEMORIES:
-[Memory 1]: Task: [similar task], Approach: [what worked], Outcome: [result]
-[Memory 2]: Task: [similar task], Approach: [what failed], Lesson: [what to avoid]
-```
+
+    RELEVANT MEMORIES:
+    [Memory 1]: Task: [similar task], Approach: [what worked], Outcome: [result]
+    [Memory 2]: Task: [similar task], Approach: [what failed], Lesson: [what to avoid]
 
 ### Learning Protocol
 After each task completion:
-```
-EXPERIENCE LOG:
-- Task: [what was attempted]
-- Approach: [strategy used]
-- Tools: [which tools were effective]
-- Outcome: [success/partial/failure]
-- Lesson: [key takeaway]
-- Reuse: [when to apply this learning]
-```
+
+    EXPERIENCE LOG:
+    - Task: [what was attempted]
+    - Approach: [strategy used]
+    - Tools: [which tools were effective]
+    - Outcome: [success/partial/failure]
+    - Lesson: [key takeaway]
+    - Reuse: [when to apply this learning]
 
 ### Adaptation Rules
 1. If a similar task succeeded before → try same approach first
@@ -674,22 +664,20 @@ Remember across sessions:
 
 ### Context Application
 When starting a new task:
-```
-CONTEXT CHECK:
-- User profile: [known preferences]
-- Related history: [relevant past tasks]
-- Applicable lessons: [what to apply]
-- Customizations: [user-specific adjustments]
-```
+
+    CONTEXT CHECK:
+    - User profile: [known preferences]
+    - Related history: [relevant past tasks]
+    - Applicable lessons: [what to apply]
+    - Customizations: [user-specific adjustments]
 
 ### Context Update
 After significant interactions:
-```
-CONTEXT UPDATE:
-- New preference: [what was learned]
-- Confidence: [how certain]
-- Applicability: [when to apply]
-```
+
+    CONTEXT UPDATE:
+    - New preference: [what was learned]
+    - Confidence: [how certain]
+    - Applicability: [when to apply]
 """
 ```
 
@@ -701,14 +689,13 @@ STRATEGY_REFINEMENT_PROMPT = """
 
 ### Performance Tracking
 Track success rates for different strategies:
-```
-STRATEGY PERFORMANCE:
-| Strategy | Uses | Successes | Avg Time | Confidence |
-|----------|------|-----------|----------|------------|
-| A        | 10   | 8         | 30s      | 80%        |
-| B        | 5    | 2         | 45s      | 40%        |
-| C        | 3    | 3         | 20s      | 100%       |
-```
+
+    STRATEGY PERFORMANCE:
+    | Strategy | Uses | Successes | Avg Time | Confidence |
+    |----------|------|-----------|----------|------------|
+    | A        | 10   | 8         | 30s      | 80%        |
+    | B        | 5    | 2         | 45s      | 40%        |
+    | C        | 3    | 3         | 20s      | 100%       |
 
 ### Strategy Selection
 Choose strategies based on:
@@ -737,140 +724,126 @@ Periodically:
 
 ### 8.1 Goal-Driven Workflow Definition
 
-```yaml
-# goal_based_workflow.yaml
-name: Autonomous Research Workflow
-description: Goal-based workflow that plans and executes research autonomously
-
-input_schema:
-  goal:
-    type: string
-    description: The research goal to achieve
-  constraints:
-    type: object
-    description: Any constraints on the research
-
-nodes:
-  - node_id: goal_analysis
-    node_type: llm
-    config:
-      system_prompt: |
-        Analyze this research goal and produce a structured plan.
-        
-        GOAL: {{input.goal}}
-        CONSTRAINTS: {{input.constraints}}
-        
-        Output JSON:
-        {
-          "terminal_goal": "...",
-          "success_criteria": ["..."],
-          "sub_goals": [
-            {"id": 1, "description": "...", "tasks": ["..."]}
-          ],
-          "estimated_steps": N
-        }
-      model: gpt-4
-      temperature: 0.3
-      output_format: json
-
-  - node_id: plan_execution
-    node_type: agent
-    config:
-      agent_type: plan_and_execute
-      tools: [web_search, web_fetch, calculator, text_summarize]
-      input: |
-        Execute this research plan:
-        {{goal_analysis.output}}
-        
-        For each sub-goal, work through the tasks systematically.
-        Report progress after each sub-goal.
-    depends_on: [goal_analysis]
-
-  - node_id: quality_check
-    node_type: llm
-    config:
-      system_prompt: |
-        Evaluate if the research achieved its goals:
-        
-        ORIGINAL GOAL: {{input.goal}}
-        SUCCESS CRITERIA: {{goal_analysis.output.success_criteria}}
-        RESEARCH RESULTS: {{plan_execution.output}}
-        
-        Output JSON:
-        {
-          "goals_met": true/false,
-          "criteria_scores": {"criterion": score},
-          "gaps": ["..."],
-          "recommendations": ["..."]
-        }
-      model: gpt-4
-      temperature: 0.2
-    depends_on: [plan_execution]
-
-  - node_id: gap_filling
-    node_type: condition
-    config:
-      conditions:
-        - expression: "quality_check.output.goals_met == false"
-          target: replan
-        - default: compile_results
-    depends_on: [quality_check]
-
-  - node_id: replan
-    node_type: agent
-    config:
-      agent_type: plan_and_execute
-      input: |
-        The initial research had gaps. Fill them:
-        GAPS: {{quality_check.output.gaps}}
-        RECOMMENDATIONS: {{quality_check.output.recommendations}}
-    depends_on: [gap_filling]
-
-  - node_id: compile_results
-    node_type: llm
-    config:
-      system_prompt: |
-        Compile the final research report:
-        {{plan_execution.output}}
-        {% if replan.output %}
-        Additional research:
-        {{replan.output}}
-        {% endif %}
-      model: gpt-4
-      temperature: 0.5
-    depends_on: [gap_filling, replan]
+```json
+{
+  "name": "Autonomous Research Workflow",
+  "description": "Goal-based workflow that plans and executes research autonomously",
+  
+  "input_schema": {
+    "goal": {
+      "type": "string",
+      "description": "The research goal to achieve"
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Any constraints on the research"
+    }
+  },
+  
+  "nodes": [
+    {
+      "node_id": "goal_analysis",
+      "node_type": "llm",
+      "config": {
+        "system_prompt": "Analyze this research goal and produce a structured plan.\n\nGOAL: {{input.goal}}\nCONSTRAINTS: {{input.constraints}}\n\nOutput JSON:\n{\n  \"terminal_goal\": \"...\",\n  \"success_criteria\": [\"...\"],\n  \"sub_goals\": [\n    {\"id\": 1, \"description\": \"...\", \"tasks\": [\"...\"]}\n  ],\n  \"estimated_steps\": N\n}",
+        "model": "gpt-4",
+        "temperature": 0.3,
+        "output_format": "json"
+      }
+    },
+    {
+      "node_id": "plan_execution",
+      "node_type": "agent",
+      "config": {
+        "agent_type": "plan_and_execute",
+        "tools": ["web_search", "web_fetch", "calculator", "text_summarize"],
+        "input": "Execute this research plan:\n{{goal_analysis.output}}\n\nFor each sub-goal, work through the tasks systematically.\nReport progress after each sub-goal."
+      },
+      "depends_on": ["goal_analysis"]
+    },
+    {
+      "node_id": "quality_check",
+      "node_type": "llm",
+      "config": {
+        "system_prompt": "Evaluate if the research achieved its goals:\n\nORIGINAL GOAL: {{input.goal}}\nSUCCESS CRITERIA: {{goal_analysis.output.success_criteria}}\nRESEARCH RESULTS: {{plan_execution.output}}\n\nOutput JSON:\n{\n  \"goals_met\": true,\n  \"criteria_scores\": {\"criterion\": 8},\n  \"gaps\": [\"...\"],\n  \"recommendations\": [\"...\"]\n}",
+        "model": "gpt-4",
+        "temperature": 0.2
+      },
+      "depends_on": ["plan_execution"]
+    },
+    {
+      "node_id": "gap_filling",
+      "node_type": "condition",
+      "config": {
+        "conditions": [
+          {"expression": "quality_check.output.goals_met == false", "target": "replan"},
+          {"default": "compile_results"}
+        ]
+      },
+      "depends_on": ["quality_check"]
+    },
+    {
+      "node_id": "replan",
+      "node_type": "agent",
+      "config": {
+        "agent_type": "plan_and_execute",
+        "input": "The initial research had gaps. Fill them:\nGAPS: {{quality_check.output.gaps}}\nRECOMMENDATIONS: {{quality_check.output.recommendations}}"
+      },
+      "depends_on": ["gap_filling"]
+    },
+    {
+      "node_id": "compile_results",
+      "node_type": "llm",
+      "config": {
+        "system_prompt": "Compile the final research report:\n{{plan_execution.output}}\n\nAdditional research (if any):\n{{replan.output}}",
+        "model": "gpt-4",
+        "temperature": 0.5
+      },
+      "depends_on": ["gap_filling", "replan"]
+    }
+  ]
+}
 ```
 
 ### 8.2 Workflow with HITL Checkpoints
 
-```yaml
-# goal_workflow_with_hitl.yaml
-name: Supervised Goal Execution
-description: Goal-based workflow with human checkpoints
-
-nodes:
-  - node_id: generate_plan
-    node_type: agent
-    config:
-      agent_type: plan_and_execute
-      input: "Create a detailed plan for: {{input.goal}}"
-
-  - node_id: approve_plan
-    node_type: hitl
-    config:
-      task_type: approval
-      title: "Approve Research Plan"
-      description: "Review and approve the generated plan before execution"
-      options: [approve, reject, modify]
-    depends_on: [generate_plan]
-
-  - node_id: execute_plan
-    node_type: agent
-    config:
-      agent_type: plan_and_execute
-      input: "Execute approved plan: {{approve_plan.approved_content}}"
-    depends_on: [approve_plan]
-    condition: "approve_plan.decision == 'approve'"
+```json
+{
+  "name": "Supervised Goal Execution",
+  "description": "Goal-based workflow with human checkpoints",
+  
+  "nodes": [
+    {
+      "node_id": "generate_plan",
+      "node_type": "agent",
+      "config": {
+        "agent_type": "plan_and_execute",
+        "input": "Create a detailed plan for: {{input.goal}}"
+      }
+    },
+    {
+      "node_id": "approve_plan",
+      "node_type": "hitl",
+      "config": {
+        "task_type": "approval",
+        "title": "Approve Research Plan",
+        "description": "Review and approve the generated plan before execution",
+        "options": ["approve", "reject", "modify"]
+      },
+      "depends_on": ["generate_plan"]
+    },
+    {
+      "node_id": "execute_plan",
+      "node_type": "agent",
+      "config": {
+        "agent_type": "plan_and_execute",
+        "input": "Execute approved plan: {{approve_plan.approved_content}}"
+      },
+      "depends_on": ["approve_plan"],
+      "condition": "approve_plan.decision == 'approve'"
+    }
+  ]
+}
 ```
 
 ---
