@@ -317,3 +317,676 @@
 2025-12-29 11:36:18,287 - abhikarta.web.routes.admin_routes - INFO - Added 85 builtin tools
 2025-12-29 11:36:50,365 - abhikarta.web.routes.admin_routes - INFO - Found 235 enabled tools in registry
 2025-12-29 11:36:50,366 - abhikarta.web.routes.admin_routes - INFO - Added 85 builtin tools
+2025-12-29 11:39:13,933 - abhikarta.web.abhikarta_llm_web - ERROR - Exception on /help/workflow_visual_designer [GET]
+Traceback (most recent call last):
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/web/routes/auth_routes.py", line 230, in help_page
+    return render_template(template,
+                           fullname=session.get('fullname'),
+                           userid=session.get('user_id'),
+                           roles=session.get('roles', []),
+                           is_admin=session.get('is_admin', False))
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/web/templates/help/pages/workflow_visual_designer.html", line 1, in top-level template code
+    {% extends "help/help_base.html" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/web/templates/help/help_base.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/web/templates/base.html", line 223, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/web/templates/help/help_base.html", line 176, in block 'content'
+    {% block help_content %}{% endblock %}
+    ^^^^^^^^^
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/web/templates/help/pages/workflow_visual_designer.html", line 12, in block 'help_content'
+    <a href="{{ url_for('new_workflow_designer') }}" class="btn btn-primary">
+    ^^^^^^^^^^^^^^^^^
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "/home/ashutosh/.local/lib/python3.14/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'new_workflow_designer'. Did you mean 'workflow_designer' instead?
+2025-12-29 11:39:13,938 - abhikarta.web.abhikarta_llm_web - ERROR - Internal server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.
+2025-12-29 11:41:40,012 - __main__ - INFO - Terminating actor system...
+2025-12-29 11:41:40,012 - __main__ - WARNING - Error terminating actor system: ActorSystem.terminate() got an unexpected keyword argument 'timeout'
+2025-12-29 11:41:45,012 - abhikarta.mcp.manager - INFO - Health monitor stopped
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_ecb_get_exchange_rate
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_un_get_sdgs
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_duckdb_list_tables
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_check_robots_txt
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_boj_get_jgb_yield
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_imf_compare_countries
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_ecb_get_bond_yield
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_imf_get_bop_data
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_extract_content
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_boj_get_exchange_rate
+2025-12-29 11:41:45,013 - abhikarta.tools.registry - INFO - Unregistered tool: test_ecb_search_series
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_financial_ratios
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_un_get_trade_data
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_un_get_sdg_targets
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_fbi_get_participation_rate
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_fbi_get_agency_statistics
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_proxy_statements
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_sqlselect_count_rows
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_fed_get_latest
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_ir_get_all_resources
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_extract_links
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_registration_statements
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_bdf_get_oat_yield
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_read_excel_sheet
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_fbi_get_offense_data
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_fbi_compare_states
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_tavily_news_search
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_rbi_get_policy_rate
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_duckdb_get_stats
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_extract_text
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_pboc_get_cgb_yield
+2025-12-29 11:41:45,014 - abhikarta.tools.registry - INFO - Unregistered tool: test_extract_metadata
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_boc_get_interest_rate
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_imf_get_weo_data
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_search_word
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_fbi_search_agencies
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_xbrl_frames_multi_concept
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_ir_get_documents
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_sec_get_insider_trading
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_fbi_get_national_statistics
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_sqlselect_get_schema
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_amendments
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_boj_get_money_stock
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_read_word
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_ecb_get_inflation
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_bdf_get_exchange_rate
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_company_concept
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_tavily_research_search
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_boc_get_latest
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_duckdb_aggregate
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_rbi_get_exchange_rate
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_ownership_reports
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_frame_data
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_boj_get_policy_rate
+2025-12-29 11:41:45,015 - abhikarta.tools.registry - INFO - Unregistered tool: test_boc_get_bond_yield
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_search_indicators
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_wiki_search
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_get_indicator_data
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_list_files
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_compare_countries
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_boc_get_common_indicators
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_pboc_get_forex_reserves
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_tavily_web_search
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_un_get_sdg_indicators
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_un_get_country_trade
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_current_reports
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_imf_get_country_profile
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_bdf_get_eurozone_indicator
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_company_search
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_un_compare_trade
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_fbi_get_state_statistics
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_get_countries
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_duckdb_query
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_ecb_get_latest
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_yahoo_search_symbols
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_ir_find_page
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_crawl_sitemap
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_boc_get_series
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_get_indicators
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_ir_get_latest_earnings
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_boj_get_price_index
+2025-12-29 11:41:45,016 - abhikarta.tools.registry - INFO - Unregistered tool: test_imf_get_databases
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_fed_get_common_indicators
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_foreign_issuers
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_un_get_trade_balance
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_get_word_metadata
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_filings_by_form
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_get_excel_metadata
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_read_excel
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_bdf_get_ecb_policy_rate
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_boc_get_exchange_rate
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_sqlselect_execute_query
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_bdf_get_french_indicator
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_search_excel
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_ir_list_supported_companies
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_pboc_get_money_supply
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_get_lending_types
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_msdoc_get_excel_sheets
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_imf_get_dataflows
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_google_search
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_ir_get_annual_reports
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_get_topic_indicators
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_ecb_get_interest_rate
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_rbi_get_gsec_yield
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_sec_search_company
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_company_tickers_by_exchange
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_pboc_get_lpr
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_get_country_data
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_sec_get_company_facts
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_fbi_get_agency_details
+2025-12-29 11:41:45,017 - abhikarta.tools.registry - INFO - Unregistered tool: test_fed_search_series
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_sqlselect_describe_source
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_company_submissions
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_duckdb_list_files
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_sec_get_company_info
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_companies_by_sic
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_boc_search_series
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_wiki_get_summary
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_imf_get_data
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_tavily_domain_search
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_un_get_sdg_data
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_get_page_info
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_insider_transactions
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_un_get_sdg_progress
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_yahoo_get_history
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_rbi_get_forex_reserves
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_institutional_holdings
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_ir_get_presentations
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_yahoo_get_quote
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_fbi_get_crime_trend
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_fed_get_series
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_imf_get_ifs_data
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_sec_get_mutual_fund_holdings
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_duckdb_refresh_views
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_sec_get_company_filings
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_sec_get_financial_data
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_get_regions
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_rbi_get_inflation
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_duckdb_describe_table
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_wiki_get_page
+2025-12-29 11:41:45,018 - abhikarta.tools.registry - INFO - Unregistered tool: test_crawl_url
+2025-12-29 11:41:45,019 - abhikarta.tools.registry - INFO - Unregistered tool: test_ecb_get_series
+2025-12-29 11:41:45,019 - abhikarta.tools.registry - INFO - Unregistered tool: test_ecb_get_common_indicators
+2025-12-29 11:41:45,019 - abhikarta.tools.registry - INFO - Unregistered tool: test_sqlselect_sample_data
+2025-12-29 11:41:45,019 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_filing_details
+2025-12-29 11:41:45,019 - abhikarta.tools.registry - INFO - Unregistered tool: test_sqlselect_list_sources
+2025-12-29 11:41:45,019 - abhikarta.tools.registry - INFO - Unregistered tool: test_pboc_get_exchange_rate
+2025-12-29 11:41:45,019 - abhikarta.tools.registry - INFO - Unregistered tool: test_wb_get_income_levels
+2025-12-29 11:41:45,019 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_company_facts
+2025-12-29 11:41:45,019 - abhikarta.tools.registry - INFO - Unregistered tool: test_edgar_mutual_fund_holdings
+2025-12-29 11:41:45,019 - abhikarta.mcp.manager - INFO - Disconnected from MCP server: test
+2025-12-29 11:41:45,019 - abhikarta.mcp.manager - INFO - MCPServerManager shutdown
+2025-12-29 11:41:45,019 - __main__ - INFO - MCP manager shutdown
+2025-12-29 11:41:45,019 - abhikarta.database.db_facade - INFO - Database disconnected
+2025-12-29 11:41:45,019 - __main__ - INFO - Database connection closed
+2025-12-29 11:41:45,020 - __main__ - INFO - Properties auto-reload stopped
+2025-12-29 11:41:45,020 - abhikarta.actor.system - INFO - Terminating ActorSystem 'abhikarta-actors'...
+2025-12-29 11:41:45,020 - abhikarta.actor.scheduler - INFO - Scheduler stopped
+2025-12-29 11:41:45,020 - abhikarta.actor.dispatcher - INFO - DefaultDispatcher shutdown complete
+2025-12-29 11:41:45,020 - abhikarta.actor.system - INFO - ActorSystem 'abhikarta-actors' terminated
+2025-12-29 11:41:47,822 - __main__ - INFO - Properties configuration initialized
+2025-12-29 11:41:47,837 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2025-12-29 11:41:47,837 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2025-12-29 11:41:47,837 - abhikarta.database.db_facade - INFO - Database delegates initialized
+2025-12-29 11:41:47,838 - abhikarta.database.db_facade - INFO - Database connected
+2025-12-29 11:41:47,838 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2025-12-29 11:41:47,838 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2025-12-29 11:41:47,839 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2025-12-29 11:41:47,839 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2025-12-29 11:41:47,840 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.2.5)
+2025-12-29 11:41:47,840 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2025-12-29 11:41:47,840 - abhikarta.database.db_facade - INFO - Database schema initialized
+2025-12-29 11:41:47,840 - __main__ - INFO - Database initialized: sqlite
+2025-12-29 11:41:47,841 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2025-12-29 11:41:47,841 - __main__ - INFO - User management initialized
+2025-12-29 11:41:47,896 - abhikarta.tools.registry - INFO - ToolsRegistry initialized
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: get_current_datetime (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: parse_date (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: calculate_date_difference (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: add_days_to_date (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: get_business_days (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: calculate_expression (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: calculate_percentage (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: calculate_compound_interest (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_emi (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: convert_currency (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: extract_text_patterns (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: clean_text (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: extract_entities (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: generate_summary_stats (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: mask_sensitive_data (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: validate_email (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: validate_phone (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: validate_credit_card (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: validate_iban (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: validate_ssn (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: json_to_csv (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: csv_to_json (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: base64_encode (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: base64_decode (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: generate_hash (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: generate_uuid (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: generate_reference_number (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.registry - INFO - Registered tool: generate_account_number (type=function)
+2025-12-29 11:41:47,897 - abhikarta.tools.prebuilt.common_tools - INFO - Registered 28 common tools
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: verify_identity_document (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: calculate_kyc_risk_score (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: verify_address (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: calculate_credit_score (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: assess_debt_to_income (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_eligibility (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: generate_amortization_schedule (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: analyze_transaction (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: detect_transaction_patterns (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: calculate_transaction_limits (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: check_sanctions_list (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: generate_aml_report (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: validate_regulatory_compliance (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.prebuilt.banking_tools - INFO - Registered 13 banking tools
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: make_http_request (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: build_query_string (type=function)
+2025-12-29 11:41:47,898 - abhikarta.tools.registry - INFO - Registered tool: parse_json_response (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: validate_api_response (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: format_email_template (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: create_notification (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: format_sms_message (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: map_fields (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: flatten_nested_dict (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: unflatten_dict (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: merge_dicts (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: filter_dict_keys (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: filter_list (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: sort_list (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: group_by (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: aggregate_list (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: paginate_list (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: create_workflow_context (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: update_workflow_context (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: evaluate_condition (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.prebuilt.integration_tools - INFO - Registered 20 integration tools
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: web_search (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: web_fetch (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: intranet_search (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: news_search (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: read_document (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: write_document (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: convert_document (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: extract_document_metadata (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: list_files (type=function)
+2025-12-29 11:41:47,899 - abhikarta.tools.registry - INFO - Registered tool: copy_file (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: move_file (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: delete_file (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: get_system_info (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: execute_shell_command (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: get_environment_variable (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: set_environment_variable (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: check_url_status (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: ping_host (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: dns_lookup (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: parse_url (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: url_encode (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: url_decode (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: html_encode (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - INFO - Registered tool: html_decode (type=function)
+2025-12-29 11:41:47,900 - abhikarta.tools.prebuilt.general_tools - INFO - Registered 24 general-purpose tools
+2025-12-29 11:41:47,900 - __main__ - INFO - Registered 85 pre-built tools
+2025-12-29 11:41:47,900 - abhikarta.database.sqlite_handler - ERROR - SQLite fetch_all error: no such column: status
+2025-12-29 11:41:47,900 - abhikarta.tools.registry - ERROR - Error loading code fragments: no such column: status
+2025-12-29 11:41:47,900 - __main__ - INFO - Registered 0 code fragment tools
+2025-12-29 11:41:47,900 - __main__ - INFO - Tools registry initialized with 85 tools
+2025-12-29 11:41:47,903 - abhikarta.mcp.manager - INFO - MCPServerManager initialized
+2025-12-29 11:41:47,903 - abhikarta.mcp.manager - INFO - Added MCP server: test
+2025-12-29 11:41:47,915 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,915 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdgs (type=mcp)
+2025-12-29 11:41:47,915 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_list_tables (type=mcp)
+2025-12-29 11:41:47,915 - abhikarta.tools.registry - INFO - Registered tool: test_check_robots_txt (type=mcp)
+2025-12-29 11:41:47,915 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_jgb_yield (type=mcp)
+2025-12-29 11:41:47,915 - abhikarta.tools.registry - INFO - Registered tool: test_imf_compare_countries (type=mcp)
+2025-12-29 11:41:47,915 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_bond_yield (type=mcp)
+2025-12-29 11:41:47,915 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_bop_data (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_extract_content (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_search_series (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_financial_ratios (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_trade_data (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdg_targets (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_participation_rate (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_agency_statistics (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_proxy_statements (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_count_rows (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_fed_get_latest (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_all_resources (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_extract_links (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_registration_statements (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_oat_yield (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_read_excel_sheet (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_offense_data (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_compare_states (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_tavily_news_search (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_policy_rate (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_get_stats (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_extract_text (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_cgb_yield (type=mcp)
+2025-12-29 11:41:47,916 - abhikarta.tools.registry - INFO - Registered tool: test_extract_metadata (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_interest_rate (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_weo_data (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_search_word (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_search_agencies (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_xbrl_frames_multi_concept (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_documents (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_insider_trading (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_national_statistics (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_get_schema (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_amendments (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_money_stock (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_read_word (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_inflation (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_concept (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_tavily_research_search (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_latest (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_aggregate (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_ownership_reports (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_frame_data (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_policy_rate (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_bond_yield (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_wb_search_indicators (type=mcp)
+2025-12-29 11:41:47,917 - abhikarta.tools.registry - INFO - Registered tool: test_wiki_search (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_indicator_data (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_list_files (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_wb_compare_countries (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_common_indicators (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_forex_reserves (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_tavily_web_search (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdg_indicators (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_country_trade (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_current_reports (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_country_profile (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_eurozone_indicator (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_search (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_un_compare_trade (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_state_statistics (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_countries (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_query (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_latest (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_yahoo_search_symbols (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_ir_find_page (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_crawl_sitemap (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_series (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_indicators (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_latest_earnings (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_price_index (type=mcp)
+2025-12-29 11:41:47,918 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_databases (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_fed_get_common_indicators (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_foreign_issuers (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_trade_balance (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_get_word_metadata (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_filings_by_form (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_get_excel_metadata (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_read_excel (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_ecb_policy_rate (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_execute_query (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_french_indicator (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_search_excel (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_ir_list_supported_companies (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_money_supply (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_lending_types (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_get_excel_sheets (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_dataflows (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_google_search (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_annual_reports (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_topic_indicators (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_interest_rate (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_gsec_yield (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_sec_search_company (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_tickers_by_exchange (type=mcp)
+2025-12-29 11:41:47,919 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_lpr (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_country_data (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_company_facts (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_agency_details (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_fed_search_series (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_describe_source (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_submissions (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_list_files (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_company_info (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_companies_by_sic (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_boc_search_series (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_wiki_get_summary (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_data (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_tavily_domain_search (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdg_data (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_get_page_info (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_insider_transactions (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdg_progress (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_yahoo_get_history (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_forex_reserves (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_institutional_holdings (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_presentations (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_yahoo_get_quote (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_crime_trend (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_fed_get_series (type=mcp)
+2025-12-29 11:41:47,920 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_ifs_data (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_mutual_fund_holdings (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_refresh_views (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_company_filings (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_financial_data (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_regions (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_inflation (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_describe_table (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_wiki_get_page (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_crawl_url (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_series (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_common_indicators (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_sample_data (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_filing_details (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_list_sources (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_income_levels (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_facts (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_mutual_fund_holdings (type=mcp)
+2025-12-29 11:41:47,921 - abhikarta.mcp.manager - INFO - Loaded 150 tools from test
+2025-12-29 11:41:47,921 - abhikarta.mcp.manager - INFO - Connected to MCP server: test
+2025-12-29 11:41:47,921 - abhikarta.mcp.manager - INFO - Loaded 1 MCP servers from database
+2025-12-29 11:41:47,921 - __main__ - INFO - Loaded 1 MCP servers from database
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdgs (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_list_tables (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_check_robots_txt (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_jgb_yield (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_imf_compare_countries (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_bond_yield (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_bop_data (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_extract_content (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_search_series (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_financial_ratios (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_trade_data (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdg_targets (type=mcp)
+2025-12-29 11:41:47,932 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_participation_rate (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_agency_statistics (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_proxy_statements (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_count_rows (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_fed_get_latest (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_all_resources (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_extract_links (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_registration_statements (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_oat_yield (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_read_excel_sheet (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_offense_data (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_compare_states (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_tavily_news_search (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_policy_rate (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_get_stats (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_extract_text (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_cgb_yield (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_extract_metadata (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_interest_rate (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_weo_data (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_search_word (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_search_agencies (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_xbrl_frames_multi_concept (type=mcp)
+2025-12-29 11:41:47,933 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_documents (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_insider_trading (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_national_statistics (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_get_schema (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_amendments (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_money_stock (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_read_word (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_inflation (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_concept (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_tavily_research_search (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_latest (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_aggregate (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_ownership_reports (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_frame_data (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_policy_rate (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_bond_yield (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_wb_search_indicators (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_wiki_search (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_indicator_data (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_list_files (type=mcp)
+2025-12-29 11:41:47,934 - abhikarta.tools.registry - INFO - Registered tool: test_wb_compare_countries (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_common_indicators (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_forex_reserves (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_tavily_web_search (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdg_indicators (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_country_trade (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_current_reports (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_country_profile (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_eurozone_indicator (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_search (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_un_compare_trade (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_state_statistics (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_countries (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_query (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_latest (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_yahoo_search_symbols (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_ir_find_page (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_crawl_sitemap (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_series (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_indicators (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_latest_earnings (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_boj_get_price_index (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_databases (type=mcp)
+2025-12-29 11:41:47,935 - abhikarta.tools.registry - INFO - Registered tool: test_fed_get_common_indicators (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_foreign_issuers (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_trade_balance (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_get_word_metadata (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_filings_by_form (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_get_excel_metadata (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_read_excel (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_ecb_policy_rate (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_boc_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_execute_query (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_bdf_get_french_indicator (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_search_excel (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_ir_list_supported_companies (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_money_supply (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_lending_types (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_msdoc_get_excel_sheets (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_dataflows (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_google_search (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_annual_reports (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_topic_indicators (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_interest_rate (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_gsec_yield (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_sec_search_company (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_tickers_by_exchange (type=mcp)
+2025-12-29 11:41:47,936 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_lpr (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_country_data (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_company_facts (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_agency_details (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_fed_search_series (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_describe_source (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_submissions (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_list_files (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_company_info (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_companies_by_sic (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_boc_search_series (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_wiki_get_summary (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_data (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_tavily_domain_search (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdg_data (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_get_page_info (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_insider_transactions (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_un_get_sdg_progress (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_yahoo_get_history (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_forex_reserves (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_institutional_holdings (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_ir_get_presentations (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_yahoo_get_quote (type=mcp)
+2025-12-29 11:41:47,937 - abhikarta.tools.registry - INFO - Registered tool: test_fbi_get_crime_trend (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_fed_get_series (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_imf_get_ifs_data (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_mutual_fund_holdings (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_refresh_views (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_company_filings (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_sec_get_financial_data (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_regions (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_rbi_get_inflation (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_duckdb_describe_table (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_wiki_get_page (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_crawl_url (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_series (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_ecb_get_common_indicators (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_sample_data (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_filing_details (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_sqlselect_list_sources (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_pboc_get_exchange_rate (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_wb_get_income_levels (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_company_facts (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.tools.registry - INFO - Registered tool: test_edgar_mutual_fund_holdings (type=mcp)
+2025-12-29 11:41:47,938 - abhikarta.mcp.manager - INFO - Loaded 150 tools from test
+2025-12-29 11:41:47,938 - abhikarta.mcp.manager - INFO - Connected to MCP server: test
+2025-12-29 11:41:47,938 - __main__ - INFO - Connected to 1 MCP servers
+2025-12-29 11:41:47,939 - abhikarta.mcp.manager - INFO - Health monitor started (interval: 30s)
+2025-12-29 11:41:47,939 - __main__ - INFO - MCP health monitor started (interval: 30s)
+2025-12-29 11:41:47,939 - __main__ - INFO - MCP manager initialized with 1 servers
+2025-12-29 11:41:47,939 - abhikarta.actor.dispatcher - INFO - DefaultDispatcher initialized with 8 threads
+2025-12-29 11:41:47,939 - abhikarta.actor.scheduler - INFO - Scheduler started
+2025-12-29 11:41:47,939 - abhikarta.actor.system - INFO - ActorSystem 'abhikarta-actors' started
+2025-12-29 11:41:47,939 - __main__ - INFO - Actor system 'abhikarta-actors' started
+2025-12-29 11:41:47,940 - __main__ - INFO -   Default dispatcher threads: 8
+2025-12-29 11:41:47,940 - __main__ - INFO -   I/O dispatcher threads: 16
+2025-12-29 11:41:47,940 - __main__ - INFO -   Dead letter logging: True
+2025-12-29 11:41:47,940 - __main__ - INFO - Actor system 'abhikarta-actors' ready for concurrent execution
+2025-12-29 11:41:47,989 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2025-12-29 11:41:47,989 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
+2025-12-29 11:41:47,989 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
+2025-12-29 11:41:47,994 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2025-12-29 11:41:47,994 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
+2025-12-29 11:41:47,996 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
+2025-12-29 11:41:47,996 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2025-12-29 11:41:47,996 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
+2025-12-29 11:41:48,008 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
+2025-12-29 11:41:48,008 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2025-12-29 11:41:48,008 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
+2025-12-29 11:41:48,013 - abhikarta.web.routes.user_routes - INFO - User routes registered
+2025-12-29 11:41:48,013 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2025-12-29 11:41:48,013 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
+2025-12-29 11:41:48,017 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
+2025-12-29 11:41:48,017 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2025-12-29 11:41:48,017 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
+2025-12-29 11:41:48,019 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
+2025-12-29 11:41:48,019 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2025-12-29 11:41:48,019 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
+2025-12-29 11:41:48,024 - abhikarta.web.routes.api_routes - INFO - API routes registered
+2025-12-29 11:41:48,024 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2025-12-29 11:41:48,029 - abhikarta.web.routes.workflow_routes - INFO - Workflow routes registered
+2025-12-29 11:41:48,029 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
+2025-12-29 11:41:48,029 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
+2025-12-29 11:41:48,029 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
+2025-12-29 11:41:48,029 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
