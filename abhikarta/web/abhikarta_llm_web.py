@@ -186,6 +186,7 @@ class AbhikartaLLMWeb:
             WorkflowRoutes
         )
         from .routes.swarm_routes import SwarmRoutes
+        from .routes.notification_routes import NotificationRoutes  # v1.4.0
         
         # Route classes to register
         route_classes = [
@@ -196,7 +197,8 @@ class AbhikartaLLMWeb:
             MCPRoutes,
             APIRoutes,
             WorkflowRoutes,
-            SwarmRoutes  # v1.3.0
+            SwarmRoutes,  # v1.3.0
+            NotificationRoutes  # v1.4.0
         ]
         
         for route_class in route_classes:

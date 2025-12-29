@@ -1,4 +1,4 @@
-# Abhikarta-LLM v1.3.0 - Quick Start Guide
+# Abhikarta-LLM v1.4.0 - Quick Start Guide
 
 This guide will help you get started with Abhikarta-LLM in under 15 minutes.
 
@@ -11,7 +11,11 @@ This guide will help you get started with Abhikarta-LLM in under 15 minutes.
 5. [Create Your First Workflow](#create-your-first-workflow)
 6. [Use Pre-built Banking Solutions](#use-pre-built-banking-solutions)
 7. [Using Tools](#using-tools)
-8. [Key Features Overview](#key-features-overview)
+8. [Chain of Thought & Tree of Thought](#chain-of-thought--tree-of-thought)
+9. [Goal-Based Agents](#goal-based-agents)
+10. [ReAct, Reflect & Hierarchical Agents](#react-reflect--hierarchical-agents)
+11. [Notifications (v1.4.0)](#notifications-v140)
+12. [Key Features Overview](#key-features-overview)
 
 ---
 
@@ -401,10 +405,10 @@ Add tool names to agent configuration:
 | **Database Schema Docs** | 22 tables documented with ER diagram | v1.2.0 |
 | **Page Glossaries** | Contextual help on 22 templates | v1.2.0 |
 | **Database Delegates** | 9 modular delegates for DB operations | v1.2.1 |
-| **Actor System** | Pekko-inspired concurrency (millions of actors) | v1.3.0 |
-| **Agent Templates** | 36 templates across 15 categories | v1.3.0 |
-| **Workflow Templates** | 33 templates across 11 industries | v1.3.0 |
-| **Code Fragment URIs** | Templates use db://, s3://, file:// URIs | v1.3.0 |
+| **Actor System** | Pekko-inspired concurrency (millions of actors) | v1.4.0 |
+| **Agent Templates** | 36 templates across 15 categories | v1.4.0 |
+| **Workflow Templates** | 33 templates across 11 industries | v1.4.0 |
+| **Code Fragment URIs** | Templates use db://, s3://, file:// URIs | v1.4.0 |
 
 ### Architecture Layers
 
@@ -416,7 +420,7 @@ Add tool names to agent configuration:
 │                    Application Layer                         │
 │    Agent Manager │ Workflow Engine │ HITL Manager            │
 ├─────────────────────────────────────────────────────────────┤
-│                 Actor System Layer (v1.3.0)                  │
+│                 Actor System Layer (v1.4.0)                  │
 │  ActorSystem │ Dispatchers │ Supervision │ Routers │ Events │
 ├─────────────────────────────────────────────────────────────┤
 │                      Tools Layer                             │
@@ -441,14 +445,172 @@ Add tool names to agent configuration:
 
 ---
 
+## Chain of Thought & Tree of Thought
+
+Abhikarta supports advanced reasoning patterns for complex problem-solving.
+
+### Quick CoT Agent
+
+Create an agent that reasons step-by-step:
+
+1. Go to **Agents → Create Agent**
+2. Set **Agent Type** to "Chain of Thought (CoT)"
+3. Use temperature `0.2-0.4` for consistent reasoning
+4. Test with a complex math or logic problem
+
+**Example System Prompt:**
+```
+You are a logical reasoning agent. For every question:
+1. UNDERSTAND: State what's being asked
+2. IDENTIFY: List relevant facts
+3. REASON: Work step by step
+4. CONCLUDE: State final answer
+```
+
+### Quick ToT Workflow
+
+For problems needing exploration of multiple solutions:
+
+1. Create a workflow with this structure:
+   - Decompose node → 3 parallel Branch nodes → Evaluate node → Refine node
+2. Set branch temperature to `0.7` for diversity
+3. Set evaluate temperature to `0.2` for objective scoring
+
+**See Full Tutorial:** [Chain of Thought & Tree of Thought](/help/cot-tot) | [Markdown Version](/docs/COT_TOT_TUTORIAL)
+
+---
+
+## Goal-Based Agents
+
+Build autonomous agents that plan, reason, and learn to achieve complex objectives.
+
+### Key Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| **Autonomous Action** | Break goals into tasks, select tools, act without constant input |
+| **Planning & Reasoning** | Plan sequences, consider future states, find efficient paths |
+| **Strategy Adjustment** | Modify plans when obstacles arise, try alternatives |
+| **Learning & Adaptation** | Learn from past actions, remember context, improve over time |
+
+### Quick Goal-Based Agent
+
+1. Go to **Agents → Create Agent**
+2. Set **Agent Type** to "Plan and Execute"
+3. Use the goal-based system prompt:
+
+```
+You are a Goal-Based Agent with autonomous planning.
+
+## Goal Framework
+1. ANALYZE: Understand the goal fully
+2. PLAN: Decompose into achievable steps
+3. EXECUTE: Take actions autonomously
+4. MONITOR: Track progress toward goal
+5. ADAPT: Adjust when needed
+6. COMPLETE: Verify success criteria met
+```
+
+4. Add tools: `web_search`, `web_fetch`, `file_write`, `calculator`
+5. Set temperature to `0.3-0.5`
+
+**See Full Tutorial:** [Goal-Based Agents](/help/goal-based-agents) | [Markdown](/docs/GOAL_BASED_AGENTS_TUTORIAL)
+
+---
+
+## ReAct, Reflect & Hierarchical Agents
+
+Abhikarta supports three powerful agent patterns for sophisticated AI reasoning.
+
+### ReAct (Reasoning + Acting)
+
+Interleaves thinking and tool use in a loop:
+
+```
+Thought: I need to find the current price
+Action: web_search(query="AAPL stock price")
+Observation: AAPL: $178.50
+Thought: Got the price, ready to answer
+Action: Final Answer: Apple stock is $178.50
+```
+
+**Create ReAct Agent:**
+1. Set **Agent Type** to "ReAct"
+2. Add tools: `web_search`, `calculator`
+3. Temperature: `0.3`
+
+### Reflect (Self-Critique)
+
+Improves output through iterative self-critique:
+
+```
+Draft v1 → Critique (5/10) → Revise → Draft v2 → Critique (8/10) → Done
+```
+
+**Create Reflect Agent:**
+1. Set **Agent Type** to "Reflect"
+2. Set `quality_threshold=8`, `max_revisions=3`
+3. Temperature: `0.5` for generation, `0.2` for critique
+
+### Hierarchical (Manager-Workers)
+
+Manager decomposes and delegates to specialized workers:
+
+```
+[Manager]
+   ├── [Researcher] → Gathers data
+   ├── [Analyst] → Analyzes trends
+   └── [Writer] → Creates report
+```
+
+**See Full Tutorial:** [ReAct, Reflect & Hierarchical](/help/react-reflect-hierarchical) | [Markdown](/docs/REACT_REFLECT_HIERARCHICAL_TUTORIAL)
+
+---
+
+## Notifications (v1.4.0)
+
+Send alerts to Slack, Teams, and receive webhooks from external systems.
+
+### Quick Slack Setup
+
+1. Create a Slack app at [api.slack.com/apps](https://api.slack.com/apps)
+2. Add OAuth scopes: `chat:write`, `chat:write.public`
+3. Install to workspace and copy Bot Token
+4. In Abhikarta: **Admin → Notifications → Add Channel → Slack**
+5. Paste your token and save
+
+### Quick Teams Setup
+
+1. In Teams channel: **... → Connectors → Incoming Webhook**
+2. Name it and copy the webhook URL
+3. In Abhikarta: **Admin → Notifications → Add Channel → Teams**
+4. Paste URL and save
+
+### Webhook Receiver
+
+Receive events from GitHub, Stripe, etc.:
+
+1. **Admin → Notifications → Webhook Endpoints → Add**
+2. Configure:
+   - Path: `github` → URL will be `http://your-server/api/webhooks/github`
+   - Auth: HMAC-SHA256 (recommended)
+   - Target: Select agent/workflow/swarm to trigger
+3. Configure external service to send webhooks to your URL
+
+**See Full Guide:** [Notifications Help](/help/notifications) | [Markdown](/docs/NOTIFICATION_QUICKSTART)
+
+---
+
 ## Next Steps
 
 1. **Browse Tools**: Visit `/tools` to explore all 85 pre-built tools
 2. **Explore Help**: Click **Help** in navigation for detailed guides
 3. **Try Banking Agents**: Clone and test pre-built banking solutions
-4. **Build Custom Tools**: Create domain-specific tools
-5. **Set Up MCP**: Connect external tool servers
-6. **Configure HITL**: Add human approval points to workflows
+4. **Try CoT/ToT**: Create agents with advanced reasoning patterns
+5. **Configure Notifications**: Set up Slack/Teams for alerts
+6. **Build Custom Tools**: Create domain-specific tools
+7. **Set Up MCP**: Connect external tool servers
+8. **Configure HITL**: Add human approval points to workflows
 
 ---
 
@@ -457,23 +619,31 @@ Add tool names to agent configuration:
 - **In-App Help**: `/help` - Comprehensive documentation
 - **Tools Browser**: `/tools` - Browse and test all tools
 - **Architecture**: `/help/about/architecture` - System design
-- **API Reference**: `/help/page/api-reference` - REST API docs
-- **Banking Guide**: `/help/page/banking-solutions` - Banking solutions
+- **API Reference**: `/help/api-reference` - REST API docs
+- **Banking Guide**: `/help/banking-solutions` - Banking solutions
+- **CoT/ToT Tutorial**: `/help/cot-tot` - Advanced reasoning patterns
+- **Goal-Based Agents**: `/help/goal-based-agents` - Autonomous planning agents
+- **ReAct/Reflect/Hierarchical**: `/help/react-reflect-hierarchical` - Agent patterns
+- **Notifications**: `/help/notifications` - Slack, Teams, Webhooks
 
 ---
 
 ## File Structure Reference
 
 ```
-abhikarta-llm-v1.3.0/
+abhikarta-llm-v1.4.0/
 ├── abhikarta/
 │   ├── agent/          # Agent management
 │   ├── config/         # Configuration
-│   ├── database/       # Database layer (22 tables)
+│   ├── database/       # Database layer (27 tables)
 │   ├── hitl/           # Human-in-the-loop
 │   ├── langchain/      # LangChain/LangGraph integration
+│   ├── llm/            # LLM Adapter (v1.3.0)
 │   ├── llm_provider/   # Multi-provider LLM facade
 │   ├── mcp/            # MCP server management
+│   ├── messaging/      # Kafka/RabbitMQ/ActiveMQ (v1.3.0)
+│   ├── notification/   # Slack/Teams/Webhooks (v1.4.0)
+│   ├── swarm/          # Agent Swarms (v1.3.0)
 │   ├── tools/          # Tools system + prebuilt (85)
 │   │   └── prebuilt/   # Common(28), Banking(13), Integration(20), General(24)
 │   ├── web/            # Flask application
@@ -487,4 +657,4 @@ abhikarta-llm-v1.3.0/
 
 ---
 
-*Version 1.3.0 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
+*Version 1.4.0 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*

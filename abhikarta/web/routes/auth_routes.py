@@ -223,6 +223,11 @@ class AuthRoutes(AbstractRoutes):
                 'llm-management': 'help/pages/llm_management.html',
                 'glossary': 'help/pages/glossary.html',
                 'database-schema': 'help/pages/database_schema.html',
+                # v1.4.0 tutorials
+                'cot-tot': 'help/pages/cot-tot.html',
+                'goal-based-agents': 'help/pages/goal-based-agents.html',
+                'react-reflect-hierarchical': 'help/pages/react-reflect-hierarchical.html',
+                'notifications': 'help/pages/notifications.html',
             }
             
             template = page_map.get(page)
@@ -318,6 +323,12 @@ class AuthRoutes(AbstractRoutes):
                 'PATENT_APPLICATION': 'Patent Application',
                 'PATENT_WORTHINESS_ANALYSIS': 'Patent Worthiness Analysis',
                 'LEGAL_NOTICE': 'Legal Notice',
+                'COT_TOT_TUTORIAL': 'Chain of Thought & Tree of Thought Tutorial',
+                'GOAL_BASED_AGENTS_TUTORIAL': 'Goal-Based Agents Tutorial',
+                'NOTIFICATION_QUICKSTART': 'Notifications Quick Start',
+                'NOTIFICATION_ARCHITECTURE': 'Notifications Architecture',
+                'REACT_REFLECT_HIERARCHICAL_TUTORIAL': 'ReAct, Reflect & Hierarchical Agents Tutorial',
+                'REQUIREMENTS': 'Requirements Specification',
             }
             
             title = doc_titles.get(filename, filename)
@@ -344,9 +355,16 @@ class AuthRoutes(AbstractRoutes):
                 'QUICKSTART': os.path.join(base_path, 'docs', 'QUICKSTART.md'),
                 'DESIGN': os.path.join(base_path, 'docs', 'DESIGN.md'),
                 'ACTORS': os.path.join(base_path, 'docs', 'ACTORS.md'),
+                'REQUIREMENTS': os.path.join(base_path, 'docs', 'REQUIREMENTS.md'),
                 'PATENT_APPLICATION': os.path.join(base_path, 'docs', 'PATENT_APPLICATION.md'),
                 'PATENT_WORTHINESS_ANALYSIS': os.path.join(base_path, 'docs', 'PATENT_WORTHINESS_ANALYSIS.md'),
                 'LEGAL_NOTICE': os.path.join(base_path, 'LEGAL_NOTICE.md'),
+                # v1.4.0 tutorials
+                'COT_TOT_TUTORIAL': os.path.join(base_path, 'docs', 'COT_TOT_TUTORIAL.md'),
+                'GOAL_BASED_AGENTS_TUTORIAL': os.path.join(base_path, 'docs', 'GOAL_BASED_AGENTS_TUTORIAL.md'),
+                'REACT_REFLECT_HIERARCHICAL_TUTORIAL': os.path.join(base_path, 'docs', 'REACT_REFLECT_HIERARCHICAL_TUTORIAL.md'),
+                'NOTIFICATION_QUICKSTART': os.path.join(base_path, 'docs', 'NOTIFICATION_QUICKSTART.md'),
+                'NOTIFICATION_ARCHITECTURE': os.path.join(base_path, 'docs', 'NOTIFICATION_ARCHITECTURE.md'),
             }
             
             file_path = file_map.get(filename)

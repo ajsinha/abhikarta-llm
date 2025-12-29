@@ -30,7 +30,7 @@ class SQLiteSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.3.0"
+    SCHEMA_VERSION = "1.4.0"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -698,6 +698,99 @@ class SQLiteSchema:
     """
     
     # ==========================================================================
+    # NOTIFICATION TABLES (v1.4.0)
+    # ==========================================================================
+    
+    CREATE_NOTIFICATION_CHANNELS = """
+    CREATE TABLE IF NOT EXISTS notification_channels (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        channel_id TEXT UNIQUE NOT NULL,
+        channel_type TEXT NOT NULL,
+        name TEXT NOT NULL,
+        config TEXT NOT NULL,
+        is_active INTEGER DEFAULT 1,
+        created_by TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+    
+    CREATE_NOTIFICATION_LOGS = """
+    CREATE TABLE IF NOT EXISTS notification_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        notification_id TEXT UNIQUE NOT NULL,
+        channel_id TEXT,
+        channel_type TEXT NOT NULL,
+        recipient TEXT,
+        title TEXT,
+        body TEXT,
+        level TEXT DEFAULT 'info',
+        status TEXT DEFAULT 'pending',
+        error_message TEXT,
+        source TEXT,
+        source_type TEXT,
+        correlation_id TEXT,
+        sent_at TIMESTAMP,
+        delivered_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+    
+    CREATE_WEBHOOK_ENDPOINTS = """
+    CREATE TABLE IF NOT EXISTS webhook_endpoints (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        endpoint_id TEXT UNIQUE NOT NULL,
+        path TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        auth_method TEXT DEFAULT 'hmac',
+        secret_hash TEXT,
+        target_type TEXT,
+        target_id TEXT,
+        rate_limit INTEGER DEFAULT 100,
+        is_active INTEGER DEFAULT 1,
+        created_by TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+    
+    CREATE_WEBHOOK_EVENTS = """
+    CREATE TABLE IF NOT EXISTS webhook_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id TEXT UNIQUE NOT NULL,
+        endpoint_id TEXT NOT NULL,
+        event_type TEXT,
+        payload TEXT,
+        headers TEXT,
+        source_ip TEXT,
+        verified INTEGER DEFAULT 0,
+        processed INTEGER DEFAULT 0,
+        process_result TEXT,
+        error_message TEXT,
+        received_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        processed_at TIMESTAMP,
+        FOREIGN KEY (endpoint_id) REFERENCES webhook_endpoints(endpoint_id)
+    );
+    """
+    
+    CREATE_USER_NOTIFICATION_PREFS = """
+    CREATE TABLE IF NOT EXISTS user_notification_preferences (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL,
+        channel_type TEXT NOT NULL,
+        channel_address TEXT,
+        enabled INTEGER DEFAULT 1,
+        min_level TEXT DEFAULT 'info',
+        quiet_hours_start TEXT,
+        quiet_hours_end TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, channel_type)
+    );
+    """
+    
+    # ==========================================================================
     # INDEXES
     # ==========================================================================
     
@@ -760,6 +853,16 @@ class SQLiteSchema:
         "CREATE INDEX IF NOT EXISTS idx_swarm_events_correlation_id ON swarm_events(correlation_id);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_decisions_swarm_id ON swarm_decisions(swarm_id);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_decisions_execution_id ON swarm_decisions(execution_id);",
+        # Notification indexes (v1.4.0)
+        "CREATE INDEX IF NOT EXISTS idx_notification_logs_channel_type ON notification_logs(channel_type);",
+        "CREATE INDEX IF NOT EXISTS idx_notification_logs_status ON notification_logs(status);",
+        "CREATE INDEX IF NOT EXISTS idx_notification_logs_source ON notification_logs(source);",
+        "CREATE INDEX IF NOT EXISTS idx_notification_logs_created_at ON notification_logs(created_at);",
+        "CREATE INDEX IF NOT EXISTS idx_webhook_endpoints_path ON webhook_endpoints(path);",
+        "CREATE INDEX IF NOT EXISTS idx_webhook_endpoints_is_active ON webhook_endpoints(is_active);",
+        "CREATE INDEX IF NOT EXISTS idx_webhook_events_endpoint_id ON webhook_events(endpoint_id);",
+        "CREATE INDEX IF NOT EXISTS idx_webhook_events_received_at ON webhook_events(received_at);",
+        "CREATE INDEX IF NOT EXISTS idx_user_notification_prefs_user_id ON user_notification_preferences(user_id);",
     ]
     
     # ==========================================================================
@@ -921,6 +1024,12 @@ class SQLiteSchema:
             self.CREATE_SWARM_EXECUTIONS_TABLE,
             self.CREATE_SWARM_EVENTS_TABLE,
             self.CREATE_SWARM_DECISIONS_TABLE,
+            # Notification tables (v1.4.0)
+            self.CREATE_NOTIFICATION_CHANNELS,
+            self.CREATE_NOTIFICATION_LOGS,
+            self.CREATE_WEBHOOK_ENDPOINTS,
+            self.CREATE_WEBHOOK_EVENTS,
+            self.CREATE_USER_NOTIFICATION_PREFS,
         ]
     
     def get_all_index_statements(self) -> list:

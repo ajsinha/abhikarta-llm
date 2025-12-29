@@ -577,7 +577,7 @@ def main():
 ║                                                                              ║
 ║     All resources have been released gracefully.                             ║
 ║                                                                              ║
-║     👋  Goodbye! Thank you for using Abhikarta-LLM v1.3.0                    ║
+║     👋  Goodbye! Thank you for using Abhikarta-LLM v1.4.0                    ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 \033[0m''')

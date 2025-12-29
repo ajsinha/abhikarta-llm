@@ -1,0 +1,362 @@
+{% extends "help/help_base.html" %}
+
+{% block title %}Chain of Thought & Tree of Thought - {{ app_name }}{% endblock %}
+
+{% block help_content %}
+<div class="help-content">
+    <h1><i class="bi bi-diagram-3 me-2 text-primary"></i>Chain of Thought & Tree of Thought</h1>
+    <p class="lead">Advanced reasoning patterns for complex problem-solving with AI agents.</p>
+
+    <div class="alert alert-success mb-4">
+        <i class="bi bi-lightbulb me-2"></i>
+        <strong>Pro Tip:</strong> CoT improves accuracy by 2-3x on complex reasoning tasks. ToT can explore multiple solutions simultaneously.
+    </div>
+
+    <hr>
+
+    <h2 id="overview">Overview</h2>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-arrow-down me-2"></i>Chain of Thought (CoT)</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Linear reasoning</strong> - The model "thinks step by step" before answering.</p>
+                    <pre class="bg-light p-2 rounded">Problem → Step 1 → Step 2 → Step 3 → Answer</pre>
+                    <h6>Best For:</h6>
+                    <ul class="mb-0">
+                        <li>Math problems</li>
+                        <li>Logical deduction</li>
+                        <li>Code debugging</li>
+                        <li>Multi-step analysis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-diagram-2 me-2"></i>Tree of Thought (ToT)</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Parallel exploration</strong> - Multiple solution paths explored and evaluated.</p>
+                    <pre class="bg-light p-2 rounded">Problem → [Path A, Path B, Path C] → Evaluate → Best</pre>
+                    <h6>Best For:</h6>
+                    <ul class="mb-0">
+                        <li>Creative tasks</li>
+                        <li>Strategy planning</li>
+                        <li>Design problems</li>
+                        <li>Optimization</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="quick-start">Quick Start</h2>
+
+    <h4>Creating a CoT Agent</h4>
+    <ol>
+        <li>Go to <strong>Agents → Create Agent</strong></li>
+        <li>Set <strong>Agent Type</strong> to "Chain of Thought (CoT)"</li>
+        <li>The system prompt will auto-populate with CoT instructions</li>
+        <li>Set <strong>Temperature</strong> to <code>0.2-0.4</code> (lower = more deterministic)</li>
+        <li>Save and Publish</li>
+    </ol>
+
+    <div class="card bg-light mb-4">
+        <div class="card-body">
+            <h6>Example CoT System Prompt:</h6>
+            <pre class="mb-0"><code>You are a logical reasoning agent. For every question:
+
+**Step 1 - Understand**: Clearly state what is being asked
+**Step 2 - Identify**: List relevant facts and constraints
+**Step 3 - Reason**: Work through the problem step by step
+**Step 4 - Conclude**: State your final answer
+
+Always show your complete reasoning. Never skip steps.</code></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="cot-examples">CoT Examples</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Math Problem with CoT</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Input:</strong></p>
+            <blockquote class="blockquote bg-light p-3 rounded">
+                "A farmer has 3 fields. Field A produces 120 bushels/acre (15 acres). Field B produces 80% of Field A (20 acres). Field C produces 50 more bushels than Field B (10 acres). What's the total production?"
+            </blockquote>
+            
+            <p><strong>CoT Output:</strong></p>
+            <div class="bg-light p-3 rounded">
+                <p><strong>Step 1 - Field A:</strong> 120 × 15 = 1,800 bushels</p>
+                <p><strong>Step 2 - Field B rate:</strong> 80% × 120 = 96 bushels/acre</p>
+                <p><strong>Step 3 - Field B:</strong> 96 × 20 = 1,920 bushels</p>
+                <p><strong>Step 4 - Field C rate:</strong> 96 + 50 = 146 bushels/acre</p>
+                <p><strong>Step 5 - Field C:</strong> 146 × 10 = 1,460 bushels</p>
+                <p><strong>Step 6 - Total:</strong> 1,800 + 1,920 + 1,460 = <strong>5,180 bushels</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="tot-implementation">ToT Implementation</h2>
+
+    <p>Abhikarta implements Tree of Thought through a multi-stage workflow:</p>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <pre class="mb-0">
+                    [Problem Input]
+                           │
+                           ▼
+                    ┌──────────────┐
+                    │  DECOMPOSE   │  Break into sub-problems
+                    └──────┬───────┘
+                           │
+                           ▼
+                    ┌──────────────┐
+                    │    BRANCH    │  Generate N solution paths
+                    └──────┬───────┘
+                      ┌────┼────┐
+                      ▼    ▼    ▼
+                    [P1] [P2] [P3]   Parallel exploration
+                      │    │    │
+                      ▼    ▼    ▼
+                    ┌──────────────┐
+                    │   EVALUATE   │  Score each path
+                    └──────┬───────┘
+                           │
+                           ▼
+                    ┌──────────────┐
+                    │    REFINE    │  Develop best solution
+                    └──────┬───────┘
+                           │
+                           ▼
+                    [Final Solution]
+            </pre>
+        </div>
+    </div>
+
+    <h4>Creating a ToT Workflow</h4>
+    <ol>
+        <li>Go to <strong>Workflows → Create Workflow</strong></li>
+        <li>Add a <strong>Decompose</strong> LLM node (temp: 0.3)</li>
+        <li>Add 3 parallel <strong>Branch</strong> LLM nodes (temp: 0.7)</li>
+        <li>Add an <strong>Evaluate</strong> node that receives all branches (temp: 0.2)</li>
+        <li>Add a <strong>Refine</strong> node (temp: 0.4)</li>
+        <li>Connect: Decompose → [Branch1, Branch2, Branch3] → Evaluate → Refine</li>
+    </ol>
+
+    <hr>
+
+    <h2 id="workflows">Using in Workflows</h2>
+
+    <div class="card bg-light mb-4">
+        <div class="card-body">
+            <h6>YAML Workflow Definition:</h6>
+            <pre class="mb-0"><code>name: CoT Decision Workflow
+nodes:
+  - node_id: analyze
+    node_type: llm
+    config:
+      system_prompt: |
+        Analyze this using chain of thought:
+        1. UNDERSTAND the situation
+        2. IDENTIFY key factors
+        3. EVALUATE options
+        4. RECOMMEND action
+      model: gpt-4
+      temperature: 0.3
+  
+  - node_id: decide
+    node_type: condition
+    config:
+      conditions:
+        - expression: "'urgent' in analyze.output.lower()"
+          target: escalate
+        - default: normal_process
+    depends_on: [analyze]</code></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="swarms">Using in Agent Swarms</h2>
+
+    <p>The Master Actor in a swarm can use CoT reasoning to decide task delegation:</p>
+
+    <div class="card bg-light mb-4">
+        <div class="card-body">
+            <h6>Master Actor with CoT:</h6>
+            <pre class="mb-0"><code>When you receive a task, reason through it step by step:
+
+1. UNDERSTAND: What exactly needs to be done?
+2. DECOMPOSE: What subtasks are involved?
+3. MATCH: Which agents have the right capabilities?
+4. SEQUENCE: What order should agents work?
+5. DELEGATE: Assign specific tasks to specific agents.
+
+Output your delegation decision as JSON after reasoning.</code></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="best-practices">Best Practices</h2>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-check-circle me-2"></i>Do
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Use explicit "think step by step" instructions</li>
+                        <li>Provide structured output formats</li>
+                        <li>Set low temperature (0.2-0.4) for CoT</li>
+                        <li>Set higher temperature (0.6-0.8) for ToT branching</li>
+                        <li>Include verification step</li>
+                        <li>Budget for 2-3x tokens (CoT) or 5-10x tokens (ToT)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-x-circle me-2"></i>Don't
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Skip to answers without showing work</li>
+                        <li>Use high temperature for CoT reasoning</li>
+                        <li>Make ToT branches too similar</li>
+                        <li>Forget evaluation in ToT</li>
+                        <li>Use CoT/ToT for simple factual queries</li>
+                        <li>Ignore token costs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Temperature Guidelines</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Phase</th>
+                    <th>Temperature</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Problem Decomposition</td>
+                    <td><code>0.2 - 0.3</code></td>
+                    <td>Accurate understanding needed</td>
+                </tr>
+                <tr>
+                    <td>CoT Reasoning</td>
+                    <td><code>0.2 - 0.4</code></td>
+                    <td>Deterministic logical steps</td>
+                </tr>
+                <tr>
+                    <td>ToT Branching</td>
+                    <td><code>0.6 - 0.8</code></td>
+                    <td>Creative diversity needed</td>
+                </tr>
+                <tr>
+                    <td>ToT Evaluation</td>
+                    <td><code>0.1 - 0.3</code></td>
+                    <td>Objective scoring</td>
+                </tr>
+                <tr>
+                    <td>ToT Refinement</td>
+                    <td><code>0.3 - 0.5</code></td>
+                    <td>Balanced development</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+
+    <h2 id="when-to-use">When to Use Each</h2>
+
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Task Type</th>
+                    <th>Recommended</th>
+                    <th>Rationale</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Math problems</td>
+                    <td><span class="badge bg-primary">CoT</span></td>
+                    <td>Single correct answer, linear steps</td>
+                </tr>
+                <tr>
+                    <td>Code debugging</td>
+                    <td><span class="badge bg-primary">CoT</span></td>
+                    <td>Systematic analysis needed</td>
+                </tr>
+                <tr>
+                    <td>Creative writing</td>
+                    <td><span class="badge bg-success">ToT</span></td>
+                    <td>Multiple valid approaches</td>
+                </tr>
+                <tr>
+                    <td>Business strategy</td>
+                    <td><span class="badge bg-success">ToT</span></td>
+                    <td>Explore alternatives</td>
+                </tr>
+                <tr>
+                    <td>Classification</td>
+                    <td><span class="badge bg-primary">CoT</span></td>
+                    <td>Explain reasoning</td>
+                </tr>
+                <tr>
+                    <td>Design tasks</td>
+                    <td><span class="badge bg-success">ToT</span></td>
+                    <td>Generate options</td>
+                </tr>
+                <tr>
+                    <td>Simple facts</td>
+                    <td><span class="badge bg-secondary">Neither</span></td>
+                    <td>Direct answer sufficient</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ url_for('help_page', page='agent_visual_designer') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-1"></i>Agent Designer
+        </a>
+        <a href="{{ url_for('markdown_viewer', filename='COT_TOT_TUTORIAL') }}" class="btn btn-primary">
+            <i class="bi bi-book me-1"></i>Full Tutorial
+        </a>
+        <a href="{{ url_for('help_page', page='workflow-dags') }}" class="btn btn-outline-primary">
+            Workflow DAGs<i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,20 +1,21 @@
-# Abhikarta-LLM v1.3.0 - Architecture Design Document
+# Abhikarta-LLM v1.4.0 - Architecture Design Document
 
 ## Table of Contents
 
 1. [Overview](#1-overview)
 2. [System Architecture](#2-system-architecture)
-3. [Actor System (NEW)](#3-actor-system)
-4. [Database Design](#4-database-design)
-5. [Agent System Design](#5-agent-system-design)
-6. [Workflow Engine Design](#6-workflow-engine-design)
-7. [LLM Provider Integration](#7-llm-provider-integration)
-8. [Human-in-the-Loop System](#8-human-in-the-loop-system)
-9. [Tools System Design](#9-tools-system-design)
-10. [MCP Plugin Framework](#10-mcp-plugin-framework)
-11. [Pre-built Solutions](#11-pre-built-solutions)
-12. [Security Architecture](#12-security-architecture)
-13. [API Design](#13-api-design)
+3. [Actor System](#3-actor-system)
+4. [Notification System (v1.4.0)](#4-notification-system)
+5. [Database Design](#5-database-design)
+6. [Agent System Design](#6-agent-system-design)
+7. [Workflow Engine Design](#7-workflow-engine-design)
+8. [LLM Provider Integration](#8-llm-provider-integration)
+9. [Human-in-the-Loop System](#9-human-in-the-loop-system)
+10. [Tools System Design](#10-tools-system-design)
+11. [MCP Plugin Framework](#11-mcp-plugin-framework)
+12. [Pre-built Solutions](#12-pre-built-solutions)
+13. [Security Architecture](#13-security-architecture)
+14. [API Design](#14-api-design)
 
 ---
 
@@ -59,7 +60,7 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 │                     PRESENTATION LAYER                           │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
 │  │   Web UI    │  │  REST API   │  │  Help Documentation     │  │
-│  │  (Flask)    │  │  Endpoints  │  │  (30+ pages)            │  │
+│  │  (Flask)    │  │  Endpoints  │  │  (35+ pages)            │  │
 │  └─────────────┘  └─────────────┘  └─────────────────────────┘  │
 ├─────────────────────────────────────────────────────────────────┤
 │                     APPLICATION LAYER                            │
@@ -67,8 +68,12 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 │  │ Agent        │ │ Workflow     │ │ HITL         │             │
 │  │ Manager      │ │ Engine       │ │ Manager      │             │
 │  └──────────────┘ └──────────────┘ └──────────────┘             │
+│  ┌──────────────┐ ┌──────────────┐                              │
+│  │ Swarm        │ │ Notification │  (v1.3.0+)                   │
+│  │ Orchestrator │ │ Manager      │  (v1.4.0)                    │
+│  └──────────────┘ └──────────────┘                              │
 ├─────────────────────────────────────────────────────────────────┤
-│                   ACTOR SYSTEM LAYER (NEW in v1.3.0)             │
+│                   ACTOR SYSTEM LAYER (v1.3.0)                    │
 │  ┌───────────────────────────────────────────────────────────┐  │
 │  │                    ActorSystem                             │  │
 │  │  ┌─────────┐ ┌─────────────┐ ┌────────────┐ ┌──────────┐  │  │
@@ -77,6 +82,17 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 │  │  └─────────┘ └─────────────┘ └────────────┘ └──────────┘  │  │
 │  │  ┌──────────────────────────────────────────────────────┐ │  │
 │  │  │ Patterns: Routers │ CircuitBreaker │ Aggregator      │ │  │
+│  │  └──────────────────────────────────────────────────────┘ │  │
+│  └───────────────────────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────────────┤
+│                   NOTIFICATION LAYER (v1.4.0)                    │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐  │  │
+│  │  │ Slack       │ │ Teams       │ │ Webhook Receiver    │  │  │
+│  │  │ Adapter     │ │ Adapter     │ │ (HMAC/JWT/API Key)  │  │  │
+│  │  └─────────────┘ └─────────────┘ └─────────────────────┘  │  │
+│  │  ┌──────────────────────────────────────────────────────┐ │  │
+│  │  │ Rate Limiting │ Retry Logic │ Audit Logging          │ │  │
 │  │  └──────────────────────────────────────────────────────┘ │  │
 │  └───────────────────────────────────────────────────────────┘  │
 ├─────────────────────────────────────────────────────────────────┤
@@ -94,11 +110,15 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 │  │ LangChain    │ │ MCP Clients  │ │ LLM Provider Facade      │ │
 │  │ LangGraph    │ │ (HTTP/WS)    │ │ (11 providers)           │ │
 │  └──────────────┘ └──────────────┘ └──────────────────────────┘ │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐ │
+│  │ Kafka        │ │ RabbitMQ     │ │ Slack/Teams APIs         │ │
+│  │ (v1.3.0)     │ │ (v1.3.0)     │ │ (v1.4.0)                 │ │
+│  └──────────────┘ └──────────────┘ └──────────────────────────┘ │
 ├─────────────────────────────────────────────────────────────────┤
 │                        DATA LAYER                                │
 │  ┌────────────────────────────────────────────────────────────┐ │
-│  │  DatabaseFacade │ 9 Delegates │ PostgreSQL/SQLite (22 Tbl) │ │
-│  │  Core │ Users │ LLM │ Tools │ HITL │ Audit │ Config        │ │
+│  │  DatabaseFacade │ 10 Delegates │ PostgreSQL/SQLite (27 Tbl)│ │
+│  │  Core│Users│LLM│Tools│HITL│Audit│Config│Swarm│Notification │ │
 │  └────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -297,9 +317,233 @@ agents = [
 
 ---
 
-## 4. Database Design
+## 4. Notification System (v1.4.0)
 
-### 4.1 Schema Overview (22 Tables)
+### 4.1 Overview
+
+The Notification System provides enterprise-grade multi-channel notifications for agents, workflows, and swarms. It supports outgoing notifications (Slack, Teams, Email) and incoming webhooks from external systems.
+
+### 4.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   NOTIFICATION SYSTEM                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                  NotificationManager                      │   │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐ │   │
+│  │  │ Routing     │ │ Rate        │ │ Retry Logic         │ │   │
+│  │  │ Engine      │ │ Limiter     │ │ (Exp. Backoff)      │ │   │
+│  │  └─────────────┘ └─────────────┘ └─────────────────────┘ │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│         ┌────────────────────┼────────────────────┐             │
+│         ▼                    ▼                    ▼             │
+│  ┌─────────────┐      ┌─────────────┐      ┌─────────────┐     │
+│  │ Slack       │      │ Teams       │      │ Email       │     │
+│  │ Adapter     │      │ Adapter     │      │ Adapter     │     │
+│  │ ─────────── │      │ ─────────── │      │ ─────────── │     │
+│  │ Block Kit   │      │ Adaptive    │      │ SMTP        │     │
+│  │ Web API     │      │ Cards       │      │ Templates   │     │
+│  └─────────────┘      └─────────────┘      └─────────────┘     │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                   WEBHOOK RECEIVER                               │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                  WebhookReceiver                          │   │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐ │   │
+│  │  │ Signature   │ │ Replay      │ │ Event               │ │   │
+│  │  │ Verification│ │ Protection  │ │ Dispatcher          │ │   │
+│  │  └─────────────┘ └─────────────┘ └─────────────────────┘ │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│         ┌────────────────────┼────────────────────┐             │
+│         ▼                    ▼                    ▼             │
+│  ┌─────────────┐      ┌─────────────┐      ┌─────────────┐     │
+│  │ Trigger     │      │ Trigger     │      │ Trigger     │     │
+│  │ Agent       │      │ Workflow    │      │ Swarm       │     │
+│  └─────────────┘      └─────────────┘      └─────────────┘     │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 4.3 NotificationManager
+
+Central orchestrator for all notification operations:
+
+```python
+class NotificationManager:
+    """Routes notifications to appropriate channels with retry and rate limiting."""
+    
+    def __init__(self, db_facade: DatabaseFacade):
+        self.db = db_facade
+        self.adapters = {
+            ChannelType.SLACK: SlackAdapter(),
+            ChannelType.TEAMS: TeamsAdapter(),
+            ChannelType.EMAIL: EmailAdapter()
+        }
+        self.rate_limiters = {}  # Per-channel token bucket
+    
+    async def send(self, notification: Notification) -> NotificationResult:
+        """Send notification with rate limiting and retry."""
+        # Check rate limit
+        if not self._check_rate_limit(notification.channel_id):
+            return NotificationResult(success=False, error="Rate limited")
+        
+        # Get adapter and send
+        adapter = self.adapters[notification.channel_type]
+        result = await self._send_with_retry(adapter, notification)
+        
+        # Log result
+        self.db.notifications.log_notification(notification, result)
+        return result
+    
+    async def _send_with_retry(self, adapter, notification, max_retries=3):
+        """Exponential backoff retry logic."""
+        for attempt in range(max_retries):
+            try:
+                return await adapter.send(notification)
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    raise
+                await asyncio.sleep(2 ** attempt)  # 1s, 2s, 4s
+```
+
+### 4.4 Slack Adapter
+
+```python
+class SlackAdapter:
+    """Slack Web API integration with Block Kit support."""
+    
+    async def send(self, notification: Notification) -> NotificationResult:
+        # Build Block Kit message
+        blocks = self._build_blocks(notification)
+        
+        # Send via Web API
+        response = await self.client.chat_postMessage(
+            channel=notification.channel_address,
+            text=notification.title,
+            blocks=blocks,
+            thread_ts=notification.thread_ts  # Optional thread reply
+        )
+        
+        return NotificationResult(
+            success=response["ok"],
+            message_id=response.get("ts")
+        )
+    
+    def _build_blocks(self, notification):
+        """Build Slack Block Kit blocks from notification."""
+        return [
+            {"type": "header", "text": {"type": "plain_text", "text": notification.title}},
+            {"type": "section", "text": {"type": "mrkdwn", "text": notification.body}},
+            {"type": "context", "elements": [
+                {"type": "mrkdwn", "text": f"Level: {notification.level.value}"}
+            ]}
+        ]
+```
+
+### 4.5 Webhook Receiver
+
+```python
+class WebhookReceiver:
+    """Receives and processes external webhooks."""
+    
+    def __init__(self, db_facade: DatabaseFacade):
+        self.db = db_facade
+        self.verifiers = {
+            AuthMethod.HMAC: HMACVerifier(),
+            AuthMethod.JWT: JWTVerifier(),
+            AuthMethod.API_KEY: APIKeyVerifier()
+        }
+    
+    async def handle(self, endpoint_path: str, request: Request) -> WebhookResult:
+        # Find endpoint
+        endpoint = self.db.notifications.get_webhook_endpoint(path=endpoint_path)
+        if not endpoint:
+            return WebhookResult(success=False, error="Endpoint not found")
+        
+        # Verify signature
+        verifier = self.verifiers[endpoint.auth_method]
+        if not await verifier.verify(request, endpoint.secret):
+            return WebhookResult(success=False, error="Signature verification failed")
+        
+        # Check replay protection
+        if self._is_replay(request):
+            return WebhookResult(success=False, error="Replay detected")
+        
+        # Log event
+        event_id = self.db.notifications.log_webhook_event(endpoint, request)
+        
+        # Dispatch to target
+        await self._dispatch(endpoint, request.json)
+        
+        return WebhookResult(success=True, event_id=event_id)
+    
+    async def _dispatch(self, endpoint: WebhookEndpoint, payload: dict):
+        """Dispatch webhook to agent, workflow, or swarm."""
+        if endpoint.target_type == TargetType.AGENT:
+            await self.agent_manager.execute(endpoint.target_id, payload)
+        elif endpoint.target_type == TargetType.WORKFLOW:
+            await self.workflow_engine.execute(endpoint.target_id, payload)
+        elif endpoint.target_type == TargetType.SWARM:
+            await self.swarm_orchestrator.trigger(endpoint.target_id, payload)
+```
+
+### 4.6 Authentication Methods
+
+| Method | How It Works | Best For |
+|--------|--------------|----------|
+| **HMAC-SHA256** | Compute hash of payload with shared secret, compare to header | GitHub, Stripe, Slack |
+| **JWT** | Verify JWT signature in Authorization header | Enterprise integrations |
+| **API Key** | Check X-API-Key header against stored key | Simple integrations |
+| **Basic** | Username/password in Authorization header | Legacy systems |
+
+### 4.7 Rate Limiting
+
+Token bucket algorithm prevents overwhelming external services:
+
+```python
+class TokenBucketRateLimiter:
+    def __init__(self, rate: int, capacity: int):
+        self.rate = rate          # Tokens per second
+        self.capacity = capacity  # Max bucket size
+        self.tokens = capacity
+        self.last_update = time.time()
+    
+    def acquire(self) -> bool:
+        """Try to acquire a token. Returns True if allowed."""
+        self._refill()
+        if self.tokens >= 1:
+            self.tokens -= 1
+            return True
+        return False
+    
+    def _refill(self):
+        """Add tokens based on elapsed time."""
+        now = time.time()
+        elapsed = now - self.last_update
+        self.tokens = min(self.capacity, self.tokens + elapsed * self.rate)
+        self.last_update = now
+```
+
+### 4.8 Database Tables (5 new)
+
+| Table | Purpose |
+|-------|---------|
+| `notification_channels` | Channel configurations (Slack, Teams, Email) |
+| `notification_logs` | Notification history and delivery status |
+| `webhook_endpoints` | Registered webhook paths and auth |
+| `webhook_events` | Incoming webhook event log |
+| `user_notification_preferences` | Per-user notification settings |
+
+---
+
+## 5. Database Design
+
+### 5.1 Schema Overview (27 Tables)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -571,7 +815,7 @@ graph = create_workflow_graph(workflow_definition)
 result = graph.invoke(input_data)
 ```
 
-### 6.4 LLM Adapter (v1.3.0 - NEW)
+### 6.4 LLM Adapter (v1.4.0 - NEW)
 
 The LLM Adapter provides an async-first interface for making LLM calls,
 designed for use in the swarm and agent modules.
@@ -638,7 +882,7 @@ response = await generate("Tell me a joke", provider='openai')
 
 ---
 
-### 6.5 Playground Navigation (v1.3.0 - NEW)
+### 6.5 Playground Navigation (v1.4.0 - NEW)
 
 The navigation has been streamlined with a unified **Playground** mega-menu combining Agents, Workflows, and Swarms:
 
@@ -661,13 +905,13 @@ The navigation has been streamlined with a unified **Playground** mega-menu comb
                     │   • Template Library              │
                     │   • Upload Workflow               │
                     ├───────────────────────────────────┤
-                    │ 🐝 SWARMS (v1.3.0)                │
+                    │ 🐝 SWARMS (v1.4.0)                │
                     │   • All Swarms                    │
                     │   • Swarm Designer                │
                     └───────────────────────────────────┘
 ```
 
-### 6.6 Swarm Execution Logging (v1.3.0 - NEW)
+### 6.6 Swarm Execution Logging (v1.4.0 - NEW)
 
 Swarm executions are fully logged to the database, similar to agent and workflow executions:
 
@@ -860,7 +1104,7 @@ class ToolsRegistry:
 - List/Array: 5 tools
 - Workflow: 3 tools
 
-#### General Tools (24) - NEW in v1.3.0
+#### General Tools (24) - NEW in v1.4.0
 - Web/Search: 4 tools (web_search, web_fetch, intranet_search, news_search)
 - Document Handling: 4 tools (read_document, write_document, convert_document, extract_document_metadata)
 - File Operations: 4 tools (list_files, copy_file, move_file, delete_file)
@@ -1126,6 +1370,162 @@ POST   /api/tools/{name}/execute # Execute tool
 
 ---
 
+## 13. Notification System (v1.4.0)
+
+### 13.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        NOTIFICATION MODULE                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                    NOTIFICATION MANAGER                              │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                  │   │
+│  │  │   Config    │  │   Queue     │  │   Logger    │                  │   │
+│  │  │   Loader    │  │   Manager   │  │   (Audit)   │                  │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘                  │   │
+│  └───────────────────────────┬─────────────────────────────────────────┘   │
+│                              │                                              │
+│  ┌───────────────────────────┼─────────────────────────────────────────┐   │
+│  │                    PROVIDER ADAPTERS                                 │   │
+│  │                           │                                          │   │
+│  │  ┌─────────────┐  ┌───────┴─────┐  ┌─────────────┐                  │   │
+│  │  │   Slack     │  │   Teams     │  │   Email     │                  │   │
+│  │  │   Adapter   │  │   Adapter   │  │   Adapter   │                  │   │
+│  │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                  │   │
+│  └─────────┼────────────────┼────────────────┼──────────────────────────┘   │
+│            │                │                │                              │
+│            ▼                ▼                ▼                              │
+│       ┌─────────┐     ┌─────────┐     ┌─────────┐                          │
+│       │ Slack   │     │ Teams   │     │ SMTP    │                          │
+│       │ API     │     │ Webhook │     │ Server  │                          │
+│       └─────────┘     └─────────┘     └─────────┘                          │
+│                                                                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                        WEBHOOK RECEIVER                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                  │   │
+│  │  │  Endpoint   │  │  Validator  │  │  Dispatcher │                  │   │
+│  │  │  Registry   │  │  & Auth     │  │  (Events)   │                  │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘                  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 13.2 Components
+
+#### NotificationManager
+Central orchestrator for all notification operations:
+- Multi-channel support (Slack, Teams, Email)
+- Priority-based routing
+- Retry with exponential backoff
+- Rate limiting per channel
+- Audit logging
+
+#### SlackAdapter
+Slack integration using Web API:
+- Channel messages (#channel)
+- Direct messages (@user)
+- Rich formatting (Block Kit)
+- Thread replies
+- File attachments
+
+#### TeamsAdapter
+Microsoft Teams integration using Incoming Webhooks:
+- Channel messages
+- Adaptive Cards
+- MessageCard format
+- Action buttons
+
+#### WebhookReceiver
+Receives and processes incoming webhooks:
+- Endpoint registration
+- Signature verification (HMAC, JWT, API key)
+- Payload validation
+- Event dispatching to agents/workflows/swarms
+- Rate limiting and replay protection
+
+### 13.3 Database Tables
+
+```sql
+-- Notification Channels Configuration
+notification_channels (
+    channel_id, channel_type, name, config, is_active, created_by
+)
+
+-- Notification Logs
+notification_logs (
+    notification_id, channel_type, recipient, title, body, level,
+    status, source, source_type, correlation_id, sent_at
+)
+
+-- Webhook Endpoints
+webhook_endpoints (
+    endpoint_id, path, name, auth_method, secret_hash,
+    target_type, target_id, rate_limit, is_active
+)
+
+-- Webhook Events
+webhook_events (
+    event_id, endpoint_id, event_type, payload, headers,
+    source_ip, verified, processed, received_at
+)
+
+-- User Notification Preferences
+user_notification_preferences (
+    user_id, channel_type, channel_address, enabled,
+    min_level, quiet_hours_start, quiet_hours_end
+)
+```
+
+### 13.4 Integration with Agents/Workflows/Swarms
+
+Agents, workflows, and swarms can send notifications:
+
+```python
+# From an Agent
+await notification_manager.send(
+    channels=["slack", "teams"],
+    message=NotificationMessage(
+        title="Agent Task Complete",
+        body="Data analysis finished",
+        level=NotificationLevel.SUCCESS,
+        source=agent_id,
+        source_type="agent"
+    )
+)
+
+# From a Workflow Node
+- node_id: notify_success
+  node_type: notification
+  config:
+    channels: ["slack"]
+    level: success
+    title: "Workflow Complete"
+
+# From a Swarm Master Actor
+await master_actor.notify_stakeholders(event, channels=["slack", "teams"])
+```
+
+### 13.5 Webhook Triggers
+
+External systems can trigger agents/workflows/swarms via webhooks:
+
+```python
+# Register endpoint
+receiver.register_endpoint(
+    path="/webhooks/github",
+    name="GitHub Webhook",
+    auth_method=AuthMethod.HMAC,
+    secret="github-secret",
+    target_type="swarm",
+    target_id="code-review-swarm"
+)
+```
+
+---
+
 ## Appendix A: Module Structure
 
 ```
@@ -1136,9 +1536,19 @@ abhikarta/
 ├── database/           # Database layer (5 files)
 ├── hitl/               # HITL system (1 file)
 ├── langchain/          # LangChain integration (4 files)
+├── llm/                # LLM Adapter (v1.3.0) (2 files)
 ├── llm_provider/       # LLM facade (1 file)
 ├── mcp/                # MCP integration (3 files)
+├── messaging/          # Message brokers (v1.3.0) (6 files)
+├── notification/       # Notification system (v1.4.0) (6 files)
+│   ├── __init__.py
+│   ├── base.py         # Data models and enums
+│   ├── manager.py      # NotificationManager
+│   ├── slack_adapter.py
+│   ├── teams_adapter.py
+│   └── webhook_receiver.py
 ├── rbac/               # Access control (1 file)
+├── swarm/              # Agent Swarms (v1.3.0) (5 files)
 ├── tools/              # Tools system (8 files)
 │   └── prebuilt/       # Pre-built tools (4 files)
 ├── user_management/    # User management (1 file)
@@ -1149,4 +1559,4 @@ abhikarta/
 
 ---
 
-*Version 1.3.0 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*
+*Version 1.4.0 - Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.*

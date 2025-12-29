@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Webhook Endpoint - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-pencil me-2 text-info"></i>Edit Webhook Endpoint</h2>
+                    <p class="text-muted mb-0">Modify webhook endpoint configuration</p>
+                </div>
+                <a href="{{ url_for('webhook_endpoints') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+
+            <!-- Endpoint URL -->
+            <div class="alert alert-info mb-4">
+                <strong>Webhook URL:</strong> 
+                <code>{{ request.url_root }}api/webhooks/{{ endpoint.path }}</code>
+                <button class="btn btn-sm btn-link p-0 ms-2" onclick="copyUrl()">
+                    <i class="bi bi-clipboard"></i> Copy
+                </button>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Endpoint Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <!-- Basic Info -->
+                        <h6 class="text-muted mb-3">Basic Information</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Endpoint Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" required
+                                   value="{{ endpoint.name }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Path</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><code>/api/webhooks/</code></span>
+                                <input type="text" class="form-control" value="{{ endpoint.path }}" disabled>
+                            </div>
+                            <div class="form-text">Path cannot be changed after creation</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="2">{{ endpoint.description or '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input type="checkbox" name="is_active" class="form-check-input" id="isActive" 
+                                       {{ 'checked' if endpoint.is_active }}>
+                                <label class="form-check-label" for="isActive">Active</label>
+                            </div>
+                            <div class="form-text">Enable or disable this endpoint</div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Authentication -->
+                        <h6 class="text-muted mb-3">Authentication</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Authentication Method</label>
+                            <select name="auth_method" class="form-select" id="authMethod" onchange="toggleAuthFields()">
+                                <option value="hmac" {{ 'selected' if endpoint.auth_method == 'hmac' }}>HMAC-SHA256 Signature</option>
+                                <option value="jwt" {{ 'selected' if endpoint.auth_method == 'jwt' }}>JWT Token</option>
+                                <option value="api_key" {{ 'selected' if endpoint.auth_method == 'api_key' }}>API Key</option>
+                                <option value="basic" {{ 'selected' if endpoint.auth_method == 'basic' }}>Basic Auth</option>
+                                <option value="none" {{ 'selected' if endpoint.auth_method == 'none' }}>None</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="secretField" style="{{ 'display: none;' if endpoint.auth_method == 'none' else '' }}">
+                            <label class="form-label">New Secret Key (leave blank to keep existing)</label>
+                            <div class="input-group">
+                                <input type="text" name="secret" class="form-control" id="secretInput"
+                                       placeholder="Enter new secret or leave blank">
+                                <button type="button" class="btn btn-outline-secondary" onclick="generateSecret()">
+                                    <i class="bi bi-dice-5"></i> Generate
+                                </button>
+                            </div>
+                            <div class="form-text">Only update if you need to change the secret</div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Target -->
+                        <h6 class="text-muted mb-3">Target Action</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Target Type</label>
+                            <select name="target_type" class="form-select" id="targetType" onchange="toggleTargetId()">
+                                <option value="" {{ 'selected' if not endpoint.target_type }}>Manual Handler</option>
+                                <option value="agent" {{ 'selected' if endpoint.target_type == 'agent' }}>Trigger Agent</option>
+                                <option value="workflow" {{ 'selected' if endpoint.target_type == 'workflow' }}>Trigger Workflow</option>
+                                <option value="swarm" {{ 'selected' if endpoint.target_type == 'swarm' }}>Trigger Swarm</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="targetIdField" style="{{ '' if endpoint.target_type else 'display: none;' }}">
+                            <label class="form-label">Target ID</label>
+                            <input type="text" name="target_id" class="form-control" id="targetIdInput"
+                                   value="{{ endpoint.target_id or '' }}">
+                        </div>
+
+                        <hr>
+
+                        <!-- Rate Limiting -->
+                        <h6 class="text-muted mb-3">Rate Limiting</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Rate Limit (requests/minute)</label>
+                            <input type="number" name="rate_limit" class="form-control" 
+                                   value="{{ endpoint.rate_limit or 100 }}" min="1" max="10000">
+                        </div>
+
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('webhook_events', endpoint_id=endpoint.endpoint_id) }}" class="btn btn-outline-info">
+                                <i class="bi bi-list me-1"></i>View Events
+                            </a>
+                            <div>
+                                <a href="{{ url_for('webhook_endpoints') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                                <button type="submit" class="btn btn-info">
+                                    <i class="bi bi-check-lg me-1"></i>Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleAuthFields() {
+    const method = document.getElementById('authMethod').value;
+    const secretField = document.getElementById('secretField');
+    secretField.style.display = method === 'none' ? 'none' : 'block';
+}
+
+function toggleTargetId() {
+    const targetType = document.getElementById('targetType').value;
+    const targetIdField = document.getElementById('targetIdField');
+    targetIdField.style.display = targetType ? 'block' : 'none';
+}
+
+function generateSecret() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let secret = '';
+    for (let i = 0; i < 32; i++) {
+        secret += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('secretInput').value = secret;
+}
+
+function copyUrl() {
+    const url = '{{ request.url_root }}api/webhooks/{{ endpoint.path }}';
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Webhook URL copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}

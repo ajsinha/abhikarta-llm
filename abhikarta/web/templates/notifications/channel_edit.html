@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Notification Channel - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-pencil me-2 text-primary"></i>Edit Channel</h2>
+                    <p class="text-muted mb-0">Modify notification channel configuration</p>
+                </div>
+                <a href="{{ url_for('notification_channels') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        {% if channel.channel_type == 'slack' %}
+                        <i class="bi bi-slack me-2 text-purple"></i>Slack Channel
+                        {% elif channel.channel_type == 'teams' %}
+                        <i class="bi bi-microsoft-teams me-2 text-primary"></i>Teams Channel
+                        {% elif channel.channel_type == 'email' %}
+                        <i class="bi bi-envelope me-2 text-warning"></i>Email Channel
+                        {% else %}
+                        <i class="bi bi-bell me-2"></i>{{ channel.channel_type|title }} Channel
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Channel Name</label>
+                            <input type="text" name="name" class="form-control" value="{{ channel.name }}" required>
+                            <div class="form-text">A descriptive name for this channel</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Channel Type</label>
+                            <input type="text" class="form-control" value="{{ channel.channel_type|title }}" disabled>
+                            <div class="form-text">Channel type cannot be changed</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input type="checkbox" name="is_active" class="form-check-input" id="isActive" 
+                                       {{ 'checked' if channel.is_active }}>
+                                <label class="form-check-label" for="isActive">Active</label>
+                            </div>
+                            <div class="form-text">Enable or disable this channel</div>
+                        </div>
+
+                        <hr>
+                        <h6 class="mb-3">Channel Configuration</h6>
+
+                        {% if channel.channel_type == 'slack' %}
+                        <div class="mb-3">
+                            <label class="form-label">Bot Token</label>
+                            <input type="password" name="bot_token" class="form-control" 
+                                   value="{{ channel.config.bot_token if channel.config else '' }}" 
+                                   placeholder="xoxb-...">
+                            <div class="form-text">Slack Bot User OAuth Token (starts with xoxb-)</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Default Channel</label>
+                            <input type="text" name="default_channel" class="form-control" 
+                                   value="{{ channel.config.default_channel if channel.config else '' }}"
+                                   placeholder="#general">
+                            <div class="form-text">Default channel for notifications (e.g., #alerts)</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Signing Secret (Optional)</label>
+                            <input type="password" name="signing_secret" class="form-control" 
+                                   value="{{ channel.config.signing_secret if channel.config else '' }}">
+                            <div class="form-text">For verifying Slack requests</div>
+                        </div>
+
+                        {% elif channel.channel_type == 'teams' %}
+                        <div class="mb-3">
+                            <label class="form-label">Webhook URL</label>
+                            <input type="url" name="webhook_url" class="form-control" 
+                                   value="{{ channel.config.webhook_url if channel.config else '' }}"
+                                   placeholder="https://outlook.office.com/webhook/...">
+                            <div class="form-text">Teams Incoming Webhook URL</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Card Theme Color (Optional)</label>
+                            <input type="text" name="theme_color" class="form-control" 
+                                   value="{{ channel.config.theme_color if channel.config else '' }}"
+                                   placeholder="0076D7">
+                            <div class="form-text">Hex color for message cards (default: blue)</div>
+                        </div>
+
+                        {% elif channel.channel_type == 'email' %}
+                        <div class="mb-3">
+                            <label class="form-label">SMTP Host</label>
+                            <input type="text" name="smtp_host" class="form-control" 
+                                   value="{{ channel.config.smtp_host if channel.config else '' }}"
+                                   placeholder="smtp.example.com">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">SMTP Port</label>
+                                <input type="number" name="smtp_port" class="form-control" 
+                                       value="{{ channel.config.smtp_port if channel.config else '587' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Use TLS</label>
+                                <select name="use_tls" class="form-select">
+                                    <option value="true" {{ 'selected' if channel.config and channel.config.use_tls }}>Yes</option>
+                                    <option value="false" {{ 'selected' if channel.config and not channel.config.use_tls }}>No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" class="form-control" 
+                                   value="{{ channel.config.username if channel.config else '' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" 
+                                   value="{{ channel.config.password if channel.config else '' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">From Address</label>
+                            <input type="email" name="from_address" class="form-control" 
+                                   value="{{ channel.config.from_address if channel.config else '' }}"
+                                   placeholder="noreply@example.com">
+                        </div>
+                        {% endif %}
+
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-success" onclick="testChannel()">
+                                <i class="bi bi-play me-1"></i>Test Channel
+                            </button>
+                            <div>
+                                <a href="{{ url_for('notification_channels') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-1"></i>Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.text-purple { color: #6f42c1 !important; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function testChannel() {
+    try {
+        const response = await fetch(`/api/notifications/test/{{ channel.channel_id }}`, {
+            method: 'POST'
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Test notification sent successfully!');
+        } else {
+            alert('Test failed: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

@@ -9,7 +9,7 @@ Legal Notice:
 This software and associated documentation are proprietary and confidential.
 Unauthorized copying, distribution, modification, or use is strictly prohibited.
 
-Version: 1.3.0
+Version: 1.4.0
 """
 
 from abc import ABC, abstractmethod
@@ -68,6 +68,7 @@ class DatabaseFacade:
     - mcp: MCPDelegate for plugins, tool_servers
     - audit: AuditDelegate for audit_logs, settings
     - code_fragments: CodeFragmentDelegate for code_fragments
+    - notifications: NotificationDelegate for channels, logs, webhooks (v1.4.0)
     """
     
     def __init__(self, settings):
@@ -110,7 +111,7 @@ class DatabaseFacade:
         from .delegates import (
             UserDelegate, LLMDelegate, AgentDelegate, WorkflowDelegate,
             ExecutionDelegate, HITLDelegate, MCPDelegate, AuditDelegate,
-            CodeFragmentDelegate
+            CodeFragmentDelegate, NotificationDelegate
         )
         
         self._users = UserDelegate(self)
@@ -122,8 +123,9 @@ class DatabaseFacade:
         self._mcp = MCPDelegate(self)
         self._audit = AuditDelegate(self)
         self._code_fragments = CodeFragmentDelegate(self)
+        self._notifications = NotificationDelegate(self)
         
-        logger.info("Database delegates initialized")
+        logger.info("Database delegates initialized (including NotificationDelegate)")
     
     # =========================================================================
     # DELEGATE ACCESSORS
@@ -173,6 +175,11 @@ class DatabaseFacade:
     def code_fragments(self):
         """Get CodeFragmentDelegate for code fragment operations."""
         return self._code_fragments
+    
+    @property
+    def notifications(self):
+        """Get NotificationDelegate for notification operations."""
+        return self._notifications
     
     # =========================================================================
     # CORE DATABASE OPERATIONS

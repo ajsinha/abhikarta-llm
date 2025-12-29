@@ -151,6 +151,19 @@
             </a>
         </div>
 
+        <!-- Notifications (v1.4.0 - NEW!) -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='notifications') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: linear-gradient(135deg, #ffc107 0%, #ff6b00 100%); color: #000;">
+                        <i class="bi bi-bell"></i>
+                    </div>
+                    <h5>Notifications <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+                    <p>Slack, Teams integration & webhook receiver for external events</p>
+                </div>
+            </a>
+        </div>
+
         <!-- Workflow DAGs -->
         <div class="col-md-6 col-lg-4">
             <a href="{{ url_for('help_page', page='workflow-dags') }}" class="help-card card">
@@ -160,6 +173,45 @@
                     </div>
                     <h5>Workflow DAG Execution</h5>
                     <p>Build complex multi-step workflows with JSON + Python</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Chain of Thought & Tree of Thought -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='cot-tot') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: linear-gradient(135deg, #6f42c1 0%, #d63384 100%); color: white;">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <h5>Chain & Tree of Thought <span class="badge bg-info">Tutorial</span></h5>
+                    <p>Advanced reasoning patterns: CoT for step-by-step, ToT for exploration</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Goal-Based Agents -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='goal-based-agents') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white;">
+                        <i class="bi bi-bullseye"></i>
+                    </div>
+                    <h5>Goal-Based Agents <span class="badge bg-info">Tutorial</span></h5>
+                    <p>Autonomous planning, reasoning, and learning agents that achieve objectives</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- ReAct, Reflect, Hierarchical -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('help_page', page='react-reflect-hierarchical') }}" class="help-card card">
+                <div class="card-body text-center p-4">
+                    <div class="icon mx-auto" style="background: linear-gradient(135deg, #198754 0%, #0d6efd 100%); color: white;">
+                        <i class="bi bi-layers"></i>
+                    </div>
+                    <h5>ReAct, Reflect & Hierarchical <span class="badge bg-info">Tutorial</span></h5>
+                    <p>Three agent patterns: tool use, self-critique, and manager-worker coordination</p>
                 </div>
             </a>
         </div>

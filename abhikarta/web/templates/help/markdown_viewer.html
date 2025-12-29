@@ -434,7 +434,15 @@ function generateTOC() {
     
     let tocHtml = '';
     headings.forEach((heading, index) => {
-        const id = `heading-${index}`;
+        // Generate slug-based ID from heading text (like GitHub does)
+        const slug = heading.textContent
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')  // Remove special chars except spaces and hyphens
+            .replace(/\s+/g, '-')          // Replace spaces with hyphens
+            .replace(/-+/g, '-')           // Collapse multiple hyphens
+            .replace(/^-|-$/g, '');        // Remove leading/trailing hyphens
+        
+        const id = slug || `heading-${index}`;
         heading.id = id;
         
         const level = heading.tagName.toLowerCase();
@@ -450,7 +458,7 @@ function generateTOC() {
     tocList.innerHTML = tocHtml || '<li><em class="text-muted small">No headings found</em></li>';
 }
 
-// Add IDs to headings
+// Add IDs to headings (backup for any missed)
 function addHeadingIds() {
     const content = document.getElementById('markdown-content');
     const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
@@ -459,8 +467,10 @@ function addHeadingIds() {
         if (!heading.id) {
             const slug = heading.textContent
                 .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/(^-|-$)/g, '');
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
             heading.id = slug || `heading-${index}`;
         }
     });

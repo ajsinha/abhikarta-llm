@@ -1,66 +1,75 @@
-# Abhikarta-LLM v1.3.0
+# Abhikarta-LLM v1.4.0
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
-**Enterprise-grade AI Agent & Workflow Orchestration Platform with Agent Swarms**
+**Enterprise-grade AI Agent & Workflow Orchestration Platform with Agent Swarms and Enterprise Notifications**
 
-Abhikarta-LLM is a comprehensive platform for building, deploying, and managing AI agents, workflows, and intelligent agent swarms with multi-provider LLM support, visual designers, human-in-the-loop controls, and industry-specific solutions.
+Abhikarta-LLM is a comprehensive platform for building, deploying, and managing AI agents, workflows, and intelligent agent swarms with multi-provider LLM support, visual designers, human-in-the-loop controls, enterprise notifications, and industry-specific solutions.
 
 ---
 
-## 🚀 What's New in v1.3.0
+## 🚀 What's New in v1.4.0
 
-### 🐝 Agent Swarms - Major New Feature
-Introducing **Agent Swarms** - a powerful framework for coordinating multiple AI agents through event-driven choreography:
+### 📬 Enterprise Notification System - Major New Feature
+Introducing the **Notification Module** - unified multi-channel notifications for agents, workflows, and swarms:
 
-- **Master Actor Choreography**: LLM-powered master actor that intelligently coordinates agent activities
-- **Event-Driven Architecture**: Internal event bus for decoupled agent communication
-- **On-Demand Agent Scaling**: Agents spawn when needed, only master stays resident
-- **External Triggers**: Kafka, RabbitMQ, ActiveMQ, HTTP webhooks, schedules, or user queries
-- **Visual Swarm Designer**: Design swarms visually with drag-and-drop interface
-- **Real-time Monitoring**: Watch events flow through your swarm in real-time
+- **Slack Integration**: Channel messages, direct messages, Block Kit rich formatting, thread replies
+- **Microsoft Teams Integration**: Incoming webhooks, Adaptive Cards, MessageCard format, action buttons
+- **Webhook Receiver**: Accept external webhooks with HMAC/JWT/API key authentication
+- **NotificationManager**: Central orchestrator for routing notifications across channels
+- **Rate Limiting**: Per-channel rate limiting with token bucket algorithm
+- **Retry Logic**: Exponential backoff for failed notification delivery
+- **Audit Logging**: Full notification history stored in database
 
-### 📡 Messaging Module - Unified Pub/Sub
-New abstraction layer for message brokers with consistent interface:
+### 🔌 Webhook Endpoints
+New module for receiving external events:
 
-- **Unified Interface**: Same API for Kafka, RabbitMQ, ActiveMQ, or in-memory
-- **Backpressure Handling**: Configurable strategies (block, drop oldest/newest, sample)
-- **Dead Letter Queues**: Automatic DLQ routing for failed messages
-- **Message Priorities**: Critical, high, normal, low priority support
-- **Factory Pattern**: Easy broker creation and connection pooling
+- **Endpoint Registration**: Register custom webhook endpoints with path and auth
+- **Signature Verification**: HMAC-SHA256, JWT, API key, Basic auth support
+- **Replay Protection**: Nonce and timestamp validation
+- **Event Dispatching**: Trigger agents, workflows, or swarms from webhooks
+- **Rate Limiting**: Per-endpoint configurable rate limits
 
 ### Database Schema Updates
-- 6 new swarm tables: `swarms`, `swarm_agents`, `swarm_triggers`, `swarm_executions`, `swarm_events`, `swarm_decisions`
-- Comprehensive indexing for swarm queries
-- Schema version updated to 1.3.0
+- 5 new notification tables: `notification_channels`, `notification_logs`, `webhook_endpoints`, `webhook_events`, `user_notification_preferences`
+- Schema version updated to 1.4.0
 
-### Navigation Enhancement
-- New **Playground** mega-menu combining Agents, Workflows, and Swarms:
-  - **Agents Section**: Browse Agents, Visual Designer, Template Library
-  - **Workflows Section**: All Workflows, Visual Designer, Template Library, Upload
-  - **Swarms Section**: All Swarms, Swarm Designer (NEW in v1.3.0)
-- Streamlined navigation with categorized dropdown menu
+### New abhikarta.notification Module
+```
+abhikarta/notification/
+├── __init__.py          # Module exports
+├── base.py              # Data models and enums
+├── manager.py           # NotificationManager
+├── slack_adapter.py     # Slack integration
+├── teams_adapter.py     # Teams integration
+└── webhook_receiver.py  # Webhook handling
+```
 
-### Execution Logging & Viewing
-- **Swarm Executions**: Full DB logging like agents and workflows
-  - Execution records stored in `swarm_executions` table
-  - Events logged in `swarm_events` table
-  - Master Actor decisions logged in `swarm_decisions` table
-- **Unified Executions View**: Tabbed interface showing:
-  - Agent/Workflow executions
-  - Swarm executions with trigger type, status, and duration
-- **Swarm Execution Detail Page**: 
-  - Status overview with trigger info and timing
-  - Master Actor decisions timeline
-  - Event log with source agents and payloads
+### 🧠 Chain of Thought & Tree of Thought Tutorial
+New comprehensive tutorial for advanced reasoning patterns:
+
+- **Chain of Thought (CoT)**: Step-by-step reasoning for complex problems
+- **Tree of Thought (ToT)**: Parallel exploration of multiple solution paths
+- **Agent Types**: Pre-configured CoT and ToT agent templates
+- **Workflow Integration**: CoT/ToT nodes for visual workflows
+- **Swarm Choreography**: Master Actors using CoT for delegation decisions
+- **Best Practices**: Temperature settings, token budgeting, prompt engineering
+
+**Documentation**: `docs/COT_TOT_TUTORIAL.md` (940 lines)
 
 ---
 
 ## 📋 Previous Version Highlights
 
-### v1.3.0 - Visual Designer Enhancements
+### v1.3.0 - Agent Swarms & Messaging
+- **Agent Swarms**: Master Actor choreography, event-driven architecture, on-demand scaling
+- **Messaging Module**: Unified Kafka/RabbitMQ/ActiveMQ abstraction
+- **Visual Swarm Designer**: Drag-and-drop swarm building
+- **Playground Menu**: Combined Agents, Workflows, Swarms navigation
+
+### v1.2.0 - Visual Designer Enhancements
 - **Workflow Visual Designer**: Complete rewrite matching Agent Visual Designer look and feel
   - Same node styles, connectors, canvas, and minimap as Agent Designer
   - Tool namespacing support (`builtin:toolname`, `mcp:server:toolname`)
@@ -156,7 +165,7 @@ New abstraction layer for message brokers with consistent interface:
 
 ## ✨ Key Features
 
-### ⚡ Actor System (v1.3.0 NEW)
+### ⚡ Actor System (v1.4.0 NEW)
 - **Pekko-Inspired Design**: Lightweight actors for massive concurrency
 - **Message-Driven**: Fire-and-forget (tell) and request-response (ask) patterns
 - **Fault Tolerance**: Supervision strategies with automatic recovery
@@ -199,7 +208,7 @@ New abstraction layer for message brokers with consistent interface:
 - **Workflow Integration**: HITL nodes pause execution for human input
 - **User & Admin Interfaces**: Separate views for different roles
 
-### 🏦 Banking Solutions (v1.3.0+)
+### 🏦 Banking Solutions (v1.4.0+)
 - **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
 - **Credit Assessment**: Credit scoring, DTI calculation, eligibility
 - **Loan Processing**: EMI calculation, amortization schedules
@@ -256,7 +265,7 @@ New abstraction layer for message brokers with consistent interface:
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.3.0/
+abhikarta-llm-v1.4.0/
 ├── abhikarta/
 │   ├── __init__.py
 │   ├── agent/                    # Agent management
@@ -278,7 +287,7 @@ abhikarta-llm-v1.3.0/
 │   │   ├── llm_factory.py        # LLM provider factory
 │   │   ├── tools.py              # Tool adapters
 │   │   └── workflow_graph.py     # LangGraph integration
-│   ├── llm/                      # LLM Adapter (v1.3.0) NEW!
+│   ├── llm/                      # LLM Adapter (v1.4.0) NEW!
 │   │   ├── __init__.py           # Module exports
 │   │   └── adapter.py            # LLMAdapter, async interface
 │   ├── llm_provider/             # LLM abstraction
@@ -297,7 +306,7 @@ abhikarta-llm-v1.3.0/
 │   │   ├── code_fragment_tool.py # CodeFragmentTool
 │   │   ├── langchain_tool.py     # LangChain integration
 │   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.3.0)
+│   │   └── prebuilt/             # Pre-built tools (v1.4.0)
 │   │       ├── common_tools.py   # 28 common utilities
 │   │       ├── banking_tools.py  # 13 banking tools
 │   │       ├── integration_tools.py  # 20 integration tools
@@ -333,7 +342,7 @@ abhikarta-llm-v1.3.0/
 ├── config/
 │   └── application.properties    # Configuration file
 ├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.3.0)
+│   └── prebuilt/                 # Pre-built solutions (v1.4.0)
 │       ├── agents/
 │       │   └── banking/          # 10 banking agents
 │       └── workflows/
@@ -510,7 +519,7 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.3.0 | 2025-01 | Visual Designer bug fixes (MCP tool nodes), Tool selection in properties, Agent Designer How-To Guide |
+| 1.4.0 | 2025-01 | Visual Designer bug fixes (MCP tool nodes), Tool selection in properties, Agent Designer How-To Guide |
 | 1.2.3 | 2025-01 | Template Libraries (36 agent, 33 workflow), Code Fragment URIs, Actor System, Modular Database Delegates |
 | 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |
 | 1.1.8 | 2025-01 | Tool View/Test pages, dedicated tool detail UI, form-based testing |

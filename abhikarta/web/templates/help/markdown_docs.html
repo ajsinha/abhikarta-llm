@@ -204,14 +204,14 @@
                     <div class="card-header bg-danger text-white">
                         <i class="bi bi-file-earmark-text"></i>
                         Patent Application
-                        <span class="badge bg-warning text-dark ms-auto">Pending</span>
+                        <span class="badge bg-warning text-dark ms-auto">21 Claims</span>
                     </div>
                     <div class="card-body">
                         <div class="doc-meta">
                             <i class="bi bi-file-earmark-text me-1"></i>docs/PATENT_APPLICATION.md
                         </div>
                         <p class="doc-description">
-                            Complete USPTO-format patent application with 15 claims and prior art analysis.
+                            Complete USPTO-format patent application with 21 claims covering all innovations.
                         </p>
                         <a href="{{ url_for('markdown_viewer', filename='PATENT_APPLICATION') }}" class="btn btn-danger btn-sm">
                             <i class="bi bi-eye me-1"></i>View Patent Application
@@ -255,6 +255,116 @@
                         </p>
                         <a href="{{ url_for('markdown_viewer', filename='LEGAL_NOTICE') }}" class="btn btn-dark btn-sm">
                             <i class="bi bi-eye me-1"></i>View Legal Notice
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tutorials (v1.4.0) -->
+    <div class="doc-category">
+        <div class="doc-category-title">
+            <i class="bi bi-mortarboard text-info"></i>
+            Tutorials
+            <span class="badge bg-info ms-2">v1.4.0</span>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #6f42c1 0%, #d63384 100%); color: white;">
+                        <i class="bi bi-lightbulb"></i>
+                        Chain of Thought & Tree of Thought
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/COT_TOT_TUTORIAL.md
+                        </div>
+                        <p class="doc-description">
+                            Advanced reasoning patterns: step-by-step thinking and exploration strategies.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='COT_TOT_TUTORIAL') }}" class="btn btn-sm" style="background: #6f42c1; color: white;">
+                            <i class="bi bi-eye me-1"></i>View Tutorial
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white;">
+                        <i class="bi bi-bullseye"></i>
+                        Goal-Based Agents
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/GOAL_BASED_AGENTS_TUTORIAL.md
+                        </div>
+                        <p class="doc-description">
+                            Autonomous action, planning & reasoning, learning & adaptation.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='GOAL_BASED_AGENTS_TUTORIAL') }}" class="btn btn-sm" style="background: #dc3545; color: white;">
+                            <i class="bi bi-eye me-1"></i>View Tutorial
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #198754 0%, #0d6efd 100%); color: white;">
+                        <i class="bi bi-layers"></i>
+                        ReAct, Reflect & Hierarchical
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/REACT_REFLECT_HIERARCHICAL_TUTORIAL.md
+                        </div>
+                        <p class="doc-description">
+                            Three agent patterns: tool use, self-critique, manager-worker coordination.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='REACT_REFLECT_HIERARCHICAL_TUTORIAL') }}" class="btn btn-sm" style="background: #198754; color: white;">
+                            <i class="bi bi-eye me-1"></i>View Tutorial
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header bg-warning text-dark">
+                        <i class="bi bi-bell"></i>
+                        Notifications Quick Start
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/NOTIFICATION_QUICKSTART.md
+                        </div>
+                        <p class="doc-description">
+                            Set up Slack, Teams, and webhook notifications in minutes.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='NOTIFICATION_QUICKSTART') }}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-eye me-1"></i>View Quick Start
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="doc-card card">
+                    <div class="card-header" style="background: #6c757d; color: white;">
+                        <i class="bi bi-diagram-3"></i>
+                        Notifications Architecture
+                    </div>
+                    <div class="card-body">
+                        <div class="doc-meta">
+                            <i class="bi bi-file-earmark-text me-1"></i>docs/NOTIFICATION_ARCHITECTURE.md
+                        </div>
+                        <p class="doc-description">
+                            Deep dive into notification system design and webhook receiver architecture.
+                        </p>
+                        <a href="{{ url_for('markdown_viewer', filename='NOTIFICATION_ARCHITECTURE') }}" class="btn btn-secondary btn-sm">
+                            <i class="bi bi-eye me-1"></i>View Architecture
                         </a>
                     </div>
                 </div>

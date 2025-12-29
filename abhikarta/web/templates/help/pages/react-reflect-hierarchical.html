@@ -1,0 +1,577 @@
+{% extends "help/help_base.html" %}
+
+{% block title %}ReAct, Reflect & Hierarchical Agents - {{ app_name }}{% endblock %}
+
+{% block help_content %}
+<div class="help-content">
+    <h1><i class="bi bi-layers me-2 text-success"></i>ReAct, Reflect & Hierarchical Agents</h1>
+    <p class="lead">Master the three powerful agent patterns for sophisticated AI reasoning and coordination.</p>
+
+    <div class="alert alert-success mb-4">
+        <i class="bi bi-lightbulb me-2"></i>
+        <strong>Pattern Selection:</strong> ReAct for tool use, Reflect for quality, Hierarchical for complex coordination.
+    </div>
+
+    <hr>
+
+    <h2 id="overview">Pattern Overview</h2>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-arrow-repeat me-2"></i>ReAct</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Reasoning + Acting</strong></p>
+                    <pre class="bg-light p-2 rounded small">Thought → Action → Observation
+    ↑                    │
+    └────────────────────┘</pre>
+                    <h6>Best For:</h6>
+                    <ul class="mb-0 small">
+                        <li>Tool-based problem solving</li>
+                        <li>Information retrieval</li>
+                        <li>Multi-step calculations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-mirror me-2"></i>Reflect</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Self-Critique + Improve</strong></p>
+                    <pre class="bg-light p-2 rounded small">Generate → Critique → Revise
+              ↑           │
+              └───────────┘</pre>
+                    <h6>Best For:</h6>
+                    <ul class="mb-0 small">
+                        <li>Quality-critical content</li>
+                        <li>Code review</li>
+                        <li>Iterative refinement</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-diagram-2 me-2"></i>Hierarchical</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Manager + Workers</strong></p>
+                    <pre class="bg-light p-2 rounded small">  [Manager]
+   /   |   \
+ [W1] [W2] [W3]
+   \   |   /
+  [Aggregate]</pre>
+                    <h6>Best For:</h6>
+                    <ul class="mb-0 small">
+                        <li>Complex multi-step projects</li>
+                        <li>Specialized task delegation</li>
+                        <li>Large-scale coordination</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="react">ReAct Pattern</h2>
+
+    <p>ReAct interleaves <strong>thinking</strong> and <strong>tool use</strong> in a continuous loop until the task is complete.</p>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">ReAct Execution Example</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Query:</strong> "What's the weather in Tokyo and NYC?"</p>
+            <div class="bg-light p-3 rounded">
+                <p><strong>Iteration 1:</strong></p>
+                <p class="mb-1"><code>Thought:</code> I need weather for both cities. Starting with Tokyo.</p>
+                <p class="mb-1"><code>Action:</code> weather_api(city="Tokyo")</p>
+                <p class="mb-3"><code>Observation:</code> Tokyo: 22°C, Sunny</p>
+                
+                <p><strong>Iteration 2:</strong></p>
+                <p class="mb-1"><code>Thought:</code> Got Tokyo. Now need NYC.</p>
+                <p class="mb-1"><code>Action:</code> weather_api(city="New York")</p>
+                <p class="mb-3"><code>Observation:</code> New York: 18°C, Cloudy</p>
+                
+                <p><strong>Iteration 3:</strong></p>
+                <p class="mb-1"><code>Thought:</code> I have both. Ready to answer.</p>
+                <p class="mb-0"><code>Action:</code> Final Answer: Tokyo is 22°C and sunny. NYC is 18°C and cloudy.</p>
+            </div>
+        </div>
+    </div>
+
+    <h4>Creating a ReAct Agent</h4>
+    <ol>
+        <li>Go to <strong>Agents → Create Agent</strong></li>
+        <li>Set <strong>Agent Type</strong> to "ReAct"</li>
+        <li>Add tools: <code>web_search</code>, <code>calculator</code>, <code>web_fetch</code></li>
+        <li>Set <strong>Temperature</strong> to <code>0.3</code></li>
+    </ol>
+
+    <div class="card bg-light mb-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-code me-2"></i>ReAct System Prompt</h6>
+        </div>
+        <div class="card-body">
+            <pre class="mb-0"><code>You are a ReAct agent. Solve problems by alternating thinking and acting.
+
+## Format (follow exactly)
+Thought: [your reasoning]
+Action: tool_name(param="value")
+
+[Wait for Observation]
+
+Thought: [reasoning about observation]
+Action: tool_name() OR Final Answer: [response]
+
+## Rules
+- Think before every action
+- One action per thought
+- Use Final Answer when ready</code></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="reflect">Reflect Pattern</h2>
+
+    <p>Reflect improves output through <strong>self-critique</strong> and <strong>iterative revision</strong>.</p>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Reflect Execution Example</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Task:</strong> "Write a persuasive email about our product"</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="bg-light p-3 rounded h-100">
+                        <h6>Draft v1</h6>
+                        <p class="small">[Initial draft with basic structure]</p>
+                        <h6>Critique</h6>
+                        <ul class="small mb-0">
+                            <li>✗ Weak opening</li>
+                            <li>✗ Benefits unclear</li>
+                            <li>✓ Appropriate tone</li>
+                            <li><strong>Score: 5/10</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="bg-light p-3 rounded h-100">
+                        <h6>Draft v2 (Revised)</h6>
+                        <p class="small">[Improved draft addressing issues]</p>
+                        <h6>Critique</h6>
+                        <ul class="small mb-0">
+                            <li>✓ Strong opening hook</li>
+                            <li>✓ Clear benefits</li>
+                            <li>✓ Good CTA</li>
+                            <li><strong>Score: 8/10 ✓</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Reflect Critique Dimensions</h4>
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Dimension</th>
+                    <th>Question</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Accuracy</td><td>Are facts correct?</td></tr>
+                <tr><td>Completeness</td><td>Is anything missing?</td></tr>
+                <tr><td>Clarity</td><td>Is it easy to understand?</td></tr>
+                <tr><td>Structure</td><td>Is it well-organized?</td></tr>
+                <tr><td>Tone</td><td>Is it appropriate for audience?</td></tr>
+                <tr><td>Conciseness</td><td>Is it the right length?</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card bg-light mb-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-code me-2"></i>Reflect System Prompt</h6>
+        </div>
+        <div class="card-body">
+            <pre class="mb-0"><code>You are a Reflect agent that improves through self-critique.
+
+## Process
+1. GENERATE: Create initial response
+2. CRITIQUE: Analyze weaknesses (score 1-10)
+3. REVISE: Fix issues if score < 8
+4. REPEAT: Until score >= 8 or 3 iterations
+
+## Output Format
+## Draft v{n}
+[content]
+
+## Critique
+- Accuracy: X/10
+- Clarity: X/10
+- Completeness: X/10
+- Issues: [specific problems]
+- Overall: X/10</code></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="hierarchical">Hierarchical Pattern</h2>
+
+    <p>Hierarchical uses a <strong>manager-worker</strong> structure for complex task coordination.</p>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Hierarchical Execution Flow</h5>
+        </div>
+        <div class="card-body">
+            <pre class="mb-0">
+Task: "Create a market analysis report"
+
+┌─────────────────────────────────────────────────────┐
+│               MANAGER AGENT                          │
+│  "Decomposing into research, analysis, writing"     │
+└─────────────────────────────────────────────────────┘
+         ↓              ↓              ↓
+    [Delegate]     [Delegate]     [Delegate]
+         ↓              ↓              ↓
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│  RESEARCHER  │ │   ANALYST    │ │    WRITER    │
+│  Gather data │ │ Find trends  │ │ Draft report │
+└──────┬───────┘ └──────┬───────┘ └──────┬───────┘
+       ↓                ↓                ↓
+  [Market Data]    [Analysis]       [Draft]
+       ↓                ↓                ↓
+┌─────────────────────────────────────────────────────┐
+│           MANAGER AGGREGATES RESULTS                 │
+│  Combining into final comprehensive report           │
+└─────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <h4>Worker Types</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-search text-primary" style="font-size: 2rem;"></i>
+                    <h6 class="mt-2">Researcher</h6>
+                    <small class="text-muted">Web search, data gathering, fact-finding</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-graph-up text-success" style="font-size: 2rem;"></i>
+                    <h6 class="mt-2">Analyst</h6>
+                    <small class="text-muted">Data analysis, trend identification, insights</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-pencil text-warning" style="font-size: 2rem;"></i>
+                    <h6 class="mt-2">Writer</h6>
+                    <small class="text-muted">Reports, summaries, polished content</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-light mb-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-code me-2"></i>Manager System Prompt</h6>
+        </div>
+        <div class="card-body">
+            <pre class="mb-0"><code>You are a Manager Agent coordinating specialists.
+
+## Your Team
+- Researcher: Information gathering
+- Analyst: Data analysis
+- Writer: Content creation
+
+## Your Job
+1. Decompose tasks into subtasks
+2. Delegate to appropriate workers
+3. Review worker outputs
+4. Aggregate into final result
+
+## Delegation Format
+DELEGATE TO: [Worker]
+TASK: [Specific task]
+CONTEXT: [Relevant info]
+EXPECTED: [What you need]
+
+## Rules
+- Never do worker tasks yourself
+- Be specific in assignments
+- Verify quality before accepting</code></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="combining">Combining Patterns</h2>
+
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Combination</th>
+                    <th>Use Case</th>
+                    <th>Flow</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge bg-primary">ReAct</span> + <span class="badge bg-warning text-dark">Reflect</span></td>
+                    <td>Research then polish</td>
+                    <td>Gather info with tools → Refine output quality</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-success">Hierarchical</span> + <span class="badge bg-primary">ReAct</span></td>
+                    <td>Coordinated tool use</td>
+                    <td>Manager delegates → Workers use ReAct</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-success">Hierarchical</span> + <span class="badge bg-warning text-dark">Reflect</span></td>
+                    <td>Quality-assured delegation</td>
+                    <td>Manager delegates → Writer uses Reflect</td>
+                </tr>
+                <tr>
+                    <td>All Three</td>
+                    <td>Full-stack projects</td>
+                    <td>Manager → ReAct workers + Reflect writer</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card bg-light mb-4">
+        <div class="card-body">
+            <h6>Full Stack Architecture</h6>
+            <pre class="mb-0">
+[Manager - Hierarchical]
+    ├── [Researcher - ReAct] → Uses tools to gather info
+    ├── [Analyst - ReAct] → Uses tools to analyze
+    └── [Writer - Reflect] → Iterates on quality
+            </pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="best-practices">Best Practices</h2>
+
+    <h4>Temperature Settings</h4>
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Pattern</th>
+                    <th>Phase</th>
+                    <th>Temperature</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="1"><span class="badge bg-primary">ReAct</span></td>
+                    <td>All</td>
+                    <td><code>0.2-0.4</code></td>
+                </tr>
+                <tr>
+                    <td rowspan="3"><span class="badge bg-warning text-dark">Reflect</span></td>
+                    <td>Generate</td>
+                    <td><code>0.5-0.7</code></td>
+                </tr>
+                <tr>
+                    <td>Critique</td>
+                    <td><code>0.2-0.3</code></td>
+                </tr>
+                <tr>
+                    <td>Revise</td>
+                    <td><code>0.4-0.5</code></td>
+                </tr>
+                <tr>
+                    <td rowspan="2"><span class="badge bg-success">Hierarchical</span></td>
+                    <td>Manager</td>
+                    <td><code>0.3</code></td>
+                </tr>
+                <tr>
+                    <td>Workers</td>
+                    <td>Varies by task</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h4>Common Anti-Patterns</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-danger h-100">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-x-circle me-2"></i>ReAct
+                </div>
+                <div class="card-body">
+                    <p class="small"><strong>❌ No stop condition</strong></p>
+                    <p class="small mb-0">Set <code>max_iterations=10</code> and provide fallback response</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-danger h-100">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-x-circle me-2"></i>Reflect
+                </div>
+                <div class="card-body">
+                    <p class="small"><strong>❌ Never satisfied</strong></p>
+                    <p class="small mb-0">Set <code>quality_threshold=8</code> and <code>max_revisions=3</code></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-danger h-100">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-x-circle me-2"></i>Hierarchical
+                </div>
+                <div class="card-body">
+                    <p class="small"><strong>❌ Manager does work</strong></p>
+                    <p class="small mb-0">Add "never do worker tasks yourself" instruction</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="selection-guide">Pattern Selection Guide</h2>
+
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Task Type</th>
+                    <th>Pattern</th>
+                    <th>Why</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>API calls / tool usage</td>
+                    <td><span class="badge bg-primary">ReAct</span></td>
+                    <td>Tool-action loop</td>
+                </tr>
+                <tr>
+                    <td>Quality-critical output</td>
+                    <td><span class="badge bg-warning text-dark">Reflect</span></td>
+                    <td>Self-improvement</td>
+                </tr>
+                <tr>
+                    <td>Multiple specialists needed</td>
+                    <td><span class="badge bg-success">Hierarchical</span></td>
+                    <td>Delegation</td>
+                </tr>
+                <tr>
+                    <td>Research + writing</td>
+                    <td><span class="badge bg-primary">ReAct</span> → <span class="badge bg-warning text-dark">Reflect</span></td>
+                    <td>Gather then polish</td>
+                </tr>
+                <tr>
+                    <td>Large project</td>
+                    <td><span class="badge bg-success">Hierarchical</span> + both</td>
+                    <td>Full orchestration</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+
+    <div class="accordion mb-4" id="troubleshootingAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trouble1">
+                    ReAct: Agent loops without making progress
+                </button>
+            </h2>
+            <div id="trouble1" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                <div class="accordion-body">
+                    <ul class="mb-0">
+                        <li>Add <code>max_iterations</code> limit (e.g., 10)</li>
+                        <li>Check tool availability and descriptions</li>
+                        <li>Add "I cannot find this" as valid final answer</li>
+                        <li>Enable verbose logging to debug</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trouble2">
+                    Reflect: Agent never stops revising
+                </button>
+            </h2>
+            <div id="trouble2" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                <div class="accordion-body">
+                    <ul class="mb-0">
+                        <li>Set clear <code>quality_threshold</code> (e.g., 7/10)</li>
+                        <li>Limit <code>max_revisions</code> (e.g., 3)</li>
+                        <li>Add "good enough" acceptance criteria</li>
+                        <li>Use lower temperature for critique phase</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trouble3">
+                    Hierarchical: Manager does worker tasks
+                </button>
+            </h2>
+            <div id="trouble3" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                <div class="accordion-body">
+                    <ul class="mb-0">
+                        <li>Add explicit "never do worker tasks yourself"</li>
+                        <li>List worker capabilities clearly</li>
+                        <li>Require delegation format in output</li>
+                        <li>Check worker agent availability</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ url_for('help_page', page='goal-based-agents') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-1"></i>Goal-Based Agents
+        </a>
+        <a href="{{ url_for('markdown_viewer', filename='REACT_REFLECT_HIERARCHICAL_TUTORIAL') }}" class="btn btn-primary">
+            <i class="bi bi-book me-1"></i>Full Tutorial
+        </a>
+        <a href="{{ url_for('help_page', page='swarms') }}" class="btn btn-outline-primary">
+            Agent Swarms<i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}

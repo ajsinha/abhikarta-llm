@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Notification Logs - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-clock-history me-2 text-primary"></i>Notification Logs</h2>
+            <p class="text-muted mb-0">History of all sent notifications</p>
+        </div>
+        <div>
+            <a href="{{ url_for('notification_channels') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Channels
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Channel Type</label>
+                    <select name="channel_type" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="slack" {{ 'selected' if request.args.get('channel_type') == 'slack' }}>Slack</option>
+                        <option value="teams" {{ 'selected' if request.args.get('channel_type') == 'teams' }}>Teams</option>
+                        <option value="email" {{ 'selected' if request.args.get('channel_type') == 'email' }}>Email</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="sent" {{ 'selected' if request.args.get('status') == 'sent' }}>Sent</option>
+                        <option value="delivered" {{ 'selected' if request.args.get('status') == 'delivered' }}>Delivered</option>
+                        <option value="failed" {{ 'selected' if request.args.get('status') == 'failed' }}>Failed</option>
+                        <option value="pending" {{ 'selected' if request.args.get('status') == 'pending' }}>Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Level</label>
+                    <select name="level" class="form-select">
+                        <option value="">All Levels</option>
+                        <option value="info" {{ 'selected' if request.args.get('level') == 'info' }}>Info</option>
+                        <option value="success" {{ 'selected' if request.args.get('level') == 'success' }}>Success</option>
+                        <option value="warning" {{ 'selected' if request.args.get('level') == 'warning' }}>Warning</option>
+                        <option value="error" {{ 'selected' if request.args.get('level') == 'error' }}>Error</option>
+                        <option value="critical" {{ 'selected' if request.args.get('level') == 'critical' }}>Critical</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-filter me-1"></i>Filter
+                    </button>
+                    <a href="{{ url_for('notification_logs') }}" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Logs Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Recent Notifications</h5>
+            <span class="badge bg-secondary">{{ logs|length }} entries</span>
+        </div>
+        <div class="card-body p-0">
+            {% if logs %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Time</th>
+                            <th>Channel</th>
+                            <th>Title</th>
+                            <th>Level</th>
+                            <th>Status</th>
+                            <th>Source</th>
+                            <th class="text-end">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>
+                                <small class="text-muted">{{ log.created_at[:19] if log.created_at else 'N/A' }}</small>
+                            </td>
+                            <td>
+                                {% if log.channel_type == 'slack' %}
+                                <span class="badge bg-purple"><i class="bi bi-slack me-1"></i>Slack</span>
+                                {% elif log.channel_type == 'teams' %}
+                                <span class="badge bg-primary"><i class="bi bi-microsoft-teams me-1"></i>Teams</span>
+                                {% elif log.channel_type == 'email' %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-envelope me-1"></i>Email</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ log.channel_type }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ log.title|truncate(40) if log.title else '(No title)' }}</strong>
+                                {% if log.body %}
+                                <br><small class="text-muted">{{ log.body|truncate(60) }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if log.level == 'success' %}
+                                <span class="badge bg-success">{{ log.level }}</span>
+                                {% elif log.level == 'warning' %}
+                                <span class="badge bg-warning text-dark">{{ log.level }}</span>
+                                {% elif log.level == 'error' %}
+                                <span class="badge bg-danger">{{ log.level }}</span>
+                                {% elif log.level == 'critical' %}
+                                <span class="badge bg-dark">{{ log.level }}</span>
+                                {% else %}
+                                <span class="badge bg-info">{{ log.level }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if log.status == 'sent' %}
+                                <span class="badge bg-success"><i class="bi bi-check me-1"></i>Sent</span>
+                                {% elif log.status == 'delivered' %}
+                                <span class="badge bg-success"><i class="bi bi-check-all me-1"></i>Delivered</span>
+                                {% elif log.status == 'failed' %}
+                                <span class="badge bg-danger"><i class="bi bi-x me-1"></i>Failed</span>
+                                {% elif log.status == 'pending' %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-hourglass me-1"></i>Pending</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ log.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if log.source_type %}
+                                <small class="text-muted">{{ log.source_type }}: {{ log.source|truncate(15) if log.source else 'N/A' }}</small>
+                                {% else %}
+                                <small class="text-muted">-</small>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-info" onclick="showLogDetail('{{ log.notification_id }}')" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <h5 class="mt-3">No Notifications Found</h5>
+                <p class="text-muted">No notification logs match your filters.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Log Detail Modal -->
+<div class="modal fade" id="logDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i>Notification Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="logDetailBody">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.bg-purple { background-color: #6f42c1 !important; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function showLogDetail(notificationId) {
+    const modal = new bootstrap.Modal(document.getElementById('logDetailModal'));
+    const body = document.getElementById('logDetailBody');
+    
+    body.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+    modal.show();
+    
+    try {
+        const response = await fetch(`/api/notifications/log/${notificationId}`);
+        const log = await response.json();
+        
+        body.innerHTML = `
+            <dl class="row">
+                <dt class="col-sm-3">Notification ID</dt>
+                <dd class="col-sm-9"><code>${log.notification_id}</code></dd>
+                
+                <dt class="col-sm-3">Channel Type</dt>
+                <dd class="col-sm-9">${log.channel_type}</dd>
+                
+                <dt class="col-sm-3">Recipient</dt>
+                <dd class="col-sm-9">${log.recipient || 'N/A'}</dd>
+                
+                <dt class="col-sm-3">Title</dt>
+                <dd class="col-sm-9">${log.title || 'N/A'}</dd>
+                
+                <dt class="col-sm-3">Body</dt>
+                <dd class="col-sm-9"><pre class="bg-light p-2 rounded">${log.body || 'N/A'}</pre></dd>
+                
+                <dt class="col-sm-3">Level</dt>
+                <dd class="col-sm-9"><span class="badge bg-info">${log.level}</span></dd>
+                
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9"><span class="badge ${log.status === 'sent' ? 'bg-success' : log.status === 'failed' ? 'bg-danger' : 'bg-secondary'}">${log.status}</span></dd>
+                
+                ${log.error_message ? `
+                <dt class="col-sm-3">Error</dt>
+                <dd class="col-sm-9"><pre class="bg-danger-subtle p-2 rounded text-danger">${log.error_message}</pre></dd>
+                ` : ''}
+                
+                <dt class="col-sm-3">Source</dt>
+                <dd class="col-sm-9">${log.source_type || 'N/A'}: ${log.source || 'N/A'}</dd>
+                
+                <dt class="col-sm-3">Created At</dt>
+                <dd class="col-sm-9">${log.created_at || 'N/A'}</dd>
+                
+                <dt class="col-sm-3">Sent At</dt>
+                <dd class="col-sm-9">${log.sent_at || 'N/A'}</dd>
+            </dl>
+        `;
+    } catch (error) {
+        body.innerHTML = `<div class="alert alert-danger">Error loading details: ${error.message}</div>`;
+    }
+}
+</script>
+{% endblock %}

@@ -1040,11 +1040,49 @@ LIMIT 1
 - namespaced tool references (builtin:name, mcp:server:name);
 - automatic tool schema discovery and validation.
 
+**Claim 16** (v1.4.0): A multi-channel notification orchestration system comprising:
+- a notification manager that routes messages to multiple channels including Slack, Microsoft Teams, email, and custom webhooks;
+- channel-specific adapters that translate unified notification messages to provider-specific formats including Slack Block Kit and Teams Adaptive Cards;
+- per-channel rate limiting using a token bucket algorithm to prevent overwhelming external services;
+- exponential backoff retry logic for failed notification delivery with configurable max retries and delay;
+- comprehensive audit logging of all notification attempts, successes, and failures.
+
+**Claim 17** (v1.4.0): A webhook receiver system for triggering autonomous agents comprising:
+- endpoint registration with configurable URL paths and authentication methods;
+- signature verification supporting HMAC-SHA256, JWT, API key, and basic authentication;
+- replay attack protection through nonce tracking and timestamp validation;
+- automatic dispatching of verified webhook payloads to agents, workflows, or swarms;
+- per-endpoint rate limiting and event logging.
+
+**Claim 18** (v1.4.0): The notification system of Claim 16, wherein the Slack adapter comprises:
+- support for channel messages (#channel), direct messages (@user), and thread replies;
+- Block Kit message formatting for rich interactive content;
+- automatic user ID lookup for direct message routing;
+- file attachment support with async upload.
+
+**Claim 19** (v1.4.0): The notification system of Claim 16, wherein the Teams adapter comprises:
+- Incoming Webhook integration for channel notifications;
+- Adaptive Card formatting for rich interactive content;
+- MessageCard legacy format support for compatibility;
+- action button integration for user responses.
+
+**Claim 20** (v1.4.0): The webhook receiver of Claim 17, wherein signature verification comprises:
+- computing HMAC-SHA256 of the raw request body using a stored secret;
+- comparing the computed signature with the signature provided in request headers;
+- supporting multiple signature header formats (X-Hub-Signature-256, X-Signature);
+- validating timestamp headers to reject requests older than a configurable threshold.
+
+**Claim 21** (v1.4.0): A user notification preference system comprising:
+- per-user, per-channel configuration of notification delivery;
+- minimum notification level filtering (debug, info, success, warning, error, critical);
+- quiet hours configuration to suppress non-critical notifications during specified time periods;
+- channel-specific addressing (Slack user ID, email address).
+
 ---
 
 ## 10. ABSTRACT
 
-A system and method for intelligent agent orchestration with LLM-powered swarm choreography is disclosed. The system comprises a master actor that receives external triggers from various sources (Kafka, RabbitMQ, HTTP, scheduled events, user queries) and uses a large language model to intelligently decide which tasks to publish to an internal event bus. A plurality of agent pools, each containing configurable numbers of pre-warmed agent instances, subscribe to event patterns and react to published tasks. A novel round-robin selection mechanism ensures fair distribution of work across agent instances by selecting based on least-recently-used and least-used-count criteria. The system includes a unified message broker abstraction supporting Kafka, RabbitMQ, and ActiveMQ with configurable backpressure strategies, as well as an LLM provider abstraction supporting 10+ providers. Visual designers enable non-programmers to configure agents, workflows, and swarms through drag-and-drop interfaces. The combination of LLM-powered choreography, pre-warmed agent pools with round-robin selection, unified messaging, and visual design tools provides a comprehensive platform for building autonomous, scalable AI agent systems.
+A system and method for intelligent agent orchestration with LLM-powered swarm choreography and enterprise notifications is disclosed. The system comprises a master actor that receives external triggers from various sources (Kafka, RabbitMQ, HTTP, scheduled events, user queries, webhooks) and uses a large language model to intelligently decide which tasks to publish to an internal event bus. A plurality of agent pools, each containing configurable numbers of pre-warmed agent instances, subscribe to event patterns and react to published tasks. A novel round-robin selection mechanism ensures fair distribution of work across agent instances by selecting based on least-recently-used and least-used-count criteria. The system includes a unified message broker abstraction supporting Kafka, RabbitMQ, and ActiveMQ with configurable backpressure strategies, as well as an LLM provider abstraction supporting 10+ providers. A multi-channel notification system enables agents, workflows, and swarms to send alerts to Slack, Microsoft Teams, and email with rate limiting, retry logic, and audit logging. A webhook receiver allows external systems to trigger agent activities with cryptographic signature verification and replay protection. Visual designers enable non-programmers to configure agents, workflows, swarms, and notification channels through drag-and-drop interfaces. The combination of LLM-powered choreography, pre-warmed agent pools, unified messaging, enterprise notifications, and visual design tools provides a comprehensive platform for building autonomous, scalable AI agent systems.
 
 ---
 
@@ -1281,6 +1319,7 @@ I, **Ashutosh Sinha**, hereby declare that:
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2025-12-29 | Ashutosh Sinha | Initial patent application draft |
+| 1.1 | 2025-12-29 | Ashutosh Sinha | Added Claims 16-21 for notification system and webhook receiver (v1.4.0) |
 
 ---
 

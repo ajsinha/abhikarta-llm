@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Add Notification Channel - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-plus-circle me-2 text-primary"></i>Add Notification Channel</h2>
+                    <p class="text-muted mb-0">Configure a new notification integration</p>
+                </div>
+                <a href="{{ url_for('notification_channels') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('notification_channel_create') }}">
+                        <!-- Channel Type Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Channel Type <span class="text-danger">*</span></label>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="channel_type" id="type_slack" value="slack" checked onchange="showChannelConfig()">
+                                    <label class="btn btn-outline-primary w-100 py-3" for="type_slack">
+                                        <i class="bi bi-slack display-6 d-block mb-2"></i>
+                                        Slack
+                                    </label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="channel_type" id="type_teams" value="teams" onchange="showChannelConfig()">
+                                    <label class="btn btn-outline-primary w-100 py-3" for="type_teams">
+                                        <i class="bi bi-microsoft-teams display-6 d-block mb-2"></i>
+                                        Teams
+                                    </label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="channel_type" id="type_email" value="email" onchange="showChannelConfig()">
+                                    <label class="btn btn-outline-primary w-100 py-3" for="type_email">
+                                        <i class="bi bi-envelope display-6 d-block mb-2"></i>
+                                        Email
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Channel Name -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Channel Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" required
+                                   placeholder="e.g., Production Alerts, Team Notifications">
+                        </div>
+
+                        <!-- Slack Config -->
+                        <div id="config_slack" class="channel-config">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="bi bi-slack me-2"></i>Slack Configuration</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Bot Token <span class="text-danger">*</span></label>
+                                <input type="password" name="slack_bot_token" class="form-control"
+                                       placeholder="xoxb-your-bot-token">
+                                <small class="text-muted">Get from: api.slack.com → Your App → OAuth & Permissions</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Default Channel</label>
+                                <input type="text" name="slack_channel" class="form-control" value="#notifications"
+                                       placeholder="#channel-name">
+                            </div>
+                        </div>
+
+                        <!-- Teams Config -->
+                        <div id="config_teams" class="channel-config d-none">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="bi bi-microsoft-teams me-2"></i>Teams Configuration</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Incoming Webhook URL <span class="text-danger">*</span></label>
+                                <input type="url" name="teams_webhook_url" class="form-control"
+                                       placeholder="https://outlook.office.com/webhook/...">
+                                <small class="text-muted">Get from: Teams Channel → Connectors → Incoming Webhook</small>
+                            </div>
+                        </div>
+
+                        <!-- Email Config -->
+                        <div id="config_email" class="channel-config d-none">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="bi bi-envelope me-2"></i>Email (SMTP) Configuration</h6>
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label">SMTP Host</label>
+                                    <input type="text" name="smtp_host" class="form-control" value="smtp.gmail.com">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Port</label>
+                                    <input type="number" name="smtp_port" class="form-control" value="587">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" name="smtp_user" class="form-control" placeholder="your@email.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" name="smtp_password" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">From Address</label>
+                                    <input type="email" name="from_address" class="form-control" placeholder="noreply@example.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">From Name</label>
+                                    <input type="text" name="from_name" class="form-control" value="Abhikarta Notifications">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rate Limit -->
+                        <div class="mb-4 mt-4">
+                            <label class="form-label fw-bold">Rate Limit (per minute)</label>
+                            <input type="number" name="rate_limit" class="form-control" value="50" min="1" max="1000">
+                            <small class="text-muted">Maximum notifications per minute to prevent flooding</small>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-flex gap-2 justify-content-end pt-3 border-top">
+                            <a href="{{ url_for('notification_channels') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i>Create Channel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card mt-4 border-info">
+                <div class="card-header bg-info bg-opacity-10">
+                    <h6 class="mb-0"><i class="bi bi-lightbulb me-2 text-info"></i>Setup Tips</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="small mb-0">
+                        <li><strong>Slack:</strong> Create a Slack App at api.slack.com, add chat:write scope, and install to workspace</li>
+                        <li><strong>Teams:</strong> Go to channel settings → Connectors → Add Incoming Webhook</li>
+                        <li><strong>Email:</strong> For Gmail, enable "Less secure apps" or use an App Password</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showChannelConfig() {
+    const type = document.querySelector('input[name="channel_type"]:checked').value;
+    
+    document.querySelectorAll('.channel-config').forEach(el => {
+        el.classList.add('d-none');
+    });
+    
+    const configEl = document.getElementById('config_' + type);
+    if (configEl) {
+        configEl.classList.remove('d-none');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', showChannelConfig);
+</script>
+{% endblock %}

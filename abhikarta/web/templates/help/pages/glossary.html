@@ -27,6 +27,7 @@
             <a href="#section-n" class="badge bg-primary text-decoration-none me-1">N</a>
             <a href="#section-o" class="badge bg-primary text-decoration-none me-1">O</a>
             <a href="#section-p" class="badge bg-primary text-decoration-none me-1">P</a>
+            <a href="#section-q" class="badge bg-primary text-decoration-none me-1">Q</a>
             <a href="#section-r" class="badge bg-primary text-decoration-none me-1">R</a>
             <a href="#section-s" class="badge bg-primary text-decoration-none me-1">S</a>
             <a href="#section-t" class="badge bg-primary text-decoration-none me-1">T</a>
@@ -40,8 +41,34 @@
     <h2 id="section-a" class="border-bottom pb-2 mt-5">A</h2>
     
     <div class="glossary-term">
+        <h5>Actor <span class="badge bg-danger">v1.3.0</span></h5>
+        <p>A lightweight concurrent processing unit inspired by the Actor Model (Akka/Pekko). Actors process messages asynchronously, maintain isolated state, and communicate only via message passing. Abhikarta's actor system supports millions of concurrent actors with supervision hierarchies.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Actor Supervision <span class="badge bg-danger">v1.3.0</span></h5>
+        <p>A fault-tolerance pattern where parent actors monitor and manage child actors. Supervision strategies include:</p>
+        <ul>
+            <li><strong>Resume</strong> - Continue processing, ignore failure</li>
+            <li><strong>Restart</strong> - Recreate the actor with fresh state</li>
+            <li><strong>Stop</strong> - Permanently terminate the actor</li>
+            <li><strong>Escalate</strong> - Pass failure to parent supervisor</li>
+        </ul>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Adaptive Card <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A JSON-based card format used by Microsoft Teams for rich, interactive notifications. Supports text, images, buttons, and input fields. Abhikarta uses Adaptive Cards for Teams notifications.</p>
+    </div>
+
+    <div class="glossary-term">
         <h5>Agent</h5>
         <p>An autonomous AI entity that can perceive its environment, make decisions, and take actions to achieve specific goals. In Abhikarta LLM, agents are configurable units that combine LLMs with tools and workflows to perform complex tasks.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Agent Swarm <span class="badge bg-danger">v1.3.0</span></h5>
+        <p>A coordinated group of AI agents working together on complex tasks. Unlike workflows, swarms use LLM-powered choreography where a Master Actor dynamically decides task delegation based on real-time conditions. See also: <a href="#master-actor">Master Actor</a>, <a href="#swarm-choreography">Swarm Choreography</a>.</p>
     </div>
 
     <div class="glossary-term">
@@ -74,6 +101,11 @@
     <h2 id="section-b" class="border-bottom pb-2 mt-5">B</h2>
 
     <div class="glossary-term">
+        <h5>Backpressure <span class="badge bg-info">v1.3.0</span></h5>
+        <p>A flow control mechanism that prevents message consumers from being overwhelmed. When a consumer can't keep up, backpressure signals the producer to slow down. Essential for reliable messaging in high-throughput systems.</p>
+    </div>
+
+    <div class="glossary-term">
         <h5>Bedrock</h5>
         <p>Amazon Web Services' fully managed service for building generative AI applications. Provides access to foundation models from AI21 Labs, Anthropic, Cohere, Meta, and Amazon.</p>
     </div>
@@ -81,6 +113,16 @@
     <div class="glossary-term">
         <h5>Bearer Token</h5>
         <p>An authentication credential passed in HTTP headers (Authorization: Bearer {token}) to access protected resources. Commonly used with OAuth 2.0 and API authentication.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Block Kit <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>Slack's UI framework for building rich, interactive messages. Abhikarta uses Block Kit for Slack notifications, supporting sections, fields, buttons, and dividers.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Bot Token <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A Slack authentication token (starts with xoxb-) that allows applications to send messages and interact with the Slack API. Required for Slack notification integration.</p>
     </div>
 
     <!-- Section C -->
@@ -92,6 +134,11 @@
     </div>
 
     <div class="glossary-term">
+        <h5>Channel (Notification) <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A configured destination for sending notifications. Channels include Slack, Microsoft Teams, Email, and custom webhooks. Each channel has its own configuration and authentication.</p>
+    </div>
+
+    <div class="glossary-term">
         <h5>Code Fragment</h5>
         <p>A reusable piece of Python code that can be dynamically loaded and executed as a tool. Code fragments are stored in the database and can be managed through the admin interface.</p>
     </div>
@@ -99,6 +146,11 @@
     <div class="glossary-term">
         <h5>Completion</h5>
         <p>The text generated by an LLM in response to a prompt. Also called "generation" or "response".</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Consumer Group <span class="badge bg-info">v1.3.0</span></h5>
+        <p>A Kafka concept where multiple consumers share the work of processing messages from a topic. Messages are distributed among group members for parallel processing and fault tolerance.</p>
     </div>
 
     <div class="glossary-term">
@@ -124,6 +176,16 @@
         <p>The main interface screen that provides an overview of system status, recent activities, and quick access to key functions.</p>
     </div>
 
+    <div class="glossary-term">
+        <h5>Dead Letter Queue (DLQ) <span class="badge bg-info">v1.3.0</span></h5>
+        <p>A special queue that stores messages that couldn't be processed successfully after multiple retry attempts. Used for debugging and manual intervention.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Delegate</h5>
+        <p>A database access pattern used in Abhikarta where each domain (agents, workflows, notifications, etc.) has a dedicated delegate class that handles all database operations for that domain.</p>
+    </div>
+
     <!-- Section E -->
     <h2 id="section-e" class="border-bottom pb-2 mt-5">E</h2>
 
@@ -138,6 +200,11 @@
     </div>
 
     <div class="glossary-term">
+        <h5>Event Bus <span class="badge bg-danger">v1.3.0</span></h5>
+        <p>An internal communication channel for agent swarms. The event bus enables publish/subscribe messaging between swarm agents, with support for event types, filtering, and replay.</p>
+    </div>
+
+    <div class="glossary-term">
         <h5>Execution</h5>
         <p>A single run of an agent or workflow. Each execution has a unique ID, status (pending, running, completed, failed), input parameters, and output results.</p>
     </div>
@@ -147,8 +214,18 @@
         <p>A detailed log of all steps taken during an execution, including tool calls, LLM interactions, and intermediate results. Useful for debugging and optimization.</p>
     </div>
 
+    <div class="glossary-term">
+        <h5>Exponential Backoff <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A retry strategy where the delay between attempts increases exponentially. Used in notification delivery: 1s, 2s, 4s, 8s, etc. Prevents overwhelming failed services during recovery.</p>
+    </div>
+
     <!-- Section F -->
     <h2 id="section-f" class="border-bottom pb-2 mt-5">F</h2>
+
+    <div class="glossary-term">
+        <h5>Facade Pattern</h5>
+        <p>A design pattern that provides a simplified interface to a complex subsystem. DatabaseFacade in Abhikarta provides unified access to all database delegates.</p>
+    </div>
 
     <div class="glossary-term">
         <h5>Few-Shot Learning</h5>
@@ -170,12 +247,12 @@
 
     <div class="glossary-term">
         <h5>GPT (Generative Pre-trained Transformer)</h5>
-        <p>A family of large language models developed by OpenAI. The architecture is based on the Transformer neural network.</p>
+        <p>A family of large language models developed by OpenAI. GPT-3.5 and GPT-4 are commonly used for AI applications.</p>
     </div>
 
     <div class="glossary-term">
         <h5>Guardrails</h5>
-        <p>Safety mechanisms that prevent AI systems from producing harmful, biased, or inappropriate outputs. Can include content filters, output validators, and ethical guidelines.</p>
+        <p>Safety mechanisms that constrain LLM behavior. Can include content filters, output validation, rate limiting, and scope restrictions.</p>
     </div>
 
     <!-- Section H -->
@@ -183,46 +260,51 @@
 
     <div class="glossary-term">
         <h5>Hallucination</h5>
-        <p>When an LLM generates information that appears plausible but is factually incorrect or entirely fabricated. A known limitation of generative AI systems.</p>
+        <p>When an LLM generates plausible-sounding but factually incorrect or nonsensical content. A key challenge in AI applications requiring factual accuracy.</p>
     </div>
 
     <div class="glossary-term">
         <h5>HITL (Human-in-the-Loop)</h5>
-        <p>A workflow pattern where human oversight and intervention are integrated into automated processes. Humans review, approve, or modify AI decisions before they take effect. Essential for high-stakes applications requiring human judgment.</p>
+        <p>A system design where human oversight is integrated into automated processes. In Abhikarta LLM, HITL allows humans to review, approve, or modify AI-generated outputs before they're finalized.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>HMAC (Hash-based Message Authentication Code) <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A cryptographic signature method for verifying webhook authenticity. The sender computes a hash of the payload using a shared secret. Abhikarta supports HMAC-SHA256 for webhook verification.</p>
     </div>
 
     <!-- Section I -->
     <h2 id="section-i" class="border-bottom pb-2 mt-5">I</h2>
 
     <div class="glossary-term">
-        <h5>Inference</h5>
-        <p>The process of using a trained model to generate predictions or outputs. In LLMs, inference refers to generating text completions.</p>
+        <h5>Incoming Webhook <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A Microsoft Teams connector that accepts HTTP POST requests with message payloads. Simple way to send notifications without full OAuth setup.</p>
     </div>
 
     <div class="glossary-term">
-        <h5>Input Schema</h5>
-        <p>A JSON Schema definition that describes the expected structure and types of input parameters for a tool or API endpoint.</p>
+        <h5>Inference</h5>
+        <p>The process of using a trained model to generate predictions or outputs. In LLMs, inference refers to generating text completions from prompts.</p>
     </div>
 
     <!-- Section J -->
     <h2 id="section-j" class="border-bottom pb-2 mt-5">J</h2>
 
     <div class="glossary-term">
-        <h5>JSON (JavaScript Object Notation)</h5>
-        <p>A lightweight data interchange format. Used extensively in Abhikarta LLM for configuration files, API requests/responses, and tool schemas.</p>
+        <h5>JSON-RPC</h5>
+        <p>A remote procedure call protocol encoded in JSON. Used by MCP (Model Context Protocol) for tool communication.</p>
     </div>
 
     <div class="glossary-term">
-        <h5>JSON Schema</h5>
-        <p>A vocabulary for annotating and validating JSON documents. Used to define the structure of tool parameters, API payloads, and configuration objects.</p>
+        <h5>JWT (JSON Web Token) <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A compact, URL-safe token format for securely transmitting claims. Used in webhook authentication to verify the sender's identity without shared secrets.</p>
     </div>
 
     <!-- Section K -->
     <h2 id="section-k" class="border-bottom pb-2 mt-5">K</h2>
 
     <div class="glossary-term">
-        <h5>KYC (Know Your Customer)</h5>
-        <p>Regulatory requirements for financial institutions to verify customer identity. Abhikarta LLM includes pre-built banking agents for KYC verification workflows.</p>
+        <h5>Kafka <span class="badge bg-info">v1.3.0</span></h5>
+        <p>Apache Kafka - a distributed event streaming platform. Abhikarta's messaging module supports Kafka for high-throughput, durable message delivery between agents and systems.</p>
     </div>
 
     <!-- Section L -->
@@ -230,53 +312,63 @@
 
     <div class="glossary-term">
         <h5>LangChain</h5>
-        <p>A popular open-source framework for building applications with LLMs. Abhikarta LLM integrates with LangChain for agent orchestration and tool management.</p>
-    </div>
-
-    <div class="glossary-term">
-        <h5>LangGraph</h5>
-        <p>A library for building stateful, multi-actor applications with LLMs. Used in Abhikarta LLM for complex workflow orchestration.</p>
+        <p>An open-source framework for building applications with LLMs. Provides components for prompts, chains, agents, and memory. Abhikarta LLM integrates with LangChain for agent execution.</p>
     </div>
 
     <div class="glossary-term">
         <h5>LLM (Large Language Model)</h5>
-        <p>An AI model trained on vast amounts of text data that can understand and generate human-like text. Examples include GPT-4, Claude, Llama, and Gemini.</p>
+        <p>A neural network trained on vast amounts of text data to understand and generate human-like text. Examples include GPT-4, Claude, Llama, and Gemini.</p>
     </div>
 
     <div class="glossary-term">
         <h5>LLM Provider</h5>
-        <p>A service that hosts and provides access to large language models via APIs. Supported providers in Abhikarta LLM include OpenAI, Anthropic, Google, AWS Bedrock, Azure, Mistral, Cohere, Groq, Together AI, HuggingFace, and Ollama.</p>
+        <p>A service that hosts and serves LLM APIs. Abhikarta supports multiple providers: OpenAI, Anthropic, Google (Vertex AI), AWS Bedrock, Azure, Mistral, Hugging Face, and Ollama.</p>
     </div>
 
     <!-- Section M -->
     <h2 id="section-m" class="border-bottom pb-2 mt-5">M</h2>
 
-    <div class="glossary-term">
-        <h5>Max Tokens</h5>
-        <p>The maximum number of tokens the model should generate in its response. Controls output length and helps manage costs.</p>
+    <div class="glossary-term" id="master-actor">
+        <h5>Master Actor <span class="badge bg-danger">v1.3.0</span></h5>
+        <p>The LLM-powered orchestrator of an agent swarm. The Master Actor receives events, analyzes context, and dynamically decides which worker agents should handle each task. Unlike static workflows, decisions are made in real-time based on available agents and current conditions.</p>
     </div>
 
     <div class="glossary-term">
         <h5>MCP (Model Context Protocol)</h5>
-        <p>An open protocol for connecting AI assistants to external data sources and tools. MCP servers expose tools that can be dynamically discovered and integrated into Abhikarta LLM.</p>
+        <p>A protocol that standardizes how LLMs communicate with external tools and data sources. Enables discovery of available tools and execution of tool calls.</p>
     </div>
 
     <div class="glossary-term">
         <h5>MCP Tool Server</h5>
-        <p>A server that implements the Model Context Protocol, exposing one or more tools via a standardized API. Can be connected via HTTP/REST or stdio transport.</p>
+        <p>An external server that exposes tools via the Model Context Protocol. Can provide dynamic tools that are discovered at runtime rather than configured statically.</p>
     </div>
 
     <div class="glossary-term">
-        <h5>Model</h5>
-        <p>A specific version of an LLM offered by a provider. For example, "gpt-4o", "claude-3-sonnet", or "llama-3.2-70b".</p>
+        <h5>Message Broker <span class="badge bg-info">v1.3.0</span></h5>
+        <p>Software that enables asynchronous communication between distributed systems. Abhikarta supports Kafka, RabbitMQ, and ActiveMQ through a unified messaging interface.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>MessageCard <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>Legacy Microsoft Teams card format using the Office 365 connector schema. Simpler than Adaptive Cards but with fewer features. Abhikarta supports both formats.</p>
     </div>
 
     <!-- Section N -->
     <h2 id="section-n" class="border-bottom pb-2 mt-5">N</h2>
 
     <div class="glossary-term">
-        <h5>Node</h5>
-        <p>A single unit of work in a DAG workflow. Nodes can represent LLM calls, tool executions, conditionals, or other operations.</p>
+        <h5>Notification Channel <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A configured integration for sending alerts and messages. Supported channels: Slack (Web API), Microsoft Teams (Incoming Webhooks), Email (SMTP), and custom webhooks.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Notification Level <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>The severity/importance of a notification. Levels in order: Debug, Info, Success, Warning, Error, Critical. Users can set minimum levels to filter notifications.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>NotificationManager <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>The central orchestrator for all notification operations. Handles multi-channel routing, retry logic, rate limiting, and audit logging.</p>
     </div>
 
     <!-- Section O -->
@@ -284,12 +376,17 @@
 
     <div class="glossary-term">
         <h5>Ollama</h5>
-        <p>An open-source tool for running large language models locally. Supports models like Llama, Mistral, and others without requiring cloud API calls.</p>
+        <p>A tool for running LLMs locally on your own hardware. Useful for development, testing, and scenarios requiring data privacy.</p>
     </div>
 
     <div class="glossary-term">
-        <h5>Orchestration</h5>
-        <p>The coordination of multiple components (agents, tools, workflows) to accomplish complex tasks. Abhikarta LLM provides orchestration capabilities for building sophisticated AI applications.</p>
+        <h5>Orchestration vs Choreography <span class="badge bg-danger">v1.3.0</span></h5>
+        <p>Two patterns for coordinating distributed systems:</p>
+        <ul>
+            <li><strong>Orchestration</strong> - Central controller directs all participants (traditional workflows)</li>
+            <li><strong>Choreography</strong> - Participants react to events independently (agent swarms)</li>
+        </ul>
+        <p>Abhikarta swarms use LLM-powered choreography where the Master Actor makes dynamic decisions based on events.</p>
     </div>
 
     <!-- Section P -->
@@ -315,12 +412,40 @@
         <p>The practice of designing and optimizing prompts to get desired outputs from LLMs. Includes techniques like few-shot learning, chain of thought, and structured output formatting.</p>
     </div>
 
+    <div class="glossary-term">
+        <h5>Pub/Sub (Publish/Subscribe) <span class="badge bg-info">v1.3.0</span></h5>
+        <p>A messaging pattern where senders (publishers) don't send to specific receivers. Instead, messages are categorized into topics, and subscribers receive messages from topics they're interested in.</p>
+    </div>
+
+    <!-- Section Q -->
+    <h2 id="section-q" class="border-bottom pb-2 mt-5">Q</h2>
+
+    <div class="glossary-term">
+        <h5>Queue <span class="badge bg-info">v1.3.0</span></h5>
+        <p>A data structure for storing messages in order. Messages are typically processed FIFO (first-in, first-out). RabbitMQ and ActiveMQ use queues for point-to-point messaging.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Quiet Hours <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>User-configurable time periods when non-critical notifications are suppressed. Critical notifications always get through regardless of quiet hours settings.</p>
+    </div>
+
     <!-- Section R -->
     <h2 id="section-r" class="border-bottom pb-2 mt-5">R</h2>
 
     <div class="glossary-term">
+        <h5>RabbitMQ <span class="badge bg-info">v1.3.0</span></h5>
+        <p>A popular open-source message broker implementing AMQP. Supports queues, exchanges, routing, and acknowledgments. One of the messaging backends supported by Abhikarta.</p>
+    </div>
+
+    <div class="glossary-term">
         <h5>RAG (Retrieval-Augmented Generation)</h5>
         <p>A technique that combines information retrieval with text generation. The model retrieves relevant documents from a knowledge base and uses them to generate more accurate, grounded responses.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Rate Limiting <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>Controlling the frequency of operations to prevent overwhelming systems. Abhikarta implements token bucket rate limiting for notifications (e.g., 50 messages/minute for Slack).</p>
     </div>
 
     <div class="glossary-term">
@@ -339,8 +464,18 @@
     </div>
 
     <div class="glossary-term">
+        <h5>Replay Protection <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>Security mechanism to prevent attackers from reusing captured webhook requests. Achieved through nonce tracking and timestamp validation.</p>
+    </div>
+
+    <div class="glossary-term">
         <h5>REST API</h5>
         <p>Representational State Transfer - an architectural style for web APIs. Uses HTTP methods (GET, POST, PUT, DELETE) to perform operations on resources identified by URLs.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Retry Logic <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>Automatic reattempt of failed operations. Notification system uses exponential backoff with configurable max retries (default: 3) and max delay (default: 60s).</p>
     </div>
 
     <div class="glossary-term">
@@ -357,8 +492,23 @@
     </div>
 
     <div class="glossary-term">
+        <h5>Slack Adapter <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>Notification component for Slack integration. Supports channel messages (#channel), direct messages (@user), Block Kit formatting, thread replies, and file attachments.</p>
+    </div>
+
+    <div class="glossary-term">
         <h5>STDIO Transport</h5>
         <p>Standard Input/Output - a method of communication where data is exchanged through standard input and output streams. Used by some MCP servers for local tool execution.</p>
+    </div>
+
+    <div class="glossary-term" id="swarm-choreography">
+        <h5>Swarm Choreography <span class="badge bg-danger">v1.3.0</span></h5>
+        <p>The coordination pattern used by agent swarms. Unlike fixed workflows, the Master Actor uses LLM reasoning to dynamically route tasks to appropriate worker agents based on capabilities, availability, and context.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Swarm Trigger <span class="badge bg-danger">v1.3.0</span></h5>
+        <p>An event that initiates swarm execution. Triggers can be: scheduled (cron), webhook-based, message queue events, or manual invocation.</p>
     </div>
 
     <div class="glossary-term">
@@ -368,6 +518,11 @@
 
     <!-- Section T -->
     <h2 id="section-t" class="border-bottom pb-2 mt-5">T</h2>
+
+    <div class="glossary-term">
+        <h5>Teams Adapter <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>Notification component for Microsoft Teams integration. Uses Incoming Webhooks with Adaptive Card or MessageCard formatting.</p>
+    </div>
 
     <div class="glossary-term">
         <h5>Temperature</h5>
@@ -380,6 +535,11 @@
     </div>
 
     <div class="glossary-term">
+        <h5>Token Bucket <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A rate limiting algorithm. Tokens are added to a bucket at a fixed rate. Each operation consumes a token. If the bucket is empty, operations are blocked or delayed.</p>
+    </div>
+
+    <div class="glossary-term">
         <h5>Tool</h5>
         <p>A function or capability that an agent can use to perform actions. Tools have names, descriptions, and parameter schemas. Examples include web search, database queries, calculations, and API calls.</p>
     </div>
@@ -387,6 +547,11 @@
     <div class="glossary-term">
         <h5>Tool Call</h5>
         <p>An invocation of a tool by an agent. Includes the tool name and arguments. The tool executes and returns results that the agent can use for further reasoning.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Topic <span class="badge bg-info">v1.3.0</span></h5>
+        <p>A category or channel for messages in pub/sub systems. In Kafka, topics are partitioned logs. Publishers write to topics; subscribers read from topics they care about.</p>
     </div>
 
     <div class="glossary-term">
@@ -412,6 +577,11 @@
         <p>A person who interacts with the Abhikarta LLM system. Users have credentials (user ID, password), roles, and permissions.</p>
     </div>
 
+    <div class="glossary-term">
+        <h5>User Notification Preferences <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>Per-user settings for notification delivery. Includes channel addresses (Slack ID, email), minimum level filters, and quiet hours configuration.</p>
+    </div>
+
     <!-- Section V -->
     <h2 id="section-v" class="border-bottom pb-2 mt-5">V</h2>
 
@@ -424,6 +594,21 @@
     <h2 id="section-w" class="border-bottom pb-2 mt-5">W</h2>
 
     <div class="glossary-term">
+        <h5>Webhook <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>An HTTP callback that delivers data to other applications in real-time. Abhikarta receives webhooks from external systems (GitHub, Stripe, Slack) to trigger agents, workflows, or swarms.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Webhook Endpoint <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>A registered URL path for receiving external webhooks. Endpoints have authentication (HMAC, JWT, API key), target actions (agent/workflow/swarm), and rate limiting.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Webhook Receiver <span class="badge bg-warning text-dark">v1.4.0</span></h5>
+        <p>The component that handles incoming webhook requests. Verifies signatures, validates payloads, logs events, and dispatches to configured targets.</p>
+    </div>
+
+    <div class="glossary-term">
         <h5>Workflow</h5>
         <p>A defined sequence of steps that accomplish a specific task. In Abhikarta LLM, workflows are represented as DAGs with nodes (operations) and edges (dependencies).</p>
     </div>
@@ -433,7 +618,26 @@
         <p>A visual interface for creating and editing workflows. Allows drag-and-drop node placement, connection drawing, and configuration.</p>
     </div>
 
+    <div class="glossary-term">
+        <h5>Worker Agent <span class="badge bg-danger">v1.3.0</span></h5>
+        <p>An agent participating in a swarm that performs actual tasks. Worker agents have defined capabilities and receive task assignments from the Master Actor based on their specializations.</p>
+    </div>
+
     <hr class="my-5">
+
+    <!-- Version Legend -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-tags me-2"></i>Version Legend</h5>
+        </div>
+        <div class="card-body">
+            <span class="badge bg-danger me-3">v1.3.0</span> Agent Swarms, Actor System, Messaging Module
+            <br>
+            <span class="badge bg-info me-3">v1.3.0</span> Messaging-specific terms (Kafka, RabbitMQ, etc.)
+            <br>
+            <span class="badge bg-warning text-dark me-3">v1.4.0</span> Notification System, Webhooks
+        </div>
+    </div>
 
     <div class="alert alert-info">
         <h5><i class="bi bi-lightbulb me-2"></i>Did We Miss Something?</h5>

@@ -192,7 +192,7 @@ and the accompanying LICENSE file.
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0 | 2025-01-01 | Initial legal notice |
-| 1.3.0 | 2025-12-29 | Updated for swarm and messaging modules |
+| 1.4.0 | 2025-12-29 | Updated for swarm and messaging modules |
 
 ---
 

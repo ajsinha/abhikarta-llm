@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Notification Preferences - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-bell-slash me-2 text-primary"></i>Notification Preferences</h2>
+                    <p class="text-muted mb-0">Configure how and when you receive notifications</p>
+                </div>
+                <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Profile
+                </a>
+            </div>
+
+            <!-- Channel Preferences -->
+            <form method="POST">
+                {% for pref in preferences %}
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            {% if pref.channel_type == 'slack' %}
+                            <span class="badge bg-purple p-2 me-2"><i class="bi bi-slack"></i></span>
+                            <h5 class="mb-0">Slack Notifications</h5>
+                            {% elif pref.channel_type == 'teams' %}
+                            <span class="badge bg-primary p-2 me-2"><i class="bi bi-microsoft-teams"></i></span>
+                            <h5 class="mb-0">Microsoft Teams Notifications</h5>
+                            {% elif pref.channel_type == 'email' %}
+                            <span class="badge bg-warning text-dark p-2 me-2"><i class="bi bi-envelope"></i></span>
+                            <h5 class="mb-0">Email Notifications</h5>
+                            {% else %}
+                            <span class="badge bg-secondary p-2 me-2"><i class="bi bi-bell"></i></span>
+                            <h5 class="mb-0">{{ pref.channel_type|title }} Notifications</h5>
+                            {% endif %}
+                        </div>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" name="{{ pref.channel_type }}_enabled" 
+                                   class="form-check-input" id="{{ pref.channel_type }}Enabled"
+                                   {{ 'checked' if pref.enabled }}>
+                            <label class="form-check-label" for="{{ pref.channel_type }}Enabled">Enabled</label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            {% if pref.channel_type == 'slack' %}
+                            <div class="col-md-6">
+                                <label class="form-label">Slack User ID / Email</label>
+                                <input type="text" name="slack_address" class="form-control" 
+                                       value="{{ pref.channel_address or '' }}"
+                                       placeholder="U01234567 or user@example.com">
+                                <div class="form-text">For direct messages (leave blank for channel only)</div>
+                            </div>
+                            {% elif pref.channel_type == 'email' %}
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" name="email_address" class="form-control" 
+                                       value="{{ pref.channel_address or '' }}"
+                                       placeholder="you@example.com">
+                            </div>
+                            {% endif %}
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Minimum Level</label>
+                                <select name="{{ pref.channel_type }}_min_level" class="form-select">
+                                    <option value="debug" {{ 'selected' if pref.min_level == 'debug' }}>Debug (all messages)</option>
+                                    <option value="info" {{ 'selected' if pref.min_level == 'info' }}>Info</option>
+                                    <option value="success" {{ 'selected' if pref.min_level == 'success' }}>Success</option>
+                                    <option value="warning" {{ 'selected' if pref.min_level == 'warning' }}>Warning</option>
+                                    <option value="error" {{ 'selected' if pref.min_level == 'error' }}>Error</option>
+                                    <option value="critical" {{ 'selected' if pref.min_level == 'critical' }}>Critical only</option>
+                                </select>
+                                <div class="form-text">Only receive notifications at or above this level</div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Quiet Hours</label>
+                                <div class="row g-2">
+                                    <div class="col-md-5">
+                                        <input type="time" name="{{ pref.channel_type }}_quiet_start" class="form-control"
+                                               value="{{ pref.quiet_hours_start or '' }}">
+                                        <div class="form-text">Start time</div>
+                                    </div>
+                                    <div class="col-md-2 text-center pt-2">
+                                        <span class="text-muted">to</span>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="time" name="{{ pref.channel_type }}_quiet_end" class="form-control"
+                                               value="{{ pref.quiet_hours_end or '' }}">
+                                        <div class="form-text">End time</div>
+                                    </div>
+                                </div>
+                                <div class="form-text">No non-critical notifications during this period</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- No preferences yet - show default cards for available channels -->
+                {% for channel_type in ['slack', 'teams', 'email'] %}
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            {% if channel_type == 'slack' %}
+                            <span class="badge bg-purple p-2 me-2"><i class="bi bi-slack"></i></span>
+                            <h5 class="mb-0">Slack Notifications</h5>
+                            {% elif channel_type == 'teams' %}
+                            <span class="badge bg-primary p-2 me-2"><i class="bi bi-microsoft-teams"></i></span>
+                            <h5 class="mb-0">Microsoft Teams Notifications</h5>
+                            {% elif channel_type == 'email' %}
+                            <span class="badge bg-warning text-dark p-2 me-2"><i class="bi bi-envelope"></i></span>
+                            <h5 class="mb-0">Email Notifications</h5>
+                            {% endif %}
+                        </div>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" name="{{ channel_type }}_enabled" 
+                                   class="form-check-input" id="{{ channel_type }}Enabled" checked>
+                            <label class="form-check-label" for="{{ channel_type }}Enabled">Enabled</label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            {% if channel_type == 'slack' %}
+                            <div class="col-md-6">
+                                <label class="form-label">Slack User ID / Email</label>
+                                <input type="text" name="slack_address" class="form-control" 
+                                       placeholder="U01234567 or user@example.com">
+                            </div>
+                            {% elif channel_type == 'email' %}
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" name="email_address" class="form-control" 
+                                       placeholder="you@example.com">
+                            </div>
+                            {% endif %}
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Minimum Level</label>
+                                <select name="{{ channel_type }}_min_level" class="form-select">
+                                    <option value="debug">Debug (all messages)</option>
+                                    <option value="info" selected>Info</option>
+                                    <option value="success">Success</option>
+                                    <option value="warning">Warning</option>
+                                    <option value="error">Error</option>
+                                    <option value="critical">Critical only</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Quiet Hours (Optional)</label>
+                                <div class="row g-2">
+                                    <div class="col-md-5">
+                                        <input type="time" name="{{ channel_type }}_quiet_start" class="form-control">
+                                    </div>
+                                    <div class="col-md-2 text-center pt-2">
+                                        <span class="text-muted">to</span>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="time" name="{{ channel_type }}_quiet_end" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endfor %}
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>Save Preferences
+                    </button>
+                </div>
+            </form>
+
+            <!-- Info Card -->
+            <div class="card border-info mt-4">
+                <div class="card-body">
+                    <h6><i class="bi bi-info-circle me-2 text-info"></i>About Notification Levels</h6>
+                    <ul class="small mb-0">
+                        <li><strong>Debug:</strong> Detailed technical information (verbose)</li>
+                        <li><strong>Info:</strong> General information about normal operations</li>
+                        <li><strong>Success:</strong> Successful completion of tasks</li>
+                        <li><strong>Warning:</strong> Potential issues that need attention</li>
+                        <li><strong>Error:</strong> Errors that need investigation</li>
+                        <li><strong>Critical:</strong> Severe issues requiring immediate action</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.bg-purple { background-color: #6f42c1 !important; }
+</style>
+{% endblock %}

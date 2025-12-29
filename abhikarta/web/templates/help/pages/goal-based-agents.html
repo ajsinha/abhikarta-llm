@@ -1,0 +1,588 @@
+{% extends "help/help_base.html" %}
+
+{% block title %}Goal-Based Agents - {{ app_name }}{% endblock %}
+
+{% block help_content %}
+<div class="help-content">
+    <h1><i class="bi bi-bullseye me-2 text-danger"></i>Goal-Based Agents</h1>
+    <p class="lead">Build autonomous agents that plan, reason, and learn to achieve complex objectives.</p>
+
+    <div class="alert alert-info mb-4">
+        <i class="bi bi-lightbulb me-2"></i>
+        <strong>Key Insight:</strong> Goal-Based Agents go beyond simple rules – they define objectives, plan strategies, and adapt when things change.
+    </div>
+
+    <hr>
+
+    <h2 id="overview">Overview</h2>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100 border-secondary">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Rule-Based (Simple)</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-2 rounded">IF condition THEN action</pre>
+                    <p class="text-muted mb-0">Fixed rules, no adaptation, limited scope</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100 border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-bullseye me-2"></i>Goal-Based (Intelligent)</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-2 rounded">GOAL → PLAN → ACT → ADAPT → ACHIEVE</pre>
+                    <p class="text-muted mb-0">Dynamic planning, autonomous execution, learning</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Core Capabilities</h3>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-diagram-3 text-primary" style="font-size: 2rem;"></i>
+                    <h6 class="mt-2">Autonomous Action</h6>
+                    <small class="text-muted">Break goals into tasks, select tools, act without constant input</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-compass text-success" style="font-size: 2rem;"></i>
+                    <h6 class="mt-2">Planning & Reasoning</h6>
+                    <small class="text-muted">Plan sequences, consider future states, find efficient paths</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-arrow-repeat text-warning" style="font-size: 2rem;"></i>
+                    <h6 class="mt-2">Strategy Adjustment</h6>
+                    <small class="text-muted">Modify plans when obstacles arise, try alternatives</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-mortarboard text-info" style="font-size: 2rem;"></i>
+                    <h6 class="mt-2">Learning & Adaptation</h6>
+                    <small class="text-muted">Learn from past actions, remember context, improve over time</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="quick-start">Quick Start</h2>
+
+    <h4>Creating a Goal-Based Agent</h4>
+    <ol>
+        <li>Go to <strong>Agents → Create Agent</strong></li>
+        <li>Set <strong>Agent Type</strong> to "Plan and Execute"</li>
+        <li>Configure the goal-based system prompt (see below)</li>
+        <li>Add tools: <code>web_search</code>, <code>web_fetch</code>, <code>file_write</code>, <code>calculator</code></li>
+        <li>Set <strong>Temperature</strong> to <code>0.3-0.5</code></li>
+        <li>Save and Publish</li>
+    </ol>
+
+    <div class="card bg-light mb-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-code me-2"></i>Goal-Based System Prompt</h6>
+        </div>
+        <div class="card-body">
+            <pre class="mb-0"><code>You are a Goal-Based Agent with autonomous planning capabilities.
+
+## Goal Processing Framework
+
+### Phase 1: GOAL ANALYSIS
+When given a goal, analyze:
+1. What is the terminal objective?
+2. What constraints exist?
+3. What resources/tools are available?
+4. What is the success criteria?
+
+### Phase 2: PLAN GENERATION
+Create a step-by-step plan:
+1. Decompose goal into sub-goals
+2. Identify dependencies between steps
+3. Estimate effort for each step
+4. Identify potential failure points
+
+### Phase 3: EXECUTION
+For each step:
+1. Select appropriate tool(s)
+2. Execute action
+3. Evaluate result
+4. Adjust plan if needed
+
+### Phase 4: REFLECTION
+After completion:
+1. Did we achieve the goal?
+2. What worked well?
+3. What could be improved?
+
+Always show your reasoning at each phase.</code></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="autonomous-action">Autonomous Action</h2>
+
+    <p>Goal-Based Agents select tools and take actions without constant human input.</p>
+
+    <h4>Tool Selection Decision Tree</h4>
+    <div class="card mb-4">
+        <div class="card-body">
+            <pre class="mb-0">
+Need information?
+├── Current/recent data → web_search
+├── Full page content → web_fetch
+├── Local file → file_read
+└── Structured data → database_query
+
+Need to process?
+├── Math/calculations → calculator
+├── Text analysis → text_summarize
+└── Data transform → data_transform
+
+Need to output?
+├── Save results → file_write
+├── Send alert → send_notification
+└── Create report → report_generator
+            </pre>
+        </div>
+    </div>
+
+    <h4>Strategy Adjustment</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Level</th>
+                    <th>Strategy</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge bg-success">1</span></td>
+                    <td>Retry with variation</td>
+                    <td>Different search terms, adjusted parameters</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-info">2</span></td>
+                    <td>Alternative tool</td>
+                    <td>web_fetch instead of web_search</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-warning text-dark">3</span></td>
+                    <td>Decompose further</td>
+                    <td>Break task into smaller pieces</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-danger">4</span></td>
+                    <td>Full replan</td>
+                    <td>Reconsider entire approach</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+
+    <h2 id="planning-reasoning">Planning & Reasoning</h2>
+
+    <h4>Goal Hierarchy</h4>
+    <div class="card bg-light mb-4">
+        <div class="card-body">
+            <pre class="mb-0"><code>MISSION: Ultimate purpose
+└── GOAL: What success looks like
+    ├── OBJECTIVE 1: Major milestone
+    │   ├── Task 1.1: Actionable item
+    │   ├── Task 1.2: Actionable item
+    │   └── Checkpoint: How to verify
+    ├── OBJECTIVE 2: Major milestone
+    │   ├── Task 2.1: Actionable item
+    │   └── Checkpoint: How to verify
+    └── SUCCESS CRITERIA: How to measure completion</code></pre>
+        </div>
+    </div>
+
+    <h4>State-Space Reasoning</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">Current State</div>
+                <div class="card-body">
+                    <ul class="mb-0 small">
+                        <li>Known facts</li>
+                        <li>Unknown facts</li>
+                        <li>Available resources</li>
+                        <li>Constraints</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">Gap Analysis</div>
+                <div class="card-body">
+                    <ul class="mb-0 small">
+                        <li>Missing information</li>
+                        <li>Missing resources</li>
+                        <li>Transformation needed</li>
+                        <li>Actions required</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">Goal State</div>
+                <div class="card-body">
+                    <ul class="mb-0 small">
+                        <li>Required deliverables</li>
+                        <li>Quality criteria</li>
+                        <li>Completion indicators</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="learning-adaptation">Learning & Adaptation</h2>
+
+    <p>Advanced agents learn from experience and improve over time.</p>
+
+    <h4>Experience Memory</h4>
+    <div class="card bg-light mb-4">
+        <div class="card-body">
+            <pre class="mb-0"><code>EXPERIENCE LOG:
+- Task: [what was attempted]
+- Approach: [strategy used]
+- Tools: [which tools were effective]
+- Outcome: [success/partial/failure]
+- Lesson: [key takeaway]
+- Reuse: [when to apply this learning]</code></pre>
+        </div>
+    </div>
+
+    <h4>What to Remember</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-check-circle me-2"></i>Do Remember
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Successful strategies and why they worked</li>
+                        <li>Failed approaches and lessons learned</li>
+                        <li>User preferences and patterns</li>
+                        <li>Domain-specific knowledge gained</li>
+                        <li>Useful intermediate results</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-x-circle me-2"></i>Don't Remember
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Temporary calculations</li>
+                        <li>Sensitive information</li>
+                        <li>One-time context</li>
+                        <li>Outdated information</li>
+                        <li>Conflicting/uncertain data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="workflows">Goal-Based Workflows</h2>
+
+    <div class="card bg-light mb-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Workflow Structure</h6>
+        </div>
+        <div class="card-body">
+            <pre class="mb-0">
+[Goal Input]
+     │
+     ▼
+┌──────────────┐
+│ Goal Analysis│  Decompose into sub-goals
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│Plan Execution│  Agent works through tasks
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│Quality Check │  Verify success criteria
+└──────┬───────┘
+       │
+   ┌───┴───┐
+   │ Gaps? │
+   └───┬───┘
+   Yes │ No
+   ▼   ▼
+[Replan] [Complete]
+            </pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="swarms">Goal-Based Swarms</h2>
+
+    <p>For complex goals, use multiple specialized agents working together.</p>
+
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Agent Role</th>
+                    <th>Capabilities</th>
+                    <th>Event Subscriptions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Researcher</strong></td>
+                    <td>Web search, data gathering</td>
+                    <td>research.request, data.needed</td>
+                </tr>
+                <tr>
+                    <td><strong>Analyst</strong></td>
+                    <td>Data analysis, patterns</td>
+                    <td>analysis.request, data.ready</td>
+                </tr>
+                <tr>
+                    <td><strong>Writer</strong></td>
+                    <td>Reports, summaries</td>
+                    <td>write.request, analysis.complete</td>
+                </tr>
+                <tr>
+                    <td><strong>Validator</strong></td>
+                    <td>Fact-checking, QA</td>
+                    <td>validate.request, draft.ready</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+
+    <h2 id="best-practices">Best Practices</h2>
+
+    <h4>Goal Definition</h4>
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Aspect</th>
+                    <th class="text-success">Good</th>
+                    <th class="text-danger">Bad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Specificity</td>
+                    <td>"Find Q3 2024 revenue for top 5 tech companies"</td>
+                    <td>"Find some company data"</td>
+                </tr>
+                <tr>
+                    <td>Measurability</td>
+                    <td>"1000-word summary with 5+ citations"</td>
+                    <td>"Write something good"</td>
+                </tr>
+                <tr>
+                    <td>Constraints</td>
+                    <td>"Use only free tools, complete in 10 min"</td>
+                    <td>No constraints specified</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h4>Autonomy Levels</h4>
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Level</th>
+                    <th>Human Approval</th>
+                    <th>Auto Replan</th>
+                    <th>Best For</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge bg-success">Full</span></td>
+                    <td>No</td>
+                    <td>Yes</td>
+                    <td>Low-risk, well-defined tasks</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-info">Supervised</span></td>
+                    <td>Major decisions</td>
+                    <td>Yes</td>
+                    <td>Medium-risk tasks</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-warning text-dark">Guided</span></td>
+                    <td>Yes</td>
+                    <td>Approve</td>
+                    <td>Important tasks</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-danger">Manual</span></td>
+                    <td>Every step</td>
+                    <td>No</td>
+                    <td>Critical tasks</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+
+    <h2 id="example">Complete Example</h2>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Market Research Agent</h5>
+        </div>
+        <div class="card-body">
+            <h6>Goal Input:</h6>
+            <div class="bg-light p-3 rounded mb-3">
+                <p><strong>GOAL:</strong> Research the electric vehicle market in North America</p>
+                <p class="mb-0"><strong>DELIVERABLES:</strong></p>
+                <ol class="mb-0">
+                    <li>Market size and growth rate (2020-2024)</li>
+                    <li>Top 5 manufacturers by market share</li>
+                    <li>Key trends and predictions for 2025</li>
+                    <li>Competitive analysis summary</li>
+                </ol>
+            </div>
+
+            <h6>Agent's Plan:</h6>
+            <div class="bg-light p-3 rounded mb-3">
+                <pre class="mb-0">GOAL: EV Market Research Report
+├── OBJECTIVE 1: Gather market data
+│   ├── Task 1.1: web_search("EV market size North America 2024")
+│   ├── Task 1.2: web_search("electric vehicle sales growth 2020-2024")
+│   └── Checkpoint: Have market size and growth data
+├── OBJECTIVE 2: Competitive landscape
+│   ├── Task 2.1: web_search("top EV manufacturers market share 2024")
+│   ├── Task 2.2: web_fetch(manufacturer pages for details)
+│   └── Checkpoint: Have top 5 with market share %
+├── OBJECTIVE 3: Trends analysis
+│   ├── Task 3.1: web_search("EV industry trends 2025 predictions")
+│   └── Checkpoint: Have 3+ trends identified
+└── OBJECTIVE 4: Compile report
+    ├── Task 4.1: Synthesize findings
+    ├── Task 4.2: file_write(report.md)
+    └── SUCCESS: Markdown report with all deliverables</pre>
+            </div>
+
+            <h6>Autonomous Execution:</h6>
+            <p class="mb-0">The agent executes each task, adjusts if searches return poor results, and compiles everything into the final deliverable without human intervention.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+
+    <div class="accordion mb-4" id="troubleshootingAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trouble1">
+                    Agent not making progress (loops without advancing)
+                </button>
+            </h2>
+            <div id="trouble1" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                <div class="accordion-body">
+                    <ul class="mb-0">
+                        <li>Check goal clarity - is it specific enough?</li>
+                        <li>Increase max_iterations in config</li>
+                        <li>Enable verbose logging to see where it's stuck</li>
+                        <li>Add explicit progress checkpoints in prompt</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trouble2">
+                    Agent takes wrong actions
+                </button>
+            </h2>
+            <div id="trouble2" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                <div class="accordion-body">
+                    <ul class="mb-0">
+                        <li>Improve tool descriptions</li>
+                        <li>Add tool selection guidance in prompt</li>
+                        <li>Reduce temperature for more focused decisions</li>
+                        <li>Add tool usage examples in system prompt</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trouble3">
+                    Plans are too complex
+                </button>
+            </h2>
+            <div id="trouble3" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                <div class="accordion-body">
+                    <ul class="mb-0">
+                        <li>Add planning constraints ("max 10 steps")</li>
+                        <li>Require justification for each step</li>
+                        <li>Add "simplicity" as evaluation criterion</li>
+                        <li>Use lighter model for simple tasks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ url_for('help_page', page='cot-tot') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-1"></i>CoT & ToT
+        </a>
+        <a href="{{ url_for('markdown_viewer', filename='GOAL_BASED_AGENTS_TUTORIAL') }}" class="btn btn-primary">
+            <i class="bi bi-book me-1"></i>Full Tutorial
+        </a>
+        <a href="{{ url_for('help_page', page='swarms') }}" class="btn btn-outline-primary">
+            Agent Swarms<i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}
