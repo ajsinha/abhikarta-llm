@@ -75,12 +75,21 @@ class PostgresHandler(DatabaseHandler):
         
         Args:
             query: SQL query string
-            params: Query parameters
+            params: Query parameters (must be tuple or None)
             
         Returns:
             Last row ID or None
         """
         try:
+            # Ensure params is properly formatted
+            if params is not None:
+                # Convert to tuple if it's a list
+                if isinstance(params, list):
+                    params = tuple(params)
+                # Ensure single values are wrapped in tuple
+                elif not isinstance(params, tuple):
+                    params = (params,)
+            
             with self.connection.cursor() as cursor:
                 cursor.execute(query, params)
                 self.connection.commit()
@@ -95,6 +104,8 @@ class PostgresHandler(DatabaseHandler):
                 return None
         except Exception as e:
             logger.error(f"PostgreSQL execute error: {e}")
+            logger.error(f"Query: {query[:200]}...")
+            logger.error(f"Params: {params} (type: {type(params).__name__ if params else 'None'})")
             self.connection.rollback()
             raise
     
@@ -104,7 +115,7 @@ class PostgresHandler(DatabaseHandler):
         
         Args:
             query: SQL query string
-            params: Query parameters
+            params: Query parameters (must be tuple or None)
             
         Returns:
             Row as dictionary or None
@@ -112,12 +123,23 @@ class PostgresHandler(DatabaseHandler):
         try:
             import psycopg2.extras
             
+            # Ensure params is properly formatted
+            if params is not None:
+                # Convert to tuple if it's a list
+                if isinstance(params, list):
+                    params = tuple(params)
+                # Ensure single values are wrapped in tuple
+                elif not isinstance(params, tuple):
+                    params = (params,)
+            
             with self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute(query, params)
                 row = cursor.fetchone()
                 return dict(row) if row else None
         except Exception as e:
             logger.error(f"PostgreSQL fetch_one error: {e}")
+            logger.error(f"Query: {query[:200]}...")
+            logger.error(f"Params: {params} (type: {type(params).__name__ if params else 'None'})")
             raise
     
     def fetch_all(self, query: str, params: tuple = None) -> List[Dict]:
@@ -126,7 +148,7 @@ class PostgresHandler(DatabaseHandler):
         
         Args:
             query: SQL query string
-            params: Query parameters
+            params: Query parameters (must be tuple or None)
             
         Returns:
             List of rows as dictionaries
@@ -134,13 +156,44 @@ class PostgresHandler(DatabaseHandler):
         try:
             import psycopg2.extras
             
+            # Ensure params is properly formatted
+            if params is not None:
+                # Convert to tuple if it's a list
+                if isinstance(params, list):
+                    params = tuple(params)
+                # Ensure single values are wrapped in tuple
+                elif not isinstance(params, tuple):
+                    params = (params,)
+            
             with self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute(query, params)
                 rows = cursor.fetchall()
                 return [dict(row) for row in rows]
         except Exception as e:
             logger.error(f"PostgreSQL fetch_all error: {e}")
+            logger.error(f"Query: {query[:200]}...")
+            logger.error(f"Params: {params} (type: {type(params).__name__ if params else 'None'})")
             raise
+    
+    def commit(self) -> None:
+        """
+        Commit current transaction.
+        
+        PostgreSQL requires explicit commits when autocommit is False.
+        """
+        if self.connection:
+            self.connection.commit()
+            logger.debug("PostgreSQL commit")
+    
+    def rollback(self) -> None:
+        """
+        Rollback current transaction.
+        
+        PostgreSQL requires explicit rollback to abort failed transactions.
+        """
+        if self.connection:
+            self.connection.rollback()
+            logger.debug("PostgreSQL rollback")
     
     def init_schema(self) -> None:
         """Initialize PostgreSQL schema using the schema module."""

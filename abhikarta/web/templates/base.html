@@ -141,6 +141,26 @@
                             <li><a class="dropdown-item" href="{{ url_for('swarm_designer_new') }}">
                                 <i class="bi bi-palette me-2"></i>Swarm Designer
                             </a></li>
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- AI Org Section -->
+                            <li class="dropdown-header text-info fw-bold">
+                                <i class="bi bi-building me-1"></i>AI Organizations
+                                <span class="badge bg-info text-white ms-1" style="font-size: 0.6rem;">v1.4.5</span>
+                            </li>
+                            <li><a class="dropdown-item" href="{{ url_for('aiorg_list') }}">
+                                <i class="bi bi-list me-2"></i>All AI Orgs
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('aiorg_designer_new') }}">
+                                <i class="bi bi-diagram-3 me-2"></i>Visual Designer
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('aiorg_import') }}">
+                                <i class="bi bi-upload me-2"></i>Import JSON
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('aiorg_hitl_dashboard') }}">
+                                <i class="bi bi-person-check me-2"></i>HITL Dashboard
+                            </a></li>
                         </ul>
                     </li>
                     <li class="nav-item">

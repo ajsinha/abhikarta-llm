@@ -1,0 +1,480 @@
+{% extends "base.html" %}
+
+{% block title %}New AI Organization - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .mode-card {
+        border: 2px solid #dee2e6;
+        border-radius: 12px;
+        padding: 2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .mode-card:hover {
+        border-color: var(--bmo-blue);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .mode-card.active {
+        border-color: var(--bmo-blue);
+        background: #f8f9fa;
+    }
+    .mode-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    .form-section {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+    .form-section.active {
+        display: block;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .json-preview {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.85rem;
+        max-height: 300px;
+        overflow: auto;
+    }
+    .drop-zone {
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+        border-color: var(--bmo-blue);
+        background: #f0f7ff;
+    }
+    .template-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .template-card:hover {
+        border-color: var(--bmo-blue);
+        background: #f8f9fa;
+    }
+    .template-card.selected {
+        border-color: var(--bmo-blue);
+        border-width: 2px;
+        background: #e7f1ff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('aiorg_list') }}">AI Organizations</a></li>
+                    <li class="breadcrumb-item active">New Organization</li>
+                </ol>
+            </nav>
+            <h4 class="mb-0">
+                <i class="bi bi-building me-2"></i>Create AI Organization
+            </h4>
+        </div>
+    </div>
+
+    <!-- Mode Selection -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="mode-card active" id="modeSimple" onclick="selectMode('simple')">
+                <div class="text-center">
+                    <div class="mode-icon text-primary">
+                        <i class="bi bi-ui-checks"></i>
+                    </div>
+                    <h5>Simple Form</h5>
+                    <p class="text-muted mb-0">Create organization with basic settings and add nodes in the visual designer</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="mode-card" id="modeJson" onclick="selectMode('json')">
+                <div class="text-center">
+                    <div class="mode-icon text-success">
+                        <i class="bi bi-filetype-json"></i>
+                    </div>
+                    <h5>Import JSON</h5>
+                    <p class="text-muted mb-0">Upload a JSON file to create organization with predefined structure</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="mode-card" id="modeTemplate" onclick="selectMode('template')">
+                <div class="text-center">
+                    <div class="mode-icon text-warning">
+                        <i class="bi bi-collection"></i>
+                    </div>
+                    <h5>Use Template</h5>
+                    <p class="text-muted mb-0">Start from a pre-built organizational template</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Form Section -->
+    <div class="form-section active" id="sectionSimple">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-ui-checks me-2"></i>Organization Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('aiorg_designer_new') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Organization Info</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Organization Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" required 
+                                       placeholder="e.g., Project Analysis Team">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description" rows="3"
+                                          placeholder="Describe the purpose of this AI organization"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">CEO / Root Node</h6>
+                            <div class="mb-3">
+                                <label class="form-label">CEO Role Name</label>
+                                <input type="text" class="form-control" name="ceo_name" 
+                                       value="Chief Executive Officer" placeholder="e.g., Chief Analysis Officer">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Human Mirror Name</label>
+                                <input type="text" class="form-control" name="ceo_human_name" 
+                                       placeholder="Name of the person this AI represents">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email (for notifications)</label>
+                                <input type="email" class="form-control" name="ceo_email" 
+                                       placeholder="email@company.com">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('aiorg_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-diagram-3 me-1"></i>Create & Open Designer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSON Import Section -->
+    <div class="form-section" id="sectionJson">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-filetype-json me-2"></i>Import from JSON</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('aiorg_designer_new') }}" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="drop-zone" id="dropZone">
+                                <i class="bi bi-cloud-upload display-4 text-muted mb-3 d-block"></i>
+                                <p class="mb-2">Drag & drop your JSON file here</p>
+                                <p class="text-muted small mb-3">or</p>
+                                <label class="btn btn-outline-primary">
+                                    <i class="bi bi-folder2-open me-1"></i>Browse Files
+                                    <input type="file" name="json_file" id="jsonFileInput" accept=".json" 
+                                           style="display: none;" onchange="handleFileSelect(this)">
+                                </label>
+                            </div>
+                            <div id="selectedFile" class="mt-3" style="display: none;">
+                                <div class="alert alert-success d-flex align-items-center">
+                                    <i class="bi bi-file-earmark-check me-2"></i>
+                                    <span id="selectedFileName"></span>
+                                    <button type="button" class="btn-close ms-auto" onclick="clearFile()"></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">JSON Preview</h6>
+                            <div class="json-preview" id="jsonPreview">
+                                <span class="text-muted">Select a JSON file to preview...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="#" class="text-muted small" data-bs-toggle="collapse" data-bs-target="#jsonFormat">
+                                <i class="bi bi-info-circle me-1"></i>View expected JSON format
+                            </a>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('aiorg_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success" id="importBtn" disabled>
+                                <i class="bi bi-upload me-1"></i>Import & Open Designer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="collapse mt-3" id="jsonFormat">
+                        <div class="card card-body bg-light">
+                            <pre class="mb-0"><code>{
+  "org": {
+    "name": "My AI Organization",
+    "description": "Organization description"
+  },
+  "nodes": [
+    {
+      "role_name": "CEO",
+      "role_type": "executive",
+      "parent_node_id": null,
+      "human_name": "John Doe",
+      "human_email": "john@company.com",
+      "hitl_enabled": true,
+      "position_x": 400,
+      "position_y": 50
+    },
+    {
+      "role_name": "Project Manager",
+      "role_type": "manager",
+      "parent_node_id": "ref_to_parent",
+      "human_name": "Jane Smith",
+      "human_email": "jane@company.com",
+      "hitl_enabled": false,
+      "position_x": 400,
+      "position_y": 170
+    }
+  ]
+}</code></pre>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Section -->
+    <div class="form-section" id="sectionTemplate">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-collection me-2"></i>Choose a Template</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="template-card" onclick="selectTemplate('project_analysis')">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-kanban text-primary fs-4 me-2"></i>
+                                <h6 class="mb-0">Project Analysis Team</h6>
+                            </div>
+                            <p class="text-muted small mb-0">CEO → Project Managers → Analysts structure for analyzing project proposals</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="template-card" onclick="selectTemplate('research_org')">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-search text-success fs-4 me-2"></i>
+                                <h6 class="mb-0">Research Organization</h6>
+                            </div>
+                            <p class="text-muted small mb-0">Research Director → Research Leads → Data Analysts for comprehensive research</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="template-card" onclick="selectTemplate('compliance')">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-shield-check text-warning fs-4 me-2"></i>
+                                <h6 class="mb-0">Compliance Review</h6>
+                            </div>
+                            <p class="text-muted small mb-0">CCO → Department Auditors → Policy Analysts for regulatory compliance</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="template-card" onclick="selectTemplate('due_diligence')">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-briefcase text-danger fs-4 me-2"></i>
+                                <h6 class="mb-0">Due Diligence</h6>
+                            </div>
+                            <p class="text-muted small mb-0">M&A Lead → Functional Heads (Legal, Finance, Tech) → Specialists</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="template-card" onclick="selectTemplate('customer_support')">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-headset text-info fs-4 me-2"></i>
+                                <h6 class="mb-0">Customer Support</h6>
+                            </div>
+                            <p class="text-muted small mb-0">Support Director → Team Leads → Support Agents for tiered support</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="template-card" onclick="selectTemplate('content_team')">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-pencil-square text-secondary fs-4 me-2"></i>
+                                <h6 class="mb-0">Content Team</h6>
+                            </div>
+                            <p class="text-muted small mb-0">Editor in Chief → Section Editors → Writers for content creation</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="POST" action="{{ url_for('aiorg_designer_new') }}" id="templateForm">
+                    <input type="hidden" name="name" id="templateOrgName">
+                    <input type="hidden" name="description" id="templateOrgDesc">
+                    <input type="hidden" name="ceo_name" id="templateCeoName">
+                    <input type="hidden" name="template" id="selectedTemplate">
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('aiorg_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-warning" id="templateBtn" disabled>
+                            <i class="bi bi-plus-circle me-1"></i>Create from Template
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Template definitions
+    const templates = {
+        project_analysis: {
+            name: 'Project Analysis Team',
+            description: 'AI organization for analyzing project proposals and creating execution plans',
+            ceo_name: 'Chief Analysis Officer'
+        },
+        research_org: {
+            name: 'Research Organization',
+            description: 'AI organization for conducting comprehensive research and analysis',
+            ceo_name: 'Research Director'
+        },
+        compliance: {
+            name: 'Compliance Review Team',
+            description: 'AI organization for regulatory compliance and policy review',
+            ceo_name: 'Chief Compliance Officer'
+        },
+        due_diligence: {
+            name: 'Due Diligence Team',
+            description: 'AI organization for M&A due diligence and evaluation',
+            ceo_name: 'Due Diligence Lead'
+        },
+        customer_support: {
+            name: 'Customer Support Team',
+            description: 'AI organization for tiered customer support and issue resolution',
+            ceo_name: 'Support Director'
+        },
+        content_team: {
+            name: 'Content Creation Team',
+            description: 'AI organization for content planning, creation, and editorial review',
+            ceo_name: 'Editor in Chief'
+        }
+    };
+    
+    // Mode selection
+    function selectMode(mode) {
+        // Update mode cards
+        document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+        document.getElementById('mode' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+        
+        // Update form sections
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('section' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+    }
+    
+    // Template selection
+    function selectTemplate(templateId) {
+        document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+        event.currentTarget.classList.add('selected');
+        
+        const template = templates[templateId];
+        if (template) {
+            document.getElementById('templateOrgName').value = template.name;
+            document.getElementById('templateOrgDesc').value = template.description;
+            document.getElementById('templateCeoName').value = template.ceo_name;
+            document.getElementById('selectedTemplate').value = templateId;
+            document.getElementById('templateBtn').disabled = false;
+        }
+    }
+    
+    // File handling
+    function handleFileSelect(input) {
+        const file = input.files[0];
+        if (file) {
+            document.getElementById('selectedFileName').textContent = file.name;
+            document.getElementById('selectedFile').style.display = 'block';
+            document.getElementById('importBtn').disabled = false;
+            
+            // Preview JSON
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    document.getElementById('jsonPreview').innerHTML = 
+                        '<pre style="margin:0; white-space: pre-wrap;">' + 
+                        JSON.stringify(json, null, 2) + '</pre>';
+                } catch (err) {
+                    document.getElementById('jsonPreview').innerHTML = 
+                        '<span class="text-danger">Invalid JSON: ' + err.message + '</span>';
+                    document.getElementById('importBtn').disabled = true;
+                }
+            };
+            reader.readAsText(file);
+        }
+    }
+    
+    function clearFile() {
+        document.getElementById('jsonFileInput').value = '';
+        document.getElementById('selectedFile').style.display = 'none';
+        document.getElementById('importBtn').disabled = true;
+        document.getElementById('jsonPreview').innerHTML = 
+            '<span class="text-muted">Select a JSON file to preview...</span>';
+    }
+    
+    // Drag and drop
+    const dropZone = document.getElementById('dropZone');
+    
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].name.endsWith('.json')) {
+            document.getElementById('jsonFileInput').files = files;
+            handleFileSelect(document.getElementById('jsonFileInput'));
+        }
+    });
+</script>
+{% endblock %}

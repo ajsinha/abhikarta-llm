@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Create AI Organization - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_list') }}">AI Organizations</a></li>
+            <li class="breadcrumb-item active">Create New</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>Create AI Organization
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('aiorg_create') }}">
+                        <!-- Organization Details -->
+                        <h5 class="mb-3"><i class="bi bi-building me-2"></i>Organization Details</h5>
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Organization Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   placeholder="e.g., Project Analysis Team" required>
+                            <div class="form-text">Choose a descriptive name for your AI organization.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"
+                                      placeholder="Describe the purpose and function of this AI organization..."></textarea>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- CEO Node Configuration -->
+                        <h5 class="mb-3"><i class="bi bi-person-badge me-2"></i>CEO (Root Node) Configuration</h5>
+                        <p class="text-muted small">Every AI Organization starts with a CEO node. This is the top-level executive that receives tasks and coordinates the organization.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="ceo_name" class="form-label">CEO Role Name</label>
+                                <input type="text" class="form-control" id="ceo_name" name="ceo_name" 
+                                       value="Chief Executive Officer" placeholder="e.g., Chief Executive Officer">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ceo_email" class="form-label">CEO Email (Human Mirror)</label>
+                                <input type="email" class="form-control" id="ceo_email" name="ceo_email" 
+                                       placeholder="ceo@company.com">
+                                <div class="form-text">Notifications will be sent to this email.</div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>What's Next?</strong> After creating the organization, you'll be taken to the Visual Designer where you can add more nodes (department heads, managers, analysts) to build your complete org chart.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('aiorg_list') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-diagram-3 me-2"></i>Create Organization
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card mt-4 border-0 bg-light">
+                <div class="card-body">
+                    <h6><i class="bi bi-lightbulb me-2 text-warning"></i>Tips for Creating an AI Org</h6>
+                    <ul class="mb-0 small">
+                        <li><strong>Start Simple:</strong> Begin with a basic hierarchy and expand as needed.</li>
+                        <li><strong>Define Clear Roles:</strong> Each node should have a specific purpose.</li>
+                        <li><strong>Configure HITL:</strong> Enable Human-in-the-Loop for critical decision points.</li>
+                        <li><strong>Set Up Notifications:</strong> Ensure email/Teams/Slack are configured for alerts.</li>
+                    </ul>
+                    <div class="mt-3 pt-2 border-top">
+                        <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-book me-1"></i>Glossary
+                        </a>
+                        <a href="{{ url_for('help_page', page='aiorg') }}" class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="bi bi-question-circle me-1"></i>AI Org Help
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

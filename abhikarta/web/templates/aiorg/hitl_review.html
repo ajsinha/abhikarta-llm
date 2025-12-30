@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}HITL Review - {{ task.title }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .review-panel {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+    .action-btn {
+        padding: 1rem 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_hitl_dashboard') }}">HITL Dashboard</a></li>
+            <li class="breadcrumb-item active">Review</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Task Details -->
+        <div class="col-lg-7">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Task Under Review</h5>
+                </div>
+                <div class="card-body">
+                    <h4>{{ task.title }}</h4>
+                    <span class="badge bg-{{ 'danger' if task.priority.value == 'critical' else 'warning text-dark' if task.priority.value == 'high' else 'info' }}">
+                        {{ task.priority.value }} priority
+                    </span>
+                    <span class="badge bg-secondary ms-1">{{ task.status.value }}</span>
+                    
+                    <hr>
+                    
+                    <h6>Description</h6>
+                    <p style="white-space: pre-wrap;">{{ task.description or 'No description' }}</p>
+                    
+                    {% if task.context %}
+                    <h6>Context from Parent</h6>
+                    <pre class="bg-light p-2 rounded">{{ task.context | tojson(indent=2) }}</pre>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- AI Response (if any) -->
+            {% if responses %}
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-robot me-2"></i>AI's Proposed Response</h5>
+                </div>
+                <div class="card-body">
+                    {% for response in responses %}
+                    <div class="mb-3">
+                        <span class="badge bg-info mb-2">{{ response.response_type.value }}</span>
+                        {% if response.summary %}
+                        <h6>Summary</h6>
+                        <p>{{ response.summary }}</p>
+                        {% endif %}
+                        <h6>Full Content</h6>
+                        <pre class="bg-dark text-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">{{ response.content | tojson(indent=2) }}</pre>
+                        {% if response.reasoning %}
+                        <h6 class="mt-3">AI Reasoning</h6>
+                        <p class="text-muted">{{ response.reasoning }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Review Panel -->
+        <div class="col-lg-5">
+            <div class="card sticky-top" style="top: 1rem;">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-person-check me-2"></i>Your Review</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Role:</strong> {{ node.role_name }}<br>
+                        <strong>Organization:</strong> {{ org.name }}
+                    </div>
+
+                    <form method="post" action="{{ url_for('aiorg_hitl_review', node_id=node.node_id, task_id=task.task_id) }}">
+                        <div class="mb-4">
+                            <label class="form-label"><strong>Select Action</strong></label>
+                            <div class="d-grid gap-2">
+                                <div class="form-check review-panel">
+                                    <input class="form-check-input" type="radio" name="action_type" id="actionApprove" value="approve" checked>
+                                    <label class="form-check-label" for="actionApprove">
+                                        <strong class="text-success"><i class="bi bi-check-circle me-1"></i>Approve</strong>
+                                        <br><small class="text-muted">Accept the AI's response and continue</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check review-panel">
+                                    <input class="form-check-input" type="radio" name="action_type" id="actionOverride" value="override">
+                                    <label class="form-check-label" for="actionOverride">
+                                        <strong class="text-primary"><i class="bi bi-pencil me-1"></i>Override</strong>
+                                        <br><small class="text-muted">Replace with your own response</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check review-panel">
+                                    <input class="form-check-input" type="radio" name="action_type" id="actionReject" value="reject">
+                                    <label class="form-check-label" for="actionReject">
+                                        <strong class="text-danger"><i class="bi bi-x-circle me-1"></i>Reject</strong>
+                                        <br><small class="text-muted">Reject and request re-analysis</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="overrideSection" style="display: none;">
+                            <label for="override_content" class="form-label">Your Response (JSON or text)</label>
+                            <textarea class="form-control font-monospace" id="override_content" name="override_content" rows="8"
+                                      placeholder='{"summary": "Your summary", "findings": [...]}'></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason (Optional)</label>
+                            <input type="text" class="form-control" id="reason" name="reason" 
+                                   placeholder="Brief explanation for your decision">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Additional Comments (Optional)</label>
+                            <textarea class="form-control" id="message" name="message" rows="3"
+                                      placeholder="Any additional notes that should be included in the record..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-lg me-1"></i>Submit Review
+                            </button>
+                            <a href="{{ url_for('aiorg_hitl_dashboard') }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Links -->
+    <div class="text-center mt-3">
+        <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-book me-1"></i>Glossary
+        </a>
+        <a href="{{ url_for('help_page', page='aiorg') }}" class="btn btn-sm btn-outline-primary ms-2">
+            <i class="bi bi-question-circle me-1"></i>AI Org Help
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('input[name="action_type"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const overrideSection = document.getElementById('overrideSection');
+            if (this.value === 'override') {
+                overrideSection.style.display = 'block';
+            } else {
+                overrideSection.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

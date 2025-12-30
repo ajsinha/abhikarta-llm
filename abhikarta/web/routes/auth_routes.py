@@ -228,6 +228,8 @@ class AuthRoutes(AbstractRoutes):
                 'goal-based-agents': 'help/pages/goal-based-agents.html',
                 'react-reflect-hierarchical': 'help/pages/react-reflect-hierarchical.html',
                 'notifications': 'help/pages/notifications.html',
+                # v1.4.5 AI Organizations
+                'aiorg': 'help/pages/aiorg.html',
             }
             
             template = page_map.get(page)

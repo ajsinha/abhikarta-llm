@@ -15,6 +15,8 @@
 <a href="#banking-solutions">Banking Solutions</a>
 <a href="#llm-management">LLM Management</a>
 <a href="#hitl">Human-in-the-Loop</a>
+<a href="#ai-organizations">AI Organizations</a>
+<a href="#notifications">Notifications</a>
 <a href="#mcp-plugins">MCP Plugins</a>
 <a href="#rbac">Enterprise RBAC</a>
 {% endblock %}
@@ -429,6 +431,88 @@ def search_database(query: str) -> str:
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="ai-organizations">AI Organizations <span class="badge bg-info">v1.4.5</span></h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6">
+        <p class="lead">Create AI-powered digital twins of organizational structures with hierarchical task delegation.</p>
+        <ul>
+            <li><strong>Hierarchical Structure:</strong> Model real org charts with CEO → Managers → Analysts</li>
+            <li><strong>Visual Org Designer:</strong> Drag-and-drop interface for building AI hierarchies</li>
+            <li><strong>Task Delegation:</strong> Parent nodes delegate subtasks to subordinates</li>
+            <li><strong>Response Aggregation:</strong> AI synthesizes subordinate responses at each level</li>
+            <li><strong>Human Mirror:</strong> Each AI node represents a real employee</li>
+            <li><strong>Node Types:</strong> Executive, Manager, Analyst, Coordinator</li>
+            <li><strong>Delegation Strategies:</strong> Parallel, Sequential, Conditional</li>
+            <li><strong>HITL Integration:</strong> Human approval at any level of the hierarchy</li>
+        </ul>
+        <a href="{{ url_for('help_page', page='aiorg') }}" class="btn btn-outline-primary btn-sm">View AI Org Documentation</a>
+    </div>
+    <div class="col-lg-6">
+        <pre><code class="language-text">┌─────────────────────────────────────┐
+│         AI ORGANIZATION             │
+├─────────────────────────────────────┤
+│          ┌─────────┐                │
+│          │   CEO   │ ← Task         │
+│          │  GPT-4  │                │
+│          └────┬────┘                │
+│               │ Delegates           │
+│       ┌───────┴───────┐             │
+│       │               │             │
+│  ┌────┴────┐    ┌────┴────┐        │
+│  │VP Research│  │VP Finance│        │
+│  │ (Manager) │  │ (Manager)│        │
+│  └────┬────┘    └────┬────┘        │
+│       │               │             │
+│  ┌────┴────┐    ┌────┴────┐        │
+│  │ Analyst │    │ Analyst │        │
+│  └─────────┘    └─────────┘        │
+│                                     │
+│  Response flows UP the hierarchy    │
+└─────────────────────────────────────┘</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="notifications">Enterprise Notifications <span class="badge bg-warning text-dark">v1.4.0</span></h2>
+<div class="row align-items-center mb-5">
+    <div class="col-lg-6 order-lg-2">
+        <p class="lead">Unified multi-channel notification system for agents, workflows, and AI organizations.</p>
+        <ul>
+            <li><strong>Slack Integration:</strong> Channel messages, DMs, Block Kit formatting, thread replies</li>
+            <li><strong>Microsoft Teams:</strong> Incoming webhooks, Adaptive Cards, action buttons</li>
+            <li><strong>Email:</strong> SMTP integration with HTML templates</li>
+            <li><strong>Custom Webhooks:</strong> Send to any HTTP endpoint</li>
+            <li><strong>Rate Limiting:</strong> Token bucket algorithm prevents overwhelming services</li>
+            <li><strong>Retry Logic:</strong> Exponential backoff for failed deliveries</li>
+            <li><strong>Audit Logging:</strong> Complete notification history</li>
+        </ul>
+        <a href="{{ url_for('help_page', page='notifications') }}" class="btn btn-outline-info btn-sm">View Notification Guide</a>
+    </div>
+    <div class="col-lg-6 order-lg-1">
+        <pre><code class="language-python">from abhikarta.notification import NotificationManager
+
+manager = NotificationManager()
+
+# Send to Slack channel
+await manager.send(
+    channel_id="slack-general",
+    title="Task Completed",
+    message="Analysis complete",
+    level="success"
+)
+
+# Notify human mirror in AI Org
+await manager.notify_human_mirror(
+    node=ceo_node,
+    event="task_completed",
+    task=task
+)</code></pre>
     </div>
 </div>
 

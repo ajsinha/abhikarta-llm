@@ -733,6 +733,7 @@ class UserRoutes(AbstractRoutes):
         def tool_detail(tool_name):
             """View detailed information about a specific tool."""
             from abhikarta.tools import get_tools_registry
+            from abhikarta.tools.tool_documentation import get_tool_documentation
             import json
             
             registry = get_tools_registry()
@@ -765,6 +766,9 @@ class UserRoutes(AbstractRoutes):
             # Get JSON schema for display
             schema_json = json.dumps(schema.to_json_schema() if schema else {}, indent=2)
             
+            # Get tool documentation (sample input/output, detailed description)
+            tool_doc = get_tool_documentation(tool_name, tool)
+            
             return render_template('user/tool_detail.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('user_id'),
@@ -773,7 +777,8 @@ class UserRoutes(AbstractRoutes):
                                    source_type=source_type,
                                    source_server=source_server,
                                    parameters=parameters,
-                                   schema_json=schema_json)
+                                   schema_json=schema_json,
+                                   tool_doc=tool_doc)
         
         @self.app.route('/tools/<tool_name>/test')
         @login_required

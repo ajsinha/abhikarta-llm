@@ -1,6 +1,6 @@
 # Abhikarta-LLM Documentation
 
-**Version:** 1.4.0  
+**Version:** 1.4.5  
 **Copyright:** © 2025-2030 Ashutosh Sinha. All Rights Reserved.
 
 ## Documentation Index
@@ -16,12 +16,28 @@
 | [REACT_REFLECT_HIERARCHICAL_TUTORIAL.md](REACT_REFLECT_HIERARCHICAL_TUTORIAL.md) | ReAct, Reflect & Hierarchical Agents tutorial |
 | [NOTIFICATION_QUICKSTART.md](NOTIFICATION_QUICKSTART.md) | Notifications quick start |
 | [NOTIFICATION_ARCHITECTURE.md](NOTIFICATION_ARCHITECTURE.md) | Notifications architecture |
-| [PATENT_APPLICATION.md](PATENT_APPLICATION.md) | Patent application (21 claims) |
+| [AIORG_REQUIREMENTS.md](AIORG_REQUIREMENTS.md) | AI Organizations requirements (44 FRs, 17 NFRs) |
+| [AIORG_DESIGN.md](AIORG_DESIGN.md) | AI Organizations design |
+| [AIORG_ARCHITECTURE.md](AIORG_ARCHITECTURE.md) | AI Organizations architecture |
+| [AIORG_QUICKSTART.md](AIORG_QUICKSTART.md) | AI Organizations quick start |
+| [PATENT_APPLICATION.md](PATENT_APPLICATION.md) | Patent application (27 claims) |
 | [PATENT_WORTHINESS_ANALYSIS.md](PATENT_WORTHINESS_ANALYSIS.md) | Patent worthiness analysis |
 
-## Version 1.4.0 Features (Latest)
+## Version 1.4.5 Features (Latest)
 
-### Enterprise Notification System (NEW)
+### Hierarchical AI Organizations (NEW)
+- **AI Org Module**: Model corporate structures with AI agents
+- **Hierarchical Nodes**: Executive, Manager, Analyst, Coordinator role types
+- **Task Delegation**: Parallel, Sequential, Conditional strategies
+- **Response Aggregation**: Synthesize child node responses
+- **Human Mirror**: Link AI roles to real employees (name, email, Teams/Slack)
+- **HITL Controls**: Approval requirements at every level
+- **Visual Designer**: Drag-and-drop organization chart creation
+- **Pre-built Templates**: Research Team, Compliance Unit, Support Hierarchy
+- **6 Database Tables**: ai_orgs, ai_nodes, ai_tasks, ai_responses, ai_hitl_actions, ai_event_logs
+- **14 Indexes**: Optimized queries for organization operations
+
+### Enterprise Notification System
 - **NotificationManager**: Central orchestrator for multi-channel routing
 - **Slack Integration**: Channel messages, DMs, Block Kit formatting, thread replies
 - **Microsoft Teams**: Incoming Webhooks, Adaptive Cards, MessageCard format
@@ -30,23 +46,23 @@
 - **Retry Logic**: Exponential backoff for failed deliveries
 - **Audit Logging**: Complete notification history
 
-### Webhook Receiver (NEW)
+### Webhook Receiver
 - **Endpoint Registration**: Custom URL paths with authentication
 - **Signature Verification**: HMAC-SHA256, JWT, API key, Basic auth
 - **Replay Protection**: Nonce tracking and timestamp validation
 - **Event Dispatching**: Trigger agents, workflows, or swarms
 - **Event Logging**: Full request/response logging
 
-### Chain of Thought & Tree of Thought (NEW Tutorial)
+### Chain of Thought & Tree of Thought Tutorial
 - **CoT Agent Type**: Pre-configured for step-by-step reasoning
 - **ToT Workflows**: Parallel exploration with evaluation
 - **Best Practices**: Temperature settings, token budgeting
 - **Integration**: Works with agents, workflows, and swarms
 
 ### Database Updates
-- 5 new tables for notifications (27 total)
-- NotificationDelegate for all notification operations
-- Schema version 1.4.0
+- 33 tables total (6 new for AI Organizations)
+- AIORGDBOps for all AI Org database operations
+- Schema version 1.4.5 with transaction support (PostgreSQL ready)
 
 ## Version 1.3.0 Features
 
@@ -148,11 +164,11 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                     PRESENTATION LAYER                           │
 │         Flask Web UI │ REST API │ Help Documentation            │
-│         Tools Page (/tools) │ Notifications │ MCP Management    │
+│    Tools Page │ Notifications │ MCP │ AI Org Designer            │
 ├─────────────────────────────────────────────────────────────────┤
 │                     APPLICATION LAYER                            │
 │    Agent Manager │ Workflow Engine │ Swarm Orchestrator         │
-│    HITL Manager │ NotificationManager │ WebhookReceiver         │
+│    HITL Manager │ NotificationManager │ AIOrg Orchestrator      │
 ├─────────────────────────────────────────────────────────────────┤
 │                        TOOLS LAYER                               │
 │  BaseTool │ FunctionTool │ MCPTool │ HTTPTool │ ToolsRegistry   │
@@ -162,7 +178,7 @@
 │    LangChain │ LangGraph │ MCP │ Kafka/RabbitMQ │ Slack/Teams   │
 ├─────────────────────────────────────────────────────────────────┤
 │                        DATA LAYER                                │
-│         PostgreSQL/SQLite │ 27 Tables │ 9 Delegates             │
+│         PostgreSQL/SQLite │ 33 Tables │ 10 Delegates            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -174,11 +190,12 @@
 | Pre-built Tools | 85 |
 | Banking Agents | 10 |
 | Banking Workflows | 7 |
-| Database Tables | 27 |
-| Database Delegates | 9 |
+| Database Tables | 33 |
+| Database Delegates | 10 |
 | Workflow Node Types | 10 |
-| Patent Claims | 21 |
-| Help Pages | 35+ |
+| Patent Claims | 27 |
+| Help Pages | 40+ |
+| AI Org Templates | 6 |
 
 ## Quick Links
 
@@ -201,7 +218,7 @@
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.4.0 | Dec 2025 | Notifications (Slack/Teams/Webhooks), CoT/ToT Tutorial, 21 Patent Claims |
+| 1.4.5 | Dec 2025 | Notifications (Slack/Teams/Webhooks), CoT/ToT Tutorial, 21 Patent Claims |
 | 1.3.0 | Dec 2025 | Agent Swarms, Messaging (Kafka/RabbitMQ), Actor System |
 | 1.2.0 | Jan 2025 | Database Schema docs (22 tables), Page glossaries |
 | 1.1.8 | Jan 2025 | Tool View/Test pages, form-based testing |

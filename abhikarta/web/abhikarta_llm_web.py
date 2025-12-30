@@ -183,7 +183,8 @@ class AbhikartaLLMWeb:
             AgentRoutes,
             MCPRoutes,
             APIRoutes,
-            WorkflowRoutes
+            WorkflowRoutes,
+            AIORGRoutes  # v1.4.5
         )
         from .routes.swarm_routes import SwarmRoutes
         from .routes.notification_routes import NotificationRoutes  # v1.4.0
@@ -198,7 +199,8 @@ class AbhikartaLLMWeb:
             APIRoutes,
             WorkflowRoutes,
             SwarmRoutes,  # v1.3.0
-            NotificationRoutes  # v1.4.0
+            NotificationRoutes,  # v1.4.0
+            AIORGRoutes  # v1.4.5
         ]
         
         for route_class in route_classes:

@@ -1,0 +1,405 @@
+{% extends "help/help_base.html" %}
+
+{% block title %}AI Organizations - Help{% endblock %}
+
+{% block help_content %}
+<div class="help-content">
+    <h1><i class="bi bi-building me-2"></i>AI Organizations</h1>
+    <p class="lead">Build AI-powered digital twins of organizational structures with hierarchical task delegation and human-in-the-loop capabilities.</p>
+    
+    <div class="badge bg-info mb-3">New in v1.4.5</div>
+    
+    <div class="alert alert-success">
+        <i class="bi bi-lightbulb me-2"></i>
+        <strong>Key Innovation:</strong> AI Org combines Chain-of-Thought, Tree-of-Thoughts, and organizational hierarchy patterns to create AI systems that work like real business teams.
+    </div>
+
+    <hr>
+
+    <h2><i class="bi bi-info-circle me-2"></i>Overview</h2>
+    <p>AI Organizations (AI Org) allows you to create AI-powered representations of real organizational structures. Each position in your org chart becomes an AI agent that can:</p>
+    
+    <ul>
+        <li><strong>Receive Tasks:</strong> Accept assignments from superiors or external triggers</li>
+        <li><strong>Delegate Work:</strong> Break down tasks and assign subtasks to subordinates</li>
+        <li><strong>Process Information:</strong> Analyze, research, and generate outputs using AI</li>
+        <li><strong>Aggregate Results:</strong> Synthesize subordinate responses into summaries</li>
+        <li><strong>Report Upward:</strong> Pass consolidated results up the chain</li>
+    </ul>
+
+    <hr>
+
+    <h2><i class="bi bi-diagram-3 me-2"></i>Key Concepts</h2>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-building me-2"></i>AI Organization
+                </div>
+                <div class="card-body">
+                    <p>A complete organizational hierarchy consisting of interconnected AI nodes. Each org has:</p>
+                    <ul>
+                        <li>Unique name and description</li>
+                        <li>Status (draft, active, paused, archived)</li>
+                        <li>Dedicated event bus channel</li>
+                        <li>Configuration settings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-person-circle me-2"></i>AI Node
+                </div>
+                <div class="card-body">
+                    <p>A position/role in the org chart. Each node has:</p>
+                    <ul>
+                        <li>Role name and type (Executive, Manager, Analyst)</li>
+                        <li>Parent node (except root)</li>
+                        <li>AI agent configuration</li>
+                        <li>Human mirror (the person it represents)</li>
+                        <li>HITL settings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <i class="bi bi-clipboard-check me-2"></i>Task
+                </div>
+                <div class="card-body">
+                    <p>Work items that flow through the organization:</p>
+                    <ul>
+                        <li>Root tasks submitted to CEO</li>
+                        <li>Subtasks delegated to subordinates</li>
+                        <li>Status tracking (pending, in_progress, delegated, completed)</li>
+                        <li>Complete audit trail</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-person-check me-2"></i>Human Mirror & HITL
+                </div>
+                <div class="card-body">
+                    <p>Each AI node represents a real human employee:</p>
+                    <ul>
+                        <li>Human can view AI mirror's activities</li>
+                        <li>Approve, reject, or override AI decisions</li>
+                        <li>Interventions become part of the record</li>
+                        <li>Configurable per node</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2><i class="bi bi-arrow-repeat me-2"></i>Task Flow</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <pre class="bg-dark text-light p-3 rounded">
+External Request
+      │
+      ▼
+┌─────────────┐
+│    CEO      │ ◄─── Root node receives task
+│   (Root)    │
+└─────┬───────┘
+      │
+      │ AI Analysis: "This requires multiple specialists"
+      │
+      ▼
+┌─────────────────────────────────────────┐
+│         DELEGATION PLAN CREATED          │
+│  Subtask 1: Technical Analysis → PM-Tech │
+│  Subtask 2: Market Analysis → PM-Market  │
+└─────────────────────────────────────────┘
+      │
+      │ Parallel Delegation
+      ├─────────────────┬─────────────────┐
+      ▼                 ▼                 ▼
+┌──────────┐     ┌──────────┐     ┌──────────┐
+│ PM-Tech  │     │PM-Market │     │   CFO    │
+└────┬─────┘     └────┬─────┘     └────┬─────┘
+     │                │                │
+  Delegate         Delegate        Self-complete
+     │                │                │
+┌────▼────┐     ┌────▼────┐           │
+│Analysts │     │Analysts │           │
+└────┬────┘     └────┬────┘           │
+     │                │                │
+     │ Responses      │ Responses      │
+     ▼                ▼                │
+  ┌─────────────────────────────────┐  │
+  │      Response Aggregation        │◄─┘
+  │   (Progressive Summarization)    │
+  └─────────────────┬───────────────┘
+                    │
+                    ▼
+           ┌───────────────┐
+           │ FINAL REPORT  │ ──► Notification sent
+           └───────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2><i class="bi bi-gear me-2"></i>Node Types</h2>
+    
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Typical Roles</th>
+                <th>Behavior</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="badge bg-danger">Executive</span></td>
+                <td>Top-level decision makers</td>
+                <td>CEO, CTO, CFO, COO</td>
+                <td>Receives external tasks, creates strategy, delegates major initiatives</td>
+            </tr>
+            <tr>
+                <td><span class="badge bg-primary">Manager</span></td>
+                <td>Middle management with subordinates</td>
+                <td>Department Heads, Project Managers</td>
+                <td>Receives delegated tasks, breaks down further, aggregates results</td>
+            </tr>
+            <tr>
+                <td><span class="badge bg-success">Analyst</span></td>
+                <td>Individual contributors (leaf nodes)</td>
+                <td>Researchers, Developers, Analysts</td>
+                <td>Performs actual work, returns detailed findings</td>
+            </tr>
+            <tr>
+                <td><span class="badge bg-info">Coordinator</span></td>
+                <td>Cross-functional coordinators</td>
+                <td>Program Managers, Liaisons</td>
+                <td>Coordinates between branches, handles special cases</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2><i class="bi bi-person-check me-2"></i>Human-in-the-Loop (HITL)</h2>
+    
+    <p>HITL allows real humans to intervene in AI decisions at any level:</p>
+    
+    <h4>HITL Configuration (per node)</h4>
+    <ul>
+        <li><strong>Enable HITL:</strong> Turn on human oversight</li>
+        <li><strong>Approval Required:</strong> Human must approve before response is sent</li>
+        <li><strong>Review Delegation:</strong> Human reviews task breakdown before delegation</li>
+        <li><strong>Timeout:</strong> Hours to wait for human response</li>
+        <li><strong>Auto-proceed:</strong> Continue automatically after timeout</li>
+    </ul>
+    
+    <h4>HITL Actions</h4>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle text-success fs-1"></i>
+                    <h5>Approve</h5>
+                    <p class="small">Accept AI's response as-is</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <i class="bi bi-pencil-square text-warning fs-1"></i>
+                    <h5>Override</h5>
+                    <p class="small">Replace AI response with human content</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <i class="bi bi-x-circle text-danger fs-1"></i>
+                    <h5>Reject</h5>
+                    <p class="small">Send back for re-processing</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2><i class="bi bi-bell me-2"></i>Notifications</h2>
+    
+    <p>AI Org integrates with the notification system to alert human mirrors:</p>
+    
+    <ul>
+        <li><strong>Email:</strong> Detailed reports and task summaries</li>
+        <li><strong>Microsoft Teams:</strong> Instant notifications with action cards</li>
+        <li><strong>Slack:</strong> Channel messages and DMs</li>
+        <li><strong>In-App:</strong> Real-time dashboard updates</li>
+    </ul>
+    
+    <p>Notifications are triggered on:</p>
+    <ul>
+        <li>Task assigned to node</li>
+        <li>All subtasks completed (ready for review)</li>
+        <li>HITL intervention required</li>
+        <li>Final report ready</li>
+        <li>Errors or timeouts</li>
+    </ul>
+
+    <hr>
+
+    <h2><i class="bi bi-rocket-takeoff me-2"></i>Quick Start</h2>
+    
+    <ol>
+        <li><strong>Create Organization:</strong> Go to Playground → AI Organizations → Create AI Org</li>
+        <li><strong>Design Structure:</strong> Use the Visual Designer to add nodes and define hierarchy</li>
+        <li><strong>Configure Nodes:</strong> Set roles, human mirrors, HITL settings for each node</li>
+        <li><strong>Activate:</strong> Click "Activate" to start the organization</li>
+        <li><strong>Submit Task:</strong> Send a task to the CEO and watch it flow through the org</li>
+        <li><strong>Monitor:</strong> Use the Monitor page to see real-time progress</li>
+        <li><strong>Review:</strong> Check HITL Dashboard for pending approvals</li>
+    </ol>
+
+    <hr>
+
+    <h2><i class="bi bi-lightbulb me-2"></i>Use Cases</h2>
+    
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-file-earmark-text me-2"></i>Project Analysis
+                </div>
+                <div class="card-body">
+                    <p>CEO delegates project charter analysis to PMs who assign specific sections to analysts. Each analyst produces JIRA items and recommendations that roll up into a comprehensive project plan.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-search me-2"></i>Research Organization
+                </div>
+                <div class="card-body">
+                    <p>Research Director assigns topics to Research Leads who distribute specific questions to Data Analysts. Results aggregate into a complete research report with citations.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-shield-check me-2"></i>Compliance Review
+                </div>
+                <div class="card-body">
+                    <p>CCO receives regulatory update and delegates impact analysis to department auditors. Analysts review specific policies and flag gaps. Consolidated compliance report flows to CCO.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-people me-2"></i>Due Diligence
+                </div>
+                <div class="card-body">
+                    <p>M&A Lead assigns due diligence to functional heads (Legal, Finance, Tech). Each head delegates specific reviews to analysts. Results consolidate into deal recommendation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2><i class="bi bi-link-45deg me-2"></i>Related Features</h2>
+    
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('help_page', page='actors') }}" class="btn btn-outline-primary">
+            <i class="bi bi-broadcast me-1"></i>Actor System
+        </a>
+        <a href="{{ url_for('help_page', page='hitl') }}" class="btn btn-outline-danger">
+            <i class="bi bi-person-check me-1"></i>HITL
+        </a>
+        <a href="{{ url_for('help_page', page='notifications') }}" class="btn btn-outline-info">
+            <i class="bi bi-bell me-1"></i>Notifications
+        </a>
+        <a href="{{ url_for('list_swarms') }}" class="btn btn-outline-warning">
+            <i class="bi bi-hive me-1"></i>Swarms
+        </a>
+    </div>
+
+    <hr>
+
+    <h2><i class="bi bi-book me-2"></i>Glossary Terms</h2>
+    <p>Key terms related to AI Organizations - click to view full definitions in the glossary:</p>
+    
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6><a href="{{ url_for('help_page', page='glossary') }}#ai-org">AI Organization</a></h6>
+                    <small class="text-muted">Hierarchical structure of AI agents mirroring corporate org charts</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6><a href="{{ url_for('help_page', page='glossary') }}#ai-node">AI Node</a></h6>
+                    <small class="text-muted">Position in hierarchy with AI agent and human mirror</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6><a href="{{ url_for('help_page', page='glossary') }}#delegation-strategy">Delegation Strategy</a></h6>
+                    <small class="text-muted">How tasks are distributed: parallel, sequential, conditional</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6><a href="{{ url_for('help_page', page='glossary') }}#human-mirror">Human Mirror</a></h6>
+                    <small class="text-muted">Real employee represented by an AI node</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6><a href="{{ url_for('help_page', page='glossary') }}#response-aggregation">Response Aggregation</a></h6>
+                    <small class="text-muted">Synthesizing subordinate responses into summaries</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6><a href="{{ url_for('help_page', page='glossary') }}#task-status">Task Status</a></h6>
+                    <small class="text-muted">Task lifecycle: pending, in_progress, completed, etc.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-primary">
+            <i class="bi bi-book me-1"></i>View Full Glossary
+        </a>
+    </div>
+</div>
+{% endblock %}

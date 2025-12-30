@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Monitor - {{ org.name }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .event-feed {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    .event-item {
+        padding: 0.75rem;
+        border-left: 3px solid #dee2e6;
+        margin-bottom: 0.5rem;
+        background: #f8f9fa;
+    }
+    .event-item.task_created { border-left-color: #0d6efd; }
+    .event-item.task_completed { border-left-color: #198754; }
+    .event-item.task_failed { border-left-color: #dc3545; }
+    .event-item.hitl { border-left-color: #ffc107; }
+    .node-status {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .status-active { background: #198754; }
+    .status-busy { background: #ffc107; animation: pulse 1s infinite; }
+    .status-paused { background: #6c757d; }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_list') }}">AI Organizations</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_detail', org_id=org.org_id) }}">{{ org.name }}</a></li>
+            <li class="breadcrumb-item active">Monitor</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-activity me-2"></i>Real-time Monitor</h2>
+            <p class="text-muted mb-0">{{ org.name }}</p>
+        </div>
+        <div>
+            <span class="badge bg-{{ 'success' if org.status.value == 'active' else 'warning' }} fs-6">
+                {{ org.status.value }}
+            </span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Stats Row -->
+        <div class="col-12">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white text-center py-3">
+                        <h3 class="mb-0">{{ stats.node_count or 0 }}</h3>
+                        <small>Nodes</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white text-center py-3">
+                        <h3 class="mb-0">{{ stats.task_by_status.get('in_progress', 0) + stats.task_by_status.get('delegated', 0) + stats.task_by_status.get('waiting', 0) if stats.task_by_status else 0 }}</h3>
+                        <small>Active Tasks</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white text-center py-3">
+                        <h3 class="mb-0">{{ stats.task_by_status.get('completed', 0) if stats.task_by_status else 0 }}</h3>
+                        <small>Completed</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark text-center py-3">
+                        <h3 class="mb-0">{{ stats.hitl_actions or 0 }}</h3>
+                        <small>HITL Actions</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Node Status -->
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Node Status</h5>
+                </div>
+                <div class="card-body">
+                    {% for node in nodes %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                        <div>
+                            <span class="node-status status-{{ 'busy' if node.current_task_id else node.status }}"></span>
+                            <strong class="ms-2">{{ node.role_name }}</strong>
+                            <br>
+                            <small class="text-muted ms-4">{{ node.role_type.value }}</small>
+                        </div>
+                        {% if node.current_task_id %}
+                        <span class="badge bg-info">Working</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Idle</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Feed -->
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Event Feed</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="refreshEvents()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+                <div class="card-body event-feed" id="eventFeed">
+                    {% if events %}
+                    {% for event in events %}
+                    <div class="event-item {{ event.event_type|lower }}">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ event.event_type }}</strong>
+                            <small class="text-muted">{{ event.created_at.strftime('%H:%M:%S') if event.created_at else '' }}</small>
+                        </div>
+                        {% if event.task_id %}
+                        <small class="text-muted">Task: {{ event.task_id[:8] }}...</small>
+                        {% endif %}
+                        {% if event.payload %}
+                        <details class="mt-1">
+                            <summary class="small text-muted">Details</summary>
+                            <pre class="small bg-light p-2 mt-1 rounded">{{ event.payload | tojson(indent=2) }}</pre>
+                        </details>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox display-4"></i>
+                        <p class="mt-2">No events yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Links -->
+    <div class="text-center mt-3">
+        <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-book me-1"></i>Glossary
+        </a>
+        <a href="{{ url_for('help_page', page='aiorg') }}" class="btn btn-sm btn-outline-primary ms-2">
+            <i class="bi bi-question-circle me-1"></i>AI Org Help
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function refreshEvents() {
+        location.reload();
+    }
+    
+    // Auto-refresh every 30 seconds
+    setInterval(refreshEvents, 30000);
+</script>
+{% endblock %}

@@ -97,6 +97,16 @@
         <p>A chronological record of system activities, including user actions, agent executions, and configuration changes. Used for security monitoring and compliance.</p>
     </div>
 
+    <div class="glossary-term">
+        <h5>AI Organization (AI Org) <span class="badge bg-info">v1.4.5</span></h5>
+        <p>A hierarchical structure of AI agents that mirrors a corporate organization chart. AI Organizations enable complex task delegation, response aggregation, and human oversight through a tree of AI nodes representing roles like executives, managers, and analysts. See also: <a href="#ai-node">AI Node</a>, <a href="#delegation-strategy">Delegation Strategy</a>.</p>
+    </div>
+
+    <div class="glossary-term" id="ai-node">
+        <h5>AI Node <span class="badge bg-info">v1.4.5</span></h5>
+        <p>A position within an AI Organization hierarchy that represents a specific role (e.g., CEO, Research Lead, Data Analyst). Each node is powered by an AI agent, can delegate tasks to subordinate nodes, aggregate responses, and optionally mirror a real human employee for notifications and oversight.</p>
+    </div>
+
     <!-- Section B -->
     <h2 id="section-b" class="border-bottom pb-2 mt-5">B</h2>
 
@@ -186,6 +196,16 @@
         <p>A database access pattern used in Abhikarta where each domain (agents, workflows, notifications, etc.) has a dedicated delegate class that handles all database operations for that domain.</p>
     </div>
 
+    <div class="glossary-term" id="delegation-strategy">
+        <h5>Delegation Strategy <span class="badge bg-info">v1.4.5</span></h5>
+        <p>The method by which an AI Organization node assigns subtasks to its subordinate nodes. Strategies include:</p>
+        <ul>
+            <li><strong>Parallel</strong> - Dispatch tasks to all subordinates simultaneously and await all responses</li>
+            <li><strong>Sequential</strong> - Process one subordinate at a time, chaining results</li>
+            <li><strong>Conditional</strong> - Use LLM to decide which subordinates to delegate to based on task context</li>
+        </ul>
+    </div>
+
     <!-- Section E -->
     <h2 id="section-e" class="border-bottom pb-2 mt-5">E</h2>
 
@@ -266,6 +286,16 @@
     <div class="glossary-term">
         <h5>HITL (Human-in-the-Loop)</h5>
         <p>A system design where human oversight is integrated into automated processes. In Abhikarta LLM, HITL allows humans to review, approve, or modify AI-generated outputs before they're finalized.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>HITL Action <span class="badge bg-info">v1.4.5</span></h5>
+        <p>A recorded human intervention in an AI Organization workflow. Actions include approve, reject, override, pause, resume, escalate, and send message. Each action is logged with timestamp, user ID, and audit details for compliance.</p>
+    </div>
+
+    <div class="glossary-term" id="human-mirror">
+        <h5>Human Mirror <span class="badge bg-info">v1.4.5</span></h5>
+        <p>The real human employee that an AI Node represents in an AI Organization. The human mirror receives notifications about their AI counterpart's activities and can intervene via HITL controls. Configuration includes name, email, Teams ID, and Slack ID.</p>
     </div>
 
     <div class="glossary-term">
@@ -371,12 +401,33 @@
         <p>The central orchestrator for all notification operations. Handles multi-channel routing, retry logic, rate limiting, and audit logging.</p>
     </div>
 
+    <div class="glossary-term" id="node-type">
+        <h5>Node Type <span class="badge bg-info">v1.4.5</span></h5>
+        <p>The hierarchical level of an AI Node within an AI Organization. Types include:</p>
+        <ul>
+            <li><strong>Executive</strong> - Top-level decision makers (CEO, CTO, CFO)</li>
+            <li><strong>Manager</strong> - Middle-level coordinators (Department heads, Project Managers)</li>
+            <li><strong>Analyst</strong> - Individual contributors who perform actual work</li>
+            <li><strong>Coordinator</strong> - Cross-functional roles that facilitate communication</li>
+        </ul>
+    </div>
+
     <!-- Section O -->
     <h2 id="section-o" class="border-bottom pb-2 mt-5">O</h2>
 
     <div class="glossary-term">
         <h5>Ollama</h5>
         <p>A tool for running LLMs locally on your own hardware. Useful for development, testing, and scenarios requiring data privacy.</p>
+    </div>
+
+    <div class="glossary-term" id="org-designer">
+        <h5>Organization Designer <span class="badge bg-info">v1.4.5</span></h5>
+        <p>A visual drag-and-drop tool for creating and editing AI Organization hierarchies. Features include node placement, agent assignment, human mirror configuration, HITL settings, and pre-built templates for common structures like research teams and compliance units.</p>
+    </div>
+
+    <div class="glossary-term">
+        <h5>Org Chart <span class="badge bg-info">v1.4.5</span></h5>
+        <p>Short for Organization Chart. In Abhikarta, refers to the visual representation of an AI Organization's hierarchical structure, showing the relationships between AI Nodes (roles like CEO, managers, analysts).</p>
     </div>
 
     <div class="glossary-term">
@@ -478,6 +529,11 @@
         <p>Automatic reattempt of failed operations. Notification system uses exponential backoff with configurable max retries (default: 3) and max delay (default: 60s).</p>
     </div>
 
+    <div class="glossary-term" id="response-aggregation">
+        <h5>Response Aggregation <span class="badge bg-info">v1.4.5</span></h5>
+        <p>The process by which a parent AI Node combines and synthesizes responses from its subordinate nodes. The parent uses its AI agent to create a coherent summary, resolve conflicts, and produce a unified output that flows up the organizational hierarchy.</p>
+    </div>
+
     <div class="glossary-term">
         <h5>Role</h5>
         <p>A named set of permissions that can be assigned to users. Determines what actions a user can perform within the system.</p>
@@ -552,6 +608,26 @@
     <div class="glossary-term">
         <h5>Topic <span class="badge bg-info">v1.3.0</span></h5>
         <p>A category or channel for messages in pub/sub systems. In Kafka, topics are partitioned logs. Publishers write to topics; subscribers read from topics they care about.</p>
+    </div>
+
+    <div class="glossary-term" id="task-delegation">
+        <h5>Task Delegation <span class="badge bg-info">v1.4.5</span></h5>
+        <p>The process by which a parent AI Node breaks down a complex task and assigns subtasks to its subordinate nodes. The delegation strategy (parallel, sequential, or conditional) determines how subtasks are distributed and processed.</p>
+    </div>
+
+    <div class="glossary-term" id="task-status">
+        <h5>Task Status <span class="badge bg-info">v1.4.5</span></h5>
+        <p>The current state of a task in an AI Organization. Statuses include:</p>
+        <ul>
+            <li><strong>Pending</strong> - Task created but not started</li>
+            <li><strong>In Progress</strong> - Task is being processed</li>
+            <li><strong>Delegated</strong> - Task has been delegated to subordinates</li>
+            <li><strong>Waiting</strong> - Waiting for HITL approval or subordinate responses</li>
+            <li><strong>Completed</strong> - Task finished successfully</li>
+            <li><strong>Failed</strong> - Task encountered an error</li>
+            <li><strong>Human Override</strong> - Human intervened and modified the output</li>
+            <li><strong>Cancelled</strong> - Task was cancelled</li>
+        </ul>
     </div>
 
     <div class="glossary-term">

@@ -61,6 +61,7 @@ The present invention relates generally to artificial intelligence systems, and 
 4. **Workflow Automation** - Visual design and execution of AI-powered workflows
 5. **Human-in-the-Loop (HITL) Systems** - Hybrid human-AI decision making
 6. **Swarm Intelligence** - Coordinated multi-agent systems with intelligent choreography
+7. **Hierarchical AI Organizations** - Modeling corporate structures with AI agents that mirror human organizational hierarchies, enabling task delegation, response aggregation, and human oversight
 
 ---
 
@@ -236,14 +237,15 @@ The present invention provides the following **novel** and **non-obvious** contr
 
 ### 6.1 Overview
 
-The present invention, "Abhikarta-LLM," is a comprehensive platform for building, deploying, and managing AI agents, workflows, and intelligent agent swarms. It provides:
+The present invention, "Abhikarta-LLM," is a comprehensive platform for building, deploying, and managing AI agents, workflows, intelligent agent swarms, and hierarchical AI organizations. It provides:
 
 1. **Multi-Provider LLM Abstraction**: A unified interface (`LLMAdapter`) that abstracts differences between 10+ LLM providers (OpenAI, Anthropic, Google, Azure, Bedrock, Cohere, etc.)
 
-2. **Visual Design Tools**: Three visual designers for:
+2. **Visual Design Tools**: Four visual designers for:
    - AI Agents (nodes: LLM, Tool, Code, Condition, Loop, Memory)
    - Workflows (nodes: Start, End, Agent, LLM, Parallel, HITL)
    - Swarms (Master Actor, Event Bus, Agent Pools, Triggers)
+   - AI Organizations (hierarchical org charts with role-based AI nodes)
 
 3. **Intelligent Swarm Architecture**: An event-driven system where:
    - A Master Actor (always resident) receives external triggers
@@ -273,6 +275,13 @@ The present invention, "Abhikarta-LLM," is a comprehensive platform for building
    - Mailbox strategies
    - Actor lifecycle management
 
+8. **Hierarchical AI Organizations** (v1.4.5): Corporate structure modeling with:
+   - AI nodes representing organizational roles (executive, manager, analyst, coordinator)
+   - Task delegation from parent to child nodes with configurable strategies
+   - Response aggregation flowing back up the hierarchy
+   - Human mirror configuration linking each AI role to a real employee
+   - HITL controls at every level for human oversight
+
 ### 6.2 Key Technical Innovations
 
 | Innovation | Description |
@@ -281,10 +290,11 @@ The present invention, "Abhikarta-LLM," is a comprehensive platform for building
 | **Event-Driven Swarm** | Decoupled agents communicate via internal event bus |
 | **Round-Robin Pools** | Efficient agent instance selection with fair distribution |
 | **Broker Abstraction** | Same code works with Kafka, RabbitMQ, or ActiveMQ |
-| **Visual Designers** | Non-programmers can create agents/workflows/swarms |
+| **Visual Designers** | Non-programmers can create agents/workflows/swarms/AI orgs |
 | **Template Libraries** | 69 pre-built templates across industries |
 | **HITL Integration** | Human checkpoints at any workflow point |
 | **MCP Integration** | Model Context Protocol for tool discovery |
+| **AI Organizations** | Hierarchical AI teams mirroring corporate structures |
 
 ---
 
@@ -923,6 +933,113 @@ Pre-built templates for rapid deployment:
 - **33 Workflow Templates** across 11 industries
 - Templates support code fragment URI references (db://, s3://, file://)
 
+### 8.8 Hierarchical AI Organizations (v1.4.5)
+
+**Key Innovation**: Modeling corporate structures with AI agents that mirror human organizational hierarchies.
+
+```python
+@dataclass
+class AIOrg:
+    """
+    AI Organization representing a corporate structure.
+    
+    Features:
+    - Hierarchical node structure (executives, managers, analysts)
+    - Task delegation with configurable strategies
+    - Response aggregation from subordinates
+    - Human mirror configuration for each AI role
+    - HITL controls at every level
+    """
+    org_id: str
+    name: str
+    description: str
+    status: OrgStatus  # draft, active, paused, archived
+    config: Dict[str, Any]
+    event_bus_channel: str
+    created_by: str
+
+@dataclass  
+class AINode:
+    """
+    A node in the AI Organization hierarchy.
+    
+    Each node represents a role that can:
+    - Process tasks assigned by parent nodes
+    - Delegate subtasks to child nodes
+    - Aggregate responses from children
+    - Mirror a real human employee
+    """
+    node_id: str
+    org_id: str
+    parent_node_id: Optional[str]
+    role_name: str  # e.g., "Chief Analysis Officer"
+    role_type: NodeType  # executive, manager, analyst, coordinator
+    agent_id: str
+    human_mirror: HumanMirror  # name, email, teams_id, slack_id
+    hitl_config: HITLConfig  # enabled, approval_required, timeout
+```
+
+**Delegation Strategies**:
+
+```python
+class DelegationStrategy(Enum):
+    PARALLEL = "parallel"      # Dispatch all at once, await all
+    SEQUENTIAL = "sequential"  # One at a time, chain results
+    CONDITIONAL = "conditional"  # LLM decides which children
+```
+
+**Task Flow**:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    AI ORGANIZATION                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│           ┌──────────────────────┐                          │
+│           │   CEO (Executive)     │ ← Task Received         │
+│           │   Agent: GPT-4        │                          │
+│           │   Human: John Smith   │                          │
+│           └──────────┬───────────┘                          │
+│                      │ Delegates                             │
+│           ┌──────────┴───────────┐                          │
+│           │                       │                          │
+│    ┌──────┴──────┐        ┌──────┴──────┐                   │
+│    │ VP Research │        │ VP Finance   │                   │
+│    │ (Manager)   │        │ (Manager)    │                   │
+│    └──────┬──────┘        └──────┬──────┘                   │
+│           │                       │                          │
+│    ┌──────┴──────┐        ┌──────┴──────┐                   │
+│    │ Sr. Analyst │        │ Jr. Analyst  │                   │
+│    │ (Analyst)   │        │ (Analyst)    │                   │
+│    └─────────────┘        └─────────────┘                   │
+│                                                              │
+│    Response flows back up: Analysts → Managers → CEO        │
+│    Each level can aggregate, synthesize, and approve        │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Database Schema** (6 tables, 14 indexes):
+
+| Table | Purpose |
+|-------|---------|
+| ai_orgs | Organization metadata and configuration |
+| ai_nodes | Hierarchical nodes with roles and agents |
+| ai_tasks | Tasks with delegation and tracking |
+| ai_responses | Node responses with quality scores |
+| ai_hitl_actions | Human intervention audit trail |
+| ai_event_logs | Organization event history |
+
+**Visual Organization Designer**:
+
+The drag-and-drop organization designer enables:
+- Creating org chart hierarchies with node placement
+- Assigning agents and human mirrors to each role
+- Configuring HITL requirements per node
+- Setting delegation strategies
+- Real-time task flow visualization
+- Pre-built templates (Research Team, Compliance Unit, Support Hierarchy)
+
 ---
 
 ## 9. CLAIMS
@@ -1078,11 +1195,52 @@ LIMIT 1
 - quiet hours configuration to suppress non-critical notifications during specified time periods;
 - channel-specific addressing (Slack user ID, email address).
 
+**Claim 22** (v1.4.5): A hierarchical AI organization system for modeling corporate structures with AI agents, comprising:
+- an organization entity containing configuration, status, and an event bus channel for intra-organization communication;
+- a hierarchical tree of AI nodes representing roles in an organization chart, where each node has a role type (executive, manager, analyst, coordinator), an assigned AI agent, and optional human mirror configuration;
+- a task delegation mechanism wherein parent nodes can delegate subtasks to child nodes using configurable strategies (parallel, sequential, conditional);
+- an aggregation mechanism wherein parent nodes collect and synthesize responses from child nodes to produce consolidated outputs;
+- wherein each AI node can be configured with human-in-the-loop controls requiring approval before task completion.
+
+**Claim 23** (v1.4.5): The AI organization system of Claim 22, further comprising:
+- a human mirror configuration for each AI node, associating the AI agent with a real employee including name, email, Teams ID, and Slack ID;
+- notification triggers that alert the human mirror when their AI counterpart performs significant actions;
+- the ability for the human mirror to override, approve, reject, or modify AI-generated outputs at any point.
+
+**Claim 24** (v1.4.5): The AI organization system of Claim 22, wherein the task delegation mechanism comprises:
+- decomposition of parent tasks into subtasks with specific assignments to child nodes;
+- parallel delegation strategy that dispatches all subtasks simultaneously and awaits all responses;
+- sequential delegation strategy that dispatches subtasks one at a time, using each response to inform subsequent delegations;
+- conditional delegation strategy that uses LLM-powered decision making to determine which child nodes should receive subtasks based on task content and node capabilities.
+
+**Claim 25** (v1.4.5): The AI organization system of Claim 22, further comprising:
+- a visual organization designer with drag-and-drop interface for creating and modifying AI organization hierarchies;
+- real-time visualization of task flow through the organization showing which nodes are actively processing;
+- HITL dashboard displaying pending approvals across all nodes requiring human review;
+- organization templates for common corporate structures (research teams, compliance units, customer support hierarchies).
+
+**Claim 26** (v1.4.5): A method for hierarchical AI task processing comprising:
+- receiving a task at a root node of an AI organization;
+- the root node analyzing the task using an LLM to determine delegation strategy;
+- generating subtasks and assigning them to appropriate child nodes based on their roles and capabilities;
+- child nodes processing subtasks, optionally further delegating to their own children;
+- collecting responses from child nodes as they complete;
+- synthesizing child responses into a consolidated parent response using LLM-powered aggregation;
+- optionally routing the consolidated response through human-in-the-loop review;
+- returning the final approved output.
+
+**Claim 27** (v1.4.5): The AI organization system of Claim 22, wherein each AI node maintains:
+- position coordinates for visual representation in the organization designer;
+- current task assignment and status;
+- HITL configuration including enabled flag, approval requirements, timeout settings, and auto-proceed behavior;
+- notification channel preferences for human mirror alerts;
+- a reference to the assigned AI agent with agent-specific configuration overrides.
+
 ---
 
 ## 10. ABSTRACT
 
-A system and method for intelligent agent orchestration with LLM-powered swarm choreography and enterprise notifications is disclosed. The system comprises a master actor that receives external triggers from various sources (Kafka, RabbitMQ, HTTP, scheduled events, user queries, webhooks) and uses a large language model to intelligently decide which tasks to publish to an internal event bus. A plurality of agent pools, each containing configurable numbers of pre-warmed agent instances, subscribe to event patterns and react to published tasks. A novel round-robin selection mechanism ensures fair distribution of work across agent instances by selecting based on least-recently-used and least-used-count criteria. The system includes a unified message broker abstraction supporting Kafka, RabbitMQ, and ActiveMQ with configurable backpressure strategies, as well as an LLM provider abstraction supporting 10+ providers. A multi-channel notification system enables agents, workflows, and swarms to send alerts to Slack, Microsoft Teams, and email with rate limiting, retry logic, and audit logging. A webhook receiver allows external systems to trigger agent activities with cryptographic signature verification and replay protection. Visual designers enable non-programmers to configure agents, workflows, swarms, and notification channels through drag-and-drop interfaces. The combination of LLM-powered choreography, pre-warmed agent pools, unified messaging, enterprise notifications, and visual design tools provides a comprehensive platform for building autonomous, scalable AI agent systems.
+A system and method for intelligent agent orchestration with LLM-powered swarm choreography, enterprise notifications, and hierarchical AI organizations is disclosed. The system comprises a master actor that receives external triggers from various sources (Kafka, RabbitMQ, HTTP, scheduled events, user queries, webhooks) and uses a large language model to intelligently decide which tasks to publish to an internal event bus. A plurality of agent pools, each containing configurable numbers of pre-warmed agent instances, subscribe to event patterns and react to published tasks. A novel round-robin selection mechanism ensures fair distribution of work across agent instances by selecting based on least-recently-used and least-used-count criteria. The system includes a unified message broker abstraction supporting Kafka, RabbitMQ, and ActiveMQ with configurable backpressure strategies, as well as an LLM provider abstraction supporting 10+ providers. A multi-channel notification system enables agents, workflows, and swarms to send alerts to Slack, Microsoft Teams, and email with rate limiting, retry logic, and audit logging. A webhook receiver allows external systems to trigger agent activities with cryptographic signature verification and replay protection. A hierarchical AI organization module enables modeling of corporate structures with AI nodes representing roles, supporting task delegation to subordinates, response aggregation, and human mirror configuration for each AI role. Visual designers enable non-programmers to configure agents, workflows, swarms, AI organizations, and notification channels through drag-and-drop interfaces. The combination of LLM-powered choreography, pre-warmed agent pools, unified messaging, enterprise notifications, hierarchical AI organizations, and visual design tools provides a comprehensive platform for building autonomous, scalable AI agent systems.
 
 ---
 

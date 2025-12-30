@@ -1,6 +1,6 @@
-# Abhikarta-LLM v1.4.0
+# Abhikarta-LLM v1.4.5
 
-[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.4.5-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
@@ -10,9 +10,25 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ---
 
-## 🚀 What's New in v1.4.0
+## 🚀 What's New in v1.4.5
 
-### 📬 Enterprise Notification System - Major New Feature
+### 🏢 AI Organizations - Major New Feature
+Introducing **AI Org** - create AI-powered digital twins of organizational structures:
+
+- **Visual Org Chart Designer**: Drag-and-drop interface to design AI organizational hierarchies
+- **Hierarchical Task Delegation**: CEO delegates to managers who delegate to analysts - just like real orgs
+- **Response Aggregation**: AI synthesizes subordinate responses into consolidated summaries at each level
+- **Human-in-the-Loop (HITL)**: Human mirrors can view, approve, override, or reject AI decisions
+- **Multi-Channel Notifications**: Email, Teams, Slack notifications per node when tasks complete
+- **Complete Audit Trail**: Full traceability of all tasks, responses, and interventions
+
+### 🔗 Key AI Org Concepts
+- **AI Node**: Position in org chart with AI agent and human mirror
+- **Task Flow**: Tasks flow down through delegation, responses flow up through aggregation
+- **HITL Dashboard**: Central view for human employees to manage their AI mirrors
+- **Chain-of-Thought + Tree-of-Thoughts**: Combined reasoning patterns in organizational context
+
+### 📬 Enterprise Notification System (v1.4.0)
 Introducing the **Notification Module** - unified multi-channel notifications for agents, workflows, and swarms:
 
 - **Slack Integration**: Channel messages, direct messages, Block Kit rich formatting, thread replies
@@ -165,7 +181,7 @@ New comprehensive tutorial for advanced reasoning patterns:
 
 ## ✨ Key Features
 
-### ⚡ Actor System (v1.4.0 NEW)
+### ⚡ Actor System (v1.4.5 NEW)
 - **Pekko-Inspired Design**: Lightweight actors for massive concurrency
 - **Message-Driven**: Fire-and-forget (tell) and request-response (ask) patterns
 - **Fault Tolerance**: Supervision strategies with automatic recovery
@@ -208,7 +224,7 @@ New comprehensive tutorial for advanced reasoning patterns:
 - **Workflow Integration**: HITL nodes pause execution for human input
 - **User & Admin Interfaces**: Separate views for different roles
 
-### 🏦 Banking Solutions (v1.4.0+)
+### 🏦 Banking Solutions (v1.4.5+)
 - **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
 - **Credit Assessment**: Credit scoring, DTI calculation, eligibility
 - **Loan Processing**: EMI calculation, amortization schedules
@@ -265,7 +281,7 @@ New comprehensive tutorial for advanced reasoning patterns:
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.4.0/
+abhikarta-llm-v1.4.5/
 ├── abhikarta/
 │   ├── __init__.py
 │   ├── agent/                    # Agent management
@@ -287,7 +303,7 @@ abhikarta-llm-v1.4.0/
 │   │   ├── llm_factory.py        # LLM provider factory
 │   │   ├── tools.py              # Tool adapters
 │   │   └── workflow_graph.py     # LangGraph integration
-│   ├── llm/                      # LLM Adapter (v1.4.0) NEW!
+│   ├── llm/                      # LLM Adapter (v1.4.5) NEW!
 │   │   ├── __init__.py           # Module exports
 │   │   └── adapter.py            # LLMAdapter, async interface
 │   ├── llm_provider/             # LLM abstraction
@@ -306,7 +322,7 @@ abhikarta-llm-v1.4.0/
 │   │   ├── code_fragment_tool.py # CodeFragmentTool
 │   │   ├── langchain_tool.py     # LangChain integration
 │   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.4.0)
+│   │   └── prebuilt/             # Pre-built tools (v1.4.5)
 │   │       ├── common_tools.py   # 28 common utilities
 │   │       ├── banking_tools.py  # 13 banking tools
 │   │       ├── integration_tools.py  # 20 integration tools
@@ -342,7 +358,7 @@ abhikarta-llm-v1.4.0/
 ├── config/
 │   └── application.properties    # Configuration file
 ├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.4.0)
+│   └── prebuilt/                 # Pre-built solutions (v1.4.5)
 │       ├── agents/
 │       │   └── banking/          # 10 banking agents
 │       └── workflows/
@@ -519,6 +535,7 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.5 | 2025-01 | AI Organizations: AI-powered org charts with hierarchical delegation, HITL, visual designer, task aggregation |
 | 1.4.0 | 2025-01 | Visual Designer bug fixes (MCP tool nodes), Tool selection in properties, Agent Designer How-To Guide |
 | 1.2.3 | 2025-01 | Template Libraries (36 agent, 33 workflow), Code Fragment URIs, Actor System, Modular Database Delegates |
 | 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |

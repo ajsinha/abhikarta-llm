@@ -9,6 +9,9 @@
 {% block help_nav %}
 <a href="#overview">Overview</a>
 <a href="#layers">Architecture Layers</a>
+<a href="#ai-org">AI Organizations</a>
+<a href="#notifications">Notifications</a>
+<a href="#swarms">Agent Swarms</a>
 <a href="#database">Database Schema</a>
 <a href="#workflow-engine">Workflow Engine</a>
 <a href="#code-loader">Code Loader</a>
@@ -27,10 +30,10 @@
 │  └──────────────┘ └──────────────┘ └──────────────┘                 │
 ├─────────────────────────────────────────────────────────────────────┤
 │                        API LAYER                                     │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐                 │
-│  │  Auth        │ │  Agent       │ │  Workflow    │                 │
-│  │  Routes      │ │  Routes      │ │  Routes      │                 │
-│  └──────────────┘ └──────────────┘ └──────────────┘                 │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
+│  │  Auth      │ │  Agent     │ │  Workflow  │ │  AI Org    │       │
+│  │  Routes    │ │  Routes    │ │  Routes    │ │  Routes    │       │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
 ├─────────────────────────────────────────────────────────────────────┤
 │                     CORE SERVICES                                    │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
@@ -42,7 +45,37 @@
 │  │  Manager   │ │  Manager   │ │  Loader    │ │   Logger   │       │
 │  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
 ├─────────────────────────────────────────────────────────────────────┤
-│                     TOOLS LAYER (NEW IN 1.1.6)                       │
+│                  AI ORGANIZATIONS (v1.4.5)                           │
+│  ┌──────────────────────────────────────────────────────────┐       │
+│  │                    AI Org Manager                         │       │
+│  │   (Hierarchical Orgs, Task Delegation, Aggregation)      │       │
+│  └──────────────────────────────────────────────────────────┘       │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
+│  │  AI Node   │ │   Task     │ │  Response  │ │  Human     │       │
+│  │  Manager   │ │  Manager   │ │ Aggregator │ │  Mirror    │       │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
+├─────────────────────────────────────────────────────────────────────┤
+│                  NOTIFICATIONS (v1.4.0)                              │
+│  ┌──────────────────────────────────────────────────────────┐       │
+│  │              NotificationManager                          │       │
+│  │   (Multi-channel routing, Rate Limiting, Retry Logic)    │       │
+│  └──────────────────────────────────────────────────────────┘       │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
+│  │   Slack    │ │   Teams    │ │   Email    │ │  Webhook   │       │
+│  │  Adapter   │ │  Adapter   │ │  Adapter   │ │  Receiver  │       │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
+├─────────────────────────────────────────────────────────────────────┤
+│                    SWARMS (v1.3.0)                                   │
+│  ┌──────────────────────────────────────────────────────────┐       │
+│  │                    SwarmManager                           │       │
+│  │   (Master Actor, Agent Pools, Event-Driven Choreo)       │       │
+│  └──────────────────────────────────────────────────────────┘       │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐       │
+│  │  Master    │ │   Event    │ │   Agent    │ │  External  │       │
+│  │  Actor     │ │    Bus     │ │   Pools    │ │  Triggers  │       │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
+├─────────────────────────────────────────────────────────────────────┤
+│                     TOOLS LAYER                                      │
 │  ┌──────────────────────────────────────────────────────────┐       │
 │  │                    ToolsRegistry                          │       │
 │  │   (Centralized Tool Management & Discovery)              │       │
@@ -53,7 +86,7 @@
 │  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
 │                         ▲ BaseTool (Abstract)                        │
 ├─────────────────────────────────────────────────────────────────────┤
-│                      MCP LAYER (ENHANCED)                            │
+│                      MCP LAYER                                       │
 │  ┌──────────────────────────────────────────────────────────┐       │
 │  │                  MCPServerManager                         │       │
 │  │   (Server Lifecycle, Health Monitoring, Auto-Connect)    │       │
@@ -74,6 +107,10 @@
 │  │                    DB Facade                              │       │
 │  │         (SQLite / PostgreSQL Abstraction)                │       │
 │  └──────────────────────────────────────────────────────────┘       │
+│  ┌────────────────────────────────────────────────────────────────┐ │
+│  │  33+ Tables: Users, Agents, Workflows, Swarms, AI Orgs,       │ │
+│  │  Notifications, Executions, HITL Tasks, Audit Logs, etc.      │ │
+│  └────────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────┘</code></pre>
 
 <hr class="my-5">
@@ -166,8 +203,122 @@
 
 <hr class="my-5">
 
+<h2 id="ai-org">AI Organizations <span class="badge bg-info">v1.4.5</span></h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">AI Org Manager</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Hierarchical Structures:</strong> Model corporate org charts with AI agents</li>
+                    <li><strong>Node Types:</strong> Executive, Manager, Analyst, Coordinator roles</li>
+                    <li><strong>Task Delegation:</strong> Automatic subtask assignment to subordinates</li>
+                    <li><strong>Response Aggregation:</strong> AI synthesizes subordinate responses</li>
+                    <li><strong>Delegation Strategies:</strong> Parallel, Sequential, Conditional</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Human Mirror System</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Human Mirror:</strong> Each AI node represents a real employee</li>
+                    <li><strong>Notification Preferences:</strong> Per-node Email/Teams/Slack settings</li>
+                    <li><strong>HITL Integration:</strong> Human approval at any hierarchy level</li>
+                    <li><strong>Override Capability:</strong> Humans can modify AI outputs</li>
+                    <li><strong>Audit Trail:</strong> Complete history of all interventions</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="notifications">Enterprise Notifications <span class="badge bg-warning text-dark">v1.4.0</span></h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">NotificationManager</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Multi-Channel Routing:</strong> Single API, multiple destinations</li>
+                    <li><strong>Rate Limiting:</strong> Token bucket algorithm per channel</li>
+                    <li><strong>Retry Logic:</strong> Exponential backoff for failed deliveries</li>
+                    <li><strong>Priority Levels:</strong> Debug, Info, Success, Warning, Error, Critical</li>
+                    <li><strong>Audit Logging:</strong> Complete notification history in DB</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Channel Adapters</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Slack Adapter:</strong> Block Kit, channels, DMs, threads</li>
+                    <li><strong>Teams Adapter:</strong> Adaptive Cards, webhooks, actions</li>
+                    <li><strong>Email Adapter:</strong> SMTP with HTML templates</li>
+                    <li><strong>Webhook Receiver:</strong> HMAC/JWT/API key authentication</li>
+                    <li><strong>Replay Protection:</strong> Nonce and timestamp validation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="swarms">Agent Swarms <span class="badge bg-danger">v1.3.0</span></h2>
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">SwarmManager</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Master Actor:</strong> LLM-powered orchestration of agent coordination</li>
+                    <li><strong>Event Bus:</strong> Internal pub/sub messaging between agents</li>
+                    <li><strong>Agent Pools:</strong> Pre-warmed agent instances with round-robin selection</li>
+                    <li><strong>Choreography:</strong> Dynamic task assignment based on LLM decisions</li>
+                    <li><strong>Visual Designer:</strong> Drag-and-drop swarm building interface</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">External Triggers</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Apache Kafka:</strong> Topic-based message consumption</li>
+                    <li><strong>RabbitMQ:</strong> Queue-based message processing</li>
+                    <li><strong>HTTP Webhooks:</strong> REST endpoint triggers</li>
+                    <li><strong>Scheduled:</strong> Cron-based periodic execution</li>
+                    <li><strong>User Query:</strong> Direct user-initiated requests</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
 <h2 id="database">Database Schema</h2>
-<p>22 tables supporting the complete data model:</p>
+<p>33+ tables supporting the complete data model:</p>
 
 <pre><code class="language-sql">-- Core Tables
 users              -- User accounts and authentication
@@ -191,16 +342,10 @@ code_fragments     -- Reusable code modules (db:// URIs)
                    -- category, tags, dependencies
                    -- usage_count, is_active
 
--- LLM Management (NEW in v1.1.6)
+-- LLM Management
 llm_providers      -- Provider configurations
-                   -- provider_id, name, provider_type
-                   -- api_endpoint, api_key_name, rate_limits
-llm_models         -- Model definitions
-                   -- model_id, provider_id, context_window
-                   -- costs, capabilities (vision, functions)
+llm_models         -- Model definitions with costs
 model_permissions  -- RBAC for model access
-                   -- model_id, role_name, can_use
-                   -- daily_limit, monthly_limit
 
 -- Execution Tables
 executions         -- Execution records
@@ -212,6 +357,21 @@ hitl_tasks         -- Human review tasks
 
 -- MCP Tables
 mcp_plugins        -- Plugin registry
+
+-- Notification Tables (v1.4.0)
+notification_channels     -- Slack/Teams/Email/Webhook configs
+notification_logs         -- Complete notification history
+webhook_endpoints         -- Registered webhook receivers
+webhook_events            -- Received webhook events
+user_notification_preferences  -- Per-user delivery settings
+
+-- AI Organization Tables (v1.4.5)
+ai_orgs            -- Organization metadata and config
+ai_nodes           -- Hierarchical nodes with roles
+ai_tasks           -- Task delegation and tracking
+ai_responses       -- Node responses with quality scores
+ai_hitl_actions    -- Human intervention audit trail
+ai_event_logs      -- Organization event history
 
 -- System Tables
 audit_logs         -- Activity audit trail

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Task - {{ org.name }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_list') }}">AI Organizations</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_detail', org_id=org.org_id) }}">{{ org.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_tasks', org_id=org.org_id) }}">Tasks</a></li>
+            <li class="breadcrumb-item active">Submit Task</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-send me-2"></i>Submit Task to {{ org.name }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>How it works:</strong> Your task will be submitted to 
+                        <strong>{{ root_node.role_name }}</strong>, who will analyze it and delegate 
+                        to team members as needed. Results will be aggregated and returned.
+                    </div>
+
+                    <form method="post" action="{{ url_for('aiorg_task_create', org_id=org.org_id) }}">
+                        <div class="mb-4">
+                            <label for="title" class="form-label">Task Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   placeholder="e.g., Analyze Q4 Sales Performance" required>
+                            <div class="form-text">A clear, concise title for your task.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Detailed Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="6"
+                                      placeholder="Provide detailed instructions, requirements, and any relevant context..."></textarea>
+                            <div class="form-text">The more detail you provide, the better the results.</div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select class="form-select" id="priority" name="priority">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="deadline" class="form-label">Deadline (Optional)</label>
+                                <input type="datetime-local" class="form-control" id="deadline" name="deadline">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="input_data" class="form-label">Additional Data (JSON, Optional)</label>
+                            <textarea class="form-control font-monospace" id="input_data" name="input_data" rows="4"
+                                      placeholder='{"key": "value"}'></textarea>
+                            <div class="form-text">Optional structured data to include with the task.</div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('aiorg_tasks', org_id=org.org_id) }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send me-1"></i>Submit Task
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="card mt-4 border-0 bg-light">
+                <div class="card-body">
+                    <h6><i class="bi bi-lightbulb text-warning me-2"></i>Tips for Better Results</h6>
+                    <ul class="small mb-0">
+                        <li><strong>Be Specific:</strong> Clearly define what you need and the expected output format.</li>
+                        <li><strong>Provide Context:</strong> Include relevant background information.</li>
+                        <li><strong>Set Realistic Deadlines:</strong> Allow enough time for thorough analysis.</li>
+                        <li><strong>Break Down Complex Tasks:</strong> For very complex requests, consider submitting multiple focused tasks.</li>
+                    </ul>
+                    <div class="mt-3 pt-2 border-top">
+                        <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-book me-1"></i>Glossary
+                        </a>
+                        <a href="{{ url_for('help_page', page='aiorg') }}" class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="bi bi-question-circle me-1"></i>AI Org Help
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Task: {{ task.title }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_list') }}">AI Organizations</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_detail', org_id=org.org_id) }}">{{ org.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('aiorg_tasks', org_id=org.org_id) }}">Tasks</a></li>
+            <li class="breadcrumb-item active">{{ task.title[:30] }}...</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h2>{{ task.title }}</h2>
+            <div class="mt-2">
+                <span class="badge bg-{{ 'success' if task.status.value == 'completed' else 'primary' if task.status.value in ['in_progress', 'delegated', 'waiting'] else 'danger' if task.status.value == 'failed' else 'secondary' }} me-2">
+                    {{ task.status.value }}
+                </span>
+                <span class="badge bg-{{ 'danger' if task.priority.value == 'critical' else 'warning text-dark' if task.priority.value == 'high' else 'info' if task.priority.value == 'medium' else 'secondary' }}">
+                    {{ task.priority.value }} priority
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Task Details -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Description</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0" style="white-space: pre-wrap;">{{ task.description or 'No description provided.' }}</p>
+                </div>
+            </div>
+
+            <!-- Subtasks -->
+            {% if subtasks %}
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-diagram-2 me-2"></i>Subtasks ({{ subtasks|length }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for subtask in subtasks %}
+                        <a href="{{ url_for('aiorg_task_detail', org_id=org.org_id, task_id=subtask.task_id) }}" 
+                           class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ subtask.title }}</strong>
+                                    <br><small class="text-muted">Assigned to: {{ subtask.assigned_node_id[:8] }}...</small>
+                                </div>
+                                <span class="badge bg-{{ 'success' if subtask.status.value == 'completed' else 'primary' if subtask.status.value in ['in_progress', 'delegated', 'waiting'] else 'secondary' }}">
+                                    {{ subtask.status.value }}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Responses -->
+            {% if responses %}
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Responses</h5>
+                </div>
+                <div class="card-body">
+                    {% for response in responses %}
+                    <div class="border rounded p-3 mb-3 {% if response.is_human_modified %}bg-light{% endif %}">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-info">{{ response.response_type.value }}</span>
+                            {% if response.is_human_modified %}
+                            <span class="badge bg-warning text-dark"><i class="bi bi-person-check me-1"></i>Human Modified</span>
+                            {% endif %}
+                        </div>
+                        {% if response.summary %}
+                        <h6>Summary</h6>
+                        <p>{{ response.summary }}</p>
+                        {% endif %}
+                        <h6>Content</h6>
+                        <pre class="bg-dark text-light p-3 rounded" style="font-size: 0.85rem;">{{ response.content | tojson(indent=2) }}</pre>
+                        <small class="text-muted">
+                            {{ response.created_at.strftime('%Y-%m-%d %H:%M:%S') if response.created_at else '' }}
+                            {% if response.confidence_score %}
+                            | Confidence: {{ (response.confidence_score * 100)|round }}%
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Task Info -->
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Task Information</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted">Task ID</td>
+                            <td><code class="small">{{ task.task_id[:16] }}...</code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Assigned To</td>
+                            <td>{{ node.role_name if node else 'Unknown' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Created</td>
+                            <td>{{ task.created_at.strftime('%Y-%m-%d %H:%M') if task.created_at else 'N/A' }}</td>
+                        </tr>
+                        {% if task.started_at %}
+                        <tr>
+                            <td class="text-muted">Started</td>
+                            <td>{{ task.started_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if task.completed_at %}
+                        <tr>
+                            <td class="text-muted">Completed</td>
+                            <td>{{ task.completed_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if task.deadline %}
+                        <tr>
+                            <td class="text-muted">Deadline</td>
+                            <td>{{ task.deadline.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <!-- Parent Task -->
+            {% if parent_task %}
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-arrow-up me-2"></i>Parent Task</h6>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('aiorg_task_detail', org_id=org.org_id, task_id=parent_task.task_id) }}">
+                        {{ parent_task.title }}
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Input Data -->
+            {% if task.input_data %}
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-braces me-2"></i>Input Data</h6>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-dark text-light p-2 rounded small mb-0">{{ task.input_data | tojson(indent=2) }}</pre>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Help Links -->
+    <div class="text-center mt-3">
+        <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-book me-1"></i>Glossary
+        </a>
+        <a href="{{ url_for('help_page', page='aiorg') }}" class="btn btn-sm btn-outline-primary ms-2">
+            <i class="bi bi-question-circle me-1"></i>AI Org Help
+        </a>
+    </div>
+</div>
+{% endblock %}

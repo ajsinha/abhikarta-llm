@@ -37,7 +37,7 @@ class PostgresSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.4.0"
+    SCHEMA_VERSION = "1.4.5"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -767,6 +767,148 @@ class PostgresSchema:
     """
     
     # ==========================================================================
+    # AI ORGANIZATIONS (v1.4.5)
+    # ==========================================================================
+    
+    CREATE_AI_ORGS_TABLE = """
+    CREATE TABLE IF NOT EXISTS ai_orgs (
+        id SERIAL PRIMARY KEY,
+        org_id TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        status TEXT DEFAULT 'draft',
+        config JSONB DEFAULT '{}',
+        event_bus_channel TEXT,
+        created_by TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+    
+    CREATE_AI_NODES_TABLE = """
+    CREATE TABLE IF NOT EXISTS ai_nodes (
+        id SERIAL PRIMARY KEY,
+        node_id TEXT UNIQUE NOT NULL,
+        org_id TEXT NOT NULL,
+        parent_node_id TEXT,
+        role_name TEXT NOT NULL,
+        role_type TEXT DEFAULT 'analyst',
+        description TEXT,
+        agent_id TEXT,
+        agent_config JSONB DEFAULT '{}',
+        human_name TEXT,
+        human_email TEXT,
+        human_teams_id TEXT,
+        human_slack_id TEXT,
+        hitl_enabled BOOLEAN DEFAULT FALSE,
+        hitl_approval_required BOOLEAN DEFAULT FALSE,
+        hitl_review_delegation BOOLEAN DEFAULT FALSE,
+        hitl_timeout_hours INTEGER DEFAULT 24,
+        hitl_auto_proceed BOOLEAN DEFAULT TRUE,
+        notification_channels JSONB DEFAULT '["email"]',
+        notification_triggers JSONB DEFAULT '[]',
+        position_x INTEGER DEFAULT 0,
+        position_y INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'active',
+        current_task_id TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (org_id) REFERENCES ai_orgs(org_id) ON DELETE CASCADE
+    );
+    """
+    
+    CREATE_AI_TASKS_TABLE = """
+    CREATE TABLE IF NOT EXISTS ai_tasks (
+        id SERIAL PRIMARY KEY,
+        task_id TEXT UNIQUE NOT NULL,
+        org_id TEXT NOT NULL,
+        parent_task_id TEXT,
+        assigned_node_id TEXT,
+        title TEXT NOT NULL,
+        description TEXT,
+        priority TEXT DEFAULT 'medium',
+        input_data JSONB DEFAULT '{}',
+        output_data JSONB,
+        context JSONB DEFAULT '{}',
+        attachments JSONB DEFAULT '[]',
+        status TEXT DEFAULT 'pending',
+        delegation_strategy TEXT DEFAULT 'parallel',
+        expected_responses INTEGER DEFAULT 0,
+        received_responses INTEGER DEFAULT 0,
+        deadline TIMESTAMP WITH TIME ZONE,
+        started_at TIMESTAMP WITH TIME ZONE,
+        completed_at TIMESTAMP WITH TIME ZONE,
+        error_message TEXT,
+        retry_count INTEGER DEFAULT 0,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (org_id) REFERENCES ai_orgs(org_id) ON DELETE CASCADE,
+        FOREIGN KEY (assigned_node_id) REFERENCES ai_nodes(node_id) ON DELETE SET NULL
+    );
+    """
+    
+    CREATE_AI_RESPONSES_TABLE = """
+    CREATE TABLE IF NOT EXISTS ai_responses (
+        id SERIAL PRIMARY KEY,
+        response_id TEXT UNIQUE NOT NULL,
+        task_id TEXT NOT NULL,
+        node_id TEXT NOT NULL,
+        response_type TEXT DEFAULT 'analysis',
+        content JSONB DEFAULT '{}',
+        summary TEXT,
+        reasoning TEXT,
+        confidence_score REAL DEFAULT 0.0,
+        quality_score REAL DEFAULT 0.0,
+        is_human_modified BOOLEAN DEFAULT FALSE,
+        original_ai_content JSONB,
+        modification_reason TEXT,
+        modified_by TEXT,
+        modified_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (task_id) REFERENCES ai_tasks(task_id) ON DELETE CASCADE,
+        FOREIGN KEY (node_id) REFERENCES ai_nodes(node_id) ON DELETE CASCADE
+    );
+    """
+    
+    CREATE_AI_HITL_ACTIONS_TABLE = """
+    CREATE TABLE IF NOT EXISTS ai_hitl_actions (
+        id SERIAL PRIMARY KEY,
+        action_id TEXT UNIQUE NOT NULL,
+        org_id TEXT NOT NULL,
+        node_id TEXT NOT NULL,
+        task_id TEXT,
+        response_id TEXT,
+        user_id TEXT,
+        action_type TEXT NOT NULL,
+        original_content JSONB,
+        modified_content JSONB,
+        reason TEXT,
+        message TEXT,
+        ip_address TEXT,
+        user_agent TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (org_id) REFERENCES ai_orgs(org_id) ON DELETE CASCADE,
+        FOREIGN KEY (task_id) REFERENCES ai_tasks(task_id) ON DELETE SET NULL,
+        FOREIGN KEY (node_id) REFERENCES ai_nodes(node_id) ON DELETE CASCADE
+    );
+    """
+    
+    CREATE_AI_EVENT_LOGS_TABLE = """
+    CREATE TABLE IF NOT EXISTS ai_event_logs (
+        id SERIAL PRIMARY KEY,
+        event_id TEXT UNIQUE NOT NULL,
+        org_id TEXT NOT NULL,
+        event_type TEXT NOT NULL,
+        source_node_id TEXT,
+        target_node_id TEXT,
+        task_id TEXT,
+        payload JSONB DEFAULT '{}',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (org_id) REFERENCES ai_orgs(org_id) ON DELETE CASCADE
+    );
+    """
+    
+    # ==========================================================================
     # INDEXES
     # ==========================================================================
     
@@ -839,6 +981,23 @@ class PostgresSchema:
         "CREATE INDEX IF NOT EXISTS idx_webhook_events_endpoint_id ON webhook_events(endpoint_id);",
         "CREATE INDEX IF NOT EXISTS idx_webhook_events_received_at ON webhook_events(received_at);",
         "CREATE INDEX IF NOT EXISTS idx_user_notification_prefs_user_id ON user_notification_preferences(user_id);",
+        # AI Organizations indexes (v1.4.5)
+        "CREATE INDEX IF NOT EXISTS idx_ai_orgs_status ON ai_orgs(status);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_orgs_created_by ON ai_orgs(created_by);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_nodes_org_id ON ai_nodes(org_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_nodes_parent_node_id ON ai_nodes(parent_node_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_nodes_human_email ON ai_nodes(human_email);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_tasks_org_id ON ai_tasks(org_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_tasks_assigned_node_id ON ai_tasks(assigned_node_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_tasks_status ON ai_tasks(status);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_tasks_parent_task_id ON ai_tasks(parent_task_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_responses_task_id ON ai_responses(task_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_responses_node_id ON ai_responses(node_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_hitl_actions_org_id ON ai_hitl_actions(org_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_hitl_actions_task_id ON ai_hitl_actions(task_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_hitl_actions_node_id ON ai_hitl_actions(node_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_org_id ON ai_event_logs(org_id);",
+        "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_event_type ON ai_event_logs(event_type);",
     ]
     
     # ==========================================================================
@@ -984,6 +1143,13 @@ class PostgresSchema:
             self.CREATE_WEBHOOK_ENDPOINTS,
             self.CREATE_WEBHOOK_EVENTS,
             self.CREATE_USER_NOTIFICATION_PREFS,
+            # AI Organizations tables (v1.4.5)
+            self.CREATE_AI_ORGS_TABLE,
+            self.CREATE_AI_NODES_TABLE,
+            self.CREATE_AI_TASKS_TABLE,
+            self.CREATE_AI_RESPONSES_TABLE,
+            self.CREATE_AI_HITL_ACTIONS_TABLE,
+            self.CREATE_AI_EVENT_LOGS_TABLE,
         ]
     
     def get_all_index_statements(self) -> list:
@@ -1034,4 +1200,6 @@ class PostgresSchema:
             'swarm_agents', 'swarm_triggers', 'swarm_executions', 'swarm_events', 'swarm_decisions',
             'notification_channels', 'notification_logs', 'webhook_endpoints', 'webhook_events',
             'user_notification_preferences',
+            # AI Organizations tables (v1.4.5)
+            'ai_orgs', 'ai_nodes', 'ai_tasks', 'ai_responses', 'ai_hitl_actions', 'ai_event_logs',
         ]

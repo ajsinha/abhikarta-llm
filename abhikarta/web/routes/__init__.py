@@ -14,6 +14,7 @@ from .agent_routes import AgentRoutes
 from .mcp_routes import MCPRoutes
 from .api_routes import APIRoutes
 from .workflow_routes import WorkflowRoutes
+from .aiorg_routes import AIORGRoutes
 
 __all__ = [
     'AbstractRoutes',
@@ -25,5 +26,6 @@ __all__ = [
     'AgentRoutes',
     'MCPRoutes',
     'APIRoutes',
-    'WorkflowRoutes'
+    'WorkflowRoutes',
+    'AIORGRoutes'
 ]

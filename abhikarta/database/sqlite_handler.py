@@ -13,6 +13,7 @@ Unauthorized copying, distribution, modification, or use is strictly prohibited.
 import sqlite3
 from typing import Any, Dict, List, Optional
 from pathlib import Path
+from datetime import datetime
 import logging
 import threading
 
@@ -48,12 +49,35 @@ class SQLiteHandler(DatabaseHandler):
         db_file = Path(self.db_path)
         db_file.parent.mkdir(parents=True, exist_ok=True)
         
+        # Register custom timestamp converter that handles ISO format (with T separator)
+        def convert_timestamp(val):
+            """Convert timestamp bytes to datetime, handling ISO format."""
+            if val is None:
+                return None
+            try:
+                # Decode bytes to string
+                if isinstance(val, bytes):
+                    val = val.decode('utf-8')
+                # Handle ISO format with T separator
+                val = val.replace('T', ' ')
+                # Handle microseconds
+                if '.' in val:
+                    return datetime.strptime(val, '%Y-%m-%d %H:%M:%S.%f')
+                else:
+                    return datetime.strptime(val, '%Y-%m-%d %H:%M:%S')
+            except Exception:
+                # Return as string if parsing fails
+                return val
+        
+        # Register the converter
+        sqlite3.register_converter("TIMESTAMP", convert_timestamp)
+        sqlite3.register_converter("timestamp", convert_timestamp)
+        
         self._local.connection = sqlite3.connect(
             self.db_path,
             check_same_thread=False,
             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
         )
-        self._local.connection.row_factory = sqlite3.Row
         logger.debug(f"SQLite connected: {self.db_path}")
     
     def disconnect(self) -> None:
@@ -69,14 +93,21 @@ class SQLiteHandler(DatabaseHandler):
         
         Args:
             query: SQL query string
-            params: Query parameters
+            params: Query parameters (must be tuple or None)
             
         Returns:
             Last row ID
         """
         cursor = self.connection.cursor()
         try:
-            if params:
+            # Ensure params is properly formatted
+            if params is not None:
+                # Convert to tuple if it's a list
+                if isinstance(params, list):
+                    params = tuple(params)
+                # Ensure single values are wrapped in tuple
+                elif not isinstance(params, tuple):
+                    params = (params,)
                 cursor.execute(query, params)
             else:
                 cursor.execute(query)
@@ -84,6 +115,8 @@ class SQLiteHandler(DatabaseHandler):
             return cursor.lastrowid
         except Exception as e:
             logger.error(f"SQLite execute error: {e}")
+            logger.error(f"Query: {query[:100]}...")
+            logger.error(f"Params: {params} (type: {type(params).__name__ if params else 'None'})")
             self.connection.rollback()
             raise
     
@@ -93,21 +126,72 @@ class SQLiteHandler(DatabaseHandler):
         
         Args:
             query: SQL query string
-            params: Query parameters
+            params: Query parameters (must be tuple or None)
             
         Returns:
             Row as dictionary or None
         """
         cursor = self.connection.cursor()
         try:
-            if params:
-                cursor.execute(query, params)
-            else:
-                cursor.execute(query)
-            row = cursor.fetchone()
-            return dict(row) if row else None
+            # Step 1: Prepare params
+            if params is not None:
+                if isinstance(params, list):
+                    params = tuple(params)
+                elif not isinstance(params, tuple):
+                    params = (params,)
+            
+            # Step 2: Execute query
+            try:
+                if params is not None:
+                    cursor.execute(query, params)
+                else:
+                    cursor.execute(query)
+            except Exception as exec_err:
+                logger.error(f"fetch_one execute error: {exec_err}")
+                raise
+            
+            # Step 3: Fetch row
+            try:
+                row = cursor.fetchone()
+            except Exception as fetch_err:
+                logger.error(f"fetch_one fetchone error: {fetch_err}")
+                raise
+            
+            if row is None:
+                return None
+            
+            # Step 4: Get column names
+            try:
+                if cursor.description is None:
+                    logger.warning("fetch_one: cursor.description is None")
+                    return None
+                columns = []
+                for i, desc in enumerate(cursor.description):
+                    col_name = desc[0] if desc else f"col_{i}"
+                    columns.append(col_name)
+            except Exception as col_err:
+                logger.error(f"fetch_one column extraction error: {col_err}")
+                raise
+            
+            # Step 5: Build dict manually (most compatible way)
+            try:
+                result = {}
+                for i, col in enumerate(columns):
+                    if i < len(row):
+                        result[col] = row[i]
+                return result
+            except Exception as dict_err:
+                logger.error(f"fetch_one dict building error: {dict_err}")
+                logger.error(f"row type: {type(row)}, row: {row}")
+                logger.error(f"columns: {columns}")
+                raise
+            
         except Exception as e:
             logger.error(f"SQLite fetch_one error: {e}")
+            logger.error(f"Query: {query}")
+            logger.error(f"Params: {params} (type: {type(params).__name__ if params else 'None'})")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             raise
     
     def fetch_all(self, query: str, params: tuple = None) -> List[Dict]:
@@ -116,22 +200,98 @@ class SQLiteHandler(DatabaseHandler):
         
         Args:
             query: SQL query string
-            params: Query parameters
+            params: Query parameters (must be tuple or None)
             
         Returns:
             List of rows as dictionaries
         """
         cursor = self.connection.cursor()
         try:
-            if params:
-                cursor.execute(query, params)
-            else:
-                cursor.execute(query)
-            rows = cursor.fetchall()
-            return [dict(row) for row in rows]
+            # Step 1: Prepare params
+            if params is not None:
+                if isinstance(params, list):
+                    params = tuple(params)
+                elif not isinstance(params, tuple):
+                    params = (params,)
+            
+            # Step 2: Execute query
+            try:
+                if params is not None:
+                    cursor.execute(query, params)
+                else:
+                    cursor.execute(query)
+            except Exception as exec_err:
+                logger.error(f"fetch_all execute error: {exec_err}")
+                raise
+            
+            # Step 3: Fetch rows
+            try:
+                rows = cursor.fetchall()
+            except Exception as fetch_err:
+                logger.error(f"fetch_all fetchall error: {fetch_err}")
+                raise
+            
+            if not rows:
+                return []
+            
+            # Step 4: Get column names
+            try:
+                if cursor.description is None:
+                    logger.warning("fetch_all: cursor.description is None")
+                    return []
+                columns = []
+                for i, desc in enumerate(cursor.description):
+                    col_name = desc[0] if desc else f"col_{i}"
+                    columns.append(col_name)
+            except Exception as col_err:
+                logger.error(f"fetch_all column extraction error: {col_err}")
+                raise
+            
+            # Step 5: Build dicts manually (most compatible way)
+            try:
+                results = []
+                for row in rows:
+                    row_dict = {}
+                    for i, col in enumerate(columns):
+                        if i < len(row):
+                            row_dict[col] = row[i]
+                    results.append(row_dict)
+                return results
+            except Exception as dict_err:
+                logger.error(f"fetch_all dict building error: {dict_err}")
+                logger.error(f"columns: {columns}")
+                raise
+            
         except Exception as e:
             logger.error(f"SQLite fetch_all error: {e}")
+            logger.error(f"Query: {query}")
+            logger.error(f"Params: {params} (type: {type(params).__name__ if params else 'None'})")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             raise
+    
+    def commit(self) -> None:
+        """
+        Commit current transaction.
+        
+        Note: SQLite handler auto-commits in execute(), so this is typically
+        a no-op. However, it's provided for API consistency and explicit
+        transaction control when needed.
+        """
+        if hasattr(self._local, 'connection') and self._local.connection:
+            self._local.connection.commit()
+            logger.debug("SQLite commit")
+    
+    def rollback(self) -> None:
+        """
+        Rollback current transaction.
+        
+        Note: SQLite handler auto-commits in execute(), so this is typically
+        only needed after an error before auto-commit occurs.
+        """
+        if hasattr(self._local, 'connection') and self._local.connection:
+            self._local.connection.rollback()
+            logger.debug("SQLite rollback")
     
     def init_schema(self) -> None:
         """Initialize SQLite schema using the schema module."""

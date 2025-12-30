@@ -48,6 +48,16 @@ class DatabaseHandler(ABC):
         pass
     
     @abstractmethod
+    def commit(self) -> None:
+        """Commit current transaction."""
+        pass
+    
+    @abstractmethod
+    def rollback(self) -> None:
+        """Rollback current transaction."""
+        pass
+    
+    @abstractmethod
     def init_schema(self) -> None:
         """Initialize database schema."""
         pass
@@ -238,6 +248,34 @@ class DatabaseFacade:
         """Initialize database schema."""
         self._handler.init_schema()
         logger.info("Database schema initialized")
+    
+    def commit(self) -> None:
+        """
+        Commit current transaction.
+        
+        For SQLite with auto-commit, this is a no-op.
+        For PostgreSQL, this commits the current transaction.
+        """
+        self._handler.commit()
+    
+    def rollback(self) -> None:
+        """
+        Rollback current transaction.
+        
+        For SQLite with auto-commit, this is a no-op.
+        For PostgreSQL, this rolls back the current transaction.
+        """
+        self._handler.rollback()
+    
+    @property
+    def is_auto_commit(self) -> bool:
+        """
+        Check if database is in auto-commit mode.
+        
+        SQLite handler uses auto-commit per execute().
+        PostgreSQL requires explicit commit/rollback.
+        """
+        return self.settings.database.type.lower() == "sqlite"
     
     @property
     def db_type(self) -> str:

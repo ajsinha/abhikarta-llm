@@ -82,7 +82,8 @@ def _register_routes(app, user_facade, db_facade):
         UserRoutes,
         AgentRoutes,
         MCPRoutes,
-        APIRoutes
+        APIRoutes,
+        AIORGRoutes
     )
     
     # Create route handlers
@@ -92,7 +93,8 @@ def _register_routes(app, user_facade, db_facade):
         UserRoutes(app),
         AgentRoutes(app),
         MCPRoutes(app),
-        APIRoutes(app)
+        APIRoutes(app),
+        AIORGRoutes(app)
     ]
     
     # Set facades and register routes

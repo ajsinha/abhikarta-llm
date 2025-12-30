@@ -1,0 +1,987 @@
+{% extends "base.html" %}
+
+{% block title %}Designer: {{ org.name }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .designer-container {
+        display: flex;
+        height: calc(100vh - 200px);
+        min-height: 600px;
+    }
+    .canvas-area {
+        flex: 1;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: auto;
+        position: relative;
+    }
+    .properties-panel {
+        width: 350px;
+        margin-left: 1rem;
+        overflow-y: auto;
+    }
+    .org-canvas {
+        min-width: 1200px;
+        min-height: 800px;
+        position: relative;
+    }
+    .org-node {
+        position: absolute;
+        width: 180px;
+        padding: 12px;
+        background: white;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        cursor: move;
+        transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .org-node:hover {
+        border-color: var(--bmo-blue);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .org-node.selected {
+        border-color: var(--bmo-blue);
+        border-width: 3px;
+    }
+    .org-node.executive {
+        border-left: 4px solid #6f42c1;
+    }
+    .org-node.manager {
+        border-left: 4px solid #0d6efd;
+    }
+    .org-node.analyst {
+        border-left: 4px solid #198754;
+    }
+    .org-node.coordinator {
+        border-left: 4px solid #fd7e14;
+    }
+    .node-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+    }
+    .node-type {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    .node-human {
+        font-size: 0.8rem;
+        color: #495057;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #eee;
+    }
+    .connection-line {
+        position: absolute;
+        pointer-events: none;
+        z-index: 0;
+    }
+    .toolbar {
+        background: white;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .node-status-indicator {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+    .status-active { background: #198754; }
+    .status-paused { background: #ffc107; }
+    .status-disabled { background: #6c757d; }
+    .hitl-badge {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        font-size: 0.7rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('aiorg_list') }}">AI Organizations</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('aiorg_detail', org_id=org.org_id) }}">{{ org.name }}</a></li>
+                    <li class="breadcrumb-item active">Designer</li>
+                </ol>
+            </nav>
+            <h4 class="mb-0">
+                <i class="bi bi-diagram-3 me-2"></i>{{ org.name }}
+                {% if org.status.value == 'active' %}
+                <span class="badge bg-success ms-2">Active</span>
+                {% elif org.status.value == 'draft' %}
+                <span class="badge bg-warning text-dark ms-2">Draft</span>
+                {% endif %}
+            </h4>
+        </div>
+        <div>
+            <button class="btn btn-outline-info me-2" onclick="showImportModal()">
+                <i class="bi bi-upload me-1"></i>Import JSON
+            </button>
+            <button class="btn btn-outline-secondary me-2" onclick="exportOrg()">
+                <i class="bi bi-download me-1"></i>Export
+            </button>
+            <button class="btn btn-success" id="saveBtn" onclick="saveOrg()">
+                <i class="bi bi-check-lg me-1"></i>Save Changes
+            </button>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <button class="btn btn-primary btn-sm" onclick="addNode()">
+                    <i class="bi bi-plus-circle me-1"></i>Add Node
+                </button>
+                <button class="btn btn-outline-danger btn-sm ms-2" onclick="deleteSelectedNode()" id="deleteBtn" disabled>
+                    <i class="bi bi-trash me-1"></i>Delete
+                </button>
+            </div>
+            <div class="col-auto ms-3">
+                <div class="btn-group btn-group-sm" role="group">
+                    <button class="btn btn-outline-secondary" onclick="zoomIn()" title="Zoom In">
+                        <i class="bi bi-zoom-in"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="zoomOut()" title="Zoom Out">
+                        <i class="bi bi-zoom-out"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="resetZoom()" title="Reset">
+                        <i class="bi bi-arrows-fullscreen"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-auto ms-3">
+                <button class="btn btn-outline-secondary btn-sm" onclick="autoLayout()" title="Auto Layout">
+                    <i class="bi bi-grid-3x3 me-1"></i>Auto Layout
+                </button>
+            </div>
+            <div class="col-auto ms-auto">
+                <span class="text-muted small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Click node to select, drag to move, double-click to edit
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="designer-container">
+        <!-- Canvas Area -->
+        <div class="canvas-area" id="canvasArea">
+            <svg class="connection-lines" id="connectionsSvg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></svg>
+            <div class="org-canvas" id="orgCanvas">
+                <!-- Nodes will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Properties Panel -->
+        <div class="properties-panel">
+            <div class="card" id="propertiesCard">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-sliders me-2"></i>Node Properties</h6>
+                </div>
+                <div class="card-body" id="propertiesContent">
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-cursor display-4"></i>
+                        <p class="mt-2 mb-0">Select a node to edit its properties</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="card mt-3">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-palette me-2"></i>Legend</h6>
+                </div>
+                <div class="card-body py-2">
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 20px; height: 20px; border-left: 4px solid #6f42c1; background: #f8f9fa; border-radius: 4px;" class="me-2"></div>
+                        <small>Executive (CEO, CTO, CFO)</small>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 20px; height: 20px; border-left: 4px solid #0d6efd; background: #f8f9fa; border-radius: 4px;" class="me-2"></div>
+                        <small>Manager (PM, Lead)</small>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 20px; height: 20px; border-left: 4px solid #198754; background: #f8f9fa; border-radius: 4px;" class="me-2"></div>
+                        <small>Analyst (Individual)</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 20px; height: 20px; border-left: 4px solid #fd7e14; background: #f8f9fa; border-radius: 4px;" class="me-2"></div>
+                        <small>Coordinator</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Node Modal -->
+<div class="modal fade" id="addNodeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add New Node</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Role Name</label>
+                    <input type="text" class="form-control" id="newNodeName" placeholder="e.g., Project Manager">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Role Type</label>
+                    <select class="form-select" id="newNodeType">
+                        <option value="executive">Executive</option>
+                        <option value="manager" selected>Manager</option>
+                        <option value="analyst">Analyst</option>
+                        <option value="coordinator">Coordinator</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Parent Node</label>
+                    <select class="form-select" id="newNodeParent">
+                        <option value="">-- Select Parent --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createNode()">Add Node</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import JSON Modal -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-upload me-2"></i>Import Nodes from JSON</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Import nodes from a JSON file. Nodes will be added to the current organization.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="border rounded p-4 text-center" id="importDropZone" style="border-style: dashed !important;">
+                            <i class="bi bi-cloud-upload display-4 text-muted mb-2 d-block"></i>
+                            <p class="mb-2">Drag & drop JSON file here</p>
+                            <p class="text-muted small mb-3">or</p>
+                            <label class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-folder2-open me-1"></i>Browse
+                                <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="previewImport(this)">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Preview</h6>
+                        <div id="importPreview" class="bg-dark text-light p-3 rounded" style="font-family: monospace; font-size: 0.85rem; max-height: 200px; overflow: auto;">
+                            <span class="text-muted">Select a file to preview...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <label class="form-label">Or paste JSON directly:</label>
+                    <textarea class="form-control font-monospace" id="importJsonText" rows="6" 
+                              placeholder='{"nodes": [{"role_name": "Manager", "role_type": "manager", ...}]}'></textarea>
+                </div>
+                
+                <div class="accordion" id="importHelp">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#importHelpContent">
+                                <small><i class="bi bi-question-circle me-1"></i>JSON Format Help</small>
+                            </button>
+                        </h2>
+                        <div id="importHelpContent" class="accordion-collapse collapse" data-bs-parent="#importHelp">
+                            <div class="accordion-body small">
+<pre class="mb-0">{
+  "nodes": [
+    {
+      "role_name": "Project Manager",
+      "role_type": "manager",
+      "description": "Manages project execution",
+      "human_name": "Jane Doe",
+      "human_email": "jane@company.com",
+      "hitl_enabled": true,
+      "position_x": 200,
+      "position_y": 170
+    }
+  ]
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-info" onclick="importNodes()">
+                    <i class="bi bi-upload me-1"></i>Import Nodes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize from server data
+    let nodes = {{ nodes_json|safe }};
+    let selectedNodeId = null;
+    let zoom = 1;
+    const orgId = "{{ org.org_id }}";
+    
+    // Render nodes on canvas
+    function renderNodes() {
+        const canvas = document.getElementById('orgCanvas');
+        canvas.innerHTML = '';
+        
+        nodes.forEach(node => {
+            const div = document.createElement('div');
+            div.className = `org-node ${node.role_type}`;
+            div.id = `node-${node.node_id}`;
+            div.style.left = `${node.position_x}px`;
+            div.style.top = `${node.position_y}px`;
+            
+            div.innerHTML = `
+                <div class="node-status-indicator status-${node.status}"></div>
+                <div class="node-title">${node.role_name}</div>
+                <div class="node-type">${node.role_type}</div>
+                ${node.human_name ? `<div class="node-human"><i class="bi bi-person me-1"></i>${node.human_name}</div>` : ''}
+                ${node.hitl_enabled ? '<span class="badge bg-info hitl-badge">HITL</span>' : ''}
+            `;
+            
+            // Event listeners
+            div.addEventListener('click', (e) => selectNode(node.node_id, e));
+            div.addEventListener('dblclick', () => editNode(node.node_id));
+            
+            // Make draggable
+            makeDraggable(div, node);
+            
+            canvas.appendChild(div);
+        });
+        
+        drawConnections();
+    }
+    
+    // Draw connection lines between parent-child nodes
+    function drawConnections() {
+        const svg = document.getElementById('connectionsSvg');
+        svg.innerHTML = '';
+        
+        nodes.forEach(node => {
+            if (node.parent_node_id) {
+                const parent = nodes.find(n => n.node_id === node.parent_node_id);
+                if (parent) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    
+                    const x1 = parent.position_x + 90;
+                    const y1 = parent.position_y + 80;
+                    const x2 = node.position_x + 90;
+                    const y2 = node.position_y;
+                    
+                    const midY = (y1 + y2) / 2;
+                    const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+                    
+                    line.setAttribute('d', d);
+                    line.setAttribute('stroke', '#adb5bd');
+                    line.setAttribute('stroke-width', '2');
+                    line.setAttribute('fill', 'none');
+                    
+                    svg.appendChild(line);
+                }
+            }
+        });
+    }
+    
+    // Make node draggable
+    function makeDraggable(element, node) {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        
+        element.onmousedown = dragMouseDown;
+        
+        function dragMouseDown(e) {
+            if (e.detail === 2) return; // Ignore double-click
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
+        
+        function elementDrag(e) {
+            e.preventDefault();
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            
+            const newX = element.offsetLeft - pos1;
+            const newY = element.offsetTop - pos2;
+            
+            element.style.left = newX + "px";
+            element.style.top = newY + "px";
+            
+            node.position_x = newX;
+            node.position_y = newY;
+            
+            drawConnections();
+        }
+        
+        function closeDragElement() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    }
+    
+    // Select a node
+    function selectNode(nodeId, e) {
+        if (e) e.stopPropagation();
+        
+        // Deselect previous
+        document.querySelectorAll('.org-node.selected').forEach(n => n.classList.remove('selected'));
+        
+        selectedNodeId = nodeId;
+        const nodeEl = document.getElementById(`node-${nodeId}`);
+        if (nodeEl) nodeEl.classList.add('selected');
+        
+        document.getElementById('deleteBtn').disabled = false;
+        
+        showNodeProperties(nodeId);
+    }
+    
+    // Show node properties in panel
+    function showNodeProperties(nodeId) {
+        const node = nodes.find(n => n.node_id === nodeId);
+        if (!node) return;
+        
+        const content = document.getElementById('propertiesContent');
+        content.innerHTML = `
+            <form id="nodePropertiesForm">
+                <div class="mb-3">
+                    <label class="form-label">Role Name</label>
+                    <input type="text" class="form-control form-control-sm" name="role_name" value="${node.role_name}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Role Type</label>
+                    <select class="form-select form-select-sm" name="role_type">
+                        <option value="executive" ${node.role_type === 'executive' ? 'selected' : ''}>Executive</option>
+                        <option value="manager" ${node.role_type === 'manager' ? 'selected' : ''}>Manager</option>
+                        <option value="analyst" ${node.role_type === 'analyst' ? 'selected' : ''}>Analyst</option>
+                        <option value="coordinator" ${node.role_type === 'coordinator' ? 'selected' : ''}>Coordinator</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control form-control-sm" name="description" rows="2">${node.description || ''}</textarea>
+                </div>
+                
+                <hr>
+                <h6 class="mb-3"><i class="bi bi-person me-2"></i>Human Mirror</h6>
+                
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control form-control-sm" name="human_name" value="${node.human_name || ''}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control form-control-sm" name="human_email" value="${node.human_email || ''}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Teams ID</label>
+                    <input type="text" class="form-control form-control-sm" name="human_teams_id" value="${node.human_teams_id || ''}">
+                </div>
+                
+                <hr>
+                <h6 class="mb-3"><i class="bi bi-person-check me-2"></i>HITL Settings</h6>
+                
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="hitl_enabled" id="hitlEnabled" ${node.hitl_enabled ? 'checked' : ''}>
+                    <label class="form-check-label" for="hitlEnabled">Enable HITL</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="hitl_approval_required" id="hitlApproval" ${node.hitl_approval_required ? 'checked' : ''}>
+                    <label class="form-check-label" for="hitlApproval">Approval Required</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="hitl_review_delegation" id="hitlReview" ${node.hitl_review_delegation ? 'checked' : ''}>
+                    <label class="form-check-label" for="hitlReview">Review Delegation</label>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Timeout (hours)</label>
+                    <input type="number" class="form-control form-control-sm" name="hitl_timeout_hours" value="${node.hitl_timeout_hours || 24}">
+                </div>
+                
+                <hr>
+                <h6 class="mb-3"><i class="bi bi-bell me-2"></i>Notifications</h6>
+                
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="notify_email" id="notifyEmail" ${(node.notification_channels || []).includes('email') ? 'checked' : ''}>
+                    <label class="form-check-label" for="notifyEmail">Email</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="notify_teams" id="notifyTeams" ${(node.notification_channels || []).includes('teams') ? 'checked' : ''}>
+                    <label class="form-check-label" for="notifyTeams">Microsoft Teams</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="notify_slack" id="notifySlack" ${(node.notification_channels || []).includes('slack') ? 'checked' : ''}>
+                    <label class="form-check-label" for="notifySlack">Slack</label>
+                </div>
+                
+                <button type="button" class="btn btn-primary btn-sm w-100" onclick="updateNodeFromForm()">
+                    <i class="bi bi-check me-1"></i>Apply Changes
+                </button>
+            </form>
+        `;
+    }
+    
+    // Update node from properties form
+    function updateNodeFromForm() {
+        if (!selectedNodeId) return;
+        
+        const form = document.getElementById('nodePropertiesForm');
+        const formData = new FormData(form);
+        
+        const node = nodes.find(n => n.node_id === selectedNodeId);
+        if (!node) return;
+        
+        node.role_name = formData.get('role_name');
+        node.role_type = formData.get('role_type');
+        node.description = formData.get('description');
+        node.human_name = formData.get('human_name');
+        node.human_email = formData.get('human_email');
+        node.human_teams_id = formData.get('human_teams_id');
+        node.hitl_enabled = formData.get('hitl_enabled') === 'on';
+        node.hitl_approval_required = formData.get('hitl_approval_required') === 'on';
+        node.hitl_review_delegation = formData.get('hitl_review_delegation') === 'on';
+        node.hitl_timeout_hours = parseInt(formData.get('hitl_timeout_hours')) || 24;
+        
+        // Notification channels
+        const channels = [];
+        if (formData.get('notify_email') === 'on') channels.push('email');
+        if (formData.get('notify_teams') === 'on') channels.push('teams');
+        if (formData.get('notify_slack') === 'on') channels.push('slack');
+        node.notification_channels = channels;
+        
+        renderNodes();
+        selectNode(selectedNodeId);
+        
+        showToast('Properties updated', 'success');
+    }
+    
+    // Add new node
+    function addNode() {
+        // Populate parent dropdown
+        const parentSelect = document.getElementById('newNodeParent');
+        parentSelect.innerHTML = '<option value="">-- Select Parent (none = root) --</option>';
+        nodes.forEach(n => {
+            parentSelect.innerHTML += `<option value="${n.node_id}">${n.role_name}</option>`;
+        });
+        
+        new bootstrap.Modal(document.getElementById('addNodeModal')).show();
+    }
+    
+    // Create new node
+    function createNode() {
+        const name = document.getElementById('newNodeName').value.trim();
+        const type = document.getElementById('newNodeType').value;
+        const parentId = document.getElementById('newNodeParent').value || null;
+        
+        if (!name) {
+            alert('Please enter a role name');
+            return;
+        }
+        
+        // Calculate position
+        let posX = 400, posY = 50;
+        if (parentId) {
+            const parent = nodes.find(n => n.node_id === parentId);
+            if (parent) {
+                const siblings = nodes.filter(n => n.parent_node_id === parentId);
+                posX = parent.position_x + (siblings.length * 200) - 100;
+                posY = parent.position_y + 120;
+            }
+        } else if (nodes.length > 0) {
+            // No parent but other nodes exist - place below
+            const maxY = Math.max(...nodes.map(n => n.position_y));
+            posY = maxY + 120;
+        }
+        
+        const nodeData = {
+            role_name: name,
+            role_type: type,
+            parent_node_id: parentId,
+            position_x: posX,
+            position_y: posY,
+            description: '',
+            human_name: '',
+            human_email: '',
+            hitl_enabled: false,
+            notification_channels: ['email']
+        };
+        
+        // Save to server
+        fetch(`/api/aiorg/${orgId}/nodes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nodeData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.node_id) {
+                nodes.push(data);
+                renderNodes();
+                bootstrap.Modal.getInstance(document.getElementById('addNodeModal')).hide();
+                showToast('Node added successfully', 'success');
+            } else {
+                alert('Error creating node: ' + (data.error || 'Unknown error'));
+            }
+        });
+    }
+    
+    // Delete selected node
+    function deleteSelectedNode() {
+        if (!selectedNodeId) return;
+        
+        const node = nodes.find(n => n.node_id === selectedNodeId);
+        if (!node) return;
+        
+        // Check for children
+        const children = nodes.filter(n => n.parent_node_id === selectedNodeId);
+        if (children.length > 0) {
+            alert('Cannot delete node with children. Delete or reassign children first.');
+            return;
+        }
+        
+        if (!confirm(`Delete "${node.role_name}"?`)) return;
+        
+        fetch(`/api/aiorg/${orgId}/nodes/${selectedNodeId}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                nodes = nodes.filter(n => n.node_id !== selectedNodeId);
+                selectedNodeId = null;
+                renderNodes();
+                document.getElementById('propertiesContent').innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-cursor display-4"></i>
+                        <p class="mt-2 mb-0">Select a node to edit its properties</p>
+                    </div>
+                `;
+                document.getElementById('deleteBtn').disabled = true;
+                showToast('Node deleted', 'success');
+            } else {
+                alert('Error deleting node: ' + (data.error || 'Unknown error'));
+            }
+        });
+    }
+    
+    // Save all changes
+    function saveOrg() {
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+        
+        // Save each node's position
+        const promises = nodes.map(node => 
+            fetch(`/api/aiorg/${orgId}/nodes/${node.node_id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    position_x: node.position_x,
+                    position_y: node.position_y,
+                    role_name: node.role_name,
+                    role_type: node.role_type,
+                    description: node.description,
+                    human_name: node.human_name,
+                    human_email: node.human_email,
+                    human_teams_id: node.human_teams_id,
+                    hitl_enabled: node.hitl_enabled,
+                    hitl_approval_required: node.hitl_approval_required,
+                    hitl_review_delegation: node.hitl_review_delegation,
+                    hitl_timeout_hours: node.hitl_timeout_hours,
+                    notification_channels: node.notification_channels
+                })
+            })
+        );
+        
+        Promise.all(promises)
+        .then(() => {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Save Changes';
+            showToast('All changes saved!', 'success');
+        })
+        .catch(err => {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Save Changes';
+            alert('Error saving: ' + err.message);
+        });
+    }
+    
+    // Export organization
+    function exportOrg() {
+        window.location.href = `/aiorg/${orgId}/export`;
+    }
+    
+    // Zoom functions
+    function zoomIn() { zoom = Math.min(zoom + 0.1, 2); applyZoom(); }
+    function zoomOut() { zoom = Math.max(zoom - 0.1, 0.5); applyZoom(); }
+    function resetZoom() { zoom = 1; applyZoom(); }
+    function applyZoom() {
+        document.getElementById('orgCanvas').style.transform = `scale(${zoom})`;
+        document.getElementById('orgCanvas').style.transformOrigin = 'top left';
+    }
+    
+    // Toast notification
+    function showToast(message, type) {
+        // Simple alert for now - could use Bootstrap toast
+        console.log(`${type}: ${message}`);
+    }
+    
+    // Edit node (double-click)
+    function editNode(nodeId) {
+        selectNode(nodeId);
+        // Focus on first input in properties
+        setTimeout(() => {
+            const input = document.querySelector('#propertiesContent input');
+            if (input) input.focus();
+        }, 100);
+    }
+    
+    // =====================================================
+    // IMPORT FUNCTIONS
+    // =====================================================
+    
+    function showImportModal() {
+        document.getElementById('importJsonText').value = '';
+        document.getElementById('importPreview').innerHTML = '<span class="text-muted">Select a file to preview...</span>';
+        new bootstrap.Modal(document.getElementById('importModal')).show();
+    }
+    
+    function previewImport(input) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    document.getElementById('importPreview').innerHTML = 
+                        '<pre style="margin:0; white-space: pre-wrap; color: #d4d4d4;">' + 
+                        JSON.stringify(json, null, 2) + '</pre>';
+                    document.getElementById('importJsonText').value = e.target.result;
+                } catch (err) {
+                    document.getElementById('importPreview').innerHTML = 
+                        '<span class="text-danger">Invalid JSON: ' + err.message + '</span>';
+                }
+            };
+            reader.readAsText(file);
+        }
+    }
+    
+    function importNodes() {
+        let jsonText = document.getElementById('importJsonText').value.trim();
+        if (!jsonText) {
+            alert('Please provide JSON data to import');
+            return;
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(jsonText);
+        } catch (err) {
+            alert('Invalid JSON: ' + err.message);
+            return;
+        }
+        
+        const nodesToImport = data.nodes || [data]; // Handle both {nodes:[]} and single node
+        
+        if (!Array.isArray(nodesToImport) || nodesToImport.length === 0) {
+            alert('No nodes found in JSON');
+            return;
+        }
+        
+        // Find first node without parent to use as parent for root imports
+        const rootNode = nodes.find(n => !n.parent_node_id);
+        
+        let imported = 0;
+        const idMap = {};
+        
+        nodesToImport.forEach((nodeData, index) => {
+            // Calculate position
+            let posX = 200 + (index % 4) * 200;
+            let posY = 170 + Math.floor(index / 4) * 120;
+            
+            // Determine parent
+            let parentId = null;
+            if (nodeData.parent_node_id) {
+                parentId = idMap[nodeData.parent_node_id] || nodeData.parent_node_id;
+            } else if (rootNode && nodeData.role_type !== 'executive') {
+                parentId = rootNode.node_id;
+            }
+            
+            // Create node via API
+            fetch(`/api/aiorg/${orgId}/nodes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    role_name: nodeData.role_name || 'Imported Node',
+                    role_type: nodeData.role_type || 'analyst',
+                    description: nodeData.description || '',
+                    parent_node_id: parentId,
+                    human_name: nodeData.human_name || '',
+                    human_email: nodeData.human_email || '',
+                    hitl_enabled: nodeData.hitl_enabled || false,
+                    position_x: nodeData.position_x || posX,
+                    position_y: nodeData.position_y || posY
+                })
+            })
+            .then(r => r.json())
+            .then(newNode => {
+                if (newNode.node_id) {
+                    nodes.push(newNode);
+                    if (nodeData.id || nodeData.node_id) {
+                        idMap[nodeData.id || nodeData.node_id] = newNode.node_id;
+                    }
+                    imported++;
+                    renderNodes();
+                }
+            });
+        });
+        
+        // Close modal
+        bootstrap.Modal.getInstance(document.getElementById('importModal')).hide();
+        
+        setTimeout(() => {
+            showToast(`Imported ${imported} nodes`, 'success');
+        }, 500);
+    }
+    
+    // Setup drag and drop for import
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropZone = document.getElementById('importDropZone');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--bmo-blue)';
+                dropZone.style.background = '#f0f7ff';
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.borderColor = '';
+                dropZone.style.background = '';
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '';
+                dropZone.style.background = '';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].name.endsWith('.json')) {
+                    document.getElementById('importFileInput').files = files;
+                    previewImport(document.getElementById('importFileInput'));
+                }
+            });
+        }
+    });
+    
+    // =====================================================
+    // AUTO LAYOUT
+    // =====================================================
+    
+    function autoLayout() {
+        // Find root node
+        const rootNode = nodes.find(n => !n.parent_node_id);
+        if (!rootNode) {
+            alert('No root node found');
+            return;
+        }
+        
+        // Build hierarchy
+        const levels = {};
+        const visited = new Set();
+        
+        function assignLevel(nodeId, level) {
+            if (visited.has(nodeId)) return;
+            visited.add(nodeId);
+            
+            if (!levels[level]) levels[level] = [];
+            levels[level].push(nodeId);
+            
+            // Find children
+            nodes.filter(n => n.parent_node_id === nodeId).forEach(child => {
+                assignLevel(child.node_id, level + 1);
+            });
+        }
+        
+        assignLevel(rootNode.node_id, 0);
+        
+        // Position nodes
+        const levelHeight = 120;
+        const nodeWidth = 200;
+        const canvasWidth = 1200;
+        
+        Object.keys(levels).forEach(level => {
+            const nodesAtLevel = levels[level];
+            const totalWidth = nodesAtLevel.length * nodeWidth;
+            const startX = (canvasWidth - totalWidth) / 2 + nodeWidth / 2;
+            
+            nodesAtLevel.forEach((nodeId, index) => {
+                const node = nodes.find(n => n.node_id === nodeId);
+                if (node) {
+                    node.position_x = startX + index * nodeWidth;
+                    node.position_y = 50 + parseInt(level) * levelHeight;
+                }
+            });
+        });
+        
+        renderNodes();
+        showToast('Auto layout applied', 'success');
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        renderNodes();
+        
+        // Deselect on canvas click
+        document.getElementById('canvasArea').addEventListener('click', function(e) {
+            if (e.target === this || e.target.id === 'orgCanvas') {
+                document.querySelectorAll('.org-node.selected').forEach(n => n.classList.remove('selected'));
+                selectedNodeId = null;
+                document.getElementById('deleteBtn').disabled = true;
+                document.getElementById('propertiesContent').innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-cursor display-4"></i>
+                        <p class="mt-2 mb-0">Select a node to edit its properties</p>
+                    </div>
+                `;
+            }
+        });
+    });
+</script>
+{% endblock %}
