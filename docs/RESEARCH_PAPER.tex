@@ -1,0 +1,560 @@
+%%
+%% This is file `RESEARCH_PAPER.tex',
+%% Using the ACM Article Template
+%%
+%% Abhikarta-LLM: An Enterprise Platform for Hierarchical AI Agent 
+%% Orchestration with Human-in-the-Loop Oversight
+%%
+%% Author: Ashutosh Sinha
+%% Email: ajsinha@gmail.com
+%%
+
+\documentclass[sigconf,nonacm]{acmart}
+
+%%
+%% \BibsourceString command if needed
+%%
+
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\pagestyle{plain}
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{Abhikarta-LLM: An Enterprise Platform for Hierarchical AI Agent Orchestration with Human-in-the-Loop Oversight}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+\author{Ashutosh Sinha}
+\email{ajsinha@gmail.com}
+\affiliation{%
+  \institution{Independent Researcher}
+  \city{}
+  \country{}
+}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+The rapid advancement of Large Language Models (LLMs) has catalyzed significant interest in multi-agent systems capable of autonomous task execution. However, enterprise adoption faces critical challenges including lack of governance frameworks, inadequate human oversight mechanisms, and absence of organizational structure mapping in AI systems. This paper presents Abhikarta-LLM, a comprehensive enterprise platform for AI agent design and orchestration that addresses these challenges through a novel hierarchical AI Organization architecture. The platform introduces several key innovations: (1) AI Organizations that mirror corporate hierarchies with task delegation and response aggregation, (2) a workflow DAG execution engine supporting 12+ node types, (3) comprehensive Human-in-the-Loop (HITL) controls at every level of agent autonomy, (4) enterprise-grade Role-Based Access Control (RBAC) with model-level permissions, and (5) a unified notification system for multi-channel enterprise communication. We discuss the platform's architecture, compare it against existing frameworks, and present a critical analysis of its capabilities and limitations. Our work demonstrates that structured AI agent orchestration with proper governance can enable safer and more effective enterprise AI deployments.
+\end{abstract}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented.
+\keywords{LLM Agents, Multi-Agent Systems, Human-in-the-Loop, Enterprise AI, Workflow Orchestration, Hierarchical AI Organizations, RBAC}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introduction}
+
+The emergence of Large Language Models (LLMs) has fundamentally transformed how organizations approach automation and decision-making. These models, trained on vast corpora of text, demonstrate remarkable capabilities in reasoning, planning, and natural language understanding~\cite{guo2024multiagent}. However, the transition from experimental chatbots to enterprise-grade autonomous agents presents substantial challenges that current frameworks inadequately address.
+
+Recent surveys indicate that while 82\% of organizations are exploring AI agents, only 44\% have security policies in place, and merely 52\% can track and audit all data accessed by AI agents~\cite{rbac2025}. This governance gap poses significant risks as organizations deploy increasingly autonomous systems. The EU AI Act mandates human oversight for high-risk AI systems, requiring that ``natural persons to whom human oversight is assigned are enabled to properly understand the relevant capacities and limitations of the high-risk AI system''~\cite{euaiact2024}.
+
+The challenge intensifies when considering multi-agent orchestration. Traditional organizational structures rely on hierarchical delegation, accountability chains, and human judgment at critical decision points. Existing LLM frameworks like LangChain, CrewAI, and AutoGen focus primarily on agent capabilities rather than enterprise governance requirements~\cite{langchain2024}. This creates a fundamental disconnect between AI system architecture and organizational operating models.
+
+This paper introduces Abhikarta-LLM, an enterprise platform that bridges this gap through several key contributions:
+
+\begin{enumerate}
+\item \textbf{AI Organizations}: A novel architecture for creating AI-powered digital twins of corporate hierarchies with task delegation and response aggregation mechanisms.
+\item \textbf{Comprehensive HITL Framework}: Multi-level human oversight capabilities including approval workflows, override mechanisms, and escalation paths.
+\item \textbf{Enterprise Security Model}: Role-Based Access Control extending to model-level permissions with usage limits and audit trails.
+\item \textbf{Workflow DAG Engine}: A Directed Acyclic Graph execution engine supporting complex multi-step workflows with conditional logic, parallel execution, and error handling.
+\item \textbf{Unified Notification System}: Multi-channel enterprise notifications supporting Slack, Microsoft Teams, email, and webhooks with rate limiting and retry logic.
+\end{enumerate}
+
+The name ``Abhikarta'' derives from Sanskrit (\textit{अभिकर्ता}), meaning ``the one who acts'' or ``the doer''---reflecting the platform's focus on autonomous agents that perform tasks while remaining under human governance.
+
+\section{Literature Survey}
+
+\subsection{Evolution of LLM-Based Multi-Agent Systems}
+
+The field of LLM-based multi-agent systems has evolved rapidly from single-agent planning to sophisticated multi-agent collaboration~\cite{autogen2023}. Guo et al. (2024) provide a comprehensive survey categorizing multi-agent systems into five main streams: frameworks, orchestration efficiency, problem solving, world simulation, and benchmarks~\cite{guo2024survey}.
+
+Early frameworks like AutoGen introduced conversational multi-agent patterns where agents interact through LLM-mediated chat~\cite{autogen2023}. MetaGPT advanced this by assigning different roles to generative agents forming collaborative entities for complex tasks~\cite{metagpt2023}. OpenAI's Swarm framework offered lightweight multi-agent orchestration with fine-grained control over context and tool calls~\cite{swarm2024}.
+
+However, these frameworks primarily focus on agent capabilities rather than enterprise governance. As Tran et al. (2025) note, ``collaboration mechanisms remain conceptual, lacking detailed implementation and characterization'' for enterprise requirements~\cite{tran2025}.
+
+\subsection{Workflow Orchestration and DAG Architectures}
+
+Directed Acyclic Graphs (DAGs) have emerged as the canonical representation for AI workflow orchestration~\cite{gabriel2024}. DAGs organize tasks as nodes connected by directed edges that define dependencies, ensuring proper execution sequence while enabling parallelism~\cite{hopsworks2024}.
+
+Gabriel et al. (2024) demonstrate that effective orchestration requires balanced optimization of graph structure and operational execution, noting that ``performance degradation with complexity inversely correlates with success metrics''~\cite{gabriel2024}. LangGraph implements stateful agent workflows as graphs where nodes represent actions and edges control information flow~\cite{langgraph2024}.
+
+The LlamaIndex team introduced event-driven workflows as an alternative to rigid DAG structures, enabling dynamic loops and self-correction patterns essential for agentic systems~\cite{llamaindex2024}.
+
+\subsection{Human-in-the-Loop AI Systems}
+
+Human-in-the-Loop (HITL) has become critical as AI agents transition from assistants to autonomous actors. Karpathy notes that organizations must ``keep the AI on the leash'' as agents take on more responsibility~\cite{superannotate2025}. HITL systems address several key concerns:
+
+\begin{itemize}
+\item \textbf{Accuracy and Reliability}: Human feedback catches and corrects AI errors including hallucinations~\cite{lin2024}.
+\item \textbf{Edge Cases and Ambiguity}: Human judgment handles situations beyond training data~\cite{hitl2025}.
+\item \textbf{Ethical Oversight}: Humans ensure AI decisions adhere to ethical standards and societal norms~\cite{holisticai2024}.
+\end{itemize}
+
+The EU AI Act specifically mandates human oversight for high-risk systems, requiring capabilities to ``decide, in any particular situation, not to use the high-risk AI system or to otherwise disregard, override or reverse the output''~\cite{euaiact2024}.
+
+\subsection{Enterprise AI Governance and Security}
+
+Enterprise AI deployment demands comprehensive governance frameworks. The Databricks AI Governance Framework identifies 43 key considerations across five foundational pillars: AI Organization, Legal Compliance, Data Quality, Risk Management, and Operational Excellence~\cite{databricks2024}.
+
+Role-Based Access Control (RBAC) has been recognized as essential but insufficient for agentic AI security. Traditional RBAC proves inadequate because AI agents make autonomous decisions and adapt their behavior~\cite{obsidian2025}. Emerging approaches include Attribute-Based Access Control (ABAC) and Policy-Based Access Control (PBAC)~\cite{mckinsey2025}.
+
+\subsection{Hierarchical AI Agent Architectures}
+
+Hierarchical AI agents represent a paradigm shift from flat single-agent systems to structured multi-level architectures~\cite{hierarchical2025}. This approach mirrors organizational hierarchies where executive, management, and operational levels have distinct responsibilities.
+
+CrewAI implements hierarchical processes with manager agents coordinating worker agents based on roles and capabilities~\cite{crewai2024}. The MIT Sloan Management Review reports that 45\% of organizations with extensive AI adoption expect reductions in middle management layers, suggesting AI will increasingly coordinate hybrid human-agent teams~\cite{mitsloan2025}.
+
+\subsection{Agent Swarms and Event-Driven Orchestration}
+
+Agent swarms represent a fundamentally different paradigm from hierarchical systems---emphasizing dynamic collaboration, event-driven coordination, and emergent behavior~\cite{goortani2025}. Unlike static hierarchies, swarms enable agents to self-organize around tasks based on capabilities and availability.
+
+The actor model, pioneered by Hewitt and refined in systems like Akka/Pekko, provides a foundation for concurrent agent systems. Key properties include message-driven communication, location transparency, supervision hierarchies, and elastic scaling~\cite{sukka2024}.
+
+Event-driven architectures using message brokers (Kafka, RabbitMQ) enable swarms to react to real-world events. This is particularly valuable for real-time processing, decoupled systems, horizontal scalability, and message reliability~\cite{zenml2024}.
+
+\section{Key Objectives and Design Philosophy}
+
+\subsection{Core Objectives}
+
+Abhikarta-LLM was designed with five primary objectives:
+
+\textbf{O1: Enterprise-Grade Governance} --- Enable organizations to deploy AI agents with the same governance rigor applied to human employees---complete audit trails, approval workflows, and accountability chains.
+
+\textbf{O2: Organizational Structure Mapping} --- Allow AI systems to mirror existing corporate hierarchies, enabling natural task delegation patterns that align with established business processes.
+
+\textbf{O3: Multi-Level Human Oversight} --- Provide Human-in-the-Loop controls at every level of autonomy---from individual agent actions to organization-wide decisions.
+
+\textbf{O4: Multi-Provider LLM Flexibility} --- Support 11+ LLM providers with unified interfaces, enabling organizations to leverage best-in-class models while avoiding vendor lock-in.
+
+\textbf{O5: Production-Ready Operations} --- Deliver enterprise features including visual designers, comprehensive logging, cost tracking, and multi-channel notifications from day one.
+
+\subsection{Design Principles}
+
+The platform adheres to several key design principles:
+
+\begin{itemize}
+\item \textbf{Separation of Concerns}: Clear boundaries between presentation, API, core services, and data layers.
+\item \textbf{Modular Architecture}: Each capability implemented as independent modules with clean interfaces.
+\item \textbf{Defense in Depth}: Multiple security layers including authentication, RBAC, model-level permissions, and rate limiting.
+\item \textbf{Audit Everything}: Complete logging of LLM calls, user actions, agent decisions, and system events.
+\item \textbf{Visual-First UX}: Drag-and-drop designers reducing barriers for non-developers.
+\end{itemize}
+
+\section{Core Design and Architecture}
+
+\subsection{System Architecture Overview}
+
+Abhikarta-LLM follows a layered architecture with clear separation of concerns. The presentation layer includes a Flask web UI, REST API endpoints, and CLI tools. Core services encompass Agent Manager, Workflow Executor, LLM Facade, and HITL Manager. Specialized modules handle AI Organizations, Notifications, and Swarms. The database layer supports both SQLite and PostgreSQL through an abstraction facade.
+
+\subsection{AI Organizations Module}
+
+The AI Organizations module represents the platform's most significant innovation---enabling creation of AI-powered digital twins of corporate structures.
+
+\subsubsection{Hierarchical Structure}
+
+AI Organizations model corporate hierarchies where each node represents a position with:
+
+\begin{itemize}
+\item \textbf{AI Agent}: LLM-powered component handling autonomous tasks
+\item \textbf{Human Mirror}: Real employee who receives notifications and can intervene
+\item \textbf{Node Type}: Executive, Manager, Analyst, or Coordinator role
+\item \textbf{Delegation Strategy}: Parallel, Sequential, or Conditional task routing
+\end{itemize}
+
+\subsubsection{Task Delegation and Response Aggregation}
+
+When a task enters at the CEO level:
+
+\begin{enumerate}
+\item \textbf{Task Analysis}: CEO agent analyzes task requirements
+\item \textbf{Subtask Generation}: Task decomposed into subtasks for subordinates
+\item \textbf{Delegation}: Subtasks assigned based on delegation strategy
+\item \textbf{Execution}: Each subordinate processes their subtask (may recursively delegate)
+\item \textbf{Response Collection}: Subordinate responses collected
+\item \textbf{Aggregation}: Superior synthesizes responses into consolidated output
+\item \textbf{HITL Checkpoint}: Human mirror may review/approve/override at any level
+\end{enumerate}
+
+The database schema supports this with six dedicated tables: \texttt{ai\_orgs}, \texttt{ai\_nodes}, \texttt{ai\_tasks}, \texttt{ai\_responses}, \texttt{ai\_hitl\_actions}, and \texttt{ai\_event\_logs}.
+
+\subsection{Workflow DAG Execution Engine}
+
+The workflow engine implements a topological execution model supporting 12+ node types including Start/End, LLM, Agent, Python, HTTP, Condition, Loop, Parallel, HITL, Transform, RAG Query, and Memory nodes.
+
+Workflows are defined in JSON format and support Code Fragment URIs (\texttt{db://}, \texttt{file://}, \texttt{s3://}), dynamic dependency resolution, error handling with configurable retry policies, and execution logging with cost tracking.
+
+\subsection{Human-in-the-Loop Framework}
+
+HITL is implemented at multiple levels throughout the platform:
+
+\textbf{Agent Level}: Individual agents can be configured with HITL nodes that pause execution for human review. Supported actions include approve, reject, override, escalate, and request\_info.
+
+\textbf{Workflow Level}: HITL Review nodes within workflows enable conditional human review based on confidence scores, role-based task routing, time-bounded reviews with default actions, and comment threads for collaboration.
+
+\textbf{AI Organization Level}: Human mirrors at each organizational node can view all AI decisions before external delivery, override individual responses or entire subtrees, configure notification preferences per event type, and establish approval thresholds for automated release.
+
+\subsection{Role-Based Access Control}
+
+RBAC extends from user permissions to model-level access with seven predefined roles: admin, developer, operator, analyst, hitl\_reviewer, auditor, and viewer. Model-level permissions include per-model access control by role, daily/monthly usage limits, cost allocation tracking, and rate limiting per provider.
+
+\subsection{Enterprise Notification System}
+
+The notification module provides unified multi-channel communication supporting Slack (Block Kit formatting, threads, DMs), Microsoft Teams (Adaptive Cards, action buttons), Email (SMTP with HTML templates), and Webhooks (custom HTTP endpoints). Enterprise features include token bucket rate limiting, exponential backoff retry logic, HMAC/JWT signature verification, and complete notification audit logging.
+
+\subsection{Agent Swarms and Actor System}
+
+Agent Swarms represent a paradigm for solving problems that require dynamic collaboration, parallel processing, and event-driven coordination---complementing the structured hierarchy of AI Organizations.
+
+\subsubsection{Problems Solved by Swarms}
+
+Swarms excel at solving several classes of problems that traditional sequential or hierarchical approaches handle poorly:
+
+\textbf{Real-Time Event Processing}: Organizations need to react immediately to external events---customer inquiries, market changes, security alerts, or operational anomalies. Swarms can process thousands of events per second, routing each to appropriate specialist agents.
+
+\textbf{Embarrassingly Parallel Tasks}: Research, analysis, and data processing tasks that can be divided into independent subtasks benefit from swarm parallelization. A research swarm might simultaneously search multiple sources, analyze different aspects of a problem, and synthesize findings.
+
+\textbf{Dynamic Workload Distribution}: Unlike static workflows, swarms adapt to varying workloads by scaling agent pools up or down. During peak demand, more agents join the swarm; during quiet periods, resources are released.
+
+\textbf{Fault-Tolerant Operations}: Individual agent failures don't halt the swarm. Supervision hierarchies restart failed agents, and work is redistributed to healthy nodes.
+
+\textbf{Multi-Source Integration}: Swarms can simultaneously consume from multiple external sources (Kafka topics, RabbitMQ queues, HTTP webhooks, scheduled triggers) and coordinate responses across channels.
+
+\subsubsection{Master Actor (LLM-Powered Choreographer)}
+
+The Master Actor is the brain of the swarm---an LLM-powered component that makes intelligent decisions about task routing and coordination. It supports decision types including BROADCAST (publish to all matching agents), DIRECT (send to specific agent), AGGREGATE (wait for and combine results), COMPLETE (task finished), RETRY (retry failed operation), and ESCALATE (escalate to human).
+
+The Master Actor receives events from external triggers, uses LLM reasoning to analyze situations, decides which agents should handle specific aspects, publishes tasks to appropriate agent pools, monitors responses, aggregates results, and determines when the overall task is complete.
+
+\subsubsection{External Triggers}
+
+Swarms can be activated through multiple external sources:
+
+\begin{itemize}
+\item \textbf{Kafka}: Stream processing and event sourcing from Kafka topics
+\item \textbf{RabbitMQ}: Work queues and RPC patterns from RabbitMQ
+\item \textbf{HTTP Webhook}: API integrations and external notifications
+\item \textbf{Schedule}: Cron-based periodic task execution
+\item \textbf{User Query}: Interactive requests from users
+\item \textbf{API}: Programmatic triggering via REST endpoints
+\end{itemize}
+
+\subsubsection{Event Bus and Agent Pools}
+
+The Event Bus provides topic-based pub/sub messaging with pattern subscriptions, priority queuing, at-least-once delivery guarantees, and event persistence for audit and replay.
+
+Agent Pools provide pre-warmed, scalable agent instances with configurable pool sizing, round-robin work distribution, health monitoring with automatic replacement, and auto-scaling based on queue depth or latency.
+
+\subsubsection{Swarm Use Cases}
+
+\textbf{Customer Support Triage}: A swarm receives tickets from Kafka, classifies by urgency, routes to specialists, and escalates complex issues to humans.
+
+\textbf{Market Intelligence}: Scheduled triggers activate research swarms that monitor news, analyze trends, and generate daily briefings.
+
+\textbf{Incident Response}: Monitoring webhooks trigger analysis swarms that investigate alerts, correlate events, and suggest remediations.
+
+\textbf{Content Pipeline}: Content swarms process articles through fact-checking, editing, SEO optimization, and image generation before publishing.
+
+\subsubsection{Pekko-Inspired Actor System}
+
+The underlying actor system provides enterprise-grade concurrency with supervision strategies (OneForOne, AllForOne, Escalate), dispatcher types (ThreadPool, ForkJoin, Pinned), and mailbox configurations (Unbounded, Bounded, Priority).
+
+\section{Implementation Details}
+
+\subsection{Technology Stack}
+
+The platform utilizes Flask (Python 3.9+) for the backend, Bootstrap 5 for the frontend, SQLite/PostgreSQL for data storage, and supports 11 LLM providers through a unified facade. The database schema comprises 33+ tables organized across core, agent, workflow, execution, HITL, AI Org, notification, and system domains.
+
+\subsection{Visual Designers}
+
+The platform provides three visual designers: Agent Designer for drag-and-drop agent building, Workflow Designer for visual DAG construction with 33+ templates, and AI Org Designer for organizational hierarchy building with human mirror configuration.
+
+\section{Critical Analysis}
+
+\subsection{Strengths}
+
+\textbf{S1: Comprehensive Enterprise Focus} --- Unlike research-oriented frameworks, Abhikarta-LLM addresses enterprise requirements from the ground up with built-in RBAC, audit logging, and cost tracking.
+
+\textbf{S2: Novel AI Organization Architecture} --- The hierarchical AI organization concept uniquely bridges AI capabilities with existing corporate structures.
+
+\textbf{S3: Multi-Level HITL Implementation} --- Human oversight is available at agent, workflow, and organizational levels providing defense-in-depth.
+
+\textbf{S4: Visual-First Design Philosophy} --- Drag-and-drop designers lower barriers to entry for non-developers.
+
+\textbf{S5: Multi-Provider LLM Support} --- Support for 11 LLM providers enables vendor flexibility and cost optimization.
+
+\textbf{S6: Event-Driven Swarm Architecture} --- The swarm module solves problems that hierarchical systems cannot efficiently address: real-time processing of high-volume event streams, parallel execution of independent subtasks, dynamic scaling based on workload, fault tolerance through supervision hierarchies, and multi-source integration (Kafka, RabbitMQ, webhooks). The LLM-powered Master Actor provides intelligent choreography, enabling swarms to adapt to novel situations.
+
+\subsection{Weaknesses}
+
+\textbf{W1: Scalability Constraints} --- The current SQLite default and Flask-based architecture may face scalability challenges under high concurrency.
+
+\textbf{W2: Limited Evaluation Benchmarks} --- The platform lacks comprehensive performance evaluation against competitors with standardized benchmarks.
+
+\textbf{W3: Learning Curve for Complex Features} --- Advanced features like custom actor systems and MCP plugins require significant learning investment.
+
+\textbf{W4: Single-Tenant Architecture} --- The current design assumes single-tenant deployment; multi-tenant operation would require architectural modifications.
+
+\textbf{W5: Limited AI Org Feedback Loops} --- The AI Organization module lacks sophisticated feedback loops for organizational learning from human interventions.
+
+\subsection{Comparison with Existing Frameworks}
+
+Abhikarta-LLM provides unique capabilities compared to LangChain, CrewAI, and AutoGen including visual designers, enterprise RBAC, AI Organizations, comprehensive HITL, cost tracking, audit logging, and multi-channel notifications---features absent or limited in competing frameworks.
+
+\section{Future Work}
+
+\subsection{Short-Term Enhancements (v1.5-v1.6)}
+
+\begin{itemize}
+\item \textbf{Advanced Analytics Dashboard}: Real-time execution monitoring, cost analysis, and anomaly detection
+\item \textbf{A/B Testing for Prompts}: Systematic prompt optimization with statistical significance calculation
+\item \textbf{AI Org Performance Metrics}: Delegation efficiency, aggregation quality, and human intervention rates
+\end{itemize}
+
+\subsection{Medium-Term Features (v2.0)}
+
+\begin{itemize}
+\item \textbf{Multi-Tenant SaaS Architecture}: Tenant isolation, usage-based billing, and self-service provisioning
+\item \textbf{AI Organization Learning}: Automatic prompt refinement based on human overrides
+\item \textbf{Agent Marketplace}: Public marketplace with ratings, reviews, and revenue sharing
+\end{itemize}
+
+\subsection{Long-Term Vision (v3.0+)}
+
+\begin{itemize}
+\item \textbf{Federated AI Organizations}: Cross-organization task delegation with privacy preservation
+\item \textbf{Autonomous Improvement}: RLHF integration and self-monitoring capabilities
+\item \textbf{Extended Reality Integration}: VR/AR visualization and voice-first interaction modes
+\end{itemize}
+
+\section{Conclusion}
+
+This paper presented Abhikarta-LLM, an enterprise platform for hierarchical AI agent orchestration with comprehensive human-in-the-loop oversight. The platform addresses critical gaps in existing frameworks by providing AI Organizations that mirror corporate hierarchies, multi-level HITL controls, enterprise-grade governance, visual designers, and multi-channel notifications.
+
+As AI agents transition from experimental tools to production systems, the need for structured governance becomes paramount. Abhikarta-LLM demonstrates that enterprise AI deployment can maintain the governance rigor organizations apply to human employees while leveraging LLM capabilities for automation and augmentation.
+
+The platform's limitations---particularly around scalability and empirical validation---highlight areas for future research. However, the architectural patterns established, especially the AI Organization concept, provide a foundation for building AI systems that align with how enterprises actually operate.
+
+The name Abhikarta---``the one who acts''---captures our vision: AI agents that act autonomously within human-defined boundaries, contributing to organizational goals while remaining accountable through transparent governance structures.
+
+\section*{Acknowledgments}
+
+The author acknowledges the contributions of the open-source communities behind Flask, LangChain, and the various LLM providers that make platforms like Abhikarta-LLM possible. Special thanks to researchers in multi-agent systems, workflow orchestration, and AI governance whose work informed this design.
+
+%%
+%% The next two lines define the bibliography style to be used, and
+%% the bibliography file.
+\bibliographystyle{ACM-Reference-Format}
+
+\begin{thebibliography}{35}
+
+\bibitem{guo2024multiagent}
+T. Guo, X. Chen, Y. Wang, et al.
+\newblock Large Language Model based Multi-Agents: A Survey of Progress and Challenges.
+\newblock In \emph{Proceedings of IJCAI 2024}, pages 8048--8057, 2024.
+
+\bibitem{rbac2025}
+Medium.
+\newblock AI Agent RBAC: Essential Security Framework for Enterprise AI Deployment.
+\newblock 2025.
+
+\bibitem{euaiact2024}
+European Union.
+\newblock EU AI Act, Article 14: Human Oversight.
+\newblock \emph{Regulation (EU) 2024/XXX}, 2024.
+
+\bibitem{langchain2024}
+LangChain.
+\newblock State of AI Agents Report.
+\newblock 2024.
+
+\bibitem{autogen2023}
+Q. Wu, G. Bansal, J. Zhang, et al.
+\newblock AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation.
+\newblock \emph{arXiv preprint arXiv:2308.08155}, 2023.
+
+\bibitem{guo2024survey}
+T. Guo et al.
+\newblock LLM\_MultiAgents\_Survey\_Papers.
+\newblock GitHub Repository, 2024.
+
+\bibitem{metagpt2023}
+S. Hong et al.
+\newblock MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework.
+\newblock \emph{arXiv preprint arXiv:2308.00352}, 2023.
+
+\bibitem{swarm2024}
+OpenAI.
+\newblock Swarm: Experimental Multi-Agent Orchestration Framework.
+\newblock 2024.
+
+\bibitem{tran2025}
+H. Tran et al.
+\newblock Multi-Agent Collaboration Mechanisms: A Survey of LLMs.
+\newblock \emph{arXiv:2501.06322v1}, 2025.
+
+\bibitem{gabriel2024}
+Gabriel et al.
+\newblock Advancing Agentic Systems: Dynamic Task Decomposition, Tool Integration and Evaluation.
+\newblock 2024.
+
+\bibitem{hopsworks2024}
+Hopsworks.
+\newblock What is a DAG Processing Model?
+\newblock 2024.
+
+\bibitem{langgraph2024}
+LangChain.
+\newblock Getting Started with LangGraph: Build Your First DAG-Based Agent Flow.
+\newblock 2024.
+
+\bibitem{llamaindex2024}
+LlamaIndex.
+\newblock Introducing workflows beta: a new way to create complex AI applications.
+\newblock 2024.
+
+\bibitem{superannotate2025}
+SuperAnnotate.
+\newblock What is Human-in-the-Loop (HITL) in AI?
+\newblock 2025.
+
+\bibitem{lin2024}
+L. Lin.
+\newblock Designing Effective Human-in-the-Loop Systems with LLMs: A Practical Guide.
+\newblock 2024.
+
+\bibitem{hitl2025}
+Humans in the Loop.
+\newblock How Humans in the Loop Powers Responsible AI.
+\newblock 2025.
+
+\bibitem{holisticai2024}
+Holistic AI.
+\newblock Human in the Loop AI: Keeping AI Aligned with Human Values.
+\newblock 2024.
+
+\bibitem{permit2025}
+Permit.io.
+\newblock Human-in-the-Loop for AI Agents: Best Practices, Frameworks, Use Cases.
+\newblock 2025.
+
+\bibitem{databricks2024}
+Databricks.
+\newblock Introducing the Databricks AI Governance Framework.
+\newblock 2024.
+
+\bibitem{obsidian2025}
+Obsidian Security.
+\newblock From Agentic AI to Autonomous Risk: Why Security Must Evolve.
+\newblock 2025.
+
+\bibitem{mckinsey2025}
+McKinsey.
+\newblock Deploying agentic AI with safety and security: A playbook for technology leaders.
+\newblock 2025.
+
+\bibitem{hierarchical2025}
+All About AI.
+\newblock Hierarchical AI Agents: Innovations, Applications, and Advantages.
+\newblock 2025.
+
+\bibitem{crewai2024}
+CrewAI.
+\newblock Hierarchical Process Documentation.
+\newblock 2024.
+
+\bibitem{mitsloan2025}
+MIT Sloan Management Review.
+\newblock The Emerging Agentic Enterprise.
+\newblock 2025.
+
+\bibitem{lyzr2025}
+Lyzr.
+\newblock What are Hierarchical AI Agents?
+\newblock 2025.
+
+\bibitem{goortani2025}
+F. Goortani.
+\newblock Bridging Human Delegation and AI Agent Autonomy.
+\newblock \emph{Medium}, 2025.
+
+\bibitem{talkdesk2025}
+Talkdesk.
+\newblock What is Multi-Agent Orchestration? An Overview.
+\newblock 2025.
+
+\bibitem{mckinseyorg2025}
+McKinsey.
+\newblock The agentic organization: Contours of the next paradigm for the AI era.
+\newblock 2025.
+
+\bibitem{salesforce2025}
+Salesforce.
+\newblock The Enterprise AI Agent Era: Why Trust, Security, and Governance are Non-Negotiable.
+\newblock 2025.
+
+\bibitem{writer2025}
+WRITER.
+\newblock Agentic AI governance: An enterprise guide.
+\newblock 2025.
+
+\bibitem{agentsecurity2025}
+Agent Security Platform.
+\newblock Zero-Trust for AI Agents.
+\newblock 2025.
+
+\bibitem{sukka2024}
+S. Sukka.
+\newblock Agentic AI workflows in Directed Acyclic Graphs (DAGs).
+\newblock \emph{Medium}, 2024.
+
+\bibitem{zenml2024}
+ZenML.
+\newblock 9 Best LLM Orchestration Frameworks for Agents and RAG.
+\newblock 2024.
+
+\bibitem{arxiv2024dag}
+Action Engine.
+\newblock An LLM-based Framework for Automatic FaaS Workflow Generation.
+\newblock \emph{arXiv:2411.19485v1}, 2024.
+
+\bibitem{beyond2024}
+Beyond ReAct.
+\newblock A Planner-Centric Framework for Complex Tool-Augmented LLM Reasoning.
+\newblock \emph{arXiv:2511.10037v1}, 2024.
+
+\end{thebibliography}
+
+\newpage
+
+\section*{Copyright and Legal Notice}
+
+\noindent\textcopyright~2025 Ashutosh Sinha. All Rights Reserved.
+
+\vspace{0.5em}
+\noindent This document describes the Abhikarta-LLM platform, which is proprietary software. The concepts, architectures, and implementations described herein are protected under applicable intellectual property laws. Unauthorized reproduction, distribution, or use of this document or the described platform is prohibited.
+
+\vspace{0.5em}
+\noindent Patent applications covering the AI Organization architecture, hierarchical task delegation, and response aggregation mechanisms are pending.
+
+\vspace{0.5em}
+\noindent For licensing inquiries, contact: ajsinha@gmail.com
+
+\vspace{1em}
+\noindent\textit{Document Version: 1.0}\\
+\textit{Last Updated: December 2025}
+
+\end{document}
