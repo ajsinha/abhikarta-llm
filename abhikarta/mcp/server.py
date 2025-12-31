@@ -149,6 +149,7 @@ class MCPServerConfig:
             auth_token=auth_token,
             auth_header=record.get('auth_header', 'Authorization'),
             auth_config=auth_config,
+            auth_endpoint=record.get('auth_endpoint', ''),
             tools_endpoint=record.get('tools_endpoint', '/api/tools'),
             call_endpoint=record.get('call_endpoint', '/api/tools/call'),
             health_endpoint=record.get('health_endpoint', '/health'),

@@ -265,12 +265,13 @@ class HTTPMCPClient(MCPClientBase):
             return {'success': False, 'error': str(e)}
     
     def health_check(self) -> tuple[bool, float]:
-        """Check server health."""
+        """Check server health. Uses authenticated session if configured."""
         try:
             url = f"{self.config.url.rstrip('/')}{self.config.health_endpoint}"
             
             start_time = time.time()
-            response = requests.get(url, timeout=5)
+            # Use session to include authentication headers
+            response = self._get_session().get(url, timeout=5)
             latency = (time.time() - start_time) * 1000
             
             return response.status_code == 200, latency

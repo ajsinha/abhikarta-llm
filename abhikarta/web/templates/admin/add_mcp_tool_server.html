@@ -114,17 +114,16 @@
                                     Configure authentication parameters in JSON format
                                 </div>
                             </div>
-                            
-                            <div id="auth_endpoint_container" class="d-none">
-                                <div class="mb-3">
-                                    <label for="auth_endpoint" class="form-label">Authentication Endpoint</label>
-                                    <input type="text" class="form-control" id="auth_endpoint" name="auth_endpoint" 
-                                           placeholder="/api/auth/login">
-                                    <div class="form-text">
-                                        For Basic Auth: The endpoint to call for login. Should return JSON with 'token' field
-                                        or raw token string. Example: <code>/api/auth/login</code>
-                                    </div>
-                                </div>
+                        </div>
+                        
+                        <!-- Auth Endpoint - always visible -->
+                        <div class="mb-3">
+                            <label for="auth_endpoint" class="form-label">Authentication Endpoint <span class="text-muted">(Optional)</span></label>
+                            <input type="text" class="form-control" id="auth_endpoint" name="auth_endpoint" 
+                                   placeholder="/api/auth/login">
+                            <div class="form-text">
+                                Optional if not using Basic Authentication. For Basic Auth, this endpoint will be called 
+                                with credentials to obtain a token. Should return JSON with 'token' field or raw token string.
                             </div>
                         </div>
                         
@@ -251,7 +250,6 @@ function toggleAuthConfig() {
     const container = document.getElementById('auth_config_container');
     const authHelp = document.getElementById('auth_help');
     const authConfig = document.getElementById('auth_config');
-    const authEndpointContainer = document.getElementById('auth_endpoint_container');
     const authFlowInfo = document.getElementById('auth_flow_info');
     const authFlowText = document.getElementById('auth_flow_text');
     
@@ -269,13 +267,12 @@ function toggleAuthConfig() {
         authHelp.textContent = example.help;
         authFlowText.textContent = example.flow;
         
-        // Show auth endpoint only for basic auth
+        // Set default auth endpoint for basic auth
         if (authType === 'basic') {
-            authEndpointContainer.classList.remove('d-none');
-            document.getElementById('auth_endpoint').value = '/api/auth/login';
-        } else {
-            authEndpointContainer.classList.add('d-none');
-            document.getElementById('auth_endpoint').value = '';
+            const authEndpoint = document.getElementById('auth_endpoint');
+            if (!authEndpoint.value) {
+                authEndpoint.value = '/api/auth/login';
+            }
         }
     }
 }

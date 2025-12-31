@@ -183,7 +183,7 @@
                 </tr>
                 <tr>
                     <td><code>auth_endpoint</code></td>
-                    <td>Login endpoint (for basic auth)</td>
+                    <td>Login endpoint (optional if not using Basic Auth)</td>
                     <td>/api/auth/login</td>
                 </tr>
                 <tr>
@@ -237,7 +237,20 @@
 <hr class="my-5">
 
 <h2 id="authentication">Authentication</h2>
-<p>MCP Tool Servers support multiple authentication methods to secure API access.</p>
+<p>MCP Tool Servers support multiple authentication methods to secure API access. <strong>When configured, authentication credentials are automatically included in all requests</strong> to the MCP server, including:</p>
+
+<ul class="mb-4">
+    <li><strong>Tool discovery</strong> - fetching the list of available tools</li>
+    <li><strong>Tool execution</strong> - calling tools with parameters</li>
+    <li><strong>Health checks</strong> - monitoring server availability</li>
+</ul>
+
+<div class="alert alert-info mb-4">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Authentication Endpoint:</strong> This field is always visible on the Add/Edit MCP Tool Server page. 
+    It is <strong>optional if not using Basic Authentication</strong>. For Basic Auth, it specifies the login 
+    endpoint to call for obtaining a token.
+</div>
 
 <div class="row g-4 mb-4">
     <div class="col-md-6">
@@ -252,7 +265,7 @@
   "token": "your-jwt-or-api-token"
 }</code></pre>
                 <h6>How it works:</h6>
-                <p class="small text-muted mb-0">Token is sent as <code>Authorization: Bearer {token}</code> header with every request.</p>
+                <p class="small text-muted mb-0">Token is sent as <code>Authorization: Bearer {token}</code> header with every request to the MCP server.</p>
             </div>
         </div>
     </div>
@@ -269,7 +282,7 @@
   "key": "your-api-key-here"
 }</code></pre>
                 <h6>How it works:</h6>
-                <p class="small text-muted mb-0">Key is sent in the specified header with every request.</p>
+                <p class="small text-muted mb-0">Key is sent in the specified header (e.g., <code>X-API-Key: your-api-key</code>) with every request.</p>
             </div>
         </div>
     </div>
@@ -288,16 +301,16 @@
   "password": "your-password"
 }</code></pre>
         
-        <h6>Auth Endpoint:</h6>
+        <h6>Auth Endpoint (Required for Basic Auth):</h6>
         <p>Set the <code>auth_endpoint</code> field, e.g., <code>/api/auth/login</code></p>
         
-        <h6>How it works:</h6>
+        <h6>Authentication Flow:</h6>
         <ol class="small">
-            <li>System calls <code>{base_url}{auth_endpoint}</code> with POST body <code>{"username": "...", "password": "..."}</code></li>
-            <li>Expects response with token:</li>
-        </ol>
-        
-        <pre><code class="language-json">{
+            <li><strong>Connect:</strong> When connecting to the MCP server, system calls <code>{base_url}{auth_endpoint}</code> with POST body:
+                <pre class="mt-2"><code>{"username": "...", "password": "..."}</code></pre>
+            </li>
+            <li><strong>Token Response:</strong> Expects response with token:
+                <pre class="mt-2"><code class="language-json">{
   "token": "jwt-token-here",
   "user": {
     "user_id": "123",
@@ -305,13 +318,22 @@
     "roles": ["admin"]
   }
 }</code></pre>
-        
-        <p class="small text-muted">Or just the raw token string if not JSON.</p>
-        
-        <ol class="small" start="3">
-            <li>The obtained token is then used as <code>Authorization: Bearer {token}</code> for all subsequent MCP requests.</li>
+                <p class="text-muted">Or just the raw token string if not JSON.</p>
+            </li>
+            <li><strong>Subsequent Calls:</strong> The obtained token is cached and used as <code>Authorization: Bearer {token}</code> header for all subsequent MCP requests (tool discovery, tool calls, health checks).</li>
         </ol>
     </div>
+</div>
+
+<div class="alert alert-success mb-4">
+    <h6><i class="bi bi-check-circle me-2"></i>Authentication Best Practices</h6>
+    <ul class="mb-0 small">
+        <li>Always use authentication for production MCP servers</li>
+        <li>Use HTTPS in production to encrypt credentials in transit</li>
+        <li>For API keys, use a dedicated header name (e.g., X-API-Key) rather than Authorization</li>
+        <li>For Basic Auth, ensure the auth endpoint returns short-lived tokens</li>
+        <li>Store credentials securely - never commit to source control</li>
+    </ul>
 </div>
 
 <hr class="my-5">
