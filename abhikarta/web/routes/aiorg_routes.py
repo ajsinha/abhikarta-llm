@@ -8,7 +8,7 @@ This module provides routes for:
 - HITL dashboard
 - Real-time monitoring
 
-Version: 1.4.5
+Version: 1.4.6
 Copyright © 2025-2030, All Rights Reserved
 """
 
@@ -792,7 +792,7 @@ class AIORGRoutes(AbstractRoutes):
                 'org': org.to_dict(),
                 'nodes': [n.to_dict() for n in nodes],
                 'exported_at': datetime.utcnow().isoformat(),
-                'version': '1.4.5'
+                'version': '1.4.6'
             }
             
             response = Response(

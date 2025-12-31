@@ -8,7 +8,7 @@ This module defines the data structures for:
 - AI Responses (task outputs)
 - HITL Actions (human interventions)
 
-Version: 1.4.5
+Version: 1.4.6
 Copyright © 2025-2030, All Rights Reserved
 """
 

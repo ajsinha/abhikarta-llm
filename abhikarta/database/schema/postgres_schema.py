@@ -37,7 +37,7 @@ class PostgresSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.4.5"
+    SCHEMA_VERSION = "1.4.6"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -767,7 +767,7 @@ class PostgresSchema:
     """
     
     # ==========================================================================
-    # AI ORGANIZATIONS (v1.4.5)
+    # AI ORGANIZATIONS (v1.4.6)
     # ==========================================================================
     
     CREATE_AI_ORGS_TABLE = """
@@ -981,7 +981,7 @@ class PostgresSchema:
         "CREATE INDEX IF NOT EXISTS idx_webhook_events_endpoint_id ON webhook_events(endpoint_id);",
         "CREATE INDEX IF NOT EXISTS idx_webhook_events_received_at ON webhook_events(received_at);",
         "CREATE INDEX IF NOT EXISTS idx_user_notification_prefs_user_id ON user_notification_preferences(user_id);",
-        # AI Organizations indexes (v1.4.5)
+        # AI Organizations indexes (v1.4.6)
         "CREATE INDEX IF NOT EXISTS idx_ai_orgs_status ON ai_orgs(status);",
         "CREATE INDEX IF NOT EXISTS idx_ai_orgs_created_by ON ai_orgs(created_by);",
         "CREATE INDEX IF NOT EXISTS idx_ai_nodes_org_id ON ai_nodes(org_id);",
@@ -1022,7 +1022,7 @@ class PostgresSchema:
     
     INSERT_DEFAULT_PROVIDERS = """
     INSERT INTO llm_providers (provider_id, name, description, provider_type, api_key_name, is_active, is_default, config) VALUES
-        ('openai', 'OpenAI', 'OpenAI GPT models', 'openai', 'OPENAI_API_KEY', TRUE, TRUE, '{"base_url": "https://api.openai.com/v1"}'),
+        ('openai', 'OpenAI', 'OpenAI GPT models', 'openai', 'OPENAI_API_KEY', TRUE, FALSE, '{"base_url": "https://api.openai.com/v1"}'),
         ('anthropic', 'Anthropic', 'Claude models', 'anthropic', 'ANTHROPIC_API_KEY', TRUE, FALSE, '{"base_url": "https://api.anthropic.com"}'),
         ('google', 'Google AI', 'Gemini models', 'google', 'GOOGLE_API_KEY', TRUE, FALSE, '{}'),
         ('azure', 'Azure OpenAI', 'Azure-hosted models', 'azure', 'AZURE_OPENAI_KEY', FALSE, FALSE, '{"api_version": "2024-02-15-preview"}'),
@@ -1031,33 +1031,137 @@ class PostgresSchema:
         ('together', 'Together AI', 'Together AI models', 'together', 'TOGETHER_API_KEY', TRUE, FALSE, '{"base_url": "https://api.together.xyz/v1"}'),
         ('cohere', 'Cohere', 'Cohere models', 'cohere', 'COHERE_API_KEY', TRUE, FALSE, '{}'),
         ('bedrock', 'AWS Bedrock', 'Amazon Bedrock', 'bedrock', 'AWS_ACCESS_KEY_ID', FALSE, FALSE, '{"region": "us-east-1"}'),
-        ('ollama', 'Ollama', 'Local Ollama', 'ollama', '', TRUE, FALSE, '{"base_url": "http://localhost:11434"}'),
+        ('ollama', 'Ollama', 'Local Ollama - free and private', 'ollama', '', TRUE, TRUE, '{"base_url": "http://localhost:11434"}'),
         ('huggingface', 'Hugging Face', 'HF Inference API', 'huggingface', 'HF_API_TOKEN', TRUE, FALSE, '{"base_url": "https://api-inference.huggingface.co"}')
     ON CONFLICT (provider_id) DO NOTHING;
     """
     
     INSERT_DEFAULT_MODELS = """
     INSERT INTO llm_models (model_id, provider_id, name, display_name, description, context_window, max_output_tokens, input_cost_per_1k, output_cost_per_1k, supports_vision, supports_functions, is_active, is_default) VALUES
-        ('gpt-4o', 'openai', 'gpt-4o', 'GPT-4o', 'Most capable OpenAI model', 128000, 4096, 0.005, 0.015, TRUE, TRUE, TRUE, TRUE),
+        -- Ollama Models (Default Provider - FREE)
+        ('llama3.3', 'ollama', 'llama3.3', 'Llama 3.3 70B', 'Best open model, matches 405B quality', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, TRUE),
+        ('llama3.2', 'ollama', 'llama3.2', 'Llama 3.2 3B', 'Lightweight, fast, edge deployment', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('llama3.2:1b', 'ollama', 'llama3.2:1b', 'Llama 3.2 1B', 'Ultra-lightweight, mobile', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('llama3.2-vision', 'ollama', 'llama3.2-vision', 'Llama 3.2 Vision 11B', 'Multimodal with image understanding', 131072, 4096, 0, 0, TRUE, TRUE, TRUE, FALSE),
+        ('llama3.1', 'ollama', 'llama3.1', 'Llama 3.1 8B', 'General purpose, production ready', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('llama3.1:70b', 'ollama', 'llama3.1:70b', 'Llama 3.1 70B', 'High quality general purpose', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('deepseek-r1', 'ollama', 'deepseek-r1', 'DeepSeek R1 7B', 'Reasoning model, rivals o1', 65536, 8192, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('deepseek-r1:8b', 'ollama', 'deepseek-r1:8b', 'DeepSeek R1 8B', 'Reasoning with chain-of-thought', 65536, 8192, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('deepseek-r1:14b', 'ollama', 'deepseek-r1:14b', 'DeepSeek R1 14B', 'Enhanced reasoning model', 65536, 8192, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('deepseek-r1:32b', 'ollama', 'deepseek-r1:32b', 'DeepSeek R1 32B', 'Large reasoning model', 65536, 8192, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('deepseek-r1:70b', 'ollama', 'deepseek-r1:70b', 'DeepSeek R1 70B', 'Largest reasoning model', 65536, 8192, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('deepseek-coder-v2', 'ollama', 'deepseek-coder-v2', 'DeepSeek Coder V2', 'Code generation and analysis', 65536, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('qwen2.5', 'ollama', 'qwen2.5', 'Qwen 2.5 7B', 'Multilingual, Chinese support', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('qwen2.5:14b', 'ollama', 'qwen2.5:14b', 'Qwen 2.5 14B', 'Larger multilingual model', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('qwen2.5:32b', 'ollama', 'qwen2.5:32b', 'Qwen 2.5 32B', 'High quality multilingual', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('qwen2.5:72b', 'ollama', 'qwen2.5:72b', 'Qwen 2.5 72B', 'Flagship multilingual', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('qwen2.5-coder', 'ollama', 'qwen2.5-coder', 'Qwen 2.5 Coder 7B', 'Best open-source coding model', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('qwen2.5-coder:14b', 'ollama', 'qwen2.5-coder:14b', 'Qwen 2.5 Coder 14B', 'Enhanced coding model', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('qwen2.5-coder:32b', 'ollama', 'qwen2.5-coder:32b', 'Qwen 2.5 Coder 32B', 'Large coding model', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('qwq', 'ollama', 'qwq', 'QwQ 32B', 'Reasoning and problem solving', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('mistral', 'ollama', 'mistral', 'Mistral 7B', 'Balanced performance and speed', 32768, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('mistral-nemo', 'ollama', 'mistral-nemo', 'Mistral Nemo 12B', 'Improved Mistral with longer context', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('mixtral', 'ollama', 'mixtral', 'Mixtral 8x7B', 'MoE architecture, complex tasks', 32768, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('mixtral:8x22b', 'ollama', 'mixtral:8x22b', 'Mixtral 8x22B', 'Large MoE model', 65536, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('codellama', 'ollama', 'codellama', 'Code Llama 7B', 'Code generation and completion', 16384, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('codellama:13b', 'ollama', 'codellama:13b', 'Code Llama 13B', 'Enhanced code model', 16384, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('codellama:34b', 'ollama', 'codellama:34b', 'Code Llama 34B', 'Large code model', 16384, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('codellama:70b', 'ollama', 'codellama:70b', 'Code Llama 70B', 'Largest code model', 16384, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('gemma2', 'ollama', 'gemma2', 'Gemma 2 9B', 'Google open model', 8192, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('gemma2:27b', 'ollama', 'gemma2:27b', 'Gemma 2 27B', 'Large Google model', 8192, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('phi4', 'ollama', 'phi4', 'Phi 4 14B', 'Microsoft latest small model', 16384, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('phi3', 'ollama', 'phi3', 'Phi 3 3B', 'Small but capable', 4096, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('phi3:14b', 'ollama', 'phi3:14b', 'Phi 3 14B', 'Larger Phi model', 4096, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('command-r', 'ollama', 'command-r', 'Command R 35B', 'RAG and retrieval tasks', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('yi', 'ollama', 'yi', 'Yi 6B', 'Bilingual EN/CN', 4096, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('yi:34b', 'ollama', 'yi:34b', 'Yi 34B', 'Large bilingual model', 4096, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
+        ('nomic-embed-text', 'ollama', 'nomic-embed-text', 'Nomic Embed Text', 'Text embeddings 768d', 8192, 768, 0, 0, FALSE, FALSE, TRUE, FALSE),
+        ('mxbai-embed-large', 'ollama', 'mxbai-embed-large', 'MxBai Embed Large', 'High quality embeddings 1024d', 512, 1024, 0, 0, FALSE, FALSE, TRUE, FALSE),
+        ('snowflake-arctic-embed', 'ollama', 'snowflake-arctic-embed', 'Snowflake Arctic Embed', 'Retrieval optimized embeddings', 512, 1024, 0, 0, FALSE, FALSE, TRUE, FALSE),
+        ('all-minilm', 'ollama', 'all-minilm', 'All MiniLM', 'Lightweight embeddings 384d', 512, 384, 0, 0, FALSE, FALSE, TRUE, FALSE),
+        -- OpenAI Models
+        ('gpt-4o', 'openai', 'gpt-4o', 'GPT-4o', 'Most capable OpenAI model', 128000, 4096, 0.005, 0.015, TRUE, TRUE, TRUE, FALSE),
         ('gpt-4o-mini', 'openai', 'gpt-4o-mini', 'GPT-4o Mini', 'Fast GPT-4o variant', 128000, 16384, 0.00015, 0.0006, TRUE, TRUE, TRUE, FALSE),
         ('gpt-4-turbo', 'openai', 'gpt-4-turbo', 'GPT-4 Turbo', 'GPT-4 Turbo with vision', 128000, 4096, 0.01, 0.03, TRUE, TRUE, TRUE, FALSE),
         ('gpt-3.5-turbo', 'openai', 'gpt-3.5-turbo', 'GPT-3.5 Turbo', 'Fast and cost-effective', 16385, 4096, 0.0005, 0.0015, FALSE, TRUE, TRUE, FALSE),
-        ('claude-3-5-sonnet-20241022', 'anthropic', 'claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet', 'Latest Claude 3.5', 200000, 8192, 0.003, 0.015, TRUE, TRUE, TRUE, FALSE),
-        ('claude-3-opus-20240229', 'anthropic', 'claude-3-opus-20240229', 'Claude 3 Opus', 'Most powerful Claude', 200000, 4096, 0.015, 0.075, TRUE, TRUE, TRUE, FALSE),
-        ('claude-3-haiku-20240307', 'anthropic', 'claude-3-haiku-20240307', 'Claude 3 Haiku', 'Fast Claude', 200000, 4096, 0.00025, 0.00125, TRUE, TRUE, TRUE, FALSE),
+        -- Anthropic Claude 4.5 Models (Latest)
+        ('claude-opus-4-5-20251101', 'anthropic', 'claude-opus-4-5-20251101', 'Claude 4.5 Opus', 'Most intelligent Claude model', 200000, 8192, 0.015, 0.075, TRUE, TRUE, TRUE, FALSE),
+        ('claude-sonnet-4-5-20250929', 'anthropic', 'claude-sonnet-4-5-20250929', 'Claude 4.5 Sonnet', 'Best balance of capability and speed', 200000, 8192, 0.003, 0.015, TRUE, TRUE, TRUE, FALSE),
+        -- Anthropic Claude 4 Models
+        ('claude-opus-4-20250514', 'anthropic', 'claude-opus-4-20250514', 'Claude 4 Opus', 'Powerful Claude 4 model', 200000, 8192, 0.015, 0.075, TRUE, TRUE, TRUE, FALSE),
+        ('claude-sonnet-4-20250514', 'anthropic', 'claude-sonnet-4-20250514', 'Claude 4 Sonnet', 'Balanced Claude 4 model', 200000, 8192, 0.003, 0.015, TRUE, TRUE, TRUE, FALSE),
+        -- Anthropic Claude 3.5 Models
+        ('claude-3-5-sonnet-20241022', 'anthropic', 'claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet', 'Previous generation best overall', 200000, 8192, 0.003, 0.015, TRUE, TRUE, TRUE, FALSE),
+        ('claude-3-5-haiku-20241022', 'anthropic', 'claude-3-5-haiku-20241022', 'Claude 3.5 Haiku', 'Fast and cost-effective', 200000, 8192, 0.0008, 0.004, TRUE, TRUE, TRUE, FALSE),
+        -- Anthropic Claude 3 Models (Legacy)
+        ('claude-3-opus-20240229', 'anthropic', 'claude-3-opus-20240229', 'Claude 3 Opus', 'Legacy powerful Claude', 200000, 4096, 0.015, 0.075, TRUE, TRUE, TRUE, FALSE),
+        ('claude-3-haiku-20240307', 'anthropic', 'claude-3-haiku-20240307', 'Claude 3 Haiku', 'Legacy fast Claude', 200000, 4096, 0.00025, 0.00125, TRUE, TRUE, TRUE, FALSE),
+        -- Google Models
         ('gemini-1.5-pro', 'google', 'gemini-1.5-pro', 'Gemini 1.5 Pro', 'Google multimodal', 1000000, 8192, 0.00125, 0.005, TRUE, TRUE, TRUE, FALSE),
         ('gemini-1.5-flash', 'google', 'gemini-1.5-flash', 'Gemini 1.5 Flash', 'Fast Google model', 1000000, 8192, 0.000075, 0.0003, TRUE, TRUE, TRUE, FALSE),
+        ('gemini-2.0-flash', 'google', 'gemini-2.0-flash', 'Gemini 2.0 Flash', 'Latest fast Google model', 1000000, 8192, 0.0001, 0.0004, TRUE, TRUE, TRUE, FALSE),
+        -- Mistral Models
         ('mistral-large-latest', 'mistral', 'mistral-large-latest', 'Mistral Large', 'Flagship Mistral', 128000, 4096, 0.004, 0.012, FALSE, TRUE, TRUE, FALSE),
         ('mistral-small-latest', 'mistral', 'mistral-small-latest', 'Mistral Small', 'Cost-effective Mistral', 32000, 4096, 0.001, 0.003, FALSE, TRUE, TRUE, FALSE),
+        -- Groq Models
         ('mixtral-8x7b-32768', 'groq', 'mixtral-8x7b-32768', 'Mixtral 8x7B (Groq)', 'Fast Mixtral', 32768, 4096, 0.00027, 0.00027, FALSE, TRUE, TRUE, FALSE),
         ('llama-3.1-70b-versatile', 'groq', 'llama-3.1-70b-versatile', 'Llama 3.1 70B (Groq)', 'Llama on Groq', 131072, 4096, 0.00059, 0.00079, FALSE, TRUE, TRUE, FALSE),
+        ('llama-3.3-70b-versatile', 'groq', 'llama-3.3-70b-versatile', 'Llama 3.3 70B (Groq)', 'Latest Llama on Groq', 131072, 4096, 0.00059, 0.00079, FALSE, TRUE, TRUE, FALSE),
+        -- Cohere Models
         ('command-r-plus', 'cohere', 'command-r-plus', 'Command R+', 'Cohere flagship', 128000, 4096, 0.003, 0.015, FALSE, TRUE, TRUE, FALSE),
-        ('command-r', 'cohere', 'command-r', 'Command R', 'Cohere standard', 128000, 4096, 0.0005, 0.0015, FALSE, TRUE, TRUE, FALSE)
+        ('command-r', 'cohere', 'command-r', 'Command R', 'Cohere standard', 128000, 4096, 0.0005, 0.0015, FALSE, TRUE, TRUE, FALSE),
+        -- AWS Bedrock Models (Anthropic)
+        ('anthropic.claude-opus-4-5-20251101-v1:0', 'bedrock', 'anthropic.claude-opus-4-5-20251101-v1:0', 'Claude 4.5 Opus (Bedrock)', 'Most intelligent Claude on Bedrock', 200000, 8192, 0.015, 0.075, TRUE, TRUE, TRUE, FALSE),
+        ('anthropic.claude-sonnet-4-5-20250929-v1:0', 'bedrock', 'anthropic.claude-sonnet-4-5-20250929-v1:0', 'Claude 4.5 Sonnet (Bedrock)', 'Best Claude on Bedrock', 200000, 8192, 0.003, 0.015, TRUE, TRUE, TRUE, FALSE),
+        ('anthropic.claude-opus-4-20250514-v1:0', 'bedrock', 'anthropic.claude-opus-4-20250514-v1:0', 'Claude 4 Opus (Bedrock)', 'Claude 4 Opus on Bedrock', 200000, 8192, 0.015, 0.075, TRUE, TRUE, TRUE, FALSE),
+        ('anthropic.claude-sonnet-4-20250514-v1:0', 'bedrock', 'anthropic.claude-sonnet-4-20250514-v1:0', 'Claude 4 Sonnet (Bedrock)', 'Claude 4 Sonnet on Bedrock', 200000, 8192, 0.003, 0.015, TRUE, TRUE, TRUE, FALSE),
+        ('anthropic.claude-3-5-sonnet-20241022-v2:0', 'bedrock', 'anthropic.claude-3-5-sonnet-20241022-v2:0', 'Claude 3.5 Sonnet v2 (Bedrock)', 'Claude 3.5 Sonnet on Bedrock', 200000, 8192, 0.003, 0.015, TRUE, TRUE, TRUE, FALSE),
+        ('anthropic.claude-3-5-haiku-20241022-v1:0', 'bedrock', 'anthropic.claude-3-5-haiku-20241022-v1:0', 'Claude 3.5 Haiku (Bedrock)', 'Fast Claude on Bedrock', 200000, 8192, 0.0008, 0.004, TRUE, TRUE, TRUE, FALSE),
+        -- AWS Bedrock Models (Meta Llama)
+        ('meta.llama3-3-70b-instruct-v1:0', 'bedrock', 'meta.llama3-3-70b-instruct-v1:0', 'Llama 3.3 70B (Bedrock)', 'Latest Llama on Bedrock', 131072, 4096, 0.00099, 0.00099, FALSE, TRUE, TRUE, FALSE),
+        ('meta.llama3-2-90b-instruct-v1:0', 'bedrock', 'meta.llama3-2-90b-instruct-v1:0', 'Llama 3.2 90B (Bedrock)', 'Multimodal Llama on Bedrock', 131072, 4096, 0.002, 0.002, TRUE, TRUE, TRUE, FALSE),
+        ('meta.llama3-2-11b-instruct-v1:0', 'bedrock', 'meta.llama3-2-11b-instruct-v1:0', 'Llama 3.2 11B (Bedrock)', 'Lightweight multimodal Llama', 131072, 4096, 0.00035, 0.00035, TRUE, TRUE, TRUE, FALSE),
+        ('meta.llama3-2-3b-instruct-v1:0', 'bedrock', 'meta.llama3-2-3b-instruct-v1:0', 'Llama 3.2 3B (Bedrock)', 'Fast lightweight Llama', 131072, 4096, 0.00015, 0.00015, FALSE, TRUE, TRUE, FALSE),
+        ('meta.llama3-1-405b-instruct-v1:0', 'bedrock', 'meta.llama3-1-405b-instruct-v1:0', 'Llama 3.1 405B (Bedrock)', 'Largest open model', 131072, 4096, 0.00532, 0.016, FALSE, TRUE, TRUE, FALSE),
+        ('meta.llama3-1-70b-instruct-v1:0', 'bedrock', 'meta.llama3-1-70b-instruct-v1:0', 'Llama 3.1 70B (Bedrock)', 'Strong general purpose', 131072, 4096, 0.00099, 0.00099, FALSE, TRUE, TRUE, FALSE),
+        ('meta.llama3-1-8b-instruct-v1:0', 'bedrock', 'meta.llama3-1-8b-instruct-v1:0', 'Llama 3.1 8B (Bedrock)', 'Fast efficient Llama', 131072, 4096, 0.0003, 0.0006, FALSE, TRUE, TRUE, FALSE),
+        -- AWS Bedrock Models (Mistral)
+        ('mistral.mistral-large-2411-v1:0', 'bedrock', 'mistral.mistral-large-2411-v1:0', 'Mistral Large Nov 2024 (Bedrock)', 'Latest Mistral on Bedrock', 128000, 4096, 0.004, 0.012, FALSE, TRUE, TRUE, FALSE),
+        ('mistral.mistral-large-2407-v1:0', 'bedrock', 'mistral.mistral-large-2407-v1:0', 'Mistral Large Jul 2024 (Bedrock)', 'Mistral Large on Bedrock', 128000, 4096, 0.004, 0.012, FALSE, TRUE, TRUE, FALSE),
+        -- AWS Bedrock Models (Amazon)
+        ('amazon.titan-text-premier-v2:0', 'bedrock', 'amazon.titan-text-premier-v2:0', 'Titan Text Premier v2', 'AWS native premier model', 32000, 4096, 0.0008, 0.0024, FALSE, TRUE, TRUE, FALSE),
+        ('amazon.nova-pro-v1:0', 'bedrock', 'amazon.nova-pro-v1:0', 'Amazon Nova Pro', 'Multimodal Amazon model', 300000, 5000, 0.0008, 0.0032, TRUE, TRUE, TRUE, FALSE),
+        ('amazon.nova-lite-v1:0', 'bedrock', 'amazon.nova-lite-v1:0', 'Amazon Nova Lite', 'Lightweight multimodal', 300000, 5000, 0.00006, 0.00024, TRUE, TRUE, TRUE, FALSE)
     ON CONFLICT (model_id) DO NOTHING;
     """
     
     INSERT_DEFAULT_MODEL_PERMISSIONS = """
     INSERT INTO model_permissions (model_id, role_name, can_use, daily_limit, monthly_limit) VALUES
+        -- Ollama models (no limits - free local models)
+        ('llama3.3', 'super_admin', TRUE, -1, -1),
+        ('llama3.3', 'domain_admin', TRUE, -1, -1),
+        ('llama3.3', 'agent_developer', TRUE, -1, -1),
+        ('llama3.3', 'agent_user', TRUE, -1, -1),
+        ('llama3.3', 'viewer', TRUE, -1, -1),
+        ('llama3.2', 'super_admin', TRUE, -1, -1),
+        ('llama3.2', 'domain_admin', TRUE, -1, -1),
+        ('llama3.2', 'agent_developer', TRUE, -1, -1),
+        ('llama3.2', 'agent_user', TRUE, -1, -1),
+        ('llama3.2', 'viewer', TRUE, -1, -1),
+        ('deepseek-r1', 'super_admin', TRUE, -1, -1),
+        ('deepseek-r1', 'domain_admin', TRUE, -1, -1),
+        ('deepseek-r1', 'agent_developer', TRUE, -1, -1),
+        ('deepseek-r1', 'agent_user', TRUE, -1, -1),
+        ('qwen2.5-coder', 'super_admin', TRUE, -1, -1),
+        ('qwen2.5-coder', 'domain_admin', TRUE, -1, -1),
+        ('qwen2.5-coder', 'agent_developer', TRUE, -1, -1),
+        ('qwen2.5-coder', 'agent_user', TRUE, -1, -1),
+        ('mistral', 'super_admin', TRUE, -1, -1),
+        ('mistral', 'domain_admin', TRUE, -1, -1),
+        ('mistral', 'agent_developer', TRUE, -1, -1),
+        ('mistral', 'agent_user', TRUE, -1, -1),
+        ('mistral', 'viewer', TRUE, -1, -1),
+        -- OpenAI models (with limits for paid API)
         ('gpt-4o', 'super_admin', TRUE, -1, -1),
         ('gpt-4o', 'domain_admin', TRUE, -1, -1),
         ('gpt-4o', 'agent_developer', TRUE, 100, 3000),
@@ -1067,6 +1171,14 @@ class PostgresSchema:
         ('gpt-4o-mini', 'agent_developer', TRUE, -1, -1),
         ('gpt-4o-mini', 'agent_user', TRUE, -1, -1),
         ('gpt-4o-mini', 'viewer', TRUE, 20, 500),
+        -- Anthropic models (with limits for paid API)
+        ('claude-opus-4-5-20251101', 'super_admin', TRUE, -1, -1),
+        ('claude-opus-4-5-20251101', 'domain_admin', TRUE, -1, -1),
+        ('claude-opus-4-5-20251101', 'agent_developer', TRUE, 50, 1500),
+        ('claude-sonnet-4-5-20250929', 'super_admin', TRUE, -1, -1),
+        ('claude-sonnet-4-5-20250929', 'domain_admin', TRUE, -1, -1),
+        ('claude-sonnet-4-5-20250929', 'agent_developer', TRUE, 100, 3000),
+        ('claude-sonnet-4-5-20250929', 'agent_user', TRUE, 50, 1000),
         ('claude-3-5-sonnet-20241022', 'super_admin', TRUE, -1, -1),
         ('claude-3-5-sonnet-20241022', 'domain_admin', TRUE, -1, -1),
         ('claude-3-5-sonnet-20241022', 'agent_developer', TRUE, 100, 3000),
@@ -1143,7 +1255,7 @@ class PostgresSchema:
             self.CREATE_WEBHOOK_ENDPOINTS,
             self.CREATE_WEBHOOK_EVENTS,
             self.CREATE_USER_NOTIFICATION_PREFS,
-            # AI Organizations tables (v1.4.5)
+            # AI Organizations tables (v1.4.6)
             self.CREATE_AI_ORGS_TABLE,
             self.CREATE_AI_NODES_TABLE,
             self.CREATE_AI_TASKS_TABLE,
@@ -1200,6 +1312,6 @@ class PostgresSchema:
             'swarm_agents', 'swarm_triggers', 'swarm_executions', 'swarm_events', 'swarm_decisions',
             'notification_channels', 'notification_logs', 'webhook_endpoints', 'webhook_events',
             'user_notification_preferences',
-            # AI Organizations tables (v1.4.5)
+            # AI Organizations tables (v1.4.6)
             'ai_orgs', 'ai_nodes', 'ai_tasks', 'ai_responses', 'ai_hitl_actions', 'ai_event_logs',
         ]

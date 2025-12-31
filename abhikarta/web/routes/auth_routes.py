@@ -228,7 +228,7 @@ class AuthRoutes(AbstractRoutes):
                 'goal-based-agents': 'help/pages/goal-based-agents.html',
                 'react-reflect-hierarchical': 'help/pages/react-reflect-hierarchical.html',
                 'notifications': 'help/pages/notifications.html',
-                # v1.4.5 AI Organizations
+                # v1.4.6 AI Organizations
                 'aiorg': 'help/pages/aiorg.html',
             }
             
@@ -331,6 +331,11 @@ class AuthRoutes(AbstractRoutes):
                 'NOTIFICATION_ARCHITECTURE': 'Notifications Architecture',
                 'REACT_REFLECT_HIERARCHICAL_TUTORIAL': 'ReAct, Reflect & Hierarchical Agents Tutorial',
                 'REQUIREMENTS': 'Requirements Specification',
+                'RESEARCH_PAPER': 'Research Paper - AI Agent Orchestration',
+                'AIORG_ARCHITECTURE': 'AI Organization Architecture',
+                'AIORG_DESIGN': 'AI Organization Design',
+                'AIORG_QUICKSTART': 'AI Organization Quick Start',
+                'AIORG_REQUIREMENTS': 'AI Organization Requirements',
             }
             
             title = doc_titles.get(filename, filename)
@@ -367,6 +372,13 @@ class AuthRoutes(AbstractRoutes):
                 'REACT_REFLECT_HIERARCHICAL_TUTORIAL': os.path.join(base_path, 'docs', 'REACT_REFLECT_HIERARCHICAL_TUTORIAL.md'),
                 'NOTIFICATION_QUICKSTART': os.path.join(base_path, 'docs', 'NOTIFICATION_QUICKSTART.md'),
                 'NOTIFICATION_ARCHITECTURE': os.path.join(base_path, 'docs', 'NOTIFICATION_ARCHITECTURE.md'),
+                # Research paper
+                'RESEARCH_PAPER': os.path.join(base_path, 'docs', 'RESEARCH_PAPER.md'),
+                # AI Organization docs
+                'AIORG_ARCHITECTURE': os.path.join(base_path, 'docs', 'AIORG_ARCHITECTURE.md'),
+                'AIORG_DESIGN': os.path.join(base_path, 'docs', 'AIORG_DESIGN.md'),
+                'AIORG_QUICKSTART': os.path.join(base_path, 'docs', 'AIORG_QUICKSTART.md'),
+                'AIORG_REQUIREMENTS': os.path.join(base_path, 'docs', 'AIORG_REQUIREMENTS.md'),
             }
             
             file_path = file_map.get(filename)

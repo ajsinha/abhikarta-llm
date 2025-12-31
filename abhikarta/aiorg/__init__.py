@@ -12,7 +12,7 @@ Key Features:
 - Multi-channel notifications
 - Complete audit trail
 
-Version: 1.4.5
+Version: 1.4.6
 Copyright © 2025-2030, All Rights Reserved
 """
 
@@ -78,7 +78,7 @@ __all__ = [
     'AIORGPrompts'
 ]
 
-__version__ = '1.4.5'
+__version__ = '1.4.6'
 
 
 # Singleton instance for db operations

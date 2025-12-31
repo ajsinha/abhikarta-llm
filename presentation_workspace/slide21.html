@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body class="col" style="width: 960px; height: 540px; background: #F4F9FD; padding: 30px 40px; box-sizing: border-box;">
+  <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 8px;">
+    <p style="font-size: 15px; color: #0079C1; margin: 0; font-weight: 600;">Agent Definition: JSON Format</p>
+    <p style="font-size: 9px; color: #5A7A9C; margin: 0;">Abhikarta-LLM v1.4.6</p>
+  </div>
+  <div style="background: #0079C1; height: 2px; margin-bottom: 8px; border-radius: 2px;"></div>
+  <div class="fill-height" style="overflow: hidden;">
+    <div class="col gap-sm" style="height: 100%;">
+      <div style="background: #1A3A5C; padding: 8px; border-radius: 4px;">
+        <p style="font-size: 7px; color: #7FDBFF; margin: 0; font-family: monospace; white-space: pre; line-height: 1.3;">{"name": "Research Assistant",
+ "provider": "ollama", "model": "llama3.3:70b",
+ "persona": "You are a research assistant...",
+ "reasoning_pattern": "react",
+ "tools": [
+   {"type": "web_search", "config": {"max_results": 5}},
+   {"type": "file_read"},
+   {"type": "mcp", "server": "github"}
+ ],
+ "knowledge_base": {"vector_store": "chroma"},
+ "hitl": {"approval_required": ["web_search"]},
+ "max_iterations": 10, "temperature": 0.7}</p>
+      </div>
+      <div style="background: #FFF; padding: 8px; border-radius: 4px;">
+        <p style="font-size: 10px; color: #0079C1; margin: 0; font-weight: 600;">Python Usage</p>
+        <p style="font-size: 7px; color: #1A3A5C; margin: 3px 0 0 0; font-family: monospace;">from abhikarta import Agent</p>
+        <p style="font-size: 7px; color: #1A3A5C; margin: 1px 0 0 0; font-family: monospace;">agent = Agent.from_json("agent.json")</p>
+        <p style="font-size: 7px; color: #1A3A5C; margin: 1px 0 0 0; font-family: monospace;">result = agent.run("Analyze Q3 earnings")</p>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="justify-content: space-between; align-items: center; margin-top: 6px;">
+    <p style="font-size: 6px; color: #5A7A9C; margin: 0;">Copyright 2025-2030 Ashutosh Sinha | Patent Pending</p>
+    <p style="font-size: 6px; color: #5A7A9C; margin: 0;">21</p>
+  </div>
+</body>
+</html>

@@ -12,6 +12,8 @@
 <a href="#strengths">Strengths</a>
 <a href="#weaknesses">Weaknesses</a>
 <a href="#configuration">Configuration</a>
+<a href="#usage">Usage Examples</a>
+<a href="#pricing">Pricing</a>
 <a href="#resources">Resources</a>
 {% endblock %}
 
@@ -28,15 +30,51 @@
 
 <div class="alert alert-warning">
     <i class="bi bi-shield-check me-2"></i>
-    <strong>EU Data Sovereignty:</strong> Mistral is a French company offering EU-based processing - ideal for European data compliance.
+    <strong>EU Data Sovereignty:</strong> Mistral is a French company offering EU-based processing - ideal for GDPR compliance and European data residency requirements.
 </div>
 
-<p class="lead">Founded by former Google DeepMind and Meta researchers, Mistral has quickly become a leader with their efficient open-weight models and competitive API service.</p>
+<p class="lead">Founded by former Google DeepMind and Meta researchers, Mistral has quickly become a leader with efficient open-weight models and a competitive API. Known for excellent performance-per-parameter and strong multilingual capabilities.</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-warning">
+            <div class="card-body">
+                <h3 class="text-warning">🇪🇺</h3>
+                <p class="mb-0">EU-based</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-success">
+            <div class="card-body">
+                <h3 class="text-success">128K</h3>
+                <p class="mb-0">Context (Large)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-primary">
+            <div class="card-body">
+                <h3 class="text-primary">80+</h3>
+                <p class="mb-0">Code languages</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-info">
+            <div class="card-body">
+                <h3 class="text-info">Open</h3>
+                <p class="mb-0">Weights available</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <hr class="my-5">
 
 <h2 id="models">Available Models</h2>
 
+<h4 class="mt-4 mb-3">Premier Models</h4>
 <div class="table-responsive">
     <table class="table table-hover">
         <thead class="table-dark">
@@ -44,39 +82,118 @@
         </thead>
         <tbody>
             <tr class="table-success">
-                <td><code>mistral-large-latest</code> <span class="badge bg-success">Best</span></td>
+                <td><code>mistral-large-latest</code> <span class="badge bg-success">Flagship</span></td>
                 <td>128K</td>
                 <td>$2.00</td>
                 <td>$6.00</td>
-                <td>Complex reasoning, multilingual</td>
+                <td>Complex reasoning, multilingual, analysis</td>
             </tr>
+            <tr>
+                <td><code>mistral-large-2411</code></td>
+                <td>128K</td>
+                <td>$2.00</td>
+                <td>$6.00</td>
+                <td>Nov 2024 version (pinned)</td>
+            </tr>
+            <tr>
+                <td><code>pixtral-large-latest</code> <span class="badge bg-info">Vision</span></td>
+                <td>128K</td>
+                <td>$2.00</td>
+                <td>$6.00</td>
+                <td>Multimodal, image understanding</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4 class="mt-4 mb-3">Efficient Models</h4>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-secondary">
+            <tr><th>Model</th><th>Context</th><th>Input $/1M</th><th>Output $/1M</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
             <tr>
                 <td><code>mistral-small-latest</code></td>
                 <td>32K</td>
                 <td>$0.20</td>
                 <td>$0.60</td>
-                <td>Cost-effective, fast</td>
+                <td>Cost-effective, fast responses</td>
             </tr>
             <tr>
-                <td><code>codestral-latest</code> <span class="badge bg-info">Code</span></td>
+                <td><code>ministral-8b-latest</code></td>
+                <td>128K</td>
+                <td>$0.10</td>
+                <td>$0.10</td>
+                <td>Edge deployment, lightweight</td>
+            </tr>
+            <tr>
+                <td><code>ministral-3b-latest</code></td>
+                <td>128K</td>
+                <td>$0.04</td>
+                <td>$0.04</td>
+                <td>Ultra-lightweight, IoT</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4 class="mt-4 mb-3">Specialized Models</h4>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-secondary">
+            <tr><th>Model</th><th>Context</th><th>Input $/1M</th><th>Output $/1M</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr class="table-info">
+                <td><code>codestral-latest</code> <span class="badge bg-primary">Code</span></td>
                 <td>32K</td>
                 <td>$0.20</td>
                 <td>$0.60</td>
                 <td>Code generation, 80+ languages</td>
             </tr>
             <tr>
-                <td><code>mixtral-8x7b-instruct</code></td>
-                <td>32K</td>
-                <td>$0.45</td>
-                <td>$0.70</td>
-                <td>Open source MoE</td>
-            </tr>
-            <tr>
                 <td><code>mistral-embed</code></td>
                 <td>8K</td>
                 <td>$0.10</td>
                 <td>-</td>
-                <td>Embeddings for RAG</td>
+                <td>Text embeddings for RAG</td>
+            </tr>
+            <tr>
+                <td><code>mistral-moderation-latest</code></td>
+                <td>8K</td>
+                <td>$0.10</td>
+                <td>-</td>
+                <td>Content moderation</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4 class="mt-4 mb-3">Open Weight Models (Self-Host)</h4>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-secondary">
+            <tr><th>Model</th><th>Context</th><th>Parameters</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>mixtral-8x7b-instruct</code></td>
+                <td>32K</td>
+                <td>47B (MoE)</td>
+                <td>Self-hosting, diverse tasks</td>
+            </tr>
+            <tr>
+                <td><code>mixtral-8x22b-instruct</code></td>
+                <td>64K</td>
+                <td>141B (MoE)</td>
+                <td>High quality self-hosting</td>
+            </tr>
+            <tr>
+                <td><code>mistral-7b-instruct</code></td>
+                <td>32K</td>
+                <td>7B</td>
+                <td>Lightweight, efficient</td>
             </tr>
         </tbody>
     </table>
@@ -90,7 +207,7 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Efficiency</h5>
-                <p class="mb-0">Excellent performance-per-parameter. Fast inference with lower costs.</p>
+                <p class="mb-0">Best-in-class performance-per-parameter. Fast inference at lower costs.</p>
             </div>
         </div>
     </div>
@@ -98,7 +215,7 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Multilingual</h5>
-                <p class="mb-0">Strong performance in European languages (French, German, Spanish, Italian).</p>
+                <p class="mb-0">Excellent European language support (French, German, Spanish, Italian).</p>
             </div>
         </div>
     </div>
@@ -118,6 +235,22 @@
             </div>
         </div>
     </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>EU Compliance</h5>
+                <p class="mb-0">French company with EU data processing. GDPR-friendly.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Function Calling</h5>
+                <p class="mb-0">Native tool/function calling support in API models.</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <hr class="my-5">
@@ -128,15 +261,15 @@
         <div class="card h-100 border-danger">
             <div class="card-body">
                 <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Smaller Ecosystem</h5>
-                <p class="mb-0">Fewer community resources and examples compared to OpenAI.</p>
+                <p class="mb-0">Fewer community resources and examples vs OpenAI/Anthropic.</p>
             </div>
         </div>
     </div>
     <div class="col-md-6">
         <div class="card h-100 border-danger">
             <div class="card-body">
-                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Context Limits</h5>
-                <p class="mb-0">32K context for most models (vs 128K+ for competitors).</p>
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Vision Limited</h5>
+                <p class="mb-0">Only Pixtral has vision - others are text-only.</p>
             </div>
         </div>
     </div>
@@ -146,18 +279,84 @@
 
 <h2 id="configuration">Configuration in Abhikarta-LLM</h2>
 
-<pre><code class="language-properties"># config/application.properties
+<h5>Step 1: Get Your API Key</h5>
+<ol>
+    <li>Go to <a href="https://console.mistral.ai" target="_blank">console.mistral.ai</a></li>
+    <li>Create an account</li>
+    <li>Navigate to API Keys and create a key</li>
+</ol>
 
+<h5>Step 2: Configure in application.properties</h5>
+<pre><code class="language-properties"># config/application.properties
 llm.mistral.enabled=true
 llm.mistral.api_key=your-mistral-api-key
+# Or: llm.mistral.api_key=${MISTRAL_API_KEY}
+
 llm.mistral.default_model=mistral-large-latest
 llm.mistral.base_url=https://api.mistral.ai/v1</code></pre>
 
 <hr class="my-5">
 
+<h2 id="usage">Usage Examples</h2>
+
+<h5>General Purpose</h5>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "mistral",
+    "model": "mistral-large-latest",
+    "temperature": 0.7,
+    "prompt": "Analyze this document:\n{document}"
+  }
+}</code></pre>
+
+<h5>Code Generation</h5>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "mistral",
+    "model": "codestral-latest",
+    "temperature": 0.2,
+    "prompt": "Write a Python function for:\n{task}"
+  }
+}</code></pre>
+
+<h5>Cost-Effective Tasks</h5>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "mistral",
+    "model": "mistral-small-latest",
+    "temperature": 0.5,
+    "prompt": "Classify this text: {input}"
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="pricing">Pricing</h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Input (per 1M)</th><th>Output (per 1M)</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>mistral-large-latest</td><td>$2.00</td><td>$6.00</td></tr>
+            <tr><td>mistral-small-latest</td><td>$0.20</td><td>$0.60</td></tr>
+            <tr><td>codestral-latest</td><td>$0.20</td><td>$0.60</td></tr>
+            <tr><td>ministral-8b-latest</td><td>$0.10</td><td>$0.10</td></tr>
+            <tr><td>ministral-3b-latest</td><td>$0.04</td><td>$0.04</td></tr>
+            <tr><td>mistral-embed</td><td>$0.10</td><td>-</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
 <h2 id="resources">Resources & Links</h2>
 <div class="row g-3">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <a href="https://docs.mistral.ai" target="_blank" class="card h-100 text-decoration-none">
             <div class="card-body text-center">
                 <i class="bi bi-book display-4 text-primary"></i>
@@ -165,7 +364,7 @@ llm.mistral.base_url=https://api.mistral.ai/v1</code></pre>
             </div>
         </a>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <a href="https://console.mistral.ai" target="_blank" class="card h-100 text-decoration-none">
             <div class="card-body text-center">
                 <i class="bi bi-terminal display-4 text-success"></i>
@@ -173,11 +372,19 @@ llm.mistral.base_url=https://api.mistral.ai/v1</code></pre>
             </div>
         </a>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <a href="https://mistral.ai/technology" target="_blank" class="card h-100 text-decoration-none">
             <div class="card-body text-center">
                 <i class="bi bi-gear display-4 text-warning"></i>
                 <h6 class="mt-2">Technology</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://huggingface.co/mistralai" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-box display-4 text-info"></i>
+                <h6 class="mt-2">HuggingFace</h6>
             </div>
         </a>
     </div>

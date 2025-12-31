@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="abhikarta-styles.css">
+</head>
+<body class="col bg-surface" style="width: 960px; height: 540px; position: relative;">
+  
+  <!-- Orange accent bar on left -->
+  <div style="position: absolute; left: 0; top: 0; width: 8px; height: 100%; background: #f97316;"></div>
+  
+  <!-- Title zone -->
+  <div style="width: 920px; margin: 0 20px; padding-top: 24px; padding-left: 20px;" class="fit">
+    <h1 style="color: #1e3a5f; font-size: 36px; font-weight: 700; margin: 0;">Supported LLM Providers</h1>
+  </div>
+  
+  <!-- Content zone - Provider grid -->
+  <div class="fill-height" style="padding: 12px 48px 12px 48px;">
+    
+    <!-- Provider cards - 4 columns -->
+    <div class="row" style="gap: 12px; margin-bottom: 12px;">
+      
+      <!-- Ollama - Default -->
+      <div style="flex: 1; background: linear-gradient(135deg, #f97316, #ea580c); padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: white; font-weight: 700; margin: 0;">Ollama</p>
+        <p style="font-size: 10px; color: rgba(255,255,255,0.8); margin: 4px 0 0 0;">Default • Local • Free</p>
+        <p style="font-size: 9px; color: rgba(255,255,255,0.7); margin: 6px 0 0 0;">Llama 3.3, DeepSeek R1, Qwen, Mistral</p>
+      </div>
+      
+      <!-- OpenAI -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">OpenAI</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Cloud • Pay-per-use</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">GPT-4o, GPT-4, o1, o3-mini</p>
+      </div>
+      
+      <!-- Anthropic -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">Anthropic</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Cloud • Pay-per-use</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">Claude 4.5, Claude 4, 3.5 Sonnet</p>
+      </div>
+      
+      <!-- Google -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">Google</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Cloud • Free tier</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">Gemini 2.0, 1.5 Pro, Flash</p>
+      </div>
+      
+    </div>
+    
+    <div class="row" style="gap: 12px; margin-bottom: 12px;">
+      
+      <!-- Mistral -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">Mistral AI</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Cloud • EU-based</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">Large, Small, Codestral</p>
+      </div>
+      
+      <!-- Groq -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">Groq</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Cloud • Ultra-fast</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">Llama 3.3, Mixtral, Gemma</p>
+      </div>
+      
+      <!-- Azure -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">Azure OpenAI</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Enterprise • Compliant</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">GPT-4o, HIPAA/SOC2</p>
+      </div>
+      
+      <!-- AWS Bedrock -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">AWS Bedrock</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Enterprise • Multi-model</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">Claude, Llama, Titan</p>
+      </div>
+      
+    </div>
+    
+    <div class="row" style="gap: 12px;">
+      
+      <!-- Cohere -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">Cohere</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Cloud • Enterprise RAG</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">Command R+, Embed</p>
+      </div>
+      
+      <!-- HuggingFace -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">HuggingFace</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Cloud • Open models</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">1000s of models</p>
+      </div>
+      
+      <!-- Together AI -->
+      <div style="flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #1e3a5f; font-weight: 700; margin: 0;">Together AI</p>
+        <p style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;">Cloud • Open source</p>
+        <p style="font-size: 9px; color: #94a3b8; margin: 6px 0 0 0;">Llama, Qwen, DeepSeek</p>
+      </div>
+      
+      <!-- Custom -->
+      <div style="flex: 1; background: #1e3a5f; padding: 14px; border-radius: 8px;">
+        <p style="font-size: 15px; color: #f97316; font-weight: 700; margin: 0;">Custom</p>
+        <p style="font-size: 10px; color: #94a3b8; margin: 4px 0 0 0;">Any OpenAI-compatible</p>
+        <p style="font-size: 9px; color: #64748b; margin: 6px 0 0 0;">vLLM, LocalAI, LM Studio</p>
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <!-- Footnote zone -->
+  <div class="fit" style="padding: 4px 48px;">
+    <p style="font-size: 10px; color: #94a3b8; margin: 0;">Ollama is the default provider - run AI models locally with zero API costs</p>
+  </div>
+  
+</body>
+</html>

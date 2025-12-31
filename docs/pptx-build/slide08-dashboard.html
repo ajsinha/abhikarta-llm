@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="abhikarta-styles.css">
+</head>
+<body class="col bg-surface" style="width: 960px; height: 540px; position: relative;">
+  
+  <!-- Orange accent bar on left -->
+  <div style="position: absolute; left: 0; top: 0; width: 8px; height: 100%; background: #f97316;"></div>
+  
+  <!-- Title zone -->
+  <div style="width: 920px; margin: 0 20px; padding-top: 24px; padding-left: 20px;" class="fit">
+    <h1 style="color: #1e3a5f; font-size: 36px; font-weight: 700; margin: 0;">Admin Dashboard</h1>
+  </div>
+  
+  <!-- Content zone -->
+  <div class="fill-height" style="padding: 12px 48px 8px 48px;">
+    
+    <p style="font-size: 13px; color: #475569; margin: 0 0 16px 0;">Comprehensive web interface for managing your AI platform.</p>
+    
+    <!-- Dashboard mockup -->
+    <div style="background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 12px; padding: 12px; height: calc(100% - 40px);">
+      
+      <!-- Header bar -->
+      <div class="row" style="background: #1e3a5f; padding: 8px 16px; border-radius: 6px; margin-bottom: 12px; gap: 16px;">
+        <span style="color: #f97316; font-weight: 700; font-size: 12px;">Abhikarta</span>
+        <span style="color: #94a3b8; font-size: 10px;">Dashboard</span>
+        <span style="color: #94a3b8; font-size: 10px;">Providers</span>
+        <span style="color: #94a3b8; font-size: 10px;">Models</span>
+        <span style="color: #94a3b8; font-size: 10px;">Agents</span>
+        <span style="color: #94a3b8; font-size: 10px;">Users</span>
+        <div style="flex: 1;"></div>
+        <span style="background: #f97316; color: white; padding: 2px 8px; border-radius: 4px; font-size: 9px;">v1.4.6</span>
+      </div>
+      
+      <!-- Dashboard content -->
+      <div class="row" style="gap: 12px; height: calc(100% - 48px);">
+        
+        <!-- Left column - Stats -->
+        <div class="col" style="flex: 0.7; gap: 10px;">
+          
+          <!-- Stat cards row -->
+          <div class="row" style="gap: 8px;">
+            <div style="flex: 1; background: white; padding: 12px; border-radius: 6px; text-align: center;">
+              <p style="font-size: 20px; color: #f97316; font-weight: 700; margin: 0;">12</p>
+              <p style="font-size: 9px; color: #64748b; margin: 2px 0 0 0;">Providers</p>
+            </div>
+            <div style="flex: 1; background: white; padding: 12px; border-radius: 6px; text-align: center;">
+              <p style="font-size: 20px; color: #0d9488; font-weight: 700; margin: 0;">87</p>
+              <p style="font-size: 9px; color: #64748b; margin: 2px 0 0 0;">Models</p>
+            </div>
+            <div style="flex: 1; background: white; padding: 12px; border-radius: 6px; text-align: center;">
+              <p style="font-size: 20px; color: #8b5cf6; font-weight: 700; margin: 0;">15</p>
+              <p style="font-size: 9px; color: #64748b; margin: 2px 0 0 0;">Agents</p>
+            </div>
+          </div>
+          
+          <!-- Usage chart placeholder -->
+          <div style="flex: 1; background: white; border-radius: 6px; padding: 12px;">
+            <p style="font-size: 10px; color: #1e3a5f; font-weight: 600; margin: 0 0 8px 0;">API Usage (7 days)</p>
+            <div style="height: calc(100% - 24px); background: linear-gradient(to top, rgba(249,115,22,0.1), transparent); border-radius: 4px; display: flex; align-items: flex-end; gap: 8px; padding: 8px;">
+              <div style="flex: 1; background: #f97316; height: 40%; border-radius: 2px;"></div>
+              <div style="flex: 1; background: #f97316; height: 60%; border-radius: 2px;"></div>
+              <div style="flex: 1; background: #f97316; height: 45%; border-radius: 2px;"></div>
+              <div style="flex: 1; background: #f97316; height: 80%; border-radius: 2px;"></div>
+              <div style="flex: 1; background: #f97316; height: 70%; border-radius: 2px;"></div>
+              <div style="flex: 1; background: #f97316; height: 55%; border-radius: 2px;"></div>
+              <div style="flex: 1; background: #f97316; height: 90%; border-radius: 2px;"></div>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Right column - Management features -->
+        <div class="col" style="flex: 1; gap: 8px;">
+          
+          <p style="font-size: 10px; color: #1e3a5f; font-weight: 600; margin: 0;">Management Features</p>
+          
+          <div class="row" style="gap: 8px;">
+            <div style="flex: 1; background: white; padding: 10px; border-radius: 6px;">
+              <p style="font-size: 10px; color: #f97316; font-weight: 600; margin: 0;">Providers</p>
+              <p style="font-size: 8px; color: #64748b; margin: 2px 0 0 0;">Configure API keys, rate limits, defaults</p>
+            </div>
+            <div style="flex: 1; background: white; padding: 10px; border-radius: 6px;">
+              <p style="font-size: 10px; color: #0d9488; font-weight: 600; margin: 0;">Models</p>
+              <p style="font-size: 8px; color: #64748b; margin: 2px 0 0 0;">Enable/disable, set permissions, costs</p>
+            </div>
+          </div>
+          
+          <div class="row" style="gap: 8px;">
+            <div style="flex: 1; background: white; padding: 10px; border-radius: 6px;">
+              <p style="font-size: 10px; color: #8b5cf6; font-weight: 600; margin: 0;">Users & Roles</p>
+              <p style="font-size: 8px; color: #64748b; margin: 2px 0 0 0;">RBAC, API keys, quotas</p>
+            </div>
+            <div style="flex: 1; background: white; padding: 10px; border-radius: 6px;">
+              <p style="font-size: 10px; color: #ec4899; font-weight: 600; margin: 0;">Audit Logs</p>
+              <p style="font-size: 8px; color: #64748b; margin: 2px 0 0 0;">Track all actions, compliance</p>
+            </div>
+          </div>
+          
+          <div class="row" style="gap: 8px;">
+            <div style="flex: 1; background: white; padding: 10px; border-radius: 6px;">
+              <p style="font-size: 10px; color: #06b6d4; font-weight: 600; margin: 0;">Help System</p>
+              <p style="font-size: 8px; color: #64748b; margin: 2px 0 0 0;">Provider docs, glossary, setup guides</p>
+            </div>
+            <div style="flex: 1; background: white; padding: 10px; border-radius: 6px;">
+              <p style="font-size: 10px; color: #1e3a5f; font-weight: 600; margin: 0;">Cost Tracking</p>
+              <p style="font-size: 8px; color: #64748b; margin: 2px 0 0 0;">Usage analytics, budgets</p>
+            </div>
+          </div>
+          
+          <!-- Quick actions -->
+          <div style="background: #1e3a5f; padding: 10px 12px; border-radius: 6px; margin-top: auto;">
+            <p style="font-size: 9px; color: #f97316; font-weight: 600; margin: 0 0 4px 0;">Quick Actions</p>
+            <div class="row" style="gap: 6px;">
+              <span style="background: rgba(255,255,255,0.1); color: #94a3b8; padding: 4px 8px; border-radius: 4px; font-size: 8px;">+ Add Provider</span>
+              <span style="background: rgba(255,255,255,0.1); color: #94a3b8; padding: 4px 8px; border-radius: 4px; font-size: 8px;">+ New Agent</span>
+              <span style="background: rgba(255,255,255,0.1); color: #94a3b8; padding: 4px 8px; border-radius: 4px; font-size: 8px;">+ Create User</span>
+            </div>
+          </div>
+          
+        </div>
+        
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <!-- Footnote zone -->
+  <div class="fit" style="padding: 4px 48px;">
+    <p style="font-size: 10px; color: #94a3b8; margin: 0;">Built with Flask + Bootstrap 5 • Responsive design</p>
+  </div>
+  
+</body>
+</html>

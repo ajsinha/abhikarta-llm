@@ -8,18 +8,19 @@
 
 {% block help_nav %}
 <a href="#overview">Overview</a>
+<a href="#why-ollama">Why Ollama?</a>
 <a href="#models">Available Models</a>
 <a href="#installation">Installation</a>
-<a href="#strengths">Strengths</a>
-<a href="#weaknesses">Weaknesses</a>
+<a href="#hardware">Hardware</a>
 <a href="#configuration">Configuration</a>
-<a href="#usage">Usage Examples</a>
-<a href="#references">References</a>
+<a href="#usage">Usage</a>
+<a href="#troubleshooting">Troubleshooting</a>
+<a href="#resources">Resources</a>
 {% endblock %}
 
 {% block help_content %}
 <div class="d-flex align-items-center mb-4">
-    <div class="rounded-circle p-3 me-3" style="background: #333;">
+    <div class="rounded-circle p-3 me-3" style="background: linear-gradient(135deg, #333, #1a1a1a);">
         <i class="bi bi-hdd-fill text-white fs-3"></i>
     </div>
     <div>
@@ -28,83 +29,201 @@
     </div>
 </div>
 
-<h2 id="overview">Overview</h2>
-<p class="lead">Ollama makes it easy to run large language models locally on your own hardware. Perfect for development, testing, privacy-sensitive applications, or when you need unlimited free inference.</p>
-
 <div class="alert alert-success">
-    <i class="bi bi-gift me-2"></i>
-    <strong>100% Free!</strong> No API costs, no rate limits, no data leaving your machine.
+    <i class="bi bi-star-fill me-2"></i>
+    <strong>Default Provider!</strong> Ollama is the default provider in Abhikarta-LLM. No API keys needed.
+</div>
+
+<hr class="my-5">
+
+<h2 id="overview">Overview</h2>
+<p class="lead">Ollama makes it easy to run large language models locally on your own hardware. Perfect for development, testing, privacy-sensitive applications, or unlimited free inference.</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-success">
+            <div class="card-body">
+                <h3 class="text-success">$0</h3>
+                <p class="mb-0">Cost per request</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-primary">
+            <div class="card-body">
+                <h3 class="text-primary">100%</h3>
+                <p class="mb-0">Data stays local</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-warning">
+            <div class="card-body">
+                <h3 class="text-warning">∞</h3>
+                <p class="mb-0">Unlimited requests</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-info">
+            <div class="card-body">
+                <h3 class="text-info">200+</h3>
+                <p class="mb-0">Available models</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="why-ollama">Why Choose Ollama?</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-header bg-success text-white"><i class="bi bi-check-circle me-2"></i>Advantages</div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><strong>Completely Free</strong> - No API costs, no billing</li>
+                    <li><strong>100% Private</strong> - Data never leaves your machine</li>
+                    <li><strong>Works Offline</strong> - No internet required</li>
+                    <li><strong>No Rate Limits</strong> - Run unlimited requests</li>
+                    <li><strong>Easy Setup</strong> - One command install</li>
+                    <li><strong>GPU Acceleration</strong> - CUDA/Metal support</li>
+                    <li><strong>OpenAI-Compatible API</strong> - Drop-in replacement</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-warning">
+            <div class="card-header bg-warning text-dark"><i class="bi bi-exclamation-triangle me-2"></i>Considerations</div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><strong>Hardware Required</strong> - Need sufficient RAM/VRAM</li>
+                    <li><strong>Speed Varies</strong> - Depends on hardware</li>
+                    <li><strong>Initial Setup</strong> - Must install and download models</li>
+                    <li><strong>Model Updates</strong> - You manage updates</li>
+                    <li><strong>Storage Space</strong> - Models can be 2-50GB each</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
 <hr class="my-5">
 
 <h2 id="models">Available Models</h2>
+
+<div class="alert alert-info mb-4">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Tip:</strong> Start with <code>llama3.2:3b</code> for testing, upgrade to <code>llama3.3</code> or <code>deepseek-r1</code> for production.
+</div>
+
+<h4 class="mt-4 mb-3"><i class="bi bi-fire text-danger me-2"></i>Recommended Models</h4>
 <div class="table-responsive">
     <table class="table table-hover">
         <thead class="table-dark">
-            <tr><th>Model</th><th>Sizes</th><th>RAM Required</th><th>Best For</th></tr>
+            <tr><th>Model</th><th>Sizes</th><th>RAM</th><th>Best For</th><th>Quality</th></tr>
         </thead>
         <tbody>
+            <tr class="table-warning">
+                <td><code>deepseek-r1</code> <span class="badge bg-danger">🔥 Hot</span></td>
+                <td>1.5B-70B</td>
+                <td>2-48GB</td>
+                <td>Reasoning, math, coding</td>
+                <td><span class="badge bg-success">Rivals o1</span></td>
+            </tr>
             <tr class="table-success">
-                <td><code>llama3.2</code> <span class="badge bg-success">Newest</span></td>
+                <td><code>llama3.3</code> <span class="badge bg-success">Latest</span></td>
+                <td>70B</td>
+                <td>48GB</td>
+                <td>General purpose</td>
+                <td><span class="badge bg-success">Best quality</span></td>
+            </tr>
+            <tr class="table-success">
+                <td><code>qwen2.5-coder</code> <span class="badge bg-primary">Coding</span></td>
+                <td>0.5B-32B</td>
+                <td>1-48GB</td>
+                <td>Code generation</td>
+                <td><span class="badge bg-success">Best OSS coder</span></td>
+            </tr>
+            <tr>
+                <td><code>llama3.2</code></td>
                 <td>1B, 3B</td>
                 <td>2-4GB</td>
-                <td>Fast, efficient, edge deployment</td>
+                <td>Fast testing</td>
+                <td><span class="badge bg-info">Good</span></td>
             </tr>
-            <tr>
-                <td><code>llama3.1</code></td>
-                <td>8B, 70B, 405B</td>
-                <td>8-256GB</td>
-                <td>General purpose, best open model</td>
-            </tr>
-            <tr>
-                <td><code>mistral</code></td>
-                <td>7B</td>
-                <td>8GB</td>
-                <td>Balanced performance/speed</td>
-            </tr>
-            <tr>
-                <td><code>mixtral</code></td>
-                <td>8x7B</td>
-                <td>48GB</td>
-                <td>Complex tasks, MoE architecture</td>
-            </tr>
-            <tr>
-                <td><code>codellama</code></td>
-                <td>7B, 13B, 34B</td>
-                <td>8-48GB</td>
-                <td>Code generation and analysis</td>
-            </tr>
-            <tr>
-                <td><code>deepseek-coder</code></td>
-                <td>6.7B, 33B</td>
-                <td>8-32GB</td>
-                <td>Code generation</td>
-            </tr>
-            <tr>
-                <td><code>phi3</code></td>
-                <td>3B, 14B</td>
-                <td>4-16GB</td>
-                <td>Small but capable</td>
-            </tr>
-            <tr>
-                <td><code>gemma2</code></td>
-                <td>2B, 9B, 27B</td>
-                <td>4-32GB</td>
-                <td>Google's open model</td>
-            </tr>
-            <tr>
-                <td><code>qwen2.5</code></td>
-                <td>0.5B-72B</td>
-                <td>2-128GB</td>
-                <td>Multilingual, Chinese support</td>
-            </tr>
-            <tr>
-                <td><code>nomic-embed-text</code></td>
-                <td>137M</td>
-                <td>1GB</td>
-                <td>Text embeddings</td>
-            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4 class="mt-4 mb-3">All Model Families</h4>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><strong>Meta Llama</strong></div>
+            <div class="card-body">
+                <ul class="mb-0 small">
+                    <li><code>llama3.3</code> - 70B, best quality</li>
+                    <li><code>llama3.2</code> - 1B, 3B, lightweight</li>
+                    <li><code>llama3.2-vision</code> - 11B, 90B, multimodal</li>
+                    <li><code>llama3.1</code> - 8B, 70B, 405B</li>
+                    <li><code>codellama</code> - 7B-70B, code</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><strong>DeepSeek</strong></div>
+            <div class="card-body">
+                <ul class="mb-0 small">
+                    <li><code>deepseek-r1</code> - 1.5B-70B, reasoning</li>
+                    <li><code>deepseek-v3</code> - 671B MoE, flagship</li>
+                    <li><code>deepseek-coder-v2</code> - 16B-236B, code</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><strong>Qwen (Alibaba)</strong></div>
+            <div class="card-body">
+                <ul class="mb-0 small">
+                    <li><code>qwen2.5</code> - 0.5B-72B, multilingual</li>
+                    <li><code>qwen2.5-coder</code> - 0.5B-32B, coding</li>
+                    <li><code>qwq</code> - 32B, reasoning</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><strong>Others</strong></div>
+            <div class="card-body">
+                <ul class="mb-0 small">
+                    <li><code>mistral</code>, <code>mixtral</code> - Mistral AI</li>
+                    <li><code>gemma2</code> - Google</li>
+                    <li><code>phi4</code> - Microsoft</li>
+                    <li><code>command-r</code> - Cohere, RAG</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-4 mb-3">Embedding Models</h4>
+<div class="table-responsive">
+    <table class="table table-sm">
+        <thead class="table-secondary">
+            <tr><th>Model</th><th>Dimensions</th><th>RAM</th><th>Use Case</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>nomic-embed-text</code></td><td>768</td><td>1GB</td><td>General embeddings</td></tr>
+            <tr><td><code>mxbai-embed-large</code></td><td>1024</td><td>2GB</td><td>High quality</td></tr>
+            <tr><td><code>all-minilm</code></td><td>384</td><td>500MB</td><td>Lightweight</td></tr>
         </tbody>
     </table>
 </div>
@@ -114,147 +233,147 @@
 <h2 id="installation">Installation</h2>
 
 <h5>Linux/macOS</h5>
-<pre><code class="language-bash"># One-line install
+<pre><code class="language-bash"># Install
 curl -fsSL https://ollama.ai/install.sh | sh
 
-# Pull models you want to use
-ollama pull llama3.1
-ollama pull mistral
-ollama pull codellama
+# Pull models
+ollama pull llama3.3          # Best quality
+ollama pull deepseek-r1:8b    # Reasoning  
+ollama pull llama3.2:3b       # Fast testing
 
-# Verify installation
+# Verify
 ollama list</code></pre>
 
 <h5>Windows</h5>
-<pre><code class="language-bash"># Download installer from https://ollama.ai/download
-# Or use winget
-winget install Ollama.Ollama</code></pre>
+<pre><code class="language-bash"># Download from https://ollama.ai/download
+# Or: winget install Ollama.Ollama</code></pre>
 
 <h5>Docker</h5>
-<pre><code class="language-bash">docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+<pre><code class="language-bash"># With GPU
+docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 ollama/ollama
 
-# Pull a model
-docker exec -it ollama ollama pull llama3.1</code></pre>
-
-<hr class="my-5">
-
-<h2 id="strengths">Strengths</h2>
-<div class="row g-3">
-    <div class="col-md-6">
-        <div class="card h-100 border-success">
-            <div class="card-body">
-                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Completely Free</h5>
-                <p class="mb-0">No API costs, unlimited usage. Perfect for development and testing.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card h-100 border-success">
-            <div class="card-body">
-                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>100% Private</h5>
-                <p class="mb-0">Data never leaves your machine. No external API calls.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card h-100 border-success">
-            <div class="card-body">
-                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Works Offline</h5>
-                <p class="mb-0">No internet required after downloading models.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card h-100 border-success">
-            <div class="card-body">
-                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Easy to Use</h5>
-                <p class="mb-0">Simple installation, one-command model downloads.</p>
-            </div>
-        </div>
-    </div>
-</div>
+# Pull models
+docker exec -it ollama ollama pull llama3.3</code></pre>
 
 <hr class="my-5">
 
-<h2 id="weaknesses">Weaknesses</h2>
-<div class="row g-3">
-    <div class="col-md-6">
-        <div class="card h-100 border-danger">
-            <div class="card-body">
-                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Hardware Requirements</h5>
-                <p class="mb-0">Larger models require significant RAM and GPU memory.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card h-100 border-danger">
-            <div class="card-body">
-                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Slower Than Cloud</h5>
-                <p class="mb-0">Inference speed depends on your hardware, often slower than API providers.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card h-100 border-danger">
-            <div class="card-body">
-                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Quality Gap</h5>
-                <p class="mb-0">Open models may not match GPT-4 or Claude 3.5 quality.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card h-100 border-danger">
-            <div class="card-body">
-                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>No Multimodal</h5>
-                <p class="mb-0">Limited vision/image capabilities on most models.</p>
-            </div>
-        </div>
-    </div>
+<h2 id="hardware">Hardware Requirements</h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr><th>Model Size</th><th>Min RAM</th><th>GPU VRAM</th><th>Examples</th></tr>
+        </thead>
+        <tbody>
+            <tr class="table-success"><td>1-3B</td><td>4GB</td><td>4GB</td><td>llama3.2:1b, phi3</td></tr>
+            <tr class="table-success"><td>7-8B</td><td>8GB</td><td>8GB</td><td>llama3.1:8b, mistral</td></tr>
+            <tr class="table-warning"><td>13-14B</td><td>16GB</td><td>16GB</td><td>phi4, deepseek-r1:14b</td></tr>
+            <tr class="table-warning"><td>32-34B</td><td>32GB</td><td>24GB</td><td>qwen2.5:32b, qwq</td></tr>
+            <tr class="table-danger"><td>70B</td><td>48GB</td><td>48GB</td><td>llama3.3</td></tr>
+        </tbody>
+    </table>
 </div>
 
 <hr class="my-5">
 
 <h2 id="configuration">Configuration</h2>
+
 <pre><code class="language-properties"># config/application.properties
 llm.ollama.enabled=true
 llm.ollama.base_url=http://localhost:11434
-llm.ollama.default_model=llama3.1
-
-# For remote Ollama server
-llm.ollama.base_url=http://your-server:11434</code></pre>
+llm.ollama.default_model=llama3.3
+llm.default_provider=ollama</code></pre>
 
 <hr class="my-5">
 
 <h2 id="usage">Usage Examples</h2>
+
 <pre><code class="language-json">{
   "type": "llm",
   "config": {
     "provider": "ollama",
-    "model": "llama3.1",
+    "model": "llama3.3",
     "temperature": 0.7,
-    "prompt": "Write a Python function to calculate fibonacci numbers"
+    "prompt": "Explain quantum computing"
   }
 }</code></pre>
 
-<h5>Using Code Models</h5>
 <pre><code class="language-json">{
   "type": "llm",
   "config": {
     "provider": "ollama",
-    "model": "codellama",
-    "temperature": 0.2,
-    "prompt": "Review this code for bugs:\n\n{input_data.code}"
+    "model": "deepseek-r1:8b",
+    "temperature": 0.3,
+    "prompt": "Solve step by step: {problem}"
   }
 }</code></pre>
 
 <hr class="my-5">
 
-<h2 id="references">References</h2>
-<ul>
-    <li><a href="https://ollama.ai/" target="_blank">Ollama Website</a></li>
-    <li><a href="https://github.com/ollama/ollama" target="_blank">GitHub Repository</a></li>
-    <li><a href="https://ollama.ai/library" target="_blank">Model Library</a></li>
-</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<div class="accordion" id="troubleAccordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#t1">Connection refused</button>
+        </h2>
+        <div id="t1" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <pre><code>ollama serve  # Start the server
+curl http://localhost:11434/api/tags  # Test</code></pre>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t2">Out of memory</button>
+        </h2>
+        <div id="t2" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                Use smaller models (<code>:3b</code> instead of <code>:7b</code>) or quantized versions (<code>-q4_0</code>).
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="resources">Resources</h2>
+
+<div class="row g-3">
+    <div class="col-md-3">
+        <a href="https://ollama.ai/" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-globe display-4 text-primary"></i>
+                <h6 class="mt-2">Website</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://github.com/ollama/ollama" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-github display-4"></i>
+                <h6 class="mt-2">GitHub</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://ollama.ai/library" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-collection display-4 text-success"></i>
+                <h6 class="mt-2">Model Library</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://discord.gg/ollama" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-discord display-4 text-info"></i>
+                <h6 class="mt-2">Discord</h6>
+            </div>
+        </a>
+    </div>
+</div>
 
 <div class="text-center mt-5">
     <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">

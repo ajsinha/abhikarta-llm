@@ -886,6 +886,47 @@ class AdminRoutes(AbstractRoutes):
             
             return redirect(url_for('admin_llm_providers'))
         
+        @self.app.route('/admin/llm-providers/<provider_id>/set-default', methods=['POST'])
+        @admin_required
+        def set_default_provider(provider_id):
+            """Set a provider as the default."""
+            try:
+                # Unset all providers as default
+                self.db_facade.execute("UPDATE llm_providers SET is_default = 0")
+                # Set this provider as default
+                self.db_facade.execute(
+                    "UPDATE llm_providers SET is_default = 1 WHERE provider_id = ?",
+                    (provider_id,)
+                )
+                self.log_audit('set_default_provider', 'llm_provider', provider_id)
+                flash(f'Provider "{provider_id}" set as default', 'success')
+            except Exception as e:
+                logger.error(f"Error setting default provider: {e}")
+                flash('Error setting default provider', 'error')
+            
+            return redirect(url_for('admin_llm_providers'))
+        
+        @self.app.route('/admin/llm-providers/<provider_id>/toggle-status', methods=['POST'])
+        @admin_required
+        def toggle_provider_status(provider_id):
+            """Toggle a provider's active status."""
+            try:
+                provider = self.db_facade.llm.get_provider(provider_id)
+                if provider:
+                    new_status = 0 if provider.get('is_active', 1) else 1
+                    self.db_facade.execute(
+                        "UPDATE llm_providers SET is_active = ? WHERE provider_id = ?",
+                        (new_status, provider_id)
+                    )
+                    status_text = 'activated' if new_status else 'deactivated'
+                    self.log_audit(f'toggle_provider_{status_text}', 'llm_provider', provider_id)
+                    flash(f'Provider "{provider_id}" {status_text}', 'success')
+            except Exception as e:
+                logger.error(f"Error toggling provider status: {e}")
+                flash('Error toggling provider status', 'error')
+            
+            return redirect(url_for('admin_llm_providers'))
+        
         # ============================================
         # LLM PROVIDERS & MODELS API (for Visual Designers)
         # ============================================
@@ -1141,6 +1182,50 @@ class AdminRoutes(AbstractRoutes):
             except Exception as e:
                 logger.error(f"Error deleting LLM model: {e}")
                 flash('Error deleting model', 'error')
+            
+            return redirect(url_for('admin_llm_models'))
+        
+        @self.app.route('/admin/llm-models/<model_id>/set-default', methods=['POST'])
+        @admin_required
+        def set_default_model(model_id):
+            """Set a model as the default."""
+            try:
+                # Unset all models as default
+                self.db_facade.execute("UPDATE llm_models SET is_default = 0")
+                # Set this model as default
+                self.db_facade.execute(
+                    "UPDATE llm_models SET is_default = 1 WHERE model_id = ?",
+                    (model_id,)
+                )
+                self.log_audit('set_default_model', 'llm_model', model_id)
+                flash(f'Model "{model_id}" set as default', 'success')
+            except Exception as e:
+                logger.error(f"Error setting default model: {e}")
+                flash('Error setting default model', 'error')
+            
+            return redirect(url_for('admin_llm_models'))
+        
+        @self.app.route('/admin/llm-models/<model_id>/toggle-status', methods=['POST'])
+        @admin_required
+        def toggle_model_status(model_id):
+            """Toggle a model's active status."""
+            try:
+                model = self.db_facade.fetch_one(
+                    "SELECT * FROM llm_models WHERE model_id = ?",
+                    (model_id,)
+                )
+                if model:
+                    new_status = 0 if model.get('is_active', 1) else 1
+                    self.db_facade.execute(
+                        "UPDATE llm_models SET is_active = ? WHERE model_id = ?",
+                        (new_status, model_id)
+                    )
+                    status_text = 'activated' if new_status else 'deactivated'
+                    self.log_audit(f'toggle_model_{status_text}', 'llm_model', model_id)
+                    flash(f'Model "{model_id}" {status_text}', 'success')
+            except Exception as e:
+                logger.error(f"Error toggling model status: {e}")
+                flash('Error toggling model status', 'error')
             
             return redirect(url_for('admin_llm_models'))
         

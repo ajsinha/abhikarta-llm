@@ -164,29 +164,37 @@ Always show your complete reasoning. Never skip steps.</code></pre>
 
     <div class="card bg-light mb-4">
         <div class="card-body">
-            <h6>YAML Workflow Definition:</h6>
-            <pre class="mb-0"><code>name: CoT Decision Workflow
-nodes:
-  - node_id: analyze
-    node_type: llm
-    config:
-      system_prompt: |
-        Analyze this using chain of thought:
-        1. UNDERSTAND the situation
-        2. IDENTIFY key factors
-        3. EVALUATE options
-        4. RECOMMEND action
-      model: gpt-4
-      temperature: 0.3
-  
-  - node_id: decide
-    node_type: condition
-    config:
-      conditions:
-        - expression: "'urgent' in analyze.output.lower()"
-          target: escalate
-        - default: normal_process
-    depends_on: [analyze]</code></pre>
+            <h6>JSON Workflow Definition:</h6>
+            <pre class="mb-0"><code>{
+  "name": "CoT Decision Workflow",
+  "nodes": [
+    {
+      "node_id": "analyze",
+      "node_type": "llm",
+      "config": {
+        "system_prompt": "Analyze this using chain of thought:\n1. UNDERSTAND the situation\n2. IDENTIFY key factors\n3. EVALUATE options\n4. RECOMMEND action",
+        "model": "gpt-4",
+        "temperature": 0.3
+      }
+    },
+    {
+      "node_id": "decide",
+      "node_type": "condition",
+      "config": {
+        "conditions": [
+          {
+            "expression": "'urgent' in analyze.output.lower()",
+            "target": "escalate"
+          },
+          {
+            "default": "normal_process"
+          }
+        ]
+      },
+      "depends_on": ["analyze"]
+    }
+  ]
+}</code></pre>
         </div>
     </div>
 

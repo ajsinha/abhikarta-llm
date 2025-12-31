@@ -1,6 +1,6 @@
 # AI Org Quickstart Guide
 
-**Version:** 1.4.5  
+**Version:** 1.4.6  
 **Last Updated:** December 2025
 
 ---
@@ -244,7 +244,7 @@ VP of Engineering
       "position_y": 170
     }
   ],
-  "version": "1.4.5"
+  "version": "1.4.6"
 }
 ```
 

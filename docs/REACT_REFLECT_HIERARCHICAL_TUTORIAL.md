@@ -2,7 +2,7 @@
 
 ## A Comprehensive Tutorial Guide
 
-**Version:** 1.4.5  
+**Version:** 1.4.6  
 **Author:** Ashutosh Sinha  
 **Copyright © 2025-2030 All Rights Reserved**
 

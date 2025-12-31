@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="abhikarta-styles.css">
+</head>
+<body class="col bg-surface" style="width: 960px; height: 540px; position: relative;">
+  
+  <!-- Orange accent bar on left -->
+  <div style="position: absolute; left: 0; top: 0; width: 8px; height: 100%; background: #f97316;"></div>
+  
+  <!-- Title zone -->
+  <div style="width: 920px; margin: 0 20px; padding-top: 24px; padding-left: 20px;" class="fit">
+    <h1 style="color: #1e3a5f; font-size: 36px; font-weight: 700; margin: 0;">Getting Started</h1>
+  </div>
+  
+  <!-- Content zone -->
+  <div class="fill-height row" style="padding: 12px 48px 8px 48px; gap: 24px;">
+    
+    <!-- Left - Steps -->
+    <div class="col" style="flex: 1; gap: 12px;">
+      
+      <p style="font-size: 13px; color: #475569; margin: 0;">Up and running in 5 minutes with Ollama (free, local).</p>
+      
+      <!-- Step 1 -->
+      <div class="row" style="gap: 12px; align-items: flex-start;">
+        <div style="width: 32px; height: 32px; background: #f97316; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <span style="color: white; font-weight: 700; font-size: 14px;">1</span>
+        </div>
+        <div style="flex: 1;">
+          <p style="font-size: 12px; color: #1e3a5f; font-weight: 600; margin: 0;">Install Ollama</p>
+          <div style="background: #1e3a5f; padding: 8px 12px; border-radius: 6px; margin-top: 6px;">
+            <code style="font-size: 10px; color: #94a3b8;">curl -fsSL https://ollama.com/install.sh | sh</code>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step 2 -->
+      <div class="row" style="gap: 12px; align-items: flex-start;">
+        <div style="width: 32px; height: 32px; background: #0d9488; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <span style="color: white; font-weight: 700; font-size: 14px;">2</span>
+        </div>
+        <div style="flex: 1;">
+          <p style="font-size: 12px; color: #1e3a5f; font-weight: 600; margin: 0;">Pull a Model</p>
+          <div style="background: #1e3a5f; padding: 8px 12px; border-radius: 6px; margin-top: 6px;">
+            <code style="font-size: 10px; color: #94a3b8;">ollama pull llama3.3</code>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step 3 -->
+      <div class="row" style="gap: 12px; align-items: flex-start;">
+        <div style="width: 32px; height: 32px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <span style="color: white; font-weight: 700; font-size: 14px;">3</span>
+        </div>
+        <div style="flex: 1;">
+          <p style="font-size: 12px; color: #1e3a5f; font-weight: 600; margin: 0;">Clone Abhikarta</p>
+          <div style="background: #1e3a5f; padding: 8px 12px; border-radius: 6px; margin-top: 6px;">
+            <code style="font-size: 10px; color: #94a3b8;">git clone https://github.com/abhikarta/abhikarta-llm</code>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step 4 -->
+      <div class="row" style="gap: 12px; align-items: flex-start;">
+        <div style="width: 32px; height: 32px; background: #ec4899; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <span style="color: white; font-weight: 700; font-size: 14px;">4</span>
+        </div>
+        <div style="flex: 1;">
+          <p style="font-size: 12px; color: #1e3a5f; font-weight: 600; margin: 0;">Start the Server</p>
+          <div style="background: #1e3a5f; padding: 8px 12px; border-radius: 6px; margin-top: 6px;">
+            <code style="font-size: 10px; color: #94a3b8;">python run.py</code>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step 5 -->
+      <div class="row" style="gap: 12px; align-items: flex-start;">
+        <div style="width: 32px; height: 32px; background: #06b6d4; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <span style="color: white; font-weight: 700; font-size: 14px;">5</span>
+        </div>
+        <div style="flex: 1;">
+          <p style="font-size: 12px; color: #1e3a5f; font-weight: 600; margin: 0;">Open Dashboard</p>
+          <div style="background: #f8fafc; padding: 8px 12px; border-radius: 6px; margin-top: 6px; border: 1px solid #e2e8f0;">
+            <code style="font-size: 10px; color: #1e3a5f;">http://localhost:5000</code>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Right - Config example -->
+    <div class="col" style="flex: 0.9; gap: 12px;">
+      
+      <p style="font-size: 12px; color: #1e3a5f; font-weight: 700; margin: 0;">Configuration</p>
+      
+      <!-- Config file -->
+      <div style="background: #1e3a5f; border-radius: 8px; padding: 14px; flex: 1; overflow: hidden;">
+        <p style="font-size: 9px; color: #94a3b8; margin: 0 0 8px 0;">config/application.properties</p>
+        <div style="font-family: 'Courier New', monospace; font-size: 9px; color: #e2e8f0; line-height: 1.6;">
+          <p style="margin: 0;"><span style="color: #94a3b8;"># Server</span></p>
+          <p style="margin: 0;">server.host=<span style="color: #f97316;">0.0.0.0</span></p>
+          <p style="margin: 0;">server.port=<span style="color: #f97316;">5000</span></p>
+          <p style="margin: 0;"> </p>
+          <p style="margin: 0;"><span style="color: #94a3b8;"># Default Provider (Ollama)</span></p>
+          <p style="margin: 0;">llm.default_provider=<span style="color: #0d9488;">ollama</span></p>
+          <p style="margin: 0;">llm.ollama.enabled=<span style="color: #0d9488;">true</span></p>
+          <p style="margin: 0;">llm.ollama.base_url=<span style="color: #f97316;">http://localhost:11434</span></p>
+          <p style="margin: 0;"> </p>
+          <p style="margin: 0;"><span style="color: #94a3b8;"># Optional: Cloud Providers</span></p>
+          <p style="margin: 0;">llm.openai.api_key=<span style="color: #8b5cf6;">${OPENAI_API_KEY}</span></p>
+          <p style="margin: 0;">llm.anthropic.api_key=<span style="color: #8b5cf6;">${ANTHROPIC_API_KEY}</span></p>
+        </div>
+      </div>
+      
+      <!-- Note -->
+      <div style="background: #f8fafc; padding: 10px 12px; border-radius: 6px; border-left: 4px solid #0d9488;">
+        <p style="font-size: 9px; color: #1e3a5f; font-weight: 600; margin: 0;">Zero Configuration Needed!</p>
+        <p style="font-size: 9px; color: #64748b; margin: 4px 0 0 0;">Ollama works out of the box with no API keys required.</p>
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <!-- Footnote zone -->
+  <div class="fit" style="padding: 4px 48px;">
+    <p style="font-size: 10px; color: #94a3b8; margin: 0;">Supports Python 3.9+ • SQLite (dev) or PostgreSQL (prod)</p>
+  </div>
+  
+</body>
+</html>

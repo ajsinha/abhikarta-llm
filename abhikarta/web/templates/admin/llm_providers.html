@@ -47,7 +47,11 @@
                         {% for provider in providers %}
                         <tr>
                             <td>
-                                <strong>{{ provider.name }}</strong>
+                                <a href="{{ url_for('help_provider', provider=provider.provider_id) }}" 
+                                   class="text-decoration-none fw-bold" title="View {{ provider.name }} documentation">
+                                    {{ provider.name }}
+                                    <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                                </a>
                                 {% if provider.is_default %}
                                 <span class="badge bg-warning text-dark ms-2">Default</span>
                                 {% endif %}
@@ -79,20 +83,49 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('edit_llm_provider', provider_id=provider.provider_id) }}" 
-                                   class="btn btn-sm btn-outline-primary" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <a href="{{ url_for('admin_llm_models') }}?provider={{ provider.provider_id }}" 
-                                   class="btn btn-sm btn-outline-info" title="View Models">
-                                    <i class="bi bi-cpu"></i>
-                                </a>
-                                <form method="POST" action="{{ url_for('delete_llm_provider', provider_id=provider.provider_id) }}" 
-                                      style="display: inline;" onsubmit="return confirm('Delete this provider?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                                <div class="d-flex flex-column gap-1">
+                                    <!-- View Models Button - Prominent -->
+                                    <a href="{{ url_for('admin_llm_models') }}?provider={{ provider.provider_id }}" 
+                                       class="btn btn-sm btn-info text-white" title="View all models for {{ provider.name }}">
+                                        <i class="bi bi-cpu me-1"></i>View Models
+                                    </a>
+                                    <!-- Action Buttons -->
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('edit_llm_provider', provider_id=provider.provider_id) }}" 
+                                           class="btn btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{{ url_for('help_provider', provider=provider.provider_id) }}" 
+                                           class="btn btn-outline-secondary" title="Help Documentation">
+                                            <i class="bi bi-question-circle"></i>
+                                        </a>
+                                        {% if not provider.is_default %}
+                                        <form method="POST" action="{{ url_for('set_default_provider', provider_id=provider.provider_id) }}" 
+                                              style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-warning" title="Set as Default">
+                                                <i class="bi bi-star"></i>
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                        <button class="btn btn-warning" disabled title="Current Default">
+                                            <i class="bi bi-star-fill"></i>
+                                        </button>
+                                        {% endif %}
+                                        <form method="POST" action="{{ url_for('toggle_provider_status', provider_id=provider.provider_id) }}" 
+                                              style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-{{ 'secondary' if provider.is_active else 'success' }}" 
+                                                    title="{{ 'Deactivate' if provider.is_active else 'Activate' }}">
+                                                <i class="bi bi-{{ 'pause' if provider.is_active else 'play' }}"></i>
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('delete_llm_provider', provider_id=provider.provider_id) }}" 
+                                              style="display: inline;" onsubmit="return confirm('Delete this provider?');">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -120,27 +153,27 @@
                 <div class="col-md-4">
                     <h6>Cloud Providers</h6>
                     <ul class="list-unstyled">
-                        <li><code>openai</code> - OpenAI GPT models</li>
-                        <li><code>anthropic</code> - Claude models</li>
-                        <li><code>google</code> - Gemini models</li>
-                        <li><code>azure</code> - Azure OpenAI</li>
+                        <li><a href="{{ url_for('help_provider', provider='openai') }}"><code>openai</code></a> - OpenAI GPT models</li>
+                        <li><a href="{{ url_for('help_provider', provider='anthropic') }}"><code>anthropic</code></a> - Claude models</li>
+                        <li><a href="{{ url_for('help_provider', provider='google') }}"><code>google</code></a> - Gemini models</li>
+                        <li><a href="{{ url_for('help_provider', provider='azure') }}"><code>azure</code></a> - Azure OpenAI</li>
                     </ul>
                 </div>
                 <div class="col-md-4">
                     <h6>Alternative Providers</h6>
                     <ul class="list-unstyled">
-                        <li><code>mistral</code> - Mistral AI</li>
-                        <li><code>groq</code> - Groq (fast inference)</li>
-                        <li><code>together</code> - Together AI</li>
-                        <li><code>cohere</code> - Cohere</li>
+                        <li><a href="{{ url_for('help_provider', provider='mistral') }}"><code>mistral</code></a> - Mistral AI</li>
+                        <li><a href="{{ url_for('help_provider', provider='groq') }}"><code>groq</code></a> - Groq (fast inference)</li>
+                        <li><a href="{{ url_for('help_provider', provider='together') }}"><code>together</code></a> - Together AI</li>
+                        <li><a href="{{ url_for('help_provider', provider='cohere') }}"><code>cohere</code></a> - Cohere</li>
                     </ul>
                 </div>
                 <div class="col-md-4">
-                    <h6>Self-Hosted</h6>
+                    <h6>Self-Hosted / Cloud</h6>
                     <ul class="list-unstyled">
-                        <li><code>ollama</code> - Local Ollama</li>
-                        <li><code>huggingface</code> - HF Inference</li>
-                        <li><code>bedrock</code> - AWS Bedrock</li>
+                        <li><a href="{{ url_for('help_provider', provider='ollama') }}"><code>ollama</code></a> - Local Ollama <span class="badge bg-success">Default</span></li>
+                        <li><a href="{{ url_for('help_provider', provider='huggingface') }}"><code>huggingface</code></a> - HF Inference</li>
+                        <li><a href="{{ url_for('help_provider', provider='bedrock') }}"><code>bedrock</code></a> - AWS Bedrock</li>
                     </ul>
                 </div>
             </div>

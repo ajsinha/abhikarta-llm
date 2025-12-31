@@ -13,12 +13,14 @@
 <a href="#weaknesses">Weaknesses</a>
 <a href="#configuration">Configuration</a>
 <a href="#usage">Usage Examples</a>
-<a href="#references">References</a>
+<a href="#best-practices">Best Practices</a>
+<a href="#pricing">Pricing</a>
+<a href="#resources">Resources</a>
 {% endblock %}
 
 {% block help_content %}
 <div class="d-flex align-items-center mb-4">
-    <div class="rounded-circle p-3 me-3" style="background: #f55036;">
+    <div class="rounded-circle p-3 me-3" style="background: linear-gradient(135deg, #f55036, #d93920);">
         <i class="bi bi-lightning-fill text-white fs-3"></i>
     </div>
     <div>
@@ -28,16 +30,53 @@
 </div>
 
 <h2 id="overview">Overview</h2>
-<p class="lead">Groq uses custom Language Processing Units (LPUs) to achieve unprecedented inference speeds - often 10-50x faster than GPU-based solutions. Perfect for real-time applications where latency matters.</p>
+<p class="lead">Groq uses custom Language Processing Units (LPUs) to achieve unprecedented inference speeds - often 10-50x faster than GPU-based solutions. Perfect for real-time applications, chatbots, and any use case where latency matters.</p>
 
 <div class="alert alert-warning">
     <i class="bi bi-speedometer2 me-2"></i>
-    <strong>Speed Benchmark:</strong> Groq can generate up to 800 tokens/second on Llama 3.1 8B!
+    <strong>Speed Benchmark:</strong> Groq generates up to 800+ tokens/second on Llama 3.1 8B - that's instant responses!
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-danger">
+            <div class="card-body">
+                <h3 class="text-danger">800+</h3>
+                <p class="mb-0">Tokens/second</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-warning">
+            <div class="card-body">
+                <h3 class="text-warning">&lt;100ms</h3>
+                <p class="mb-0">Time to first token</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-success">
+            <div class="card-body">
+                <h3 class="text-success">Free</h3>
+                <p class="mb-0">Tier available</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-info">
+            <div class="card-body">
+                <h3 class="text-info">128K</h3>
+                <p class="mb-0">Context window</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <hr class="my-5">
 
 <h2 id="models">Available Models</h2>
+
+<h4 class="mt-4 mb-3">Llama Models</h4>
 <div class="table-responsive">
     <table class="table table-hover">
         <thead class="table-dark">
@@ -45,12 +84,18 @@
         </thead>
         <tbody>
             <tr class="table-success">
+                <td><code>llama-3.3-70b-versatile</code> <span class="badge bg-success">New</span></td>
+                <td>128K</td>
+                <td>~250 tok/s</td>
+                <td>Best quality, latest Llama</td>
+            </tr>
+            <tr>
                 <td><code>llama-3.1-70b-versatile</code></td>
                 <td>128K</td>
                 <td>~250 tok/s</td>
                 <td>Best quality + speed balance</td>
             </tr>
-            <tr>
+            <tr class="table-warning">
                 <td><code>llama-3.1-8b-instant</code> <span class="badge bg-danger">Fastest</span></td>
                 <td>128K</td>
                 <td>~800 tok/s</td>
@@ -63,16 +108,51 @@
                 <td>Highest quality</td>
             </tr>
             <tr>
+                <td><code>llama-3.2-11b-text-preview</code></td>
+                <td>128K</td>
+                <td>~400 tok/s</td>
+                <td>Balanced performance</td>
+            </tr>
+            <tr>
+                <td><code>llama-3.2-3b-preview</code></td>
+                <td>128K</td>
+                <td>~600 tok/s</td>
+                <td>Lightweight tasks</td>
+            </tr>
+            <tr>
+                <td><code>llama-3.2-1b-preview</code></td>
+                <td>128K</td>
+                <td>~700 tok/s</td>
+                <td>Simple tasks, classification</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4 class="mt-4 mb-3">Other Models</h4>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-secondary">
+            <tr><th>Model</th><th>Context</th><th>Speed</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
+            <tr>
                 <td><code>mixtral-8x7b-32768</code></td>
                 <td>32K</td>
                 <td>~480 tok/s</td>
-                <td>MoE architecture</td>
+                <td>MoE architecture, diverse tasks</td>
             </tr>
             <tr>
                 <td><code>gemma2-9b-it</code></td>
                 <td>8K</td>
                 <td>~500 tok/s</td>
                 <td>Google's efficient model</td>
+            </tr>
+            <tr>
+                <td><code>llama3-groq-70b-8192-tool-use-preview</code></td>
+                <td>8K</td>
+                <td>~300 tok/s</td>
+                <td>Tool/function calling</td>
             </tr>
         </tbody>
     </table>
@@ -81,20 +161,20 @@
 <hr class="my-5">
 
 <h2 id="strengths">Strengths</h2>
-<div class="row g-3">
+<div class="row g-4">
     <div class="col-md-6">
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Blazing Fast</h5>
-                <p class="mb-0">10-50x faster than traditional GPU inference. Sub-second responses.</p>
+                <p class="mb-0">10-50x faster than traditional GPU inference. 800+ tokens/second on smaller models.</p>
             </div>
         </div>
     </div>
     <div class="col-md-6">
         <div class="card h-100 border-success">
             <div class="card-body">
-                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Low Latency</h5>
-                <p class="mb-0">Time-to-first-token often under 100ms. Perfect for real-time apps.</p>
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Ultra-Low Latency</h5>
+                <p class="mb-0">Time-to-first-token often under 100ms. Essential for real-time chatbots.</p>
             </div>
         </div>
     </div>
@@ -102,7 +182,7 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Generous Free Tier</h5>
-                <p class="mb-0">Free API access with reasonable rate limits for testing.</p>
+                <p class="mb-0">Free API access with reasonable rate limits for development and testing.</p>
             </div>
         </div>
     </div>
@@ -110,7 +190,23 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>OpenAI Compatible</h5>
-                <p class="mb-0">Drop-in replacement for OpenAI API format.</p>
+                <p class="mb-0">Drop-in replacement for OpenAI API. Easy integration.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Competitive Pricing</h5>
+                <p class="mb-0">Very affordable for high-speed inference. Great value for real-time apps.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Latest Models</h5>
+                <p class="mb-0">Quick to add new open-source models like Llama 3.3.</p>
             </div>
         </div>
     </div>
@@ -119,12 +215,12 @@
 <hr class="my-5">
 
 <h2 id="weaknesses">Weaknesses</h2>
-<div class="row g-3">
+<div class="row g-4">
     <div class="col-md-6">
         <div class="card h-100 border-danger">
             <div class="card-body">
                 <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Limited Model Selection</h5>
-                <p class="mb-0">Only open-source models, no GPT-4 or Claude.</p>
+                <p class="mb-0">Only open-source models. No GPT-4, Claude, or proprietary models.</p>
             </div>
         </div>
     </div>
@@ -132,7 +228,23 @@
         <div class="card h-100 border-danger">
             <div class="card-body">
                 <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Rate Limits</h5>
-                <p class="mb-0">Strict rate limits even on paid plans.</p>
+                <p class="mb-0">Strict rate limits even on paid plans. May need to manage request pacing.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Quality vs Proprietary</h5>
+                <p class="mb-0">Open models may not match GPT-4 or Claude quality for complex tasks.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>No Vision (yet)</h5>
+                <p class="mb-0">Text-only inference currently. No multimodal support.</p>
             </div>
         </div>
     </div>
@@ -141,33 +253,159 @@
 <hr class="my-5">
 
 <h2 id="configuration">Configuration</h2>
+
+<h5>Step 1: Get Your API Key</h5>
+<ol>
+    <li>Go to <a href="https://console.groq.com/keys" target="_blank">console.groq.com</a></li>
+    <li>Create an account (free)</li>
+    <li>Generate an API key (starts with <code>gsk_</code>)</li>
+</ol>
+
+<h5>Step 2: Configure in application.properties</h5>
 <pre><code class="language-properties"># config/application.properties
 llm.groq.enabled=true
 llm.groq.api_key=gsk_your-groq-api-key
-llm.groq.default_model=llama-3.1-70b-versatile
+# Or use env: llm.groq.api_key=${GROQ_API_KEY}
+
+llm.groq.default_model=llama-3.3-70b-versatile
 llm.groq.base_url=https://api.groq.com/openai/v1</code></pre>
 
 <hr class="my-5">
 
 <h2 id="usage">Usage Examples</h2>
+
+<h5>Ultra-Fast Responses</h5>
 <pre><code class="language-json">{
   "type": "llm",
   "config": {
     "provider": "groq",
     "model": "llama-3.1-8b-instant",
     "temperature": 0.5,
-    "prompt": "Quickly summarize: {input_data.text}"
+    "prompt": "Quickly summarize: {input}"
   }
+}</code></pre>
+
+<h5>High Quality (Balanced)</h5>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "groq",
+    "model": "llama-3.3-70b-versatile",
+    "temperature": 0.7,
+    "max_tokens": 2048,
+    "prompt": "Analyze this document:\n{document}"
+  }
+}</code></pre>
+
+<h5>Real-Time Chatbot</h5>
+<pre><code class="language-json">{
+  "agent_id": "fast-assistant",
+  "llm_config": {
+    "provider": "groq",
+    "model": "llama-3.1-8b-instant",
+    "temperature": 0.7,
+    "stream": true
+  },
+  "system_prompt": "You are a helpful assistant. Respond quickly and concisely."
 }</code></pre>
 
 <hr class="my-5">
 
-<h2 id="references">References</h2>
-<ul>
-    <li><a href="https://console.groq.com/" target="_blank">Groq Console</a></li>
-    <li><a href="https://console.groq.com/docs/" target="_blank">API Documentation</a></li>
-    <li><a href="https://groq.com/" target="_blank">Groq Website</a></li>
-</ul>
+<h2 id="best-practices">Best Practices</h2>
+
+<div class="accordion" id="bestPracticesGroq">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#bp1">Model Selection</button>
+        </h2>
+        <div id="bp1" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <ul>
+                    <li><strong>llama-3.1-8b-instant</strong>: Maximum speed, simple tasks</li>
+                    <li><strong>llama-3.3-70b-versatile</strong>: Best quality, complex tasks</li>
+                    <li><strong>mixtral-8x7b</strong>: Good for diverse topics</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#bp2">When to Use Groq</button>
+        </h2>
+        <div id="bp2" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Real-time chatbots requiring instant responses</li>
+                    <li>High-volume, low-latency applications</li>
+                    <li>Development/testing (generous free tier)</li>
+                    <li>When open-source model quality is sufficient</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="pricing">Pricing</h2>
+
+<div class="alert alert-success">
+    <i class="bi bi-gift me-2"></i>
+    <strong>Free Tier:</strong> Groq offers a generous free tier for development and testing!
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Input (per 1M)</th><th>Output (per 1M)</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>llama-3.3-70b-versatile</td><td>$0.59</td><td>$0.79</td></tr>
+            <tr><td>llama-3.1-70b-versatile</td><td>$0.59</td><td>$0.79</td></tr>
+            <tr><td>llama-3.1-8b-instant</td><td>$0.05</td><td>$0.08</td></tr>
+            <tr><td>mixtral-8x7b-32768</td><td>$0.24</td><td>$0.24</td></tr>
+            <tr><td>gemma2-9b-it</td><td>$0.20</td><td>$0.20</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="resources">Resources & Links</h2>
+<div class="row g-3">
+    <div class="col-md-3">
+        <a href="https://console.groq.com/" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-terminal display-4 text-primary"></i>
+                <h6 class="mt-2">Console</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://console.groq.com/docs/" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-book display-4 text-success"></i>
+                <h6 class="mt-2">Documentation</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://groq.com/" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-globe display-4 text-warning"></i>
+                <h6 class="mt-2">Website</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://console.groq.com/playground" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-play-circle display-4 text-info"></i>
+                <h6 class="mt-2">Playground</h6>
+            </div>
+        </a>
+    </div>
+</div>
 
 <div class="text-center mt-5">
     <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">

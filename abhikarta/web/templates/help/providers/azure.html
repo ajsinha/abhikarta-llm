@@ -12,12 +12,13 @@
 <a href="#strengths">Strengths</a>
 <a href="#weaknesses">Weaknesses</a>
 <a href="#configuration">Configuration</a>
-<a href="#references">References</a>
+<a href="#usage">Usage</a>
+<a href="#resources">Resources</a>
 {% endblock %}
 
 {% block help_content %}
 <div class="d-flex align-items-center mb-4">
-    <div class="rounded-circle p-3 me-3" style="background: #0078d4;">
+    <div class="rounded-circle p-3 me-3" style="background: linear-gradient(135deg, #0078d4, #005a9e);">
         <i class="bi bi-microsoft text-white fs-3"></i>
     </div>
     <div>
@@ -26,37 +27,121 @@
     </div>
 </div>
 
+<div class="alert alert-primary">
+    <i class="bi bi-building me-2"></i>
+    <strong>Enterprise Choice:</strong> Ideal for organizations with Azure infrastructure, compliance requirements, or data residency needs.
+</div>
+
 <h2 id="overview">Overview</h2>
-<p class="lead">Azure OpenAI Service provides access to OpenAI's powerful models with enterprise-grade security, compliance, and regional availability through Microsoft Azure.</p>
+<p class="lead">Azure OpenAI Service provides access to OpenAI's powerful models with enterprise-grade security, compliance, and regional availability through Microsoft Azure. Your data stays within your Azure tenant and never trains OpenAI models.</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-primary">
+            <div class="card-body">
+                <h3 class="text-primary">SOC 2</h3>
+                <p class="mb-0">Compliant</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-success">
+            <div class="card-body">
+                <h3 class="text-success">HIPAA</h3>
+                <p class="mb-0">Eligible</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-warning">
+            <div class="card-body">
+                <h3 class="text-warning">GDPR</h3>
+                <p class="mb-0">Compliant</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-info">
+            <div class="card-body">
+                <h3 class="text-info">30+</h3>
+                <p class="mb-0">Azure Regions</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <hr class="my-5">
 
 <h2 id="models">Available Models</h2>
-<p>Same models as OpenAI, deployed within Azure:</p>
-<ul>
-    <li>GPT-4o, GPT-4 Turbo, GPT-4</li>
-    <li>GPT-3.5 Turbo</li>
-    <li>Text Embedding models</li>
-    <li>DALL-E for image generation</li>
-</ul>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Context</th><th>Best For</th><th>Availability</th></tr>
+        </thead>
+        <tbody>
+            <tr class="table-success">
+                <td><code>gpt-4o</code> <span class="badge bg-success">Recommended</span></td>
+                <td>128K</td>
+                <td>General purpose, multimodal</td>
+                <td>Most regions</td>
+            </tr>
+            <tr>
+                <td><code>gpt-4o-mini</code></td>
+                <td>128K</td>
+                <td>Fast, cost-effective</td>
+                <td>Most regions</td>
+            </tr>
+            <tr>
+                <td><code>gpt-4-turbo</code></td>
+                <td>128K</td>
+                <td>Complex reasoning</td>
+                <td>Select regions</td>
+            </tr>
+            <tr>
+                <td><code>gpt-4</code></td>
+                <td>8K/32K</td>
+                <td>Legacy support</td>
+                <td>All regions</td>
+            </tr>
+            <tr>
+                <td><code>gpt-35-turbo</code></td>
+                <td>16K</td>
+                <td>High volume, chatbots</td>
+                <td>All regions</td>
+            </tr>
+            <tr>
+                <td><code>text-embedding-3-large</code></td>
+                <td>8K</td>
+                <td>Embeddings for RAG</td>
+                <td>Most regions</td>
+            </tr>
+            <tr>
+                <td><code>dall-e-3</code></td>
+                <td>-</td>
+                <td>Image generation</td>
+                <td>Select regions</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 <hr class="my-5">
 
 <h2 id="strengths">Strengths</h2>
-<div class="row g-3">
+<div class="row g-4">
     <div class="col-md-6">
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Enterprise Compliance</h5>
-                <p class="mb-0">SOC 2, HIPAA, GDPR, and more. Data stays in your Azure tenant.</p>
+                <p class="mb-0">SOC 2, HIPAA, GDPR, FedRAMP, and more. Data never trains OpenAI models.</p>
             </div>
         </div>
     </div>
     <div class="col-md-6">
         <div class="card h-100 border-success">
             <div class="card-body">
-                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Regional Availability</h5>
-                <p class="mb-0">Deploy in specific regions for data residency requirements.</p>
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Regional Data Residency</h5>
+                <p class="mb-0">Deploy in specific Azure regions. Data stays in your chosen geography.</p>
             </div>
         </div>
     </div>
@@ -64,7 +149,7 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Azure Integration</h5>
-                <p class="mb-0">Native integration with Azure AD, VNET, Private Endpoints.</p>
+                <p class="mb-0">Native integration with Azure AD, VNET, Private Endpoints, Key Vault.</p>
             </div>
         </div>
     </div>
@@ -72,7 +157,23 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Content Filtering</h5>
-                <p class="mb-0">Built-in content filtering and responsible AI features.</p>
+                <p class="mb-0">Built-in content filtering and responsible AI safety features.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>SLA Guarantees</h5>
+                <p class="mb-0">Enterprise SLAs with guaranteed uptime and support.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Provisioned Throughput</h5>
+                <p class="mb-0">Reserved capacity option for predictable performance.</p>
             </div>
         </div>
     </div>
@@ -81,20 +182,36 @@
 <hr class="my-5">
 
 <h2 id="weaknesses">Weaknesses</h2>
-<div class="row g-3">
+<div class="row g-4">
     <div class="col-md-6">
         <div class="card h-100 border-danger">
             <div class="card-body">
                 <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Complex Setup</h5>
-                <p class="mb-0">Requires Azure subscription and resource provisioning.</p>
+                <p class="mb-0">Requires Azure subscription, resource provisioning, and deployment creation.</p>
             </div>
         </div>
     </div>
     <div class="col-md-6">
         <div class="card h-100 border-danger">
             <div class="card-body">
-                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Model Availability</h5>
-                <p class="mb-0">New models may not be immediately available in all regions.</p>
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Model Lag</h5>
+                <p class="mb-0">New models may take weeks/months to be available after OpenAI release.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Regional Limits</h5>
+                <p class="mb-0">Some models only available in certain Azure regions.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Quota Management</h5>
+                <p class="mb-0">Need to manage deployment quotas per region.</p>
             </div>
         </div>
     </div>
@@ -103,21 +220,76 @@
 <hr class="my-5">
 
 <h2 id="configuration">Configuration</h2>
+
+<h5>Step 1: Create Azure OpenAI Resource</h5>
+<ol>
+    <li>Go to <a href="https://portal.azure.com" target="_blank">Azure Portal</a></li>
+    <li>Create an "Azure OpenAI" resource</li>
+    <li>Deploy a model (e.g., gpt-4o)</li>
+    <li>Get your endpoint URL and API key</li>
+</ol>
+
+<h5>Step 2: Configure in application.properties</h5>
 <pre><code class="language-properties"># config/application.properties
 llm.azure.enabled=true
-llm.azure.api_key=your-azure-api-key
+llm.azure.api_key=your-azure-openai-key
+# Or: llm.azure.api_key=${AZURE_OPENAI_KEY}
+
 llm.azure.endpoint=https://your-resource.openai.azure.com/
 llm.azure.api_version=2024-02-15-preview
 llm.azure.deployment_name=gpt-4o-deployment</code></pre>
 
 <hr class="my-5">
 
-<h2 id="references">References</h2>
-<ul>
-    <li><a href="https://azure.microsoft.com/en-us/products/ai-services/openai-service" target="_blank">Azure OpenAI Service</a></li>
-    <li><a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/" target="_blank">Documentation</a></li>
-    <li><a href="https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/" target="_blank">Pricing</a></li>
-</ul>
+<h2 id="usage">Usage Examples</h2>
+
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "azure",
+    "model": "gpt-4o-deployment",
+    "temperature": 0.7,
+    "prompt": "Analyze this enterprise document:\n{document}"
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="resources">Resources & Links</h2>
+<div class="row g-3">
+    <div class="col-md-3">
+        <a href="https://azure.microsoft.com/en-us/products/ai-services/openai-service" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-globe display-4 text-primary"></i>
+                <h6 class="mt-2">Service Page</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-book display-4 text-success"></i>
+                <h6 class="mt-2">Documentation</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-currency-dollar display-4 text-warning"></i>
+                <h6 class="mt-2">Pricing</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://portal.azure.com" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-terminal display-4 text-info"></i>
+                <h6 class="mt-2">Portal</h6>
+            </div>
+        </a>
+    </div>
+</div>
 
 <div class="text-center mt-5">
     <a href="{{ url_for('help_page', page='llm-providers') }}" class="btn btn-outline-primary">

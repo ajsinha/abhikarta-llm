@@ -1,0 +1,41 @@
+/* Abhikarta-LLM Presentation Styles
+   Bold, modern tech aesthetic with dark blue and vibrant orange accents
+*/
+
+:root {
+  /* Primary - Deep Navy Blue */
+  --color-primary: #1e3a5f;
+  --color-primary-light: #2d5a8a;
+  --color-primary-dark: #0f1f33;
+  --color-primary-foreground: #ffffff;
+  
+  /* Secondary - Vibrant Orange */
+  --color-secondary: #f97316;
+  --color-secondary-foreground: #ffffff;
+  
+  /* Surface */
+  --color-surface: #ffffff;
+  --color-surface-foreground: #1a1a1a;
+  
+  /* Muted - Light gray */
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  
+  /* Accent - Teal */
+  --color-accent: #0d9488;
+  --color-accent-foreground: #ffffff;
+  
+  /* Border */
+  --color-border: #e2e8f0;
+  
+  /* Typography */
+  --font-family-display: 'Segoe UI', Arial, sans-serif;
+  --font-weight-display: 700;
+  --font-family-content: 'Segoe UI', Arial, sans-serif;
+  --font-weight-content: 400;
+  --font-size-content: 14px;
+  --line-height-content: 1.5;
+  
+  /* Spacing */
+  --radius: 8px;
+}

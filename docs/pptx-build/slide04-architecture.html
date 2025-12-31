@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="abhikarta-styles.css">
+</head>
+<body class="col bg-surface" style="width: 960px; height: 540px; position: relative;">
+  
+  <!-- Orange accent bar on left -->
+  <div style="position: absolute; left: 0; top: 0; width: 8px; height: 100%; background: #f97316;"></div>
+  
+  <!-- Title zone -->
+  <div style="width: 920px; margin: 0 20px; padding-top: 24px; padding-left: 20px;" class="fit">
+    <h1 style="color: #1e3a5f; font-size: 36px; font-weight: 700; margin: 0;">Architecture Overview</h1>
+  </div>
+  
+  <!-- Content zone - Architecture diagram -->
+  <div class="fill-height col" style="padding: 12px 48px 8px 48px; gap: 16px;">
+    
+    <!-- Top layer - User Interface -->
+    <div class="row" style="gap: 12px; justify-content: center;">
+      <div style="background: #1e3a5f; padding: 12px 24px; border-radius: 8px; text-align: center;">
+        <p style="font-size: 12px; color: #f97316; font-weight: 600; margin: 0;">WEB DASHBOARD</p>
+        <p style="font-size: 10px; color: #94a3b8; margin: 2px 0 0 0;">Flask + Bootstrap</p>
+      </div>
+      <div style="background: #1e3a5f; padding: 12px 24px; border-radius: 8px; text-align: center;">
+        <p style="font-size: 12px; color: #f97316; font-weight: 600; margin: 0;">REST API</p>
+        <p style="font-size: 10px; color: #94a3b8; margin: 2px 0 0 0;">OpenAPI 3.0</p>
+      </div>
+      <div style="background: #1e3a5f; padding: 12px 24px; border-radius: 8px; text-align: center;">
+        <p style="font-size: 12px; color: #f97316; font-weight: 600; margin: 0;">SDK / CLI</p>
+        <p style="font-size: 10px; color: #94a3b8; margin: 2px 0 0 0;">Python Client</p>
+      </div>
+    </div>
+    
+    <!-- Arrow -->
+    <div style="text-align: center;">
+      <span style="font-size: 20px; color: #94a3b8;">▼</span>
+    </div>
+    
+    <!-- Middle layer - Core Services -->
+    <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px;">
+      <p style="font-size: 11px; color: #1e3a5f; font-weight: 700; margin: 0 0 12px 0; text-align: center;">ABHIKARTA CORE ENGINE</p>
+      <div class="row" style="gap: 12px; justify-content: center;">
+        <div style="background: white; border: 1px solid #e2e8f0; padding: 10px 16px; border-radius: 6px; text-align: center;">
+          <p style="font-size: 11px; color: #0d9488; font-weight: 600; margin: 0;">Agent Manager</p>
+        </div>
+        <div style="background: white; border: 1px solid #e2e8f0; padding: 10px 16px; border-radius: 6px; text-align: center;">
+          <p style="font-size: 11px; color: #8b5cf6; font-weight: 600; margin: 0;">Workflow Engine</p>
+        </div>
+        <div style="background: white; border: 1px solid #e2e8f0; padding: 10px 16px; border-radius: 6px; text-align: center;">
+          <p style="font-size: 11px; color: #ec4899; font-weight: 600; margin: 0;">LLM Router</p>
+        </div>
+        <div style="background: white; border: 1px solid #e2e8f0; padding: 10px 16px; border-radius: 6px; text-align: center;">
+          <p style="font-size: 11px; color: #06b6d4; font-weight: 600; margin: 0;">Security/RBAC</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Arrow -->
+    <div style="text-align: center;">
+      <span style="font-size: 20px; color: #94a3b8;">▼</span>
+    </div>
+    
+    <!-- Bottom layer - Providers + Database -->
+    <div class="row" style="gap: 16px;">
+      
+      <!-- Providers -->
+      <div style="flex: 1; background: linear-gradient(135deg, #1e3a5f, #0f1f33); border-radius: 8px; padding: 12px;">
+        <p style="font-size: 10px; color: #f97316; font-weight: 600; margin: 0 0 8px 0; text-align: center;">LLM PROVIDERS</p>
+        <div class="row" style="gap: 6px; flex-wrap: wrap; justify-content: center;">
+          <span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 9px; color: #94a3b8;">OpenAI</span>
+          <span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 9px; color: #94a3b8;">Anthropic</span>
+          <span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 9px; color: #94a3b8;">Google</span>
+          <span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 9px; color: #94a3b8;">Mistral</span>
+          <span style="background: rgba(249,115,22,0.3); padding: 4px 8px; border-radius: 4px; font-size: 9px; color: #f97316; font-weight: 600;">Ollama</span>
+          <span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 9px; color: #94a3b8;">Groq</span>
+          <span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 9px; color: #94a3b8;">Azure</span>
+          <span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 9px; color: #94a3b8;">Bedrock</span>
+        </div>
+      </div>
+      
+      <!-- Database -->
+      <div style="flex: 0.6; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+        <p style="font-size: 10px; color: #1e3a5f; font-weight: 600; margin: 0 0 8px 0; text-align: center;">DATABASE</p>
+        <div class="col" style="gap: 4px; align-items: center;">
+          <span style="font-size: 9px; color: #475569;">SQLite (Dev)</span>
+          <span style="font-size: 9px; color: #475569;">PostgreSQL (Prod)</span>
+        </div>
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <!-- Footnote zone -->
+  <div class="fit" style="padding: 4px 48px;">
+    <p style="font-size: 10px; color: #94a3b8; margin: 0;">Modular design enables easy extension and customization</p>
+  </div>
+  
+</body>
+</html>

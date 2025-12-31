@@ -12,7 +12,9 @@
 <a href="#strengths">Strengths</a>
 <a href="#weaknesses">Weaknesses</a>
 <a href="#configuration">Configuration</a>
-<a href="#usage">Usage in Abhikarta</a>
+<a href="#usage">Usage Examples</a>
+<a href="#best-practices">Best Practices</a>
+<a href="#pricing">Pricing</a>
 <a href="#resources">Resources</a>
 {% endblock %}
 
@@ -32,12 +34,48 @@
     <strong>Massive Context:</strong> Gemini 1.5 Pro supports up to 2 million tokens - process entire books or codebases in one request.
 </div>
 
-<p class="lead">Google's Gemini models are natively multimodal, able to process text, images, audio, and video. With context windows up to 2M tokens, they're ideal for long-document analysis.</p>
+<p class="lead">Google's Gemini models are natively multimodal, able to process text, images, audio, and video. With context windows up to 2M tokens, they're ideal for long-document analysis, code review, and multimedia understanding.</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-primary">
+            <div class="card-body">
+                <h3 class="text-primary">2M</h3>
+                <p class="mb-0">Max context tokens</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-success">
+            <div class="card-body">
+                <h3 class="text-success">4</h3>
+                <p class="mb-0">Modalities supported</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-warning">
+            <div class="card-body">
+                <h3 class="text-warning">Free</h3>
+                <p class="mb-0">Tier available</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center border-info">
+            <div class="card-body">
+                <h3 class="text-info">$0.075</h3>
+                <p class="mb-0">Flash per 1M input</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <hr class="my-5">
 
 <h2 id="models">Available Models</h2>
 
+<h4 class="mt-4 mb-3">Gemini 2.0 (Latest)</h4>
 <div class="table-responsive">
     <table class="table table-hover">
         <thead class="table-dark">
@@ -45,37 +83,69 @@
         </thead>
         <tbody>
             <tr class="table-info">
-                <td><code>gemini-2.0-flash-exp</code> <span class="badge bg-info">New</span></td>
+                <td><code>gemini-2.0-flash-exp</code> <span class="badge bg-danger">New</span></td>
                 <td>1M</td>
                 <td>Free*</td>
                 <td>Free*</td>
-                <td>Latest experimental, agentic capabilities</td>
+                <td>Agentic capabilities, tool use, multimodal</td>
             </tr>
+            <tr>
+                <td><code>gemini-2.0-flash-thinking-exp</code></td>
+                <td>1M</td>
+                <td>Free*</td>
+                <td>Free*</td>
+                <td>Reasoning, problem solving (like o1)</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<p class="small text-muted">*Experimental models with free tier rate limits</p>
+
+<h4 class="mt-4 mb-3">Gemini 1.5 (Production)</h4>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-secondary">
+            <tr><th>Model</th><th>Context</th><th>Input $/1M</th><th>Output $/1M</th><th>Best For</th></tr>
+        </thead>
+        <tbody>
             <tr class="table-success">
                 <td><code>gemini-1.5-pro</code> <span class="badge bg-success">Recommended</span></td>
                 <td>2M</td>
                 <td>$1.25</td>
                 <td>$5.00</td>
-                <td>Long documents, complex analysis</td>
+                <td>Long documents, complex analysis, coding</td>
+            </tr>
+            <tr>
+                <td><code>gemini-1.5-pro-002</code></td>
+                <td>2M</td>
+                <td>$1.25</td>
+                <td>$5.00</td>
+                <td>Latest stable version</td>
             </tr>
             <tr>
                 <td><code>gemini-1.5-flash</code></td>
                 <td>1M</td>
                 <td>$0.075</td>
                 <td>$0.30</td>
-                <td>Fast, cost-effective</td>
+                <td>Fast responses, cost-effective</td>
+            </tr>
+            <tr>
+                <td><code>gemini-1.5-flash-002</code></td>
+                <td>1M</td>
+                <td>$0.075</td>
+                <td>$0.30</td>
+                <td>Latest stable Flash</td>
             </tr>
             <tr>
                 <td><code>gemini-1.5-flash-8b</code></td>
                 <td>1M</td>
                 <td>$0.0375</td>
                 <td>$0.15</td>
-                <td>Very fast, high volume</td>
+                <td>High volume, simple tasks</td>
             </tr>
         </tbody>
     </table>
 </div>
-<p class="small text-muted">*Free tier with rate limits</p>
 
 <hr class="my-5">
 
@@ -85,7 +155,7 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>2M Token Context</h5>
-                <p class="mb-0">Largest context window available. Process entire books, codebases, or months of logs.</p>
+                <p class="mb-0">Largest context window available. Process entire books, codebases, or months of logs in a single request.</p>
             </div>
         </div>
     </div>
@@ -93,7 +163,7 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>True Multimodal</h5>
-                <p class="mb-0">Native support for text, images, audio, and video in the same request.</p>
+                <p class="mb-0">Native support for text, images, audio, and video in the same request. No separate vision API needed.</p>
             </div>
         </div>
     </div>
@@ -101,7 +171,7 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Competitive Pricing</h5>
-                <p class="mb-0">Flash models are among the cheapest available. Free tier for experimentation.</p>
+                <p class="mb-0">Flash models among cheapest available. Free tier for experimentation with generous limits.</p>
             </div>
         </div>
     </div>
@@ -109,7 +179,23 @@
         <div class="card h-100 border-success">
             <div class="card-body">
                 <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Google Integration</h5>
-                <p class="mb-0">Tight integration with Google Cloud, Vertex AI, and Google Workspace.</p>
+                <p class="mb-0">Tight integration with Google Cloud, Vertex AI, BigQuery, and Google Workspace.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Fast Inference</h5>
+                <p class="mb-0">Flash models offer excellent speed. 8B variant is one of the fastest models available.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h5><i class="bi bi-check-circle-fill text-success me-2"></i>Grounding & Search</h5>
+                <p class="mb-0">Built-in Google Search grounding for real-time information retrieval.</p>
             </div>
         </div>
     </div>
@@ -123,7 +209,7 @@
         <div class="card h-100 border-danger">
             <div class="card-body">
                 <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Instruction Following</h5>
-                <p class="mb-0">Can be less precise than GPT-4 or Claude at following complex instructions.</p>
+                <p class="mb-0">Can be less precise than GPT-4 or Claude at following complex, nuanced instructions.</p>
             </div>
         </div>
     </div>
@@ -131,7 +217,23 @@
         <div class="card h-100 border-danger">
             <div class="card-body">
                 <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>API Stability</h5>
-                <p class="mb-0">Frequent model updates can cause behavior changes. Test thoroughly.</p>
+                <p class="mb-0">Frequent model updates can cause behavior changes. Pin to specific versions (e.g., -002).</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Safety Filters</h5>
+                <p class="mb-0">Can be overly restrictive for some use cases. Less configurable than competitors.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-body">
+                <h5><i class="bi bi-x-circle-fill text-danger me-2"></i>Regional Availability</h5>
+                <p class="mb-0">Some features not available in all regions. Check Google Cloud regions.</p>
             </div>
         </div>
     </div>
@@ -145,41 +247,138 @@
 <ol>
     <li>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
     <li>Click "Get API Key"</li>
-    <li>Create or select a project</li>
+    <li>Create or select a Google Cloud project</li>
+    <li>Copy the generated API key</li>
 </ol>
 
 <h5>Step 2: Configure in application.properties</h5>
 <pre><code class="language-properties"># config/application.properties
 
+# Enable Google AI
 llm.google.enabled=true
 llm.google.api_key=your-google-api-key
+# Or use environment variable
+# llm.google.api_key=${GOOGLE_API_KEY}
+
+# Default model
 llm.google.default_model=gemini-1.5-pro
 
 # For Vertex AI (enterprise)
+# llm.google.use_vertex=true
 # llm.google.project_id=your-project-id
 # llm.google.location=us-central1</code></pre>
 
 <hr class="my-5">
 
-<h2 id="usage">Usage in Abhikarta-LLM</h2>
+<h2 id="usage">Usage Examples</h2>
 
+<h5>Long Document Analysis</h5>
 <pre><code class="language-json">{
-  "analyze_document": {
-    "type": "llm",
-    "name": "Analyze Long Document",
-    "config": {
-      "provider": "google",
-      "model": "gemini-1.5-pro",
-      "prompt": "Analyze this 500-page document and provide a summary:\n\n{<!-- -->{context.document}<!-- -->}"
-    }
+  "type": "llm",
+  "config": {
+    "provider": "google",
+    "model": "gemini-1.5-pro",
+    "prompt": "Analyze this 500-page document and provide:\n1. Executive summary\n2. Key findings\n3. Recommendations\n\n{document}"
+  }
+}</code></pre>
+
+<h5>Multimodal (Image + Text)</h5>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "google",
+    "model": "gemini-1.5-flash",
+    "prompt": "Describe what you see in this image and extract any text.",
+    "images": ["{image_base64}"]
+  }
+}</code></pre>
+
+<h5>Code Review with Full Codebase</h5>
+<pre><code class="language-json">{
+  "type": "llm",
+  "config": {
+    "provider": "google",
+    "model": "gemini-1.5-pro",
+    "prompt": "Review this entire codebase for security vulnerabilities, performance issues, and best practices violations:\n\n{codebase}"
   }
 }</code></pre>
 
 <hr class="my-5">
 
+<h2 id="best-practices">Best Practices</h2>
+
+<div class="accordion" id="bestPracticesGoogle">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#bp1">Model Selection</button>
+        </h2>
+        <div id="bp1" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <ul>
+                    <li><strong>gemini-1.5-pro</strong>: Complex analysis, long documents, coding</li>
+                    <li><strong>gemini-1.5-flash</strong>: General tasks, quick responses</li>
+                    <li><strong>gemini-1.5-flash-8b</strong>: High volume, simple tasks</li>
+                    <li><strong>gemini-2.0-flash-exp</strong>: Agentic tasks, experimentation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#bp2">Context Window Usage</button>
+        </h2>
+        <div id="bp2" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Use the full 2M context for large documents - it's a key advantage</li>
+                    <li>Place important instructions at the beginning and end</li>
+                    <li>For very long inputs, structure with clear section headers</li>
+                    <li>Consider chunking if you need to process multiple large documents</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#bp3">Cost Optimization</button>
+        </h2>
+        <div id="bp3" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Use Flash models (75x cheaper than Pro) for simple tasks</li>
+                    <li>Use context caching for repeated prompts (up to 75% savings)</li>
+                    <li>Start with free tier for development</li>
+                    <li>Consider Vertex AI for enterprise discounts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="pricing">Pricing (as of Jan 2025)</h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr><th>Model</th><th>Input (per 1M)</th><th>Output (per 1M)</th><th>~Cost per 1K calls*</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>gemini-1.5-pro</td><td>$1.25</td><td>$5.00</td><td>~$1.88</td></tr>
+            <tr><td>gemini-1.5-flash</td><td>$0.075</td><td>$0.30</td><td>~$0.11</td></tr>
+            <tr><td>gemini-1.5-flash-8b</td><td>$0.0375</td><td>$0.15</td><td>~$0.06</td></tr>
+            <tr class="table-success"><td>Free tier</td><td colspan="3">15 RPM, 1M TPM, 1.5K RPD (Flash)</td></tr>
+        </tbody>
+    </table>
+</div>
+<p class="small text-muted">*Estimated based on 500 input + 300 output tokens per call</p>
+
+<hr class="my-5">
+
 <h2 id="resources">Resources & Links</h2>
 <div class="row g-3">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <a href="https://ai.google.dev/docs" target="_blank" class="card h-100 text-decoration-none">
             <div class="card-body text-center">
                 <i class="bi bi-book display-4 text-primary"></i>
@@ -187,7 +386,7 @@ llm.google.default_model=gemini-1.5-pro
             </div>
         </a>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <a href="https://aistudio.google.com" target="_blank" class="card h-100 text-decoration-none">
             <div class="card-body text-center">
                 <i class="bi bi-terminal display-4 text-success"></i>
@@ -195,11 +394,19 @@ llm.google.default_model=gemini-1.5-pro
             </div>
         </a>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <a href="https://ai.google.dev/pricing" target="_blank" class="card h-100 text-decoration-none">
             <div class="card-body text-center">
                 <i class="bi bi-currency-dollar display-4 text-warning"></i>
                 <h6 class="mt-2">Pricing</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="https://cloud.google.com/vertex-ai" target="_blank" class="card h-100 text-decoration-none">
+            <div class="card-body text-center">
+                <i class="bi bi-cloud display-4 text-info"></i>
+                <h6 class="mt-2">Vertex AI</h6>
             </div>
         </a>
     </div>

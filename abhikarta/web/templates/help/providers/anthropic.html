@@ -1,7 +1,7 @@
 {% extends "help/help_base.html" %}
 
 {% set title = "Anthropic" %}
-{% set description = "Claude 3.5 Sonnet, Claude 3 Opus - Safe, helpful AI assistants" %}
+{% set description = "Claude 4.5 Opus, Claude 4.5 Sonnet, Claude 4 - Safe, helpful AI assistants" %}
 {% set icon = "bi-stars" %}
 {% set header_color = "#d97757" %}
 {% set header_color_dark = "#c4623f" %}
@@ -31,7 +31,7 @@
 
 <div class="alert alert-warning">
     <i class="bi bi-award me-2"></i>
-    <strong>Top Pick for Complex Tasks:</strong> Claude 3.5 Sonnet consistently ranks among the best models for coding, analysis, and nuanced reasoning.
+    <strong>Top Pick for Complex Tasks:</strong> Claude 4.5 Sonnet and Opus are the most advanced models available, excelling at coding, analysis, and nuanced reasoning.
 </div>
 
 <p class="lead">Anthropic was founded by former OpenAI researchers with a focus on AI safety. Claude models are known for their helpfulness, harmlessness, and honesty - plus exceptional performance on complex reasoning tasks.</p>
@@ -67,6 +67,7 @@
 
 <h2 id="models">Available Models</h2>
 
+<h4 class="mt-4 mb-3">Claude 4.5 Family (Latest)</h4>
 <div class="table-responsive">
     <table class="table table-hover">
         <thead class="table-dark">
@@ -80,21 +81,115 @@
             </tr>
         </thead>
         <tbody>
-            <tr class="table-success">
-                <td><code>claude-3-5-sonnet-20241022</code> <span class="badge bg-success">Best</span></td>
-                <td>200K</td>
-                <td>$3.00</td>
-                <td>$15.00</td>
-                <td><i class="bi bi-speedometer2 text-success"></i> Fast</td>
-                <td>Best overall - coding, analysis, writing</td>
-            </tr>
-            <tr>
-                <td><code>claude-3-opus-20240229</code> <span class="badge bg-warning text-dark">Premium</span></td>
+            <tr class="table-warning">
+                <td><code>claude-opus-4-5-20251101</code> <span class="badge bg-danger">Most Capable</span></td>
                 <td>200K</td>
                 <td>$15.00</td>
                 <td>$75.00</td>
                 <td><i class="bi bi-hourglass text-warning"></i> Slower</td>
-                <td>Most capable for complex tasks</td>
+                <td>Most intelligent - complex reasoning, research, analysis</td>
+            </tr>
+            <tr class="table-success">
+                <td><code>claude-sonnet-4-5-20250929</code> <span class="badge bg-success">Best Value</span></td>
+                <td>200K</td>
+                <td>$3.00</td>
+                <td>$15.00</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Fast</td>
+                <td>Best balance - coding, analysis, writing</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4 class="mt-4 mb-3">Claude 4 Family</h4>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-secondary">
+            <tr>
+                <th>Model</th>
+                <th>Context</th>
+                <th>Input $/1M</th>
+                <th>Output $/1M</th>
+                <th>Speed</th>
+                <th>Best For</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>claude-opus-4-20250514</code></td>
+                <td>200K</td>
+                <td>$15.00</td>
+                <td>$75.00</td>
+                <td><i class="bi bi-hourglass text-warning"></i> Slower</td>
+                <td>Complex tasks requiring deep reasoning</td>
+            </tr>
+            <tr>
+                <td><code>claude-sonnet-4-20250514</code></td>
+                <td>200K</td>
+                <td>$3.00</td>
+                <td>$15.00</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Fast</td>
+                <td>General purpose, coding, analysis</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4 class="mt-4 mb-3">Claude 3.5 Family</h4>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-secondary">
+            <tr>
+                <th>Model</th>
+                <th>Context</th>
+                <th>Input $/1M</th>
+                <th>Output $/1M</th>
+                <th>Speed</th>
+                <th>Best For</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>claude-3-5-sonnet-20241022</code></td>
+                <td>200K</td>
+                <td>$3.00</td>
+                <td>$15.00</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Fast</td>
+                <td>Previous generation best overall</td>
+            </tr>
+            <tr>
+                <td><code>claude-3-5-haiku-20241022</code> <span class="badge bg-info">Budget</span></td>
+                <td>200K</td>
+                <td>$0.80</td>
+                <td>$4.00</td>
+                <td><i class="bi bi-speedometer2 text-success"></i> Very Fast</td>
+                <td>Fast, cost-effective for simple tasks</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4 class="mt-4 mb-3">Claude 3 Family (Legacy)</h4>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-secondary">
+            <tr>
+                <th>Model</th>
+                <th>Context</th>
+                <th>Input $/1M</th>
+                <th>Output $/1M</th>
+                <th>Speed</th>
+                <th>Best For</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>claude-3-opus-20240229</code></td>
+                <td>200K</td>
+                <td>$15.00</td>
+                <td>$75.00</td>
+                <td><i class="bi bi-hourglass text-warning"></i> Slower</td>
+                <td>Legacy complex reasoning</td>
             </tr>
             <tr>
                 <td><code>claude-3-sonnet-20240229</code></td>
@@ -102,23 +197,15 @@
                 <td>$3.00</td>
                 <td>$15.00</td>
                 <td><i class="bi bi-speedometer2 text-success"></i> Fast</td>
-                <td>Previous generation balanced model</td>
+                <td>Legacy balanced model</td>
             </tr>
             <tr>
-                <td><code>claude-3-haiku-20240307</code> <span class="badge bg-info">Budget</span></td>
+                <td><code>claude-3-haiku-20240307</code></td>
                 <td>200K</td>
                 <td>$0.25</td>
                 <td>$1.25</td>
                 <td><i class="bi bi-speedometer2 text-success"></i> Very Fast</td>
-                <td>Fast, simple tasks, high volume</td>
-            </tr>
-            <tr>
-                <td><code>claude-2.1</code></td>
-                <td>200K</td>
-                <td>$8.00</td>
-                <td>$24.00</td>
-                <td><i class="bi bi-speedometer text-warning"></i> Medium</td>
-                <td>Legacy support only</td>
+                <td>Legacy fast, high volume</td>
             </tr>
         </tbody>
     </table>
@@ -238,7 +325,7 @@ llm.anthropic.api_key=sk-ant-your-api-key-here
 # Or: llm.anthropic.api_key=${ANTHROPIC_API_KEY}
 
 # Default model
-llm.anthropic.default_model=claude-3-5-sonnet-20241022
+llm.anthropic.default_model=claude-sonnet-4-5-20250929
 
 # Default max tokens (Claude requires explicit max_tokens)
 llm.anthropic.max_tokens=4096
@@ -256,7 +343,7 @@ llm.default_provider=anthropic</code></pre>
   "name": "Code Review Agent",
   "llm_config": {
     "provider": "anthropic",
-    "model": "claude-3-5-sonnet-20241022",
+    "model": "claude-sonnet-4-5-20250929",
     "temperature": 0.3,
     "max_tokens": 4096
   },
@@ -270,7 +357,7 @@ llm.default_provider=anthropic</code></pre>
     "name": "Code Analysis with Claude",
     "config": {
       "provider": "anthropic",
-      "model": "claude-3-5-sonnet-20241022",
+      "model": "claude-sonnet-4-5-20250929",
       "max_tokens": 4096,
       "prompt": "Review this code and provide detailed feedback:\n\n```\n{<!-- -->{context.code}<!-- -->}\n```"
     }
@@ -287,9 +374,9 @@ llm.default_provider=anthropic</code></pre>
 </div>
 
 <ul>
-    <li><strong>Use Claude 3.5 Sonnet</strong> for most tasks - it's the best balance of capability and cost</li>
-    <li><strong>Use Haiku</strong> for high-volume simple tasks like classification</li>
-    <li><strong>Reserve Opus</strong> for truly complex reasoning tasks where quality is paramount</li>
+    <li><strong>Use Claude 4.5 Sonnet</strong> for most tasks - it's the best balance of capability and cost</li>
+    <li><strong>Use Claude 4.5 Opus</strong> for the most complex reasoning tasks requiring maximum intelligence</li>
+    <li><strong>Use Claude 3.5 Haiku</strong> for high-volume simple tasks like classification</li>
     <li><strong>Leverage the 200K context</strong> - great for analyzing entire documents or codebases</li>
     <li><strong>Be specific in prompts</strong> - Claude responds well to detailed instructions</li>
 </ul>
@@ -304,12 +391,17 @@ llm.default_provider=anthropic</code></pre>
             <tr><th>Model</th><th>Input</th><th>Output</th><th>~Cost per 1K calls*</th></tr>
         </thead>
         <tbody>
+            <tr><td>Claude 4.5 Opus</td><td>$15.00</td><td>$75.00</td><td>~$30.00</td></tr>
+            <tr><td>Claude 4.5 Sonnet</td><td>$3.00</td><td>$15.00</td><td>~$5.10</td></tr>
+            <tr><td>Claude 4 Opus</td><td>$15.00</td><td>$75.00</td><td>~$30.00</td></tr>
+            <tr><td>Claude 4 Sonnet</td><td>$3.00</td><td>$15.00</td><td>~$5.10</td></tr>
             <tr><td>Claude 3.5 Sonnet</td><td>$3.00</td><td>$15.00</td><td>~$5.10</td></tr>
-            <tr><td>Claude 3 Opus</td><td>$15.00</td><td>$75.00</td><td>~$30.00</td></tr>
+            <tr><td>Claude 3.5 Haiku</td><td>$0.80</td><td>$4.00</td><td>~$1.60</td></tr>
             <tr><td>Claude 3 Haiku</td><td>$0.25</td><td>$1.25</td><td>~$0.50</td></tr>
         </tbody>
     </table>
 </div>
+<p class="small text-muted">* Estimated cost assuming ~300 input tokens and ~500 output tokens per call</p>
 
 <hr class="my-5">
 
