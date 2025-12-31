@@ -199,6 +199,7 @@ class MCPDelegate(DatabaseDelegate):
     def create_server(self, name: str, base_url: str, created_by: str,
                       description: str = None, tools_endpoint: str = '/api/tools/list',
                       auth_type: str = 'none', auth_config: str = '{}',
+                      auth_endpoint: str = '',
                       is_active: int = 1, auto_refresh: int = 1,
                       refresh_interval_minutes: int = 60,
                       timeout_seconds: int = 30) -> Optional[str]:
@@ -208,11 +209,11 @@ class MCPDelegate(DatabaseDelegate):
             self.execute(
                 """INSERT INTO mcp_tool_servers 
                    (server_id, name, description, base_url, tools_endpoint,
-                    auth_type, auth_config, is_active, auto_refresh,
+                    auth_type, auth_config, auth_endpoint, is_active, auto_refresh,
                     refresh_interval_minutes, timeout_seconds, created_by)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (server_id, name, description, base_url, tools_endpoint,
-                 auth_type, auth_config, is_active, auto_refresh,
+                 auth_type, auth_config, auth_endpoint, is_active, auto_refresh,
                  refresh_interval_minutes, timeout_seconds, created_by)
             )
             return server_id
@@ -226,7 +227,7 @@ class MCPDelegate(DatabaseDelegate):
             return False
         
         valid_fields = ['name', 'description', 'base_url', 'tools_endpoint',
-                        'auth_type', 'auth_config', 'is_active', 'auto_refresh',
+                        'auth_type', 'auth_config', 'auth_endpoint', 'is_active', 'auto_refresh',
                         'refresh_interval_minutes', 'timeout_seconds',
                         'last_refresh', 'last_refresh_status', 'tool_count',
                         'cached_tools']

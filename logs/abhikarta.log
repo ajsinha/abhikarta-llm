@@ -1,330 +1,164 @@
-2025-12-31 15:48:05,958 - __main__ - INFO - Properties configuration initialized
-2025-12-31 15:48:06,003 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
-2025-12-31 15:48:06,003 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
-2025-12-31 15:48:06,003 - abhikarta.database.db_facade - INFO - Database delegates initialized (including NotificationDelegate)
-2025-12-31 15:48:06,004 - abhikarta.database.db_facade - INFO - Database connected
-2025-12-31 15:48:06,004 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
-2025-12-31 15:48:06,082 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
-2025-12-31 15:48:06,207 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
-2025-12-31 15:48:06,212 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
-2025-12-31 15:48:06,215 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.4.6)
-2025-12-31 15:48:06,216 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
-2025-12-31 15:48:06,216 - abhikarta.database.db_facade - INFO - Database schema initialized
-2025-12-31 15:48:06,216 - __main__ - INFO - Database initialized: sqlite
-2025-12-31 15:48:06,220 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
-2025-12-31 15:48:06,220 - __main__ - INFO - User management initialized
-2025-12-31 15:48:06,302 - abhikarta.tools.registry - INFO - ToolsRegistry initialized
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: get_current_datetime (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: parse_date (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: calculate_date_difference (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: add_days_to_date (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: get_business_days (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: calculate_expression (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: calculate_percentage (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: calculate_compound_interest (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_emi (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: convert_currency (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: extract_text_patterns (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: clean_text (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: extract_entities (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: generate_summary_stats (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: mask_sensitive_data (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: validate_email (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: validate_phone (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: validate_credit_card (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: validate_iban (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: validate_ssn (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: json_to_csv (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: csv_to_json (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: base64_encode (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: base64_decode (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: generate_hash (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: generate_uuid (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: generate_reference_number (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.registry - INFO - Registered tool: generate_account_number (type=function)
-2025-12-31 15:48:06,303 - abhikarta.tools.prebuilt.common_tools - INFO - Registered 28 common tools
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: verify_identity_document (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: calculate_kyc_risk_score (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: verify_address (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: calculate_credit_score (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: assess_debt_to_income (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_eligibility (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: generate_amortization_schedule (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: analyze_transaction (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: detect_transaction_patterns (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: calculate_transaction_limits (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: check_sanctions_list (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: generate_aml_report (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: validate_regulatory_compliance (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.prebuilt.banking_tools - INFO - Registered 13 banking tools
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: make_http_request (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: build_query_string (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: parse_json_response (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: validate_api_response (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: format_email_template (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: create_notification (type=function)
-2025-12-31 15:48:06,304 - abhikarta.tools.registry - INFO - Registered tool: format_sms_message (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: map_fields (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: flatten_nested_dict (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: unflatten_dict (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: merge_dicts (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: filter_dict_keys (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: filter_list (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: sort_list (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: group_by (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: aggregate_list (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: paginate_list (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: create_workflow_context (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: update_workflow_context (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: evaluate_condition (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.prebuilt.integration_tools - INFO - Registered 20 integration tools
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: web_search (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: web_fetch (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: intranet_search (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: news_search (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: read_document (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: write_document (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: convert_document (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: extract_document_metadata (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: list_files (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: copy_file (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: move_file (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: delete_file (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: get_system_info (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: execute_shell_command (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: get_environment_variable (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: set_environment_variable (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: check_url_status (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: ping_host (type=function)
-2025-12-31 15:48:06,305 - abhikarta.tools.registry - INFO - Registered tool: dns_lookup (type=function)
-2025-12-31 15:48:06,306 - abhikarta.tools.registry - INFO - Registered tool: parse_url (type=function)
-2025-12-31 15:48:06,306 - abhikarta.tools.registry - INFO - Registered tool: url_encode (type=function)
-2025-12-31 15:48:06,306 - abhikarta.tools.registry - INFO - Registered tool: url_decode (type=function)
-2025-12-31 15:48:06,306 - abhikarta.tools.registry - INFO - Registered tool: html_encode (type=function)
-2025-12-31 15:48:06,306 - abhikarta.tools.registry - INFO - Registered tool: html_decode (type=function)
-2025-12-31 15:48:06,306 - abhikarta.tools.prebuilt.general_tools - INFO - Registered 24 general-purpose tools
-2025-12-31 15:48:06,306 - __main__ - INFO - Registered 85 pre-built tools
-2025-12-31 15:48:06,306 - abhikarta.database.sqlite_handler - ERROR - fetch_all execute error: no such column: status
-2025-12-31 15:48:06,306 - abhikarta.database.sqlite_handler - ERROR - SQLite fetch_all error: no such column: status
-2025-12-31 15:48:06,306 - abhikarta.database.sqlite_handler - ERROR - Query: SELECT * FROM code_fragments WHERE status = 'active'
-2025-12-31 15:48:06,306 - abhikarta.database.sqlite_handler - ERROR - Params: None (type: None)
-2025-12-31 15:48:06,306 - abhikarta.database.sqlite_handler - ERROR - Traceback: Traceback (most recent call last):
+2025-12-31 16:45:31,657 - __main__ - INFO - Properties configuration initialized
+2025-12-31 16:45:31,748 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2025-12-31 16:45:31,749 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2025-12-31 16:45:31,749 - abhikarta.database.db_facade - INFO - Database delegates initialized (including NotificationDelegate)
+2025-12-31 16:45:31,749 - abhikarta.database.db_facade - INFO - Database connected
+2025-12-31 16:45:31,749 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2025-12-31 16:45:31,823 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2025-12-31 16:45:31,960 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2025-12-31 16:45:31,966 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2025-12-31 16:45:31,969 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.4.6)
+2025-12-31 16:45:31,969 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2025-12-31 16:45:31,969 - abhikarta.database.db_facade - INFO - Database schema initialized
+2025-12-31 16:45:31,969 - __main__ - INFO - Database initialized: sqlite
+2025-12-31 16:45:31,974 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2025-12-31 16:45:31,974 - __main__ - INFO - User management initialized
+2025-12-31 16:45:32,060 - abhikarta.tools.registry - INFO - ToolsRegistry initialized
+2025-12-31 16:45:32,060 - abhikarta.tools.registry - INFO - Registered tool: get_current_datetime (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: parse_date (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: calculate_date_difference (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: add_days_to_date (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: get_business_days (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: calculate_expression (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: calculate_percentage (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: calculate_compound_interest (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_emi (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: convert_currency (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: extract_text_patterns (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: clean_text (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: extract_entities (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: generate_summary_stats (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: mask_sensitive_data (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: validate_email (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: validate_phone (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: validate_credit_card (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: validate_iban (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: validate_ssn (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: json_to_csv (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: csv_to_json (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: base64_encode (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: base64_decode (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: generate_hash (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: generate_uuid (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: generate_reference_number (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: generate_account_number (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.prebuilt.common_tools - INFO - Registered 28 common tools
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: verify_identity_document (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: calculate_kyc_risk_score (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: verify_address (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: calculate_credit_score (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: assess_debt_to_income (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_eligibility (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: generate_amortization_schedule (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: analyze_transaction (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: detect_transaction_patterns (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: calculate_transaction_limits (type=function)
+2025-12-31 16:45:32,061 - abhikarta.tools.registry - INFO - Registered tool: check_sanctions_list (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: generate_aml_report (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: validate_regulatory_compliance (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.prebuilt.banking_tools - INFO - Registered 13 banking tools
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: make_http_request (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: build_query_string (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: parse_json_response (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: validate_api_response (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: format_email_template (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: create_notification (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: format_sms_message (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: map_fields (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: flatten_nested_dict (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: unflatten_dict (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: merge_dicts (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: filter_dict_keys (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: filter_list (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: sort_list (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: group_by (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: aggregate_list (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: paginate_list (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: create_workflow_context (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: update_workflow_context (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.registry - INFO - Registered tool: evaluate_condition (type=function)
+2025-12-31 16:45:32,062 - abhikarta.tools.prebuilt.integration_tools - INFO - Registered 20 integration tools
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: web_search (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: web_fetch (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: intranet_search (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: news_search (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: read_document (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: write_document (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: convert_document (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: extract_document_metadata (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: list_files (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: copy_file (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: move_file (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: delete_file (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: get_system_info (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: execute_shell_command (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: get_environment_variable (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: set_environment_variable (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: check_url_status (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: ping_host (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: dns_lookup (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: parse_url (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: url_encode (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: url_decode (type=function)
+2025-12-31 16:45:32,063 - abhikarta.tools.registry - INFO - Registered tool: html_encode (type=function)
+2025-12-31 16:45:32,064 - abhikarta.tools.registry - INFO - Registered tool: html_decode (type=function)
+2025-12-31 16:45:32,064 - abhikarta.tools.prebuilt.general_tools - INFO - Registered 24 general-purpose tools
+2025-12-31 16:45:32,064 - __main__ - INFO - Registered 85 pre-built tools
+2025-12-31 16:45:32,064 - abhikarta.database.sqlite_handler - ERROR - fetch_all execute error: no such column: status
+2025-12-31 16:45:32,064 - abhikarta.database.sqlite_handler - ERROR - SQLite fetch_all error: no such column: status
+2025-12-31 16:45:32,064 - abhikarta.database.sqlite_handler - ERROR - Query: SELECT * FROM code_fragments WHERE status = 'active'
+2025-12-31 16:45:32,064 - abhikarta.database.sqlite_handler - ERROR - Params: None (type: None)
+2025-12-31 16:45:32,064 - abhikarta.database.sqlite_handler - ERROR - Traceback: Traceback (most recent call last):
   File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/database/sqlite_handler.py", line 222, in fetch_all
     cursor.execute(query)
     ~~~~~~~~~~~~~~^^^^^^^
 sqlite3.OperationalError: no such column: status
 
-2025-12-31 15:48:06,306 - abhikarta.tools.registry - ERROR - Error loading code fragments: no such column: status
-2025-12-31 15:48:06,306 - __main__ - INFO - Registered 0 code fragment tools
-2025-12-31 15:48:06,306 - __main__ - INFO - Tools registry initialized with 85 tools
-2025-12-31 15:48:06,315 - abhikarta.mcp.manager - INFO - MCPServerManager initialized
-2025-12-31 15:48:06,315 - abhikarta.mcp.manager - INFO - Loaded 0 MCP servers from database
-2025-12-31 15:48:06,315 - __main__ - INFO - Loaded 0 MCP servers from database
-2025-12-31 15:48:06,315 - __main__ - INFO - Connected to 0 MCP servers
-2025-12-31 15:48:06,316 - abhikarta.mcp.manager - INFO - Health monitor started (interval: 30s)
-2025-12-31 15:48:06,316 - __main__ - INFO - MCP health monitor started (interval: 30s)
-2025-12-31 15:48:06,316 - __main__ - INFO - MCP manager initialized with 0 servers
-2025-12-31 15:48:06,316 - abhikarta.actor.dispatcher - INFO - DefaultDispatcher initialized with 8 threads
-2025-12-31 15:48:06,316 - abhikarta.actor.scheduler - INFO - Scheduler started
-2025-12-31 15:48:06,316 - abhikarta.actor.system - INFO - ActorSystem 'abhikarta-actors' started
-2025-12-31 15:48:06,316 - __main__ - INFO - Actor system 'abhikarta-actors' started
-2025-12-31 15:48:06,316 - __main__ - INFO -   Default dispatcher threads: 8
-2025-12-31 15:48:06,316 - __main__ - INFO -   I/O dispatcher threads: 16
-2025-12-31 15:48:06,316 - __main__ - INFO -   Dead letter logging: True
-2025-12-31 15:48:06,316 - __main__ - INFO - Actor system 'abhikarta-actors' ready for concurrent execution
-2025-12-31 15:48:06,366 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
-2025-12-31 15:48:06,366 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
-2025-12-31 15:48:06,366 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
-2025-12-31 15:48:06,424 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
-2025-12-31 15:48:06,424 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
-2025-12-31 15:48:06,427 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
-2025-12-31 15:48:06,427 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
-2025-12-31 15:48:06,427 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
-2025-12-31 15:48:06,439 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
-2025-12-31 15:48:06,440 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
-2025-12-31 15:48:06,440 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
-2025-12-31 15:48:06,445 - abhikarta.web.routes.user_routes - INFO - User routes registered
-2025-12-31 15:48:06,445 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
-2025-12-31 15:48:06,445 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
-2025-12-31 15:48:06,449 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
-2025-12-31 15:48:06,449 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
-2025-12-31 15:48:06,449 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
-2025-12-31 15:48:06,451 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
-2025-12-31 15:48:06,451 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
-2025-12-31 15:48:06,451 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
-2025-12-31 15:48:06,456 - abhikarta.web.routes.api_routes - INFO - API routes registered
-2025-12-31 15:48:06,456 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
-2025-12-31 15:48:06,461 - abhikarta.web.routes.workflow_routes - INFO - Workflow routes registered
-2025-12-31 15:48:06,461 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: SwarmRoutes
-2025-12-31 15:48:06,467 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: NotificationRoutes
-2025-12-31 15:48:06,471 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AIORGRoutes
-2025-12-31 15:48:06,476 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
-2025-12-31 15:48:06,477 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
-2025-12-31 15:48:06,477 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
-2025-12-31 15:48:06,477 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
-2025-12-31 15:54:45,847 - __main__ - INFO - Terminating actor system...
-2025-12-31 15:54:45,847 - __main__ - WARNING - Error terminating actor system: ActorSystem.terminate() got an unexpected keyword argument 'timeout'
-2025-12-31 15:55:00,591 - __main__ - INFO - Properties configuration initialized
-2025-12-31 15:55:00,605 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
-2025-12-31 15:55:00,605 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
-2025-12-31 15:55:00,605 - abhikarta.database.db_facade - INFO - Database delegates initialized (including NotificationDelegate)
-2025-12-31 15:55:00,605 - abhikarta.database.db_facade - INFO - Database connected
-2025-12-31 15:55:00,605 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
-2025-12-31 15:55:00,606 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
-2025-12-31 15:55:00,607 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
-2025-12-31 15:55:00,607 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
-2025-12-31 15:55:00,609 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.4.6)
-2025-12-31 15:55:00,609 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
-2025-12-31 15:55:00,609 - abhikarta.database.db_facade - INFO - Database schema initialized
-2025-12-31 15:55:00,609 - __main__ - INFO - Database initialized: sqlite
-2025-12-31 15:55:00,609 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
-2025-12-31 15:55:00,609 - __main__ - INFO - User management initialized
-2025-12-31 15:55:00,663 - abhikarta.tools.registry - INFO - ToolsRegistry initialized
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: get_current_datetime (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: parse_date (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: calculate_date_difference (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: add_days_to_date (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: get_business_days (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: calculate_expression (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: calculate_percentage (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: calculate_compound_interest (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_emi (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: convert_currency (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: extract_text_patterns (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: clean_text (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: extract_entities (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: generate_summary_stats (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: mask_sensitive_data (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: validate_email (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: validate_phone (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: validate_credit_card (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: validate_iban (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: validate_ssn (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: json_to_csv (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: csv_to_json (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: base64_encode (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: base64_decode (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: generate_hash (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: generate_uuid (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: generate_reference_number (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.registry - INFO - Registered tool: generate_account_number (type=function)
-2025-12-31 15:55:00,664 - abhikarta.tools.prebuilt.common_tools - INFO - Registered 28 common tools
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: verify_identity_document (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: calculate_kyc_risk_score (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: verify_address (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: calculate_credit_score (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: assess_debt_to_income (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_eligibility (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: generate_amortization_schedule (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: analyze_transaction (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: detect_transaction_patterns (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: calculate_transaction_limits (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: check_sanctions_list (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: generate_aml_report (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.registry - INFO - Registered tool: validate_regulatory_compliance (type=function)
-2025-12-31 15:55:00,665 - abhikarta.tools.prebuilt.banking_tools - INFO - Registered 13 banking tools
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: make_http_request (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: build_query_string (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: parse_json_response (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: validate_api_response (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: format_email_template (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: create_notification (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: format_sms_message (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: map_fields (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: flatten_nested_dict (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: unflatten_dict (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: merge_dicts (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: filter_dict_keys (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: filter_list (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: sort_list (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: group_by (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: aggregate_list (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: paginate_list (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: create_workflow_context (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: update_workflow_context (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.registry - INFO - Registered tool: evaluate_condition (type=function)
-2025-12-31 15:55:00,666 - abhikarta.tools.prebuilt.integration_tools - INFO - Registered 20 integration tools
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: web_search (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: web_fetch (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: intranet_search (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: news_search (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: read_document (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: write_document (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: convert_document (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: extract_document_metadata (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: list_files (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: copy_file (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: move_file (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: delete_file (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: get_system_info (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: execute_shell_command (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: get_environment_variable (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: set_environment_variable (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: check_url_status (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: ping_host (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: dns_lookup (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: parse_url (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: url_encode (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: url_decode (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: html_encode (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - INFO - Registered tool: html_decode (type=function)
-2025-12-31 15:55:00,667 - abhikarta.tools.prebuilt.general_tools - INFO - Registered 24 general-purpose tools
-2025-12-31 15:55:00,667 - __main__ - INFO - Registered 85 pre-built tools
-2025-12-31 15:55:00,667 - abhikarta.database.sqlite_handler - ERROR - fetch_all execute error: no such column: status
-2025-12-31 15:55:00,667 - abhikarta.database.sqlite_handler - ERROR - SQLite fetch_all error: no such column: status
-2025-12-31 15:55:00,667 - abhikarta.database.sqlite_handler - ERROR - Query: SELECT * FROM code_fragments WHERE status = 'active'
-2025-12-31 15:55:00,667 - abhikarta.database.sqlite_handler - ERROR - Params: None (type: None)
-2025-12-31 15:55:00,667 - abhikarta.database.sqlite_handler - ERROR - Traceback: Traceback (most recent call last):
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/database/sqlite_handler.py", line 222, in fetch_all
-    cursor.execute(query)
-    ~~~~~~~~~~~~~~^^^^^^^
-sqlite3.OperationalError: no such column: status
-
-2025-12-31 15:55:00,667 - abhikarta.tools.registry - ERROR - Error loading code fragments: no such column: status
-2025-12-31 15:55:00,667 - __main__ - INFO - Registered 0 code fragment tools
-2025-12-31 15:55:00,667 - __main__ - INFO - Tools registry initialized with 85 tools
-2025-12-31 15:55:00,671 - abhikarta.mcp.manager - INFO - MCPServerManager initialized
-2025-12-31 15:55:00,671 - abhikarta.mcp.manager - INFO - Loaded 0 MCP servers from database
-2025-12-31 15:55:00,671 - __main__ - INFO - Loaded 0 MCP servers from database
-2025-12-31 15:55:00,671 - __main__ - INFO - Connected to 0 MCP servers
-2025-12-31 15:55:00,671 - abhikarta.mcp.manager - INFO - Health monitor started (interval: 30s)
-2025-12-31 15:55:00,671 - __main__ - INFO - MCP health monitor started (interval: 30s)
-2025-12-31 15:55:00,671 - __main__ - INFO - MCP manager initialized with 0 servers
-2025-12-31 15:55:00,671 - abhikarta.actor.dispatcher - INFO - DefaultDispatcher initialized with 8 threads
-2025-12-31 15:55:00,671 - abhikarta.actor.scheduler - INFO - Scheduler started
-2025-12-31 15:55:00,671 - abhikarta.actor.system - INFO - ActorSystem 'abhikarta-actors' started
-2025-12-31 15:55:00,671 - __main__ - INFO - Actor system 'abhikarta-actors' started
-2025-12-31 15:55:00,671 - __main__ - INFO -   Default dispatcher threads: 8
-2025-12-31 15:55:00,671 - __main__ - INFO -   I/O dispatcher threads: 16
-2025-12-31 15:55:00,671 - __main__ - INFO -   Dead letter logging: True
-2025-12-31 15:55:00,671 - __main__ - INFO - Actor system 'abhikarta-actors' ready for concurrent execution
-2025-12-31 15:55:00,718 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
-2025-12-31 15:55:00,718 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
-2025-12-31 15:55:00,718 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
-2025-12-31 15:55:00,726 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
-2025-12-31 15:55:00,726 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
-2025-12-31 15:55:00,728 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
-2025-12-31 15:55:00,728 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
-2025-12-31 15:55:00,729 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
-2025-12-31 15:55:00,741 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
-2025-12-31 15:55:00,741 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
-2025-12-31 15:55:00,741 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
-2025-12-31 15:55:00,747 - abhikarta.web.routes.user_routes - INFO - User routes registered
-2025-12-31 15:55:00,747 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
-2025-12-31 15:55:00,747 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
-2025-12-31 15:55:00,750 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
-2025-12-31 15:55:00,750 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
-2025-12-31 15:55:00,750 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
-2025-12-31 15:55:00,752 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
-2025-12-31 15:55:00,752 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
-2025-12-31 15:55:00,752 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
-2025-12-31 15:55:00,758 - abhikarta.web.routes.api_routes - INFO - API routes registered
-2025-12-31 15:55:00,758 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
-2025-12-31 15:55:00,762 - abhikarta.web.routes.workflow_routes - INFO - Workflow routes registered
-2025-12-31 15:55:00,762 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: SwarmRoutes
-2025-12-31 15:55:00,767 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: NotificationRoutes
-2025-12-31 15:55:00,771 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AIORGRoutes
-2025-12-31 15:55:00,776 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
-2025-12-31 15:55:00,776 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
-2025-12-31 15:55:00,776 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
-2025-12-31 15:55:00,776 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2025-12-31 16:45:32,064 - abhikarta.tools.registry - ERROR - Error loading code fragments: no such column: status
+2025-12-31 16:45:32,064 - __main__ - INFO - Registered 0 code fragment tools
+2025-12-31 16:45:32,064 - __main__ - INFO - Tools registry initialized with 85 tools
+2025-12-31 16:45:32,075 - abhikarta.mcp.manager - INFO - MCPServerManager initialized
+2025-12-31 16:45:32,075 - abhikarta.mcp.manager - INFO - Loaded 0 MCP servers from database
+2025-12-31 16:45:32,075 - __main__ - INFO - Loaded 0 MCP servers from database
+2025-12-31 16:45:32,075 - __main__ - INFO - Connected to 0 MCP servers
+2025-12-31 16:45:32,075 - abhikarta.mcp.manager - INFO - Health monitor started (interval: 30s)
+2025-12-31 16:45:32,075 - __main__ - INFO - MCP health monitor started (interval: 30s)
+2025-12-31 16:45:32,075 - __main__ - INFO - MCP manager initialized with 0 servers
+2025-12-31 16:45:32,075 - abhikarta.actor.dispatcher - INFO - DefaultDispatcher initialized with 8 threads
+2025-12-31 16:45:32,076 - abhikarta.actor.scheduler - INFO - Scheduler started
+2025-12-31 16:45:32,076 - abhikarta.actor.system - INFO - ActorSystem 'abhikarta-actors' started
+2025-12-31 16:45:32,076 - __main__ - INFO - Actor system 'abhikarta-actors' started
+2025-12-31 16:45:32,076 - __main__ - INFO -   Default dispatcher threads: 8
+2025-12-31 16:45:32,076 - __main__ - INFO -   I/O dispatcher threads: 16
+2025-12-31 16:45:32,076 - __main__ - INFO -   Dead letter logging: True
+2025-12-31 16:45:32,076 - __main__ - INFO - Actor system 'abhikarta-actors' ready for concurrent execution
+2025-12-31 16:45:32,130 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2025-12-31 16:45:32,130 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
+2025-12-31 16:45:32,130 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
+2025-12-31 16:45:32,199 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2025-12-31 16:45:32,199 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
+2025-12-31 16:45:32,202 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
+2025-12-31 16:45:32,202 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2025-12-31 16:45:32,202 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
+2025-12-31 16:45:32,214 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
+2025-12-31 16:45:32,214 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2025-12-31 16:45:32,214 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
+2025-12-31 16:45:32,220 - abhikarta.web.routes.user_routes - INFO - User routes registered
+2025-12-31 16:45:32,220 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2025-12-31 16:45:32,220 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
+2025-12-31 16:45:32,223 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
+2025-12-31 16:45:32,223 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2025-12-31 16:45:32,223 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
+2025-12-31 16:45:32,225 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
+2025-12-31 16:45:32,225 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2025-12-31 16:45:32,225 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
+2025-12-31 16:45:32,231 - abhikarta.web.routes.api_routes - INFO - API routes registered
+2025-12-31 16:45:32,231 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2025-12-31 16:45:32,235 - abhikarta.web.routes.workflow_routes - INFO - Workflow routes registered
+2025-12-31 16:45:32,235 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: SwarmRoutes
+2025-12-31 16:45:32,240 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: NotificationRoutes
+2025-12-31 16:45:32,244 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AIORGRoutes
+2025-12-31 16:45:32,250 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
+2025-12-31 16:45:32,250 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
+2025-12-31 16:45:32,250 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
+2025-12-31 16:45:32,250 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000

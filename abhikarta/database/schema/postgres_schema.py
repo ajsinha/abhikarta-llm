@@ -378,6 +378,7 @@ class PostgresSchema:
         tools_endpoint TEXT DEFAULT '/api/tools/list',
         auth_type TEXT DEFAULT 'none',
         auth_config JSONB DEFAULT '{}',
+        auth_endpoint TEXT DEFAULT '',
         is_active BOOLEAN DEFAULT TRUE,
         auto_refresh BOOLEAN DEFAULT TRUE,
         refresh_interval_minutes INTEGER DEFAULT 60,

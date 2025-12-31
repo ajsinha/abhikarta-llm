@@ -388,6 +388,7 @@ class SQLiteSchema:
         tools_endpoint TEXT DEFAULT '/api/tools/list',
         auth_type TEXT DEFAULT 'none',
         auth_config TEXT DEFAULT '{}',
+        auth_endpoint TEXT DEFAULT '',
         is_active INTEGER DEFAULT 1,
         auto_refresh INTEGER DEFAULT 1,
         refresh_interval_minutes INTEGER DEFAULT 60,

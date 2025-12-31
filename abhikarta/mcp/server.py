@@ -61,6 +61,7 @@ class MCPServerConfig:
     auth_token: str = ""
     auth_header: str = "Authorization"
     auth_config: Dict[str, Any] = field(default_factory=dict)
+    auth_endpoint: str = ""  # For basic auth - endpoint to call for login
     
     # Endpoints
     tools_endpoint: str = "/api/tools"

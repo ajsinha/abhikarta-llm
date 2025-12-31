@@ -205,7 +205,8 @@ class AuthRoutes(AbstractRoutes):
                 'workflow_visual_designer': 'help/pages/workflow_visual_designer.html',
                 'workflow-dags': 'help/pages/workflow_dags.html',
                 'llm-providers': 'help/pages/llm_providers.html',
-                'mcp-plugins': 'help/pages/mcp_plugins.html',
+                'mcp': 'help/pages/mcp.html',
+                'mcp-plugins': 'help/pages/mcp.html',  # Redirect old URL to new page
                 'tools-system': 'help/pages/tools_system.html',
                 'prebuilt-tools': 'help/pages/prebuilt_tools.html',
                 'banking-solutions': 'help/pages/banking_solutions.html',

@@ -96,16 +96,46 @@
                                 <option value="none" {% if server.auth_type == 'none' %}selected{% endif %}>None</option>
                                 <option value="bearer" {% if server.auth_type == 'bearer' %}selected{% endif %}>Bearer Token</option>
                                 <option value="api_key" {% if server.auth_type == 'api_key' %}selected{% endif %}>API Key</option>
-                                <option value="basic" {% if server.auth_type == 'basic' %}selected{% endif %}>Basic Auth</option>
+                                <option value="basic" {% if server.auth_type == 'basic' %}selected{% endif %}>Basic Auth (with Login Endpoint)</option>
                             </select>
+                            <div class="form-text">Select how to authenticate with the MCP server</div>
                         </div>
                         
                         <div id="auth_config_container" class="{% if server.auth_type == 'none' %}d-none{% endif %}">
                             <div class="mb-3">
                                 <label for="auth_config" class="form-label">Authentication Configuration (JSON)</label>
                                 <textarea class="form-control font-monospace" id="auth_config" name="auth_config" 
-                                          rows="4">{{ server.auth_config or '{}' }}</textarea>
-                                <div class="form-text">Configure authentication parameters in JSON format</div>
+                                          rows="5">{{ server.auth_config or '{}' }}</textarea>
+                                <div class="form-text" id="auth_help">Configure authentication parameters in JSON format</div>
+                            </div>
+                            
+                            <div id="auth_endpoint_container" class="{% if server.auth_type != 'basic' %}d-none{% endif %}">
+                                <div class="mb-3">
+                                    <label for="auth_endpoint" class="form-label">Authentication Endpoint</label>
+                                    <input type="text" class="form-control" id="auth_endpoint" name="auth_endpoint" 
+                                           value="{{ server.auth_endpoint or '' }}"
+                                           placeholder="/api/auth/login">
+                                    <div class="form-text">
+                                        For Basic Auth: The endpoint to call for login. Should return JSON with 'token' field
+                                        or raw token string.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Auth Flow Explanation -->
+                        <div id="auth_flow_info" class="{% if server.auth_type == 'none' %}d-none{% endif %}">
+                            <div class="alert alert-info small mb-0">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <span id="auth_flow_text">
+                                    {% if server.auth_type == 'bearer' %}
+                                    Token will be included in all requests to the MCP server.
+                                    {% elif server.auth_type == 'api_key' %}
+                                    API key will be sent in the specified header for all requests.
+                                    {% elif server.auth_type == 'basic' %}
+                                    System will call the auth endpoint with credentials. The returned token will be used as Bearer token for all subsequent MCP calls.
+                                    {% endif %}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -208,14 +238,50 @@
 </div>
 
 <script>
+// Authentication configuration examples
+const authExamples = {
+    bearer: {
+        config: {"token": "your-bearer-token-here"},
+        help: "Enter your bearer token. It will be sent as 'Authorization: Bearer {token}' header.",
+        flow: "Token will be included in all requests to the MCP server."
+    },
+    api_key: {
+        config: {"header": "X-API-Key", "key": "your-api-key-here"},
+        help: "Specify the header name and your API key value.",
+        flow: "API key will be sent in the specified header for all requests."
+    },
+    basic: {
+        config: {"username": "your-username", "password": "your-password"},
+        help: "Enter username and password. These will be used to call the auth endpoint.",
+        flow: "System will call the auth endpoint with these credentials. The returned token will be used as Bearer token for all subsequent MCP calls."
+    }
+};
+
 function toggleAuthConfig() {
     const authType = document.getElementById('auth_type').value;
     const container = document.getElementById('auth_config_container');
+    const authHelp = document.getElementById('auth_help');
+    const authEndpointContainer = document.getElementById('auth_endpoint_container');
+    const authFlowInfo = document.getElementById('auth_flow_info');
+    const authFlowText = document.getElementById('auth_flow_text');
     
     if (authType === 'none') {
         container.classList.add('d-none');
+        authFlowInfo.classList.add('d-none');
     } else {
         container.classList.remove('d-none');
+        authFlowInfo.classList.remove('d-none');
+        
+        const example = authExamples[authType];
+        authHelp.textContent = example.help;
+        authFlowText.textContent = example.flow;
+        
+        // Show auth endpoint only for basic auth
+        if (authType === 'basic') {
+            authEndpointContainer.classList.remove('d-none');
+        } else {
+            authEndpointContainer.classList.add('d-none');
+        }
     }
 }
 </script>

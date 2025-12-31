@@ -100,18 +100,39 @@
                                 <option value="none">None</option>
                                 <option value="bearer">Bearer Token</option>
                                 <option value="api_key">API Key</option>
-                                <option value="basic">Basic Auth</option>
+                                <option value="basic">Basic Auth (with Login Endpoint)</option>
                             </select>
+                            <div class="form-text">Select how to authenticate with the MCP server</div>
                         </div>
                         
                         <div id="auth_config_container" class="d-none">
                             <div class="mb-3">
                                 <label for="auth_config" class="form-label">Authentication Configuration (JSON)</label>
                                 <textarea class="form-control font-monospace" id="auth_config" name="auth_config" 
-                                          rows="4" placeholder='{"token": "your-token-here"}'>{}</textarea>
+                                          rows="5">{}</textarea>
                                 <div class="form-text" id="auth_help">
                                     Configure authentication parameters in JSON format
                                 </div>
+                            </div>
+                            
+                            <div id="auth_endpoint_container" class="d-none">
+                                <div class="mb-3">
+                                    <label for="auth_endpoint" class="form-label">Authentication Endpoint</label>
+                                    <input type="text" class="form-control" id="auth_endpoint" name="auth_endpoint" 
+                                           placeholder="/api/auth/login">
+                                    <div class="form-text">
+                                        For Basic Auth: The endpoint to call for login. Should return JSON with 'token' field
+                                        or raw token string. Example: <code>/api/auth/login</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Auth Flow Explanation -->
+                        <div id="auth_flow_info" class="d-none">
+                            <div class="alert alert-info small mb-0">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <span id="auth_flow_text"></span>
                             </div>
                         </div>
                     </div>
@@ -169,15 +190,28 @@
   ]
 }</pre>
                     
-                    <h6 class="mt-3">Authentication Examples</h6>
+                    <h6 class="mt-3">Authentication Types</h6>
+                    
                     <p class="text-muted mb-1"><strong>Bearer Token:</strong></p>
-                    <pre class="bg-light p-2 rounded small">{"token": "your-jwt-token"}</pre>
+                    <p class="text-muted small">Token is sent in Authorization header as "Bearer {token}"</p>
                     
                     <p class="text-muted mb-1 mt-2"><strong>API Key:</strong></p>
-                    <pre class="bg-light p-2 rounded small">{"header": "X-API-Key", "key": "abc123"}</pre>
+                    <p class="text-muted small">Key is sent in custom header (e.g., X-API-Key)</p>
                     
                     <p class="text-muted mb-1 mt-2"><strong>Basic Auth:</strong></p>
-                    <pre class="bg-light p-2 rounded small">{"username": "user", "password": "pass"}</pre>
+                    <p class="text-muted small">Calls auth endpoint with credentials, uses returned token for subsequent calls</p>
+                    
+                    <h6 class="mt-3">Auth Endpoint Response</h6>
+                    <p class="text-muted">For Basic Auth, the endpoint should return:</p>
+                    <pre class="bg-light p-2 rounded small">{
+  "token": "jwt-token-here",
+  "user": {
+    "user_id": "123",
+    "user_name": "admin",
+    "roles": ["admin"]
+  }
+}</pre>
+                    <p class="text-muted small">Or just the raw token string if not JSON.</p>
                 </div>
             </div>
         </div>
@@ -185,33 +219,70 @@
 </div>
 
 <script>
+// Authentication configuration examples
+const authExamples = {
+    bearer: {
+        config: {
+            "token": "your-bearer-token-here"
+        },
+        help: "Enter your bearer token. It will be sent as 'Authorization: Bearer {token}' header.",
+        flow: "Token will be included in all requests to the MCP server."
+    },
+    api_key: {
+        config: {
+            "header": "X-API-Key",
+            "key": "your-api-key-here"
+        },
+        help: "Specify the header name and your API key value.",
+        flow: "API key will be sent in the specified header for all requests."
+    },
+    basic: {
+        config: {
+            "username": "your-username",
+            "password": "your-password"
+        },
+        help: "Enter username and password. These will be used to call the auth endpoint.",
+        flow: "System will call the auth endpoint with these credentials. The returned token will be used as Bearer token for all subsequent MCP calls."
+    }
+};
+
 function toggleAuthConfig() {
     const authType = document.getElementById('auth_type').value;
     const container = document.getElementById('auth_config_container');
     const authHelp = document.getElementById('auth_help');
     const authConfig = document.getElementById('auth_config');
+    const authEndpointContainer = document.getElementById('auth_endpoint_container');
+    const authFlowInfo = document.getElementById('auth_flow_info');
+    const authFlowText = document.getElementById('auth_flow_text');
     
     if (authType === 'none') {
         container.classList.add('d-none');
+        authFlowInfo.classList.add('d-none');
     } else {
         container.classList.remove('d-none');
+        authFlowInfo.classList.remove('d-none');
         
-        // Set placeholder based on auth type
-        switch(authType) {
-            case 'bearer':
-                authConfig.placeholder = '{"token": "your-bearer-token"}';
-                authHelp.textContent = 'Enter your bearer token in JSON format';
-                break;
-            case 'api_key':
-                authConfig.placeholder = '{"header": "X-API-Key", "key": "your-api-key"}';
-                authHelp.textContent = 'Specify the header name and API key value';
-                break;
-            case 'basic':
-                authConfig.placeholder = '{"username": "user", "password": "pass"}';
-                authHelp.textContent = 'Enter username and password for Basic authentication';
-                break;
+        const example = authExamples[authType];
+        
+        // Set example configuration in textarea (editable)
+        authConfig.value = JSON.stringify(example.config, null, 2);
+        authHelp.textContent = example.help;
+        authFlowText.textContent = example.flow;
+        
+        // Show auth endpoint only for basic auth
+        if (authType === 'basic') {
+            authEndpointContainer.classList.remove('d-none');
+            document.getElementById('auth_endpoint').value = '/api/auth/login';
+        } else {
+            authEndpointContainer.classList.add('d-none');
+            document.getElementById('auth_endpoint').value = '';
         }
     }
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAuthConfig();
+});
 </script>
 {% endblock %}

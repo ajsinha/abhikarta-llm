@@ -28,6 +28,7 @@ class MCPClientBase(ABC):
     def __init__(self, config: MCPServerConfig):
         self.config = config
         self._session = None
+        self._auth_token = None  # Token obtained from auth endpoint
     
     @abstractmethod
     def connect(self) -> bool:
@@ -59,6 +60,74 @@ class MCPClientBase(ABC):
         """Check server health. Returns (healthy, latency_ms)."""
         pass
     
+    def _authenticate_basic(self) -> Optional[str]:
+        """
+        Authenticate using basic auth by calling the auth endpoint.
+        
+        Returns the token to use for subsequent requests.
+        Expected response format:
+        {
+            'token': 'jwt-token-here',
+            'user': {
+                'user_id': '123',
+                'user_name': 'admin',
+                'roles': ['admin']
+            }
+        }
+        Or just the raw token string if not JSON.
+        """
+        if not self.config.auth_endpoint:
+            logger.warning("Basic auth configured but no auth_endpoint specified")
+            return None
+        
+        try:
+            auth_url = f"{self.config.url.rstrip('/')}{self.config.auth_endpoint}"
+            auth_data = self.config.auth_config
+            
+            # Prepare credentials
+            payload = {
+                'username': auth_data.get('username', ''),
+                'password': auth_data.get('password', '')
+            }
+            
+            response = requests.post(
+                auth_url,
+                json=payload,
+                headers={"Content-Type": "application/json"},
+                timeout=self.config.timeout_seconds
+            )
+            
+            if response.status_code != 200:
+                logger.error(f"Auth endpoint returned {response.status_code}")
+                return None
+            
+            # Try to parse as JSON
+            try:
+                data = response.json()
+                if isinstance(data, dict):
+                    # Extract token from JSON response
+                    token = data.get('token') or data.get('access_token')
+                    if token:
+                        logger.info(f"Successfully authenticated with {self.config.name}")
+                        return token
+                    else:
+                        logger.error("Auth response missing 'token' field")
+                        return None
+                else:
+                    # Response is just the token
+                    return str(data)
+            except json.JSONDecodeError:
+                # Response is raw token string
+                token = response.text.strip()
+                if token:
+                    logger.info(f"Successfully authenticated with {self.config.name} (raw token)")
+                    return token
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error authenticating with {self.config.name}: {e}")
+            return None
+    
     def _build_headers(self) -> Dict[str, str]:
         """Build request headers with authentication."""
         headers = {"Content-Type": "application/json"}
@@ -66,12 +135,19 @@ class MCPClientBase(ABC):
         if self.config.auth_type == MCPAuthType.BEARER_TOKEN:
             headers[self.config.auth_header] = f"Bearer {self.config.auth_token}"
         elif self.config.auth_type == MCPAuthType.API_KEY:
-            headers[self.config.auth_header] = self.config.auth_token
+            header_name = self.config.auth_config.get('header', 'X-API-Key') if self.config.auth_config else 'X-API-Key'
+            key = self.config.auth_config.get('key', self.config.auth_token) if self.config.auth_config else self.config.auth_token
+            headers[header_name] = key
         elif self.config.auth_type == MCPAuthType.BASIC:
-            import base64
-            credentials = self.config.auth_token
-            encoded = base64.b64encode(credentials.encode()).decode()
-            headers["Authorization"] = f"Basic {encoded}"
+            # For basic auth, we use the token obtained from auth endpoint
+            if self._auth_token:
+                headers["Authorization"] = f"Bearer {self._auth_token}"
+            elif self.config.auth_token:
+                # Fallback to direct basic auth if no auth endpoint
+                import base64
+                credentials = self.config.auth_token
+                encoded = base64.b64encode(credentials.encode()).decode()
+                headers["Authorization"] = f"Basic {encoded}"
         
         return headers
 
@@ -84,7 +160,25 @@ class HTTPMCPClient(MCPClientBase):
         self._connected = False
     
     def connect(self) -> bool:
-        """Test connection by performing health check."""
+        """
+        Connect to MCP server.
+        
+        For basic auth with auth_endpoint:
+        1. Call auth endpoint with credentials
+        2. Extract token from response
+        3. Use token as bearer token for subsequent calls
+        """
+        # If basic auth with endpoint, authenticate first
+        if self.config.auth_type == MCPAuthType.BASIC and self.config.auth_endpoint:
+            token = self._authenticate_basic()
+            if not token:
+                logger.error(f"Failed to authenticate with {self.config.name}")
+                self._connected = False
+                return False
+            self._auth_token = token
+            logger.info(f"Authenticated with {self.config.name}, token obtained")
+        
+        # Test connection by performing health check
         healthy, latency = self.health_check()
         self._connected = healthy
         return healthy
@@ -95,6 +189,7 @@ class HTTPMCPClient(MCPClientBase):
             self._session.close()
             self._session = None
         self._connected = False
+        self._auth_token = None
     
     def is_connected(self) -> bool:
         return self._connected

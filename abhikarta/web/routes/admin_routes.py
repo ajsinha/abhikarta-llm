@@ -1323,6 +1323,7 @@ class AdminRoutes(AbstractRoutes):
                 tools_endpoint = request.form.get('tools_endpoint', '/api/tools/list').strip()
                 auth_type = request.form.get('auth_type', 'none')
                 auth_config = request.form.get('auth_config', '{}').strip()
+                auth_endpoint = request.form.get('auth_endpoint', '').strip()
                 timeout_seconds = int(request.form.get('timeout_seconds', 30))
                 auto_refresh = 1 if 'auto_refresh' in request.form else 0
                 refresh_interval = int(request.form.get('refresh_interval_minutes', 60))
@@ -1347,6 +1348,7 @@ class AdminRoutes(AbstractRoutes):
                         tools_endpoint=tools_endpoint,
                         auth_type=auth_type,
                         auth_config=auth_config,
+                        auth_endpoint=auth_endpoint,
                         is_active=is_active,
                         auto_refresh=auto_refresh,
                         refresh_interval_minutes=refresh_interval,
@@ -1432,6 +1434,7 @@ class AdminRoutes(AbstractRoutes):
                 tools_endpoint = request.form.get('tools_endpoint', '/api/tools/list').strip()
                 auth_type = request.form.get('auth_type', 'none')
                 auth_config = request.form.get('auth_config', '{}').strip()
+                auth_endpoint = request.form.get('auth_endpoint', '').strip()
                 timeout_seconds = int(request.form.get('timeout_seconds', 30))
                 auto_refresh = 1 if 'auto_refresh' in request.form else 0
                 refresh_interval = int(request.form.get('refresh_interval_minutes', 60))
@@ -1450,11 +1453,11 @@ class AdminRoutes(AbstractRoutes):
                     self.db_facade.execute(
                         """UPDATE mcp_tool_servers SET
                            name = ?, description = ?, base_url = ?, tools_endpoint = ?,
-                           auth_type = ?, auth_config = ?, is_active = ?, auto_refresh = ?,
+                           auth_type = ?, auth_config = ?, auth_endpoint = ?, is_active = ?, auto_refresh = ?,
                            refresh_interval_minutes = ?, timeout_seconds = ?
                            WHERE server_id = ?""",
                         (name, description, base_url, tools_endpoint,
-                         auth_type, auth_config, is_active, auto_refresh,
+                         auth_type, auth_config, auth_endpoint, is_active, auto_refresh,
                          refresh_interval, timeout_seconds, server_id)
                     )
                     self.log_audit('update', 'mcp_tool_server', server_id)

@@ -1,0 +1,642 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "MCP - Model Context Protocol" %}
+{% set description = "Extend agent capabilities with external tools via MCP Plugins and Tool Servers" %}
+{% set icon = "bi-plug" %}
+{% set header_color = "#6c757d" %}
+{% set header_color_dark = "#495057" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#mcp-plugins">MCP Plugins</a>
+<a href="#tool-servers">MCP Tool Servers</a>
+<a href="#authentication">Authentication</a>
+<a href="#server-manager">MCPServerManager</a>
+<a href="#tool-integration">Tool Integration</a>
+<a href="#creating-server">Creating MCP Server</a>
+<a href="#health-monitoring">Health Monitoring</a>
+<a href="#examples">Examples</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Overview</h2>
+<p>The Model Context Protocol (MCP) allows you to extend agent capabilities by connecting to external tools and services. Abhikarta-LLM supports two approaches:</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-plug me-2"></i>MCP Plugins
+            </div>
+            <div class="card-body">
+                <p>Statically configured tool plugins that are bundled with the application or loaded at startup.</p>
+                <ul>
+                    <li>Pre-built integrations (Filesystem, GitHub, Slack, etc.)</li>
+                    <li>Configured via Admin → MCP Plugins</li>
+                    <li>Direct tool definitions with schemas</li>
+                    <li>Version controlled configurations</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-server me-2"></i>MCP Tool Servers
+            </div>
+            <div class="card-body">
+                <p>Dynamic external servers that expose tools via HTTP API. Tools are discovered at runtime.</p>
+                <ul>
+                    <li>External MCP servers (your own or third-party)</li>
+                    <li>Configured via Admin → MCP Tool Servers</li>
+                    <li>Dynamic tool discovery and loading</li>
+                    <li>Health monitoring and auto-reconnect</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>When to use which?</strong> Use <strong>MCP Plugins</strong> for stable, well-known integrations. Use <strong>MCP Tool Servers</strong> for dynamic services, custom APIs, or when tools change frequently.
+</div>
+
+<hr class="my-5">
+
+<h2 id="mcp-plugins">MCP Plugins</h2>
+<p>MCP Plugins provide pre-built integrations with common services.</p>
+
+<h5>Available Plugin Types</h5>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6><i class="bi bi-folder2 text-primary me-2"></i>Filesystem</h6>
+                <p class="small text-muted mb-0">Read/write files, list directories</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6><i class="bi bi-github text-dark me-2"></i>GitHub</h6>
+                <p class="small text-muted mb-0">Repos, issues, PRs, code search</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6><i class="bi bi-slack text-purple me-2"></i>Slack</h6>
+                <p class="small text-muted mb-0">Send messages, read channels</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6><i class="bi bi-database text-info me-2"></i>PostgreSQL</h6>
+                <p class="small text-muted mb-0">Query databases, schema inspection</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6><i class="bi bi-browser-chrome text-warning me-2"></i>Puppeteer</h6>
+                <p class="small text-muted mb-0">Browser automation, screenshots</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6><i class="bi bi-search text-success me-2"></i>Web Search</h6>
+                <p class="small text-muted mb-0">Search the web (Brave, Google)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5>Configuring a Plugin</h5>
+<ol>
+    <li>Navigate to <strong>Admin → MCP Plugins</strong></li>
+    <li>Click <strong>"Add Plugin"</strong></li>
+    <li>Select the plugin type and configure</li>
+</ol>
+
+<pre><code class="language-json">{
+  "plugin_id": "github-tools",
+  "name": "GitHub Integration",
+  "plugin_type": "github",
+  "status": "active",
+  "config": {
+    "token": "ghp_xxxxxxxxxxxx",
+    "org": "my-organization",
+    "default_repo": "main-project"
+  },
+  "manifest": {
+    "tools": ["search_code", "create_issue", "list_repos"]
+  }
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="tool-servers">MCP Tool Servers</h2>
+<p>MCP Tool Servers are external HTTP services that expose tools via a standardized API.</p>
+
+<h5>Adding a Tool Server</h5>
+<ol>
+    <li>Navigate to <strong>Admin → MCP Tool Servers</strong></li>
+    <li>Click <strong>"Add Server"</strong></li>
+    <li>Configure connection settings</li>
+</ol>
+
+<div class="card mb-4">
+    <div class="card-header">Server Configuration Fields</div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead>
+                <tr><th>Field</th><th>Description</th><th>Example</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>name</code></td>
+                    <td>Friendly name for the server</td>
+                    <td>Weather API</td>
+                </tr>
+                <tr>
+                    <td><code>base_url</code></td>
+                    <td>Server URL without trailing slash</td>
+                    <td>http://localhost:8080</td>
+                </tr>
+                <tr>
+                    <td><code>tools_endpoint</code></td>
+                    <td>Endpoint to fetch tool list</td>
+                    <td>/api/tools/list</td>
+                </tr>
+                <tr>
+                    <td><code>auth_type</code></td>
+                    <td>Authentication method</td>
+                    <td>none, bearer, api_key, basic</td>
+                </tr>
+                <tr>
+                    <td><code>auth_endpoint</code></td>
+                    <td>Login endpoint (for basic auth)</td>
+                    <td>/api/auth/login</td>
+                </tr>
+                <tr>
+                    <td><code>timeout_seconds</code></td>
+                    <td>Request timeout</td>
+                    <td>30</td>
+                </tr>
+                <tr>
+                    <td><code>auto_refresh</code></td>
+                    <td>Periodically refresh tool list</td>
+                    <td>true</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<h5>Expected API Response</h5>
+<p>The tools endpoint should return JSON with tool definitions:</p>
+<pre><code class="language-json">{
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "Get current weather for a city",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string",
+            "description": "City name"
+          }
+        },
+        "required": ["city"]
+      }
+    },
+    {
+      "name": "get_forecast",
+      "description": "Get weather forecast",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "city": {"type": "string"},
+          "days": {"type": "integer", "default": 5}
+        },
+        "required": ["city"]
+      }
+    }
+  ]
+}</code></pre>
+
+<hr class="my-5">
+
+<h2 id="authentication">Authentication</h2>
+<p>MCP Tool Servers support multiple authentication methods to secure API access.</p>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <i class="bi bi-key me-2"></i>Bearer Token
+            </div>
+            <div class="card-body">
+                <p>Static token sent in Authorization header.</p>
+                <h6>Configuration:</h6>
+                <pre><code class="language-json">{
+  "token": "your-jwt-or-api-token"
+}</code></pre>
+                <h6>How it works:</h6>
+                <p class="small text-muted mb-0">Token is sent as <code>Authorization: Bearer {token}</code> header with every request.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <i class="bi bi-shield-lock me-2"></i>API Key
+            </div>
+            <div class="card-body">
+                <p>Key sent in custom header (e.g., X-API-Key).</p>
+                <h6>Configuration:</h6>
+                <pre><code class="language-json">{
+  "header": "X-API-Key",
+  "key": "your-api-key-here"
+}</code></pre>
+                <h6>How it works:</h6>
+                <p class="small text-muted mb-0">Key is sent in the specified header with every request.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4 border-warning">
+    <div class="card-header bg-warning">
+        <i class="bi bi-person-lock me-2"></i>Basic Auth (with Login Endpoint)
+    </div>
+    <div class="card-body">
+        <p>Username/password authentication that calls a login endpoint to obtain a token.</p>
+        
+        <h6>Configuration:</h6>
+        <pre><code class="language-json">{
+  "username": "your-username",
+  "password": "your-password"
+}</code></pre>
+        
+        <h6>Auth Endpoint:</h6>
+        <p>Set the <code>auth_endpoint</code> field, e.g., <code>/api/auth/login</code></p>
+        
+        <h6>How it works:</h6>
+        <ol class="small">
+            <li>System calls <code>{base_url}{auth_endpoint}</code> with POST body <code>{"username": "...", "password": "..."}</code></li>
+            <li>Expects response with token:</li>
+        </ol>
+        
+        <pre><code class="language-json">{
+  "token": "jwt-token-here",
+  "user": {
+    "user_id": "123",
+    "user_name": "admin",
+    "roles": ["admin"]
+  }
+}</code></pre>
+        
+        <p class="small text-muted">Or just the raw token string if not JSON.</p>
+        
+        <ol class="small" start="3">
+            <li>The obtained token is then used as <code>Authorization: Bearer {token}</code> for all subsequent MCP requests.</li>
+        </ol>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="server-manager">MCPServerManager</h2>
+<p>Centralized singleton for managing all MCP server connections programmatically.</p>
+
+<pre><code class="language-python">from abhikarta.mcp import get_mcp_manager, MCPServerConfig
+
+# Get the manager instance
+manager = get_mcp_manager()
+
+# Add a server with bearer token auth
+config = MCPServerConfig(
+    server_id="weather-server",
+    name="Weather API",
+    url="http://localhost:8080",
+    auth_type="bearer_token",
+    auth_token="your-token-here",
+    auto_connect=True
+)
+manager.add_server(config)
+
+# Add a server with basic auth (uses auth endpoint)
+config_basic = MCPServerConfig(
+    server_id="internal-api",
+    name="Internal Tools",
+    url="http://internal.company.com:8000",
+    auth_type="basic",
+    auth_config={"username": "admin", "password": "secret"},
+    auth_endpoint="/api/auth/login",
+    auto_connect=True
+)
+manager.add_server(config_basic)
+
+# Connect to server
+manager.connect_server("weather-server")
+
+# List connected servers
+servers = manager.list_servers(connected_only=True)
+
+# Get server tools
+tools = manager.get_server_tools("weather-server")
+
+# Health check
+healthy, latency = manager.check_health("weather-server")
+
+# Start background health monitoring
+manager.start_health_monitor(interval_seconds=30)</code></pre>
+
+<div class="row g-4 mb-4 mt-4">
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-plug text-success" style="font-size: 2rem;"></i>
+                <h5 class="mt-2">Auto-Connect</h5>
+                <p class="small text-muted">Servers connect automatically on startup</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-heart-pulse text-danger" style="font-size: 2rem;"></i>
+                <h5 class="mt-2">Health Monitoring</h5>
+                <p class="small text-muted">Background health checks with auto-reconnect</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-tools text-primary" style="font-size: 2rem;"></i>
+                <h5 class="mt-2">Tool Registration</h5>
+                <p class="small text-muted">Tools auto-register with ToolsRegistry</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="tool-integration">Automatic Tool Integration</h2>
+<p>When an MCP server connects, its tools are automatically wrapped as <code>MCPTool</code> instances and registered with the <code>ToolsRegistry</code>.</p>
+
+<pre><code class="language-python">from abhikarta.tools import get_tools_registry
+from abhikarta.mcp import get_mcp_manager
+
+# Connect to MCP server
+manager = get_mcp_manager()
+manager.connect_server("weather-server")
+
+# Tools are now in the registry
+registry = get_tools_registry()
+weather_tool = registry.get("weather-server_get_weather")
+
+# Execute the tool
+result = registry.execute("weather-server_get_weather", city="London")
+
+# Or use with agents - convert to LLM format
+openai_tools = registry.to_openai_functions()
+anthropic_tools = registry.to_anthropic_tools()
+langchain_tools = registry.to_langchain_tools()</code></pre>
+
+<h5>Using with Agents</h5>
+<pre><code class="language-python">from abhikarta.agents import BaseAgent
+
+# Create agent with MCP tools
+agent = BaseAgent(
+    name="Weather Assistant",
+    provider="ollama",
+    model="llama3.2",
+    tools=["weather-server_get_weather", "weather-server_get_forecast"]
+)
+
+# Agent can now use the MCP tools
+result = agent.run("What's the weather like in New York?")</code></pre>
+
+<hr class="my-5">
+
+<h2 id="creating-server">Creating an MCP Server</h2>
+<p>You can create your own MCP-compatible tool servers using FastMCP (Python) or the MCP SDK (TypeScript).</p>
+
+<h5>Python with FastMCP</h5>
+<pre><code class="language-python">from fastmcp import FastMCP
+
+mcp = FastMCP("Weather Service")
+
+@mcp.tool()
+def get_weather(city: str) -> str:
+    """Get current weather for a city"""
+    return f"Weather in {city}: 72°F, Sunny"
+
+@mcp.tool()
+def get_forecast(city: str, days: int = 5) -> str:
+    """Get weather forecast"""
+    return f"{days}-day forecast for {city}..."
+
+# Run with: uvicorn mcp_server:mcp.app --port 8080</code></pre>
+
+<h5>TypeScript with MCP SDK</h5>
+<pre><code class="language-typescript">import { McpServer } from "@modelcontextprotocol/sdk";
+
+const server = new McpServer({
+  name: "Weather Service",
+  version: "1.0.0"
+});
+
+server.addTool({
+  name: "get_weather",
+  description: "Get current weather for a city",
+  inputSchema: {
+    type: "object",
+    properties: {
+      city: { type: "string" }
+    },
+    required: ["city"]
+  },
+  handler: async (params) => {
+    return { temperature: 72, condition: "Sunny" };
+  }
+});
+
+server.start({ port: 8080 });</code></pre>
+
+<h5>Server with Authentication</h5>
+<pre><code class="language-python">from fastmcp import FastMCP
+from flask import Flask, request, jsonify
+import jwt
+
+app = Flask(__name__)
+mcp = FastMCP("Secure Service")
+
+# Login endpoint for basic auth
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    
+    # Validate credentials (replace with your auth logic)
+    if username == "admin" and password == "secret":
+        token = jwt.encode({'user': username}, 'secret-key')
+        return jsonify({
+            'token': token,
+            'user': {
+                'user_id': '1',
+                'user_name': username,
+                'roles': ['admin']
+            }
+        })
+    return jsonify({'error': 'Invalid credentials'}), 401
+
+# Middleware to verify token
+def verify_token():
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return None
+    token = auth_header[7:]
+    try:
+        return jwt.decode(token, 'secret-key', algorithms=['HS256'])
+    except:
+        return None
+
+@mcp.tool()
+def secure_operation(data: str) -> str:
+    """A secure operation requiring authentication"""
+    return f"Processed: {data}"
+
+# Mount MCP routes with auth
+app.register_blueprint(mcp.app, url_prefix='/api/tools')</code></pre>
+
+<hr class="my-5">
+
+<h2 id="health-monitoring">Health Monitoring</h2>
+<pre><code class="language-python"># Start background monitoring
+manager.start_health_monitor(interval_seconds=30)
+
+# Get statistics
+stats = manager.get_stats()
+# {
+#   "total_servers": 3,
+#   "connected_servers": 2,
+#   "disconnected_servers": 1,
+#   "total_tools": 15,
+#   "servers": {...}
+# }
+
+# Stop monitoring
+manager.stop_health_monitor()</code></pre>
+
+<hr class="my-5">
+
+<h2 id="examples">Complete Examples</h2>
+
+<div class="accordion" id="examplesAccordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#example1">
+                Example 1: Weather API with API Key
+            </button>
+        </h2>
+        <div id="example1" class="accordion-collapse collapse show" data-bs-parent="#examplesAccordion">
+            <div class="accordion-body">
+<pre><code class="language-json">// MCP Tool Server Configuration
+{
+  "name": "Weather API",
+  "base_url": "https://api.weather.example.com",
+  "tools_endpoint": "/v1/tools",
+  "auth_type": "api_key",
+  "auth_config": {
+    "header": "X-Weather-API-Key",
+    "key": "wk_live_xxxxxxxxxxxxx"
+  },
+  "timeout_seconds": 30,
+  "auto_refresh": true,
+  "refresh_interval_minutes": 60
+}</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#example2">
+                Example 2: Internal API with Basic Auth
+            </button>
+        </h2>
+        <div id="example2" class="accordion-collapse collapse" data-bs-parent="#examplesAccordion">
+            <div class="accordion-body">
+<pre><code class="language-json">// MCP Tool Server Configuration
+{
+  "name": "Internal Tools API",
+  "base_url": "http://internal.corp.local:8000",
+  "tools_endpoint": "/api/tools/list",
+  "auth_type": "basic",
+  "auth_config": {
+    "username": "service-account",
+    "password": "secure-password"
+  },
+  "auth_endpoint": "/api/auth/login",
+  "timeout_seconds": 60,
+  "auto_refresh": true,
+  "refresh_interval_minutes": 30
+}</code></pre>
+<p class="text-muted small mt-2">The system will call <code>/api/auth/login</code> first to get a JWT token, then use it for all subsequent requests.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#example3">
+                Example 3: GitHub Integration with Bearer Token
+            </button>
+        </h2>
+        <div id="example3" class="accordion-collapse collapse" data-bs-parent="#examplesAccordion">
+            <div class="accordion-body">
+<pre><code class="language-json">// MCP Tool Server Configuration
+{
+  "name": "GitHub MCP Server",
+  "base_url": "http://localhost:3000",
+  "tools_endpoint": "/tools",
+  "auth_type": "bearer",
+  "auth_config": {
+    "token": "ghp_xxxxxxxxxxxxxxxxxxxx"
+  },
+  "timeout_seconds": 30,
+  "auto_refresh": false
+}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-success mt-5">
+    <h5><i class="bi bi-check-circle me-2"></i>Best Practices</h5>
+    <ul class="mb-0">
+        <li>Enable <code>auto_connect</code> for production servers</li>
+        <li>Use health monitoring for critical integrations</li>
+        <li>Set appropriate timeouts for your use case</li>
+        <li>Always use authentication for production MCP servers</li>
+        <li>For basic auth, implement token refresh logic in long-running applications</li>
+        <li>Store credentials securely - never commit to source control</li>
+        <li>Tools from MCP servers extend <code>BaseTool</code> and work with all components</li>
+    </ul>
+</div>
+{% endblock %}
