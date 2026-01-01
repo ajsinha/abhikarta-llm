@@ -4,28 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb8075d7-6a43-45a0-aa83-9afdedf815cb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/langchain/tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/langchain/tools.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/langchain/workflow_graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/langchain/workflow_graph.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/user_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/admin/hitl_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/admin/hitl_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/admin/hitl_tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/admin/hitl_tasks.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/notifications/channels.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/notifications/channels.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/notifications/webhook_events.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/notifications/webhook_events.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/notifications/webhook_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/notifications/webhook_view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/swarms/execution.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/swarms/execution.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/swarms/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/swarms/list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/swarms/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/swarms/view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/execution_progress.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/execution_progress.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/executions.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/executions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/hitl_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/hitl_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/hitl_tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/hitl_tasks.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/abhikarta.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/abhikarta.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/abhikarta.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/abhikarta.log" afterDir="false" />
-    </list>
+    <list default="true" id="cb8075d7-6a43-45a0-aa83-9afdedf815cb" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

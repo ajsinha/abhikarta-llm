@@ -197,3 +197,130 @@ Bill Gates was born on October 28, 1955, in Seattle, Washington. His father, Wil
                    status = ?, metadata = json_set(COALESCE(metadata, '{}'), ...
 2026-01-01 11:24:41,147 - abhikarta.database.sqlite_handler - ERROR - Params: ('completed', 'approved', 'de1ef36a-5ec0-434e-b6d2-2c3097bccc22') (type: tuple)
 2026-01-01 11:24:41,147 - abhikarta.hitl.hitl_manager - WARNING - Failed to update execution HITL status: no such column: metadata
+2026-01-01 11:27:10,784 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:27:13,104 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:27:23,680 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:27:23,682 - abhikarta.web.routes.workflow_routes - INFO - Created workflow wf_b448ee84bf73 from template wf_tpl_code_fragments
+2026-01-01 11:27:33,992 - abhikarta.workflow.executor - INFO - LangGraph workflow executor initialized
+2026-01-01 11:27:33,992 - abhikarta.workflow.executor - INFO - Starting LangGraph workflow execution: 77f5207c-32bf-4f6f-93f5-55cf34a17301
+2026-01-01 11:27:33,992 - abhikarta.workflow.executor - INFO - LangGraph config: 7 nodes, 6 edges
+2026-01-01 11:27:33,996 - abhikarta.langchain.workflow_graph - INFO - Setting entry point to: validate (from start node edge)
+2026-01-01 11:27:34,008 - abhikarta.langchain.workflow_graph - INFO - Executing tool node: fetch
+2026-01-01 11:27:34,017 - abhikarta.langchain.workflow_graph - INFO - [NODE:fetch] Tool: web_fetch, Input: who is elon musk...
+2026-01-01 11:27:34,036 - abhikarta.langchain.workflow_graph - INFO - [NODE:fetch] Tool output: Error fetching URL: URL can't contain control characters. 'who is elon musk' (found at least ' ')...
+2026-01-01 11:27:34,037 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: analyze
+2026-01-01 11:27:34,037 - abhikarta.langchain.llm_factory - INFO - Creating Ollama LLM: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 11:27:34,071 - abhikarta.langchain.workflow_graph - INFO - [NODE:analyze] Raw input type: dict
+2026-01-01 11:27:34,071 - abhikarta.langchain.workflow_graph - INFO - [NODE:analyze] Extracted input value: who is elon musk...
+2026-01-01 11:27:34,071 - abhikarta.langchain.workflow_graph - INFO - [NODE:analyze] LLM Input prompt: who is elon musk...
+2026-01-01 11:27:34,316 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 11:27:38,244 - abhikarta.langchain.workflow_graph - INFO - [NODE:analyze] LLM Output: Elon Musk is a South African-born entrepreneur, inventor, and business magnate. He is one of the most successful and influential figures in the tech industry, known for his ambitious goals and innovative ideas.
+
+Early Life and Education:
+
+Musk was born on June 28, 1971, in Pretoria, South Africa. He moved to Canada at the age of 17 to attend college and later transferred to the University of Pennsylvania, where he graduated with a degree in economics and physics.
+
+Career:
+
+After college, Musk mo...
+2026-01-01 11:27:48,522 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:27:50,387 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:27:58,677 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:27:58,680 - abhikarta.web.routes.workflow_routes - INFO - Created workflow wf_625523d0b85e from template wf_tpl_conditional
+2026-01-01 11:28:14,694 - abhikarta.workflow.executor - INFO - LangGraph workflow executor initialized
+2026-01-01 11:28:14,695 - abhikarta.workflow.executor - INFO - Starting LangGraph workflow execution: cc22acc6-013c-4740-a51c-4e56ec968860
+2026-01-01 11:28:14,695 - abhikarta.workflow.executor - INFO - LangGraph config: 9 nodes, 10 edges
+2026-01-01 11:28:14,698 - abhikarta.langchain.workflow_graph - INFO - Setting entry point to: analyze (from start node edge)
+2026-01-01 11:28:14,716 - abhikarta.langchain.workflow_graph - INFO - Executing condition node: condition1
+2026-01-01 11:28:14,717 - abhikarta.langchain.workflow_graph - INFO - Executing condition node: condition2
+2026-01-01 11:28:14,718 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: large_handler
+2026-01-01 11:28:14,719 - abhikarta.langchain.llm_factory - INFO - Creating Ollama LLM: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 11:28:14,753 - abhikarta.langchain.workflow_graph - INFO - [NODE:large_handler] Raw input type: dict
+2026-01-01 11:28:14,753 - abhikarta.langchain.workflow_graph - INFO - [NODE:large_handler] Extracted input value: who is bill gates...
+2026-01-01 11:28:14,754 - abhikarta.langchain.workflow_graph - INFO - [NODE:large_handler] LLM Input prompt: who is bill gates...
+2026-01-01 11:28:15,203 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 11:28:19,814 - abhikarta.langchain.workflow_graph - INFO - [NODE:large_handler] LLM Output: Bill Gates is an American business magnate, software developer, and philanthropist. He is best known for co-founding Microsoft Corporation, the world's largest software company, and his work in developing the Windows operating system.
+
+**Early Life and Education**
+
+William Henry Gates III was born on October 28, 1955, in Seattle, Washington. His parents were William H. Gates Sr. and Mary Maxwell Gates. Bill Gates showed a keen interest in computer programming at an early age and began writing hi...
+2026-01-01 11:28:19,819 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: medium_handler
+2026-01-01 11:28:19,819 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: small_handler
+2026-01-01 11:28:19,821 - abhikarta.langchain.llm_factory - INFO - Creating Ollama LLM: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 11:28:19,823 - abhikarta.langchain.llm_factory - INFO - Creating Ollama LLM: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 11:28:19,893 - abhikarta.langchain.workflow_graph - INFO - [NODE:small_handler] Raw input type: dict
+2026-01-01 11:28:19,894 - abhikarta.langchain.workflow_graph - INFO - [NODE:small_handler] Extracted input value: who is bill gates...
+2026-01-01 11:28:19,894 - abhikarta.langchain.workflow_graph - INFO - [NODE:small_handler] LLM Input prompt: who is bill gates...
+2026-01-01 11:28:19,895 - abhikarta.langchain.workflow_graph - INFO - [NODE:medium_handler] Raw input type: dict
+2026-01-01 11:28:19,895 - abhikarta.langchain.workflow_graph - INFO - [NODE:medium_handler] Extracted input value: who is bill gates...
+2026-01-01 11:28:19,895 - abhikarta.langchain.workflow_graph - INFO - [NODE:medium_handler] LLM Input prompt: who is bill gates...
+2026-01-01 11:28:19,994 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 11:28:24,794 - abhikarta.langchain.workflow_graph - INFO - [NODE:small_handler] LLM Output: Bill Gates is an American business magnate, software developer, and philanthropist. He is best known as the co-founder of Microsoft Corporation, one of the largest and most successful technology companies in the world.
+
+Early Life and Education:
+
+William Henry Gates III was born on October 28, 1955, in Seattle, Washington. His father, William H. Gates Sr., was a successful attorney, and his mother, Mary Maxwell Gates, was a philanthropist and university regent. Gates showed an early interest in ...
+2026-01-01 11:28:24,810 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 11:28:28,829 - abhikarta.langchain.workflow_graph - INFO - [NODE:medium_handler] LLM Output: Bill Gates is a renowned American business magnate, software developer, and philanthropist. He is best known for co-founding Microsoft Corporation, the world's largest software company.
+
+**Early Life and Education**
+
+William Henry Gates III was born on October 28, 1955, in Seattle, Washington. His father was a successful attorney, and his mother was a philanthropist and university regent. Gates showed an early interest in computer programming and attended Lakeside School, a private school in Sea...
+2026-01-01 11:28:35,353 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:28:40,597 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:28:50,547 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:28:50,550 - abhikarta.web.routes.workflow_routes - INFO - Created workflow wf_9cd8695274e3 from template wf_tpl_parallel
+2026-01-01 11:29:02,282 - abhikarta.workflow.executor - INFO - LangGraph workflow executor initialized
+2026-01-01 11:29:02,282 - abhikarta.workflow.executor - INFO - Starting LangGraph workflow execution: 9f566975-eae7-45c8-a732-907d3f812481
+2026-01-01 11:29:02,282 - abhikarta.workflow.executor - INFO - LangGraph config: 8 nodes, 9 edges
+2026-01-01 11:29:02,285 - abhikarta.langchain.workflow_graph - INFO - Setting entry point to: split (from start node edge)
+2026-01-01 11:29:02,300 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: branch1
+2026-01-01 11:29:02,300 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: branch2
+2026-01-01 11:29:02,303 - abhikarta.langchain.llm_factory - INFO - Creating Ollama LLM: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 11:29:02,304 - abhikarta.langchain.llm_factory - INFO - Creating Ollama LLM: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 11:29:02,371 - abhikarta.langchain.workflow_graph - INFO - [NODE:branch2] Raw input type: dict
+2026-01-01 11:29:02,371 - abhikarta.langchain.workflow_graph - INFO - [NODE:branch2] Extracted input value: who is donald trump...
+2026-01-01 11:29:02,371 - abhikarta.langchain.workflow_graph - INFO - [NODE:branch2] LLM Input prompt: who is donald trump...
+2026-01-01 11:29:02,372 - abhikarta.langchain.workflow_graph - INFO - [NODE:branch1] Raw input type: dict
+2026-01-01 11:29:02,372 - abhikarta.langchain.workflow_graph - INFO - [NODE:branch1] Extracted input value: who is donald trump...
+2026-01-01 11:29:02,372 - abhikarta.langchain.workflow_graph - INFO - [NODE:branch1] LLM Input prompt: who is donald trump...
+2026-01-01 11:29:02,994 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 11:29:07,227 - abhikarta.langchain.workflow_graph - INFO - [NODE:branch2] LLM Output: Donald John Trump is the 45th President of the United States, serving from January 20, 2017, to January 20, 2021. He is a businessman, television personality, and politician who has been a prominent figure in American politics for several decades.
+
+Early Life and Career:
+
+Trump was born on June 14, 1946, in Queens, New York, to Mary Anne MacLeod and Frederick Christ Trump. He is the fourth of five children. Trump graduated from the University of Pennsylvania with a degree in economics in 1968. A...
+2026-01-01 11:29:07,243 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 11:29:11,990 - abhikarta.langchain.workflow_graph - INFO - [NODE:branch1] LLM Output: Donald John Trump is an American businessman, television personality, and politician who served as the 45th President of the United States from 2017 to 2021. He was a member of the Republican Party.
+
+Early Life and Career:
+Trump was born on June 14, 1946, in Queens, New York, to Mary Anne MacLeod and Frederick Christ Trump. His father was a successful real estate developer, and Donald Trump took over the family business after his death in 1971. He expanded the company's portfolio through various...
+2026-01-01 11:29:11,994 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: aggregate
+2026-01-01 11:29:11,995 - abhikarta.langchain.llm_factory - INFO - Creating Ollama LLM: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 11:29:12,036 - abhikarta.langchain.workflow_graph - INFO - [NODE:aggregate] Raw input type: dict
+2026-01-01 11:29:12,036 - abhikarta.langchain.workflow_graph - INFO - [NODE:aggregate] Extracted input value: who is donald trump...
+2026-01-01 11:29:12,036 - abhikarta.langchain.workflow_graph - INFO - [NODE:aggregate] LLM Input prompt: who is donald trump...
+2026-01-01 11:29:12,125 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 11:29:16,688 - abhikarta.langchain.workflow_graph - INFO - [NODE:aggregate] LLM Output: Donald John Trump is an American businessman, television personality, and politician who served as the 45th President of the United States from 2017 to 2021. He was born on June 14, 1946, in Queens, New York.
+
+Early Life and Career:
+
+Trump was the fourth of five children born to Mary Anne MacLeod and Frederick Christ Trump. His father was a successful real estate developer, and Trump grew up learning the business from him. After graduating from the University of Pennsylvania's Wharton School, Tr...
+2026-01-01 11:29:26,597 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:29:30,523 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:29:38,717 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
+2026-01-01 11:29:38,721 - abhikarta.web.routes.workflow_routes - INFO - Created workflow wf_e75ce647145b from template wf_tpl_sequential
+2026-01-01 11:29:56,857 - abhikarta.workflow.executor - INFO - LangGraph workflow executor initialized
+2026-01-01 11:29:56,857 - abhikarta.workflow.executor - INFO - Starting LangGraph workflow execution: 51d9a367-85a0-4ec6-ab8c-cbc45a3cd205
+2026-01-01 11:29:56,857 - abhikarta.workflow.executor - INFO - LangGraph config: 5 nodes, 4 edges
+2026-01-01 11:29:56,859 - abhikarta.langchain.workflow_graph - INFO - Setting entry point to: validate (from start node edge)
+2026-01-01 11:29:56,867 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: process
+2026-01-01 11:29:56,868 - abhikarta.langchain.llm_factory - INFO - Creating Ollama LLM: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 11:29:56,904 - abhikarta.langchain.workflow_graph - INFO - [NODE:process] Raw input type: dict
+2026-01-01 11:29:56,905 - abhikarta.langchain.workflow_graph - INFO - [NODE:process] Extracted input value: who is roosevelt...
+2026-01-01 11:29:56,905 - abhikarta.langchain.workflow_graph - INFO - [NODE:process] LLM Input prompt: who is roosevelt...
+2026-01-01 11:29:57,061 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 11:29:59,322 - abhikarta.langchain.workflow_graph - INFO - [NODE:process] LLM Output: There have been several notable individuals named Roosevelt throughout history, so I'll provide a brief overview of a few:
+
+1. **Theodore Roosevelt** (1858-1919): The 26th President of the United States, serving from 1901 to 1909. He was a leading figure in the Progressive Movement and is known for his trust-busting policies, conservation efforts, and foreign policy initiatives, including the construction of the Panama Canal.
+2. **Franklin D. Roosevelt** (1882-1945): The 32nd President of the Un...
