@@ -76,7 +76,7 @@
                         
                         <dt class="col-sm-4">Created</dt>
                         <dd class="col-sm-8">
-                            <small class="text-muted">{{ endpoint.created_at[:19] if endpoint.created_at else 'N/A' }}</small>
+                            <small class="text-muted">{{ endpoint.created_at|dt(19) if endpoint.created_at else 'N/A' }}</small>
                         </dd>
                     </dl>
                 </div>
@@ -151,7 +151,7 @@
                             <tbody>
                                 {% for event in events[:10] %}
                                 <tr>
-                                    <td><small class="text-muted">{{ event.received_at[:19] if event.received_at else 'N/A' }}</small></td>
+                                    <td><small class="text-muted">{{ event.received_at|dt(19) if event.received_at else 'N/A' }}</small></td>
                                     <td>
                                         {% if event.event_type %}
                                         <code>{{ event.event_type }}</code>

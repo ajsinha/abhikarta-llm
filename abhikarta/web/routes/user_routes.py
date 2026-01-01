@@ -435,11 +435,14 @@ class UserRoutes(AbstractRoutes):
             
             user_id = session.get('user_id')
             is_reviewer = 'hitl_reviewer' in session.get('roles', [])
+            status_filter = request.args.get('status', '')
             
             manager = HITLManager(self.db_facade)
             
-            # Get tasks assigned to user (and unassigned if reviewer)
-            tasks = manager.get_user_tasks(user_id, include_unassigned=is_reviewer)
+            # Always include unassigned tasks so users can claim them
+            # This allows any user to see and respond to HITL tasks
+            tasks = manager.get_user_tasks(user_id, status=status_filter if status_filter else None, 
+                                          include_unassigned=True)
             stats = manager.get_stats(user_id)
             
             return render_template('user/hitl_tasks.html',
@@ -448,7 +451,8 @@ class UserRoutes(AbstractRoutes):
                                    roles=session.get('roles', []),
                                    tasks=tasks,
                                    stats=stats,
-                                   is_reviewer=is_reviewer)
+                                   is_reviewer=is_reviewer,
+                                   status_filter=status_filter)
         
         @self.app.route('/user/hitl/<task_id>')
         @login_required

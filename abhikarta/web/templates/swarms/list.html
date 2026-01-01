@@ -117,7 +117,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <small>{{ swarm.updated_at[:16] if swarm.updated_at else '-' }}</small>
+                                <small>{{ swarm.updated_at|dt(16) if swarm.updated_at else '-' }}</small>
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">

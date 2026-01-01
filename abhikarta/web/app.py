@@ -83,7 +83,9 @@ def _register_routes(app, user_facade, db_facade):
         AgentRoutes,
         MCPRoutes,
         APIRoutes,
-        AIORGRoutes
+        AIORGRoutes,
+        WorkflowRoutes,
+        HITLRoutes
     )
     
     # Create route handlers
@@ -94,7 +96,9 @@ def _register_routes(app, user_facade, db_facade):
         AgentRoutes(app),
         MCPRoutes(app),
         APIRoutes(app),
-        AIORGRoutes(app)
+        AIORGRoutes(app),
+        WorkflowRoutes(app),
+        HITLRoutes(app)
     ]
     
     # Set facades and register routes
@@ -108,6 +112,7 @@ def _register_routes(app, user_facade, db_facade):
 
 def _register_context_processors(app, settings):
     """Register template context processors."""
+    from datetime import datetime
     
     @app.context_processor
     def inject_globals():
@@ -116,6 +121,51 @@ def _register_context_processors(app, settings):
             'app_name': settings.app_name,
             'app_version': settings.app_version
         }
+    
+    @app.template_filter('format_datetime')
+    def format_datetime_filter(value, format='%Y-%m-%d %H:%M'):
+        """
+        Format a datetime value for display.
+        Handles both datetime objects and strings.
+        """
+        if value is None:
+            return '-'
+        
+        if isinstance(value, datetime):
+            return value.strftime(format)
+        
+        if isinstance(value, str):
+            # Return the appropriate slice based on format
+            if format == '%Y-%m-%d' or len(format) <= 10:
+                return value[:10] if len(value) >= 10 else value
+            elif format == '%Y-%m-%d %H:%M':
+                return value[:16] if len(value) >= 16 else value
+            else:
+                return value[:19] if len(value) >= 19 else value
+        
+        return str(value)
+    
+    @app.template_filter('dt')
+    def dt_filter(value, length=16):
+        """
+        Short filter to format datetime - handles strings and datetime objects.
+        Usage: {{ task.created_at|dt }} or {{ task.created_at|dt(10) }}
+        """
+        if value is None:
+            return '-'
+        
+        if isinstance(value, datetime):
+            if length <= 10:
+                return value.strftime('%Y-%m-%d')
+            elif length <= 16:
+                return value.strftime('%Y-%m-%d %H:%M')
+            else:
+                return value.strftime('%Y-%m-%d %H:%M:%S')
+        
+        if isinstance(value, str):
+            return value[:length] if len(value) >= length else value
+        
+        return str(value)
 
 
 def _register_error_handlers(app):

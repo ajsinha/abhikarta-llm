@@ -5,45 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cb8075d7-6a43-45a0-aa83-9afdedf815cb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/abhikarta-llm.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/abhikarta-llm.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/agent/agent_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/agent/agent_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/agent/agent_template.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/agent/agent_template.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/config/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/database/schema/postgres_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/database/schema/postgres_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/database/schema/sqlite_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/database/schema/sqlite_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/langchain/llm_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/langchain/llm_factory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/langchain/tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/langchain/tools.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/abhikarta/langchain/workflow_graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/langchain/workflow_graph.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/llm_provider/llm_facade.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/llm_provider/llm_facade.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/mcp/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/mcp/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/mcp/manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/mcp/manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/swarm/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/swarm/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/abstract_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/abstract_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/admin_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/admin_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/agent_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/agent_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/aiorg_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/aiorg_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/api_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/api_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/mcp_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/mcp_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/notification_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/notification_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/swarm_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/swarm_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/user_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/workflow_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/workflow_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/agents/designer.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/agents/designer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/mcp/plugin_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/mcp/plugin_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/admin/hitl_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/admin/hitl_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/admin/hitl_tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/admin/hitl_tasks.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/notifications/channels.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/notifications/channels.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/notifications/webhook_events.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/notifications/webhook_events.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/notifications/webhook_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/notifications/webhook_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/swarms/execution.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/swarms/execution.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/swarms/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/swarms/list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/swarms/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/swarms/view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/agent_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/agent_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/execution_trace.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/execution_trace.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/workflows/designer.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/workflows/designer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/workflows/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/workflows/detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/workflow/dag_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/workflow/dag_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/workflow/executor.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/workflow/executor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/workflow/node_types.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/workflow/node_types.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/workflow/workflow_template.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/workflow/workflow_template.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/execution_progress.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/execution_progress.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/executions.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/executions.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/hitl_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/hitl_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/hitl_tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/hitl_tasks.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/abhikarta.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/abhikarta.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/abhikarta.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/abhikarta.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +48,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.run_server.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main"
   }

@@ -541,7 +541,7 @@
                             <div class="timeline-meta">
                                 <span class="badge bg-secondary me-2">{{ step.node_type }}</span>
                                 {% if step.duration_ms %}{{ step.duration_ms }}ms{% endif %}
-                                {% if step.started_at %} • {{ step.started_at[:19] }}{% endif %}
+                                {% if step.started_at %} • {{ step.started_at|dt(19) }}{% endif %}
                             </div>
                         </div>
                     </div>

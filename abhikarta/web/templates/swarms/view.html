@@ -162,7 +162,7 @@
                                 <tr>
                                     <td>
                                         <a href="{{ url_for('view_swarm_execution', swarm_id=swarm.swarm_id, execution_id=e.execution_id) }}">
-                                            {{ e.start_time[:16] if e.start_time else '-' }}
+                                            {{ e.start_time|dt(16) if e.start_time else '-' }}
                                         </a>
                                     </td>
                                     <td>{{ e.trigger_type }}</td>

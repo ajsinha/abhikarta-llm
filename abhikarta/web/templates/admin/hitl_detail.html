@@ -155,7 +155,7 @@
                                         <span class="badge bg-warning text-dark ms-1">Internal</span>
                                         {% endif %}
                                     </div>
-                                    <small class="text-muted">{{ comment.created_at[:16] }}</small>
+                                    <small class="text-muted">{{ comment.created_at|dt(16) }}</small>
                                 </div>
                                 <p class="mb-0 {% if comment.comment_type == 'system' %}text-muted fst-italic{% endif %}">
                                     {{ comment.comment }}
@@ -194,7 +194,7 @@
                                 <td>{{ a.assigned_to }}</td>
                                 <td>{{ a.assigned_by }}</td>
                                 <td>{{ a.reason or '-' }}</td>
-                                <td><small>{{ a.assigned_at[:16] if a.assigned_at else '-' }}</small></td>
+                                <td><small>{{ a.assigned_at|dt(16) if a.assigned_at else '-' }}</small></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -241,11 +241,11 @@
                         </tr>
                         <tr>
                             <td class="text-muted">Created</td>
-                            <td>{{ task.created_at[:16] if task.created_at else '-' }}</td>
+                            <td>{{ task.created_at|dt(16) if task.created_at else '-' }}</td>
                         </tr>
                         <tr>
                             <td class="text-muted">Due</td>
-                            <td>{{ task.due_at[:16] if task.due_at else '-' }}</td>
+                            <td>{{ task.due_at|dt(16) if task.due_at else '-' }}</td>
                         </tr>
                         <tr>
                             <td class="text-muted">Timeout</td>
@@ -254,7 +254,7 @@
                         {% if task.completed_at %}
                         <tr>
                             <td class="text-muted">Completed</td>
-                            <td>{{ task.completed_at[:16] }}</td>
+                            <td>{{ task.completed_at|dt(16) }}</td>
                         </tr>
                         <tr>
                             <td class="text-muted">Completed By</td>

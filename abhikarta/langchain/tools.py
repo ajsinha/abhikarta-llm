@@ -341,6 +341,7 @@ class ToolFactory:
         
         Available tools:
         - web_search: Search the web (requires Tavily API key)
+        - web_fetch: Fetch content from a URL
         - wikipedia: Search Wikipedia
         - python_repl: Execute Python code
         - shell: Execute shell commands
@@ -352,6 +353,8 @@ class ToolFactory:
         Returns:
             List of LangChain tools
         """
+        from langchain_core.tools import Tool, StructuredTool
+        
         tools = []
         available = tool_names or ['wikipedia']
         
@@ -360,6 +363,9 @@ class ToolFactory:
                 if name == 'web_search':
                     from langchain_community.tools import TavilySearchResults
                     tools.append(TavilySearchResults(max_results=5))
+                elif name == 'web_fetch':
+                    # Create a simple web fetch tool
+                    tools.append(self._create_web_fetch_tool())
                 elif name == 'wikipedia':
                     from langchain_community.tools import WikipediaQueryRun
                     from langchain_community.utilities import WikipediaAPIWrapper
@@ -380,6 +386,115 @@ class ToolFactory:
                 logger.warning(f"Error creating built-in tool {name}: {e}")
         
         return tools
+    
+    def _create_web_fetch_tool(self) -> Any:
+        """Create a web fetch tool for fetching URL content."""
+        from langchain_core.tools import Tool
+        
+        def fetch_url(url: str) -> str:
+            """Fetch content from a URL."""
+            import urllib.request
+            import urllib.error
+            
+            try:
+                # Clean the URL
+                url = url.strip()
+                if not url.startswith(('http://', 'https://')):
+                    url = 'https://' + url
+                
+                req = urllib.request.Request(
+                    url,
+                    headers={
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                )
+                
+                with urllib.request.urlopen(req, timeout=30) as response:
+                    content = response.read().decode('utf-8', errors='ignore')
+                    
+                    # Try to extract text from HTML
+                    try:
+                        from html.parser import HTMLParser
+                        
+                        class TextExtractor(HTMLParser):
+                            def __init__(self):
+                                super().__init__()
+                                self.text_parts = []
+                                self.skip_tags = {'script', 'style', 'nav', 'footer', 'header'}
+                                self.current_tag = None
+                            
+                            def handle_starttag(self, tag, attrs):
+                                self.current_tag = tag
+                            
+                            def handle_endtag(self, tag):
+                                self.current_tag = None
+                            
+                            def handle_data(self, data):
+                                if self.current_tag not in self.skip_tags:
+                                    text = data.strip()
+                                    if text:
+                                        self.text_parts.append(text)
+                            
+                            def get_text(self):
+                                return ' '.join(self.text_parts)
+                        
+                        parser = TextExtractor()
+                        parser.feed(content)
+                        text = parser.get_text()
+                        
+                        # Limit response size
+                        if len(text) > 10000:
+                            text = text[:10000] + "... [truncated]"
+                        
+                        return text if text else content[:5000]
+                        
+                    except Exception:
+                        # Return raw content if parsing fails
+                        return content[:5000]
+                        
+            except urllib.error.HTTPError as e:
+                return f"HTTP Error {e.code}: {e.reason}"
+            except urllib.error.URLError as e:
+                return f"URL Error: {e.reason}"
+            except Exception as e:
+                return f"Error fetching URL: {str(e)}"
+        
+        return Tool(
+            name="web_fetch",
+            description="Fetch and extract text content from a URL. Input should be a valid URL.",
+            func=fetch_url
+        )
+    
+    def get_tool_by_name(self, tool_name: str, server_id: str = None) -> Any:
+        """
+        Get a specific tool by name.
+        
+        Searches in order:
+        1. Built-in tools
+        2. MCP tools from specified server
+        3. MCP tools from all servers
+        
+        Args:
+            tool_name: Name of the tool
+            server_id: Optional specific MCP server ID
+            
+        Returns:
+            LangChain tool or None if not found
+        """
+        # Check built-in tools first
+        builtin_names = ['web_search', 'web_fetch', 'wikipedia', 'python_repl', 'shell', 'requests']
+        if tool_name in builtin_names:
+            tools = self.get_builtin_tools([tool_name])
+            if tools:
+                return tools[0]
+        
+        # Check MCP tools
+        mcp_tools = self.get_mcp_tools(server_id)
+        for tool in mcp_tools:
+            if tool.name == tool_name:
+                return tool
+        
+        return None
     
     def create_custom_tool(self, name: str, description: str, 
                           func: Callable, args_schema: Type[BaseModel] = None) -> Any:

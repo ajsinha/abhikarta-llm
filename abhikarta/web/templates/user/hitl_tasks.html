@@ -137,7 +137,7 @@
                             </td>
                             <td>
                                 {% if task.due_at %}
-                                <small>{{ task.due_at[:16] }}</small>
+                                <small>{{ task.due_at|dt(16) }}</small>
                                 {% else %}
                                 <span class="text-muted">-</span>
                                 {% endif %}

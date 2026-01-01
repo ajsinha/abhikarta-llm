@@ -15,6 +15,7 @@ from .mcp_routes import MCPRoutes
 from .api_routes import APIRoutes
 from .workflow_routes import WorkflowRoutes
 from .aiorg_routes import AIORGRoutes
+from .hitl_routes import HITLRoutes
 
 __all__ = [
     'AbstractRoutes',
@@ -27,5 +28,6 @@ __all__ = [
     'MCPRoutes',
     'APIRoutes',
     'WorkflowRoutes',
-    'AIORGRoutes'
+    'AIORGRoutes',
+    'HITLRoutes'
 ]

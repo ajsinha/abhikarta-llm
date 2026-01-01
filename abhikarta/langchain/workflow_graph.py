@@ -17,12 +17,39 @@ import json
 import logging
 import time
 import uuid
-from typing import Dict, Any, Optional, List, Callable, TypedDict, Annotated
+from typing import Dict, Any, Optional, List, Callable, TypedDict, Annotated, Union
 from datetime import datetime
 from dataclasses import dataclass, field
 from operator import add
 
 logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# Reducer Functions for Concurrent State Updates
+# ============================================================================
+
+def last_value(current: Any, new: Any) -> Any:
+    """Reducer that keeps the last value (for concurrent updates)."""
+    return new
+
+
+def merge_dicts(current: Dict, new: Dict) -> Dict:
+    """Reducer that merges dictionaries (for concurrent updates)."""
+    if current is None:
+        current = {}
+    if new is None:
+        return current
+    result = dict(current)
+    result.update(new)
+    return result
+
+
+def keep_first_error(current: Optional[str], new: Optional[str]) -> Optional[str]:
+    """Reducer that keeps the first error encountered."""
+    if current:
+        return current
+    return new
 
 
 # ============================================================================
@@ -35,30 +62,33 @@ class WorkflowState(TypedDict, total=False):
     
     Each node can read and modify this state. The state is persisted
     and can be checkpointed for resumption.
+    
+    Fields with Annotated types use reducers to handle concurrent updates
+    from parallel node execution.
     """
-    # Input/Output
+    # Input/Output - use reducers for concurrent access
     input: Any
-    output: Any
+    output: Annotated[Any, last_value]
     
-    # Execution tracking
-    current_node: str
+    # Execution tracking - concurrent updates possible
+    current_node: Annotated[str, last_value]
     executed_nodes: Annotated[List[str], add]
-    node_outputs: Dict[str, Any]
+    node_outputs: Annotated[Dict[str, Any], merge_dicts]
     
-    # Error handling
-    error: Optional[str]
-    status: str  # running, completed, failed, waiting_for_human
+    # Error handling - keep first error
+    error: Annotated[Optional[str], keep_first_error]
+    status: Annotated[str, last_value]  # running, completed, failed, waiting_for_human
     
-    # Context
-    context: Dict[str, Any]
-    variables: Dict[str, Any]
+    # Context - merge for concurrent updates
+    context: Annotated[Dict[str, Any], merge_dicts]
+    variables: Annotated[Dict[str, Any], merge_dicts]
     
     # Human-in-the-loop
-    hitl_pending: bool
-    hitl_message: Optional[str]
-    hitl_response: Optional[str]
+    hitl_pending: Annotated[bool, last_value]
+    hitl_message: Annotated[Optional[str], last_value]
+    hitl_response: Annotated[Optional[str], last_value]
     
-    # Metadata
+    # Metadata - typically not updated concurrently
     execution_id: str
     workflow_id: str
     started_at: str
@@ -353,24 +383,26 @@ class LangGraphNodeFactory:
                 tool_name = node_config.get('tool_name')
                 server_id = node_config.get('server_id')
                 
-                # Get tool
+                # Get tool factory
                 factory = self.tool_factory or ToolFactory(self.db_facade)
-                tools = factory.get_mcp_tools(server_id)
                 
-                # Find the specific tool
-                tool = next((t for t in tools if t.name == tool_name), None)
+                # Use get_tool_by_name which checks both built-in and MCP tools
+                tool = factory.get_tool_by_name(tool_name, server_id)
+                
                 if not tool:
                     raise ValueError(f"Tool not found: {tool_name}")
                 
-                # Get input
+                # Get input - extract meaningful value
                 input_key = node_config.get('input_key', 'input')
-                tool_input = state.get(input_key, state.get('input', {}))
+                raw_input = state.get(input_key, state.get('input', {}))
+                tool_input = self._extract_input_value(raw_input, state)
+                
+                logger.info(f"[NODE:{node_id}] Tool: {tool_name}, Input: {str(tool_input)[:200]}...")
                 
                 # Execute tool
-                if isinstance(tool_input, str):
-                    result = tool.invoke(tool_input)
-                else:
-                    result = tool.invoke(tool_input)
+                result = tool.invoke(tool_input)
+                
+                logger.info(f"[NODE:{node_id}] Tool output: {str(result)[:500]}...")
                 
                 output_key = node_config.get('output_key', node_id)
                 
@@ -663,9 +695,11 @@ def create_workflow_graph(workflow_config: Dict, db_facade,
     # Support both 'start'/'end' and 'input'/'output' node types
     start_types = {'start', 'input'}
     end_types = {'end', 'output'}
+    hitl_types = {'hitl', 'human', 'human_in_the_loop', 'approval', 'review'}
     
     start_node_id = None
     end_node_ids = []
+    hitl_node_ids = set()  # Track HITL nodes for special edge handling
     executable_nodes = []  # Nodes that actually get added to graph
     
     for node in nodes:
@@ -680,8 +714,12 @@ def create_workflow_graph(workflow_config: Dict, db_facade,
             logger.debug(f"Found end/output node: {node_id}")
         else:
             executable_nodes.append(node)
+            # Track HITL nodes
+            if node_type in hitl_types:
+                hitl_node_ids.add(node_id)
+                logger.debug(f"Found HITL node: {node_id}")
     
-    logger.debug(f"Start node: {start_node_id}, End nodes: {end_node_ids}, Executable: {[n['id'] for n in executable_nodes]}")
+    logger.debug(f"Start node: {start_node_id}, End nodes: {end_node_ids}, HITL nodes: {hitl_node_ids}, Executable: {[n['id'] for n in executable_nodes]}")
     
     # Add executable nodes to graph (skip start/end nodes)
     for node_config in executable_nodes:
@@ -748,6 +786,19 @@ def create_workflow_graph(workflow_config: Dict, db_facade,
                 source,
                 make_condition(condition, target, false_target)
             )
+        # Handle HITL node edges - make them conditional to pause when hitl_pending
+        elif source in hitl_node_ids:
+            def make_hitl_check(next_target):
+                def check_hitl(state: WorkflowState) -> str:
+                    # If HITL is pending, pause the workflow (go to END)
+                    if state.get('hitl_pending'):
+                        logger.info(f"HITL pending, pausing workflow at {source}")
+                        return END
+                    return next_target
+                return check_hitl
+            
+            logger.debug(f"Adding HITL conditional edge: {source} -> {target} (with pause check)")
+            graph.add_conditional_edges(source, make_hitl_check(target))
         else:
             logger.debug(f"Adding edge: {source} -> {target}")
             graph.add_edge(source, target)

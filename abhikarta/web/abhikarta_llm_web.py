@@ -154,6 +154,28 @@ class AbhikartaLLMWeb:
                     return value
             return value.strftime(format_str)
         
+        @self.app.template_filter('dt')
+        def dt_filter(value, length=16):
+            """
+            Short filter to format datetime - handles strings and datetime objects.
+            Usage: {{ task.created_at|dt }} or {{ task.created_at|dt(10) }}
+            """
+            if value is None:
+                return '-'
+            
+            if isinstance(value, datetime):
+                if length <= 10:
+                    return value.strftime('%Y-%m-%d')
+                elif length <= 16:
+                    return value.strftime('%Y-%m-%d %H:%M')
+                else:
+                    return value.strftime('%Y-%m-%d %H:%M:%S')
+            
+            if isinstance(value, str):
+                return value[:length] if len(value) >= length else value
+            
+            return str(value)
+        
         @self.app.template_filter('truncate_text')
         def truncate_text(text, length=100, suffix='...'):
             """Truncate text to specified length."""

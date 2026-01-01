@@ -87,7 +87,7 @@
             <div class="card h-100">
                 <div class="card-body text-center">
                     <h6 class="text-muted mb-2">Started</h6>
-                    <p class="mb-0 fs-6">{{ execution.created_at[:19] if execution.created_at else '-' }}</p>
+                    <p class="mb-0 fs-6">{{ execution.created_at|dt(19) if execution.created_at else '-' }}</p>
                 </div>
             </div>
         </div>
@@ -181,7 +181,7 @@
                                     <span class="badge bg-{{ 'success' if decision.decision_type == 'delegate' else 'info' if decision.decision_type == 'plan' else 'secondary' }} me-2">
                                         {{ decision.decision_type or 'decision' }}
                                     </span>
-                                    <small class="text-muted">{{ decision.created_at[:19] if decision.created_at else '' }}</small>
+                                    <small class="text-muted">{{ decision.created_at|dt(19) if decision.created_at else '' }}</small>
                                 </div>
                             </div>
                             <div class="mt-2">
@@ -278,7 +278,7 @@
                 </div>
                 <div class="col-md-3">
                     <p class="mb-1"><strong>Completed At:</strong></p>
-                    <span class="small">{{ execution.completed_at[:19] if execution.completed_at else '-' }}</span>
+                    <span class="small">{{ execution.completed_at|dt(19) if execution.completed_at else '-' }}</span>
                 </div>
             </div>
         </div>

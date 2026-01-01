@@ -86,7 +86,7 @@
                         {% for event in events %}
                         <tr>
                             <td>
-                                <small class="text-muted">{{ event.received_at[:19] if event.received_at else 'N/A' }}</small>
+                                <small class="text-muted">{{ event.received_at|dt(19) if event.received_at else 'N/A' }}</small>
                             </td>
                             <td>
                                 <span class="badge bg-info">{{ event.endpoint_name or event.path or 'Unknown' }}</span>

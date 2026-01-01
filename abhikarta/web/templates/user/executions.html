@@ -272,7 +272,7 @@
                                             <span class="text-muted">{{ exec.agents_used or '-' }}</span>
                                         </td>
                                         <td>
-                                            <small>{{ exec.created_at[:16] if exec.created_at else '-' }}</small>
+                                            <small>{{ exec.created_at|dt(16) if exec.created_at else '-' }}</small>
                                         </td>
                                         <td>
                                             {% if exec.completed_at and exec.created_at %}

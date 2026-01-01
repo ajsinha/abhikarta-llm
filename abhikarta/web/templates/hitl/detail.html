@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task.title }} - HITL Task - Abhikarta LLM{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-person-check me-2"></i>{{ task.title }}</h2>
+                    <p class="text-muted mb-0">
+                        Task ID: <code>{{ task.task_id }}</code>
+                        {% if task.workflow_id %}
+                        | Workflow: <a href="{{ url_for('workflow_detail', workflow_id=task.workflow_id) }}">{{ task.workflow_id }}</a>
+                        {% endif %}
+                    </p>
+                </div>
+                <a href="{{ url_for('hitl_tasks') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Tasks
+                </a>
+            </div>
+
+            <div class="row">
+                <!-- Task Details -->
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Task Details</h5>
+                            {% if task.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif task.status == 'in_progress' %}
+                            <span class="badge bg-info">In Progress</span>
+                            {% elif task.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Description:</strong>
+                                <p class="mt-2">{{ task.description or 'No description provided' }}</p>
+                            </div>
+                            
+                            {% if task.context %}
+                            <div class="mb-3">
+                                <strong>Context Data:</strong>
+                                <pre class="bg-light p-3 mt-2 rounded" style="max-height: 300px; overflow: auto;">{{ task.context | tojson(indent=2) if task.context is mapping else task.context }}</pre>
+                            </div>
+                            {% endif %}
+                            
+                            {% if task.request_data %}
+                            <div class="mb-3">
+                                <strong>Content to Review:</strong>
+                                <div class="bg-light p-3 mt-2 rounded" style="max-height: 400px; overflow: auto;">
+                                    {% if task.request_data is string %}
+                                    <div style="white-space: pre-wrap;">{{ task.request_data }}</div>
+                                    {% else %}
+                                    <pre>{{ task.request_data | tojson(indent=2) }}</pre>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Response Form (only show for pending/in_progress) -->
+                    {% if task.status in ['pending', 'in_progress'] %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-reply me-2"></i>Your Response</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('hitl_respond', task_id=task.task_id) }}">
+                                <div class="mb-3">
+                                    <label class="form-label">Response / Feedback</label>
+                                    <textarea class="form-control" name="response" rows="5" 
+                                              placeholder="Enter your response, feedback, or modifications here..."></textarea>
+                                    <div class="form-text">
+                                        {% if task.task_type == 'approval' %}
+                                        Optionally provide feedback with your approval or rejection.
+                                        {% elif task.task_type == 'input' %}
+                                        Provide the requested input or information.
+                                        {% else %}
+                                        Provide your review comments or modifications.
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex gap-2">
+                                    {% if task.task_type == 'approval' %}
+                                    <button type="submit" name="action" value="approve" class="btn btn-success btn-lg">
+                                        <i class="bi bi-check-lg me-1"></i>Approve
+                                    </button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger btn-lg">
+                                        <i class="bi bi-x-lg me-1"></i>Reject
+                                    </button>
+                                    {% else %}
+                                    <button type="submit" name="action" value="complete" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-check-circle me-1"></i>Submit Response
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% elif task.status == 'completed' %}
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Task Completed</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if task.response_data %}
+                            <strong>Response:</strong>
+                            <pre class="bg-light p-3 mt-2 rounded">{{ task.response_data | tojson(indent=2) if task.response_data is mapping else task.response_data }}</pre>
+                            {% endif %}
+                            <p class="text-muted mb-0">
+                                Completed by: {{ task.completed_by or 'Unknown' }}<br>
+                                Completed at: {{ task.completed_at or 'Unknown' }}
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="bi bi-gear me-2"></i>Task Info</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td class="text-muted">Type</td>
+                                    <td>
+                                        {% if task.task_type == 'approval' %}
+                                        <span class="badge bg-primary">Approval</span>
+                                        {% elif task.task_type == 'input' %}
+                                        <span class="badge bg-info">Input Required</span>
+                                        {% elif task.task_type == 'review' %}
+                                        <span class="badge bg-secondary">Review</span>
+                                        {% else %}
+                                        {{ task.task_type }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Priority</td>
+                                    <td>
+                                        {% if task.priority <= 3 %}
+                                        <span class="badge bg-danger">High ({{ task.priority }})</span>
+                                        {% elif task.priority <= 6 %}
+                                        <span class="badge bg-warning text-dark">Medium ({{ task.priority }})</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Low ({{ task.priority }})</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Assigned To</td>
+                                    <td>{{ task.assigned_to or 'Unassigned' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Created</td>
+                                    <td>{{ task.created_at|dt(16) if task.created_at else '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Expires</td>
+                                    <td>{{ task.expires_at|dt(16) if task.expires_at else 'Never' }}</td>
+                                </tr>
+                                {% if task.node_id %}
+                                <tr>
+                                    <td class="text-muted">Node ID</td>
+                                    <td><code>{{ task.node_id }}</code></td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                            
+                            {% if not task.assigned_to and task.status == 'pending' %}
+                            <form method="POST" action="{{ url_for('hitl_claim', task_id=task.task_id) }}">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-hand-index me-1"></i>Claim Task
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if workflow %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Workflow</h6>
+                        </div>
+                        <div class="card-body">
+                            <h6>{{ workflow.name }}</h6>
+                            <p class="text-muted small mb-2">{{ workflow.description[:100] if workflow.description else 'No description' }}</p>
+                            <a href="{{ url_for('workflow_detail', workflow_id=workflow.workflow_id) }}" class="btn btn-sm btn-outline-secondary">
+                                View Workflow
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
