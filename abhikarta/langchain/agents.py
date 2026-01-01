@@ -5,7 +5,8 @@ Supports:
 - ReAct agents (reasoning + acting)
 - Tool-calling agents (OpenAI function calling, Anthropic tool use)
 - Structured chat agents
-- Custom agent types
+- Conversational agents
+- Retrieval/RAG agents
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
@@ -16,7 +17,7 @@ import logging
 import time
 import uuid
 from typing import Dict, Any, Optional, List, Callable
-from datetime import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ _create_tool_calling_agent_func = None
 _create_structured_chat_agent_func = None
 _hub = None
 _python_314_mode = False
+_import_errors = []  # Track import errors for debugging
 
 import sys
 if sys.version_info >= (3, 14):
@@ -41,71 +43,82 @@ if sys.version_info >= (3, 14):
 
 # Try importing LangChain components
 if not _python_314_mode:
+    # Try to import AgentExecutor
     try:
         from langchain.agents import AgentExecutor as _LangChainAgentExecutor
         _langchain_available = True
         logger.info("LangChain AgentExecutor imported successfully")
     except ImportError as e:
+        _import_errors.append(f"AgentExecutor ImportError: {e}")
         logger.warning(f"Could not import AgentExecutor from langchain.agents: {e}")
     except Exception as e:
-        logger.warning(f"Error importing langchain.agents (Python 3.14 compatibility?): {e}")
-        _python_314_mode = True
+        _import_errors.append(f"AgentExecutor Exception: {e}")
+        logger.warning(f"Error importing langchain.agents: {e}")
 
     # Try to import create_react_agent
-    if not _python_314_mode:
-        try:
-            from langchain.agents import create_react_agent as _create_react_agent_func
-            logger.info("create_react_agent imported from langchain.agents")
-        except ImportError:
-            try:
-                from langchain.agents.react.agent import create_react_agent as _create_react_agent_func
-                logger.info("create_react_agent imported from langchain.agents.react.agent")
-            except ImportError as e:
-                logger.warning(f"Could not import create_react_agent: {e}")
-
-    # Try to import create_tool_calling_agent
-    if not _python_314_mode:
-        try:
-            from langchain.agents import create_tool_calling_agent as _create_tool_calling_agent_func
-            logger.info("create_tool_calling_agent imported from langchain.agents")
-        except ImportError:
-            try:
-                from langchain.agents.tool_calling_agent.base import create_tool_calling_agent as _create_tool_calling_agent_func
-                logger.info("create_tool_calling_agent imported from langchain.agents.tool_calling_agent.base")
-            except ImportError:
-                try:
-                    from langchain_core.agents import create_tool_calling_agent as _create_tool_calling_agent_func
-                    logger.info("create_tool_calling_agent imported from langchain_core.agents")
-                except ImportError as e:
-                    logger.warning(f"Could not import create_tool_calling_agent: {e}")
-
-    # Try to import create_structured_chat_agent
-    if not _python_314_mode:
-        try:
-            from langchain.agents import create_structured_chat_agent as _create_structured_chat_agent_func
-            logger.info("create_structured_chat_agent imported from langchain.agents")
-        except ImportError:
-            try:
-                from langchain.agents.structured_chat.base import create_structured_chat_agent as _create_structured_chat_agent_func
-                logger.info("create_structured_chat_agent imported from langchain.agents.structured_chat.base")
-            except ImportError as e:
-                logger.warning(f"Could not import create_structured_chat_agent: {e}")
-
-    # Try to import hub
     try:
-        from langchain import hub as _hub
-        logger.info("LangChain hub imported successfully")
+        from langchain.agents import create_react_agent as _create_react_agent_func
+        logger.info("create_react_agent imported from langchain.agents")
     except ImportError:
         try:
-            from langchainhub import hub as _hub
-            logger.info("langchainhub imported as hub")
+            from langchain.agents.react.agent import create_react_agent as _create_react_agent_func
+            logger.info("create_react_agent imported from langchain.agents.react.agent")
         except ImportError as e:
-            logger.warning(f"Could not import langchain hub: {e}")
+            _import_errors.append(f"create_react_agent ImportError: {e}")
+            logger.warning(f"Could not import create_react_agent: {e}")
 
-# Python 3.14 mode - use simplified imports that avoid Pydantic v1
-if _python_314_mode:
-    logger.info("Running in Python 3.14 compatibility mode - using simplified agent execution")
-    _langchain_available = True  # We'll use langchain-core directly
+    # Try to import create_tool_calling_agent
+    try:
+        from langchain.agents import create_tool_calling_agent as _create_tool_calling_agent_func
+        logger.info("create_tool_calling_agent imported from langchain.agents")
+    except ImportError:
+        try:
+            from langchain.agents.tool_calling_agent.base import create_tool_calling_agent as _create_tool_calling_agent_func
+            logger.info("create_tool_calling_agent imported from langchain.agents.tool_calling_agent.base")
+        except ImportError:
+            try:
+                from langchain_core.agents import create_tool_calling_agent as _create_tool_calling_agent_func
+                logger.info("create_tool_calling_agent imported from langchain_core.agents")
+            except ImportError as e:
+                _import_errors.append(f"create_tool_calling_agent ImportError: {e}")
+                logger.warning(f"Could not import create_tool_calling_agent: {e}")
+
+    # Try to import create_structured_chat_agent
+    try:
+        from langchain.agents import create_structured_chat_agent as _create_structured_chat_agent_func
+        logger.info("create_structured_chat_agent imported from langchain.agents")
+    except ImportError:
+        try:
+            from langchain.agents.structured_chat.base import create_structured_chat_agent as _create_structured_chat_agent_func
+            logger.info("create_structured_chat_agent imported from langchain.agents.structured_chat.base")
+        except ImportError as e:
+            _import_errors.append(f"create_structured_chat_agent ImportError: {e}")
+            logger.warning(f"Could not import create_structured_chat_agent: {e}")
+
+# Try to import hub (outside python_314_mode check since it's used by both)
+try:
+    from langchain import hub as _hub
+    logger.info("LangChain hub imported successfully")
+except ImportError:
+    try:
+        from langchainhub import hub as _hub
+        logger.info("langchainhub imported as hub")
+    except ImportError as e:
+        logger.warning(f"Could not import langchain hub: {e}")
+
+# Log summary of import status
+if _import_errors:
+    logger.warning(f"LangChain import issues detected: {len(_import_errors)} errors. Complex agents may fall back to conversational mode.")
+    for err in _import_errors:
+        logger.debug(f"  - {err}")
+
+# Set langchain_available based on what we could import
+if _LangChainAgentExecutor is not None:
+    _langchain_available = True
+else:
+    # Even without AgentExecutor, we can still use conversational mode
+    _langchain_available = True  # Allow conversational agents to work
+    logger.info("LangChain AgentExecutor not available - will use conversational mode for complex agent types")
 
 
 @dataclass
@@ -514,6 +527,13 @@ class AgentExecutor:
         'conversational': create_conversational_agent,
         'plan_and_execute': create_plan_execute_agent,
         'plan_execute': create_plan_execute_agent,
+        # RAG/Retrieval agents use conversational mode (retrieval is done via tools or context)
+        'retrieval': create_conversational_agent,
+        'rag': create_conversational_agent,
+        'basic_rag': create_conversational_agent,
+        'chat': create_conversational_agent,
+        # Default fallback
+        'default': create_conversational_agent,
     }
     
     def __init__(self, db_facade, llm_factory=None, tool_factory=None):
@@ -549,7 +569,7 @@ class AgentExecutor:
             execution_id=execution_id,
             agent_id=agent_id,
             input_data=input_data,
-            started_at=datetime.utcnow()
+            started_at=datetime.now(timezone.utc)
         )
         
         logger.info(f"[AGENT:{agent_id}] Starting execution: {execution_id}")
@@ -582,15 +602,23 @@ class AgentExecutor:
             logger.info(f"[AGENT:{agent_id}] Tools created: {[t.name if hasattr(t, 'name') else str(t) for t in tools]}")
             
             # Create agent executor
-            agent_type = agent_config.get('agent_type', 'tool_calling')
+            agent_type = agent_config.get('agent_type', 'conversational')
             system_prompt = agent_config.get('system_prompt', '')
             
             logger.info(f"[AGENT:{agent_id}] Creating {agent_type} agent executor...")
             if system_prompt:
                 logger.info(f"[AGENT:{agent_id}] System prompt: {system_prompt[:200]}...")
             
-            creator_func = self.AGENT_TYPES.get(agent_type, create_tool_calling_agent)
-            agent_executor = creator_func(llm, tools, system_prompt)
+            # Get the creator function with conversational as default fallback
+            creator_func = self.AGENT_TYPES.get(agent_type, create_conversational_agent)
+            
+            try:
+                agent_executor = creator_func(llm, tools, system_prompt)
+            except ImportError as e:
+                # If the requested agent type fails due to missing imports, fall back to conversational
+                logger.warning(f"[AGENT:{agent_id}] Failed to create {agent_type} agent: {e}. Falling back to conversational.")
+                agent_executor = create_conversational_agent(llm, tools, system_prompt)
+            
             logger.info(f"[AGENT:{agent_id}] Agent executor created")
             
             # Prepare input
@@ -634,7 +662,7 @@ class AgentExecutor:
                         logger.info(f"[AGENT:{agent_id}] Step {i+1}: {step_dict['action']} -> {str(step_dict['observation'])[:200]}...")
             
             result.status = 'completed'
-            result.completed_at = datetime.utcnow()
+            result.completed_at = datetime.now(timezone.utc)
             
             logger.info(f"[AGENT:{agent_id}] Execution completed successfully")
             
@@ -645,8 +673,8 @@ class AgentExecutor:
             logger.error(f"[AGENT:{agent_id}] Execution failed: {e}", exc_info=True)
             result.status = 'failed'
             result.error_message = str(e)
-            result.completed_at = datetime.utcnow()
-            result.duration_ms = int((datetime.utcnow() - result.started_at).total_seconds() * 1000)
+            result.completed_at = datetime.now(timezone.utc)
+            result.duration_ms = int((datetime.now(timezone.utc) - result.started_at).total_seconds() * 1000)
             
             # Log failed execution
             self._log_execution(result, {})

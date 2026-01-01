@@ -1,527 +1,416 @@
-2026-01-01 13:38:32,840 - __main__ - INFO - Properties configuration initialized
-2026-01-01 13:38:32,931 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
-2026-01-01 13:38:32,931 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
-2026-01-01 13:38:32,931 - abhikarta.database.db_facade - INFO - Database delegates initialized (including NotificationDelegate)
-2026-01-01 13:38:32,932 - abhikarta.database.db_facade - INFO - Database connected
-2026-01-01 13:38:32,932 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
-2026-01-01 13:38:33,026 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
-2026-01-01 13:38:33,244 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
-2026-01-01 13:38:33,252 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
-2026-01-01 13:38:33,257 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.4.6)
-2026-01-01 13:38:33,258 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
-2026-01-01 13:38:33,258 - abhikarta.database.db_facade - INFO - Database schema initialized
-2026-01-01 13:38:33,258 - __main__ - INFO - Database initialized: sqlite
-2026-01-01 13:38:33,269 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
-2026-01-01 13:38:33,270 - __main__ - INFO - User management initialized
-2026-01-01 13:38:33,473 - abhikarta.tools.registry - INFO - ToolsRegistry initialized
-2026-01-01 13:38:33,474 - abhikarta.tools.registry - INFO - Registered tool: get_current_datetime (type=function)
-2026-01-01 13:38:33,474 - abhikarta.tools.registry - INFO - Registered tool: parse_date (type=function)
-2026-01-01 13:38:33,474 - abhikarta.tools.registry - INFO - Registered tool: calculate_date_difference (type=function)
-2026-01-01 13:38:33,474 - abhikarta.tools.registry - INFO - Registered tool: add_days_to_date (type=function)
-2026-01-01 13:38:33,474 - abhikarta.tools.registry - INFO - Registered tool: get_business_days (type=function)
-2026-01-01 13:38:33,474 - abhikarta.tools.registry - INFO - Registered tool: calculate_expression (type=function)
-2026-01-01 13:38:33,474 - abhikarta.tools.registry - INFO - Registered tool: calculate_percentage (type=function)
-2026-01-01 13:38:33,474 - abhikarta.tools.registry - INFO - Registered tool: calculate_compound_interest (type=function)
-2026-01-01 13:38:33,474 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_emi (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: convert_currency (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: extract_text_patterns (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: clean_text (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: extract_entities (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: generate_summary_stats (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: mask_sensitive_data (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: validate_email (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: validate_phone (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: validate_credit_card (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: validate_iban (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: validate_ssn (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: json_to_csv (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: csv_to_json (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: base64_encode (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: base64_decode (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: generate_hash (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: generate_uuid (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: generate_reference_number (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.registry - INFO - Registered tool: generate_account_number (type=function)
-2026-01-01 13:38:33,475 - abhikarta.tools.prebuilt.common_tools - INFO - Registered 28 common tools
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: verify_identity_document (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: calculate_kyc_risk_score (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: verify_address (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: calculate_credit_score (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: assess_debt_to_income (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_eligibility (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: generate_amortization_schedule (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: analyze_transaction (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: detect_transaction_patterns (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: calculate_transaction_limits (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: check_sanctions_list (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: generate_aml_report (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.registry - INFO - Registered tool: validate_regulatory_compliance (type=function)
-2026-01-01 13:38:33,476 - abhikarta.tools.prebuilt.banking_tools - INFO - Registered 13 banking tools
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: make_http_request (type=function)
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: build_query_string (type=function)
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: parse_json_response (type=function)
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: validate_api_response (type=function)
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: format_email_template (type=function)
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: create_notification (type=function)
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: format_sms_message (type=function)
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: map_fields (type=function)
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: flatten_nested_dict (type=function)
-2026-01-01 13:38:33,477 - abhikarta.tools.registry - INFO - Registered tool: unflatten_dict (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: merge_dicts (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: filter_dict_keys (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: filter_list (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: sort_list (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: group_by (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: aggregate_list (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: paginate_list (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: create_workflow_context (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: update_workflow_context (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.registry - INFO - Registered tool: evaluate_condition (type=function)
-2026-01-01 13:38:33,478 - abhikarta.tools.prebuilt.integration_tools - INFO - Registered 20 integration tools
-2026-01-01 13:38:33,482 - abhikarta.tools.registry - INFO - Registered tool: web_search (type=function)
-2026-01-01 13:38:33,482 - abhikarta.tools.registry - INFO - Registered tool: web_fetch (type=function)
-2026-01-01 13:38:33,482 - abhikarta.tools.registry - INFO - Registered tool: intranet_search (type=function)
-2026-01-01 13:38:33,483 - abhikarta.tools.registry - INFO - Registered tool: news_search (type=function)
-2026-01-01 13:38:33,483 - abhikarta.tools.registry - INFO - Registered tool: read_document (type=function)
-2026-01-01 13:38:33,483 - abhikarta.tools.registry - INFO - Registered tool: write_document (type=function)
-2026-01-01 13:38:33,483 - abhikarta.tools.registry - INFO - Registered tool: convert_document (type=function)
-2026-01-01 13:38:33,483 - abhikarta.tools.registry - INFO - Registered tool: extract_document_metadata (type=function)
-2026-01-01 13:38:33,483 - abhikarta.tools.registry - INFO - Registered tool: list_files (type=function)
-2026-01-01 13:38:33,483 - abhikarta.tools.registry - INFO - Registered tool: copy_file (type=function)
-2026-01-01 13:38:33,483 - abhikarta.tools.registry - INFO - Registered tool: move_file (type=function)
-2026-01-01 13:38:33,484 - abhikarta.tools.registry - INFO - Registered tool: delete_file (type=function)
-2026-01-01 13:38:33,484 - abhikarta.tools.registry - INFO - Registered tool: get_system_info (type=function)
-2026-01-01 13:38:33,484 - abhikarta.tools.registry - INFO - Registered tool: execute_shell_command (type=function)
-2026-01-01 13:38:33,484 - abhikarta.tools.registry - INFO - Registered tool: get_environment_variable (type=function)
-2026-01-01 13:38:33,484 - abhikarta.tools.registry - INFO - Registered tool: set_environment_variable (type=function)
-2026-01-01 13:38:33,484 - abhikarta.tools.registry - INFO - Registered tool: check_url_status (type=function)
-2026-01-01 13:38:33,484 - abhikarta.tools.registry - INFO - Registered tool: ping_host (type=function)
-2026-01-01 13:38:33,484 - abhikarta.tools.registry - INFO - Registered tool: dns_lookup (type=function)
-2026-01-01 13:38:33,484 - abhikarta.tools.registry - INFO - Registered tool: parse_url (type=function)
-2026-01-01 13:38:33,485 - abhikarta.tools.registry - INFO - Registered tool: url_encode (type=function)
-2026-01-01 13:38:33,485 - abhikarta.tools.registry - INFO - Registered tool: url_decode (type=function)
-2026-01-01 13:38:33,485 - abhikarta.tools.registry - INFO - Registered tool: html_encode (type=function)
-2026-01-01 13:38:33,485 - abhikarta.tools.registry - INFO - Registered tool: html_decode (type=function)
-2026-01-01 13:38:33,485 - abhikarta.tools.prebuilt.general_tools - INFO - Registered 24 general-purpose tools
-2026-01-01 13:38:33,485 - __main__ - INFO - Registered 85 pre-built tools
-2026-01-01 13:38:33,485 - abhikarta.database.sqlite_handler - ERROR - fetch_all execute error: no such column: status
-2026-01-01 13:38:33,486 - abhikarta.database.sqlite_handler - ERROR - SQLite fetch_all error: no such column: status
-2026-01-01 13:38:33,486 - abhikarta.database.sqlite_handler - ERROR - Query: SELECT * FROM code_fragments WHERE status = 'active'
-2026-01-01 13:38:33,486 - abhikarta.database.sqlite_handler - ERROR - Params: None (type: None)
-2026-01-01 13:38:33,487 - abhikarta.database.sqlite_handler - ERROR - Traceback: Traceback (most recent call last):
+2026-01-01 14:07:02,569 - __main__ - INFO - Properties configuration initialized
+2026-01-01 14:07:02,606 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2026-01-01 14:07:02,607 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2026-01-01 14:07:02,607 - abhikarta.database.db_facade - INFO - Database delegates initialized (including NotificationDelegate)
+2026-01-01 14:07:02,607 - abhikarta.database.db_facade - INFO - Database connected
+2026-01-01 14:07:02,607 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2026-01-01 14:07:02,717 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2026-01-01 14:07:02,870 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2026-01-01 14:07:02,875 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2026-01-01 14:07:02,878 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.4.6)
+2026-01-01 14:07:02,879 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2026-01-01 14:07:02,879 - abhikarta.database.db_facade - INFO - Database schema initialized
+2026-01-01 14:07:02,879 - __main__ - INFO - Database initialized: sqlite
+2026-01-01 14:07:02,883 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2026-01-01 14:07:02,883 - __main__ - INFO - User management initialized
+2026-01-01 14:07:02,963 - abhikarta.tools.registry - INFO - ToolsRegistry initialized
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: get_current_datetime (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: parse_date (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: calculate_date_difference (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: add_days_to_date (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: get_business_days (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: calculate_expression (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: calculate_percentage (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: calculate_compound_interest (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_emi (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: convert_currency (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: extract_text_patterns (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: clean_text (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: extract_entities (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: generate_summary_stats (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: mask_sensitive_data (type=function)
+2026-01-01 14:07:02,964 - abhikarta.tools.registry - INFO - Registered tool: validate_email (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: validate_phone (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: validate_credit_card (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: validate_iban (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: validate_ssn (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: json_to_csv (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: csv_to_json (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: base64_encode (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: base64_decode (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: generate_hash (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: generate_uuid (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: generate_reference_number (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.registry - INFO - Registered tool: generate_account_number (type=function)
+2026-01-01 14:07:02,965 - abhikarta.tools.prebuilt.common_tools - INFO - Registered 28 common tools
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: verify_identity_document (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: calculate_kyc_risk_score (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: verify_address (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: calculate_credit_score (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: assess_debt_to_income (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_eligibility (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: generate_amortization_schedule (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: analyze_transaction (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: detect_transaction_patterns (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: calculate_transaction_limits (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: check_sanctions_list (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: generate_aml_report (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.registry - INFO - Registered tool: validate_regulatory_compliance (type=function)
+2026-01-01 14:07:02,966 - abhikarta.tools.prebuilt.banking_tools - INFO - Registered 13 banking tools
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: make_http_request (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: build_query_string (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: parse_json_response (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: validate_api_response (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: format_email_template (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: create_notification (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: format_sms_message (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: map_fields (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: flatten_nested_dict (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: unflatten_dict (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: merge_dicts (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: filter_dict_keys (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: filter_list (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: sort_list (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: group_by (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: aggregate_list (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: paginate_list (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: create_workflow_context (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: update_workflow_context (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.registry - INFO - Registered tool: evaluate_condition (type=function)
+2026-01-01 14:07:02,967 - abhikarta.tools.prebuilt.integration_tools - INFO - Registered 20 integration tools
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: web_search (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: web_fetch (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: intranet_search (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: news_search (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: read_document (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: write_document (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: convert_document (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: extract_document_metadata (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: list_files (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: copy_file (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: move_file (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: delete_file (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: get_system_info (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: execute_shell_command (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: get_environment_variable (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: set_environment_variable (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: check_url_status (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: ping_host (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: dns_lookup (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: parse_url (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: url_encode (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: url_decode (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: html_encode (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.registry - INFO - Registered tool: html_decode (type=function)
+2026-01-01 14:07:02,968 - abhikarta.tools.prebuilt.general_tools - INFO - Registered 24 general-purpose tools
+2026-01-01 14:07:02,968 - __main__ - INFO - Registered 85 pre-built tools
+2026-01-01 14:07:02,968 - abhikarta.database.sqlite_handler - ERROR - fetch_all execute error: no such column: status
+2026-01-01 14:07:02,968 - abhikarta.database.sqlite_handler - ERROR - SQLite fetch_all error: no such column: status
+2026-01-01 14:07:02,968 - abhikarta.database.sqlite_handler - ERROR - Query: SELECT * FROM code_fragments WHERE status = 'active'
+2026-01-01 14:07:02,968 - abhikarta.database.sqlite_handler - ERROR - Params: None (type: None)
+2026-01-01 14:07:02,969 - abhikarta.database.sqlite_handler - ERROR - Traceback: Traceback (most recent call last):
   File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/database/sqlite_handler.py", line 222, in fetch_all
     cursor.execute(query)
 sqlite3.OperationalError: no such column: status
 
-2026-01-01 13:38:33,487 - abhikarta.tools.registry - ERROR - Error loading code fragments: no such column: status
-2026-01-01 13:38:33,487 - __main__ - INFO - Registered 0 code fragment tools
-2026-01-01 13:38:33,487 - __main__ - INFO - Tools registry initialized with 85 tools
-2026-01-01 13:38:33,523 - abhikarta.mcp.manager - INFO - MCPServerManager initialized
-2026-01-01 13:38:33,524 - abhikarta.mcp.manager - INFO - Loaded 0 MCP servers from database
-2026-01-01 13:38:33,524 - __main__ - INFO - Loaded 0 MCP servers from database
-2026-01-01 13:38:33,525 - __main__ - INFO - Connected to 0 MCP servers
-2026-01-01 13:38:33,525 - abhikarta.mcp.manager - INFO - Health monitor started (interval: 30s)
-2026-01-01 13:38:33,525 - __main__ - INFO - MCP health monitor started (interval: 30s)
-2026-01-01 13:38:33,526 - __main__ - INFO - MCP manager initialized with 0 servers
-2026-01-01 13:38:33,526 - abhikarta.actor.dispatcher - INFO - DefaultDispatcher initialized with 8 threads
-2026-01-01 13:38:33,526 - abhikarta.actor.scheduler - INFO - Scheduler started
-2026-01-01 13:38:33,527 - abhikarta.actor.system - INFO - ActorSystem 'abhikarta-actors' started
-2026-01-01 13:38:33,527 - __main__ - INFO - Actor system 'abhikarta-actors' started
-2026-01-01 13:38:33,527 - __main__ - INFO -   Default dispatcher threads: 8
-2026-01-01 13:38:33,527 - __main__ - INFO -   I/O dispatcher threads: 16
-2026-01-01 13:38:33,527 - __main__ - INFO -   Dead letter logging: True
-2026-01-01 13:38:33,527 - __main__ - INFO - Actor system 'abhikarta-actors' ready for concurrent execution
-2026-01-01 13:38:33,649 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
-2026-01-01 13:38:33,649 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
-2026-01-01 13:38:33,649 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
-2026-01-01 13:38:33,749 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
-2026-01-01 13:38:33,749 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
-2026-01-01 13:38:33,754 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
-2026-01-01 13:38:33,754 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
-2026-01-01 13:38:33,754 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
-2026-01-01 13:38:33,775 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
-2026-01-01 13:38:33,775 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
-2026-01-01 13:38:33,775 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
-2026-01-01 13:38:33,784 - abhikarta.web.routes.user_routes - INFO - User routes registered
-2026-01-01 13:38:33,784 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
-2026-01-01 13:38:33,784 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
-2026-01-01 13:38:33,790 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
-2026-01-01 13:38:33,790 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
-2026-01-01 13:38:33,790 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
-2026-01-01 13:38:33,795 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
-2026-01-01 13:38:33,795 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
-2026-01-01 13:38:33,795 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
-2026-01-01 13:38:33,804 - abhikarta.web.routes.api_routes - INFO - API routes registered
-2026-01-01 13:38:33,804 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
-2026-01-01 13:38:33,811 - abhikarta.web.routes.workflow_routes - INFO - Workflow routes registered
-2026-01-01 13:38:33,811 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: SwarmRoutes
-2026-01-01 13:38:33,820 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: NotificationRoutes
-2026-01-01 13:38:33,827 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AIORGRoutes
-2026-01-01 13:38:33,836 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
-2026-01-01 13:38:33,837 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
-2026-01-01 13:38:33,837 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
-2026-01-01 13:38:33,837 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
-2026-01-01 13:39:05,694 - abhikarta.web.routes.auth_routes - INFO - User logged out: admin
-2026-01-01 13:39:07,683 - abhikarta.user_management.user_facade - INFO - User authenticated successfully: admin
-2026-01-01 13:39:07,688 - abhikarta.web.routes.auth_routes - INFO - User logged in: admin
-2026-01-01 13:39:32,843 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
-2026-01-01 13:39:36,787 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
-2026-01-01 13:39:48,608 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized
-2026-01-01 13:39:48,614 - abhikarta.web.routes.workflow_routes - INFO - Created workflow wf_c83e9cf415b5 from template wf_tpl_code_fragments
-2026-01-01 13:40:18,369 - abhikarta.workflow.executor - INFO - LangGraph workflow executor initialized
-2026-01-01 13:40:18,369 - abhikarta.workflow.executor - INFO - Starting LangGraph workflow execution: a8cc7393-45e6-457f-8afa-a73bb0674dbd
-2026-01-01 13:40:18,369 - abhikarta.workflow.executor - INFO - LangGraph config: 7 nodes, 6 edges
-2026-01-01 13:40:18,967 - abhikarta.langchain.workflow_graph - INFO - Setting entry point to: validate (from start node edge)
-2026-01-01 13:40:18,975 - abhikarta.langchain.workflow_graph - INFO - Executing tool node: fetch
-2026-01-01 13:40:18,988 - abhikarta.langchain.workflow_graph - INFO - [NODE:fetch] Tool: web_fetch, Input: who is elon musk...
-2026-01-01 13:40:19,019 - abhikarta.langchain.workflow_graph - INFO - [NODE:fetch] Tool output: Error fetching URL: URL can't contain control characters. 'who is elon musk' (found at least ' ')...
-2026-01-01 13:40:19,021 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: analyze
-2026-01-01 13:40:19,261 - abhikarta.langchain.llm_factory - INFO - Successfully imported ChatOllama from langchain_ollama
-2026-01-01 13:40:19,261 - abhikarta.langchain.llm_factory - INFO - Creating Ollama LLM: model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-01 13:40:19,320 - abhikarta.langchain.workflow_graph - INFO - [NODE:analyze] Raw input type: dict
-2026-01-01 13:40:19,321 - abhikarta.langchain.workflow_graph - INFO - [NODE:analyze] Extracted input value: who is elon musk...
-2026-01-01 13:40:19,321 - abhikarta.langchain.workflow_graph - INFO - [NODE:analyze] LLM Input prompt: who is elon musk...
-2026-01-01 13:40:21,170 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:40:27,166 - abhikarta.langchain.workflow_graph - INFO - [NODE:analyze] LLM Output: Elon Musk is a South African-born entrepreneur, inventor, and business magnate. He is one of the most successful and influential figures in the tech industry today.
+2026-01-01 14:07:02,969 - abhikarta.tools.registry - ERROR - Error loading code fragments: no such column: status
+2026-01-01 14:07:02,969 - __main__ - INFO - Registered 0 code fragment tools
+2026-01-01 14:07:02,969 - __main__ - INFO - Tools registry initialized with 85 tools
+2026-01-01 14:07:02,977 - abhikarta.mcp.manager - INFO - MCPServerManager initialized
+2026-01-01 14:07:02,977 - abhikarta.mcp.manager - INFO - Loaded 0 MCP servers from database
+2026-01-01 14:07:02,977 - __main__ - INFO - Loaded 0 MCP servers from database
+2026-01-01 14:07:02,977 - __main__ - INFO - Connected to 0 MCP servers
+2026-01-01 14:07:02,977 - abhikarta.mcp.manager - INFO - Health monitor started (interval: 30s)
+2026-01-01 14:07:02,977 - __main__ - INFO - MCP health monitor started (interval: 30s)
+2026-01-01 14:07:02,978 - __main__ - INFO - MCP manager initialized with 0 servers
+2026-01-01 14:07:02,978 - abhikarta.actor.dispatcher - INFO - DefaultDispatcher initialized with 8 threads
+2026-01-01 14:07:02,978 - abhikarta.actor.scheduler - INFO - Scheduler started
+2026-01-01 14:07:02,978 - abhikarta.actor.system - INFO - ActorSystem 'abhikarta-actors' started
+2026-01-01 14:07:02,978 - __main__ - INFO - Actor system 'abhikarta-actors' started
+2026-01-01 14:07:02,978 - __main__ - INFO -   Default dispatcher threads: 8
+2026-01-01 14:07:02,978 - __main__ - INFO -   I/O dispatcher threads: 16
+2026-01-01 14:07:02,978 - __main__ - INFO -   Dead letter logging: True
+2026-01-01 14:07:02,978 - __main__ - INFO - Actor system 'abhikarta-actors' ready for concurrent execution
+2026-01-01 14:07:03,040 - abhikarta.web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2026-01-01 14:07:03,040 - abhikarta.web.abhikarta_llm_web - INFO - User facade set
+2026-01-01 14:07:03,040 - abhikarta.web.abhikarta_llm_web - INFO - Database facade set
+2026-01-01 14:07:03,090 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2026-01-01 14:07:03,090 - abhikarta.web.routes.auth_routes - INFO - AuthRoutes initialized
+2026-01-01 14:07:03,093 - abhikarta.web.routes.auth_routes - INFO - Auth routes registered
+2026-01-01 14:07:03,093 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2026-01-01 14:07:03,093 - abhikarta.web.routes.admin_routes - INFO - AdminRoutes initialized
+2026-01-01 14:07:03,107 - abhikarta.web.routes.admin_routes - INFO - Admin routes registered
+2026-01-01 14:07:03,107 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2026-01-01 14:07:03,107 - abhikarta.web.routes.user_routes - INFO - UserRoutes initialized
+2026-01-01 14:07:03,118 - abhikarta.web.routes.user_routes - INFO - User routes registered
+2026-01-01 14:07:03,118 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2026-01-01 14:07:03,118 - abhikarta.web.routes.agent_routes - INFO - AgentRoutes initialized
+2026-01-01 14:07:03,124 - abhikarta.web.routes.agent_routes - INFO - Agent routes registered
+2026-01-01 14:07:03,125 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2026-01-01 14:07:03,125 - abhikarta.web.routes.mcp_routes - INFO - MCPRoutes initialized
+2026-01-01 14:07:03,129 - abhikarta.web.routes.mcp_routes - INFO - MCP routes registered
+2026-01-01 14:07:03,129 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2026-01-01 14:07:03,129 - abhikarta.web.routes.api_routes - INFO - APIRoutes initialized
+2026-01-01 14:07:03,140 - abhikarta.web.routes.api_routes - INFO - API routes registered
+2026-01-01 14:07:03,140 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2026-01-01 14:07:03,147 - abhikarta.web.routes.workflow_routes - INFO - Workflow routes registered
+2026-01-01 14:07:03,148 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: SwarmRoutes
+2026-01-01 14:07:03,159 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: NotificationRoutes
+2026-01-01 14:07:03,166 - abhikarta.web.abhikarta_llm_web - INFO - Registering routes: AIORGRoutes
+2026-01-01 14:07:03,176 - abhikarta.web.abhikarta_llm_web - INFO - All routes registered successfully
+2026-01-01 14:07:03,176 - abhikarta.web.abhikarta_llm_web - INFO - Error handlers registered
+2026-01-01 14:07:03,176 - abhikarta.web.abhikarta_llm_web - INFO - Routes prepared successfully
+2026-01-01 14:07:03,176 - abhikarta.web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2026-01-01 14:07:10,899 - abhikarta.web.routes.auth_routes - INFO - User logged out: admin
+2026-01-01 14:07:12,439 - abhikarta.user_management.user_facade - INFO - User authenticated successfully: admin
+2026-01-01 14:07:12,443 - abhikarta.web.routes.auth_routes - INFO - User logged in: admin
+2026-01-01 14:07:16,586 - abhikarta.agent.agent_manager - INFO - AgentManager initialized
+2026-01-01 14:07:16,592 - abhikarta.agent.agent_template - INFO - AgentTemplateManager initialized
+2026-01-01 14:07:22,385 - abhikarta.agent.agent_template - INFO - Creating agent 'agent3' from template 'tpl_retrieval_basic'
+2026-01-01 14:07:22,385 - abhikarta.agent.agent_template - INFO - Template llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
+2026-01-01 14:07:22,385 - abhikarta.agent.agent_template - INFO - Template agent_type: retrieval
+2026-01-01 14:07:22,386 - abhikarta.agent.agent_manager - INFO - Creating agent: agent3 (retrieval)
+2026-01-01 14:07:22,386 - abhikarta.agent.agent_manager - INFO - LLM config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
+2026-01-01 14:07:22,386 - abhikarta.agent.agent_manager - INFO - Workflow: {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Query', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'embed', 'node_type': 'python', 'name': 'Create Embedding', 'position': {'x': 300, 'y': 200}, 'config': {'code': "# Create embedding for query\noutput = {'query': input_data, 'embedding': 'vector'}"}}, {'node_id': 'retrieve', 'node_type': 'tool', 'name': 'Vector Search', 'position': {'x': 500, 'y': 200}, 'config': {'tool_name': 'vector_search'}}, {'node_id': 'augment', 'node_type': 'transform', 'name': 'Build Context', 'position': {'x': 700, 'y': 200}, 'config': {'transform_type': 'passthrough'}}, {'node_id': 'generate', 'node_type': 'llm', 'name': 'Generate Answer', 'position': {'x': 900, 'y': 200}, 'config': {'system_prompt': 'Answer using the retrieved context. Cite sources.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Answer', 'position': {'x': 1100, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'embed'}, {'source': 'embed', 'target': 'retrieve'}, {'source': 'retrieve', 'target': 'augment'}, {'source': 'augment', 'target': 'generate'}, {'source': 'generate', 'target': 'output'}]}
+2026-01-01 14:07:22,386 - abhikarta.agent.agent_manager - INFO - Final config to save: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'query': input_data, 'embedding': 'vector'}"}}, {"node_id": "retrieve", "node_type": "tool", "name": "Vector Search", "position": {"x": 500, "y": 200}, "config": {"tool_name": "vector_search"}}, {"node...
+2026-01-01 14:07:22,386 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:22,386 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
+2026-01-01 14:07:22,388 - abhikarta.agent.agent_manager - INFO - Inserting new agent: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:22,390 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:22,390 - abhikarta.agent.agent_manager - INFO - Agent saved to database: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:22,390 - abhikarta.agent.agent_manager - INFO - Created agent: agent_ba5f1ba3ad0d_1767294442 - agent3
+2026-01-01 14:07:22,390 - abhikarta.agent.agent_template - INFO - Agent created with ID: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:22,390 - abhikarta.agent.agent_template - INFO - Agent config: {'workflow': {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Query', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'embed', 'node_type': 'python', 'name': 'Create Embedding', 'position': {'x': 300, 'y': 200}, 'config': {'code': "# Create embedding for query\noutput = {'query': input_data, 'embedding': 'vector'}"}}, {'node_id': 'retrieve', 'node_type': 'tool', 'name': 'Vector Search', 'position': {'x': 500, 'y': 200}, 'config': {'tool_name': 'vector_search'}}, {'node_id': 'augment', 'node_type': 'transform', 'name': 'Build Context', 'position': {'x': 700, 'y': 200}, 'config': {'transform_type': 'passthrough'}}, {'node_id': 'generate', 'node_type': 'llm', 'name': 'Generate Answer', 'position': {'x': 900, 'y': 200}, 'config': {'system_prompt': 'Answer using the retrieved context. Cite sources.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Answer', 'position': {'x': 1100, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'embed'}, {'source': 'embed', 'target': 'retrieve'}, {'source': 'retrieve', 'target': 'augment'}, {'source': 'augment', 'target': 'generate'}, {'source': 'generate', 'target': 'output'}]}, 'llm_config': {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}, 'tools': ['vector_search', 'embeddings']}
+2026-01-01 14:07:22,390 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:22,391 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
+2026-01-01 14:07:22,391 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:22,393 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:22,393 - abhikarta.agent.agent_manager - INFO - Updated agent: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:33,972 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:33,972 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
+2026-01-01 14:07:33,975 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:33,985 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:33,985 - abhikarta.agent.agent_manager - INFO - Agent agent_ba5f1ba3ad0d_1767294442 status changed: draft -> testing
+2026-01-01 14:07:36,343 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:36,343 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
+2026-01-01 14:07:36,344 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:36,355 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:36,355 - abhikarta.agent.agent_manager - INFO - Agent agent_ba5f1ba3ad0d_1767294442 status changed: testing -> pending_review
+2026-01-01 14:07:39,090 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:39,090 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
+2026-01-01 14:07:39,093 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:39,103 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:39,103 - abhikarta.agent.agent_manager - INFO - Agent agent_ba5f1ba3ad0d_1767294442 status changed: pending_review -> approved
+2026-01-01 14:07:41,769 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:41,769 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
+2026-01-01 14:07:41,771 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:41,781 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_ba5f1ba3ad0d_1767294442
+2026-01-01 14:07:41,782 - abhikarta.agent.agent_manager - INFO - Agent agent_ba5f1ba3ad0d_1767294442 status changed: approved -> published
+2026-01-01 14:08:31,954 - abhikarta.langchain.agents - WARNING - Could not import AgentExecutor from langchain.agents: cannot import name 'AgentExecutor' from 'langchain.agents' (/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain/agents/__init__.py)
+2026-01-01 14:08:31,955 - abhikarta.langchain.agents - WARNING - Could not import create_react_agent: No module named 'langchain.agents.react'
+2026-01-01 14:08:31,957 - abhikarta.langchain.agents - WARNING - Could not import create_tool_calling_agent: cannot import name 'create_tool_calling_agent' from 'langchain_core.agents' (/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/agents.py)
+2026-01-01 14:08:31,957 - abhikarta.langchain.agents - WARNING - Could not import create_structured_chat_agent: No module named 'langchain.agents.structured_chat'
+2026-01-01 14:08:31,957 - abhikarta.langchain.agents - WARNING - Could not import langchain hub: cannot import name 'hub' from 'langchainhub' (/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchainhub/__init__.py)
+2026-01-01 14:08:31,957 - abhikarta.langchain.agents - WARNING - LangChain import issues detected: 4 errors. Complex agents may fall back to conversational mode.
+2026-01-01 14:08:31,957 - abhikarta.langchain.agents - INFO - LangChain AgentExecutor not available - will use conversational mode for complex agent types
+2026-01-01 14:08:31,958 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Starting execution: c192f67a-584d-4d6b-a0b7-3e084f64eac2
+2026-01-01 14:08:31,958 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Input: who is elon musk...
+2026-01-01 14:08:31,959 - abhikarta.langchain.agents - INFO - [AGENT] Loaded agent from DB: agent3
+2026-01-01 14:08:31,959 - abhikarta.langchain.agents - INFO - [AGENT] Found llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
+2026-01-01 14:08:31,959 - abhikarta.langchain.agents - INFO - [AGENT] Agent type: retrieval
+2026-01-01 14:08:31,959 - abhikarta.langchain.agents - INFO - [AGENT] System prompt: Answer using the retrieved context. Cite sources....
+2026-01-01 14:08:31,959 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Loaded config for: agent3
+2026-01-01 14:08:31,959 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Agent type: retrieval
+2026-01-01 14:08:31,959 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Creating LLM instance...
+2026-01-01 14:08:31,961 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from agent: model_id=None, provider_id=None
+2026-01-01 14:08:31,961 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from config_json: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
+2026-01-01 14:08:31,961 - abhikarta.langchain.agents - INFO - [AGENT] Parameters: {}
+2026-01-01 14:08:31,961 - abhikarta.langchain.agents - INFO - [AGENT] Creating LLM from llm_config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 14:08:32,106 - abhikarta.langchain.agents - INFO - [AGENT] Created ChatOllama: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 14:08:32,106 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] LLM created successfully
+2026-01-01 14:08:32,106 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Creating tools...
+2026-01-01 14:08:32,110 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Tools created: []
+2026-01-01 14:08:32,110 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Creating retrieval agent executor...
+2026-01-01 14:08:32,110 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] System prompt: Answer using the retrieved context. Cite sources....
+2026-01-01 14:08:32,126 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Creating conversational agent
+2026-01-01 14:08:32,126 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] System prompt: Answer using the retrieved context. Cite sources....
+2026-01-01 14:08:32,126 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Chain created successfully
+2026-01-01 14:08:32,126 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Agent executor created
+2026-01-01 14:08:32,126 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Invoking agent...
+2026-01-01 14:08:32,126 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Invoking with input: {'input': 'who is elon musk'}...
+2026-01-01 14:08:33,874 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 14:08:38,202 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Got response: Elon Musk is a South African-born entrepreneur, inventor, and business magnate. He is one of the most successful and influential figures in the tech industry today (Kurtz, 2020).
 
-Early Life and Education:
+Musk was born on Jun...
+2026-01-01 14:08:38,202 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Agent completed in 6075ms
+2026-01-01 14:08:38,202 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Output: Elon Musk is a South African-born entrepreneur, inventor, and business magnate. He is one of the most successful and influential figures in the tech industry today (Kurtz, 2020).
 
-Musk was born on June 28, 1971, in Pretoria, South Africa. He developed an interest in computing and programming at an early age and taught himself computer programming. Musk moved to Canada in 1992 to attend college, and later transferred to the University of Pennsylvania, where he graduated with a degree...
-2026-01-01 13:46:24,683 - abhikarta.agent.agent_manager - INFO - AgentManager initialized
-2026-01-01 13:46:24,684 - abhikarta.agent.agent_template - INFO - AgentTemplateManager initialized
-2026-01-01 13:46:35,039 - abhikarta.agent.agent_template - INFO - Creating agent 'agent1' from template 'tpl_conversational_basic'
-2026-01-01 13:46:35,040 - abhikarta.agent.agent_template - INFO - Template llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.8}
-2026-01-01 13:46:35,040 - abhikarta.agent.agent_template - INFO - Template agent_type: conversational
-2026-01-01 13:46:35,040 - abhikarta.agent.agent_manager - INFO - Creating agent: agent1 (conversational)
-2026-01-01 13:46:35,040 - abhikarta.agent.agent_manager - INFO - LLM config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.8}
-2026-01-01 13:46:35,040 - abhikarta.agent.agent_manager - INFO - Workflow: {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'User Message', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'memory', 'node_type': 'transform', 'name': 'Load Context', 'position': {'x': 300, 'y': 200}, 'config': {'transform_type': 'passthrough'}}, {'node_id': 'llm', 'node_type': 'llm', 'name': 'Generate Response', 'position': {'x': 500, 'y': 200}, 'config': {'system_prompt': 'You are a helpful assistant. Use conversation history for context.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Assistant Response', 'position': {'x': 700, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'memory'}, {'source': 'memory', 'target': 'llm'}, {'source': 'llm', 'target': 'output'}]}
-2026-01-01 13:46:35,040 - abhikarta.agent.agent_manager - INFO - Final config to save: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "User Message", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "memory", "node_type": "transform", "name": "Load Context", "position": {"x": 300, "y": 200}, "config": {"transform_type": "passthrough"}}, {"node_id": "llm", "node_type": "llm", "name": "Generate Response", "position": {"x": 500, "y": 200}, "config": {"system_prompt": "You are a helpful assistant. Use conversation history for context."}}, {"node...
-2026-01-01 13:46:35,040 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:35,041 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "User Message", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "memory", "node_type": "transform", "name": "Load Context", "position": {"x": 300, "y": 200}, "config": {"transform_type": "passthrough"}}, {"node_i...
-2026-01-01 13:46:35,042 - abhikarta.agent.agent_manager - INFO - Inserting new agent: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:35,045 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:35,045 - abhikarta.agent.agent_manager - INFO - Agent saved to database: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:35,045 - abhikarta.agent.agent_manager - INFO - Created agent: agent_127bf2ceb8ac_1767293195 - agent1
-2026-01-01 13:46:35,045 - abhikarta.agent.agent_template - INFO - Agent created with ID: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:35,045 - abhikarta.agent.agent_template - INFO - Agent config: {'workflow': {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'User Message', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'memory', 'node_type': 'transform', 'name': 'Load Context', 'position': {'x': 300, 'y': 200}, 'config': {'transform_type': 'passthrough'}}, {'node_id': 'llm', 'node_type': 'llm', 'name': 'Generate Response', 'position': {'x': 500, 'y': 200}, 'config': {'system_prompt': 'You are a helpful assistant. Use conversation history for context.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Assistant Response', 'position': {'x': 700, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'memory'}, {'source': 'memory', 'target': 'llm'}, {'source': 'llm', 'target': 'output'}]}, 'llm_config': {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.8}}
-2026-01-01 13:46:35,045 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:35,046 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "User Message", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "memory", "node_type": "transform", "name": "Load Context", "position": {"x": 300, "y": 200}, "config": {"transform_type": "passthrough"}}, {"node_i...
-2026-01-01 13:46:35,046 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:35,047 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:35,048 - abhikarta.agent.agent_manager - INFO - Updated agent: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:52,691 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:52,691 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "User Message", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "memory", "node_type": "transform", "name": "Load Context", "position": {"x": 300, "y": 200}, "config": {"transform_type": "passthrough"}}, {"node_i...
-2026-01-01 13:46:52,693 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:52,704 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:52,704 - abhikarta.agent.agent_manager - INFO - Agent agent_127bf2ceb8ac_1767293195 status changed: draft -> testing
-2026-01-01 13:46:56,336 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:56,336 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "User Message", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "memory", "node_type": "transform", "name": "Load Context", "position": {"x": 300, "y": 200}, "config": {"transform_type": "passthrough"}}, {"node_i...
-2026-01-01 13:46:56,340 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:56,351 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:56,351 - abhikarta.agent.agent_manager - INFO - Agent agent_127bf2ceb8ac_1767293195 status changed: testing -> pending_review
-2026-01-01 13:46:59,113 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:59,114 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "User Message", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "memory", "node_type": "transform", "name": "Load Context", "position": {"x": 300, "y": 200}, "config": {"transform_type": "passthrough"}}, {"node_i...
-2026-01-01 13:46:59,117 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:59,126 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:46:59,127 - abhikarta.agent.agent_manager - INFO - Agent agent_127bf2ceb8ac_1767293195 status changed: pending_review -> approved
-2026-01-01 13:47:02,624 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:47:02,625 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "User Message", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "memory", "node_type": "transform", "name": "Load Context", "position": {"x": 300, "y": 200}, "config": {"transform_type": "passthrough"}}, {"node_i...
-2026-01-01 13:47:02,627 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:47:02,630 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_127bf2ceb8ac_1767293195
-2026-01-01 13:47:02,630 - abhikarta.agent.agent_manager - INFO - Agent agent_127bf2ceb8ac_1767293195 status changed: approved -> published
-2026-01-01 13:47:19,930 - abhikarta.langchain.agents - WARNING - Could not import AgentExecutor from langchain.agents: cannot import name 'AgentExecutor' from 'langchain.agents' (/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain/agents/__init__.py)
-2026-01-01 13:47:19,930 - abhikarta.langchain.agents - WARNING - Could not import create_react_agent: No module named 'langchain.agents.react'
-2026-01-01 13:47:19,934 - abhikarta.langchain.agents - WARNING - Could not import create_tool_calling_agent: cannot import name 'create_tool_calling_agent' from 'langchain_core.agents' (/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/agents.py)
-2026-01-01 13:47:19,935 - abhikarta.langchain.agents - WARNING - Could not import create_structured_chat_agent: No module named 'langchain.agents.structured_chat'
-2026-01-01 13:47:19,936 - abhikarta.langchain.agents - WARNING - Could not import langchain hub: cannot import name 'hub' from 'langchainhub' (/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchainhub/__init__.py)
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Starting execution: a52ee4b3-ea90-41af-8513-d8059fdb0488
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Input: who is elon musk...
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT] Loaded agent from DB: agent1
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT] Found llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.8}
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT] Agent type: conversational
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT] System prompt: You are a helpful assistant. Use conversation history for context....
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Loaded config for: agent1
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Agent type: conversational
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Creating LLM instance...
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from agent: model_id=None, provider_id=None
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from config_json: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.8}
-2026-01-01 13:47:19,938 - abhikarta.langchain.agents - INFO - [AGENT] Parameters: {}
-2026-01-01 13:47:19,939 - abhikarta.langchain.agents - INFO - [AGENT] Creating LLM from llm_config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-01 13:47:19,997 - abhikarta.langchain.agents - INFO - [AGENT] Created ChatOllama: model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-01 13:47:19,997 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] LLM created successfully
-2026-01-01 13:47:19,997 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Creating tools...
-2026-01-01 13:47:19,997 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Tools created: []
-2026-01-01 13:47:19,997 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Creating conversational agent executor...
-2026-01-01 13:47:19,997 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] System prompt: You are a helpful assistant. Use conversation history for context....
-2026-01-01 13:47:20,028 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Creating conversational agent
-2026-01-01 13:47:20,028 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] System prompt: You are a helpful assistant. Use conversation history for context....
-2026-01-01 13:47:20,028 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Chain created successfully
-2026-01-01 13:47:20,029 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Agent executor created
-2026-01-01 13:47:20,029 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Invoking agent...
-2026-01-01 13:47:20,029 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Invoking with input: {'input': 'who is elon musk'}...
-2026-01-01 13:47:23,142 - abhikarta.langchain.agents - ERROR - [CONVERSATIONAL] Error: [Errno 113] No route to host
-Traceback (most recent call last):
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
-    yield
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
-    resp = self._pool.handle_request(req)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
-    raise exc from None
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
-    response = connection.handle_request(
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
-    raise exc
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
-    stream = self._connect(request)
-             ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
-    stream = self._network_backend.connect_tcp(**kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
-    with map_exceptions(exc_map):
-  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
-    self.gen.throw(value)
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
-    raise to_exc(exc) from exc
-httpcore.ConnectError: [Errno 113] No route to host
+Musk was born on June 28, 1971, in Pretoria, South Africa. He developed an interest in computing and programming at an early age and taught himself computer programming (Musk, 2017). After moving to Canada and then the United States, Musk attended college and graduated with a degree in economics and physics from the Un...
+2026-01-01 14:08:38,202 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Processing 0 intermediate steps
+2026-01-01 14:08:38,202 - abhikarta.langchain.agents - INFO - [AGENT:agent_ba5f1ba3ad0d_1767294442] Execution completed successfully
+2026-01-01 14:09:15,605 - abhikarta.agent.agent_template - INFO - Creating agent 'agent4' from template 'tpl_custom_code_fragment'
+2026-01-01 14:09:15,605 - abhikarta.agent.agent_template - INFO - Template llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
+2026-01-01 14:09:15,606 - abhikarta.agent.agent_template - INFO - Template agent_type: custom
+2026-01-01 14:09:15,606 - abhikarta.agent.agent_manager - INFO - Creating agent: agent4 (custom)
+2026-01-01 14:09:15,606 - abhikarta.agent.agent_manager - INFO - LLM config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
+2026-01-01 14:09:15,606 - abhikarta.agent.agent_manager - INFO - Workflow: {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Input Data', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'preprocess', 'node_type': 'code_fragment', 'name': 'Preprocess', 'position': {'x': 300, 'y': 200}, 'config': {'fragment_name': 'data_processor'}}, {'node_id': 'analyze', 'node_type': 'llm', 'name': 'Analyze', 'position': {'x': 500, 'y': 200}, 'config': {'system_prompt': 'Analyze the processed data.'}}, {'node_id': 'postprocess', 'node_type': 'code_fragment', 'name': 'Format Output', 'position': {'x': 700, 'y': 200}, 'config': {'fragment_name': 'formatter'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Result', 'position': {'x': 900, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'preprocess'}, {'source': 'preprocess', 'target': 'analyze'}, {'source': 'analyze', 'target': 'postprocess'}, {'source': 'postprocess', 'target': 'output'}]}
+2026-01-01 14:09:15,606 - abhikarta.agent.agent_manager - INFO - Final config to save: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Input Data", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "preprocess", "node_type": "code_fragment", "name": "Preprocess", "position": {"x": 300, "y": 200}, "config": {"fragment_name": "data_processor"}}, {"node_id": "analyze", "node_type": "llm", "name": "Analyze", "position": {"x": 500, "y": 200}, "config": {"system_prompt": "Analyze the processed data."}}, {"node_id": "postprocess", "node_type": "code...
+2026-01-01 14:09:15,607 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_c42c244821e4_1767294555
+2026-01-01 14:09:15,607 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Input Data", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "preprocess", "node_type": "code_fragment", "name": "Preprocess", "position": {"x": 300, "y": 200}, "config": {"fragment_name": "data_processor"}}, {"...
+2026-01-01 14:09:15,609 - abhikarta.agent.agent_manager - INFO - Inserting new agent: agent_c42c244821e4_1767294555
+2026-01-01 14:09:15,611 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_c42c244821e4_1767294555
+2026-01-01 14:09:15,611 - abhikarta.agent.agent_manager - INFO - Agent saved to database: agent_c42c244821e4_1767294555
+2026-01-01 14:09:15,611 - abhikarta.agent.agent_manager - INFO - Created agent: agent_c42c244821e4_1767294555 - agent4
+2026-01-01 14:09:15,611 - abhikarta.agent.agent_template - INFO - Agent created with ID: agent_c42c244821e4_1767294555
+2026-01-01 14:09:15,612 - abhikarta.agent.agent_template - INFO - Agent config: {'workflow': {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Input Data', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'preprocess', 'node_type': 'code_fragment', 'name': 'Preprocess', 'position': {'x': 300, 'y': 200}, 'config': {'fragment_name': 'data_processor'}}, {'node_id': 'analyze', 'node_type': 'llm', 'name': 'Analyze', 'position': {'x': 500, 'y': 200}, 'config': {'system_prompt': 'Analyze the processed data.'}}, {'node_id': 'postprocess', 'node_type': 'code_fragment', 'name': 'Format Output', 'position': {'x': 700, 'y': 200}, 'config': {'fragment_name': 'formatter'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Result', 'position': {'x': 900, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'preprocess'}, {'source': 'preprocess', 'target': 'analyze'}, {'source': 'analyze', 'target': 'postprocess'}, {'source': 'postprocess', 'target': 'output'}]}, 'llm_config': {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}}
+2026-01-01 14:09:15,612 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_c42c244821e4_1767294555
+2026-01-01 14:09:15,612 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Input Data", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "preprocess", "node_type": "code_fragment", "name": "Preprocess", "position": {"x": 300, "y": 200}, "config": {"fragment_name": "data_processor"}}, {"...
+2026-01-01 14:09:15,612 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_c42c244821e4_1767294555
+2026-01-01 14:09:15,614 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_c42c244821e4_1767294555
+2026-01-01 14:09:15,614 - abhikarta.agent.agent_manager - INFO - Updated agent: agent_c42c244821e4_1767294555
+2026-01-01 14:09:55,971 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_c42c244821e4_1767294555
+2026-01-01 14:09:55,972 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Input Data", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "preprocess", "node_type": "code_fragment", "name": "Preprocess", "position": {"x": 300, "y": 200}, "config": {"fragment_name": "data_processor"}}, {"...
+2026-01-01 14:09:55,974 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_c42c244821e4_1767294555
+2026-01-01 14:09:55,984 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_c42c244821e4_1767294555
+2026-01-01 14:09:55,985 - abhikarta.agent.agent_manager - INFO - Agent agent_c42c244821e4_1767294555 status changed: draft -> testing
+2026-01-01 14:09:58,074 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_c42c244821e4_1767294555
+2026-01-01 14:09:58,075 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Input Data", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "preprocess", "node_type": "code_fragment", "name": "Preprocess", "position": {"x": 300, "y": 200}, "config": {"fragment_name": "data_processor"}}, {"...
+2026-01-01 14:09:58,077 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_c42c244821e4_1767294555
+2026-01-01 14:09:58,087 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_c42c244821e4_1767294555
+2026-01-01 14:09:58,087 - abhikarta.agent.agent_manager - INFO - Agent agent_c42c244821e4_1767294555 status changed: testing -> pending_review
+2026-01-01 14:10:00,268 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_c42c244821e4_1767294555
+2026-01-01 14:10:00,268 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Input Data", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "preprocess", "node_type": "code_fragment", "name": "Preprocess", "position": {"x": 300, "y": 200}, "config": {"fragment_name": "data_processor"}}, {"...
+2026-01-01 14:10:00,271 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_c42c244821e4_1767294555
+2026-01-01 14:10:00,280 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_c42c244821e4_1767294555
+2026-01-01 14:10:00,280 - abhikarta.agent.agent_manager - INFO - Agent agent_c42c244821e4_1767294555 status changed: pending_review -> approved
+2026-01-01 14:10:02,643 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_c42c244821e4_1767294555
+2026-01-01 14:10:02,643 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Input Data", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "preprocess", "node_type": "code_fragment", "name": "Preprocess", "position": {"x": 300, "y": 200}, "config": {"fragment_name": "data_processor"}}, {"...
+2026-01-01 14:10:02,645 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_c42c244821e4_1767294555
+2026-01-01 14:10:02,656 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_c42c244821e4_1767294555
+2026-01-01 14:10:02,656 - abhikarta.agent.agent_manager - INFO - Agent agent_c42c244821e4_1767294555 status changed: approved -> published
+2026-01-01 14:10:26,248 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Starting execution: 2a3d8a5c-eb91-4340-8a4e-3713934f4a94
+2026-01-01 14:10:26,248 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Input: analyze this code - select * from employee...
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT] Loaded agent from DB: agent4
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT] Found llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT] Agent type: custom
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT] System prompt: Analyze the processed data....
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Loaded config for: agent4
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Agent type: custom
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Creating LLM instance...
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from agent: model_id=None, provider_id=None
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from config_json: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
+2026-01-01 14:10:26,249 - abhikarta.langchain.agents - INFO - [AGENT] Parameters: {}
+2026-01-01 14:10:26,250 - abhikarta.langchain.agents - INFO - [AGENT] Creating LLM from llm_config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 14:10:26,292 - abhikarta.langchain.agents - INFO - [AGENT] Created ChatOllama: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 14:10:26,292 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] LLM created successfully
+2026-01-01 14:10:26,292 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Creating tools...
+2026-01-01 14:10:26,293 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Tools created: []
+2026-01-01 14:10:26,293 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Creating custom agent executor...
+2026-01-01 14:10:26,293 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] System prompt: Analyze the processed data....
+2026-01-01 14:10:26,293 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Creating conversational agent
+2026-01-01 14:10:26,293 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] System prompt: Analyze the processed data....
+2026-01-01 14:10:26,293 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Chain created successfully
+2026-01-01 14:10:26,293 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Agent executor created
+2026-01-01 14:10:26,293 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Invoking agent...
+2026-01-01 14:10:26,293 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Invoking with input: {'input': 'analyze this code - select * from employee'}...
+2026-01-01 14:10:26,587 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 14:10:28,917 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Got response: **SQL Analysis**
 
-The above exception was the direct cause of the following exception:
+The given SQL query is a simple `SELECT` statement that retrieves all columns (`*`) from a table named `employee`.
 
-Traceback (most recent call last):
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/langchain/agents.py", line 456, in invoke
-    result = self.chain.invoke(inputs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3151, in invoke
-    input_ = context.run(step.invoke, input_, config)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 398, in invoke
-    self.generate_prompt(
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1117, in generate_prompt
-    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 927, in generate
-    self._generate_with_cache(
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1221, in _generate_with_cache
-    result = self._generate(
-             ^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_ollama/chat_models.py", line 1030, in _generate
-    final_chunk = self._chat_stream_with_aggregation(
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_ollama/chat_models.py", line 965, in _chat_stream_with_aggregation
-    for chunk in self._iterate_over_stream(messages, stop, **kwargs):
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_ollama/chat_models.py", line 1054, in _iterate_over_stream
-    for stream_resp in self._create_chat_stream(messages, stop, **kwargs):
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_ollama/chat_models.py", line 952, in _create_chat_stream
-    yield from self._client.chat(**chat_params)
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/ollama/_client.py", line 174, in inner
-    with self._client.stream(*args, **kwargs) as r:
-  File "/usr/lib/python3.12/contextlib.py", line 137, in __enter__
-    return next(self.gen)
-           ^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpx/_client.py", line 868, in stream
-    response = self.send(
-               ^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
-    response = self._send_handling_auth(
-               ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
-    response = self._send_handling_redirects(
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
-    response = self._send_single_request(request)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
-    response = transport.handle_request(request)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
-    with map_httpcore_exceptions():
-  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
-    self.gen.throw(value)
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
-    raise mapped_exc(message) from exc
-httpx.ConnectError: [Errno 113] No route to host
-2026-01-01 13:47:23,156 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Agent completed in 3127ms
-2026-01-01 13:47:23,156 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Output: I encountered an error: [Errno 113] No route to host...
-2026-01-01 13:47:23,156 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Processing 0 intermediate steps
-2026-01-01 13:47:23,156 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Execution completed successfully
-2026-01-01 13:56:13,454 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Starting execution: be9d789e-1d24-422e-b6ec-be493486b925
-2026-01-01 13:56:13,454 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Input: who is elon must...
-2026-01-01 13:56:13,455 - abhikarta.langchain.agents - INFO - [AGENT] Loaded agent from DB: agent1
-2026-01-01 13:56:13,455 - abhikarta.langchain.agents - INFO - [AGENT] Found llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.8}
-2026-01-01 13:56:13,455 - abhikarta.langchain.agents - INFO - [AGENT] Agent type: conversational
-2026-01-01 13:56:13,455 - abhikarta.langchain.agents - INFO - [AGENT] System prompt: You are a helpful assistant. Use conversation history for context....
-2026-01-01 13:56:13,455 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Loaded config for: agent1
-2026-01-01 13:56:13,455 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Agent type: conversational
-2026-01-01 13:56:13,455 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Creating LLM instance...
-2026-01-01 13:56:13,456 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from agent: model_id=None, provider_id=None
-2026-01-01 13:56:13,456 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from config_json: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.8}
-2026-01-01 13:56:13,456 - abhikarta.langchain.agents - INFO - [AGENT] Parameters: {}
-2026-01-01 13:56:13,456 - abhikarta.langchain.agents - INFO - [AGENT] Creating LLM from llm_config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [AGENT] Created ChatOllama: model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] LLM created successfully
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Creating tools...
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Tools created: []
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Creating conversational agent executor...
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] System prompt: You are a helpful assistant. Use conversation history for context....
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Creating conversational agent
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] System prompt: You are a helpful assistant. Use conversation history for context....
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Chain created successfully
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Agent executor created
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Invoking agent...
-2026-01-01 13:56:13,497 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Invoking with input: {'input': 'who is elon must'}...
-2026-01-01 13:56:17,381 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:56:19,567 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Got response: Elon Musk is a South African-born entrepreneur, inventor, and business magnate. He is one of the most successful and innovative entrepreneurs of our time.
+```sql
+SELECT *
+FROM employee;
+```
 
-Musk has founded or co-founded several compa...
-2026-01-01 13:56:19,567 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Agent completed in 6069ms
-2026-01-01 13:56:19,567 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Output: Elon Musk is a South African-born entrepreneur, inventor, and business magnate. He is one of the most successful and innovative entrepreneurs of our time.
+Here's a breakdown of the quer...
+2026-01-01 14:10:28,917 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Agent completed in 2623ms
+2026-01-01 14:10:28,917 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Output: **SQL Analysis**
 
-Musk has founded or co-founded several companies, including:
+The given SQL query is a simple `SELECT` statement that retrieves all columns (`*`) from a table named `employee`.
 
-1. PayPal: An online payment system that was acquired by eBay for $1.5 billion.
-2. SpaceX: A private aerospace manufacturer and space transport services company aimed at reducing space transportation costs and enabling the colonization of Mars.
-3. Tesla, Inc.: An electric vehicle a...
-2026-01-01 13:56:19,567 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Processing 0 intermediate steps
-2026-01-01 13:56:19,567 - abhikarta.langchain.agents - INFO - [AGENT:agent_127bf2ceb8ac_1767293195] Execution completed successfully
-2026-01-01 13:56:39,881 - abhikarta.agent.agent_template - INFO - Creating agent 'agent2' from template 'tpl_plan_execute_basic'
-2026-01-01 13:56:39,881 - abhikarta.agent.agent_template - INFO - Template llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
-2026-01-01 13:56:39,882 - abhikarta.agent.agent_template - INFO - Template agent_type: plan_and_execute
-2026-01-01 13:56:39,882 - abhikarta.agent.agent_manager - INFO - Creating agent: agent2 (plan_and_execute)
-2026-01-01 13:56:39,882 - abhikarta.agent.agent_manager - INFO - LLM config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
-2026-01-01 13:56:39,882 - abhikarta.agent.agent_manager - INFO - Workflow: {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Task', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'plan', 'node_type': 'llm', 'name': 'Create Plan', 'position': {'x': 300, 'y': 200}, 'config': {'system_prompt': 'Break down the task into sequential steps. Output as JSON list.'}}, {'node_id': 'step1', 'node_type': 'llm', 'name': 'Execute Step 1', 'position': {'x': 500, 'y': 200}, 'config': {'system_prompt': 'Execute the first step of the plan.'}}, {'node_id': 'step2', 'node_type': 'llm', 'name': 'Execute Step 2', 'position': {'x': 700, 'y': 200}, 'config': {'system_prompt': 'Execute the second step using previous result.'}}, {'node_id': 'step3', 'node_type': 'llm', 'name': 'Execute Step 3', 'position': {'x': 900, 'y': 200}, 'config': {'system_prompt': 'Execute the third step using previous results.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Final Result', 'position': {'x': 1100, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'plan'}, {'source': 'plan', 'target': 'step1'}, {'source': 'step1', 'target': 'step2'}, {'source': 'step2', 'target': 'step3'}, {'source': 'step3', 'target': 'output'}]}
-2026-01-01 13:56:39,882 - abhikarta.agent.agent_manager - INFO - Final config to save: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps. Output as JSON list."}}, {"node_id": "step1", "node_type": "llm", "name": "Execute Step 1", "position": {"x": 500, "y": 200}, "config": {"system_prompt": "Execute the first step of the plan."}}, {"no...
-2026-01-01 13:56:39,883 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:39,883 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps....
-2026-01-01 13:56:39,885 - abhikarta.agent.agent_manager - INFO - Inserting new agent: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:39,887 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:39,887 - abhikarta.agent.agent_manager - INFO - Agent saved to database: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:39,887 - abhikarta.agent.agent_manager - INFO - Created agent: agent_2cbe8861bc03_1767293799 - agent2
-2026-01-01 13:56:39,887 - abhikarta.agent.agent_template - INFO - Agent created with ID: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:39,888 - abhikarta.agent.agent_template - INFO - Agent config: {'workflow': {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Task', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'plan', 'node_type': 'llm', 'name': 'Create Plan', 'position': {'x': 300, 'y': 200}, 'config': {'system_prompt': 'Break down the task into sequential steps. Output as JSON list.'}}, {'node_id': 'step1', 'node_type': 'llm', 'name': 'Execute Step 1', 'position': {'x': 500, 'y': 200}, 'config': {'system_prompt': 'Execute the first step of the plan.'}}, {'node_id': 'step2', 'node_type': 'llm', 'name': 'Execute Step 2', 'position': {'x': 700, 'y': 200}, 'config': {'system_prompt': 'Execute the second step using previous result.'}}, {'node_id': 'step3', 'node_type': 'llm', 'name': 'Execute Step 3', 'position': {'x': 900, 'y': 200}, 'config': {'system_prompt': 'Execute the third step using previous results.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Final Result', 'position': {'x': 1100, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'plan'}, {'source': 'plan', 'target': 'step1'}, {'source': 'step1', 'target': 'step2'}, {'source': 'step2', 'target': 'step3'}, {'source': 'step3', 'target': 'output'}]}, 'llm_config': {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}}
-2026-01-01 13:56:39,888 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:39,888 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps....
-2026-01-01 13:56:39,888 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:39,890 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:39,890 - abhikarta.agent.agent_manager - INFO - Updated agent: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:54,388 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:54,388 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps....
-2026-01-01 13:56:54,389 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:54,393 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:54,393 - abhikarta.agent.agent_manager - INFO - Agent agent_2cbe8861bc03_1767293799 status changed: draft -> testing
-2026-01-01 13:56:56,753 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:56,753 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps....
-2026-01-01 13:56:56,755 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:56,757 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:56,757 - abhikarta.agent.agent_manager - INFO - Agent agent_2cbe8861bc03_1767293799 status changed: testing -> pending_review
-2026-01-01 13:56:59,218 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:59,219 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps....
-2026-01-01 13:56:59,221 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:59,231 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_2cbe8861bc03_1767293799
-2026-01-01 13:56:59,231 - abhikarta.agent.agent_manager - INFO - Agent agent_2cbe8861bc03_1767293799 status changed: pending_review -> approved
-2026-01-01 13:57:01,717 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_2cbe8861bc03_1767293799
-2026-01-01 13:57:01,717 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps....
-2026-01-01 13:57:01,719 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_2cbe8861bc03_1767293799
-2026-01-01 13:57:01,722 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_2cbe8861bc03_1767293799
-2026-01-01 13:57:01,722 - abhikarta.agent.agent_manager - INFO - Agent agent_2cbe8861bc03_1767293799 status changed: approved -> published
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Starting execution: 54a9179b-ad41-4e15-9e01-cbd2fbeaf60c
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Input: who is donald trump...
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT] Loaded agent from DB: agent2
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT] Found llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT] Agent type: plan_and_execute
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT] System prompt: Break down the task into sequential steps. Output as JSON list....
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Loaded config for: agent2
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Agent type: plan_and_execute
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Creating LLM instance...
-2026-01-01 13:57:17,944 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from agent: model_id=None, provider_id=None
-2026-01-01 13:57:17,945 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from config_json: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
-2026-01-01 13:57:17,945 - abhikarta.langchain.agents - INFO - [AGENT] Parameters: {}
-2026-01-01 13:57:17,945 - abhikarta.langchain.agents - INFO - [AGENT] Creating LLM from llm_config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-01 13:57:17,980 - abhikarta.langchain.agents - INFO - [AGENT] Created ChatOllama: model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-01 13:57:17,980 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] LLM created successfully
-2026-01-01 13:57:17,980 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Creating tools...
-2026-01-01 13:57:17,980 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Tools created: []
-2026-01-01 13:57:17,981 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Creating plan_and_execute agent executor...
-2026-01-01 13:57:17,981 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] System prompt: Break down the task into sequential steps. Output as JSON list....
-2026-01-01 13:57:18,213 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Agent executor created
-2026-01-01 13:57:18,213 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Invoking agent...
-2026-01-01 13:57:18,502 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:57:21,055 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:57:21,483 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:57:21,899 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:57:22,442 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:57:23,459 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:57:23,910 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:57:24,350 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:57:24,956 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-01 13:57:25,282 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Agent completed in 7068ms
-2026-01-01 13:57:25,282 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Output: Donald Trump was a businessman, television personality, and politician who served as the 45th President of the United States from 2017 to 2021....
-2026-01-01 13:57:25,283 - abhikarta.langchain.agents - INFO - [AGENT:agent_2cbe8861bc03_1767293799] Execution completed successfully
-2026-01-01 13:58:11,284 - abhikarta.agent.agent_template - INFO - Creating agent 'agent3' from template 'tpl_retrieval_basic'
-2026-01-01 13:58:11,284 - abhikarta.agent.agent_template - INFO - Template llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
-2026-01-01 13:58:11,285 - abhikarta.agent.agent_template - INFO - Template agent_type: retrieval
-2026-01-01 13:58:11,285 - abhikarta.agent.agent_manager - INFO - Creating agent: agent3 (retrieval)
-2026-01-01 13:58:11,285 - abhikarta.agent.agent_manager - INFO - LLM config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
-2026-01-01 13:58:11,285 - abhikarta.agent.agent_manager - INFO - Workflow: {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Query', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'embed', 'node_type': 'python', 'name': 'Create Embedding', 'position': {'x': 300, 'y': 200}, 'config': {'code': "# Create embedding for query\noutput = {'query': input_data, 'embedding': 'vector'}"}}, {'node_id': 'retrieve', 'node_type': 'tool', 'name': 'Vector Search', 'position': {'x': 500, 'y': 200}, 'config': {'tool_name': 'vector_search'}}, {'node_id': 'augment', 'node_type': 'transform', 'name': 'Build Context', 'position': {'x': 700, 'y': 200}, 'config': {'transform_type': 'passthrough'}}, {'node_id': 'generate', 'node_type': 'llm', 'name': 'Generate Answer', 'position': {'x': 900, 'y': 200}, 'config': {'system_prompt': 'Answer using the retrieved context. Cite sources.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Answer', 'position': {'x': 1100, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'embed'}, {'source': 'embed', 'target': 'retrieve'}, {'source': 'retrieve', 'target': 'augment'}, {'source': 'augment', 'target': 'generate'}, {'source': 'generate', 'target': 'output'}]}
-2026-01-01 13:58:11,285 - abhikarta.agent.agent_manager - INFO - Final config to save: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'query': input_data, 'embedding': 'vector'}"}}, {"node_id": "retrieve", "node_type": "tool", "name": "Vector Search", "position": {"x": 500, "y": 200}, "config": {"tool_name": "vector_search"}}, {"node...
-2026-01-01 13:58:11,285 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:11,285 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
-2026-01-01 13:58:11,286 - abhikarta.agent.agent_manager - INFO - Inserting new agent: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:11,287 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:11,288 - abhikarta.agent.agent_manager - INFO - Agent saved to database: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:11,288 - abhikarta.agent.agent_manager - INFO - Created agent: agent_b2551b8635c4_1767293891 - agent3
-2026-01-01 13:58:11,288 - abhikarta.agent.agent_template - INFO - Agent created with ID: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:11,288 - abhikarta.agent.agent_template - INFO - Agent config: {'workflow': {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Query', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'embed', 'node_type': 'python', 'name': 'Create Embedding', 'position': {'x': 300, 'y': 200}, 'config': {'code': "# Create embedding for query\noutput = {'query': input_data, 'embedding': 'vector'}"}}, {'node_id': 'retrieve', 'node_type': 'tool', 'name': 'Vector Search', 'position': {'x': 500, 'y': 200}, 'config': {'tool_name': 'vector_search'}}, {'node_id': 'augment', 'node_type': 'transform', 'name': 'Build Context', 'position': {'x': 700, 'y': 200}, 'config': {'transform_type': 'passthrough'}}, {'node_id': 'generate', 'node_type': 'llm', 'name': 'Generate Answer', 'position': {'x': 900, 'y': 200}, 'config': {'system_prompt': 'Answer using the retrieved context. Cite sources.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Answer', 'position': {'x': 1100, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'embed'}, {'source': 'embed', 'target': 'retrieve'}, {'source': 'retrieve', 'target': 'augment'}, {'source': 'augment', 'target': 'generate'}, {'source': 'generate', 'target': 'output'}]}, 'llm_config': {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}, 'tools': ['vector_search', 'embeddings']}
-2026-01-01 13:58:11,288 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:11,288 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
-2026-01-01 13:58:11,288 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:11,289 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:11,289 - abhikarta.agent.agent_manager - INFO - Updated agent: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:22,589 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:22,589 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
-2026-01-01 13:58:22,590 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:22,601 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:22,601 - abhikarta.agent.agent_manager - INFO - Agent agent_b2551b8635c4_1767293891 status changed: draft -> testing
-2026-01-01 13:58:24,718 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:24,719 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
-2026-01-01 13:58:24,721 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:24,731 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:24,731 - abhikarta.agent.agent_manager - INFO - Agent agent_b2551b8635c4_1767293891 status changed: testing -> pending_review
-2026-01-01 13:58:26,969 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:26,969 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
-2026-01-01 13:58:26,971 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:26,980 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:26,981 - abhikarta.agent.agent_manager - INFO - Agent agent_b2551b8635c4_1767293891 status changed: pending_review -> approved
-2026-01-01 13:58:29,341 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:29,342 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "embed", "node_type": "python", "name": "Create Embedding", "position": {"x": 300, "y": 200}, "config": {"code": "# Create embedding for query\noutput = {'...
-2026-01-01 13:58:29,344 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:29,353 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_b2551b8635c4_1767293891
-2026-01-01 13:58:29,354 - abhikarta.agent.agent_manager - INFO - Agent agent_b2551b8635c4_1767293891 status changed: approved -> published
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] Starting execution: 5d01b053-91bb-4482-87ab-9307e46c6576
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] Input: how github token works ?...
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT] Loaded agent from DB: agent3
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT] Found llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT] Agent type: retrieval
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT] System prompt: Answer using the retrieved context. Cite sources....
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] Loaded config for: agent3
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] Agent type: retrieval
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] Creating LLM instance...
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from agent: model_id=None, provider_id=None
-2026-01-01 13:58:52,750 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from config_json: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
-2026-01-01 13:58:52,751 - abhikarta.langchain.agents - INFO - [AGENT] Parameters: {}
-2026-01-01 13:58:52,751 - abhikarta.langchain.agents - INFO - [AGENT] Creating LLM from llm_config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-01 13:58:52,797 - abhikarta.langchain.agents - INFO - [AGENT] Created ChatOllama: model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-01 13:58:52,797 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] LLM created successfully
-2026-01-01 13:58:52,797 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] Creating tools...
-2026-01-01 13:58:52,797 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] Tools created: []
-2026-01-01 13:58:52,797 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] Creating retrieval agent executor...
-2026-01-01 13:58:52,797 - abhikarta.langchain.agents - INFO - [AGENT:agent_b2551b8635c4_1767293891] System prompt: Answer using the retrieved context. Cite sources....
-2026-01-01 13:58:52,797 - abhikarta.langchain.agents - ERROR - [AGENT:agent_b2551b8635c4_1767293891] Execution failed: langchain is required. Install with: pip install langchain langchain-core
-Traceback (most recent call last):
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/langchain/agents.py", line 593, in execute_agent
-    agent_executor = creator_func(llm, tools, system_prompt)
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta/langchain/agents.py", line 253, in create_tool_calling_agent
-    raise ImportError("langchain is required. Install with: pip install langchain langchain-core")
-ImportError: langchain is required. Install with: pip install langchain langchain-core
+```sql
+SELECT *
+FROM employee;
+```
+
+Here's a breakdown of the query:
+
+1. **SELECT**: This keyword is used to specify which columns are being retrieved.
+2. *****: The asterisk (\*) is a wildcard character that represents all columns in the table.
+3. **FROM**: This keyword specifies the table from which data is being retrieved.
+4. **employee**: This is the name of t...
+2026-01-01 14:10:28,917 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Processing 0 intermediate steps
+2026-01-01 14:10:28,917 - abhikarta.langchain.agents - INFO - [AGENT:agent_c42c244821e4_1767294555] Execution completed successfully
+2026-01-01 14:11:34,254 - abhikarta.agent.agent_template - INFO - Creating agent 'agent1' from template 'tpl_tool_single'
+2026-01-01 14:11:34,254 - abhikarta.agent.agent_template - INFO - Template llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
+2026-01-01 14:11:34,254 - abhikarta.agent.agent_template - INFO - Template agent_type: tool_calling
+2026-01-01 14:11:34,254 - abhikarta.agent.agent_manager - INFO - Creating agent: agent1 (tool_calling)
+2026-01-01 14:11:34,254 - abhikarta.agent.agent_manager - INFO - LLM config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
+2026-01-01 14:11:34,254 - abhikarta.agent.agent_manager - INFO - Workflow: {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Request', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'prepare', 'node_type': 'llm', 'name': 'Prepare Parameters', 'position': {'x': 300, 'y': 200}, 'config': {'system_prompt': 'Extract tool parameters from user request.'}}, {'node_id': 'tool', 'node_type': 'tool', 'name': 'Execute Tool', 'position': {'x': 500, 'y': 200}, 'config': {}}, {'node_id': 'format', 'node_type': 'llm', 'name': 'Format Output', 'position': {'x': 700, 'y': 200}, 'config': {'system_prompt': 'Format tool output for user.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Result', 'position': {'x': 900, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'prepare'}, {'source': 'prepare', 'target': 'tool'}, {'source': 'tool', 'target': 'format'}, {'source': 'format', 'target': 'output'}]}
+2026-01-01 14:11:34,255 - abhikarta.agent.agent_manager - INFO - Final config to save: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Request", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "prepare", "node_type": "llm", "name": "Prepare Parameters", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Extract tool parameters from user request."}}, {"node_id": "tool", "node_type": "tool", "name": "Execute Tool", "position": {"x": 500, "y": 200}, "config": {}}, {"node_id": "format", "node_type": "llm", "name": "Format Output", "...
+2026-01-01 14:11:34,255 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:34,255 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Request", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "prepare", "node_type": "llm", "name": "Prepare Parameters", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Extract tool parameters from ...
+2026-01-01 14:11:34,257 - abhikarta.agent.agent_manager - INFO - Inserting new agent: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:34,260 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:34,260 - abhikarta.agent.agent_manager - INFO - Agent saved to database: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:34,260 - abhikarta.agent.agent_manager - INFO - Created agent: agent_9c6af0f677b7_1767294694 - agent1
+2026-01-01 14:11:34,260 - abhikarta.agent.agent_template - INFO - Agent created with ID: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:34,260 - abhikarta.agent.agent_template - INFO - Agent config: {'workflow': {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Request', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'prepare', 'node_type': 'llm', 'name': 'Prepare Parameters', 'position': {'x': 300, 'y': 200}, 'config': {'system_prompt': 'Extract tool parameters from user request.'}}, {'node_id': 'tool', 'node_type': 'tool', 'name': 'Execute Tool', 'position': {'x': 500, 'y': 200}, 'config': {}}, {'node_id': 'format', 'node_type': 'llm', 'name': 'Format Output', 'position': {'x': 700, 'y': 200}, 'config': {'system_prompt': 'Format tool output for user.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Result', 'position': {'x': 900, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'prepare'}, {'source': 'prepare', 'target': 'tool'}, {'source': 'tool', 'target': 'format'}, {'source': 'format', 'target': 'output'}]}, 'llm_config': {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}, 'tools': ['web_search']}
+2026-01-01 14:11:34,260 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:34,261 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Request", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "prepare", "node_type": "llm", "name": "Prepare Parameters", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Extract tool parameters from ...
+2026-01-01 14:11:34,261 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:34,263 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:34,263 - abhikarta.agent.agent_manager - INFO - Updated agent: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:59,003 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:59,003 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Request", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "prepare", "node_type": "llm", "name": "Prepare Parameters", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Extract tool parameters from ...
+2026-01-01 14:11:59,005 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:59,031 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_9c6af0f677b7_1767294694
+2026-01-01 14:11:59,031 - abhikarta.agent.agent_manager - INFO - Agent agent_9c6af0f677b7_1767294694 status changed: draft -> testing
+2026-01-01 14:12:01,219 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_9c6af0f677b7_1767294694
+2026-01-01 14:12:01,220 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Request", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "prepare", "node_type": "llm", "name": "Prepare Parameters", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Extract tool parameters from ...
+2026-01-01 14:12:01,222 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_9c6af0f677b7_1767294694
+2026-01-01 14:12:01,249 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_9c6af0f677b7_1767294694
+2026-01-01 14:12:01,249 - abhikarta.agent.agent_manager - INFO - Agent agent_9c6af0f677b7_1767294694 status changed: testing -> pending_review
+2026-01-01 14:12:03,514 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_9c6af0f677b7_1767294694
+2026-01-01 14:12:03,514 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Request", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "prepare", "node_type": "llm", "name": "Prepare Parameters", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Extract tool parameters from ...
+2026-01-01 14:12:03,517 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_9c6af0f677b7_1767294694
+2026-01-01 14:12:03,545 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_9c6af0f677b7_1767294694
+2026-01-01 14:12:03,545 - abhikarta.agent.agent_manager - INFO - Agent agent_9c6af0f677b7_1767294694 status changed: pending_review -> approved
+2026-01-01 14:12:06,155 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_9c6af0f677b7_1767294694
+2026-01-01 14:12:06,155 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Request", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "prepare", "node_type": "llm", "name": "Prepare Parameters", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Extract tool parameters from ...
+2026-01-01 14:12:06,157 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_9c6af0f677b7_1767294694
+2026-01-01 14:12:06,184 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_9c6af0f677b7_1767294694
+2026-01-01 14:12:06,185 - abhikarta.agent.agent_manager - INFO - Agent agent_9c6af0f677b7_1767294694 status changed: approved -> published
+2026-01-01 14:12:17,453 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Starting execution: 70f5a64f-5d33-4242-b164-6392bcdd5749
+2026-01-01 14:12:17,453 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Input: hello...
+2026-01-01 14:12:17,453 - abhikarta.langchain.agents - INFO - [AGENT] Loaded agent from DB: agent1
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT] Found llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT] Agent type: tool_calling
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT] System prompt: Extract tool parameters from user request....
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Loaded config for: agent1
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Agent type: tool_calling
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Creating LLM instance...
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from agent: model_id=None, provider_id=None
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT] LLM Config from config_json: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.3}
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT] Parameters: {}
+2026-01-01 14:12:17,454 - abhikarta.langchain.agents - INFO - [AGENT] Creating LLM from llm_config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 14:12:17,500 - abhikarta.langchain.agents - INFO - [AGENT] Created ChatOllama: model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-01 14:12:17,500 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] LLM created successfully
+2026-01-01 14:12:17,500 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Creating tools...
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Tools created: []
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Creating tool_calling agent executor...
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] System prompt: Extract tool parameters from user request....
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - WARNING - [AGENT:agent_9c6af0f677b7_1767294694] Failed to create tool_calling agent: langchain is required. Install with: pip install langchain langchain-core. Falling back to conversational.
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Creating conversational agent
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] System prompt: Extract tool parameters from user request....
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Chain created successfully
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Agent executor created
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Invoking agent...
+2026-01-01 14:12:17,501 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Invoking with input: {'input': 'hello'}...
+2026-01-01 14:12:17,793 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-01 14:12:18,135 - abhikarta.langchain.agents - INFO - [CONVERSATIONAL] Got response: It seems like you forgot to ask a question or provide a task. How can I assist you today? Would you like me to extract tool parameters from a user request? If so, please provide an example of what tha...
+2026-01-01 14:12:18,135 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Agent completed in 633ms
+2026-01-01 14:12:18,135 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Output: It seems like you forgot to ask a question or provide a task. How can I assist you today? Would you like me to extract tool parameters from a user request? If so, please provide an example of what that might look like (e.g., a hypothetical user request)....
+2026-01-01 14:12:18,135 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Processing 0 intermediate steps
+2026-01-01 14:12:18,135 - abhikarta.langchain.agents - INFO - [AGENT:agent_9c6af0f677b7_1767294694] Execution completed successfully
