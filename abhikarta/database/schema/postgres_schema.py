@@ -168,6 +168,7 @@ class PostgresSchema:
         output_data JSONB,
         error_message TEXT,
         execution_config JSONB DEFAULT '{}',
+        metadata JSONB DEFAULT '{}',
         started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         completed_at TIMESTAMP WITH TIME ZONE,
         duration_ms INTEGER,
@@ -176,6 +177,25 @@ class PostgresSchema:
         trace_data JSONB DEFAULT '[]',
         FOREIGN KEY (agent_id) REFERENCES agents(agent_id),
         FOREIGN KEY (user_id) REFERENCES users(user_id)
+    );
+    """
+    
+    CREATE_AGENT_EXECUTIONS_TABLE = """
+    CREATE TABLE IF NOT EXISTS agent_executions (
+        id SERIAL PRIMARY KEY,
+        execution_id TEXT UNIQUE NOT NULL,
+        agent_id TEXT NOT NULL,
+        status TEXT DEFAULT 'pending',
+        input_data JSONB,
+        output_data JSONB,
+        error_message TEXT,
+        duration_ms INTEGER,
+        metadata JSONB DEFAULT '{}',
+        started_at TIMESTAMP WITH TIME ZONE,
+        completed_at TIMESTAMP WITH TIME ZONE,
+        created_by TEXT DEFAULT 'system',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (agent_id) REFERENCES agents(agent_id)
     );
     """
     
@@ -999,6 +1019,10 @@ class PostgresSchema:
         "CREATE INDEX IF NOT EXISTS idx_ai_hitl_actions_node_id ON ai_hitl_actions(node_id);",
         "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_org_id ON ai_event_logs(org_id);",
         "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_event_type ON ai_event_logs(event_type);",
+        # Agent executions indexes (v1.4.6.1)
+        "CREATE INDEX IF NOT EXISTS idx_agent_executions_agent_id ON agent_executions(agent_id);",
+        "CREATE INDEX IF NOT EXISTS idx_agent_executions_status ON agent_executions(status);",
+        "CREATE INDEX IF NOT EXISTS idx_agent_executions_created_at ON agent_executions(created_at);",
     ]
     
     # ==========================================================================
@@ -1234,6 +1258,7 @@ class PostgresSchema:
             self.CREATE_AGENT_VERSIONS_TABLE,
             self.CREATE_AGENT_TEMPLATES_TABLE,
             self.CREATE_EXECUTIONS_TABLE,
+            self.CREATE_AGENT_EXECUTIONS_TABLE,
             self.CREATE_EXECUTION_STEPS_TABLE,
             self.CREATE_LLM_CALLS_TABLE,
             self.CREATE_WORKFLOWS_TABLE,
@@ -1312,7 +1337,7 @@ class PostgresSchema:
     def get_table_list(self) -> list:
         return [
             'schema_version', 'users', 'roles', 'user_roles', 'agents', 'agent_versions',
-            'agent_templates', 'executions', 'execution_steps', 'llm_calls', 'workflows',
+            'agent_templates', 'executions', 'agent_executions', 'execution_steps', 'llm_calls', 'workflows',
             'workflow_nodes', 'hitl_tasks', 'hitl_comments', 'hitl_assignments', 'mcp_plugins',
             'mcp_tool_servers', 'audit_logs', 'sessions', 'api_keys', 'system_settings',
             'code_fragments', 'llm_providers', 'llm_models', 'model_permissions', 'swarms',

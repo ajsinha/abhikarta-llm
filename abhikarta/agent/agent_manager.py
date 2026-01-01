@@ -146,6 +146,10 @@ class AgentManager:
         agent_id = generate_id("agent")
         now = get_timestamp()
         
+        logger.info(f"Creating agent: {name} ({agent_type})")
+        logger.info(f"LLM config: {llm_config}")
+        logger.info(f"Workflow: {workflow}")
+        
         # Build config with all sub-configs
         final_config = config.copy() if config else {}
         if workflow:
@@ -156,6 +160,8 @@ class AgentManager:
             final_config['tools'] = tools
         if hitl_config:
             final_config['hitl_config'] = hitl_config
+        
+        logger.info(f"Final config to save: {json.dumps(final_config)[:500]}...")
         
         agent = Agent(
             agent_id=agent_id,
@@ -175,6 +181,9 @@ class AgentManager:
         # Store in database if available
         if self.db_facade:
             self._save_to_db(agent)
+            logger.info(f"Agent saved to database: {agent_id}")
+        else:
+            logger.warning(f"No db_facade, agent not persisted: {agent_id}")
         
         # Cache in memory
         self._agents[agent_id] = agent
@@ -440,9 +449,13 @@ class AgentManager:
     def _save_to_db(self, agent: Agent):
         """Save agent to database."""
         if not self.db_facade:
+            logger.warning("No db_facade available, cannot save agent")
             return
         
         try:
+            logger.info(f"Saving agent to DB: {agent.agent_id}")
+            logger.info(f"Config being saved: {json.dumps(agent.config)[:300]}...")
+            
             # Check if exists
             existing = self.db_facade.fetch_one(
                 "SELECT agent_id FROM agents WHERE agent_id = ?",
@@ -451,6 +464,7 @@ class AgentManager:
             
             if existing:
                 # Update
+                logger.info(f"Updating existing agent: {agent.agent_id}")
                 self.db_facade.execute("""
                     UPDATE agents SET 
                         name = ?, description = ?, agent_type = ?, version = ?,
@@ -463,6 +477,7 @@ class AgentManager:
                 ))
             else:
                 # Insert
+                logger.info(f"Inserting new agent: {agent.agent_id}")
                 self.db_facade.execute("""
                     INSERT INTO agents (agent_id, name, description, agent_type, 
                         version, status, config, created_by, created_at, updated_at)
@@ -472,6 +487,8 @@ class AgentManager:
                     agent.version, agent.status, json.dumps(agent.config),
                     agent.created_by, agent.created_at, agent.updated_at
                 ))
+            
+            logger.info(f"Agent saved successfully: {agent.agent_id}")
         except Exception as e:
             logger.error(f"Error saving agent to DB: {e}", exc_info=True)
     

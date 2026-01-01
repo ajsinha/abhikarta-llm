@@ -27,59 +27,108 @@
 
     <!-- Statistics Cards -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-white-50">Total Agents</h6>
-                            <h3 class="mb-0">{{ stats.total }}</h3>
+                            <h6 class="text-white-50 small mb-1">Total</h6>
+                            <h4 class="mb-0">{{ stats.total }}</h4>
                         </div>
-                        <i class="bi bi-robot display-6 opacity-50"></i>
+                        <i class="bi bi-robot fs-3 opacity-50"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="text-white-50">Published</h6>
-                            <h3 class="mb-0">{{ stats.published }}</h3>
+        <div class="col-md-2">
+            <a href="?status=pending_review" class="text-decoration-none">
+                <div class="card bg-danger text-white">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white-50 small mb-1">Pending Review</h6>
+                                <h4 class="mb-0">{{ stats.by_status.pending_review|default(0) }}</h4>
+                            </div>
+                            <i class="bi bi-hourglass-split fs-3 opacity-50"></i>
                         </div>
-                        <i class="bi bi-check-circle display-6 opacity-50"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="opacity-75">In Development</h6>
-                            <h3 class="mb-0">{{ stats.draft }}</h3>
+        <div class="col-md-2">
+            <a href="?status=approved" class="text-decoration-none">
+                <div class="card bg-info text-white">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white-50 small mb-1">Approved</h6>
+                                <h4 class="mb-0">{{ stats.by_status.approved|default(0) }}</h4>
+                            </div>
+                            <i class="bi bi-check-lg fs-3 opacity-50"></i>
                         </div>
-                        <i class="bi bi-pencil display-6 opacity-50"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="text-white-50">Executions Today</h6>
-                            <h3 class="mb-0">{{ stats.executions_today|default(0) }}</h3>
+        <div class="col-md-2">
+            <a href="?status=published" class="text-decoration-none">
+                <div class="card bg-success text-white">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white-50 small mb-1">Published</h6>
+                                <h4 class="mb-0">{{ stats.published }}</h4>
+                            </div>
+                            <i class="bi bi-globe fs-3 opacity-50"></i>
                         </div>
-                        <i class="bi bi-play-circle display-6 opacity-50"></i>
                     </div>
                 </div>
-            </div>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="?status=draft" class="text-decoration-none">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="opacity-75 small mb-1">Draft</h6>
+                                <h4 class="mb-0">{{ stats.draft }}</h4>
+                            </div>
+                            <i class="bi bi-pencil fs-3 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2">
+            <a href="?status=testing" class="text-decoration-none">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white-50 small mb-1">Testing</h6>
+                                <h4 class="mb-0">{{ stats.by_status.testing|default(0) }}</h4>
+                            </div>
+                            <i class="bi bi-flask fs-3 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
+
+    <!-- Filter Active Indicator -->
+    {% if status_filter %}
+    <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <i class="bi bi-funnel me-2"></i>
+            Showing agents with status: <strong>{{ status_filter|replace('_', ' ')|title }}</strong>
+        </div>
+        <a href="{{ url_for('admin_agents') }}" class="btn btn-sm btn-outline-info">
+            <i class="bi bi-x me-1"></i>Clear Filter
+        </a>
+    </div>
+    {% endif %}
 
     <!-- Filters -->
     <div class="card mb-4">
@@ -92,14 +141,14 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" id="status-filter">
+                    <select class="form-select" id="status-filter" onchange="filterByStatus(this.value)">
                         <option value="">All Status</option>
-                        <option value="draft">Draft</option>
-                        <option value="testing">Testing</option>
-                        <option value="pending_review">Pending Review</option>
-                        <option value="approved">Approved</option>
-                        <option value="published">Published</option>
-                        <option value="deprecated">Deprecated</option>
+                        <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="testing" {% if status_filter == 'testing' %}selected{% endif %}>Testing</option>
+                        <option value="pending_review" {% if status_filter == 'pending_review' %}selected{% endif %}>Pending Review</option>
+                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+                        <option value="deprecated" {% if status_filter == 'deprecated' %}selected{% endif %}>Deprecated</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -221,12 +270,19 @@
 $(document).ready(function() {
     // Search filter
     $('#agent-search').on('input', filterAgents);
-    $('#status-filter, #type-filter').change(filterAgents);
+    $('#type-filter').change(filterAgents);
 });
+
+function filterByStatus(status) {
+    if (status) {
+        window.location.href = '{{ url_for("admin_agents") }}?status=' + status;
+    } else {
+        window.location.href = '{{ url_for("admin_agents") }}';
+    }
+}
 
 function filterAgents() {
     const search = $('#agent-search').val().toLowerCase();
-    const status = $('#status-filter').val();
     const type = $('#type-filter').val();
     
     $('#agents-table tbody tr').each(function() {
@@ -234,12 +290,10 @@ function filterAgents() {
         if ($row.find('td').length < 6) return; // Skip empty row
         
         const name = $row.find('td:first').text().toLowerCase();
-        const rowStatus = $row.find('td:eq(2) .badge').text().toLowerCase().replace(' ', '_');
         const rowType = $row.find('td:eq(1) .badge').text().toLowerCase();
         
         let visible = true;
         if (search && !name.includes(search)) visible = false;
-        if (status && rowStatus !== status) visible = false;
         if (type && rowType !== type) visible = false;
         
         $row.toggle(visible);
@@ -250,7 +304,7 @@ function resetFilters() {
     $('#agent-search').val('');
     $('#status-filter').val('');
     $('#type-filter').val('');
-    filterAgents();
+    window.location.href = '{{ url_for("admin_agents") }}';
 }
 
 function testAgent(agentId) {

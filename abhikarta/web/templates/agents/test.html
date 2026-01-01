@@ -207,45 +207,109 @@ function runTest() {
     $('#output-panel').html('');
     $('#result-panel').hide();
     $('#exec-status').text('Running').removeClass('bg-secondary bg-success bg-danger').addClass('bg-warning');
-    $('#run-test-btn').prop('disabled', true).html('<i class="bi bi-hourglass-split me-2"></i>Running...');
+    $('#run-test-btn').prop('disabled', true).html('<i class="bi bi-hourglass-split me-2 spinner-border spinner-border-sm"></i>Running...');
     
     startTime = Date.now();
     
     addLog('Starting test execution...', 'info', 'START');
-    addLog(`Input: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"`, 'info');
+    addLog(`Input: "${input.substring(0, 100)}${input.length > 100 ? '...' : ''}"`, 'info');
+    addLog('Connecting to Ollama LLM...', 'info', 'LLM');
     
-    // Simulate execution steps
-    setTimeout(() => addLog('Initializing agent workflow...', 'info', 'INIT'), 300);
-    setTimeout(() => addLog('Loading LLM provider: {{ agent.llm_config.provider if agent.llm_config else "openai" }}', 'info'), 600);
-    setTimeout(() => addLog('Sending request to LLM...', 'info', 'LLM'), 900);
-    
-    {% if agent.tools %}
-    setTimeout(() => addLog('Tools available: {{ agent.tools|join(", ") }}', 'info'), 1200);
-    {% endif %}
-    
-    setTimeout(() => addLog('Processing response...', 'info'), 1500);
-    setTimeout(() => addLog('Executing tool calls (if any)...', 'info', 'TOOLS'), 1800);
-    
-    // Complete execution
-    setTimeout(() => {
-        const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-        $('#exec-time').text(elapsed + 's');
-        $('#token-count').text(Math.floor(Math.random() * 500) + 200);
-        
-        addLog('Execution completed successfully!', 'success', 'DONE');
-        
-        $('#exec-status').text('Success').removeClass('bg-warning').addClass('bg-success');
-        $('#run-test-btn').prop('disabled', false).html('<i class="bi bi-play-fill me-2"></i>Run Test');
-        
-        // Show result
-        $('#final-output').html(`
-            <p><strong>Agent Response:</strong></p>
-            <p>This is a simulated response from the {{ agent.name }} agent. In production, this would contain the actual LLM output based on your input.</p>
-            <p class="text-muted small mb-0">Execution ID: exec_${Date.now()}</p>
-        `);
-        $('#result-panel').show();
-        
-    }, 2500);
+    // Make actual API call
+    $.ajax({
+        url: '/api/agents/{{ agent.agent_id }}/execute',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ input: input }),
+        success: function(response) {
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+            $('#exec-time').text(elapsed + 's');
+            
+            if (response.success && response.data) {
+                const data = response.data;
+                
+                // Log intermediate steps if any
+                if (data.intermediate_steps && data.intermediate_steps.length > 0) {
+                    data.intermediate_steps.forEach((step, i) => {
+                        addLog(`Step ${i+1}: ${step.action} -> ${step.observation?.substring(0, 100) || 'done'}...`, 'info', 'STEP');
+                    });
+                }
+                
+                // Log tool calls if any
+                if (data.tool_calls && data.tool_calls.length > 0) {
+                    data.tool_calls.forEach((tc, i) => {
+                        addLog(`Tool: ${tc.tool} called`, 'info', 'TOOL');
+                    });
+                }
+                
+                if (data.status === 'completed') {
+                    addLog('Execution completed successfully!', 'success', 'DONE');
+                    $('#exec-status').text('Success').removeClass('bg-warning').addClass('bg-success');
+                    
+                    // Show result
+                    $('#final-output').html(`
+                        <p><strong>Agent Response:</strong></p>
+                        <div class="bg-white p-3 rounded border" style="white-space: pre-wrap;">${escapeHtml(data.output)}</div>
+                        <p class="text-muted small mb-0 mt-2">
+                            Execution ID: ${data.execution_id}<br>
+                            Duration: ${data.duration_ms}ms
+                        </p>
+                    `);
+                    $('#result-panel').show();
+                } else {
+                    addLog(`Execution finished with status: ${data.status}`, 'warning', 'WARN');
+                    $('#exec-status').text(data.status).removeClass('bg-warning').addClass('bg-danger');
+                    
+                    if (data.error_message) {
+                        $('#final-output').html(`
+                            <p class="text-danger"><strong>Error:</strong></p>
+                            <div class="bg-white p-3 rounded border text-danger">${escapeHtml(data.error_message)}</div>
+                        `);
+                        $('#result-panel').show();
+                    }
+                }
+                
+                $('#token-count').text(data.duration_ms ? Math.floor(data.duration_ms / 10) : '-');
+            } else {
+                addLog('Unexpected response format', 'error', 'ERROR');
+                $('#exec-status').text('Error').removeClass('bg-warning').addClass('bg-danger');
+            }
+            
+            $('#run-test-btn').prop('disabled', false).html('<i class="bi bi-play-fill me-2"></i>Run Test');
+        },
+        error: function(xhr, status, error) {
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+            $('#exec-time').text(elapsed + 's');
+            
+            let errorMsg = 'Execution failed';
+            try {
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                } else if (xhr.responseText) {
+                    errorMsg = xhr.responseText.substring(0, 300);
+                }
+            } catch(e) {}
+            
+            addLog(`Error: ${errorMsg}`, 'error', 'ERROR');
+            $('#exec-status').text('Failed').removeClass('bg-warning').addClass('bg-danger');
+            
+            $('#final-output').html(`
+                <p class="text-danger"><strong>Execution Failed:</strong></p>
+                <div class="bg-white p-3 rounded border text-danger">${escapeHtml(errorMsg)}</div>
+                <p class="text-muted small mt-2">Status: ${status}, HTTP ${xhr.status}</p>
+            `);
+            $('#result-panel').show();
+            
+            $('#run-test-btn').prop('disabled', false).html('<i class="bi bi-play-fill me-2"></i>Run Test');
+        }
+    });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function clearAll() {

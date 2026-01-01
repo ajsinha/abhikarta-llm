@@ -169,6 +169,7 @@ class SQLiteSchema:
         output_data TEXT,
         error_message TEXT,
         execution_config TEXT DEFAULT '{}',
+        metadata TEXT DEFAULT '{}',
         started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         completed_at TIMESTAMP,
         duration_ms INTEGER,
@@ -177,6 +178,26 @@ class SQLiteSchema:
         trace_data TEXT DEFAULT '[]',
         FOREIGN KEY (agent_id) REFERENCES agents(agent_id),
         FOREIGN KEY (user_id) REFERENCES users(user_id)
+    );
+    """
+    
+    # Agent executions table (for detailed agent-specific execution logging)
+    CREATE_AGENT_EXECUTIONS_TABLE = """
+    CREATE TABLE IF NOT EXISTS agent_executions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        execution_id TEXT UNIQUE NOT NULL,
+        agent_id TEXT NOT NULL,
+        status TEXT DEFAULT 'pending',
+        input_data TEXT,
+        output_data TEXT,
+        error_message TEXT,
+        duration_ms INTEGER,
+        metadata TEXT DEFAULT '{}',
+        started_at TIMESTAMP,
+        completed_at TIMESTAMP,
+        created_by TEXT DEFAULT 'system',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (agent_id) REFERENCES agents(agent_id)
     );
     """
     
@@ -1023,6 +1044,10 @@ class SQLiteSchema:
         "CREATE INDEX IF NOT EXISTS idx_ai_hitl_actions_node_id ON ai_hitl_actions(node_id);",
         "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_org_id ON ai_event_logs(org_id);",
         "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_event_type ON ai_event_logs(event_type);",
+        # Agent executions indexes (v1.4.6.1)
+        "CREATE INDEX IF NOT EXISTS idx_agent_executions_agent_id ON agent_executions(agent_id);",
+        "CREATE INDEX IF NOT EXISTS idx_agent_executions_status ON agent_executions(status);",
+        "CREATE INDEX IF NOT EXISTS idx_agent_executions_created_at ON agent_executions(created_at);",
     ]
     
     # ==========================================================================
@@ -1278,6 +1303,7 @@ class SQLiteSchema:
             self.CREATE_AGENT_VERSIONS_TABLE,
             self.CREATE_AGENT_TEMPLATES_TABLE,
             self.CREATE_EXECUTIONS_TABLE,
+            self.CREATE_AGENT_EXECUTIONS_TABLE,
             self.CREATE_EXECUTION_STEPS_TABLE,
             self.CREATE_LLM_CALLS_TABLE,
             self.CREATE_WORKFLOWS_TABLE,
@@ -1388,6 +1414,7 @@ class SQLiteSchema:
             'agent_versions',
             'agent_templates',
             'executions',
+            'agent_executions',
             'execution_steps',
             'llm_calls',
             'workflows',

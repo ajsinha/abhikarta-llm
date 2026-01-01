@@ -1,5 +1,5 @@
 # Abhikarta-LLM - Python Dependencies
-# Version: 1.1.6
+# Version: 1.4.6
 # Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.
 
 # Core Framework
@@ -7,35 +7,38 @@ flask>=3.0.0
 flask-socketio>=5.3.0
 flask-cors>=4.0.0
 Werkzeug>=3.0.0
-Jinja2>=3.1.0
+Jinja2>=3.1.6
 
 # Database
 psycopg2-binary>=2.9.9
 
 # ============================================================================
 # LangChain & LangGraph - Core AI Framework
+# NOTE: All LangChain packages should use compatible versions
+# The langchain-core.messages.content module was added in 0.3.x
 # ============================================================================
 langchain>=0.3.0
 langgraph>=0.2.0
 langchain-core>=0.3.0
 langchain-community>=0.3.0
+langchain-text-splitters>=0.3.0
 
-# LangChain Provider Integrations
+# LangChain Provider Integrations (matching 0.3.x ecosystem)
 langchain-openai>=0.2.0          # OpenAI & Azure OpenAI
 langchain-anthropic>=0.2.0       # Anthropic Claude
 langchain-google-genai>=2.0.0    # Google Gemini
-langchain-aws>=0.2.0             # AWS Bedrock
-langchain-ollama>=0.2.0          # Ollama (local models)
+langchain-ollama>=0.2.0          # Ollama (local models) - requires langchain-core>=0.3.0
 langchain-mistralai>=0.2.0       # Mistral AI
 langchain-cohere>=0.3.0          # Cohere
-langchain-together>=0.2.0        # Together AI
 langchain-groq>=0.2.0            # Groq
 langchain-huggingface>=0.1.0     # HuggingFace
-langchain-fireworks>=0.2.0       # Fireworks AI
+
+# Ollama SDK (required by langchain-ollama)
+ollama>=0.3.0
 
 # LangChain Tools & Utilities
 langchain-experimental>=0.3.0    # Experimental tools (Python REPL, etc.)
-langchainhub>=0.1.0              # Prompt hub
+langchainhub>=0.1.21             # Prompt hub
 
 # ============================================================================
 # Direct LLM Provider SDKs (for advanced use cases)
@@ -68,7 +71,7 @@ prometheus-client>=0.19.0
 requests>=2.31.0
 httpx>=0.25.0
 python-dateutil>=2.8.0
-uuid>=1.30
+# Note: uuid is built-in in Python 3, no need to install
 
 # Vector Store (for RAG)
 chromadb>=0.4.0

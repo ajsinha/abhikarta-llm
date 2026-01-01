@@ -85,7 +85,7 @@ class SwarmTemplateManager:
                         "role": "Coordinator",
                         "subscriptions": ["task.new", "research.complete", "error.*"],
                         "pool_size": {"min": 1, "max": 1},
-                        "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You coordinate research tasks among the team.",
+                        "config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You coordinate research tasks among the team.",
                             "can_delegate": True
                         }
                     },
@@ -95,7 +95,7 @@ class SwarmTemplateManager:
                         "role": "Worker",
                         "subscriptions": ["research.web", "search.request"],
                         "pool_size": {"min": 1, "max": 3},
-                        "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You search the web for information.",
+                        "config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You search the web for information.",
                             "tools": ["web_search", "web_scrape"]
                         }
                     },
@@ -105,7 +105,7 @@ class SwarmTemplateManager:
                         "role": "Worker",
                         "subscriptions": ["research.document", "analyze.request"],
                         "pool_size": {"min": 1, "max": 2},
-                        "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You analyze documents and extract insights.",
+                        "config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You analyze documents and extract insights.",
                             "tools": ["document_parser"]
                         }
                     },
@@ -115,7 +115,7 @@ class SwarmTemplateManager:
                         "role": "Worker",
                         "subscriptions": ["research.synthesize", "compile.request"],
                         "pool_size": {"min": 1, "max": 1},
-                        "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You synthesize research findings into reports."
+                        "config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You synthesize research findings into reports."
                         }
                     }
                 ],
@@ -158,7 +158,7 @@ class SwarmTemplateManager:
                         "role": "Coordinator",
                         "subscriptions": ["task.new", "task.submitted"],
                         "pool_size": {"min": 1, "max": 2},
-                        "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You receive and validate incoming tasks.",
+                        "config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You receive and validate incoming tasks.",
                             "validation_schema": {}
                         }
                     },
@@ -168,7 +168,7 @@ class SwarmTemplateManager:
                         "role": "Worker",
                         "subscriptions": ["task.validated", "process.request"],
                         "pool_size": {"min": 2, "max": 5},
-                        "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You process tasks according to their requirements."
+                        "config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You process tasks according to their requirements."
                         }
                     },
                     {
@@ -177,7 +177,7 @@ class SwarmTemplateManager:
                         "role": "Worker",
                         "subscriptions": ["task.processed", "validate.request"],
                         "pool_size": {"min": 1, "max": 2},
-                        "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You validate the quality of processed tasks."
+                        "config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You validate the quality of processed tasks."
                         }
                     },
                     {
@@ -186,7 +186,7 @@ class SwarmTemplateManager:
                         "role": "Worker",
                         "subscriptions": ["task.validated", "complete.request"],
                         "pool_size": {"min": 1, "max": 1},
-                        "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You finalize and deliver completed tasks."
+                        "config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You finalize and deliver completed tasks."
                         }
                     }
                 ],

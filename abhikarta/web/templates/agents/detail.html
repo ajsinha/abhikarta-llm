@@ -165,15 +165,68 @@
                         <button class="btn btn-outline-info" onclick="changeStatus('pending_review')">
                             <i class="bi bi-eye me-1"></i> Submit for Review
                         </button>
+                        <button class="btn btn-outline-secondary" onclick="changeStatus('draft')">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Draft
+                        </button>
+                        {% elif agent.status == 'pending_review' %}
+                        <div class="alert alert-info py-2 mb-2">
+                            <i class="bi bi-hourglass-split me-1"></i>
+                            <strong>Pending Review</strong><br>
+                            <small>This agent is awaiting admin approval</small>
+                        </div>
+                        <button class="btn btn-success" onclick="changeStatus('approved')">
+                            <i class="bi bi-check-circle me-1"></i> Approve Agent
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="changeStatus('testing')">
+                            <i class="bi bi-x-circle me-1"></i> Reject (Back to Testing)
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="changeStatus('draft')">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Draft
+                        </button>
                         {% elif agent.status == 'approved' %}
-                        <button class="btn btn-outline-success" onclick="changeStatus('published')">
-                            <i class="bi bi-check-circle me-1"></i> Publish
+                        <div class="alert alert-success py-2 mb-2">
+                            <i class="bi bi-check-circle me-1"></i>
+                            <strong>Approved</strong><br>
+                            <small>Ready to publish</small>
+                        </div>
+                        <button class="btn btn-success" onclick="changeStatus('published')">
+                            <i class="bi bi-rocket me-1"></i> Publish Agent
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="changeStatus('draft')">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Draft
                         </button>
                         {% elif agent.status == 'published' %}
+                        <div class="alert alert-success py-2 mb-2">
+                            <i class="bi bi-globe me-1"></i>
+                            <strong>Published</strong><br>
+                            <small>Available to users</small>
+                        </div>
                         <button class="btn btn-outline-warning" onclick="changeStatus('deprecated')">
                             <i class="bi bi-archive me-1"></i> Deprecate
                         </button>
+                        {% elif agent.status == 'deprecated' %}
+                        <div class="alert alert-warning py-2 mb-2">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            <strong>Deprecated</strong><br>
+                            <small>No longer recommended</small>
+                        </div>
+                        <button class="btn btn-outline-success" onclick="changeStatus('published')">
+                            <i class="bi bi-arrow-up me-1"></i> Re-publish
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="changeStatus('archived')">
+                            <i class="bi bi-archive me-1"></i> Archive
+                        </button>
+                        {% elif agent.status == 'archived' %}
+                        <div class="alert alert-secondary py-2 mb-2">
+                            <i class="bi bi-archive me-1"></i>
+                            <strong>Archived</strong>
+                        </div>
+                        <button class="btn btn-outline-primary" onclick="changeStatus('draft')">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Restore to Draft
+                        </button>
                         {% endif %}
+                        
+                        <hr class="my-2">
                         <button class="btn btn-outline-danger" onclick="deleteAgent()">
                             <i class="bi bi-trash me-1"></i> Delete Agent
                         </button>

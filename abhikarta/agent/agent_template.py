@@ -105,7 +105,7 @@ class AgentTemplateManager:
                         {"source": "observe", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.7},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.7},
                 tools=["web_search", "calculator"],
                 sample_prompts=["Research the latest trends in renewable energy", "Calculate compound interest on $10000 at 5% for 10 years"],
                 tags=["react", "reasoning", "sequential", "beginner"],
@@ -154,7 +154,7 @@ class AgentTemplateManager:
                         {"source": "synthesize", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.5},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.5},
                 tools=["web_search", "code_executor", "file_reader"],
                 sample_prompts=["Compare pricing from multiple sources", "Gather data from different APIs and summarize"],
                 tags=["react", "parallel", "multi-tool", "intermediate"],
@@ -194,7 +194,7 @@ class AgentTemplateManager:
                         {"source": "llm", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.8},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.8},
                 tools=[],
                 sample_prompts=["Hello, who are you?", "Tell me more about that", "Can you explain it differently?"],
                 tags=["conversational", "chat", "memory", "beginner"],
@@ -243,7 +243,7 @@ class AgentTemplateManager:
                         {"source": "aggregate", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.5},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.5},
                 tools=["code_executor"],
                 sample_prompts=["Calculate 15% of 2500", "What is the factorial of 10?", "Just chat with me"],
                 tags=["conversational", "python", "code", "branching", "intermediate"],
@@ -286,7 +286,7 @@ class AgentTemplateManager:
                         {"source": "format", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.3},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.3},
                 tools=["web_search"],
                 sample_prompts=["Search for Python tutorials", "Find the weather in New York"],
                 tags=["tool-calling", "single-tool", "fast", "beginner"],
@@ -334,7 +334,7 @@ class AgentTemplateManager:
                         {"source": "summarize", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.5},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.5},
                 tools=["web_fetch", "text_analyzer", "code_executor"],
                 sample_prompts=["Fetch a webpage and analyze its content", "Get data from API and process it"],
                 tags=["tool-calling", "chain", "orchestration", "intermediate"],
@@ -382,7 +382,7 @@ class AgentTemplateManager:
                         {"source": "step3", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.5},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.5},
                 tools=[],
                 sample_prompts=["Write a 3-paragraph essay about AI", "Create a project plan for a website"],
                 tags=["plan-execute", "sequential", "planning", "intermediate"],
@@ -426,7 +426,7 @@ class AgentTemplateManager:
                         {"source": "review_result", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.5},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.5},
                 tools=[],
                 hitl_config={"enabled": True, "approval_required": True, "timeout_hours": 24},
                 sample_prompts=["Draft a contract amendment", "Create a proposal for client review"],
@@ -475,7 +475,7 @@ class AgentTemplateManager:
                         {"source": "generate", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.3},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.3},
                 tools=["vector_search", "embeddings"],
                 sample_prompts=["What does our policy say about refunds?", "Find relevant documentation"],
                 tags=["retrieval", "rag", "search", "intermediate"],
@@ -531,7 +531,7 @@ class AgentTemplateManager:
                         {"source": "generate", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.3},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.3},
                 tools=["doc_search", "web_search", "db_search", "embeddings"],
                 sample_prompts=["Research this topic comprehensively", "Find all information about X"],
                 tags=["retrieval", "rag", "parallel", "multi-source", "advanced"],
@@ -577,7 +577,7 @@ class AgentTemplateManager:
                         {"source": "postprocess", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.5},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.5},
                 tools=[],
                 sample_prompts=["Process this data file", "Transform and analyze this input"],
                 tags=["custom", "code-fragment", "dynamic", "advanced"],
@@ -634,7 +634,7 @@ class AgentTemplateManager:
                         {"source": "aggregate", "target": "output"}
                     ]
                 },
-                llm_config={"provider": "ollama", "model": "llama3.2:3b", "temperature": 0.5},
+                llm_config={"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.5},
                 tools=[],
                 sample_prompts=["Handle this task based on its priority", "Process this with appropriate urgency"],
                 tags=["custom", "branching", "conditional", "advanced"],
@@ -703,9 +703,14 @@ class AgentTemplateManager:
         """
         template = self.get_template(template_id)
         if not template:
+            logger.error(f"Template not found: {template_id}")
             return None
         
         import copy
+        
+        logger.info(f"Creating agent '{name}' from template '{template_id}'")
+        logger.info(f"Template llm_config: {template.llm_config}")
+        logger.info(f"Template agent_type: {template.agent_type}")
         
         # If we have an agent manager, use it to create the agent
         if agent_manager:
@@ -719,6 +724,8 @@ class AgentTemplateManager:
                 hitl_config=copy.deepcopy(template.hitl_config),
                 created_by=created_by or "system"
             )
+            logger.info(f"Agent created with ID: {agent.agent_id}")
+            logger.info(f"Agent config: {agent.config}")
         else:
             # Create agent object without persisting
             from .agent_manager import Agent
@@ -736,6 +743,7 @@ class AgentTemplateManager:
                 hitl_config=copy.deepcopy(template.hitl_config),
                 created_by=created_by or "system"
             )
+            logger.info(f"Agent created (in memory): {agent.agent_id}")
         
         # Increment use count
         template.use_count += 1

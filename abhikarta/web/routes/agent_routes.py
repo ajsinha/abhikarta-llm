@@ -74,7 +74,14 @@ class AgentRoutes(AbstractRoutes):
             """List all agents for admin management."""
             self._ensure_managers()
             
-            agents = self.agent_manager.list_agents()
+            # Get optional status filter
+            status_filter = request.args.get('status', '')
+            
+            if status_filter:
+                agents = self.agent_manager.list_agents(status=status_filter)
+            else:
+                agents = self.agent_manager.list_agents()
+            
             stats = self.agent_manager.get_statistics()
             agent_types = self.agent_manager.get_agent_types()
             
@@ -84,7 +91,8 @@ class AgentRoutes(AbstractRoutes):
                                    roles=session.get('roles', []),
                                    agents=agents,
                                    stats=stats,
-                                   agent_types=agent_types)
+                                   agent_types=agent_types,
+                                   status_filter=status_filter)
         
         @self.app.route('/admin/agents/new')
         @admin_required

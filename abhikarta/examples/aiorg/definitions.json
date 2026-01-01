@@ -36,7 +36,7 @@
           "steps": ["ceo:approve", "product_manager:requirements", "tech_lead:design", "developer:implement", "qa:review", "ceo:approve"]
         }
       ],
-      "llm_config": {"provider": "ollama", "model": "llama3.2:3b"}
+      "llm_config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434"}
     },
     {
       "org_id": "content_team",
@@ -61,7 +61,7 @@
           "steps": ["editor:assign", "writer_1:draft|writer_2:draft", "reviewer:feedback", "editor:finalize"]
         }
       ],
-      "llm_config": {"provider": "ollama", "model": "llama3.2:3b"}
+      "llm_config": {"provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434"}
     }
   ],
   "llm_defaults": {

@@ -16,6 +16,7 @@
         border-radius: 8px;
         padding: 1rem;
         font-family: 'Courier New', monospace;
+        white-space: pre-wrap;
     }
     .step-indicator {
         display: flex;
@@ -52,7 +53,7 @@
                     <i class="bi bi-play-circle me-2"></i>Execute: {{ agent.name }}
                 </h4>
             </div>
-            <span class="badge bg-{{ agent.agent_type }}">{{ agent.agent_type }}</span>
+            <span class="badge bg-info">{{ agent.agent_type }}</span>
         </div>
 
         <!-- Agent Info Card -->
@@ -65,9 +66,6 @@
                         <div class="d-flex gap-2">
                             <span class="badge bg-info">{{ agent.agent_type }}</span>
                             <span class="badge bg-secondary">v{{ agent.version }}</span>
-                            {% for tool in agent.tools[:3] %}
-                            <span class="badge bg-warning text-dark">{{ tool }}</span>
-                            {% endfor %}
                         </div>
                     </div>
                     <div class="col-md-4 text-end">
@@ -85,28 +83,12 @@
                 <h6 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Input</h6>
             </div>
             <div class="card-body">
-                <form id="execution-form" method="POST">
+                <form id="execution-form" method="POST" action="{{ url_for('execute_agent', agent_id=agent.agent_id) }}">
                     <div class="mb-3">
                         <label class="form-label">Your Request</label>
-                        <textarea class="form-control" name="input" id="user-input" rows="4" 
+                        <textarea class="form-control" name="input_data" id="user-input" rows="4" 
                                   placeholder="Enter your request or question for the agent..."
                                   required></textarea>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Temperature</label>
-                            <input type="range" class="form-range" id="temperature" 
-                                   name="temperature" min="0" max="1" step="0.1" value="0.7">
-                            <small class="text-muted">Current: <span id="temp-value">0.7</span></small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Max Tokens</label>
-                            <select class="form-select" name="max_tokens">
-                                <option value="1000">1000</option>
-                                <option value="2000" selected>2000</option>
-                                <option value="4000">4000</option>
-                            </select>
-                        </div>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg" id="execute-btn">
@@ -132,6 +114,10 @@
                     <span class="text-muted">Waiting for execution...</span>
                 </div>
                 
+                <!-- Error Details -->
+                <div id="error-details" class="alert alert-danger mt-3" style="display: none;">
+                </div>
+                
                 <!-- Actions -->
                 <div class="d-flex justify-content-end mt-3 gap-2">
                     <button class="btn btn-outline-secondary" onclick="copyOutput()">
@@ -150,78 +136,23 @@
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-    $('#temperature').on('input', function() {
-        $('#temp-value').text($(this).val());
-    });
-    
     $('#execution-form').on('submit', function(e) {
-        e.preventDefault();
-        executeAgent();
+        // Show loading state
+        $('#execute-btn').prop('disabled', true).html('<i class="bi bi-hourglass-split me-2 spinner-border spinner-border-sm"></i>Executing...');
+        $('#output-card').show();
+        $('#execution-status').text('Running').addClass('bg-warning');
+        $('#output-content').html('<i class="bi bi-hourglass-split me-2"></i>Connecting to LLM and processing your request...\n\nThis may take a moment...');
+        $('#execution-steps').html(`
+            <div class="step-indicator running">
+                <i class="bi bi-arrow-right-circle me-2"></i>
+                <span>Sending request to agent...</span>
+            </div>
+        `);
+        
+        // Allow form to submit normally - backend will redirect to execution detail page
+        return true;
     });
 });
-
-function executeAgent() {
-    const input = $('#user-input').val();
-    if (!input.trim()) {
-        alert('Please enter a request');
-        return;
-    }
-    
-    // Show output card
-    $('#output-card').show();
-    $('#execution-status').text('Running').removeClass('bg-light text-dark').addClass('bg-warning text-dark');
-    $('#output-content').html('<i class="bi bi-hourglass-split me-2"></i>Processing...');
-    $('#execute-btn').prop('disabled', true).html('<i class="bi bi-hourglass-split me-2"></i>Executing...');
-    
-    // Show execution steps
-    $('#execution-steps').html(`
-        <div class="step-indicator running">
-            <i class="bi bi-arrow-right-circle me-2"></i>
-            <span>Initializing agent...</span>
-        </div>
-    `);
-    
-    // Simulate execution (replace with actual API call)
-    setTimeout(function() {
-        $('#execution-steps').append(`
-            <div class="step-indicator running">
-                <i class="bi bi-cpu me-2"></i>
-                <span>Processing with LLM...</span>
-            </div>
-        `);
-    }, 500);
-    
-    setTimeout(function() {
-        $('#execution-steps').append(`
-            <div class="step-indicator running">
-                <i class="bi bi-tools me-2"></i>
-                <span>Executing tools...</span>
-            </div>
-        `);
-    }, 1000);
-    
-    // Simulate completion
-    setTimeout(function() {
-        $('#execution-steps .step-indicator').removeClass('running').addClass('completed');
-        $('#execution-steps').append(`
-            <div class="step-indicator completed">
-                <i class="bi bi-check-circle me-2"></i>
-                <span>Execution complete</span>
-            </div>
-        `);
-        
-        $('#execution-status').text('Completed').removeClass('bg-warning').addClass('bg-success');
-        $('#output-content').html(`
-            <strong>Agent Response:</strong><br><br>
-            Based on your request: "${input.substring(0, 50)}..."<br><br>
-            This is a simulated response from the {{ agent.name }} agent. In production, 
-            this would contain the actual output from the agent execution pipeline.<br><br>
-            <em>Execution ID: exec_${Date.now()}</em>
-        `);
-        
-        $('#execute-btn').prop('disabled', false).html('<i class="bi bi-play-fill me-2"></i>Execute Agent');
-    }, 2000);
-}
 
 function copyOutput() {
     const output = $('#output-content').text();
@@ -234,6 +165,7 @@ function clearOutput() {
     $('#output-card').hide();
     $('#user-input').val('');
     $('#execution-steps').empty();
+    $('#error-details').hide();
 }
 </script>
 {% endblock %}

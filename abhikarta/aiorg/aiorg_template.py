@@ -85,7 +85,7 @@ class AIOrgTemplateManager:
                         "position_x": 400,
                         "position_y": 50,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You are the CEO. Make strategic decisions and delegate tasks.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You are the CEO. Make strategic decisions and delegate tasks.",
                             "can_delegate": True,
                             "approval_required": False
                         },
@@ -104,7 +104,7 @@ class AIOrgTemplateManager:
                         "position_x": 200,
                         "position_y": 200,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You manage operations. Coordinate tasks and ensure efficiency.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You manage operations. Coordinate tasks and ensure efficiency.",
                             "can_delegate": True
                         },
                         "hitl_config": {
@@ -121,7 +121,7 @@ class AIOrgTemplateManager:
                         "position_x": 600,
                         "position_y": 200,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You manage technical projects. Guide development and review work.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You manage technical projects. Guide development and review work.",
                             "can_delegate": True
                         },
                         "hitl_config": {
@@ -138,7 +138,7 @@ class AIOrgTemplateManager:
                         "position_x": 100,
                         "position_y": 350,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You analyze operations data and create reports.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You analyze operations data and create reports.",
                             "tools": ["data_analysis", "report_generator"]
                         },
                         "hitl_config": {
@@ -154,7 +154,7 @@ class AIOrgTemplateManager:
                         "position_x": 300,
                         "position_y": 350,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You coordinate processes and ensure smooth workflows."
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You coordinate processes and ensure smooth workflows."
                         },
                         "hitl_config": {
                             "enabled": False
@@ -169,7 +169,7 @@ class AIOrgTemplateManager:
                         "position_x": 500,
                         "position_y": 350,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You write code and implement technical solutions.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You write code and implement technical solutions.",
                             "tools": ["code_executor", "git"]
                         },
                         "hitl_config": {
@@ -185,7 +185,7 @@ class AIOrgTemplateManager:
                         "position_x": 700,
                         "position_y": 350,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You test software and ensure quality.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You test software and ensure quality.",
                             "tools": ["test_runner"]
                         },
                         "hitl_config": {
@@ -221,7 +221,7 @@ class AIOrgTemplateManager:
                         "position_x": 400,
                         "position_y": 50,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You are the team lead. Facilitate collaboration and remove blockers.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You are the team lead. Facilitate collaboration and remove blockers.",
                             "can_delegate": True,
                             "leadership_style": "servant"
                         },
@@ -239,7 +239,7 @@ class AIOrgTemplateManager:
                         "position_x": 150,
                         "position_y": 200,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You are a research specialist. Find and analyze information.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You are a research specialist. Find and analyze information.",
                             "tools": ["web_search", "document_analyzer"],
                             "expertise": ["research", "analysis"]
                         },
@@ -256,7 +256,7 @@ class AIOrgTemplateManager:
                         "position_x": 350,
                         "position_y": 200,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You are a content specialist. Create and refine content.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You are a content specialist. Create and refine content.",
                             "expertise": ["writing", "editing", "content"]
                         },
                         "hitl_config": {
@@ -272,7 +272,7 @@ class AIOrgTemplateManager:
                         "position_x": 550,
                         "position_y": 200,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You are a technical specialist. Implement solutions.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You are a technical specialist. Implement solutions.",
                             "tools": ["code_executor"],
                             "expertise": ["development", "integration"]
                         },
@@ -289,7 +289,7 @@ class AIOrgTemplateManager:
                         "position_x": 650,
                         "position_y": 200,
                         "agent_config": {
-                            "provider": "ollama", "model": "llama3.2:3b", "system_prompt": "You are a QA specialist. Validate quality and test.",
+                            "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "system_prompt": "You are a QA specialist. Validate quality and test.",
                             "tools": ["test_runner"],
                             "expertise": ["testing", "quality"]
                         },

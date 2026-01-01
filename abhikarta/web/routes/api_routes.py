@@ -418,37 +418,93 @@ class APIRoutes(AbstractRoutes):
         @self.app.route('/api/agents/<agent_id>/execute', methods=['POST'])
         @api_login_required
         def api_execute_agent(agent_id):
-            """Execute an agent."""
+            """Execute an agent and return results."""
             import uuid
+            from datetime import datetime
+            
             data = request.get_json() or {}
+            input_data = data.get('input', data.get('input_data', ''))
+            
+            # If input is a dict, convert to string
+            if isinstance(input_data, dict):
+                input_data = json.dumps(input_data)
             
             try:
+                # Check if agent exists (allow any status for testing)
                 agent = self.db_facade.fetch_one(
-                    "SELECT * FROM agents WHERE agent_id = ? AND status = 'published'",
+                    "SELECT * FROM agents WHERE agent_id = ?",
                     (agent_id,)
                 )
                 
                 if not agent:
-                    return self._error_response('AGENT_004', 'Agent not available', 404)
+                    return self._error_response('AGENT_004', 'Agent not found', 404)
                 
                 execution_id = f"exec_{uuid.uuid4().hex[:16]}"
+                started_at = datetime.now()
                 
+                # Create execution record with 'running' status
                 self.db_facade.execute(
                     """INSERT INTO executions 
                        (execution_id, agent_id, user_id, status, input_data, started_at)
                        VALUES (?, ?, ?, ?, ?, ?)""",
-                    (execution_id, agent_id, session.get('user_id'), 'pending',
-                     json.dumps(data.get('input', {})), datetime.now().isoformat())
+                    (execution_id, agent_id, session.get('user_id'), 'running',
+                     input_data, started_at.isoformat())
                 )
                 
-                return self._success_response({
-                    'execution_id': execution_id,
-                    'agent_id': agent_id,
-                    'status': 'pending'
-                }, 'Execution started')
+                # Actually execute the agent using LangChain
+                try:
+                    from abhikarta.langchain.agents import AgentExecutor as LangChainAgentExecutor
+                    
+                    logger.info(f"[API] Executing agent {agent_id} with input: {input_data[:100]}...")
+                    
+                    executor = LangChainAgentExecutor(self.db_facade)
+                    result = executor.execute_agent(agent_id, input_data)
+                    
+                    logger.info(f"[API] Agent execution completed with status: {result.status}")
+                    
+                    # Update execution record with results
+                    self.db_facade.execute(
+                        """UPDATE executions SET 
+                           status = ?, output_data = ?, error_message = ?,
+                           completed_at = ?, duration_ms = ?, metadata = ?
+                           WHERE execution_id = ?""",
+                        (
+                            result.status,
+                            result.output,
+                            result.error_message,
+                            datetime.now().isoformat(),
+                            result.duration_ms,
+                            json.dumps({
+                                'intermediate_steps': result.intermediate_steps,
+                                'tool_calls': result.tool_calls,
+                                'execution_mode': 'langchain'
+                            }),
+                            execution_id
+                        )
+                    )
+                    
+                    return self._success_response({
+                        'execution_id': execution_id,
+                        'agent_id': agent_id,
+                        'status': result.status,
+                        'output': result.output,
+                        'error_message': result.error_message,
+                        'duration_ms': result.duration_ms,
+                        'intermediate_steps': result.intermediate_steps,
+                        'tool_calls': result.tool_calls
+                    }, 'Execution completed')
+                    
+                except ImportError as ie:
+                    logger.error(f"[API] LangChain not available: {ie}")
+                    self.db_facade.execute(
+                        "UPDATE executions SET status = 'failed', error_message = ? WHERE execution_id = ?",
+                        (f'LangChain not installed: {str(ie)}', execution_id)
+                    )
+                    return self._error_response('EXEC_002', f'LangChain not available: {str(ie)}', 500)
+                    
             except Exception as e:
-                logger.error(f"Error executing agent: {e}", exc_info=True)
-                return self._error_response('EXEC_001', 'Failed to execute agent', 500)
+                logger.error(f"[API] Error executing agent: {e}", exc_info=True)
+                return self._error_response('EXEC_001', f'Failed to execute agent: {str(e)}', 500)
         
         # ==================== Executions API ====================
         

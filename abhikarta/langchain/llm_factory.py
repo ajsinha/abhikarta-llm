@@ -179,13 +179,46 @@ class LLMFactory:
     @classmethod
     def _create_ollama_llm(cls, provider_config: Dict, model_config: Dict, **kwargs):
         """Create Ollama LLM instance."""
-        try:
-            from langchain_ollama import ChatOllama
-        except ImportError:
-            raise ImportError("langchain-ollama is required. Install with: pip install langchain-ollama")
-        
         import json
         import os
+        import sys
+        
+        ChatOllama = None
+        
+        # Try importing langchain_ollama with better error handling
+        try:
+            from langchain_ollama import ChatOllama
+            logger.info("Successfully imported ChatOllama from langchain_ollama")
+        except ImportError as e:
+            # Try to provide diagnostic info
+            logger.error(f"ImportError when importing langchain_ollama: {e}")
+            try:
+                import importlib.util
+                spec = importlib.util.find_spec('langchain_ollama')
+                if spec is None:
+                    logger.error("langchain_ollama package not found. Please install with: pip install langchain-ollama")
+                else:
+                    logger.error(f"langchain_ollama found at: {spec.origin}, but failed to import")
+                    # Try importing the module directly to get better error info
+                    import importlib
+                    try:
+                        importlib.import_module('langchain_ollama')
+                    except Exception as inner_e:
+                        logger.error(f"Detailed import error: {type(inner_e).__name__}: {inner_e}")
+            except Exception as diag_e:
+                logger.error(f"Diagnostic check failed: {diag_e}")
+            raise ImportError("langchain-ollama is required. Install with: pip install langchain-ollama")
+        except TypeError as e:
+            # Python 3.14 Pydantic compatibility issue
+            if "not subscriptable" in str(e):
+                raise ImportError(
+                    f"langchain-ollama has Pydantic compatibility issues with Python {sys.version_info.major}.{sys.version_info.minor}. "
+                    "Please use Python 3.12 or 3.13 for full functionality."
+                )
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error importing langchain_ollama: {type(e).__name__}: {e}")
+            raise ImportError(f"Failed to import langchain_ollama: {e}")
         
         # Read config from both possible column names
         config_str = provider_config.get('config_json') or provider_config.get('config') or '{}'
