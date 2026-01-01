@@ -1,0 +1,310 @@
+{
+  "template_id": "aiorg_consulting_firm",
+  "name": "Consulting Firm",
+  "description": "A multi-practice consulting firm with Strategy, Operations, and Technology practices. Features Partner-led engagement model with Managers, Consultants, and Analysts.",
+  "version": "1.0.0",
+  "category": "professional_services",
+  "difficulty": "advanced",
+  "icon": "bi-briefcase",
+  "tags": ["consulting", "strategy", "professional", "enterprise", "advanced"],
+  "estimated_setup": "15 minutes",
+  "use_cases": [
+    "Strategic planning engagements",
+    "Operational assessments",
+    "Technology advisory",
+    "Market entry analysis",
+    "Transformation programs"
+  ],
+  
+  "organization": {
+    "name": "Apex Consulting Group",
+    "description": "Full-service management consulting firm",
+    "type": "firm",
+    
+    "structure": {
+      "hierarchy": "partner_led",
+      "communication": "engagement_based",
+      "decision_making": "partner_consensus"
+    },
+    
+    "departments": [
+      {
+        "department_id": "strategy",
+        "name": "Strategy Practice",
+        "description": "Corporate and business strategy",
+        "head": "strategy_partner"
+      },
+      {
+        "department_id": "operations",
+        "name": "Operations Practice",
+        "description": "Operational excellence",
+        "head": "operations_partner"
+      },
+      {
+        "department_id": "technology",
+        "name": "Technology Practice",
+        "description": "Digital and technology advisory",
+        "head": "tech_partner"
+      }
+    ],
+    
+    "roles": [
+      {
+        "role_id": "managing_partner",
+        "name": "Managing Partner",
+        "department": null,
+        "responsibilities": [
+          "Firm leadership",
+          "Client relationships",
+          "Quality oversight",
+          "Strategic direction"
+        ],
+        "authority_level": "executive",
+        "reports_to": null,
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are the Managing Partner of a prestigious consulting firm. Provide executive-level guidance, maintain client relationships, ensure quality across engagements, and set strategic direction. Think like a trusted advisor to C-suite executives.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 2000
+          }
+        }
+      },
+      {
+        "role_id": "strategy_partner",
+        "name": "Strategy Partner",
+        "department": "strategy",
+        "responsibilities": [
+          "Lead strategy engagements",
+          "Client advisory",
+          "Team leadership",
+          "Thought leadership"
+        ],
+        "authority_level": "partner",
+        "reports_to": "managing_partner",
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are a Strategy Partner. Lead strategic engagements, advise clients on corporate strategy, market positioning, growth, and transformation. Use frameworks like Porter's Five Forces, BCG Matrix, and McKinsey 7S. Deliver actionable insights.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.5,
+            "max_tokens": 2000
+          }
+        }
+      },
+      {
+        "role_id": "operations_partner",
+        "name": "Operations Partner",
+        "department": "operations",
+        "responsibilities": [
+          "Lead operations engagements",
+          "Process optimization",
+          "Supply chain advisory",
+          "Performance improvement"
+        ],
+        "authority_level": "partner",
+        "reports_to": "managing_partner",
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are an Operations Partner. Lead operational excellence engagements, optimize processes, improve supply chains, and drive performance improvement. Use Lean, Six Sigma, and other operational frameworks. Focus on measurable outcomes.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 2000
+          }
+        }
+      },
+      {
+        "role_id": "tech_partner",
+        "name": "Technology Partner",
+        "department": "technology",
+        "responsibilities": [
+          "Lead technology engagements",
+          "Digital transformation",
+          "IT strategy",
+          "Architecture advisory"
+        ],
+        "authority_level": "partner",
+        "reports_to": "managing_partner",
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are a Technology Partner. Lead digital transformation and technology advisory engagements. Advise on IT strategy, architecture, emerging technologies, and technology-enabled business change. Bridge business and technology perspectives.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 2000
+          }
+        }
+      },
+      {
+        "role_id": "engagement_manager",
+        "name": "Engagement Manager",
+        "department": null,
+        "responsibilities": [
+          "Day-to-day engagement management",
+          "Workstream coordination",
+          "Client communication",
+          "Deliverable oversight"
+        ],
+        "authority_level": "manager",
+        "reports_to": "strategy_partner",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are an Engagement Manager. Manage day-to-day consulting engagements, coordinate workstreams, maintain client communication, and ensure quality deliverables. Be organized, proactive, and client-focused.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 1500
+          }
+        }
+      },
+      {
+        "role_id": "senior_consultant",
+        "name": "Senior Consultant",
+        "department": null,
+        "responsibilities": [
+          "Lead analysis workstreams",
+          "Client workshops",
+          "Recommendations development",
+          "Junior mentoring"
+        ],
+        "authority_level": "senior",
+        "reports_to": "engagement_manager",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Senior Consultant. Lead analysis workstreams, develop recommendations, facilitate client workshops, and mentor junior team members. Produce high-quality, insight-driven work products.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 1500
+          }
+        }
+      },
+      {
+        "role_id": "consultant",
+        "name": "Consultant",
+        "department": null,
+        "responsibilities": [
+          "Analysis execution",
+          "Data gathering",
+          "Presentation development",
+          "Research"
+        ],
+        "authority_level": "staff",
+        "reports_to": "senior_consultant",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Consultant. Execute detailed analysis, gather and synthesize data, develop compelling presentations, and conduct research. Be thorough, structured, and produce client-ready work.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.3,
+            "max_tokens": 1500
+          }
+        }
+      },
+      {
+        "role_id": "analyst",
+        "name": "Business Analyst",
+        "department": null,
+        "responsibilities": [
+          "Data analysis",
+          "Financial modeling",
+          "Research support",
+          "Document preparation"
+        ],
+        "authority_level": "junior",
+        "reports_to": "consultant",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Business Analyst. Perform detailed data analysis, build financial models, support research efforts, and prepare documents. Be accurate, detail-oriented, and learn from senior team members.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.2,
+            "max_tokens": 1200
+          }
+        }
+      }
+    ],
+    
+    "workflows": [
+      {
+        "workflow_id": "strategy_engagement",
+        "name": "Strategy Engagement",
+        "trigger": "new_strategy_project",
+        "steps": [
+          {"step": 1, "role": "strategy_partner", "action": "scope_engagement"},
+          {"step": 2, "role": "engagement_manager", "action": "plan_workstreams"},
+          {"step": 3, "role": "analyst", "action": "data_gathering"},
+          {"step": 4, "role": "consultant", "action": "analysis_execution"},
+          {"step": 5, "role": "senior_consultant", "action": "develop_recommendations"},
+          {"step": 6, "role": "engagement_manager", "action": "synthesize_findings"},
+          {"step": 7, "role": "strategy_partner", "action": "review_and_refine"},
+          {"step": 8, "role": "managing_partner", "action": "final_quality_check"},
+          {"step": 9, "role": "strategy_partner", "action": "client_presentation"}
+        ]
+      },
+      {
+        "workflow_id": "cross_practice",
+        "name": "Cross-Practice Engagement",
+        "trigger": "complex_transformation",
+        "steps": [
+          {"step": 1, "role": "managing_partner", "action": "assemble_team"},
+          {"step": 2, "role": "strategy_partner", "action": "strategy_workstream", "parallel_with": "operations_partner"},
+          {"step": 3, "role": "operations_partner", "action": "operations_workstream", "parallel_with": "tech_partner"},
+          {"step": 4, "role": "tech_partner", "action": "technology_workstream"},
+          {"step": 5, "role": "engagement_manager", "action": "integrate_workstreams"},
+          {"step": 6, "role": "managing_partner", "action": "executive_synthesis"}
+        ]
+      }
+    ],
+    
+    "communication": {
+      "channels": [
+        {"name": "partner_forum", "type": "leadership", "participants": ["managing_partner", "strategy_partner", "operations_partner", "tech_partner"]},
+        {"name": "engagement_team", "type": "project", "participants": "engagement_assigned"},
+        {"name": "practice_groups", "type": "department", "participants": "department_members"}
+      ],
+      "protocols": {
+        "client_communication": "partner_led",
+        "internal_review": "tiered_approval",
+        "knowledge_sharing": "practice_forums"
+      }
+    },
+    
+    "quality_standards": {
+      "deliverable_review": "two_tier",
+      "client_ready_definition": "partner_approved",
+      "methodology": "hypothesis_driven"
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "request": "Develop a 3-year growth strategy for a mid-market manufacturing company considering market expansion and digital transformation",
+      "type": "strategy_engagement",
+      "duration": "8 weeks"
+    }
+  ],
+  
+  "expected_outputs": [
+    "Engagement scope and workplan",
+    "Analysis findings by workstream",
+    "Strategic recommendations",
+    "Implementation roadmap",
+    "Executive presentation"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model",
+    "Understanding of consulting methodologies"
+  ]
+}

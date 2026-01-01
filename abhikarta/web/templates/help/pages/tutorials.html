@@ -1,0 +1,324 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Tutorials" %}
+{% set description = "Step-by-step guides to master advanced agent patterns and reasoning techniques" %}
+{% set icon = "bi-mortarboard" %}
+{% set header_color = "#6f42c1" %}
+{% set header_color_dark = "#5a32a3" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#cot-tot">Chain & Tree of Thought</a>
+<a href="#goal-based">Goal-Based Agents</a>
+<a href="#react-reflect">ReAct, Reflect & Hierarchical</a>
+{% endblock %}
+
+{% block help_content %}
+<style>
+    .tutorial-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .tutorial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    .tutorial-card .card-header {
+        padding: 1.5rem;
+        border: none;
+    }
+    .tutorial-card .card-body {
+        padding: 1.5rem;
+    }
+    .tutorial-card .card-footer {
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        padding: 1rem 1.5rem;
+    }
+    .tutorial-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    .topic-badge {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        margin-right: 0.3rem;
+        margin-bottom: 0.3rem;
+    }
+    .learning-outcome {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+    .learning-outcome i {
+        color: #198754;
+        margin-right: 0.5rem;
+        margin-top: 0.2rem;
+    }
+</style>
+
+<h2 id="overview">Overview</h2>
+<p class="lead">Master advanced AI agent patterns with our comprehensive tutorials. Each guide includes theory, implementation examples, and hands-on exercises.</p>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center bg-light">
+            <div class="card-body">
+                <h3 class="text-primary mb-0">3</h3>
+                <small class="text-muted">Tutorials</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center bg-light">
+            <div class="card-body">
+                <h3 class="text-success mb-0">6+</h3>
+                <small class="text-muted">Agent Patterns</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center bg-light">
+            <div class="card-body">
+                <h3 class="text-info mb-0">15+</h3>
+                <small class="text-muted">Code Examples</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<!-- Tutorial 1: Chain & Tree of Thought -->
+<h2 id="cot-tot" class="mb-4">
+    <span class="badge bg-primary me-2">1</span>
+    Chain & Tree of Thought
+</h2>
+
+<div class="tutorial-card card">
+    <div class="card-header text-white" style="background: linear-gradient(135deg, #6f42c1 0%, #d63384 100%);">
+        <div class="d-flex align-items-center">
+            <div class="tutorial-number me-3">1</div>
+            <div>
+                <h4 class="mb-1">Chain of Thought & Tree of Thought</h4>
+                <p class="mb-0 opacity-75">Advanced reasoning patterns for complex problem solving</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-7">
+                <h5>What You'll Learn</h5>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Chain of Thought (CoT) - step-by-step reasoning</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Tree of Thought (ToT) - branching exploration</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Self-consistency techniques</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>When to use each pattern</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Implementation in Abhikarta-LLM</span></div>
+                
+                <h5 class="mt-4">Topics Covered</h5>
+                <span class="badge topic-badge bg-primary">Chain of Thought</span>
+                <span class="badge topic-badge bg-success">Tree of Thought</span>
+                <span class="badge topic-badge bg-info">Self-Consistency</span>
+                <span class="badge topic-badge bg-warning text-dark">Prompt Engineering</span>
+                <span class="badge topic-badge bg-secondary">Reasoning Chains</span>
+            </div>
+            <div class="col-md-5">
+                <div class="bg-light rounded p-3">
+                    <h6><i class="bi bi-clock me-2"></i>Duration</h6>
+                    <p class="mb-3">~30 minutes</p>
+                    
+                    <h6><i class="bi bi-bar-chart me-2"></i>Difficulty</h6>
+                    <p class="mb-3"><span class="badge bg-warning text-dark">Intermediate</span></p>
+                    
+                    <h6><i class="bi bi-check2-square me-2"></i>Prerequisites</h6>
+                    <ul class="small mb-0">
+                        <li>Basic agent understanding</li>
+                        <li>LLM provider configured</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="{{ url_for('help_page', page='cot-tot') }}" class="btn btn-primary">
+            <i class="bi bi-play-circle me-2"></i>Start Tutorial
+        </a>
+        <span class="text-muted ms-3"><i class="bi bi-file-code me-1"></i>Includes 5 code examples</span>
+    </div>
+</div>
+
+<!-- Tutorial 2: Goal-Based Agents -->
+<h2 id="goal-based" class="mb-4">
+    <span class="badge bg-danger me-2">2</span>
+    Goal-Based Agents
+</h2>
+
+<div class="tutorial-card card">
+    <div class="card-header text-white" style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);">
+        <div class="d-flex align-items-center">
+            <div class="tutorial-number me-3">2</div>
+            <div>
+                <h4 class="mb-1">Goal-Based Agents</h4>
+                <p class="mb-0 opacity-75">Autonomous planning, reasoning, and learning agents</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-7">
+                <h5>What You'll Learn</h5>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Goal decomposition strategies</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Planning and replanning</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Progress monitoring</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Learning from experience</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Building autonomous agents</span></div>
+                
+                <h5 class="mt-4">Topics Covered</h5>
+                <span class="badge topic-badge bg-danger">Goal Decomposition</span>
+                <span class="badge topic-badge bg-warning text-dark">Planning</span>
+                <span class="badge topic-badge bg-success">Progress Tracking</span>
+                <span class="badge topic-badge bg-info">Replanning</span>
+                <span class="badge topic-badge bg-primary">Autonomous Agents</span>
+            </div>
+            <div class="col-md-5">
+                <div class="bg-light rounded p-3">
+                    <h6><i class="bi bi-clock me-2"></i>Duration</h6>
+                    <p class="mb-3">~45 minutes</p>
+                    
+                    <h6><i class="bi bi-bar-chart me-2"></i>Difficulty</h6>
+                    <p class="mb-3"><span class="badge bg-danger">Advanced</span></p>
+                    
+                    <h6><i class="bi bi-check2-square me-2"></i>Prerequisites</h6>
+                    <ul class="small mb-0">
+                        <li>Completed Tutorial 1</li>
+                        <li>Understanding of agent types</li>
+                        <li>Python experience</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="{{ url_for('help_page', page='goal-based-agents') }}" class="btn btn-danger">
+            <i class="bi bi-play-circle me-2"></i>Start Tutorial
+        </a>
+        <span class="text-muted ms-3"><i class="bi bi-file-code me-1"></i>Includes 6 code examples</span>
+    </div>
+</div>
+
+<!-- Tutorial 3: ReAct, Reflect & Hierarchical -->
+<h2 id="react-reflect" class="mb-4">
+    <span class="badge bg-success me-2">3</span>
+    ReAct, Reflect & Hierarchical
+</h2>
+
+<div class="tutorial-card card">
+    <div class="card-header text-white" style="background: linear-gradient(135deg, #198754 0%, #0d6efd 100%);">
+        <div class="d-flex align-items-center">
+            <div class="tutorial-number me-3">3</div>
+            <div>
+                <h4 class="mb-1">ReAct, Reflect & Hierarchical Agents</h4>
+                <p class="mb-0 opacity-75">Three powerful agent patterns for different use cases</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-7">
+                <h5>What You'll Learn</h5>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span><strong>ReAct</strong> - Reasoning + Acting with tool use</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span><strong>Reflect</strong> - Self-critique and improvement</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span><strong>Hierarchical</strong> - Manager-worker coordination</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Pattern selection guidelines</span></div>
+                <div class="learning-outcome"><i class="bi bi-check-circle-fill"></i><span>Combining patterns effectively</span></div>
+                
+                <h5 class="mt-4">Topics Covered</h5>
+                <span class="badge topic-badge bg-success">ReAct Pattern</span>
+                <span class="badge topic-badge bg-primary">Reflection</span>
+                <span class="badge topic-badge bg-info">Hierarchical Agents</span>
+                <span class="badge topic-badge bg-warning text-dark">Tool Integration</span>
+                <span class="badge topic-badge bg-secondary">Multi-Agent Systems</span>
+            </div>
+            <div class="col-md-5">
+                <div class="bg-light rounded p-3">
+                    <h6><i class="bi bi-clock me-2"></i>Duration</h6>
+                    <p class="mb-3">~40 minutes</p>
+                    
+                    <h6><i class="bi bi-bar-chart me-2"></i>Difficulty</h6>
+                    <p class="mb-3"><span class="badge bg-warning text-dark">Intermediate</span></p>
+                    
+                    <h6><i class="bi bi-check2-square me-2"></i>Prerequisites</h6>
+                    <ul class="small mb-0">
+                        <li>Basic agent creation</li>
+                        <li>Tool configuration</li>
+                        <li>Workflow understanding</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="{{ url_for('help_page', page='react-reflect-hierarchical') }}" class="btn btn-success">
+            <i class="bi bi-play-circle me-2"></i>Start Tutorial
+        </a>
+        <span class="text-muted ms-3"><i class="bi bi-file-code me-1"></i>Includes 4 code examples</span>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2>Recommended Learning Path</h2>
+
+<div class="card bg-light">
+    <div class="card-body">
+        <div class="d-flex align-items-center mb-4">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-weight: bold;">1</div>
+            <div>
+                <h5 class="mb-0">Start with Chain & Tree of Thought</h5>
+                <small class="text-muted">Foundation for advanced reasoning patterns</small>
+            </div>
+            <i class="bi bi-arrow-right ms-auto text-muted fs-4"></i>
+        </div>
+        
+        <div class="d-flex align-items-center mb-4">
+            <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-weight: bold;">2</div>
+            <div>
+                <h5 class="mb-0">Goal-Based Agents</h5>
+                <small class="text-muted">Build autonomous planning capabilities</small>
+            </div>
+            <i class="bi bi-arrow-right ms-auto text-muted fs-4"></i>
+        </div>
+        
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-weight: bold;">3</div>
+            <div>
+                <h5 class="mb-0">ReAct, Reflect & Hierarchical</h5>
+                <small class="text-muted">Master specialized agent patterns</small>
+            </div>
+            <i class="bi bi-trophy ms-auto text-warning fs-4"></i>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mt-4">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Tip:</strong> After completing these tutorials, check out the <a href="{{ url_for('help_page', page='examples') }}">Examples</a> page for complete working implementations you can run immediately.
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Documentation
+    </a>
+</div>
+{% endblock %}

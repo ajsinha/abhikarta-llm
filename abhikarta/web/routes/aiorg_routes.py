@@ -8,7 +8,7 @@ This module provides routes for:
 - HITL dashboard
 - Real-time monitoring
 
-Version: 1.4.6
+Version: 1.4.7
 Copyright © 2025-2030, All Rights Reserved
 """
 
@@ -171,6 +171,104 @@ class AIORGRoutes(AbstractRoutes):
                 flash('Error deleting organization.', 'error')
             
             return redirect(url_for('aiorg_list'))
+        
+        # =====================================================================
+        # TEMPLATE LIBRARY
+        # =====================================================================
+        
+        @self.app.route('/aiorg/templates')
+        @login_required
+        def aiorg_templates():
+            """Browse AI Organization template library."""
+            from abhikarta.aiorg.aiorg_template import AIOrgTemplateManager
+            
+            template_manager = AIOrgTemplateManager()
+            templates = template_manager.list_templates()
+            categories = template_manager.get_categories()
+            
+            return render_template(
+                'aiorg/templates.html',
+                templates=templates,
+                categories=categories,
+                fullname=session.get('fullname'),
+                userid=session.get('user_id'),
+                roles=session.get('roles', []),
+                is_admin=session.get('is_admin', False)
+            )
+        
+        @self.app.route('/aiorg/templates/<template_id>')
+        @login_required
+        def aiorg_template_detail(template_id):
+            """View AI Org template details."""
+            from abhikarta.aiorg.aiorg_template import AIOrgTemplateManager
+            
+            template_manager = AIOrgTemplateManager()
+            template = template_manager.get_template(template_id)
+            
+            if not template:
+                flash("Template not found", "warning")
+                return redirect(url_for('aiorg_templates'))
+            
+            return render_template(
+                'aiorg/template_detail.html',
+                template=template,
+                fullname=session.get('fullname'),
+                userid=session.get('user_id'),
+                roles=session.get('roles', []),
+                is_admin=session.get('is_admin', False)
+            )
+        
+        @self.app.route('/aiorg/templates/<template_id>/use', methods=['POST'])
+        @admin_required
+        def use_aiorg_template(template_id):
+            """Create a new AI Org from a template."""
+            from abhikarta.aiorg.aiorg_template import AIOrgTemplateManager
+            from abhikarta.aiorg import get_aiorg_db_ops
+            from abhikarta.aiorg.models import AIOrg, AINode, NodeType
+            import uuid
+            
+            template_manager = AIOrgTemplateManager()
+            template = template_manager.get_template(template_id)
+            
+            if not template:
+                flash("Template not found", "warning")
+                return redirect(url_for('aiorg_templates'))
+            
+            try:
+                name = request.form.get('name', f"{template.name} (Copy)")
+                db_ops = get_aiorg_db_ops(self.db_facade)
+                
+                # Create org from template definition
+                org_def = template.org_definition
+                
+                # Create the organization
+                org = AIOrg.create(
+                    name=name,
+                    description=template.description,
+                    config=org_def.get('structure', {})
+                )
+                
+                db_ops.save_org(org)
+                
+                # Create roles from template
+                for role_def in template.roles:
+                    node = AINode.create(
+                        org_id=org.org_id,
+                        node_type=NodeType.from_string(role_def.get('authority_level', 'staff')),
+                        name=role_def.get('name', 'Role'),
+                        role=role_def.get('role_id', ''),
+                        agent_config=role_def.get('agent_config', {}),
+                        reports_to=role_def.get('reports_to')
+                    )
+                    db_ops.save_node(node)
+                
+                flash(f"Created AI Organization '{name}' from template", "success")
+                return redirect(url_for('aiorg_designer', org_id=org.org_id))
+                
+            except Exception as e:
+                logger.error(f"Error creating AI Org from template: {e}", exc_info=True)
+                flash(f"Error: {e}", "danger")
+                return redirect(url_for('aiorg_templates'))
         
         # =====================================================================
         # VISUAL DESIGNER
@@ -792,7 +890,7 @@ class AIORGRoutes(AbstractRoutes):
                 'org': org.to_dict(),
                 'nodes': [n.to_dict() for n in nodes],
                 'exported_at': datetime.utcnow().isoformat(),
-                'version': '1.4.6'
+                'version': '1.4.7'
             }
             
             response = Response(

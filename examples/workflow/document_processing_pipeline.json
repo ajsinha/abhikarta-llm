@@ -1,0 +1,121 @@
+{
+  "example_id": "ex_document_processing",
+  "name": "Document Processing Pipeline",
+  "description": "A comprehensive document processing workflow that extracts, analyzes, summarizes, and transforms documents into structured outputs.",
+  "workflow_config": {
+    "workflow_id": "wf_doc_processing_001",
+    "name": "Document Processing Pipeline",
+    "version": "1.0.0",
+    "nodes": [
+      {
+        "id": "document_intake",
+        "type": "function",
+        "name": "Document Intake",
+        "config": {
+          "function": "extract_document_content",
+          "supported_formats": ["pdf", "docx", "txt", "md", "html"],
+          "output_key": "raw_content"
+        }
+      },
+      {
+        "id": "content_classifier",
+        "type": "llm",
+        "name": "Content Classifier",
+        "config": {
+          "prompt_template": "Analyze this document and classify it:\n\n{raw_content}\n\nProvide:\n1. Document Type (report/article/email/contract/memo/other)\n2. Primary Topic\n3. Key Entities (people, organizations, dates)\n4. Sentiment (positive/neutral/negative)\n5. Complexity Level (simple/moderate/complex)\n6. Recommended Processing Path",
+          "output_key": "classification"
+        }
+      },
+      {
+        "id": "structure_extractor",
+        "type": "llm",
+        "name": "Structure Extractor",
+        "config": {
+          "prompt_template": "Extract the document structure:\n\n{raw_content}\n\nIdentify:\n1. Sections and subsections\n2. Headers and titles\n3. Lists and tables\n4. Key paragraphs\n5. References or citations\n\nProvide a hierarchical structure map.",
+          "output_key": "document_structure"
+        }
+      },
+      {
+        "id": "entity_extractor",
+        "type": "llm",
+        "name": "Entity Extractor",
+        "config": {
+          "prompt_template": "Extract all named entities from:\n\n{raw_content}\n\nCategories:\n- PERSON: Names of people\n- ORG: Organizations\n- DATE: Dates and times\n- LOCATION: Places\n- MONEY: Monetary values\n- PRODUCT: Products or services\n- EVENT: Events\n\nFormat as JSON with entity text, category, and context.",
+          "output_key": "entities"
+        }
+      },
+      {
+        "id": "key_points_extractor",
+        "type": "llm",
+        "name": "Key Points Extractor",
+        "config": {
+          "prompt_template": "Extract the key points from this document:\n\n{raw_content}\n\nClassification: {classification}\n\nProvide:\n1. Main thesis/purpose\n2. Top 5-10 key points\n3. Supporting evidence for each\n4. Conclusions drawn\n5. Action items (if any)",
+          "output_key": "key_points"
+        }
+      },
+      {
+        "id": "summary_generator",
+        "type": "llm",
+        "name": "Summary Generator",
+        "config": {
+          "prompt_template": "Generate summaries at multiple levels:\n\nDocument: {raw_content}\nKey Points: {key_points}\n\nProvide:\n1. ONE-LINER: Single sentence summary\n2. BRIEF (50 words): Key takeaway\n3. STANDARD (150 words): Main points covered\n4. DETAILED (300 words): Comprehensive summary\n5. EXECUTIVE: Decision-maker focused summary",
+          "output_key": "summaries"
+        }
+      },
+      {
+        "id": "insight_generator",
+        "type": "llm",
+        "name": "Insight Generator",
+        "config": {
+          "prompt_template": "Generate insights from this document analysis:\n\nClassification: {classification}\nStructure: {document_structure}\nEntities: {entities}\nKey Points: {key_points}\n\nProvide:\n1. Key Insights (non-obvious observations)\n2. Patterns Identified\n3. Gaps or Missing Information\n4. Questions Raised\n5. Recommendations",
+          "output_key": "insights"
+        }
+      },
+      {
+        "id": "output_formatter",
+        "type": "llm",
+        "name": "Output Formatter",
+        "config": {
+          "prompt_template": "Create the final structured output:\n\nAll Analysis Results:\n- Classification: {classification}\n- Structure: {document_structure}\n- Entities: {entities}\n- Key Points: {key_points}\n- Summaries: {summaries}\n- Insights: {insights}\n\nFormat as a comprehensive document analysis report with clear sections.",
+          "output_key": "final_report"
+        }
+      },
+      {
+        "id": "metadata_generator",
+        "type": "function",
+        "name": "Metadata Generator",
+        "config": {
+          "function": "generate_metadata",
+          "fields": ["word_count", "reading_time", "processing_time", "confidence_scores"]
+        }
+      }
+    ],
+    "edges": [
+      {"source": "document_intake", "target": "content_classifier"},
+      {"source": "content_classifier", "target": "structure_extractor"},
+      {"source": "content_classifier", "target": "entity_extractor"},
+      {"source": "content_classifier", "target": "key_points_extractor"},
+      {"source": "structure_extractor", "target": "insight_generator"},
+      {"source": "entity_extractor", "target": "insight_generator"},
+      {"source": "key_points_extractor", "target": "summary_generator"},
+      {"source": "key_points_extractor", "target": "insight_generator"},
+      {"source": "summary_generator", "target": "output_formatter"},
+      {"source": "insight_generator", "target": "output_formatter"},
+      {"source": "output_formatter", "target": "metadata_generator"}
+    ],
+    "entry_point": "document_intake",
+    "output_node": "output_formatter"
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.5
+  },
+  "test_inputs": [
+    {
+      "name": "Sample Report",
+      "content": "Annual Performance Report 2024\n\nExecutive Summary:\nThis report presents the annual performance metrics for fiscal year 2024. Overall, the organization achieved 15% growth compared to the previous year, exceeding targets by 3%.\n\nKey Achievements:\n1. Revenue increased from $10M to $11.5M\n2. Customer satisfaction improved from 85% to 92%\n3. New product launches: 5 successful products\n4. Market expansion into 3 new regions\n\nChallenges:\n- Supply chain disruptions in Q2\n- Increased competition in core markets\n- Talent acquisition difficulties\n\nRecommendations:\n1. Invest in supply chain resilience\n2. Accelerate digital transformation\n3. Enhance employee value proposition\n\nConclusion:\nFY2024 was a successful year despite challenges. Strategic focus on innovation and customer experience drove growth."
+    }
+  ]
+}

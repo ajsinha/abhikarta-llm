@@ -1,0 +1,104 @@
+{
+  "template_id": "wf_parallel_processing",
+  "name": "Parallel Processing Pipeline",
+  "description": "Process input through multiple parallel branches simultaneously, then aggregate results. Demonstrates fan-out/fan-in pattern.",
+  "category": "intermediate",
+  "icon": "bi-diagram-3",
+  "difficulty": "intermediate",
+  "tags": ["parallel", "fan-out", "fan-in", "aggregation"],
+  "workflow": {
+    "nodes": [
+      {
+        "id": "splitter",
+        "type": "llm",
+        "name": "Task Splitter",
+        "description": "Split input into parallel processing tasks",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "prompt_template": "Analyze this input and identify the key aspects that can be processed independently:\n\n{input}\n\nList each aspect that needs separate analysis.",
+          "output_key": "split_tasks"
+        }
+      },
+      {
+        "id": "branch_factual",
+        "type": "llm",
+        "name": "Factual Analysis",
+        "description": "Analyze factual aspects",
+        "position": {"x": 350, "y": 100},
+        "config": {
+          "prompt_template": "From this context:\n{split_tasks}\n\nProvide a factual analysis focusing on objective data and verifiable information.",
+          "output_key": "factual_analysis"
+        }
+      },
+      {
+        "id": "branch_sentiment",
+        "type": "llm",
+        "name": "Sentiment Analysis",
+        "description": "Analyze sentiment and tone",
+        "position": {"x": 350, "y": 300},
+        "config": {
+          "prompt_template": "From this context:\n{split_tasks}\n\nAnalyze the sentiment, tone, and emotional aspects.",
+          "output_key": "sentiment_analysis"
+        }
+      },
+      {
+        "id": "branch_implications",
+        "type": "llm",
+        "name": "Implications Analysis",
+        "description": "Analyze implications and consequences",
+        "position": {"x": 350, "y": 500},
+        "config": {
+          "prompt_template": "From this context:\n{split_tasks}\n\nAnalyze the potential implications, consequences, and future impacts.",
+          "output_key": "implications_analysis"
+        }
+      },
+      {
+        "id": "aggregator",
+        "type": "llm",
+        "name": "Results Aggregator",
+        "description": "Combine all parallel analyses",
+        "position": {"x": 600, "y": 300},
+        "config": {
+          "prompt_template": "Combine these three analyses into a comprehensive report:\n\nFactual Analysis:\n{factual_analysis}\n\nSentiment Analysis:\n{sentiment_analysis}\n\nImplications:\n{implications_analysis}\n\nProvide a unified conclusion.",
+          "output_key": "aggregated_result"
+        }
+      },
+      {
+        "id": "final_formatter",
+        "type": "llm",
+        "name": "Final Formatter",
+        "description": "Format the final comprehensive report",
+        "position": {"x": 850, "y": 300},
+        "config": {
+          "prompt_template": "Create a well-formatted executive summary from:\n\n{aggregated_result}\n\nInclude key findings, analysis highlights, and recommendations.",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "splitter", "target": "branch_factual"},
+      {"source": "splitter", "target": "branch_sentiment"},
+      {"source": "splitter", "target": "branch_implications"},
+      {"source": "branch_factual", "target": "aggregator"},
+      {"source": "branch_sentiment", "target": "aggregator"},
+      {"source": "branch_implications", "target": "aggregator"},
+      {"source": "aggregator", "target": "final_formatter"}
+    ],
+    "entry_point": "splitter",
+    "output_node": "final_formatter",
+    "parallel_groups": [
+      ["branch_factual", "branch_sentiment", "branch_implications"]
+    ]
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://192.168.2.36:11434",
+    "temperature": 0.7
+  },
+  "sample_inputs": [
+    "Analyze the impact of artificial intelligence on the job market.",
+    "Evaluate the recent changes in global supply chain dynamics.",
+    "Assess the state of renewable energy adoption worldwide."
+  ]
+}

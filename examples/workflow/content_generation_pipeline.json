@@ -1,0 +1,141 @@
+{
+  "example_id": "ex_content_generation_pipeline",
+  "name": "Content Generation Pipeline",
+  "description": "A comprehensive content generation workflow that creates high-quality content through ideation, outlining, drafting, reviewing, and polishing stages. Demonstrates iterative content development.",
+  "workflow_config": {
+    "workflow_id": "wf_content_gen_001",
+    "name": "Content Generation Pipeline",
+    "version": "1.0.0",
+    "nodes": [
+      {
+        "id": "content_brief_parser",
+        "type": "llm",
+        "name": "Brief Parser",
+        "config": {
+          "prompt_template": "Parse this content request:\n\n{input}\n\nExtract:\n1. CONTENT_TYPE: What type of content (article, blog, report, etc.)\n2. TARGET_AUDIENCE: Who is this for\n3. TONE: Formal, casual, professional, etc.\n4. LENGTH: Approximate word count or scope\n5. KEY_TOPICS: Main subjects to cover\n6. GOALS: What should the content achieve\n7. CONSTRAINTS: Any limitations or requirements",
+          "output_key": "content_brief"
+        }
+      },
+      {
+        "id": "research_gatherer",
+        "type": "llm",
+        "name": "Research Gatherer",
+        "config": {
+          "prompt_template": "Gather research for this content:\n\nBRIEF: {content_brief}\n\nProvide:\n1. KEY_FACTS: Important information to include\n2. STATISTICS: Relevant data points\n3. EXAMPLES: Illustrative cases\n4. QUOTES: Notable perspectives (attributed)\n5. COUNTERPOINTS: Alternative viewpoints\n6. RESOURCES: Reference materials",
+          "output_key": "research"
+        }
+      },
+      {
+        "id": "ideation_engine",
+        "type": "llm",
+        "name": "Ideation Engine",
+        "config": {
+          "prompt_template": "Generate content ideas:\n\nBRIEF: {content_brief}\nRESEARCH: {research}\n\nBrainstorm:\n1. ANGLES: 5 different angles to approach this topic\n2. HOOKS: 5 attention-grabbing opening ideas\n3. UNIQUE_INSIGHTS: What fresh perspective can we offer\n4. CONTROVERSIAL_TAKES: Any bold positions (if appropriate)\n5. STORY_IDEAS: Narrative elements to include",
+          "output_key": "ideas"
+        }
+      },
+      {
+        "id": "outline_creator",
+        "type": "llm",
+        "name": "Outline Creator",
+        "config": {
+          "prompt_template": "Create detailed outline:\n\nBRIEF: {content_brief}\nRESEARCH: {research}\nIDEAS: {ideas}\n\nCreate comprehensive outline:\n\n# [TITLE - compelling and clear]\n\n## Introduction\n- Hook: [specific hook]\n- Context: [brief background]\n- Thesis: [main argument]\n\n## Section 1: [Topic]\n- Point 1.1\n- Point 1.2\n- Example/Evidence\n\n## Section 2: [Topic]\n...\n\n## Conclusion\n- Summary\n- Call to action\n- Final thought\n\nInclude word count targets per section.",
+          "output_key": "outline"
+        }
+      },
+      {
+        "id": "draft_writer",
+        "type": "llm",
+        "name": "Draft Writer",
+        "config": {
+          "prompt_template": "Write the first draft:\n\nBRIEF: {content_brief}\nRESEARCH: {research}\nOUTLINE: {outline}\n\nWrite a complete first draft following the outline.\n\nGuidelines:\n- Follow the outline structure\n- Use research appropriately\n- Match the specified tone\n- Meet length requirements\n- Focus on clarity over perfection\n\nThis is a FIRST DRAFT - prioritize completeness over polish.",
+          "output_key": "first_draft"
+        }
+      },
+      {
+        "id": "content_reviewer",
+        "type": "llm",
+        "name": "Content Reviewer",
+        "config": {
+          "prompt_template": "Review this draft:\n\nBRIEF: {content_brief}\nDRAFT: {first_draft}\n\nEvaluate:\n1. ACCURACY: Any factual issues?\n2. COMPLETENESS: Missing important points?\n3. STRUCTURE: Is flow logical?\n4. ENGAGEMENT: Will audience stay interested?\n5. CLARITY: Any confusing parts?\n6. TONE: Matches requirements?\n7. LENGTH: Meets target?\n\nFor each issue, provide:\n- LOCATION: Where in the draft\n- PROBLEM: What's wrong\n- SUGGESTION: How to fix it\n\nOverall score: 1-10",
+          "output_key": "review"
+        }
+      },
+      {
+        "id": "revision_handler",
+        "type": "llm",
+        "name": "Revision Handler",
+        "config": {
+          "prompt_template": "Revise draft based on review:\n\nORIGINAL DRAFT: {first_draft}\nREVIEW FEEDBACK: {review}\nBRIEF: {content_brief}\n\nCreate revised draft that:\n1. Addresses all review feedback\n2. Maintains original strengths\n3. Improves weak sections\n4. Enhances overall quality\n\nProvide complete revised draft.",
+          "output_key": "revised_draft"
+        }
+      },
+      {
+        "id": "style_polisher",
+        "type": "llm",
+        "name": "Style Polisher",
+        "config": {
+          "prompt_template": "Polish the content:\n\nDRAFT: {revised_draft}\nTARGET TONE: {content_brief}\n\nPolish for:\n1. WORD_CHOICE: Replace weak words with stronger ones\n2. SENTENCE_VARIETY: Mix short and long sentences\n3. TRANSITIONS: Smooth connections between ideas\n4. RHYTHM: Natural reading flow\n5. PUNCH: Strong openings and closings\n\nProvide polished version.",
+          "output_key": "polished_draft"
+        }
+      },
+      {
+        "id": "seo_optimizer",
+        "type": "llm",
+        "name": "SEO Optimizer",
+        "config": {
+          "prompt_template": "Optimize for discoverability:\n\nCONTENT: {polished_draft}\nTOPIC: {content_brief}\n\nProvide:\n1. TITLE_OPTIONS: 3 optimized title variations\n2. META_DESCRIPTION: 155 character summary\n3. KEY_PHRASES: Important terms naturally included\n4. HEADINGS: Optimized section headings\n5. INTERNAL_LINKS: Suggested related topics\n\nDo NOT change content meaning, only enhance discoverability.",
+          "output_key": "seo_recommendations"
+        }
+      },
+      {
+        "id": "final_assembler",
+        "type": "llm",
+        "name": "Final Assembler",
+        "config": {
+          "prompt_template": "Assemble final content:\n\nPOLISHED CONTENT: {polished_draft}\nSEO: {seo_recommendations}\nBRIEF: {content_brief}\n\nCreate final deliverable with:\n\n# [FINAL TITLE]\n\n[Complete content with all polish applied]\n\n---\n\nMETADATA:\n- Word Count: X\n- Reading Time: X min\n- Meta Description: [155 chars]\n- Keywords: [list]",
+          "output_key": "final_content"
+        }
+      },
+      {
+        "id": "quality_scorer",
+        "type": "llm",
+        "name": "Quality Scorer",
+        "config": {
+          "prompt_template": "Final quality assessment:\n\nFINAL CONTENT: {final_content}\nORIGINAL BRIEF: {content_brief}\n\nScore (1-10) on:\n1. Brief Alignment: Does it meet requirements?\n2. Quality: Overall writing quality\n3. Engagement: Will it hold attention?\n4. Value: Does it provide real value?\n5. Originality: Fresh perspective?\n\nOVERALL SCORE: X/10\n\nREADY FOR PUBLICATION: Yes/No\n\nIf No, specify what needs improvement.",
+          "output_key": "quality_score"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "content_brief_parser", "target": "research_gatherer"},
+      {"source": "research_gatherer", "target": "ideation_engine"},
+      {"source": "ideation_engine", "target": "outline_creator"},
+      {"source": "outline_creator", "target": "draft_writer"},
+      {"source": "draft_writer", "target": "content_reviewer"},
+      {"source": "content_reviewer", "target": "revision_handler"},
+      {"source": "revision_handler", "target": "style_polisher"},
+      {"source": "style_polisher", "target": "seo_optimizer"},
+      {"source": "seo_optimizer", "target": "final_assembler"},
+      {"source": "final_assembler", "target": "quality_scorer"}
+    ],
+    "entry_point": "content_brief_parser",
+    "output_node": "final_assembler"
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.7
+  },
+  "test_inputs": [
+    {
+      "name": "Blog Post Request",
+      "input": "Write a 1500-word blog post about the benefits of test-driven development for a technical audience. Tone should be informative but engaging. Include practical examples."
+    },
+    {
+      "name": "Executive Summary",
+      "input": "Create a 500-word executive summary about cloud migration strategies for C-level executives. Professional tone, focus on ROI and risk mitigation."
+    }
+  ]
+}

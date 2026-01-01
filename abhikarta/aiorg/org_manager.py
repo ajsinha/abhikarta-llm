@@ -7,7 +7,7 @@ This module manages:
 - Org tree building and validation
 - Actor lifecycle for nodes
 
-Version: 1.4.6
+Version: 1.4.7
 Copyright © 2025-2030, All Rights Reserved
 """
 
@@ -433,7 +433,7 @@ class OrgManager:
         
         # Build export structure
         export = {
-            "version": "1.4.6",
+            "version": "1.4.7",
             "exported_at": datetime.utcnow().isoformat(),
             "org": {
                 "name": org.name,

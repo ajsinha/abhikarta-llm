@@ -1,0 +1,198 @@
+{
+  "template_id": "swarm_adaptive_self_organizing",
+  "name": "Adaptive Self-Organizing Swarm",
+  "description": "An advanced swarm that dynamically adapts its structure based on task requirements. Features auto-scaling, dynamic role assignment, emergent coordination, and self-optimization.",
+  "version": "1.0.0",
+  "category": "enterprise",
+  "difficulty": "expert",
+  "icon": "bi-bezier2",
+  "tags": ["adaptive", "self-organizing", "dynamic", "auto-scaling", "enterprise", "expert"],
+  "estimated_duration": "5-10 minutes",
+  "use_cases": [
+    "Complex multi-domain projects",
+    "Variable workload processing",
+    "Exploratory research tasks",
+    "Large-scale content generation",
+    "Autonomous problem solving"
+  ],
+  
+  "swarm": {
+    "swarm_type": "adaptive",
+    "name": "Adaptive Self-Organizing Swarm",
+    "description": "Self-organizing swarm that adapts to task complexity",
+    
+    "coordinator": {
+      "type": "adaptive_orchestrator",
+      "scaling_strategy": "demand_based",
+      "min_agents": 3,
+      "max_agents": 10,
+      "optimization_interval": 30,
+      "learning_enabled": true,
+      "timeout_seconds": 900,
+      "fail_strategy": "self_heal"
+    },
+    
+    "meta_agent": {
+      "agent_id": "meta_controller",
+      "name": "Meta Controller",
+      "role": "Swarm Orchestrator",
+      "agent_type": "react",
+      "system_prompt": "You are the Meta Controller for an adaptive swarm. Your responsibilities:\n\n1. ANALYZE incoming tasks to determine complexity and required capabilities\n2. SPAWN specialized agents as needed (from the agent pool)\n3. ASSIGN tasks based on agent capabilities and current load\n4. MONITOR performance and adjust the swarm structure\n5. OPTIMIZE resource allocation based on results\n6. SYNTHESIZE final outputs from all agents\n\nAgent Pool Available:\n- GeneralistAgent: Handles diverse tasks\n- AnalystAgent: Deep analysis and research\n- CreativeAgent: Creative content and ideation\n- TechnicalAgent: Technical tasks and implementation\n- ReviewerAgent: Quality assurance and verification\n- CoordinatorAgent: Sub-task coordination\n\nYou can spawn 3-10 agents. Choose wisely based on task requirements.",
+      "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b",
+        "temperature": 0.4,
+        "max_tokens": 2500
+      },
+      "tools": ["spawn_agent", "assign_task", "monitor_progress", "reallocate", "terminate_agent", "synthesize"]
+    },
+    
+    "agent_pool": [
+      {
+        "template_id": "generalist",
+        "name": "Generalist Agent",
+        "capabilities": ["general", "flexible", "multi-task"],
+        "cost_weight": 1.0,
+        "system_prompt": "You are a Generalist Agent. Handle diverse tasks competently. Adapt your approach based on task requirements.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.5,
+          "max_tokens": 1200
+        }
+      },
+      {
+        "template_id": "analyst",
+        "name": "Analyst Agent",
+        "capabilities": ["analysis", "research", "data", "insights"],
+        "cost_weight": 1.2,
+        "system_prompt": "You are an Analyst Agent specialized in deep analysis, research, data interpretation, and insight generation.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.3,
+          "max_tokens": 1500
+        }
+      },
+      {
+        "template_id": "creative",
+        "name": "Creative Agent",
+        "capabilities": ["creative", "ideation", "content", "innovation"],
+        "cost_weight": 1.1,
+        "system_prompt": "You are a Creative Agent specialized in creative thinking, ideation, content creation, and innovative solutions.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.8,
+          "max_tokens": 1500
+        }
+      },
+      {
+        "template_id": "technical",
+        "name": "Technical Agent",
+        "capabilities": ["technical", "implementation", "architecture", "code"],
+        "cost_weight": 1.3,
+        "system_prompt": "You are a Technical Agent specialized in technical analysis, implementation details, architecture, and code-related tasks.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.2,
+          "max_tokens": 1500
+        }
+      },
+      {
+        "template_id": "reviewer",
+        "name": "Reviewer Agent",
+        "capabilities": ["review", "quality", "verification", "testing"],
+        "cost_weight": 1.0,
+        "system_prompt": "You are a Reviewer Agent specialized in quality assurance, verification, testing, and improvement suggestions.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.3,
+          "max_tokens": 1000
+        }
+      },
+      {
+        "template_id": "coordinator",
+        "name": "Coordinator Agent",
+        "capabilities": ["coordination", "planning", "organization", "synthesis"],
+        "cost_weight": 1.2,
+        "system_prompt": "You are a Coordinator Agent specialized in sub-task coordination, planning, organization, and synthesizing outputs.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.4,
+          "max_tokens": 1200
+        }
+      }
+    ],
+    
+    "adaptation_rules": {
+      "scale_up_conditions": [
+        {"metric": "queue_depth", "threshold": 5, "action": "spawn_generalist"},
+        {"metric": "avg_response_time", "threshold": 60, "action": "spawn_specialist"},
+        {"metric": "complexity_score", "threshold": 0.8, "action": "spawn_analyst"}
+      ],
+      "scale_down_conditions": [
+        {"metric": "idle_time", "threshold": 120, "action": "terminate_idle"},
+        {"metric": "duplicate_capability", "threshold": 3, "action": "consolidate"}
+      ],
+      "rebalance_triggers": [
+        {"metric": "load_imbalance", "threshold": 0.5, "action": "redistribute"},
+        {"metric": "error_rate", "threshold": 0.2, "action": "replace_failing"}
+      ]
+    },
+    
+    "execution": {
+      "mode": "adaptive",
+      "initial_agents": 3,
+      "auto_scale": true,
+      "self_optimize": true,
+      "checkpoint_interval": 60,
+      "max_iterations": 10
+    },
+    
+    "learning": {
+      "enabled": true,
+      "track_performance": true,
+      "adjust_prompts": false,
+      "remember_patterns": true,
+      "optimization_target": "quality_per_cost"
+    },
+    
+    "output": {
+      "format": "structured",
+      "include_swarm_evolution": true,
+      "include_performance_metrics": true,
+      "include_agent_contributions": true,
+      "include_optimization_log": true
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "task": "Develop a comprehensive business plan for a new AI startup including market analysis, technical architecture, go-to-market strategy, and financial projections",
+      "complexity": "high",
+      "time_constraint": "flexible"
+    },
+    {
+      "task": "Create a detailed technical documentation suite for a complex software system",
+      "complexity": "high",
+      "output_formats": ["user_guide", "api_docs", "architecture_docs", "tutorials"]
+    }
+  ],
+  
+  "expected_outputs": [
+    "Comprehensive deliverable from coordinated agents",
+    "Swarm evolution timeline",
+    "Performance metrics and optimization history",
+    "Individual agent contribution breakdown"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model",
+    "Understanding of adaptive systems",
+    "Sufficient compute resources for multi-agent execution"
+  ]
+}

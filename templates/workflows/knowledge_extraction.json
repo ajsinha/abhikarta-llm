@@ -1,0 +1,188 @@
+{
+  "template_id": "wf_knowledge_extraction",
+  "name": "Knowledge Extraction and Synthesis",
+  "description": "Extract knowledge from multiple sources, structure it into a knowledge graph, identify relationships, and synthesize into actionable intelligence. Demonstrates knowledge management patterns.",
+  "category": "enterprise",
+  "icon": "bi-diagram-3-fill",
+  "difficulty": "expert",
+  "tags": ["knowledge", "extraction", "synthesis", "graph", "intelligence"],
+  "workflow": {
+    "nodes": [
+      {
+        "id": "source_analyzer",
+        "type": "llm",
+        "name": "Source Analyzer",
+        "description": "Analyze input sources",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "prompt_template": "Analyze these knowledge sources:\n\n{input}\n\nIdentify:\n1. SOURCE_TYPES: What kinds of sources\n2. DOMAINS: Subject areas covered\n3. QUALITY: Reliability assessment\n4. STRUCTURE: How information is organized\n5. EXTRACTION_STRATEGY: Best approach for each",
+          "output_key": "source_analysis"
+        }
+      },
+      {
+        "id": "entity_extractor",
+        "type": "llm",
+        "name": "Entity Extractor",
+        "description": "Extract named entities",
+        "position": {"x": 300, "y": 150},
+        "config": {
+          "prompt_template": "Extract all entities from:\n\n{input}\n\nCategories:\n- CONCEPTS: Key ideas and theories\n- OBJECTS: Things and artifacts\n- ACTORS: People and organizations\n- EVENTS: Happenings and milestones\n- METRICS: Measurements and values\n- LOCATIONS: Places and contexts\n\nFor each: name, type, description, importance (1-10)",
+          "output_key": "entities"
+        }
+      },
+      {
+        "id": "relationship_extractor",
+        "type": "llm",
+        "name": "Relationship Extractor",
+        "description": "Extract relationships between entities",
+        "position": {"x": 300, "y": 300},
+        "config": {
+          "prompt_template": "Extract relationships between entities:\n\nENTITIES:\n{entities}\n\nSOURCE:\n{input}\n\nFor each relationship:\n1. FROM_ENTITY: Source entity\n2. RELATIONSHIP_TYPE: (causes, enables, requires, contradicts, supports, etc.)\n3. TO_ENTITY: Target entity\n4. STRENGTH: weak/moderate/strong\n5. EVIDENCE: Supporting text\n6. CONFIDENCE: 0-100%",
+          "output_key": "relationships"
+        }
+      },
+      {
+        "id": "fact_extractor",
+        "type": "llm",
+        "name": "Fact Extractor",
+        "description": "Extract factual statements",
+        "position": {"x": 300, "y": 450},
+        "config": {
+          "prompt_template": "Extract factual claims:\n\n{input}\n\nFor each fact:\n1. STATEMENT: The claim\n2. TYPE: definition/statistic/observation/rule\n3. ENTITIES_INVOLVED: Related entities\n4. CONFIDENCE: How certain\n5. SOURCE_LOCATION: Where in text\n6. VERIFIABLE: Can it be checked?",
+          "output_key": "facts"
+        }
+      },
+      {
+        "id": "taxonomy_builder",
+        "type": "llm",
+        "name": "Taxonomy Builder",
+        "description": "Build hierarchical taxonomy",
+        "position": {"x": 550, "y": 150},
+        "config": {
+          "prompt_template": "Build taxonomy from entities:\n\nENTITIES:\n{entities}\n\nCreate hierarchical structure:\n1. TOP_LEVEL: Broadest categories\n2. SUB_CATEGORIES: Second level\n3. SPECIFIC_ITEMS: Leaf nodes\n4. CROSS_CUTTING: Items in multiple categories\n5. ORPHANS: Items that don't fit",
+          "output_key": "taxonomy"
+        }
+      },
+      {
+        "id": "knowledge_graph_builder",
+        "type": "llm",
+        "name": "Knowledge Graph Builder",
+        "description": "Build knowledge graph structure",
+        "position": {"x": 550, "y": 300},
+        "config": {
+          "prompt_template": "Build knowledge graph:\n\nENTITIES:\n{entities}\n\nRELATIONSHIPS:\n{relationships}\n\nTAXONOMY:\n{taxonomy}\n\nCreate graph structure:\n1. NODES: Entity definitions with properties\n2. EDGES: Relationship connections\n3. CLUSTERS: Densely connected groups\n4. CENTRAL_NODES: Most connected entities\n5. BRIDGES: Entities connecting clusters",
+          "output_key": "knowledge_graph"
+        }
+      },
+      {
+        "id": "pattern_detector",
+        "type": "llm",
+        "name": "Pattern Detector",
+        "description": "Detect patterns in knowledge",
+        "position": {"x": 550, "y": 450},
+        "config": {
+          "prompt_template": "Detect patterns:\n\nKNOWLEDGE GRAPH:\n{knowledge_graph}\n\nFACTS:\n{facts}\n\nIdentify:\n1. RECURRING_PATTERNS: Common structures\n2. CAUSAL_CHAINS: Cause-effect sequences\n3. CYCLES: Circular relationships\n4. HIERARCHIES: Power structures\n5. ANOMALIES: Unusual patterns",
+          "output_key": "patterns"
+        }
+      },
+      {
+        "id": "gap_analyzer",
+        "type": "llm",
+        "name": "Gap Analyzer",
+        "description": "Identify knowledge gaps",
+        "position": {"x": 750, "y": 200},
+        "config": {
+          "prompt_template": "Identify knowledge gaps:\n\nKNOWLEDGE GRAPH:\n{knowledge_graph}\n\nPATTERNS:\n{patterns}\n\nFind:\n1. MISSING_ENTITIES: Expected but absent\n2. WEAK_CONNECTIONS: Underexplored relationships\n3. INCOMPLETE_FACTS: Partial information\n4. CONTRADICTIONS: Conflicting information\n5. QUESTIONS: What needs answering",
+          "output_key": "gaps"
+        }
+      },
+      {
+        "id": "inference_engine",
+        "type": "llm",
+        "name": "Inference Engine",
+        "description": "Generate inferences from knowledge",
+        "position": {"x": 750, "y": 400},
+        "config": {
+          "prompt_template": "Generate inferences:\n\nKNOWLEDGE GRAPH:\n{knowledge_graph}\n\nFACTS:\n{facts}\n\nPATTERNS:\n{patterns}\n\nInfer:\n1. DEDUCTIONS: Logical conclusions\n2. PREDICTIONS: Likely future states\n3. EXPLANATIONS: Why things are\n4. RECOMMENDATIONS: What to do\n5. HYPOTHESES: Worth investigating",
+          "output_key": "inferences"
+        }
+      },
+      {
+        "id": "synthesis_engine",
+        "type": "llm",
+        "name": "Synthesis Engine",
+        "description": "Synthesize knowledge into insights",
+        "position": {"x": 950, "y": 300},
+        "config": {
+          "prompt_template": "Synthesize all knowledge:\n\nTAXONOMY:\n{taxonomy}\n\nKNOWLEDGE GRAPH:\n{knowledge_graph}\n\nPATTERNS:\n{patterns}\n\nGAPS:\n{gaps}\n\nINFERENCES:\n{inferences}\n\nCreate synthesis:\n1. BIG_PICTURE: Overall understanding\n2. KEY_INSIGHTS: Most important findings\n3. CONNECTIONS: Non-obvious relationships\n4. IMPLICATIONS: What this means\n5. APPLICATIONS: How to use this knowledge",
+          "output_key": "synthesis"
+        }
+      },
+      {
+        "id": "query_interface",
+        "type": "llm",
+        "name": "Query Interface",
+        "description": "Enable knowledge querying",
+        "position": {"x": 1150, "y": 200},
+        "config": {
+          "prompt_template": "Generate queryable knowledge base:\n\nSYNTHESIS:\n{synthesis}\n\nKNOWLEDGE GRAPH:\n{knowledge_graph}\n\nCreate:\n1. FAQ: Common questions and answers\n2. LOOKUP_INDEX: Quick reference\n3. QUERY_TEMPLATES: How to ask questions\n4. EXAMPLE_QUERIES: Sample questions",
+          "output_key": "query_interface"
+        }
+      },
+      {
+        "id": "report_generator",
+        "type": "llm",
+        "name": "Report Generator",
+        "description": "Generate knowledge report",
+        "position": {"x": 1150, "y": 400},
+        "config": {
+          "prompt_template": "Generate knowledge report:\n\nSOURCE ANALYSIS:\n{source_analysis}\n\nSYNTHESIS:\n{synthesis}\n\nGAPS:\n{gaps}\n\nCreate comprehensive report with:\n1. Executive Summary\n2. Knowledge Map Overview\n3. Key Entities and Relationships\n4. Patterns and Insights\n5. Knowledge Gaps\n6. Recommendations",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "source_analyzer", "target": "entity_extractor"},
+      {"source": "source_analyzer", "target": "relationship_extractor"},
+      {"source": "source_analyzer", "target": "fact_extractor"},
+      {"source": "entity_extractor", "target": "taxonomy_builder"},
+      {"source": "entity_extractor", "target": "knowledge_graph_builder"},
+      {"source": "relationship_extractor", "target": "knowledge_graph_builder"},
+      {"source": "taxonomy_builder", "target": "knowledge_graph_builder"},
+      {"source": "fact_extractor", "target": "pattern_detector"},
+      {"source": "knowledge_graph_builder", "target": "pattern_detector"},
+      {"source": "knowledge_graph_builder", "target": "gap_analyzer"},
+      {"source": "pattern_detector", "target": "gap_analyzer"},
+      {"source": "pattern_detector", "target": "inference_engine"},
+      {"source": "knowledge_graph_builder", "target": "inference_engine"},
+      {"source": "fact_extractor", "target": "inference_engine"},
+      {"source": "gap_analyzer", "target": "synthesis_engine"},
+      {"source": "inference_engine", "target": "synthesis_engine"},
+      {"source": "taxonomy_builder", "target": "synthesis_engine"},
+      {"source": "knowledge_graph_builder", "target": "synthesis_engine"},
+      {"source": "pattern_detector", "target": "synthesis_engine"},
+      {"source": "synthesis_engine", "target": "query_interface"},
+      {"source": "synthesis_engine", "target": "report_generator"},
+      {"source": "knowledge_graph_builder", "target": "query_interface"}
+    ],
+    "entry_point": "source_analyzer",
+    "output_node": "report_generator",
+    "parallel_groups": [
+      ["entity_extractor", "relationship_extractor", "fact_extractor"],
+      ["taxonomy_builder", "knowledge_graph_builder"],
+      ["gap_analyzer", "inference_engine"],
+      ["query_interface", "report_generator"]
+    ]
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.5
+  },
+  "sample_inputs": [
+    "Extract and synthesize knowledge from this collection of meeting notes and project documentation.",
+    "Build a knowledge graph from these research papers and identify key relationships.",
+    "Analyze this corpus of technical documentation and create a structured knowledge base."
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "template_id": "wf_hierarchical_task_network",
+  "name": "Hierarchical Task Network (HTN)",
+  "description": "A hierarchical task decomposition workflow that breaks complex goals into primitive actions through recursive task refinement. Implements HTN planning principles for complex problem solving.",
+  "category": "enterprise",
+  "icon": "bi-diagram-2-fill",
+  "difficulty": "expert",
+  "tags": ["htn", "planning", "hierarchical", "decomposition", "goal-oriented"],
+  "workflow": {
+    "htn_config": {
+      "max_decomposition_depth": 6,
+      "primitive_detection": "automatic",
+      "backtracking_enabled": true,
+      "method_selection": "first_applicable"
+    },
+    "nodes": [
+      {
+        "id": "goal_parser",
+        "type": "llm",
+        "name": "Goal Parser",
+        "description": "Parse and understand the high-level goal",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "prompt_template": "Parse this high-level goal:\n\n{input}\n\nExtract:\n1. PRIMARY GOAL: The main objective\n2. CONSTRAINTS: Any limitations or requirements\n3. SUCCESS CRITERIA: How to measure achievement\n4. CONTEXT: Relevant background information\n5. RESOURCES: Available tools or information\n\nFormat as structured goal specification.",
+          "output_key": "parsed_goal"
+        }
+      },
+      {
+        "id": "task_analyzer",
+        "type": "llm",
+        "name": "Task Analyzer",
+        "description": "Analyze task complexity and type",
+        "position": {"x": 250, "y": 300},
+        "config": {
+          "prompt_template": "Analyze this task:\n\n{current_task}\n\nDetermine:\n1. TASK_TYPE: Is this PRIMITIVE (can be executed directly) or COMPOUND (needs decomposition)?\n2. COMPLEXITY: simple/moderate/complex\n3. DEPENDENCIES: What must be done first?\n4. ESTIMATED_STEPS: How many sub-steps likely needed?\n\nIf COMPOUND, identify the decomposition method to use.",
+          "output_key": "task_analysis"
+        }
+      },
+      {
+        "id": "task_router",
+        "type": "condition",
+        "name": "Task Router",
+        "description": "Route based on task type",
+        "position": {"x": 400, "y": 300},
+        "config": {
+          "conditions": [
+            {"condition": "PRIMITIVE in task_analysis", "target": "primitive_executor"},
+            {"condition": "depth >= max_depth", "target": "forced_primitive"},
+            {"default": true, "target": "method_selector"}
+          ]
+        }
+      },
+      {
+        "id": "method_selector",
+        "type": "llm",
+        "name": "Method Selector",
+        "description": "Select decomposition method",
+        "position": {"x": 550, "y": 450},
+        "config": {
+          "prompt_template": "Select decomposition method for:\n\nTASK: {current_task}\nANALYSIS: {task_analysis}\nCONTEXT: {parsed_goal}\nDEPTH: {current_depth}\n\nDecomposition Methods Available:\n1. SEQUENTIAL: Tasks must be done in order\n2. PARALLEL: Tasks can be done simultaneously\n3. CONDITIONAL: Tasks depend on conditions\n4. ITERATIVE: Repeat until condition met\n5. HIERARCHICAL: Further nested decomposition\n\nSelect method and provide rationale.",
+          "output_key": "selected_method"
+        }
+      },
+      {
+        "id": "task_decomposer",
+        "type": "llm",
+        "name": "Task Decomposer",
+        "description": "Decompose compound task into subtasks",
+        "position": {"x": 700, "y": 450},
+        "config": {
+          "prompt_template": "Decompose this compound task:\n\nTASK: {current_task}\nMETHOD: {selected_method}\nCONTEXT: {parsed_goal}\n\nCreate subtasks:\n1. Each subtask should be more specific than the parent\n2. Together, subtasks should fully achieve parent task\n3. Identify dependencies between subtasks\n4. Mark subtasks that might be primitive\n\nFormat:\n- SUBTASK_1: [description] (deps: none/subtask_X)\n- SUBTASK_2: [description] (deps: subtask_1)\n...\n\nProvide execution order.",
+          "output_key": "subtasks"
+        }
+      },
+      {
+        "id": "subtask_queue",
+        "type": "function",
+        "name": "Subtask Queue",
+        "description": "Queue subtasks for processing",
+        "position": {"x": 850, "y": 450},
+        "config": {
+          "function": "queue_subtasks",
+          "strategy": "depth_first",
+          "track_dependencies": true
+        }
+      },
+      {
+        "id": "dependency_resolver",
+        "type": "function",
+        "name": "Dependency Resolver",
+        "description": "Resolve dependencies and select next task",
+        "position": {"x": 850, "y": 300},
+        "config": {
+          "function": "resolve_dependencies",
+          "output_key": "current_task"
+        }
+      },
+      {
+        "id": "primitive_executor",
+        "type": "llm",
+        "name": "Primitive Executor",
+        "description": "Execute primitive tasks",
+        "position": {"x": 550, "y": 150},
+        "config": {
+          "prompt_template": "Execute this primitive task:\n\nTASK: {current_task}\nCONTEXT: {parsed_goal}\nPREVIOUS_RESULTS: {execution_results}\n\nThis is a primitive task that should be executed directly.\n\nProvide:\n1. ACTION: The specific action taken\n2. RESULT: The outcome of the action\n3. STATUS: SUCCESS / PARTIAL / FAILED\n4. OUTPUT: Any data or artifacts produced\n5. NOTES: Any observations or side effects",
+          "output_key": "primitive_result"
+        }
+      },
+      {
+        "id": "forced_primitive",
+        "type": "llm",
+        "name": "Forced Primitive",
+        "description": "Force execution when max depth reached",
+        "position": {"x": 550, "y": 50},
+        "config": {
+          "prompt_template": "Max decomposition depth reached. Execute best effort:\n\nTASK: {current_task}\nCONTEXT: {parsed_goal}\nDEPTH: {current_depth}\n\nProvide best possible execution of this task given constraints.\n\nOutput:\n1. ATTEMPTED_ACTION: What was attempted\n2. RESULT: Best effort result\n3. LIMITATIONS: What couldn't be fully addressed\n4. SUGGESTIONS: For better handling in future",
+          "output_key": "primitive_result"
+        }
+      },
+      {
+        "id": "result_validator",
+        "type": "llm",
+        "name": "Result Validator",
+        "description": "Validate task execution results",
+        "position": {"x": 700, "y": 150},
+        "config": {
+          "prompt_template": "Validate this task result:\n\nTASK: {current_task}\nRESULT: {primitive_result}\nSUCCESS_CRITERIA: {parsed_goal}\n\nCheck:\n1. Does result satisfy task requirements?\n2. Any issues or incomplete aspects?\n3. Does this enable dependent tasks?\n\nVerdict: VALID / INVALID / PARTIAL\nIf INVALID, explain what's needed.",
+          "output_key": "validation_result"
+        }
+      },
+      {
+        "id": "backtrack_handler",
+        "type": "condition",
+        "name": "Backtrack Handler",
+        "description": "Handle validation failures",
+        "position": {"x": 850, "y": 150},
+        "config": {
+          "conditions": [
+            {"condition": "VALID in validation_result", "target": "result_aggregator"},
+            {"condition": "backtrack_count < 3", "target": "alternative_method"},
+            {"default": true, "target": "failure_handler"}
+          ]
+        }
+      },
+      {
+        "id": "alternative_method",
+        "type": "llm",
+        "name": "Alternative Method",
+        "description": "Try alternative approach",
+        "position": {"x": 1000, "y": 150},
+        "config": {
+          "prompt_template": "Previous approach failed. Find alternative:\n\nFAILED_TASK: {current_task}\nFAILED_RESULT: {primitive_result}\nVALIDATION: {validation_result}\nPREVIOUS_METHODS_TRIED: {tried_methods}\n\nPropose alternative approach that:\n1. Addresses the failure reason\n2. Uses different strategy\n3. May break task differently\n\nProvide new task formulation.",
+          "output_key": "current_task"
+        }
+      },
+      {
+        "id": "failure_handler",
+        "type": "llm",
+        "name": "Failure Handler",
+        "description": "Handle unrecoverable failures",
+        "position": {"x": 1000, "y": 50},
+        "config": {
+          "prompt_template": "Task cannot be completed:\n\nTASK: {current_task}\nATTEMPTS: {backtrack_count}\nFAILURES: {failure_log}\n\nProvide:\n1. REASON: Why task cannot be completed\n2. PARTIAL_RESULTS: Any useful outputs achieved\n3. IMPACT: Effect on overall goal\n4. ALTERNATIVES: Possible workarounds",
+          "output_key": "failure_report"
+        }
+      },
+      {
+        "id": "result_aggregator",
+        "type": "function",
+        "name": "Result Aggregator",
+        "description": "Aggregate completed task results",
+        "position": {"x": 1000, "y": 300},
+        "config": {
+          "function": "aggregate_results",
+          "track_hierarchy": true,
+          "output_key": "execution_results"
+        }
+      },
+      {
+        "id": "completion_checker",
+        "type": "condition",
+        "name": "Completion Checker",
+        "description": "Check if all tasks complete",
+        "position": {"x": 1150, "y": 300},
+        "config": {
+          "conditions": [
+            {"condition": "all_tasks_complete", "target": "goal_validator"},
+            {"condition": "has_pending_tasks", "target": "dependency_resolver"},
+            {"default": true, "target": "goal_validator"}
+          ]
+        }
+      },
+      {
+        "id": "goal_validator",
+        "type": "llm",
+        "name": "Goal Validator",
+        "description": "Validate overall goal achievement",
+        "position": {"x": 1300, "y": 300},
+        "config": {
+          "prompt_template": "Validate goal achievement:\n\nORIGINAL GOAL:\n{parsed_goal}\n\nEXECUTION RESULTS:\n{execution_results}\n\nFAILURES (if any):\n{failure_report}\n\nAssess:\n1. GOAL_ACHIEVED: fully/partially/not achieved\n2. CRITERIA_MET: Which success criteria satisfied\n3. GAPS: What's missing or incomplete\n4. QUALITY: Overall quality of outcome\n\nProvide comprehensive assessment.",
+          "output_key": "goal_assessment"
+        }
+      },
+      {
+        "id": "final_report",
+        "type": "llm",
+        "name": "Final Report",
+        "description": "Generate final execution report",
+        "position": {"x": 1450, "y": 300},
+        "config": {
+          "prompt_template": "Generate HTN execution report:\n\nGOAL: {input}\nPARSED GOAL: {parsed_goal}\nEXECUTION RESULTS: {execution_results}\nGOAL ASSESSMENT: {goal_assessment}\n\nCreate comprehensive report:\n\n# HTN Execution Report\n\n## Goal Summary\n[Original goal and interpretation]\n\n## Execution Trace\n[Task hierarchy and execution order]\n\n## Results\n[Outcomes organized by subtask]\n\n## Assessment\n[Goal achievement analysis]\n\n## Recommendations\n[Suggestions for improvement]",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "goal_parser", "target": "task_analyzer"},
+      {"source": "task_analyzer", "target": "task_router"},
+      {"source": "task_router", "target": "primitive_executor", "condition": "PRIMITIVE"},
+      {"source": "task_router", "target": "forced_primitive", "condition": "max_depth"},
+      {"source": "task_router", "target": "method_selector", "condition": "COMPOUND"},
+      {"source": "method_selector", "target": "task_decomposer"},
+      {"source": "task_decomposer", "target": "subtask_queue"},
+      {"source": "subtask_queue", "target": "dependency_resolver"},
+      {"source": "dependency_resolver", "target": "task_analyzer"},
+      {"source": "primitive_executor", "target": "result_validator"},
+      {"source": "forced_primitive", "target": "result_validator"},
+      {"source": "result_validator", "target": "backtrack_handler"},
+      {"source": "backtrack_handler", "target": "result_aggregator", "condition": "VALID"},
+      {"source": "backtrack_handler", "target": "alternative_method", "condition": "retry"},
+      {"source": "backtrack_handler", "target": "failure_handler", "condition": "give_up"},
+      {"source": "alternative_method", "target": "task_analyzer"},
+      {"source": "failure_handler", "target": "result_aggregator"},
+      {"source": "result_aggregator", "target": "completion_checker"},
+      {"source": "completion_checker", "target": "dependency_resolver", "condition": "pending"},
+      {"source": "completion_checker", "target": "goal_validator", "condition": "complete"},
+      {"source": "goal_validator", "target": "final_report"}
+    ],
+    "entry_point": "goal_parser",
+    "output_node": "final_report"
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.5
+  },
+  "sample_inputs": [
+    "Organize a comprehensive training program for a team of 20 people on effective communication skills.",
+    "Create a complete project plan for migrating a legacy system to cloud infrastructure.",
+    "Design and document an API for a user management system with authentication."
+  ]
+}

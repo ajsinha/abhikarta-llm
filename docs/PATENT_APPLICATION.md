@@ -275,7 +275,7 @@ The present invention, "Abhikarta-LLM," is a comprehensive platform for building
    - Mailbox strategies
    - Actor lifecycle management
 
-8. **Hierarchical AI Organizations** (v1.4.6): Corporate structure modeling with:
+8. **Hierarchical AI Organizations** (v1.4.7): Corporate structure modeling with:
    - AI nodes representing organizational roles (executive, manager, analyst, coordinator)
    - Task delegation from parent to child nodes with configurable strategies
    - Response aggregation flowing back up the hierarchy
@@ -933,7 +933,7 @@ Pre-built templates for rapid deployment:
 - **33 Workflow Templates** across 11 industries
 - Templates support code fragment URI references (db://, s3://, file://)
 
-### 8.8 Hierarchical AI Organizations (v1.4.6)
+### 8.8 Hierarchical AI Organizations (v1.4.7)
 
 **Key Innovation**: Modeling corporate structures with AI agents that mirror human organizational hierarchies.
 
@@ -1195,31 +1195,31 @@ LIMIT 1
 - quiet hours configuration to suppress non-critical notifications during specified time periods;
 - channel-specific addressing (Slack user ID, email address).
 
-**Claim 22** (v1.4.6): A hierarchical AI organization system for modeling corporate structures with AI agents, comprising:
+**Claim 22** (v1.4.7): A hierarchical AI organization system for modeling corporate structures with AI agents, comprising:
 - an organization entity containing configuration, status, and an event bus channel for intra-organization communication;
 - a hierarchical tree of AI nodes representing roles in an organization chart, where each node has a role type (executive, manager, analyst, coordinator), an assigned AI agent, and optional human mirror configuration;
 - a task delegation mechanism wherein parent nodes can delegate subtasks to child nodes using configurable strategies (parallel, sequential, conditional);
 - an aggregation mechanism wherein parent nodes collect and synthesize responses from child nodes to produce consolidated outputs;
 - wherein each AI node can be configured with human-in-the-loop controls requiring approval before task completion.
 
-**Claim 23** (v1.4.6): The AI organization system of Claim 22, further comprising:
+**Claim 23** (v1.4.7): The AI organization system of Claim 22, further comprising:
 - a human mirror configuration for each AI node, associating the AI agent with a real employee including name, email, Teams ID, and Slack ID;
 - notification triggers that alert the human mirror when their AI counterpart performs significant actions;
 - the ability for the human mirror to override, approve, reject, or modify AI-generated outputs at any point.
 
-**Claim 24** (v1.4.6): The AI organization system of Claim 22, wherein the task delegation mechanism comprises:
+**Claim 24** (v1.4.7): The AI organization system of Claim 22, wherein the task delegation mechanism comprises:
 - decomposition of parent tasks into subtasks with specific assignments to child nodes;
 - parallel delegation strategy that dispatches all subtasks simultaneously and awaits all responses;
 - sequential delegation strategy that dispatches subtasks one at a time, using each response to inform subsequent delegations;
 - conditional delegation strategy that uses LLM-powered decision making to determine which child nodes should receive subtasks based on task content and node capabilities.
 
-**Claim 25** (v1.4.6): The AI organization system of Claim 22, further comprising:
+**Claim 25** (v1.4.7): The AI organization system of Claim 22, further comprising:
 - a visual organization designer with drag-and-drop interface for creating and modifying AI organization hierarchies;
 - real-time visualization of task flow through the organization showing which nodes are actively processing;
 - HITL dashboard displaying pending approvals across all nodes requiring human review;
 - organization templates for common corporate structures (research teams, compliance units, customer support hierarchies).
 
-**Claim 26** (v1.4.6): A method for hierarchical AI task processing comprising:
+**Claim 26** (v1.4.7): A method for hierarchical AI task processing comprising:
 - receiving a task at a root node of an AI organization;
 - the root node analyzing the task using an LLM to determine delegation strategy;
 - generating subtasks and assigning them to appropriate child nodes based on their roles and capabilities;
@@ -1229,7 +1229,7 @@ LIMIT 1
 - optionally routing the consolidated response through human-in-the-loop review;
 - returning the final approved output.
 
-**Claim 27** (v1.4.6): The AI organization system of Claim 22, wherein each AI node maintains:
+**Claim 27** (v1.4.7): The AI organization system of Claim 22, wherein each AI node maintains:
 - position coordinates for visual representation in the organization designer;
 - current task assignment and status;
 - HITL configuration including enabled flag, approval requirements, timeout settings, and auto-proceed behavior;

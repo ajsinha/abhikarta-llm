@@ -1,0 +1,188 @@
+{
+  "example_id": "ex_comprehensive_analysis_pipeline",
+  "name": "Comprehensive Analysis Pipeline",
+  "description": "A large-scale analysis workflow combining multiple patterns: parallel processing, ensemble analysis, iterative refinement, and human review. Demonstrates enterprise-grade analytical capabilities.",
+  "workflow_config": {
+    "workflow_id": "wf_comprehensive_analysis_001",
+    "name": "Comprehensive Analysis Pipeline",
+    "version": "2.0.0",
+    "nodes": [
+      {
+        "id": "input_processor",
+        "type": "llm",
+        "name": "Input Processor",
+        "config": {
+          "prompt_template": "Process and structure this input for comprehensive analysis:\n\n{input}\n\nExtract:\n1. SUBJECT: What is being analyzed\n2. SCOPE: Breadth and depth expected\n3. QUESTIONS: Key questions to answer\n4. CONTEXT: Relevant background\n5. CONSTRAINTS: Limitations or focus areas\n6. OUTPUT_FORMAT: Expected deliverable format",
+          "output_key": "processed_input"
+        }
+      },
+      {
+        "id": "analysis_planner",
+        "type": "llm",
+        "name": "Analysis Planner",
+        "config": {
+          "prompt_template": "Create comprehensive analysis plan:\n\nPROCESSED INPUT:\n{processed_input}\n\nPlan analysis approach:\n1. METHODOLOGIES: Which frameworks to apply\n2. DATA_NEEDS: Information required\n3. ANALYSIS_TRACKS: Parallel analysis streams\n4. SEQUENCE: Order of operations\n5. QUALITY_GATES: Checkpoints for quality\n6. DELIVERABLES: Expected outputs at each stage",
+          "output_key": "analysis_plan"
+        }
+      },
+      {
+        "id": "factual_analyzer",
+        "type": "llm",
+        "name": "Factual Analyzer",
+        "config": {
+          "prompt_template": "Conduct factual analysis:\n\nSUBJECT:\n{processed_input}\n\nPLAN:\n{analysis_plan}\n\nProvide:\n1. KEY_FACTS: Objective, verifiable information\n2. DATA_POINTS: Relevant statistics and figures\n3. TIMELINE: Chronological context\n4. SOURCES: Where information comes from\n5. FACT_CONFIDENCE: Certainty level for each fact",
+          "output_key": "factual_analysis"
+        }
+      },
+      {
+        "id": "trend_analyzer",
+        "type": "llm",
+        "name": "Trend Analyzer",
+        "config": {
+          "prompt_template": "Analyze trends and patterns:\n\nSUBJECT:\n{processed_input}\n\nFACTUAL BASE:\n{factual_analysis}\n\nIdentify:\n1. HISTORICAL_TRENDS: Past patterns\n2. CURRENT_TRAJECTORY: Present direction\n3. EMERGING_PATTERNS: New developments\n4. CYCLICAL_FACTORS: Recurring patterns\n5. INFLECTION_POINTS: Key changes",
+          "output_key": "trend_analysis"
+        }
+      },
+      {
+        "id": "comparative_analyzer",
+        "type": "llm",
+        "name": "Comparative Analyzer",
+        "config": {
+          "prompt_template": "Conduct comparative analysis:\n\nSUBJECT:\n{processed_input}\n\nCONTEXT:\n{factual_analysis}\n\nCompare:\n1. ALTERNATIVES: Other options or approaches\n2. BENCHMARKS: Industry standards\n3. BEST_PRACTICES: What works well elsewhere\n4. DIFFERENTIATORS: What makes this unique\n5. GAPS: Where improvements could be made",
+          "output_key": "comparative_analysis"
+        }
+      },
+      {
+        "id": "risk_analyzer",
+        "type": "llm",
+        "name": "Risk Analyzer",
+        "config": {
+          "prompt_template": "Conduct risk analysis:\n\nSUBJECT:\n{processed_input}\n\nCONTEXT:\n{factual_analysis}\n{trend_analysis}\n\nAnalyze:\n1. RISK_INVENTORY: All identified risks\n2. PROBABILITY: Likelihood of each risk\n3. IMPACT: Severity if realized\n4. RISK_MATRIX: Priority ranking\n5. MITIGATIONS: How to address each\n6. RESIDUAL_RISK: Risk after mitigation",
+          "output_key": "risk_analysis"
+        }
+      },
+      {
+        "id": "opportunity_analyzer",
+        "type": "llm",
+        "name": "Opportunity Analyzer",
+        "config": {
+          "prompt_template": "Identify opportunities:\n\nSUBJECT:\n{processed_input}\n\nCONTEXT:\n{factual_analysis}\n{trend_analysis}\n{comparative_analysis}\n\nIdentify:\n1. IMMEDIATE_OPPORTUNITIES: Quick wins\n2. STRATEGIC_OPPORTUNITIES: Long-term plays\n3. HIDDEN_OPPORTUNITIES: Non-obvious options\n4. SYNERGIES: Combination effects\n5. TIMING: When to act",
+          "output_key": "opportunity_analysis"
+        }
+      },
+      {
+        "id": "stakeholder_analyzer",
+        "type": "llm",
+        "name": "Stakeholder Analyzer",
+        "config": {
+          "prompt_template": "Analyze stakeholder perspectives:\n\nSUBJECT:\n{processed_input}\n\nCONTEXT:\n{factual_analysis}\n\nMap stakeholders:\n1. KEY_STAKEHOLDERS: Who is affected/involved\n2. INTERESTS: What each stakeholder cares about\n3. INFLUENCE: Power and impact of each\n4. POSITIONS: Likely stance of each\n5. ENGAGEMENT: How to work with each",
+          "output_key": "stakeholder_analysis"
+        }
+      },
+      {
+        "id": "synthesis_engine",
+        "type": "llm",
+        "name": "Synthesis Engine",
+        "config": {
+          "prompt_template": "Synthesize all analyses:\n\nFACTUAL:\n{factual_analysis}\n\nTRENDS:\n{trend_analysis}\n\nCOMPARATIVE:\n{comparative_analysis}\n\nRISKS:\n{risk_analysis}\n\nOPPORTUNITIES:\n{opportunity_analysis}\n\nSTAKEHOLDERS:\n{stakeholder_analysis}\n\nSynthesize:\n1. KEY_INSIGHTS: Most important findings\n2. PATTERNS: Cross-cutting themes\n3. TENSIONS: Conflicting findings\n4. IMPLICATIONS: What this means\n5. PRIORITIES: What matters most",
+          "output_key": "synthesis"
+        }
+      },
+      {
+        "id": "scenario_builder",
+        "type": "llm",
+        "name": "Scenario Builder",
+        "config": {
+          "prompt_template": "Build scenarios:\n\nSYNTHESIS:\n{synthesis}\n\nRISKS:\n{risk_analysis}\n\nOPPORTUNITIES:\n{opportunity_analysis}\n\nCreate scenarios:\n1. BASE_CASE: Most likely outcome\n2. OPTIMISTIC: Best case scenario\n3. PESSIMISTIC: Worst case scenario\n4. WILDCARD: Unexpected scenario\n\nFor each: probability, key drivers, implications",
+          "output_key": "scenarios"
+        }
+      },
+      {
+        "id": "recommendation_engine",
+        "type": "llm",
+        "name": "Recommendation Engine",
+        "config": {
+          "prompt_template": "Generate recommendations:\n\nSYNTHESIS:\n{synthesis}\n\nSCENARIOS:\n{scenarios}\n\nSTAKEHOLDERS:\n{stakeholder_analysis}\n\nProvide recommendations:\n1. STRATEGIC_RECOMMENDATIONS: Big-picture actions\n2. TACTICAL_RECOMMENDATIONS: Immediate actions\n3. CONTINGENT_RECOMMENDATIONS: If X happens, do Y\n4. PRIORITIZATION: Ranked by impact and feasibility\n5. QUICK_WINS: Low effort, high impact\n6. LONG_TERM_PLAYS: High investment, transformative",
+          "output_key": "recommendations"
+        }
+      },
+      {
+        "id": "quality_reviewer",
+        "type": "llm",
+        "name": "Quality Reviewer",
+        "config": {
+          "prompt_template": "Review analysis quality:\n\nORIGINAL INPUT:\n{input}\n\nANALYSIS OUTPUTS:\n{synthesis}\n{recommendations}\n\nReview:\n1. COMPLETENESS: Are all aspects covered?\n2. ACCURACY: Are conclusions sound?\n3. CONSISTENCY: Any contradictions?\n4. ACTIONABILITY: Are recommendations practical?\n5. CLARITY: Is it understandable?\n\nScore (1-10) and list improvements needed.",
+          "output_key": "quality_review"
+        }
+      },
+      {
+        "id": "executive_summary_generator",
+        "type": "llm",
+        "name": "Executive Summary Generator",
+        "config": {
+          "prompt_template": "Generate executive summary:\n\nCOMPLETE ANALYSIS:\n{synthesis}\n{scenarios}\n{recommendations}\n\nCreate executive summary (max 500 words):\n1. SITUATION: What's the context\n2. KEY_FINDINGS: Most important discoveries\n3. IMPLICATIONS: What this means\n4. RECOMMENDATIONS: Top 3-5 actions\n5. NEXT_STEPS: Immediate priorities",
+          "output_key": "executive_summary"
+        }
+      },
+      {
+        "id": "detailed_report_generator",
+        "type": "llm",
+        "name": "Detailed Report Generator",
+        "config": {
+          "prompt_template": "Generate comprehensive report:\n\nALL ANALYSES:\n- Factual: {factual_analysis}\n- Trends: {trend_analysis}\n- Comparative: {comparative_analysis}\n- Risks: {risk_analysis}\n- Opportunities: {opportunity_analysis}\n- Stakeholders: {stakeholder_analysis}\n\nSYNTHESIS: {synthesis}\nSCENARIOS: {scenarios}\nRECOMMENDATIONS: {recommendations}\nEXECUTIVE SUMMARY: {executive_summary}\n\nGenerate structured report:\n\n# Comprehensive Analysis Report\n\n## Executive Summary\n[From executive_summary]\n\n## 1. Introduction\n[Context and scope]\n\n## 2. Factual Foundation\n[Key facts and data]\n\n## 3. Trend Analysis\n[Patterns and trajectories]\n\n## 4. Comparative Insights\n[Benchmarks and comparisons]\n\n## 5. Risk Assessment\n[Risks and mitigations]\n\n## 6. Opportunities\n[Identified opportunities]\n\n## 7. Stakeholder Considerations\n[Stakeholder analysis]\n\n## 8. Synthesis & Insights\n[Integrated findings]\n\n## 9. Scenarios\n[Future possibilities]\n\n## 10. Recommendations\n[Prioritized actions]\n\n## 11. Implementation Roadmap\n[Timeline and next steps]\n\n## 12. Appendices\n[Supporting details]",
+          "output_key": "detailed_report"
+        }
+      },
+      {
+        "id": "output_packager",
+        "type": "aggregator",
+        "name": "Output Packager",
+        "config": {
+          "template": "COMPREHENSIVE ANALYSIS COMPLETE\n\n=== EXECUTIVE SUMMARY ===\n{executive_summary}\n\n=== DETAILED REPORT ===\n{detailed_report}\n\n=== QUALITY ASSESSMENT ===\n{quality_review}",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "input_processor", "target": "analysis_planner"},
+      {"source": "analysis_planner", "target": "factual_analyzer"},
+      {"source": "factual_analyzer", "target": "trend_analyzer"},
+      {"source": "factual_analyzer", "target": "comparative_analyzer"},
+      {"source": "factual_analyzer", "target": "stakeholder_analyzer"},
+      {"source": "trend_analyzer", "target": "risk_analyzer"},
+      {"source": "trend_analyzer", "target": "opportunity_analyzer"},
+      {"source": "comparative_analyzer", "target": "opportunity_analyzer"},
+      {"source": "risk_analyzer", "target": "synthesis_engine"},
+      {"source": "opportunity_analyzer", "target": "synthesis_engine"},
+      {"source": "stakeholder_analyzer", "target": "synthesis_engine"},
+      {"source": "synthesis_engine", "target": "scenario_builder"},
+      {"source": "scenario_builder", "target": "recommendation_engine"},
+      {"source": "recommendation_engine", "target": "quality_reviewer"},
+      {"source": "quality_reviewer", "target": "executive_summary_generator"},
+      {"source": "executive_summary_generator", "target": "detailed_report_generator"},
+      {"source": "detailed_report_generator", "target": "output_packager"}
+    ],
+    "entry_point": "input_processor",
+    "output_node": "output_packager",
+    "parallel_groups": [
+      ["trend_analyzer", "comparative_analyzer", "stakeholder_analyzer"],
+      ["risk_analyzer", "opportunity_analyzer"]
+    ]
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.6
+  },
+  "test_inputs": [
+    {
+      "name": "Strategic Assessment",
+      "input": "Conduct a comprehensive analysis of the current state of renewable energy adoption and its implications for the energy sector over the next decade."
+    },
+    {
+      "name": "Competitive Analysis",
+      "input": "Analyze the competitive landscape in cloud computing and identify strategic opportunities for new entrants."
+    }
+  ]
+}

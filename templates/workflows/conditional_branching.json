@@ -1,0 +1,119 @@
+{
+  "template_id": "wf_conditional_branching",
+  "name": "Conditional Branching Workflow",
+  "description": "Route processing through different paths based on conditions. Demonstrates dynamic decision-making and conditional execution.",
+  "category": "intermediate",
+  "icon": "bi-signpost-split",
+  "difficulty": "intermediate",
+  "tags": ["conditional", "branching", "decision", "routing"],
+  "workflow": {
+    "nodes": [
+      {
+        "id": "classifier",
+        "type": "llm",
+        "name": "Input Classifier",
+        "description": "Classify input to determine processing path",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "prompt_template": "Classify the following input into exactly one category:\n- QUESTION: If it's asking for information\n- TASK: If it requires an action or creation\n- ANALYSIS: If it needs deep analysis or research\n- SIMPLE: If it's a simple statement or greeting\n\nInput: {input}\n\nRespond with only the category name.",
+          "output_key": "classification"
+        }
+      },
+      {
+        "id": "router",
+        "type": "condition",
+        "name": "Route Decision",
+        "description": "Route to appropriate handler",
+        "position": {"x": 300, "y": 300},
+        "config": {
+          "conditions": [
+            {"condition": "QUESTION in classification", "target": "question_handler"},
+            {"condition": "TASK in classification", "target": "task_handler"},
+            {"condition": "ANALYSIS in classification", "target": "analysis_handler"},
+            {"default": true, "target": "simple_handler"}
+          ]
+        }
+      },
+      {
+        "id": "question_handler",
+        "type": "llm",
+        "name": "Question Handler",
+        "description": "Handle question-type inputs",
+        "position": {"x": 550, "y": 100},
+        "config": {
+          "prompt_template": "The user has asked a question:\n\n{input}\n\nProvide a comprehensive, well-researched answer with relevant details and context.",
+          "output_key": "branch_output"
+        }
+      },
+      {
+        "id": "task_handler",
+        "type": "llm",
+        "name": "Task Handler",
+        "description": "Handle task-type inputs",
+        "position": {"x": 550, "y": 250},
+        "config": {
+          "prompt_template": "The user has requested a task:\n\n{input}\n\nBreak down this task into steps and provide the completed output or detailed instructions.",
+          "output_key": "branch_output"
+        }
+      },
+      {
+        "id": "analysis_handler",
+        "type": "llm",
+        "name": "Analysis Handler",
+        "description": "Handle analysis-type inputs",
+        "position": {"x": 550, "y": 400},
+        "config": {
+          "prompt_template": "The user has requested analysis:\n\n{input}\n\nProvide a thorough analysis including:\n1. Key factors and considerations\n2. Different perspectives\n3. Data points and evidence\n4. Conclusions and recommendations",
+          "output_key": "branch_output"
+        }
+      },
+      {
+        "id": "simple_handler",
+        "type": "llm",
+        "name": "Simple Handler",
+        "description": "Handle simple inputs",
+        "position": {"x": 550, "y": 550},
+        "config": {
+          "prompt_template": "Respond naturally to:\n\n{input}",
+          "output_key": "branch_output"
+        }
+      },
+      {
+        "id": "response_enhancer",
+        "type": "llm",
+        "name": "Response Enhancer",
+        "description": "Enhance and polish the response",
+        "position": {"x": 800, "y": 300},
+        "config": {
+          "prompt_template": "Enhance this response for clarity and completeness:\n\n{branch_output}\n\nMake it more engaging while maintaining accuracy. Add helpful context if needed.",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "classifier", "target": "router"},
+      {"source": "router", "target": "question_handler", "condition": "QUESTION"},
+      {"source": "router", "target": "task_handler", "condition": "TASK"},
+      {"source": "router", "target": "analysis_handler", "condition": "ANALYSIS"},
+      {"source": "router", "target": "simple_handler", "condition": "default"},
+      {"source": "question_handler", "target": "response_enhancer"},
+      {"source": "task_handler", "target": "response_enhancer"},
+      {"source": "analysis_handler", "target": "response_enhancer"},
+      {"source": "simple_handler", "target": "response_enhancer"}
+    ],
+    "entry_point": "classifier",
+    "output_node": "response_enhancer"
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://192.168.2.36:11434",
+    "temperature": 0.7
+  },
+  "sample_inputs": [
+    "What are the main benefits of containerization in software development?",
+    "Create a project plan for launching a mobile application.",
+    "Analyze the pros and cons of microservices architecture.",
+    "Hello, how are you today?"
+  ]
+}

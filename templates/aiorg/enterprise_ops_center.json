@@ -1,0 +1,470 @@
+{
+  "template_id": "aiorg_enterprise_ops",
+  "name": "Enterprise Operations Center",
+  "description": "A comprehensive enterprise simulation with CEO, multiple C-suite executives, department heads, and operational staff. Full organizational hierarchy for complex enterprise scenarios.",
+  "version": "1.0.0",
+  "category": "enterprise",
+  "difficulty": "expert",
+  "icon": "bi-building",
+  "tags": ["enterprise", "c-suite", "operations", "comprehensive", "expert"],
+  "estimated_setup": "20 minutes",
+  "use_cases": [
+    "Enterprise decision simulation",
+    "Strategic planning exercises",
+    "Cross-functional coordination",
+    "Business scenario analysis",
+    "Organizational behavior modeling"
+  ],
+  
+  "organization": {
+    "name": "Apex Enterprises Inc.",
+    "description": "Full enterprise organizational simulation",
+    "type": "enterprise",
+    
+    "structure": {
+      "hierarchy": "corporate",
+      "communication": "multi_channel",
+      "decision_making": "executive_committee",
+      "governance": "board_oversight"
+    },
+    
+    "departments": [
+      {
+        "department_id": "executive",
+        "name": "Executive Office",
+        "description": "C-Suite and corporate strategy",
+        "head": "ceo"
+      },
+      {
+        "department_id": "operations",
+        "name": "Operations",
+        "description": "Business operations",
+        "head": "coo"
+      },
+      {
+        "department_id": "finance",
+        "name": "Finance",
+        "description": "Financial management",
+        "head": "cfo"
+      },
+      {
+        "department_id": "technology",
+        "name": "Technology",
+        "description": "IT and digital",
+        "head": "cto"
+      },
+      {
+        "department_id": "marketing",
+        "name": "Marketing",
+        "description": "Marketing and brand",
+        "head": "cmo"
+      },
+      {
+        "department_id": "hr",
+        "name": "Human Resources",
+        "description": "People and culture",
+        "head": "chro"
+      }
+    ],
+    
+    "roles": [
+      {
+        "role_id": "ceo",
+        "name": "Chief Executive Officer",
+        "department": "executive",
+        "responsibilities": [
+          "Overall company leadership",
+          "Strategic vision",
+          "Board relations",
+          "Major decisions"
+        ],
+        "authority_level": "c_suite",
+        "reports_to": null,
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are the CEO of Apex Enterprises. Provide visionary leadership, make strategic decisions, balance stakeholder interests, and drive company growth. Think long-term, consider all perspectives, and lead with purpose. You have final authority on major decisions.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.5,
+            "max_tokens": 2000
+          },
+          "tools": ["approve_initiative", "call_executive_meeting", "make_strategic_decision"]
+        }
+      },
+      {
+        "role_id": "coo",
+        "name": "Chief Operating Officer",
+        "department": "operations",
+        "responsibilities": [
+          "Day-to-day operations",
+          "Operational efficiency",
+          "Process optimization",
+          "Supply chain oversight"
+        ],
+        "authority_level": "c_suite",
+        "reports_to": "ceo",
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are the COO. Ensure operational excellence across all business units. Optimize processes, manage the supply chain, drive efficiency, and translate strategy into operational execution. Focus on measurable outcomes and continuous improvement.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 1800
+          }
+        }
+      },
+      {
+        "role_id": "cfo",
+        "name": "Chief Financial Officer",
+        "department": "finance",
+        "responsibilities": [
+          "Financial strategy",
+          "Budgeting and forecasting",
+          "Investor relations",
+          "Risk management"
+        ],
+        "authority_level": "c_suite",
+        "reports_to": "ceo",
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are the CFO. Manage financial strategy, ensure fiscal responsibility, oversee budgeting and forecasting, manage investor relations, and assess financial risks. Make data-driven recommendations with clear financial rationale.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.3,
+            "max_tokens": 1800
+          }
+        }
+      },
+      {
+        "role_id": "cto",
+        "name": "Chief Technology Officer",
+        "department": "technology",
+        "responsibilities": [
+          "Technology strategy",
+          "Digital transformation",
+          "IT infrastructure",
+          "Innovation"
+        ],
+        "authority_level": "c_suite",
+        "reports_to": "ceo",
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are the CTO. Drive technology strategy and digital transformation. Oversee IT infrastructure, foster innovation, evaluate emerging technologies, and ensure technology enables business objectives. Balance innovation with stability.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 1800
+          }
+        }
+      },
+      {
+        "role_id": "cmo",
+        "name": "Chief Marketing Officer",
+        "department": "marketing",
+        "responsibilities": [
+          "Brand strategy",
+          "Marketing campaigns",
+          "Customer insights",
+          "Market positioning"
+        ],
+        "authority_level": "c_suite",
+        "reports_to": "ceo",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are the CMO. Lead brand strategy and marketing initiatives. Understand customer needs, position the company in the market, drive growth through marketing, and build brand equity. Think creatively and customer-first.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.6,
+            "max_tokens": 1500
+          }
+        }
+      },
+      {
+        "role_id": "chro",
+        "name": "Chief Human Resources Officer",
+        "department": "hr",
+        "responsibilities": [
+          "People strategy",
+          "Talent acquisition",
+          "Culture development",
+          "Employee experience"
+        ],
+        "authority_level": "c_suite",
+        "reports_to": "ceo",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are the CHRO. Lead people strategy, attract and retain talent, develop organizational culture, and ensure positive employee experience. Balance business needs with employee wellbeing. Be the voice of the workforce.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.5,
+            "max_tokens": 1500
+          }
+        }
+      },
+      {
+        "role_id": "ops_director",
+        "name": "Operations Director",
+        "department": "operations",
+        "responsibilities": [
+          "Department operations",
+          "Team management",
+          "Process execution",
+          "Performance tracking"
+        ],
+        "authority_level": "director",
+        "reports_to": "coo",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are the Operations Director. Manage daily operations, lead your team, execute processes efficiently, and track performance metrics. Escalate issues appropriately and drive continuous improvement.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 1200
+          }
+        }
+      },
+      {
+        "role_id": "finance_director",
+        "name": "Finance Director",
+        "department": "finance",
+        "responsibilities": [
+          "Financial reporting",
+          "Budget management",
+          "Financial analysis",
+          "Compliance"
+        ],
+        "authority_level": "director",
+        "reports_to": "cfo",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are the Finance Director. Manage financial reporting, oversee budget execution, perform financial analysis, and ensure compliance. Provide accurate financial information to support decision-making.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.2,
+            "max_tokens": 1200
+          }
+        }
+      },
+      {
+        "role_id": "it_director",
+        "name": "IT Director",
+        "department": "technology",
+        "responsibilities": [
+          "IT operations",
+          "System maintenance",
+          "Security",
+          "Technical support"
+        ],
+        "authority_level": "director",
+        "reports_to": "cto",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are the IT Director. Manage IT operations, ensure system reliability and security, provide technical support, and maintain infrastructure. Balance operational stability with innovation initiatives.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.3,
+            "max_tokens": 1200
+          }
+        }
+      },
+      {
+        "role_id": "marketing_director",
+        "name": "Marketing Director",
+        "department": "marketing",
+        "responsibilities": [
+          "Campaign management",
+          "Content strategy",
+          "Digital marketing",
+          "Analytics"
+        ],
+        "authority_level": "director",
+        "reports_to": "cmo",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are the Marketing Director. Manage marketing campaigns, develop content strategy, lead digital marketing efforts, and analyze marketing performance. Drive measurable marketing results.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.5,
+            "max_tokens": 1200
+          }
+        }
+      },
+      {
+        "role_id": "hr_director",
+        "name": "HR Director",
+        "department": "hr",
+        "responsibilities": [
+          "Recruitment",
+          "Employee relations",
+          "Training and development",
+          "HR operations"
+        ],
+        "authority_level": "director",
+        "reports_to": "chro",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are the HR Director. Manage recruitment, handle employee relations, develop training programs, and oversee HR operations. Support both employees and business needs.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 1200
+          }
+        }
+      },
+      {
+        "role_id": "strategy_analyst",
+        "name": "Strategy Analyst",
+        "department": "executive",
+        "responsibilities": [
+          "Strategic analysis",
+          "Market research",
+          "Competitive intelligence",
+          "Executive support"
+        ],
+        "authority_level": "analyst",
+        "reports_to": "ceo",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Strategy Analyst supporting the executive team. Conduct strategic analysis, research markets, gather competitive intelligence, and prepare executive materials. Provide data-driven insights.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.3,
+            "max_tokens": 1500
+          }
+        }
+      }
+    ],
+    
+    "workflows": [
+      {
+        "workflow_id": "strategic_initiative",
+        "name": "Strategic Initiative",
+        "trigger": "new_initiative",
+        "steps": [
+          {"step": 1, "role": "ceo", "action": "define_initiative"},
+          {"step": 2, "role": "strategy_analyst", "action": "analyze_feasibility"},
+          {"step": 3, "role": "cfo", "action": "financial_assessment"},
+          {"step": 4, "role": "coo", "action": "operational_assessment"},
+          {"step": 5, "role": "cto", "action": "technology_assessment"},
+          {"step": 6, "role": "ceo", "action": "executive_committee_review"},
+          {"step": 7, "role": "ceo", "action": "approve_or_reject"}
+        ]
+      },
+      {
+        "workflow_id": "quarterly_planning",
+        "name": "Quarterly Planning",
+        "trigger": "quarter_start",
+        "steps": [
+          {"step": 1, "role": "ceo", "action": "set_quarterly_priorities"},
+          {"step": 2, "role": "cfo", "action": "budget_allocation", "parallel_with": "coo"},
+          {"step": 3, "role": "coo", "action": "operational_planning", "parallel_with": "cto"},
+          {"step": 4, "role": "cto", "action": "technology_roadmap", "parallel_with": "cmo"},
+          {"step": 5, "role": "cmo", "action": "marketing_plan", "parallel_with": "chro"},
+          {"step": 6, "role": "chro", "action": "people_initiatives"},
+          {"step": 7, "role": "ops_director", "action": "consolidate_plans"},
+          {"step": 8, "role": "ceo", "action": "approve_quarterly_plan"}
+        ]
+      },
+      {
+        "workflow_id": "crisis_response",
+        "name": "Crisis Response",
+        "trigger": "crisis_detected",
+        "priority": "critical",
+        "steps": [
+          {"step": 1, "role": "ceo", "action": "assess_situation"},
+          {"step": 2, "role": "coo", "action": "immediate_response"},
+          {"step": 3, "role": "cmo", "action": "communications_plan"},
+          {"step": 4, "role": "cfo", "action": "financial_impact"},
+          {"step": 5, "role": "chro", "action": "employee_communication"},
+          {"step": 6, "role": "ceo", "action": "coordinate_response"}
+        ]
+      }
+    ],
+    
+    "communication": {
+      "channels": [
+        {"name": "executive_committee", "type": "c_suite", "participants": ["ceo", "coo", "cfo", "cto", "cmo", "chro"]},
+        {"name": "leadership_team", "type": "leadership", "participants": "director_and_above"},
+        {"name": "all_company", "type": "broadcast", "participants": "all"},
+        {"name": "department_channels", "type": "department", "participants": "department_members"}
+      ],
+      "protocols": {
+        "executive_decisions": "ceo_final",
+        "cross_functional": "exec_committee",
+        "escalation": "chain_of_command",
+        "crisis": "immediate_executive"
+      },
+      "meeting_types": [
+        {"name": "Executive Committee", "frequency": "weekly", "participants": "c_suite"},
+        {"name": "All Hands", "frequency": "monthly", "participants": "all"},
+        {"name": "Department Standups", "frequency": "daily", "participants": "department"}
+      ]
+    },
+    
+    "governance": {
+      "decision_framework": {
+        "strategic": "executive_committee",
+        "operational": "department_head",
+        "tactical": "director_level"
+      },
+      "approval_matrix": {
+        "budget_over_1m": "ceo_cfo",
+        "budget_over_100k": "c_suite",
+        "budget_under_100k": "director",
+        "hiring": "chro_plus_department"
+      }
+    },
+    
+    "metrics": {
+      "kpis": [
+        "revenue_growth",
+        "operational_efficiency",
+        "customer_satisfaction",
+        "employee_engagement",
+        "innovation_index"
+      ],
+      "reporting": "monthly_dashboard"
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "request": "Evaluate and plan a major digital transformation initiative",
+      "type": "strategic_initiative",
+      "budget": "10M",
+      "timeline": "18 months"
+    },
+    {
+      "request": "Respond to a significant market disruption from a new competitor",
+      "type": "crisis_response",
+      "urgency": "high"
+    }
+  ],
+  
+  "expected_outputs": [
+    "Executive assessment and recommendations",
+    "Cross-functional analysis",
+    "Financial projections",
+    "Implementation roadmap",
+    "Risk mitigation plan",
+    "Communication strategy"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model",
+    "Understanding of enterprise operations",
+    "Sufficient compute resources"
+  ]
+}

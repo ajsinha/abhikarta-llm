@@ -1,0 +1,267 @@
+{
+  "template_id": "aiorg_content_studio",
+  "name": "Content Production Studio",
+  "description": "A creative content production organization with editorial workflow. Includes Content Director, Writers, Editors, and SEO Specialists for end-to-end content creation.",
+  "version": "1.0.0",
+  "category": "creative",
+  "difficulty": "intermediate",
+  "icon": "bi-pencil-square",
+  "tags": ["content", "creative", "editorial", "marketing", "intermediate"],
+  "estimated_setup": "10 minutes",
+  "use_cases": [
+    "Blog post production",
+    "Marketing content creation",
+    "Documentation writing",
+    "Social media content",
+    "Technical writing"
+  ],
+  
+  "organization": {
+    "name": "Content Studio Pro",
+    "description": "Full-service content production studio",
+    "type": "studio",
+    
+    "structure": {
+      "hierarchy": "editorial",
+      "communication": "workflow_based",
+      "decision_making": "editorial_board"
+    },
+    
+    "departments": [
+      {
+        "department_id": "editorial",
+        "name": "Editorial",
+        "description": "Content strategy and direction",
+        "head": "content_director"
+      },
+      {
+        "department_id": "creation",
+        "name": "Content Creation",
+        "description": "Writing and content production",
+        "head": "lead_writer"
+      },
+      {
+        "department_id": "optimization",
+        "name": "Optimization",
+        "description": "SEO and performance",
+        "head": "seo_specialist"
+      }
+    ],
+    
+    "roles": [
+      {
+        "role_id": "content_director",
+        "name": "Content Director",
+        "department": "editorial",
+        "responsibilities": [
+          "Content strategy",
+          "Editorial calendar",
+          "Quality standards",
+          "Final approval"
+        ],
+        "authority_level": "director",
+        "reports_to": null,
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are the Content Director. Define content strategy aligned with business goals, maintain quality standards, manage the editorial calendar, and give final approval on all content. Think strategically about audience engagement and brand voice.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.5,
+            "max_tokens": 1800
+          }
+        }
+      },
+      {
+        "role_id": "lead_writer",
+        "name": "Lead Writer",
+        "department": "creation",
+        "responsibilities": [
+          "Lead content creation",
+          "Assign writing tasks",
+          "First-round editing",
+          "Style guide enforcement"
+        ],
+        "authority_level": "lead",
+        "reports_to": "content_director",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are the Lead Writer. Create high-quality content, assign and guide other writers, perform first-round editing, and ensure all content follows the style guide. Write with clarity, engagement, and purpose.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.7,
+            "max_tokens": 2500
+          }
+        }
+      },
+      {
+        "role_id": "staff_writer",
+        "name": "Staff Writer",
+        "department": "creation",
+        "responsibilities": [
+          "Write assigned content",
+          "Research topics",
+          "Meet deadlines",
+          "Revise based on feedback"
+        ],
+        "authority_level": "staff",
+        "reports_to": "lead_writer",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Staff Writer. Write engaging, well-researched content on assigned topics. Meet deadlines, accept feedback gracefully, and continuously improve your craft. Focus on reader value and clear communication.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.7,
+            "max_tokens": 2000
+          }
+        }
+      },
+      {
+        "role_id": "editor",
+        "name": "Senior Editor",
+        "department": "editorial",
+        "responsibilities": [
+          "Edit for clarity and accuracy",
+          "Fact-checking",
+          "Grammar and style",
+          "Content polish"
+        ],
+        "authority_level": "senior",
+        "reports_to": "content_director",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Senior Editor. Edit content for clarity, accuracy, grammar, and style. Fact-check claims, improve readability, and polish content to publication quality. Be thorough but preserve the writer's voice.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.3,
+            "max_tokens": 2000
+          }
+        }
+      },
+      {
+        "role_id": "seo_specialist",
+        "name": "SEO Specialist",
+        "department": "optimization",
+        "responsibilities": [
+          "Keyword research",
+          "SEO optimization",
+          "Meta descriptions",
+          "Performance tracking"
+        ],
+        "authority_level": "specialist",
+        "reports_to": "content_director",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are an SEO Specialist. Optimize content for search engines while maintaining readability. Suggest keywords, write compelling meta descriptions, structure content with proper headings, and advise on SEO best practices.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 1200
+          }
+        }
+      },
+      {
+        "role_id": "copy_editor",
+        "name": "Copy Editor",
+        "department": "editorial",
+        "responsibilities": [
+          "Proofreading",
+          "Final polish",
+          "Formatting",
+          "Publication prep"
+        ],
+        "authority_level": "staff",
+        "reports_to": "editor",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Copy Editor. Perform final proofreading, catch any remaining errors, ensure consistent formatting, and prepare content for publication. Be meticulous and detail-oriented.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.2,
+            "max_tokens": 1500
+          }
+        }
+      }
+    ],
+    
+    "workflows": [
+      {
+        "workflow_id": "content_production",
+        "name": "Content Production Pipeline",
+        "trigger": "content_request",
+        "steps": [
+          {"step": 1, "role": "content_director", "action": "create_brief"},
+          {"step": 2, "role": "seo_specialist", "action": "keyword_research"},
+          {"step": 3, "role": "lead_writer", "action": "assign_and_outline"},
+          {"step": 4, "role": "staff_writer", "action": "write_draft"},
+          {"step": 5, "role": "lead_writer", "action": "first_edit"},
+          {"step": 6, "role": "editor", "action": "substantive_edit"},
+          {"step": 7, "role": "seo_specialist", "action": "seo_optimize"},
+          {"step": 8, "role": "copy_editor", "action": "final_proofread"},
+          {"step": 9, "role": "content_director", "action": "final_approval"}
+        ]
+      },
+      {
+        "workflow_id": "quick_content",
+        "name": "Quick Content Workflow",
+        "trigger": "urgent_content_request",
+        "steps": [
+          {"step": 1, "role": "lead_writer", "action": "write_draft"},
+          {"step": 2, "role": "editor", "action": "quick_edit"},
+          {"step": 3, "role": "content_director", "action": "approve"}
+        ]
+      }
+    ],
+    
+    "communication": {
+      "channels": [
+        {"name": "editorial_board", "type": "leadership", "participants": ["content_director", "lead_writer", "editor"]},
+        {"name": "writers_room", "type": "department", "participants": ["lead_writer", "staff_writer"]},
+        {"name": "all_hands", "type": "broadcast", "participants": "all"}
+      ],
+      "protocols": {
+        "content_handoff": "workflow_driven",
+        "feedback": "inline_comments",
+        "approval": "director_sign_off"
+      }
+    },
+    
+    "style_guide": {
+      "voice": "professional_friendly",
+      "tone": "informative_engaging",
+      "formatting": "web_optimized",
+      "length_guidelines": {
+        "blog_post": "1000-2000 words",
+        "social_post": "100-280 characters",
+        "documentation": "as_needed"
+      }
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "request": "Create a comprehensive blog post about AI trends in 2025",
+      "type": "blog_post",
+      "target_audience": "tech professionals",
+      "word_count": 1500
+    }
+  ],
+  
+  "expected_outputs": [
+    "Content brief",
+    "SEO keywords and recommendations",
+    "Draft content",
+    "Edited and polished final content",
+    "Meta description and SEO elements"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model",
+    "Understanding of content production workflows"
+  ]
+}

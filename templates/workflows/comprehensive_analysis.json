@@ -1,0 +1,224 @@
+{
+  "template_id": "wf_comprehensive_analysis",
+  "name": "Comprehensive Analysis Pipeline",
+  "description": "A large-scale analytical workflow combining data collection, multi-dimensional analysis, cross-validation, insight synthesis, and report generation. Demonstrates enterprise-grade analytical capabilities.",
+  "category": "enterprise",
+  "icon": "bi-graph-up-arrow",
+  "difficulty": "expert",
+  "tags": ["analysis", "comprehensive", "multi-dimensional", "enterprise", "reporting"],
+  "workflow": {
+    "nodes": [
+      {
+        "id": "input_processor",
+        "type": "llm",
+        "name": "Input Processor",
+        "description": "Process and understand input requirements",
+        "position": {"x": 50, "y": 400},
+        "config": {
+          "prompt_template": "Analyze this analysis request:\n\n{input}\n\nExtract:\n1. ANALYSIS_OBJECTIVE: What needs to be analyzed\n2. SCOPE: Boundaries and focus areas\n3. DEPTH: Level of detail required\n4. DIMENSIONS: Different angles to consider\n5. OUTPUT_FORMAT: Expected deliverable format\n6. CONSTRAINTS: Time, data, or other limitations",
+          "output_key": "analysis_requirements"
+        }
+      },
+      {
+        "id": "data_collector",
+        "type": "llm",
+        "name": "Data Collector",
+        "description": "Gather relevant data points",
+        "position": {"x": 200, "y": 400},
+        "config": {
+          "prompt_template": "Based on requirements:\n{analysis_requirements}\n\nIdentify and collect:\n1. PRIMARY_DATA: Core data needed\n2. SECONDARY_DATA: Supporting information\n3. CONTEXT_DATA: Background and context\n4. BENCHMARK_DATA: Comparison points\n5. DATA_GAPS: What's missing",
+          "output_key": "collected_data"
+        }
+      },
+      {
+        "id": "quantitative_analyzer",
+        "type": "llm",
+        "name": "Quantitative Analyzer",
+        "description": "Perform quantitative analysis",
+        "position": {"x": 400, "y": 200},
+        "config": {
+          "prompt_template": "Perform quantitative analysis:\n\nDATA:\n{collected_data}\n\nAnalyze:\n1. KEY_METRICS: Important numerical measures\n2. TRENDS: Patterns over time\n3. DISTRIBUTIONS: Data spread and outliers\n4. CORRELATIONS: Relationships between variables\n5. STATISTICAL_SIGNIFICANCE: Confidence levels",
+          "output_key": "quantitative_analysis"
+        }
+      },
+      {
+        "id": "qualitative_analyzer",
+        "type": "llm",
+        "name": "Qualitative Analyzer",
+        "description": "Perform qualitative analysis",
+        "position": {"x": 400, "y": 400},
+        "config": {
+          "prompt_template": "Perform qualitative analysis:\n\nDATA:\n{collected_data}\n\nAnalyze:\n1. THEMES: Recurring themes and patterns\n2. NARRATIVES: Stories and explanations\n3. SENTIMENT: Attitudes and perceptions\n4. CONTEXT: Environmental factors\n5. NUANCES: Subtle but important details",
+          "output_key": "qualitative_analysis"
+        }
+      },
+      {
+        "id": "comparative_analyzer",
+        "type": "llm",
+        "name": "Comparative Analyzer",
+        "description": "Perform comparative analysis",
+        "position": {"x": 400, "y": 600},
+        "config": {
+          "prompt_template": "Perform comparative analysis:\n\nDATA:\n{collected_data}\n\nCompare:\n1. BENCHMARKS: Against industry standards\n2. HISTORICAL: Against past performance\n3. ALTERNATIVES: Between different options\n4. BEST_PRACTICES: Against ideal states\n5. GAPS: Where differences exist",
+          "output_key": "comparative_analysis"
+        }
+      },
+      {
+        "id": "causal_analyzer",
+        "type": "llm",
+        "name": "Causal Analyzer",
+        "description": "Analyze cause-effect relationships",
+        "position": {"x": 600, "y": 300},
+        "config": {
+          "prompt_template": "Analyze causal relationships:\n\nQUANTITATIVE:\n{quantitative_analysis}\n\nQUALITATIVE:\n{qualitative_analysis}\n\nIdentify:\n1. CAUSAL_CHAINS: Cause-effect sequences\n2. ROOT_CAUSES: Underlying drivers\n3. CONTRIBUTING_FACTORS: Secondary influences\n4. FEEDBACK_LOOPS: Self-reinforcing patterns\n5. INTERVENTION_POINTS: Where to influence outcomes",
+          "output_key": "causal_analysis"
+        }
+      },
+      {
+        "id": "risk_analyzer",
+        "type": "llm",
+        "name": "Risk Analyzer",
+        "description": "Analyze risks and uncertainties",
+        "position": {"x": 600, "y": 500},
+        "config": {
+          "prompt_template": "Analyze risks:\n\nALL ANALYSES:\n- Quantitative: {quantitative_analysis}\n- Comparative: {comparative_analysis}\n\nIdentify:\n1. KEY_RISKS: Major risk factors\n2. PROBABILITY: Likelihood of occurrence\n3. IMPACT: Potential consequences\n4. MITIGATION: Risk reduction strategies\n5. CONTINGENCIES: Backup plans",
+          "output_key": "risk_analysis"
+        }
+      },
+      {
+        "id": "cross_validator",
+        "type": "llm",
+        "name": "Cross Validator",
+        "description": "Cross-validate findings across analyses",
+        "position": {"x": 800, "y": 400},
+        "config": {
+          "prompt_template": "Cross-validate all findings:\n\nQUANTITATIVE:\n{quantitative_analysis}\n\nQUALITATIVE:\n{qualitative_analysis}\n\nCOMPARATIVE:\n{comparative_analysis}\n\nCAUSAL:\n{causal_analysis}\n\nRISK:\n{risk_analysis}\n\nValidate:\n1. CONSISTENCIES: Where analyses agree\n2. CONTRADICTIONS: Where they conflict\n3. CONFIDENCE: Overall reliability\n4. GAPS: What needs more investigation\n5. SYNTHESIS: Unified view",
+          "output_key": "validated_findings"
+        }
+      },
+      {
+        "id": "insight_generator",
+        "type": "llm",
+        "name": "Insight Generator",
+        "description": "Generate actionable insights",
+        "position": {"x": 1000, "y": 300},
+        "config": {
+          "prompt_template": "Generate insights:\n\nVALIDATED FINDINGS:\n{validated_findings}\n\nProvide:\n1. KEY_INSIGHTS: Non-obvious discoveries\n2. IMPLICATIONS: What these mean\n3. OPPORTUNITIES: Potential benefits\n4. THREATS: Potential problems\n5. RECOMMENDATIONS: Suggested actions",
+          "output_key": "insights"
+        }
+      },
+      {
+        "id": "scenario_modeler",
+        "type": "llm",
+        "name": "Scenario Modeler",
+        "description": "Model different scenarios",
+        "position": {"x": 1000, "y": 500},
+        "config": {
+          "prompt_template": "Model scenarios:\n\nINSIGHTS:\n{insights}\n\nRISK ANALYSIS:\n{risk_analysis}\n\nDevelop:\n1. BEST_CASE: Optimistic scenario\n2. WORST_CASE: Pessimistic scenario\n3. MOST_LIKELY: Expected scenario\n4. WILD_CARD: Unexpected possibilities\n5. DECISION_POINTS: Critical choices",
+          "output_key": "scenarios"
+        }
+      },
+      {
+        "id": "recommendation_engine",
+        "type": "llm",
+        "name": "Recommendation Engine",
+        "description": "Generate strategic recommendations",
+        "position": {"x": 1200, "y": 400},
+        "config": {
+          "prompt_template": "Generate recommendations:\n\nINSIGHTS:\n{insights}\n\nSCENARIOS:\n{scenarios}\n\nProvide:\n1. STRATEGIC_RECOMMENDATIONS: High-level guidance\n2. TACTICAL_RECOMMENDATIONS: Specific actions\n3. QUICK_WINS: Immediate opportunities\n4. LONG_TERM_INVESTMENTS: Future-focused moves\n5. THINGS_TO_AVOID: Anti-patterns",
+          "output_key": "recommendations"
+        }
+      },
+      {
+        "id": "executive_summary_generator",
+        "type": "llm",
+        "name": "Executive Summary Generator",
+        "description": "Create executive summary",
+        "position": {"x": 1400, "y": 300},
+        "config": {
+          "prompt_template": "Create executive summary:\n\nREQUIREMENTS:\n{analysis_requirements}\n\nKEY FINDINGS:\n{validated_findings}\n\nINSIGHTS:\n{insights}\n\nRECOMMENDATIONS:\n{recommendations}\n\nWrite a concise executive summary (max 500 words) that:\n1. States the objective\n2. Highlights key findings\n3. Presents main insights\n4. Summarizes recommendations\n5. Outlines next steps",
+          "output_key": "executive_summary"
+        }
+      },
+      {
+        "id": "detailed_report_generator",
+        "type": "llm",
+        "name": "Detailed Report Generator",
+        "description": "Generate comprehensive report",
+        "position": {"x": 1400, "y": 500},
+        "config": {
+          "prompt_template": "Generate detailed report:\n\nALL CONTENT:\n- Requirements: {analysis_requirements}\n- Data: {collected_data}\n- Quantitative: {quantitative_analysis}\n- Qualitative: {qualitative_analysis}\n- Comparative: {comparative_analysis}\n- Causal: {causal_analysis}\n- Risk: {risk_analysis}\n- Insights: {insights}\n- Scenarios: {scenarios}\n- Recommendations: {recommendations}\n\nCreate structured report with sections for each analysis type.",
+          "output_key": "detailed_report"
+        }
+      },
+      {
+        "id": "visualization_planner",
+        "type": "llm",
+        "name": "Visualization Planner",
+        "description": "Plan data visualizations",
+        "position": {"x": 1200, "y": 600},
+        "config": {
+          "prompt_template": "Plan visualizations:\n\nQUANTITATIVE DATA:\n{quantitative_analysis}\n\nCOMPARATIVE DATA:\n{comparative_analysis}\n\nPlan:\n1. CHARTS: Appropriate chart types\n2. DASHBOARDS: Key metrics display\n3. INFOGRAPHICS: Summary visuals\n4. TABLES: Detailed data presentation\n5. ANNOTATIONS: Key callouts",
+          "output_key": "visualization_plan"
+        }
+      },
+      {
+        "id": "final_assembler",
+        "type": "aggregator",
+        "name": "Final Assembler",
+        "description": "Assemble final deliverable",
+        "position": {"x": 1600, "y": 400},
+        "config": {
+          "template": "# COMPREHENSIVE ANALYSIS REPORT\n\n## Executive Summary\n{executive_summary}\n\n## Detailed Analysis\n{detailed_report}\n\n## Recommendations\n{recommendations}\n\n## Scenarios\n{scenarios}\n\n## Visualization Plan\n{visualization_plan}\n\n## Appendix: Raw Analysis\n### Quantitative\n{quantitative_analysis}\n\n### Qualitative\n{qualitative_analysis}\n\n### Comparative\n{comparative_analysis}",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "input_processor", "target": "data_collector"},
+      {"source": "data_collector", "target": "quantitative_analyzer"},
+      {"source": "data_collector", "target": "qualitative_analyzer"},
+      {"source": "data_collector", "target": "comparative_analyzer"},
+      {"source": "quantitative_analyzer", "target": "causal_analyzer"},
+      {"source": "qualitative_analyzer", "target": "causal_analyzer"},
+      {"source": "quantitative_analyzer", "target": "risk_analyzer"},
+      {"source": "comparative_analyzer", "target": "risk_analyzer"},
+      {"source": "causal_analyzer", "target": "cross_validator"},
+      {"source": "risk_analyzer", "target": "cross_validator"},
+      {"source": "quantitative_analyzer", "target": "cross_validator"},
+      {"source": "qualitative_analyzer", "target": "cross_validator"},
+      {"source": "comparative_analyzer", "target": "cross_validator"},
+      {"source": "cross_validator", "target": "insight_generator"},
+      {"source": "cross_validator", "target": "scenario_modeler"},
+      {"source": "risk_analyzer", "target": "scenario_modeler"},
+      {"source": "insight_generator", "target": "recommendation_engine"},
+      {"source": "scenario_modeler", "target": "recommendation_engine"},
+      {"source": "recommendation_engine", "target": "executive_summary_generator"},
+      {"source": "recommendation_engine", "target": "detailed_report_generator"},
+      {"source": "quantitative_analyzer", "target": "visualization_planner"},
+      {"source": "comparative_analyzer", "target": "visualization_planner"},
+      {"source": "executive_summary_generator", "target": "final_assembler"},
+      {"source": "detailed_report_generator", "target": "final_assembler"},
+      {"source": "visualization_planner", "target": "final_assembler"}
+    ],
+    "entry_point": "input_processor",
+    "output_node": "final_assembler",
+    "parallel_groups": [
+      ["quantitative_analyzer", "qualitative_analyzer", "comparative_analyzer"],
+      ["causal_analyzer", "risk_analyzer"],
+      ["insight_generator", "scenario_modeler"],
+      ["executive_summary_generator", "detailed_report_generator", "visualization_planner"]
+    ]
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.5
+  },
+  "sample_inputs": [
+    "Analyze the effectiveness of our current operational processes and identify optimization opportunities.",
+    "Evaluate our competitive position and develop strategic recommendations for the next fiscal year.",
+    "Assess the impact of recent technological changes on our organization's capabilities."
+  ]
+}

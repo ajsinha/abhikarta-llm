@@ -1,0 +1,96 @@
+{
+  "template_id": "wf_iterative_refinement",
+  "name": "Iterative Refinement Loop",
+  "description": "Generate content and iteratively refine it through multiple review cycles until quality criteria are met. Demonstrates loop patterns with quality gates.",
+  "category": "advanced",
+  "icon": "bi-arrow-repeat",
+  "difficulty": "advanced",
+  "tags": ["loop", "iteration", "refinement", "quality-gate"],
+  "workflow": {
+    "nodes": [
+      {
+        "id": "initial_generator",
+        "type": "llm",
+        "name": "Initial Generator",
+        "description": "Generate initial content",
+        "position": {"x": 100, "y": 250},
+        "config": {
+          "prompt_template": "Generate initial content based on this request:\n\n{input}\n\nCreate a comprehensive first draft.",
+          "output_key": "current_draft"
+        }
+      },
+      {
+        "id": "quality_reviewer",
+        "type": "llm",
+        "name": "Quality Reviewer",
+        "description": "Review content quality and identify improvements",
+        "position": {"x": 350, "y": 250},
+        "config": {
+          "prompt_template": "Review this content draft:\n\n{current_draft}\n\nEvaluate on:\n1. Completeness (1-10)\n2. Clarity (1-10)\n3. Accuracy (1-10)\n4. Engagement (1-10)\n\nProvide:\n- Overall score (average)\n- Specific improvements needed\n- Is it READY or NEEDS_REVISION?",
+          "output_key": "review_result"
+        }
+      },
+      {
+        "id": "quality_gate",
+        "type": "condition",
+        "name": "Quality Gate",
+        "description": "Check if quality threshold is met",
+        "position": {"x": 550, "y": 250},
+        "config": {
+          "conditions": [
+            {"condition": "READY in review_result", "target": "final_polish"},
+            {"condition": "iteration_count >= 3", "target": "final_polish"},
+            {"default": true, "target": "refiner"}
+          ],
+          "max_iterations": 3
+        }
+      },
+      {
+        "id": "refiner",
+        "type": "llm",
+        "name": "Content Refiner",
+        "description": "Refine content based on review feedback",
+        "position": {"x": 550, "y": 450},
+        "config": {
+          "prompt_template": "Refine this content based on the review feedback:\n\nCurrent Draft:\n{current_draft}\n\nReview Feedback:\n{review_result}\n\nCreate an improved version addressing all feedback points.",
+          "output_key": "current_draft"
+        }
+      },
+      {
+        "id": "final_polish",
+        "type": "llm",
+        "name": "Final Polish",
+        "description": "Apply final polish and formatting",
+        "position": {"x": 800, "y": 250},
+        "config": {
+          "prompt_template": "Apply final polish to this content:\n\n{current_draft}\n\nEnsure:\n- Professional formatting\n- Clear structure\n- Engaging introduction and conclusion\n- No grammatical errors",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "initial_generator", "target": "quality_reviewer"},
+      {"source": "quality_reviewer", "target": "quality_gate"},
+      {"source": "quality_gate", "target": "final_polish", "condition": "READY"},
+      {"source": "quality_gate", "target": "refiner", "condition": "NEEDS_REVISION"},
+      {"source": "refiner", "target": "quality_reviewer"}
+    ],
+    "entry_point": "initial_generator",
+    "output_node": "final_polish",
+    "loop_config": {
+      "max_iterations": 3,
+      "loop_nodes": ["quality_reviewer", "quality_gate", "refiner"]
+    }
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://192.168.2.36:11434",
+    "temperature": 0.8
+  },
+  "sample_inputs": [
+    "Write a compelling introduction for a presentation about sustainable technology.",
+    "Create a product description for an innovative smart home device.",
+    "Draft an executive summary about digital transformation strategies."
+  ]
+}

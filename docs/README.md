@@ -1,6 +1,6 @@
 # Abhikarta-LLM Documentation
 
-**Version:** 1.4.6  
+**Version:** 1.4.7  
 **Copyright:** © 2025-2030 Ashutosh Sinha. All Rights Reserved.
 
 ## Documentation Index
@@ -23,7 +23,7 @@
 | [PATENT_APPLICATION.md](PATENT_APPLICATION.md) | Patent application (27 claims) |
 | [PATENT_WORTHINESS_ANALYSIS.md](PATENT_WORTHINESS_ANALYSIS.md) | Patent worthiness analysis |
 
-## Version 1.4.6 Features (Latest)
+## Version 1.4.7 Features (Latest)
 
 ### Hierarchical AI Organizations (NEW)
 - **AI Org Module**: Model corporate structures with AI agents
@@ -62,7 +62,7 @@
 ### Database Updates
 - 33 tables total (6 new for AI Organizations)
 - AIORGDBOps for all AI Org database operations
-- Schema version 1.4.6 with transaction support (PostgreSQL ready)
+- Schema version 1.4.7 with transaction support (PostgreSQL ready)
 
 ## Version 1.3.0 Features
 
@@ -218,7 +218,7 @@
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.4.6 | Dec 2025 | Notifications (Slack/Teams/Webhooks), CoT/ToT Tutorial, 21 Patent Claims |
+| 1.4.7 | Dec 2025 | Notifications (Slack/Teams/Webhooks), CoT/ToT Tutorial, 21 Patent Claims |
 | 1.3.0 | Dec 2025 | Agent Swarms, Messaging (Kafka/RabbitMQ), Actor System |
 | 1.2.0 | Jan 2025 | Database Schema docs (22 tables), Page glossaries |
 | 1.1.8 | Jan 2025 | Tool View/Test pages, form-based testing |

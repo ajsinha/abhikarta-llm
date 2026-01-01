@@ -898,4 +898,88 @@ class APIRoutes(AbstractRoutes):
                 logger.error(f"Error getting server tools: {e}", exc_info=True)
                 return self._error_response('MCP_SERVERS_003', 'Failed to get tools', 500)
         
+        @self.app.route('/api/examples/<path:filepath>', methods=['GET'])
+        def api_get_example_file(filepath):
+            """Get example file content (JSON or Python)."""
+            import os
+            try:
+                # Sanitize filepath to prevent directory traversal
+                filepath = filepath.replace('..', '').strip('/')
+                
+                # Determine base path - go up from routes to web to abhikarta to project root
+                routes_dir = os.path.dirname(os.path.abspath(__file__))
+                web_dir = os.path.dirname(routes_dir)
+                abhikarta_dir = os.path.dirname(web_dir)
+                project_dir = os.path.dirname(abhikarta_dir)
+                base_path = os.path.join(project_dir, 'examples')
+                
+                # Construct full path
+                full_path = os.path.join(base_path, filepath)
+                
+                logger.debug(f"Looking for example file: {full_path}")
+                
+                # Verify the path is within examples directory
+                if not os.path.realpath(full_path).startswith(os.path.realpath(base_path)):
+                    return jsonify({'error': 'Invalid path'}), 400
+                
+                # Check if file exists
+                if not os.path.isfile(full_path):
+                    logger.warning(f"Example file not found: {full_path}")
+                    return jsonify({'error': 'File not found'}), 404
+                
+                # Read and return file content
+                with open(full_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                # Set appropriate content type
+                if filepath.endswith('.json'):
+                    return content, 200, {'Content-Type': 'application/json'}
+                elif filepath.endswith('.py'):
+                    return content, 200, {'Content-Type': 'text/x-python'}
+                else:
+                    return content, 200, {'Content-Type': 'text/plain'}
+                    
+            except Exception as e:
+                logger.error(f"Error getting example file: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/templates/<path:filepath>', methods=['GET'])
+        def api_get_template_file(filepath):
+            """Get template file content (JSON)."""
+            import os
+            try:
+                # Sanitize filepath to prevent directory traversal
+                filepath = filepath.replace('..', '').strip('/')
+                
+                # Determine base path - go up from routes to web to abhikarta to project root
+                routes_dir = os.path.dirname(os.path.abspath(__file__))
+                web_dir = os.path.dirname(routes_dir)
+                abhikarta_dir = os.path.dirname(web_dir)
+                project_dir = os.path.dirname(abhikarta_dir)
+                base_path = os.path.join(project_dir, 'templates')
+                
+                # Construct full path
+                full_path = os.path.join(base_path, filepath)
+                
+                logger.debug(f"Looking for template file: {full_path}")
+                
+                # Verify the path is within templates directory
+                if not os.path.realpath(full_path).startswith(os.path.realpath(base_path)):
+                    return jsonify({'error': 'Invalid path'}), 400
+                
+                # Check if file exists
+                if not os.path.isfile(full_path):
+                    logger.warning(f"Template file not found: {full_path}")
+                    return jsonify({'error': 'File not found'}), 404
+                
+                # Read and return file content
+                with open(full_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                return content, 200, {'Content-Type': 'application/json'}
+                    
+            except Exception as e:
+                logger.error(f"Error getting template file: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
         logger.info("API routes registered")

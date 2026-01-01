@@ -1,249 +1,606 @@
 {% extends "help/help_base.html" %}
 
-{% set title = "Pre-built Workflows & Agents" %}
-{% set description = "Ready-to-use workflows and agents - start building immediately" %}
-{% set icon = "bi-box-seam-fill" %}
+{% set title = "Template Library" %}
+{% set description = "65+ ready-to-use templates for Workflows, Agents, Swarms, and AI Organizations" %}
+{% set icon = "bi-collection-fill" %}
 {% set header_color = "#6f42c1" %}
-{% set header_color_dark = "#59359a" %}
+{% set header_color_dark = "#5a32a3" %}
 
 {% block help_nav %}
 <a href="#overview">Overview</a>
-<a href="#workflows">Pre-built Workflows</a>
-<a href="#agents">Pre-built Agents</a>
-<a href="#customizing">Customizing</a>
-<a href="#importing">Importing</a>
+<a href="#workflows">Workflows</a>
+<a href="#agents">Agents</a>
+<a href="#swarms">Swarms</a>
+<a href="#aiorg">AI Organizations</a>
+<a href="#usage">Using Templates</a>
 {% endblock %}
 
 {% block help_content %}
-<h2 id="overview">Overview</h2>
-<p class="lead">Abhikarta-LLM comes with professionally designed workflows and agents that you can use immediately or customize for your needs.</p>
+<style>
+    .library-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+        overflow: hidden;
+    }
+    .library-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    .library-card .card-header {
+        padding: 1.5rem;
+        border: none;
+    }
+    .library-card .card-body {
+        padding: 1.25rem;
+    }
+    .library-card .card-footer {
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        padding: 1rem 1.25rem;
+    }
+    .library-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        background: rgba(255,255,255,0.2);
+    }
+    .stat-pill {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .template-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .template-list-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.9rem;
+    }
+    .template-list-item:last-child {
+        border-bottom: none;
+    }
+    .difficulty-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+    .difficulty-beginner { background: #198754; }
+    .difficulty-intermediate { background: #ffc107; }
+    .difficulty-advanced { background: #fd7e14; }
+    .difficulty-expert { background: #dc3545; }
+    .overview-stat {
+        text-align: center;
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+    .overview-stat h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+</style>
 
-<div class="alert alert-success">
-    <i class="bi bi-rocket-takeoff me-2"></i>
-    <strong>Quick Start:</strong> These pre-built items are production-ready and have been tested extensively. Just configure your LLM provider and start using them!
+<h2 id="overview">Template Library Overview</h2>
+<p class="lead">Abhikarta-LLM provides an extensive library of professionally designed templates to accelerate your AI development. Choose from workflows, agents, swarms, or complete AI organizations.</p>
+
+<!-- Overview Stats -->
+<div class="row mb-5">
+    <div class="col-md-3 col-6 mb-3">
+        <div class="overview-stat" style="background: linear-gradient(135deg, #0d6efd15 0%, #0d6efd30 100%);">
+            <h2 class="text-primary">27</h2>
+            <small class="text-muted">Workflow Templates</small>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="overview-stat" style="background: linear-gradient(135deg, #19875415 0%, #19875430 100%);">
+            <h2 class="text-success">24</h2>
+            <small class="text-muted">Agent Templates</small>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="overview-stat" style="background: linear-gradient(135deg, #6f42c115 0%, #6f42c130 100%);">
+            <h2 class="text-purple" style="color: #6f42c1;">7</h2>
+            <small class="text-muted">Swarm Templates</small>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="overview-stat" style="background: linear-gradient(135deg, #fd7e1415 0%, #fd7e1430 100%);">
+            <h2 class="text-orange" style="color: #fd7e14;">7</h2>
+            <small class="text-muted">AI Org Templates</small>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mb-5">
+    <div class="d-flex align-items-center">
+        <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+        <div>
+            <strong>Quick Start:</strong> All templates are production-ready. Configure your LLM provider (e.g., Ollama with llama3.2:3b), load a template, customize if needed, and start executing!
+        </div>
+    </div>
 </div>
 
 <hr class="my-5">
 
-<h2 id="workflows">Pre-built Workflows</h2>
+<!-- Workflow Templates Section -->
+<h2 id="workflows" class="mb-4">
+    <i class="bi bi-diagram-3 text-primary me-2"></i>
+    Workflow Templates
+</h2>
 
-<div class="row g-4">
-    <!-- Data Analyzer -->
+<div class="row mb-5">
+    <div class="col-lg-8">
+        <div class="library-card card">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                <div class="d-flex align-items-center">
+                    <div class="library-icon me-3">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">Workflow Templates</h4>
+                        <p class="mb-0 opacity-75">Multi-step DAG-based processing pipelines</p>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-light text-primary fs-5">27</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <p>Build complex, multi-step AI workflows with visual DAG designer. From simple sequential pipelines to enterprise-grade orchestration.</p>
+                
+                <h6 class="mt-3 mb-2">Difficulty Breakdown:</h6>
+                <span class="stat-pill bg-success text-white"><span class="difficulty-dot difficulty-beginner"></span>Beginner: 3</span>
+                <span class="stat-pill bg-warning text-dark"><span class="difficulty-dot difficulty-intermediate"></span>Intermediate: 4</span>
+                <span class="stat-pill bg-orange text-white" style="background: #fd7e14;"><span class="difficulty-dot difficulty-advanced"></span>Advanced: 12</span>
+                <span class="stat-pill bg-danger text-white"><span class="difficulty-dot difficulty-expert"></span>Enterprise: 8</span>
+                
+                <h6 class="mt-4 mb-2">Featured Templates:</h6>
+                <div class="template-list">
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-beginner"></span>Sequential Pipeline</span>
+                        <small class="text-muted">4 nodes</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-intermediate"></span>Parallel Processing</span>
+                        <small class="text-muted">6 nodes</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-advanced"></span>Map-Reduce Pattern</span>
+                        <small class="text-muted">8 nodes</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-advanced"></span>Human-in-the-Loop Review</span>
+                        <small class="text-muted">7 nodes</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-expert"></span>Multi-Agent Orchestration</span>
+                        <small class="text-muted">12 nodes</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-expert"></span>Saga Pattern (Distributed Transactions)</span>
+                        <small class="text-muted">10 nodes</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('workflow_templates') }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-right-circle me-2"></i>Browse Workflow Templates
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card bg-light h-100">
+            <div class="card-body">
+                <h6><i class="bi bi-lightbulb text-warning me-2"></i>Use Cases</h6>
+                <ul class="small mb-0">
+                    <li>Document processing pipelines</li>
+                    <li>Content generation workflows</li>
+                    <li>Data transformation chains</li>
+                    <li>Research and analysis</li>
+                    <li>Approval workflows with HITL</li>
+                    <li>Error handling with retries</li>
+                </ul>
+                
+                <hr>
+                
+                <h6><i class="bi bi-gear text-secondary me-2"></i>Key Features</h6>
+                <ul class="small mb-0">
+                    <li>Visual DAG designer</li>
+                    <li>Conditional branching</li>
+                    <li>Parallel execution</li>
+                    <li>State machine patterns</li>
+                    <li>Code fragment integration</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<!-- Agent Templates Section -->
+<h2 id="agents" class="mb-4">
+    <i class="bi bi-robot text-success me-2"></i>
+    Agent Templates
+</h2>
+
+<div class="row mb-5">
+    <div class="col-lg-8">
+        <div class="library-card card">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #198754 0%, #146c43 100%);">
+                <div class="d-flex align-items-center">
+                    <div class="library-icon me-3">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">Agent Templates</h4>
+                        <p class="mb-0 opacity-75">Intelligent agents with various reasoning patterns</p>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-light text-success fs-5">24</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <p>Pre-configured agents covering 6 agent types: ReAct, Conversational, Tool-Calling, Plan-Execute, Retrieval (RAG), and Custom.</p>
+                
+                <h6 class="mt-3 mb-2">By Agent Type:</h6>
+                <span class="stat-pill" style="background: #e3f2fd; color: #1565c0;">ReAct: 4</span>
+                <span class="stat-pill" style="background: #e8f5e9; color: #2e7d32;">Conversational: 4</span>
+                <span class="stat-pill" style="background: #fff3e0; color: #ef6c00;">Tool-Calling: 4</span>
+                <span class="stat-pill" style="background: #fce4ec; color: #c2185b;">Plan-Execute: 4</span>
+                <span class="stat-pill" style="background: #f3e5f5; color: #7b1fa2;">Retrieval: 4</span>
+                <span class="stat-pill" style="background: #e0f7fa; color: #00838f;">Custom: 4</span>
+                
+                <h6 class="mt-4 mb-2">Featured Templates:</h6>
+                <div class="template-list">
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-beginner"></span>Research Agent</span>
+                        <small class="text-muted">Knowledge gathering</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-intermediate"></span>Code Generation Agent</span>
+                        <small class="text-muted">Technical implementation</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-intermediate"></span>Socratic Tutor Agent</span>
+                        <small class="text-muted">Educational guidance</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-advanced"></span>Decision Support Agent</span>
+                        <small class="text-muted">Analytics & recommendations</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-advanced"></span>Multi-Step Reasoning Agent</span>
+                        <small class="text-muted">Complex problem solving</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-advanced"></span>Reflection Agent</span>
+                        <small class="text-muted">Self-critique & improvement</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('agent_templates') }}" class="btn btn-success">
+                    <i class="bi bi-arrow-right-circle me-2"></i>Browse Agent Templates
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card bg-light h-100">
+            <div class="card-body">
+                <h6><i class="bi bi-lightbulb text-warning me-2"></i>Use Cases</h6>
+                <ul class="small mb-0">
+                    <li>Research assistants</li>
+                    <li>Code generation & review</li>
+                    <li>Creative writing</li>
+                    <li>Data analysis</li>
+                    <li>Task planning & decomposition</li>
+                    <li>Interactive tutoring</li>
+                </ul>
+                
+                <hr>
+                
+                <h6><i class="bi bi-gear text-secondary me-2"></i>Agent Types</h6>
+                <ul class="small mb-0">
+                    <li><strong>ReAct:</strong> Reason + Act loop</li>
+                    <li><strong>Conversational:</strong> Dialog-based</li>
+                    <li><strong>Tool-Calling:</strong> External tools</li>
+                    <li><strong>Plan-Execute:</strong> Multi-step plans</li>
+                    <li><strong>Retrieval:</strong> RAG-enabled</li>
+                    <li><strong>Custom:</strong> Flexible patterns</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<!-- Swarm Templates Section -->
+<h2 id="swarms" class="mb-4">
+    <i class="bi bi-people-fill me-2" style="color: #6f42c1;"></i>
+    Swarm Templates
+</h2>
+
+<div class="row mb-5">
+    <div class="col-lg-8">
+        <div class="library-card card">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                <div class="d-flex align-items-center">
+                    <div class="library-icon me-3">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">Swarm Templates</h4>
+                        <p class="mb-0 opacity-75">Coordinated multi-agent systems</p>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-light fs-5" style="color: #6f42c1;">7</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <p>Multi-agent swarms with various coordination patterns. From simple parallel execution to self-organizing adaptive systems.</p>
+                
+                <h6 class="mt-3 mb-2">Swarm Types:</h6>
+                <span class="stat-pill" style="background: #ede7f6; color: #5e35b1;">Parallel: 2</span>
+                <span class="stat-pill" style="background: #e8eaf6; color: #3949ab;">Sequential: 1</span>
+                <span class="stat-pill" style="background: #e3f2fd; color: #1e88e5;">Hierarchical: 1</span>
+                <span class="stat-pill" style="background: #fff8e1; color: #ffa000;">Collaborative: 1</span>
+                <span class="stat-pill" style="background: #fce4ec; color: #d81b60;">Adaptive: 2</span>
+                
+                <h6 class="mt-4 mb-2">All Swarm Templates:</h6>
+                <div class="template-list">
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-beginner"></span>Basic Parallel Swarm</span>
+                        <small class="text-muted">3 agents, parallel execution</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-beginner"></span>Sequential Pipeline Swarm</span>
+                        <small class="text-muted">4 agents, chained processing</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-intermediate"></span>Hierarchical Manager-Worker</span>
+                        <small class="text-muted">5 agents, delegated tasks</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-advanced"></span>Collaborative Debate Swarm</span>
+                        <small class="text-muted">5 agents, structured debate</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-expert"></span>Adaptive Self-Organizing Swarm</span>
+                        <small class="text-muted">3-10 agents, auto-scaling</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('swarm_templates') }}" class="btn text-white" style="background: #6f42c1;">
+                    <i class="bi bi-arrow-right-circle me-2"></i>Browse Swarm Templates
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card bg-light h-100">
+            <div class="card-body">
+                <h6><i class="bi bi-lightbulb text-warning me-2"></i>Use Cases</h6>
+                <ul class="small mb-0">
+                    <li>Multi-perspective analysis</li>
+                    <li>Complex problem decomposition</li>
+                    <li>Parallel data processing</li>
+                    <li>Decision making with debate</li>
+                    <li>Large-scale content generation</li>
+                </ul>
+                
+                <hr>
+                
+                <h6><i class="bi bi-gear text-secondary me-2"></i>Coordination Patterns</h6>
+                <ul class="small mb-0">
+                    <li><strong>Parallel:</strong> Independent execution</li>
+                    <li><strong>Sequential:</strong> Chained processing</li>
+                    <li><strong>Hierarchical:</strong> Manager-worker</li>
+                    <li><strong>Collaborative:</strong> Debate & consensus</li>
+                    <li><strong>Adaptive:</strong> Self-organizing</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<!-- AI Organization Templates Section -->
+<h2 id="aiorg" class="mb-4">
+    <i class="bi bi-building me-2" style="color: #fd7e14;"></i>
+    AI Organization Templates
+</h2>
+
+<div class="row mb-5">
+    <div class="col-lg-8">
+        <div class="library-card card">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #fd7e14 0%, #dc6a12 100%);">
+                <div class="d-flex align-items-center">
+                    <div class="library-icon me-3">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">AI Organization Templates</h4>
+                        <p class="mb-0 opacity-75">Complete organizational simulations</p>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-light fs-5" style="color: #fd7e14;">7</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <p>Simulate complete organizations with departments, roles, workflows, and communication channels. From small teams to enterprise structures.</p>
+                
+                <h6 class="mt-3 mb-2">Organization Types:</h6>
+                <span class="stat-pill" style="background: #fff3e0; color: #e65100;">Teams: 3</span>
+                <span class="stat-pill" style="background: #fbe9e7; color: #bf360c;">Studios: 1</span>
+                <span class="stat-pill" style="background: #fff8e1; color: #ff8f00;">Firms: 1</span>
+                <span class="stat-pill" style="background: #ffebee; color: #c62828;">Enterprise: 2</span>
+                
+                <h6 class="mt-4 mb-2">All AI Org Templates:</h6>
+                <div class="template-list">
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-beginner"></span>Basic Research Team</span>
+                        <small class="text-muted">3 roles: Lead + 2 Researchers</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-intermediate"></span>Software Development Team</span>
+                        <small class="text-muted">5 roles: PM, Tech Lead, Devs, QA</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-intermediate"></span>Content Production Studio</span>
+                        <small class="text-muted">6 roles: Editorial pipeline</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-advanced"></span>Consulting Firm</span>
+                        <small class="text-muted">8 roles: Partners, Managers, Analysts</small>
+                    </div>
+                    <div class="template-list-item d-flex justify-content-between">
+                        <span><span class="difficulty-dot difficulty-expert"></span>Enterprise Operations Center</span>
+                        <small class="text-muted">12 roles: Full C-Suite + Directors</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('aiorg_templates') }}" class="btn text-white" style="background: #fd7e14;">
+                    <i class="bi bi-arrow-right-circle me-2"></i>Browse AI Org Templates
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card bg-light h-100">
+            <div class="card-body">
+                <h6><i class="bi bi-lightbulb text-warning me-2"></i>Use Cases</h6>
+                <ul class="small mb-0">
+                    <li>Team collaboration simulation</li>
+                    <li>Enterprise decision modeling</li>
+                    <li>Organizational behavior analysis</li>
+                    <li>Complex project coordination</li>
+                    <li>Cross-functional workflows</li>
+                </ul>
+                
+                <hr>
+                
+                <h6><i class="bi bi-gear text-secondary me-2"></i>Key Features</h6>
+                <ul class="small mb-0">
+                    <li>Department structures</li>
+                    <li>Role-based agents</li>
+                    <li>Defined workflows</li>
+                    <li>Communication channels</li>
+                    <li>Approval hierarchies</li>
+                    <li>HITL integration</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<!-- Using Templates Section -->
+<h2 id="usage">Using Templates</h2>
+
+<div class="row">
     <div class="col-md-6">
-        <div class="card h-100">
+        <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-bar-chart-fill me-2"></i>Data Analysis Pipeline</h5>
+                <h5 class="mb-0"><i class="bi bi-1-circle me-2"></i>Load a Template</h5>
             </div>
             <div class="card-body">
-                <p>Analyze CSV data with AI-powered insights. Upload data and get statistical analysis, patterns, and recommendations.</p>
-                
-                <h6>Features:</h6>
+                <p>Navigate to the template library for your desired type:</p>
                 <ul>
-                    <li>Automatic CSV parsing</li>
-                    <li>Statistical calculations (mean, min, max, etc.)</li>
-                    <li>AI-powered pattern detection</li>
-                    <li>Actionable recommendations</li>
+                    <li><a href="{{ url_for('workflow_templates') }}">Workflow Templates</a></li>
+                    <li><a href="{{ url_for('agent_templates') }}">Agent Templates</a></li>
+                    <li><a href="{{ url_for('swarm_templates') }}">Swarm Templates</a></li>
+                    <li><a href="{{ url_for('aiorg_templates') }}">AI Org Templates</a></li>
                 </ul>
-                
-                <h6>Input:</h6>
-                <pre><code class="language-json">{
-  "csv_data": "name,age,salary\nJohn,30,50000\nJane,25,60000",
-  "analysis_focus": "salary distribution"
-}</code></pre>
-                
-                <h6>Workflow ID:</h6>
-                <code>prebuilt-data-analyzer</code>
-            </div>
-            <div class="card-footer">
-                <span class="badge bg-primary">analytics</span>
-                <span class="badge bg-secondary">data</span>
-                <span class="badge bg-secondary">csv</span>
+                <p class="mb-0">Click on a template to view details, then click <strong>"Use Template"</strong> to load it.</p>
             </div>
         </div>
     </div>
-    
-    <!-- Document Summarizer -->
     <div class="col-md-6">
-        <div class="card h-100">
+        <div class="card mb-4">
             <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Document Summarizer</h5>
+                <h5 class="mb-0"><i class="bi bi-2-circle me-2"></i>Customize & Save</h5>
             </div>
             <div class="card-body">
-                <p>Summarize long documents with AI. Supports multiple output formats: executive summary, bullet points, or detailed analysis.</p>
-                
-                <h6>Features:</h6>
+                <p>After loading, customize the template:</p>
                 <ul>
-                    <li>Multiple summary types (executive, bullets, detailed)</li>
-                    <li>Configurable output length</li>
-                    <li>Compression ratio tracking</li>
-                    <li>Handles large documents via chunking</li>
+                    <li>Modify agent prompts and configurations</li>
+                    <li>Add or remove nodes/roles</li>
+                    <li>Adjust LLM providers and models</li>
+                    <li>Configure tools and integrations</li>
                 </ul>
-                
-                <h6>Input:</h6>
-                <pre><code class="language-json">{
-  "document_text": "Your long document text here...",
-  "summary_type": "executive",
-  "max_length": 500
-}</code></pre>
-                
-                <h6>Workflow ID:</h6>
-                <code>prebuilt-doc-summarizer</code>
-            </div>
-            <div class="card-footer">
-                <span class="badge bg-success">content</span>
-                <span class="badge bg-secondary">document</span>
-                <span class="badge bg-secondary">summary</span>
+                <p class="mb-0">Save your customized version with a new name.</p>
             </div>
         </div>
     </div>
-</div>
-
-<hr class="my-5">
-
-<h2 id="agents">Pre-built Agents</h2>
-
-<div class="row g-4">
-    <!-- Customer Support Agent -->
     <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-headset me-2"></i>Customer Support Agent</h5>
-            </div>
-            <div class="card-body">
-                <p>A professional customer support agent that handles inquiries, provides product information, and resolves common issues with empathy.</p>
-                
-                <h6>Capabilities:</h6>
-                <ul>
-                    <li>Answer product questions</li>
-                    <li>Handle complaints professionally</li>
-                    <li>Escalate complex issues (HITL enabled)</li>
-                    <li>Provide order status updates</li>
-                </ul>
-                
-                <h6>HITL Triggers:</h6>
-                <ul>
-                    <li>Keywords: "refund", "cancel", "legal"</li>
-                    <li>Cost threshold: $0.50</li>
-                </ul>
-                
-                <h6>Agent ID:</h6>
-                <code>prebuilt-customer-support</code>
-                
-                <h6>Try It:</h6>
-                <pre><code class="language-text">"I ordered a product 3 days ago and haven't received shipping confirmation yet."</code></pre>
-            </div>
-            <div class="card-footer">
-                <span class="badge bg-info">support</span>
-                <span class="badge bg-secondary">conversational</span>
-                <span class="badge bg-warning text-dark">HITL</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Code Reviewer Agent -->
-    <div class="col-md-6">
-        <div class="card h-100">
+        <div class="card mb-4">
             <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="bi bi-code-square me-2"></i>Code Review Assistant</h5>
+                <h5 class="mb-0"><i class="bi bi-3-circle me-2"></i>Approve for Execution</h5>
             </div>
             <div class="card-body">
-                <p>An expert code reviewer that analyzes code for bugs, security issues, performance problems, and style improvements.</p>
-                
-                <h6>Review Categories:</h6>
+                <p>Before execution, templates need approval:</p>
                 <ul>
-                    <li>Bugs & Logic Errors</li>
-                    <li>Security Vulnerabilities (SQL injection, XSS, etc.)</li>
-                    <li>Performance Issues</li>
-                    <li>Code Quality & Best Practices</li>
+                    <li>Review the configuration</li>
+                    <li>Test with sample inputs</li>
+                    <li>Submit for approval (if HITL enabled)</li>
+                    <li>Approve to make available for execution</li>
                 </ul>
-                
-                <h6>Model:</h6>
-                <p>Uses GPT-4o for highest quality code analysis.</p>
-                
-                <h6>Agent ID:</h6>
-                <code>prebuilt-code-reviewer</code>
-                
-                <h6>Try It:</h6>
-                <pre><code class="language-text">"Review this: query = f'SELECT * FROM users WHERE id = {user_id}'"</code></pre>
+                <p class="mb-0">Approved items appear in the execution dashboard.</p>
             </div>
-            <div class="card-footer">
-                <span class="badge bg-warning text-dark">code</span>
-                <span class="badge bg-secondary">development</span>
-                <span class="badge bg-secondary">security</span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-4-circle me-2"></i>Execute & Monitor</h5>
+            </div>
+            <div class="card-body">
+                <p>Run your approved configurations:</p>
+                <ul>
+                    <li>Provide input data or prompts</li>
+                    <li>Execute the workflow/agent/swarm/org</li>
+                    <li>Monitor progress in real-time</li>
+                    <li>Review outputs and logs</li>
+                </ul>
+                <p class="mb-0">All executions are logged for analysis.</p>
             </div>
         </div>
     </div>
 </div>
 
-<hr class="my-5">
-
-<h2 id="customizing">Customizing Pre-built Items</h2>
-
-<h5>1. Clone and Modify</h5>
-<p>The easiest way to customize is to clone a pre-built item and modify it:</p>
-<ol>
-    <li>Go to the workflow or agent detail page</li>
-    <li>Click "Clone" to create a copy</li>
-    <li>Modify the configuration, prompts, or workflow nodes</li>
-    <li>Save with a new name</li>
-</ol>
-
-<h5>2. Common Customizations</h5>
-<div class="table-responsive">
-    <table class="table table-hover">
-        <thead class="table-light">
-            <tr><th>What to Change</th><th>How</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>LLM Provider/Model</td><td>Edit <code>llm_config.provider</code> and <code>llm_config.model</code></td></tr>
-            <tr><td>Agent Personality</td><td>Modify the <code>system_prompt</code></td></tr>
-            <tr><td>HITL Triggers</td><td>Adjust <code>hitl_config.triggers</code> keywords or thresholds</td></tr>
-            <tr><td>Workflow Steps</td><td>Add, remove, or modify nodes in the workflow</td></tr>
-            <tr><td>Temperature</td><td>Lower for factual (0.1-0.3), higher for creative (0.7-1.0)</td></tr>
-        </tbody>
-    </table>
-</div>
-
-<h5>3. Example: Customize for Your Brand</h5>
-<pre><code class="language-json">{
-  "system_prompt": "You are a friendly support agent for ACME Corp. Our products include...\n\nUse this greeting: 'Hi! I'm Alex from ACME support.'\n\n[rest of your customizations]"
-}</code></pre>
-
-<hr class="my-5">
-
-<h2 id="importing">Importing Pre-built Items</h2>
-
-<h5>Via Web UI</h5>
-<ol>
-    <li>Go to <strong>Workflows</strong> or <strong>Agents</strong></li>
-    <li>Click <strong>"Import from Templates"</strong></li>
-    <li>Select a pre-built item</li>
-    <li>Click <strong>"Import"</strong></li>
-</ol>
-
-<h5>Via API</h5>
-<pre><code class="language-bash"># Import a pre-built workflow
-curl -X POST "http://localhost:5000/api/workflows/import" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"template_id": "prebuilt-data-analyzer"}'
-
-# Import a pre-built agent
-curl -X POST "http://localhost:5000/api/agents/import" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"template_id": "prebuilt-customer-support"}'</code></pre>
-
-<h5>File Locations</h5>
-<p>Pre-built items are stored in:</p>
-<ul>
-    <li>Workflows: <code>data/prebuilt/workflows/*.json</code></li>
-    <li>Agents: <code>data/prebuilt/agents/*.json</code></li>
-</ul>
-
-<div class="alert alert-info mt-4">
-    <i class="bi bi-lightbulb me-2"></i>
-    <strong>Pro Tip:</strong> Create your own "pre-built" items by saving JSON files to these directories. They'll be available for import after server restart.
+<div class="alert alert-success mt-4">
+    <div class="d-flex align-items-center">
+        <i class="bi bi-journal-code fs-4 me-3"></i>
+        <div>
+            <strong>Want working code examples?</strong> Check out the <a href="{{ url_for('help_page', page='examples') }}" class="alert-link">Examples</a> page for complete implementations with JSON configs and Python code you can run immediately.
+        </div>
+    </div>
 </div>
 
 <div class="text-center mt-5">

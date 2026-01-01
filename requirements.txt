@@ -1,5 +1,5 @@
 # Abhikarta-LLM - Python Dependencies
-# Version: 1.4.6
+# Version: 1.4.7
 # Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved.
 
 # Core Framework

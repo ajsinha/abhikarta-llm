@@ -1,0 +1,165 @@
+{
+  "example_id": "ex_data_transformation_pipeline",
+  "name": "Data Transformation Pipeline",
+  "description": "A comprehensive data transformation workflow that handles extraction, validation, transformation, enrichment, and loading of data. Demonstrates ETL patterns with AI-assisted data quality.",
+  "workflow_config": {
+    "workflow_id": "wf_data_transform_001",
+    "name": "Data Transformation Pipeline",
+    "version": "1.0.0",
+    "nodes": [
+      {
+        "id": "data_inspector",
+        "type": "llm",
+        "name": "Data Inspector",
+        "config": {
+          "prompt_template": "Inspect this data and provide analysis:\n\n{input}\n\nProvide:\n1. DATA_TYPE: What kind of data is this?\n2. FORMAT: Current format (JSON, CSV, text, etc.)\n3. SCHEMA: Identify fields/columns and their types\n4. QUALITY_ISSUES: Any obvious problems\n5. STATISTICS: Basic stats (count, completeness, etc.)\n6. ANOMALIES: Any outliers or unusual values",
+          "output_key": "data_inspection"
+        }
+      },
+      {
+        "id": "schema_validator",
+        "type": "llm",
+        "name": "Schema Validator",
+        "config": {
+          "prompt_template": "Validate data against expected schema:\n\nDATA INSPECTION:\n{data_inspection}\n\nRAW DATA:\n{input}\n\nValidate:\n1. REQUIRED_FIELDS: Are all expected fields present?\n2. DATA_TYPES: Do values match expected types?\n3. CONSTRAINTS: Are values within acceptable ranges?\n4. RELATIONSHIPS: Do related fields make sense together?\n\nProvide validation report with PASS/FAIL for each check.",
+          "output_key": "validation_report"
+        }
+      },
+      {
+        "id": "quality_assessor",
+        "type": "llm",
+        "name": "Quality Assessor",
+        "config": {
+          "prompt_template": "Assess data quality:\n\nDATA INSPECTION:\n{data_inspection}\nVALIDATION:\n{validation_report}\n\nAssess:\n1. COMPLETENESS: % of required data present\n2. ACCURACY: Signs of incorrect data\n3. CONSISTENCY: Internal consistency\n4. TIMELINESS: Is data current/relevant?\n5. UNIQUENESS: Any duplicates?\n\nProvide quality score (0-100) and list issues.",
+          "output_key": "quality_assessment"
+        }
+      },
+      {
+        "id": "quality_router",
+        "type": "condition",
+        "name": "Quality Router",
+        "config": {
+          "conditions": [
+            {"condition": "quality_score >= 80", "target": "transformation_planner"},
+            {"condition": "quality_score >= 50", "target": "data_cleaner"},
+            {"default": true, "target": "rejection_handler"}
+          ]
+        }
+      },
+      {
+        "id": "data_cleaner",
+        "type": "llm",
+        "name": "Data Cleaner",
+        "config": {
+          "prompt_template": "Clean this data:\n\nRAW DATA:\n{input}\n\nQUALITY ISSUES:\n{quality_assessment}\n\nPerform cleaning:\n1. MISSING_VALUES: How to handle (impute, remove, flag)\n2. DUPLICATES: Identify and remove\n3. FORMATTING: Standardize formats\n4. OUTLIERS: How to handle\n5. TYPOS: Correct obvious errors\n\nProvide cleaned data and cleaning log.",
+          "output_key": "cleaned_data"
+        }
+      },
+      {
+        "id": "rejection_handler",
+        "type": "llm",
+        "name": "Rejection Handler",
+        "config": {
+          "prompt_template": "Data rejected due to quality issues:\n\nQUALITY ASSESSMENT:\n{quality_assessment}\n\nProvide:\n1. REJECTION_REASON: Clear explanation\n2. REQUIRED_FIXES: What needs to change\n3. SALVAGEABLE: Which parts (if any) can be used\n4. RECOMMENDATIONS: How to improve data quality",
+          "output_key": "rejection_report"
+        }
+      },
+      {
+        "id": "transformation_planner",
+        "type": "llm",
+        "name": "Transformation Planner",
+        "config": {
+          "prompt_template": "Plan data transformations:\n\nDATA:\n{cleaned_data}\n\nSCHEMA:\n{data_inspection}\n\nDetermine transformations needed:\n1. FIELD_MAPPING: Source to target field mapping\n2. TYPE_CONVERSIONS: Data type changes\n3. CALCULATIONS: Derived fields to compute\n4. AGGREGATIONS: Any grouping/summarization\n5. RESTRUCTURING: Shape changes (flatten, nest, etc.)\n\nProvide transformation plan.",
+          "output_key": "transformation_plan"
+        }
+      },
+      {
+        "id": "transformer",
+        "type": "llm",
+        "name": "Transformer",
+        "config": {
+          "prompt_template": "Apply transformations:\n\nSOURCE DATA:\n{cleaned_data}\n\nTRANSFORMATION PLAN:\n{transformation_plan}\n\nApply all planned transformations and provide:\n1. TRANSFORMED_DATA: The result\n2. TRANSFORMATION_LOG: What was changed\n3. VALIDATION: Verify transformations applied correctly",
+          "output_key": "transformed_data"
+        }
+      },
+      {
+        "id": "enrichment_analyzer",
+        "type": "llm",
+        "name": "Enrichment Analyzer",
+        "config": {
+          "prompt_template": "Analyze enrichment opportunities:\n\nTRANSFORMED DATA:\n{transformed_data}\n\nIdentify:\n1. DERIVED_METRICS: Useful calculations to add\n2. CATEGORIZATIONS: Useful groupings/labels\n3. NORMALIZATIONS: Standardizations to apply\n4. RELATIONSHIPS: Cross-references to add\n5. METADATA: Useful metadata to generate",
+          "output_key": "enrichment_plan"
+        }
+      },
+      {
+        "id": "data_enricher",
+        "type": "llm",
+        "name": "Data Enricher",
+        "config": {
+          "prompt_template": "Enrich the data:\n\nDATA:\n{transformed_data}\n\nENRICHMENT PLAN:\n{enrichment_plan}\n\nAdd enrichments:\n1. Apply all planned enrichments\n2. Document what was added\n3. Ensure enrichments are accurate\n\nProvide enriched data.",
+          "output_key": "enriched_data"
+        }
+      },
+      {
+        "id": "output_formatter",
+        "type": "llm",
+        "name": "Output Formatter",
+        "config": {
+          "prompt_template": "Format final output:\n\nENRICHED DATA:\n{enriched_data}\n\nFormat for output:\n1. Apply consistent formatting\n2. Order fields appropriately\n3. Add metadata (timestamps, version, etc.)\n4. Validate final structure\n\nProvide formatted output.",
+          "output_key": "formatted_output"
+        }
+      },
+      {
+        "id": "lineage_tracker",
+        "type": "llm",
+        "name": "Lineage Tracker",
+        "config": {
+          "prompt_template": "Generate data lineage:\n\nTRANSFORMATION JOURNEY:\n- Original: {input}\n- Cleaned: {cleaned_data}\n- Transformed: {transformed_data}\n- Enriched: {enriched_data}\n- Final: {formatted_output}\n\nCreate lineage documentation:\n1. SOURCE_TO_TARGET mapping\n2. TRANSFORMATIONS applied\n3. QUALITY_CHANGES throughout\n4. AUDIT_TRAIL for compliance",
+          "output_key": "data_lineage"
+        }
+      },
+      {
+        "id": "final_output",
+        "type": "aggregator",
+        "name": "Final Output",
+        "config": {
+          "template": "DATA TRANSFORMATION COMPLETE\n\n=== FINAL DATA ===\n{formatted_output}\n\n=== LINEAGE ===\n{data_lineage}\n\n=== QUALITY METRICS ===\nInitial Quality: {initial_quality}\nFinal Quality: Validated\nTransformations: {transformation_count}",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "data_inspector", "target": "schema_validator"},
+      {"source": "schema_validator", "target": "quality_assessor"},
+      {"source": "quality_assessor", "target": "quality_router"},
+      {"source": "quality_router", "target": "transformation_planner", "condition": "high_quality"},
+      {"source": "quality_router", "target": "data_cleaner", "condition": "medium_quality"},
+      {"source": "quality_router", "target": "rejection_handler", "condition": "low_quality"},
+      {"source": "data_cleaner", "target": "transformation_planner"},
+      {"source": "transformation_planner", "target": "transformer"},
+      {"source": "transformer", "target": "enrichment_analyzer"},
+      {"source": "enrichment_analyzer", "target": "data_enricher"},
+      {"source": "data_enricher", "target": "output_formatter"},
+      {"source": "output_formatter", "target": "lineage_tracker"},
+      {"source": "lineage_tracker", "target": "final_output"}
+    ],
+    "entry_point": "data_inspector",
+    "output_node": "final_output"
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.3
+  },
+  "test_inputs": [
+    {
+      "name": "JSON Data",
+      "input": "[{\"name\": \"John Doe\", \"age\": 30, \"email\": \"john@example.com\", \"salary\": \"50000\"}, {\"name\": \"Jane Smith\", \"age\": null, \"email\": \"invalid-email\", \"salary\": 60000}]"
+    },
+    {
+      "name": "CSV-like Data",
+      "input": "name,department,hire_date,performance_score\nAlice,Engineering,2020-01-15,4.5\nBob,Marketing,2019-03-20,3.8\nCharlie,Engineering,invalid-date,4.2"
+    }
+  ]
+}

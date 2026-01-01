@@ -6,7 +6,7 @@ def title_slide():
 <head></head>
 <body class="col center" style="width: 960px; height: 540px; background: #F4F9FD; padding: 50px; box-sizing: border-box;">
   <h1 style="font-size: 42px; color: #0079C1; margin: 0; font-weight: 700;">Abhikarta-LLM</h1>
-  <p style="font-size: 16px; color: #1A3A5C; margin: 8px 0 0 0;">Enterprise AI Orchestration Platform v1.4.6</p>
+  <p style="font-size: 16px; color: #1A3A5C; margin: 8px 0 0 0;">Enterprise AI Orchestration Platform v1.4.7</p>
   <div class="row gap" style="margin-top: 24px;">
     <div style="background: #E8F4FC; padding: 12px 20px; border-radius: 6px; text-align: center;">
       <p style="font-size: 20px; color: #0079C1; margin: 0; font-weight: 600;">11+</p>
@@ -44,7 +44,7 @@ def content_slide(num, title, content):
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD; padding: 30px 40px; box-sizing: border-box;">
   <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 8px;">
     <p style="font-size: 14px; color: #0079C1; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 8px; color: #5A7A9C; margin: 0;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 8px; color: #5A7A9C; margin: 0;">Abhikarta-LLM v1.4.7</p>
   </div>
   <div style="background: #0079C1; height: 2px; margin-bottom: 8px; border-radius: 2px;"></div>
   <div class="fill-height" style="overflow: hidden;">
@@ -63,7 +63,7 @@ def thank_you_slide(num):
 <head></head>
 <body class="col center" style="width: 960px; height: 540px; background: #F4F9FD; padding: 50px; box-sizing: border-box;">
   <h1 style="font-size: 40px; color: #0079C1; margin: 0; font-weight: 700;">Thank You</h1>
-  <p style="font-size: 16px; color: #1A3A5C; margin: 10px 0 0 0;">Abhikarta-LLM v1.4.6</p>
+  <p style="font-size: 16px; color: #1A3A5C; margin: 10px 0 0 0;">Abhikarta-LLM v1.4.7</p>
   <p style="font-size: 11px; color: #5A7A9C; margin: 6px 0 0 0;">Enterprise AI Orchestration Platform</p>
   <p style="font-size: 8px; color: #5A7A9C; margin: 24px 0 0 0;">Copyright 2025-2030 Ashutosh Sinha | All Rights Reserved | Patent Pending | Slide {num}</p>
 </body>

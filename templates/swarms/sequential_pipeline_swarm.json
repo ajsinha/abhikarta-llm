@@ -1,0 +1,126 @@
+{
+  "template_id": "swarm_sequential_pipeline",
+  "name": "Sequential Pipeline Swarm",
+  "description": "A swarm that chains agents sequentially, where each agent's output becomes the next agent's input. Ideal for multi-stage processing workflows.",
+  "version": "1.0.0",
+  "category": "pipeline",
+  "difficulty": "beginner",
+  "icon": "bi-arrow-right-circle",
+  "tags": ["sequential", "pipeline", "chain", "processing"],
+  "estimated_duration": "1-2 minutes",
+  "use_cases": [
+    "Document processing pipeline",
+    "Content refinement workflow",
+    "Data transformation chain",
+    "Multi-stage analysis"
+  ],
+  
+  "swarm": {
+    "swarm_type": "sequential",
+    "name": "Sequential Pipeline Swarm",
+    "description": "Chain agents in sequence for multi-stage processing",
+    
+    "coordinator": {
+      "type": "pipeline_controller",
+      "pass_context": true,
+      "accumulate_results": true,
+      "timeout_seconds": 300,
+      "fail_strategy": "stop_on_error"
+    },
+    
+    "agents": [
+      {
+        "agent_id": "intake_agent",
+        "name": "Intake Processor",
+        "role": "Stage 1: Input Processing",
+        "order": 1,
+        "agent_type": "conversational",
+        "system_prompt": "You are the Intake Processor. Your job is to receive raw input and structure it for further processing. Extract key information, identify the main topic, and organize the content into clear sections. Output a structured summary.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.2,
+          "max_tokens": 1500
+        }
+      },
+      {
+        "agent_id": "analyzer_agent",
+        "name": "Deep Analyzer",
+        "role": "Stage 2: Analysis",
+        "order": 2,
+        "agent_type": "conversational",
+        "system_prompt": "You are the Deep Analyzer. You receive structured input from the Intake Processor. Perform detailed analysis: identify patterns, extract insights, evaluate strengths and weaknesses, and provide analytical observations.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.4,
+          "max_tokens": 2000
+        }
+      },
+      {
+        "agent_id": "synthesizer_agent",
+        "name": "Synthesizer",
+        "role": "Stage 3: Synthesis",
+        "order": 3,
+        "agent_type": "conversational",
+        "system_prompt": "You are the Synthesizer. You receive analyzed content from the Deep Analyzer. Synthesize the findings into coherent conclusions, connect related insights, and prepare comprehensive recommendations.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.5,
+          "max_tokens": 1500
+        }
+      },
+      {
+        "agent_id": "formatter_agent",
+        "name": "Output Formatter",
+        "role": "Stage 4: Formatting",
+        "order": 4,
+        "agent_type": "conversational",
+        "system_prompt": "You are the Output Formatter. You receive synthesized content and format it for final presentation. Create a polished, well-structured output with clear sections, bullet points where appropriate, and a professional tone.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.3,
+          "max_tokens": 2000
+        }
+      }
+    ],
+    
+    "execution": {
+      "mode": "sequential",
+      "pass_full_context": true,
+      "timeout_per_agent": 90,
+      "retry_on_failure": true,
+      "max_retries": 1
+    },
+    
+    "output": {
+      "format": "structured",
+      "include_intermediate": true,
+      "include_pipeline_trace": true
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "content": "Raw research notes about artificial intelligence trends in healthcare...",
+      "output_format": "executive_report"
+    },
+    {
+      "content": "Customer feedback data from Q3 2024...",
+      "output_format": "insights_summary"
+    }
+  ],
+  
+  "expected_outputs": [
+    "Processed and formatted final output",
+    "Intermediate results from each stage",
+    "Pipeline execution trace"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model",
+    "Understanding of pipeline processing"
+  ]
+}

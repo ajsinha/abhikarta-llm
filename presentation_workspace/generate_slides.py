@@ -8,7 +8,7 @@ def create_slide(slide_num, title, content_html):
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD;">
   <div style="background: #0079C1; padding: 12px 40px; display: flex; justify-content: space-between; align-items: center;">
     <p style="font-size: 18px; color: #FFFFFF; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 11px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 11px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.7</p>
   </div>
   
   <div class="fill-height" style="background: #F4F9FD; padding: 16px 40px;">

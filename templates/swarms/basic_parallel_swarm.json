@@ -1,0 +1,106 @@
+{
+  "template_id": "swarm_basic_parallel",
+  "name": "Basic Parallel Swarm",
+  "description": "A simple swarm that executes multiple agents in parallel and aggregates their results. Perfect for tasks that can be divided into independent subtasks.",
+  "version": "1.0.0",
+  "category": "basic",
+  "difficulty": "beginner",
+  "icon": "bi-grid-3x3",
+  "tags": ["parallel", "basic", "aggregation", "beginner"],
+  "estimated_duration": "< 1 minute",
+  "use_cases": [
+    "Multi-perspective analysis",
+    "Parallel data processing",
+    "Independent task execution",
+    "Brainstorming from multiple angles"
+  ],
+  
+  "swarm": {
+    "swarm_type": "parallel",
+    "name": "Basic Parallel Swarm",
+    "description": "Execute agents in parallel and aggregate results",
+    
+    "coordinator": {
+      "type": "simple_aggregator",
+      "aggregation_strategy": "merge_all",
+      "timeout_seconds": 120,
+      "fail_strategy": "partial_results"
+    },
+    
+    "agents": [
+      {
+        "agent_id": "analyst_1",
+        "name": "Analyst Alpha",
+        "role": "Primary Analyst",
+        "agent_type": "conversational",
+        "system_prompt": "You are Analyst Alpha. Analyze the given input from a factual and data-driven perspective. Focus on concrete evidence, statistics, and measurable outcomes.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.3,
+          "max_tokens": 1000
+        }
+      },
+      {
+        "agent_id": "analyst_2",
+        "name": "Analyst Beta",
+        "role": "Secondary Analyst",
+        "agent_type": "conversational",
+        "system_prompt": "You are Analyst Beta. Analyze the given input from a creative and innovative perspective. Focus on possibilities, opportunities, and unconventional approaches.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.7,
+          "max_tokens": 1000
+        }
+      },
+      {
+        "agent_id": "analyst_3",
+        "name": "Analyst Gamma",
+        "role": "Risk Analyst",
+        "agent_type": "conversational",
+        "system_prompt": "You are Analyst Gamma. Analyze the given input from a risk and challenge perspective. Focus on potential problems, obstacles, and mitigation strategies.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.4,
+          "max_tokens": 1000
+        }
+      }
+    ],
+    
+    "execution": {
+      "mode": "parallel",
+      "max_concurrent": 3,
+      "timeout_per_agent": 60,
+      "retry_on_failure": true,
+      "max_retries": 2
+    },
+    
+    "output": {
+      "format": "structured",
+      "include_metadata": true,
+      "include_timing": true
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "task": "Analyze the potential of remote work for a mid-sized technology company"
+    },
+    {
+      "task": "Evaluate the pros and cons of migrating to cloud infrastructure"
+    }
+  ],
+  
+  "expected_outputs": [
+    "Aggregated analysis from all three perspectives",
+    "Structured JSON with individual agent responses",
+    "Execution timing and metadata"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model",
+    "Basic understanding of parallel execution"
+  ]
+}

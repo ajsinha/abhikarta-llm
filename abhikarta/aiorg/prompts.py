@@ -1,7 +1,7 @@
 """
 AI Org Prompts - LLM prompts for task analysis, delegation, and aggregation.
 
-Version: 1.4.6
+Version: 1.4.7
 Copyright © 2025-2030, All Rights Reserved
 """
 

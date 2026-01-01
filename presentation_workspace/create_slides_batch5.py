@@ -7,7 +7,7 @@ def content_slide(num, title, content):
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD; padding: 20px 30px; box-sizing: border-box;">
   <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 10px;">
     <p style="font-size: 15px; color: #0079C1; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 9px; color: #5A7A9C; margin: 0;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 9px; color: #5A7A9C; margin: 0;">Abhikarta-LLM v1.4.7</p>
   </div>
   <div style="background: #0079C1; height: 2px; margin-bottom: 10px; border-radius: 2px;"></div>
   <div class="fill-height" style="overflow: hidden;">
@@ -39,7 +39,7 @@ def thank_you_slide(num):
 <body class="col center" style="width: 960px; height: 540px; background: #F4F9FD; padding: 40px; box-sizing: border-box;">
   <h1 style="font-size: 42px; color: #0079C1; margin: 0; font-weight: 700;">Thank You</h1>
   <p style="font-size: 18px; color: #1A3A5C; margin: 12px 0 0 0;">Abhikarta-LLM</p>
-  <p style="font-size: 12px; color: #5A7A9C; margin: 6px 0 0 0;">Enterprise AI Orchestration Platform v1.4.6</p>
+  <p style="font-size: 12px; color: #5A7A9C; margin: 6px 0 0 0;">Enterprise AI Orchestration Platform v1.4.7</p>
   <div class="row gap" style="margin-top: 20px;">
     <div style="background: #E8F4FC; padding: 10px 16px; border-radius: 6px; text-align: center;">
       <p style="font-size: 16px; color: #ED1C24; margin: 0; font-weight: 600;">11+ Providers</p>

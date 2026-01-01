@@ -1,0 +1,148 @@
+{
+  "example_id": "ex_strategic_planning",
+  "name": "Strategic Planning Pipeline",
+  "description": "A comprehensive strategic planning workflow that conducts environmental analysis, evaluates strategic options, develops action plans, and creates implementation roadmaps.",
+  "workflow_config": {
+    "workflow_id": "wf_strategic_planning_001",
+    "name": "Strategic Planning Pipeline",
+    "version": "1.0.0",
+    "nodes": [
+      {
+        "id": "situation_analyzer",
+        "type": "llm",
+        "name": "Situation Analyzer",
+        "config": {
+          "prompt_template": "Analyze the current situation:\n\n{input}\n\nProvide comprehensive analysis:\n\n1. CURRENT STATE\n- Where are we now?\n- Key metrics and indicators\n- Recent trends\n\n2. CONTEXT\n- Market conditions\n- Competitive landscape\n- Regulatory environment\n\n3. STAKEHOLDERS\n- Who is affected?\n- What are their interests?\n- Who has influence?",
+          "output_key": "situation_analysis"
+        }
+      },
+      {
+        "id": "swot_analyzer",
+        "type": "llm",
+        "name": "SWOT Analyzer",
+        "config": {
+          "prompt_template": "Conduct SWOT analysis:\n\nSITUATION:\n{situation_analysis}\n\nAnalyze:\n\nSTRENGTHS (Internal Positives)\n- What advantages exist?\n- What is done well?\n- Unique capabilities?\n\nWEAKNESSES (Internal Negatives)\n- What could be improved?\n- What is done poorly?\n- Resource gaps?\n\nOPPORTUNITIES (External Positives)\n- Market trends to leverage?\n- Competitor weaknesses?\n- Emerging needs?\n\nTHREATS (External Negatives)\n- Competitive threats?\n- Market risks?\n- Regulatory changes?",
+          "output_key": "swot_analysis"
+        }
+      },
+      {
+        "id": "pestle_analyzer",
+        "type": "llm",
+        "name": "PESTLE Analyzer",
+        "config": {
+          "prompt_template": "Conduct PESTLE analysis:\n\nSITUATION:\n{situation_analysis}\n\nAnalyze external factors:\n\nPOLITICAL\n- Government policies\n- Political stability\n- Trade regulations\n\nECONOMIC\n- Economic growth\n- Interest rates\n- Consumer spending\n\nSOCIAL\n- Demographics\n- Cultural trends\n- Lifestyle changes\n\nTECHNOLOGICAL\n- New technologies\n- R&D activity\n- Automation\n\nLEGAL\n- Regulations\n- Compliance requirements\n- Legal risks\n\nENVIRONMENTAL\n- Sustainability\n- Climate factors\n- Environmental regulations",
+          "output_key": "pestle_analysis"
+        }
+      },
+      {
+        "id": "strategic_issue_identifier",
+        "type": "llm",
+        "name": "Strategic Issue Identifier",
+        "config": {
+          "prompt_template": "Identify strategic issues:\n\nSWOT:\n{swot_analysis}\n\nPESTLE:\n{pestle_analysis}\n\nIdentify key strategic issues:\n\n1. CRITICAL ISSUES\n- Most urgent challenges\n- Highest impact items\n\n2. OPPORTUNITY AREAS\n- Where to capitalize\n- Growth potential\n\n3. RISK AREAS\n- What could go wrong\n- Mitigation needs\n\n4. STRATEGIC QUESTIONS\n- Key decisions needed\n- Trade-offs to resolve",
+          "output_key": "strategic_issues"
+        }
+      },
+      {
+        "id": "option_generator",
+        "type": "llm",
+        "name": "Strategic Option Generator",
+        "config": {
+          "prompt_template": "Generate strategic options:\n\nSTRATEGIC ISSUES:\n{strategic_issues}\n\nDevelop 3-5 distinct strategic options:\n\nFor each option:\n1. OPTION NAME: Clear label\n2. DESCRIPTION: What it involves\n3. RATIONALE: Why it makes sense\n4. KEY ACTIONS: Main initiatives\n5. RESOURCE REQUIREMENTS: What's needed\n6. RISKS: Main risks\n7. TIMELINE: Implementation horizon",
+          "output_key": "strategic_options"
+        }
+      },
+      {
+        "id": "option_evaluator",
+        "type": "llm",
+        "name": "Option Evaluator",
+        "config": {
+          "prompt_template": "Evaluate strategic options:\n\nOPTIONS:\n{strategic_options}\n\nSTRATEGIC CONTEXT:\n{strategic_issues}\n\nEvaluate each option on:\n\n1. STRATEGIC FIT (1-10)\n- Alignment with vision\n- Addresses key issues\n\n2. FEASIBILITY (1-10)\n- Resource availability\n- Capability match\n\n3. RISK-ADJUSTED RETURN (1-10)\n- Expected benefits\n- Risk profile\n\n4. IMPLEMENTATION COMPLEXITY (1-10)\n- Difficulty level\n- Change required\n\nProvide overall ranking and recommendation.",
+          "output_key": "option_evaluation"
+        }
+      },
+      {
+        "id": "strategy_synthesizer",
+        "type": "llm",
+        "name": "Strategy Synthesizer",
+        "config": {
+          "prompt_template": "Synthesize final strategy:\n\nEVALUATED OPTIONS:\n{option_evaluation}\n\nCreate comprehensive strategy:\n\n1. STRATEGIC DIRECTION\n- Vision statement\n- Strategic priorities\n- Guiding principles\n\n2. STRATEGIC INITIATIVES\n- Key programs\n- Major projects\n- Quick wins\n\n3. SUCCESS METRICS\n- Key performance indicators\n- Targets and milestones\n- Tracking approach",
+          "output_key": "strategy_synthesis"
+        }
+      },
+      {
+        "id": "roadmap_developer",
+        "type": "llm",
+        "name": "Roadmap Developer",
+        "config": {
+          "prompt_template": "Develop implementation roadmap:\n\nSTRATEGY:\n{strategy_synthesis}\n\nCreate phased roadmap:\n\nPHASE 1: QUICK WINS (0-3 months)\n- Immediate actions\n- Early results\n\nPHASE 2: FOUNDATION (3-12 months)\n- Core initiatives\n- Capability building\n\nPHASE 3: ACCELERATION (12-24 months)\n- Scale initiatives\n- Expand impact\n\nPHASE 4: TRANSFORMATION (24-36 months)\n- Full realization\n- Sustained advantage\n\nFor each phase: actions, milestones, dependencies, resources.",
+          "output_key": "implementation_roadmap"
+        }
+      },
+      {
+        "id": "risk_mitigator",
+        "type": "llm",
+        "name": "Risk Mitigator",
+        "config": {
+          "prompt_template": "Develop risk mitigation plan:\n\nSTRATEGY:\n{strategy_synthesis}\n\nROADMAP:\n{implementation_roadmap}\n\nFor each major risk:\n1. RISK DESCRIPTION\n2. PROBABILITY (High/Medium/Low)\n3. IMPACT (High/Medium/Low)\n4. MITIGATION STRATEGY\n5. CONTINGENCY PLAN\n6. RISK OWNER",
+          "output_key": "risk_mitigation"
+        }
+      },
+      {
+        "id": "executive_summary_generator",
+        "type": "llm",
+        "name": "Executive Summary Generator",
+        "config": {
+          "prompt_template": "Generate executive summary:\n\nFULL ANALYSIS:\n- Situation: {situation_analysis}\n- Strategic Issues: {strategic_issues}\n- Strategy: {strategy_synthesis}\n- Roadmap: {implementation_roadmap}\n- Risks: {risk_mitigation}\n\nCreate executive summary (max 600 words):\n1. Strategic context\n2. Key findings\n3. Recommended strategy\n4. Implementation approach\n5. Critical success factors\n6. Immediate next steps",
+          "output_key": "executive_summary"
+        }
+      },
+      {
+        "id": "final_assembler",
+        "type": "aggregator",
+        "name": "Final Assembler",
+        "config": {
+          "template": "# STRATEGIC PLAN\n\n## Executive Summary\n{executive_summary}\n\n## Situation Analysis\n{situation_analysis}\n\n### SWOT Analysis\n{swot_analysis}\n\n### PESTLE Analysis\n{pestle_analysis}\n\n## Strategic Issues\n{strategic_issues}\n\n## Strategic Options Considered\n{strategic_options}\n\n## Option Evaluation\n{option_evaluation}\n\n## Recommended Strategy\n{strategy_synthesis}\n\n## Implementation Roadmap\n{implementation_roadmap}\n\n## Risk Mitigation\n{risk_mitigation}",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "situation_analyzer", "target": "swot_analyzer"},
+      {"source": "situation_analyzer", "target": "pestle_analyzer"},
+      {"source": "swot_analyzer", "target": "strategic_issue_identifier"},
+      {"source": "pestle_analyzer", "target": "strategic_issue_identifier"},
+      {"source": "strategic_issue_identifier", "target": "option_generator"},
+      {"source": "option_generator", "target": "option_evaluator"},
+      {"source": "option_evaluator", "target": "strategy_synthesizer"},
+      {"source": "strategy_synthesizer", "target": "roadmap_developer"},
+      {"source": "strategy_synthesizer", "target": "risk_mitigator"},
+      {"source": "roadmap_developer", "target": "risk_mitigator"},
+      {"source": "strategy_synthesizer", "target": "executive_summary_generator"},
+      {"source": "roadmap_developer", "target": "executive_summary_generator"},
+      {"source": "risk_mitigator", "target": "executive_summary_generator"},
+      {"source": "executive_summary_generator", "target": "final_assembler"}
+    ],
+    "entry_point": "situation_analyzer",
+    "output_node": "final_assembler",
+    "parallel_groups": [
+      ["swot_analyzer", "pestle_analyzer"]
+    ]
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.6
+  },
+  "test_inputs": [
+    {
+      "name": "Organization Strategy",
+      "input": "Develop a strategic plan for a mid-sized technology company looking to expand into new markets while maintaining profitability."
+    },
+    {
+      "name": "Digital Transformation",
+      "input": "Create a strategic plan for digital transformation of a traditional manufacturing company."
+    }
+  ]
+}

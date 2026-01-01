@@ -4,7 +4,7 @@ AI Org Database Operations - Persistence layer for AI Organizations.
 This module provides database operations using the delegate pattern
 to support both SQLite and PostgreSQL.
 
-Version: 1.4.6
+Version: 1.4.7
 Copyright © 2025-2030, All Rights Reserved
 """
 

@@ -7,7 +7,7 @@ def create_slide(slide_num, title, content_html):
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD;">
   <div style="background: #0079C1; padding: 12px 40px; display: flex; justify-content: space-between; align-items: center;">
     <p style="font-size: 18px; color: #FFFFFF; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 11px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 11px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.7</p>
   </div>
   
   <div class="fill-height" style="background: #F4F9FD; padding: 16px 40px;">
@@ -124,7 +124,7 @@ slides.append((51, "Copyright Notice", '''
     <div class="col center" style="height: 100%;">
       <p style="font-size: 32px; color: #0079C1; margin: 0; font-weight: 700;">Abhikarta-LLM</p>
       <p style="font-size: 16px; color: #1A3A5C; margin: 12px 0 0 0;">Enterprise AI Orchestration Platform</p>
-      <p style="font-size: 14px; color: #5A7A9C; margin: 8px 0 0 0;">Version 1.4.6</p>
+      <p style="font-size: 14px; color: #5A7A9C; margin: 8px 0 0 0;">Version 1.4.7</p>
       
       <div style="background: #FFFFFF; border: 1px solid #D0E4F0; border-radius: 8px; padding: 20px 40px; margin-top: 28px; text-align: center;">
         <p style="font-size: 13px; color: #1A3A5C; margin: 0; font-weight: 600;">Copyright © 2025-2030 Ashutosh Sinha</p>

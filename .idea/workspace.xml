@@ -4,7 +4,116 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="014fc29a-e95d-4fe0-82c3-f3b357c9f648" name="Changes" comment="" />
+    <list default="true" id="014fc29a-e95d-4fe0-82c3-f3b357c9f648" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/agent/agent_template.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/agent/agent_template.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/aiorg_template.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/aiorg_template.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/db_ops.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/db_ops.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/hitl_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/hitl_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/org_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/org_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/prompts.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/prompts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/task_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/task_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/database/schema/postgres_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/database/schema/postgres_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/database/schema/sqlite_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/database/schema/sqlite_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/examples/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/examples/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/swarm/swarm_template.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/swarm/swarm_template.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/abhikarta_llm_web.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/abhikarta_llm_web.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/aiorg_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/aiorg_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/api_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/api_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/auth_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/auth_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/swarm_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/swarm_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/aiorg/import.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/aiorg/import.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/about.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/help/about.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/about/architecture.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/help/about/architecture.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/about/comparison.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/help/about/comparison.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/about/features.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/help/about/features.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/about/roadmap.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/help/about/roadmap.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/help.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/help/help.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/pages/aiorg.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/help/pages/aiorg.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/pages/banking_solutions.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/pages/glossary.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/help/pages/glossary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/help/pages/prebuilt.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/help/pages/prebuilt.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/workflow/workflow_template.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/workflow/workflow_template.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/abhikarta.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/abhikarta.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/AIORG_ARCHITECTURE.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/AIORG_ARCHITECTURE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/AIORG_DESIGN.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/AIORG_DESIGN.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/AIORG_QUICKSTART.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/AIORG_QUICKSTART.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/AIORG_REQUIREMENTS.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/AIORG_REQUIREMENTS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/GOAL_BASED_AGENTS_TUTORIAL.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/GOAL_BASED_AGENTS_TUTORIAL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/PATENT_APPLICATION.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/PATENT_APPLICATION.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/PATENT_WORTHINESS_ANALYSIS.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/PATENT_WORTHINESS_ANALYSIS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/REACT_REFLECT_HIERARCHICAL_TUTORIAL.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/REACT_REFLECT_HIERARCHICAL_TUTORIAL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pptx-build/slide01-title.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pptx-build/slide01-title.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pptx-build/slide08-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pptx-build/slide08-dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pptx-build/slide12-thankyou.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pptx-build/slide12-thankyou.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/abhikarta.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/abhikarta.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/add_agent_executions_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/add_agent_executions_table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/set_ollama_default.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/set_ollama_default.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_all_slides.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_all_slides.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_detailed_slides.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_detailed_slides.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_final_deck.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_final_deck.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_proper_slides.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_proper_slides.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_simple_slides.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_simple_slides.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_slides_21_35.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_slides_21_35.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_slides_8_20.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_slides_8_20.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_slides_batch2.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_slides_batch2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_slides_batch3.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_slides_batch3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_slides_batch4.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_slides_batch4.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/create_slides_batch5.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/create_slides_batch5.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/fix_slides.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/fix_slides.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/generate_slides.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/generate_slides.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/generate_slides_part2.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/generate_slides_part2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/generate_slides_part3.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/generate_slides_part3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/generate_slides_part4.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/generate_slides_part4.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/generate_slides_part5.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/generate_slides_part5.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/regenerate_all_slides.py" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/regenerate_all_slides.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide01.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide01.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide02.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide02.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide03.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide03.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide04.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide04.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide05.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide05.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide06.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide06.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide08.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide08.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide09.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide09.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide11.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide11.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide12.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide12.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide14.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide14.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide15.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide15.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide17.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide17.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide18.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide18.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide19.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide19.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide20.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide20.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide21.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide21.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide23.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide23.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide24.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide24.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide25.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide25.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide27.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide27.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide29.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide29.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide30.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide30.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide32.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide32.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide33.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide33.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide35.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide35.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide36.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide36.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide37.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide37.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide38.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide38.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide39.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide39.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide41.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide41.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide43.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide43.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide44.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide44.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide45.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide45.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide47.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide47.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide48.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide48.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide49.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide49.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide50.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide50.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/presentation_workspace/slide51.html" beforeDir="false" afterPath="$PROJECT_DIR$/presentation_workspace/slide51.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_server.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -102,16 +211,5 @@
       <updated>1767291144475</updated>
     </task>
     <servers />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>8</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

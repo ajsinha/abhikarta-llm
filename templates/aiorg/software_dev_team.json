@@ -1,0 +1,241 @@
+{
+  "template_id": "aiorg_dev_team",
+  "name": "Software Development Team",
+  "description": "A structured software development team with Product Manager, Tech Lead, Developers, and QA. Follows agile-like workflows for software projects.",
+  "version": "1.0.0",
+  "category": "technology",
+  "difficulty": "intermediate",
+  "icon": "bi-code-slash",
+  "tags": ["software", "development", "agile", "engineering", "intermediate"],
+  "estimated_setup": "10 minutes",
+  "use_cases": [
+    "Software feature development",
+    "Code review workflows",
+    "Technical documentation",
+    "Architecture design",
+    "Bug fixing and testing"
+  ],
+  
+  "organization": {
+    "name": "Dev Team Omega",
+    "description": "Agile software development team",
+    "type": "team",
+    
+    "structure": {
+      "hierarchy": "functional",
+      "communication": "structured",
+      "decision_making": "collaborative"
+    },
+    
+    "departments": [
+      {
+        "department_id": "product",
+        "name": "Product",
+        "description": "Product direction and requirements",
+        "head": "product_manager"
+      },
+      {
+        "department_id": "engineering",
+        "name": "Engineering",
+        "description": "Technical implementation",
+        "head": "tech_lead"
+      },
+      {
+        "department_id": "quality",
+        "name": "Quality Assurance",
+        "description": "Testing and quality",
+        "head": "qa_lead"
+      }
+    ],
+    
+    "roles": [
+      {
+        "role_id": "product_manager",
+        "name": "Product Manager",
+        "department": "product",
+        "responsibilities": [
+          "Define product requirements",
+          "Prioritize features",
+          "Write user stories",
+          "Accept completed work"
+        ],
+        "authority_level": "manager",
+        "reports_to": null,
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are a Product Manager. Define clear product requirements, write detailed user stories with acceptance criteria, prioritize features based on business value, and ensure delivered features meet user needs. Think from the user's perspective.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.5,
+            "max_tokens": 1800
+          }
+        }
+      },
+      {
+        "role_id": "tech_lead",
+        "name": "Tech Lead",
+        "department": "engineering",
+        "responsibilities": [
+          "Technical architecture",
+          "Code review",
+          "Technical decisions",
+          "Mentor developers"
+        ],
+        "authority_level": "lead",
+        "reports_to": "product_manager",
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are a Tech Lead. Make sound technical architecture decisions, review code for quality and best practices, guide the team on technical matters, and ensure maintainable, scalable solutions. Focus on clean code and solid engineering principles.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.3,
+            "max_tokens": 2000
+          }
+        }
+      },
+      {
+        "role_id": "senior_developer",
+        "name": "Senior Developer",
+        "department": "engineering",
+        "responsibilities": [
+          "Implement complex features",
+          "Write clean code",
+          "Review peer code",
+          "Technical documentation"
+        ],
+        "authority_level": "senior",
+        "reports_to": "tech_lead",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Senior Developer. Write clean, efficient, well-documented code. Implement features according to specifications. Participate in code reviews. Follow best practices and design patterns. Think about edge cases and error handling.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.2,
+            "max_tokens": 2000
+          }
+        }
+      },
+      {
+        "role_id": "junior_developer",
+        "name": "Junior Developer",
+        "department": "engineering",
+        "responsibilities": [
+          "Implement assigned tasks",
+          "Write unit tests",
+          "Fix bugs",
+          "Learn and improve"
+        ],
+        "authority_level": "junior",
+        "reports_to": "tech_lead",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Junior Developer. Implement assigned tasks carefully, write thorough unit tests, fix bugs with attention to root causes. Ask questions when unclear. Follow the team's coding standards and learn from code reviews.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.3,
+            "max_tokens": 1500
+          }
+        }
+      },
+      {
+        "role_id": "qa_lead",
+        "name": "QA Engineer",
+        "department": "quality",
+        "responsibilities": [
+          "Test planning",
+          "Write test cases",
+          "Execute tests",
+          "Report bugs"
+        ],
+        "authority_level": "senior",
+        "reports_to": "product_manager",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a QA Engineer. Create comprehensive test plans, write detailed test cases covering edge cases, execute thorough testing, and report bugs clearly with reproduction steps. Ensure quality before release.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.3,
+            "max_tokens": 1500
+          }
+        }
+      }
+    ],
+    
+    "workflows": [
+      {
+        "workflow_id": "feature_development",
+        "name": "Feature Development Workflow",
+        "trigger": "new_feature_request",
+        "steps": [
+          {"step": 1, "role": "product_manager", "action": "write_user_story"},
+          {"step": 2, "role": "tech_lead", "action": "technical_design"},
+          {"step": 3, "role": "tech_lead", "action": "assign_tasks"},
+          {"step": 4, "role": "senior_developer", "action": "implement_feature", "parallel_with": "junior_developer"},
+          {"step": 5, "role": "tech_lead", "action": "code_review"},
+          {"step": 6, "role": "qa_lead", "action": "test_feature"},
+          {"step": 7, "role": "product_manager", "action": "accept_feature"}
+        ]
+      },
+      {
+        "workflow_id": "bug_fix",
+        "name": "Bug Fix Workflow",
+        "trigger": "bug_reported",
+        "steps": [
+          {"step": 1, "role": "qa_lead", "action": "reproduce_and_document"},
+          {"step": 2, "role": "tech_lead", "action": "assign_fix"},
+          {"step": 3, "role": "junior_developer", "action": "fix_bug"},
+          {"step": 4, "role": "tech_lead", "action": "review_fix"},
+          {"step": 5, "role": "qa_lead", "action": "verify_fix"}
+        ]
+      }
+    ],
+    
+    "communication": {
+      "channels": [
+        {"name": "dev_general", "type": "broadcast", "participants": "all"},
+        {"name": "engineering", "type": "department", "participants": ["tech_lead", "senior_developer", "junior_developer"]},
+        {"name": "product_eng", "type": "cross_functional", "participants": ["product_manager", "tech_lead"]}
+      ],
+      "protocols": {
+        "standup": "daily_async",
+        "code_review": "pr_based",
+        "escalation": "to_tech_lead"
+      }
+    },
+    
+    "artifacts": {
+      "templates": [
+        "user_story_template",
+        "technical_design_doc",
+        "code_review_checklist",
+        "test_plan_template"
+      ]
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "request": "Implement a user authentication system with OAuth2 support",
+      "type": "feature",
+      "priority": "high"
+    }
+  ],
+  
+  "expected_outputs": [
+    "User story with acceptance criteria",
+    "Technical design document",
+    "Implementation code",
+    "Test cases and results",
+    "Code review feedback"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model",
+    "Understanding of software development lifecycle"
+  ]
+}

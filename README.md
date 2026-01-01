@@ -1,6 +1,6 @@
-# Abhikarta-LLM v1.4.6
+# Abhikarta-LLM v1.4.7
 
-[![Version](https://img.shields.io/badge/version-1.4.6-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.4.7-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
@@ -10,7 +10,7 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ---
 
-## 🚀 What's New in v1.4.6
+## 🚀 What's New in v1.4.7
 
 ### 🏢 AI Organizations - Major New Feature
 Introducing **AI Org** - create AI-powered digital twins of organizational structures:
@@ -181,7 +181,7 @@ New comprehensive tutorial for advanced reasoning patterns:
 
 ## ✨ Key Features
 
-### ⚡ Actor System (v1.4.6 NEW)
+### ⚡ Actor System (v1.4.7 NEW)
 - **Pekko-Inspired Design**: Lightweight actors for massive concurrency
 - **Message-Driven**: Fire-and-forget (tell) and request-response (ask) patterns
 - **Fault Tolerance**: Supervision strategies with automatic recovery
@@ -224,7 +224,7 @@ New comprehensive tutorial for advanced reasoning patterns:
 - **Workflow Integration**: HITL nodes pause execution for human input
 - **User & Admin Interfaces**: Separate views for different roles
 
-### 🏦 Banking Solutions (v1.4.6+)
+### 🏦 Banking Solutions (v1.4.7+)
 - **KYC/AML Tools**: Identity verification, sanctions screening, risk scoring
 - **Credit Assessment**: Credit scoring, DTI calculation, eligibility
 - **Loan Processing**: EMI calculation, amortization schedules
@@ -281,7 +281,7 @@ New comprehensive tutorial for advanced reasoning patterns:
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.4.6/
+abhikarta-llm-v1.4.7/
 ├── abhikarta/
 │   ├── __init__.py
 │   ├── agent/                    # Agent management
@@ -303,7 +303,7 @@ abhikarta-llm-v1.4.6/
 │   │   ├── llm_factory.py        # LLM provider factory
 │   │   ├── tools.py              # Tool adapters
 │   │   └── workflow_graph.py     # LangGraph integration
-│   ├── llm/                      # LLM Adapter (v1.4.6) NEW!
+│   ├── llm/                      # LLM Adapter (v1.4.7) NEW!
 │   │   ├── __init__.py           # Module exports
 │   │   └── adapter.py            # LLMAdapter, async interface
 │   ├── llm_provider/             # LLM abstraction
@@ -322,7 +322,7 @@ abhikarta-llm-v1.4.6/
 │   │   ├── code_fragment_tool.py # CodeFragmentTool
 │   │   ├── langchain_tool.py     # LangChain integration
 │   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.4.6)
+│   │   └── prebuilt/             # Pre-built tools (v1.4.7)
 │   │       ├── common_tools.py   # 28 common utilities
 │   │       ├── banking_tools.py  # 13 banking tools
 │   │       ├── integration_tools.py  # 20 integration tools
@@ -358,7 +358,7 @@ abhikarta-llm-v1.4.6/
 ├── config/
 │   └── application.properties    # Configuration file
 ├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.4.6)
+│   └── prebuilt/                 # Pre-built solutions (v1.4.7)
 │       ├── agents/
 │       │   └── banking/          # 10 banking agents
 │       └── workflows/
@@ -535,7 +535,7 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.4.6 | 2025-01 | AI Organizations: AI-powered org charts with hierarchical delegation, HITL, visual designer, task aggregation |
+| 1.4.7 | 2025-01 | AI Organizations: AI-powered org charts with hierarchical delegation, HITL, visual designer, task aggregation |
 | 1.4.0 | 2025-01 | Visual Designer bug fixes (MCP tool nodes), Tool selection in properties, Agent Designer How-To Guide |
 | 1.2.3 | 2025-01 | Template Libraries (36 agent, 33 workflow), Code Fragment URIs, Actor System, Modular Database Delegates |
 | 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |

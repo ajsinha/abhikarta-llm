@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}{{ template.name }} - AI Org Template - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('user_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('aiorg_list') }}">AI Organizations</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('aiorg_templates') }}">Templates</a></li>
+                    <li class="breadcrumb-item active">{{ template.name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Main Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #fd7e14 0%, #dc6a12 100%);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-1"><i class="bi {{ template.icon }} me-2"></i>{{ template.name }}</h3>
+                            <span class="badge 
+                                {% if template.difficulty == 'beginner' %}bg-success
+                                {% elif template.difficulty == 'intermediate' %}bg-warning text-dark
+                                {% elif template.difficulty == 'advanced' %}bg-light text-dark
+                                {% else %}bg-danger{% endif %}">
+                                {{ template.difficulty|title }}
+                            </span>
+                            <span class="badge bg-light text-dark ms-2">{{ template.category|title }}</span>
+                        </div>
+                        <form action="{{ url_for('use_aiorg_template', template_id=template.template_id) }}" method="POST">
+                            <button type="submit" class="btn btn-light">
+                                <i class="bi bi-plus-lg me-2"></i>Use This Template
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5>Description</h5>
+                    <p>{{ template.description }}</p>
+                    
+                    {% if template.use_cases %}
+                    <h5 class="mt-4">Use Cases</h5>
+                    <ul>
+                        {% for use_case in template.use_cases %}
+                        <li>{{ use_case }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    
+                    {% if template.departments %}
+                    <h5 class="mt-4">Departments ({{ template.departments|length }})</h5>
+                    <div class="row">
+                        {% for dept in template.departments %}
+                        <div class="col-md-6 mb-2">
+                            <div class="card bg-light">
+                                <div class="card-body py-2 px-3">
+                                    <strong>{{ dept.name }}</strong>
+                                    <br><small class="text-muted">{{ dept.description }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if template.roles %}
+                    <h5 class="mt-4">Roles ({{ template.roles|length }})</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Department</th>
+                                    <th>Authority</th>
+                                    <th>Reports To</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for role in template.roles %}
+                                <tr>
+                                    <td><strong>{{ role.name }}</strong></td>
+                                    <td>{{ role.department or '-' }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if role.authority_level == 'c_suite' or role.authority_level == 'executive' %}bg-danger
+                                            {% elif role.authority_level == 'director' or role.authority_level == 'partner' %}bg-warning text-dark
+                                            {% elif role.authority_level == 'manager' or role.authority_level == 'lead' %}bg-info
+                                            {% elif role.authority_level == 'senior' %}bg-primary
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ role.authority_level|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ role.reports_to or 'None' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                    
+                    {% if template.workflows %}
+                    <h5 class="mt-4">Workflows ({{ template.workflows|length }})</h5>
+                    {% for workflow in template.workflows %}
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <strong>{{ workflow.name }}</strong>
+                            {% if workflow.steps %}
+                            <small class="text-muted ms-2">({{ workflow.steps|length }} steps)</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    
+                    {% if template.tags %}
+                    <h5 class="mt-4">Tags</h5>
+                    <div>
+                        {% for tag in template.tags %}
+                        <span class="badge bg-light text-dark me-1 mb-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Configuration Preview -->
+            {% if template.org_definition %}
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>Configuration Preview</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-dark text-light p-3 rounded" style="max-height: 400px; overflow-y: auto;"><code>{{ template.org_definition|tojson(indent=2) }}</code></pre>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Quick Info -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Quick Info</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-clock text-muted me-2"></i>
+                            <strong>Setup Time:</strong> {{ template.estimated_setup_time }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-people text-muted me-2"></i>
+                            <strong>Roles:</strong> {{ template.roles|length if template.roles else 'N/A' }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-building text-muted me-2"></i>
+                            <strong>Departments:</strong> {{ template.departments|length if template.departments else 'N/A' }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-diagram-3 text-muted me-2"></i>
+                            <strong>Workflows:</strong> {{ template.workflows|length if template.workflows else 'N/A' }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-folder text-muted me-2"></i>
+                            <strong>Category:</strong> {{ template.category|title }}
+                        </li>
+                        <li>
+                            <i class="bi bi-speedometer2 text-muted me-2"></i>
+                            <strong>Difficulty:</strong> {{ template.difficulty|title }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Prerequisites -->
+            {% if template.prerequisites %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-check2-square me-2"></i>Prerequisites</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        {% for prereq in template.prerequisites %}
+                        <li>{{ prereq }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Actions -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form action="{{ url_for('use_aiorg_template', template_id=template.template_id) }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Custom Name (optional)</label>
+                            <input type="text" class="form-control" name="name" placeholder="{{ template.name }} (Copy)">
+                        </div>
+                        <button type="submit" class="btn w-100 mb-2 text-white" style="background: #fd7e14;">
+                            <i class="bi bi-plus-lg me-2"></i>Create Organization from Template
+                        </button>
+                    </form>
+                    <a href="{{ url_for('aiorg_templates') }}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Templates
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

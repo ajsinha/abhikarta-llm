@@ -1,0 +1,156 @@
+{
+  "template_id": "aiorg_research_team",
+  "name": "Basic Research Team",
+  "description": "A simple AI organization with a small research team. Includes a Research Lead, two Researchers, and basic task management.",
+  "version": "1.0.0",
+  "category": "research",
+  "difficulty": "beginner",
+  "icon": "bi-search",
+  "tags": ["research", "team", "basic", "beginner"],
+  "estimated_setup": "5 minutes",
+  "use_cases": [
+    "Market research projects",
+    "Literature reviews",
+    "Competitive analysis",
+    "Topic exploration"
+  ],
+  
+  "organization": {
+    "name": "Research Team Alpha",
+    "description": "A focused research team for investigative tasks",
+    "type": "team",
+    
+    "structure": {
+      "hierarchy": "flat",
+      "communication": "direct",
+      "decision_making": "lead_driven"
+    },
+    
+    "departments": [
+      {
+        "department_id": "research",
+        "name": "Research Department",
+        "description": "Core research operations",
+        "head": "research_lead"
+      }
+    ],
+    
+    "roles": [
+      {
+        "role_id": "research_lead",
+        "name": "Research Lead",
+        "department": "research",
+        "responsibilities": [
+          "Define research objectives",
+          "Assign tasks to researchers",
+          "Review findings",
+          "Synthesize final reports"
+        ],
+        "authority_level": "manager",
+        "reports_to": null,
+        "agent_config": {
+          "agent_type": "react",
+          "system_prompt": "You are the Research Lead. You coordinate research activities, define objectives, assign tasks to team members, review their findings, and create synthesized reports. Be thorough, organized, and ensure high-quality output.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 2000
+          }
+        }
+      },
+      {
+        "role_id": "researcher_1",
+        "name": "Senior Researcher",
+        "department": "research",
+        "responsibilities": [
+          "Conduct in-depth research",
+          "Analyze data and sources",
+          "Document findings",
+          "Provide recommendations"
+        ],
+        "authority_level": "senior",
+        "reports_to": "research_lead",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Senior Researcher. Conduct thorough research on assigned topics, analyze information critically, document your findings clearly, and provide actionable recommendations. Be meticulous and cite your sources.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.3,
+            "max_tokens": 1500
+          }
+        }
+      },
+      {
+        "role_id": "researcher_2",
+        "name": "Junior Researcher",
+        "department": "research",
+        "responsibilities": [
+          "Gather information",
+          "Support senior researcher",
+          "Organize data",
+          "Prepare summaries"
+        ],
+        "authority_level": "junior",
+        "reports_to": "research_lead",
+        "agent_config": {
+          "agent_type": "conversational",
+          "system_prompt": "You are a Junior Researcher. Gather information on assigned topics, organize data effectively, prepare clear summaries, and support the team with research tasks. Be diligent and detail-oriented.",
+          "llm_config": {
+            "provider": "ollama",
+            "model": "llama3.2:3b",
+            "temperature": 0.4,
+            "max_tokens": 1200
+          }
+        }
+      }
+    ],
+    
+    "workflows": [
+      {
+        "workflow_id": "research_project",
+        "name": "Research Project Workflow",
+        "trigger": "new_research_request",
+        "steps": [
+          {"step": 1, "role": "research_lead", "action": "define_objectives"},
+          {"step": 2, "role": "research_lead", "action": "assign_tasks"},
+          {"step": 3, "role": "researcher_1", "action": "conduct_research", "parallel_with": "researcher_2"},
+          {"step": 4, "role": "researcher_2", "action": "gather_data"},
+          {"step": 5, "role": "research_lead", "action": "review_findings"},
+          {"step": 6, "role": "research_lead", "action": "synthesize_report"}
+        ]
+      }
+    ],
+    
+    "communication": {
+      "channels": [
+        {"name": "team_general", "type": "broadcast", "participants": "all"},
+        {"name": "lead_direct", "type": "direct", "participants": ["research_lead"]}
+      ],
+      "protocols": {
+        "task_assignment": "lead_to_member",
+        "status_updates": "member_to_lead",
+        "escalation": "member_to_lead"
+      }
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "request": "Research the current trends in sustainable energy storage technologies",
+      "scope": "comprehensive",
+      "deadline": "48 hours"
+    }
+  ],
+  
+  "expected_outputs": [
+    "Research objectives document",
+    "Individual research findings",
+    "Synthesized final report"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model"
+  ]
+}

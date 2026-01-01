@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}AI Organization Templates - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('user_dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('aiorg_list') }}">AI Organizations</a></li>
+                    <li class="breadcrumb-item active">Templates</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1"><i class="bi bi-building me-2" style="color: #fd7e14;"></i>AI Organization Templates</h2>
+                    <p class="text-muted mb-0">Ready-to-use organizational structures with roles and workflows</p>
+                </div>
+                <a href="{{ url_for('aiorg_designer_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>New Organization
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h3 class="mb-0" style="color: #fd7e14;">{{ templates|length }}</h3>
+                    <small class="text-muted">Total Templates</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h3 class="mb-0 text-success">{{ templates|selectattr('difficulty', 'equalto', 'beginner')|list|length }}</h3>
+                    <small class="text-muted">Beginner</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h3 class="mb-0 text-warning">{{ templates|selectattr('difficulty', 'equalto', 'intermediate')|list|length }}</h3>
+                    <small class="text-muted">Intermediate</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h3 class="mb-0 text-danger">{{ templates|selectattr('difficulty', 'in', ['advanced', 'expert'])|list|length }}</h3>
+                    <small class="text-muted">Advanced/Expert</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search templates...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="difficultyFilter">
+                <option value="">All Difficulties</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+                <option value="expert">Expert</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="categoryFilter">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category }}">{{ category|title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    <!-- Templates Grid -->
+    <div class="row" id="templatesGrid">
+        {% for template in templates %}
+        <div class="col-md-6 col-lg-4 mb-4 template-card" 
+             data-name="{{ template.name|lower }}" 
+             data-description="{{ template.description|lower }}"
+             data-difficulty="{{ template.difficulty }}"
+             data-category="{{ template.category }}">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #fd7e14 0%, #dc6a12 100%);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi {{ template.icon }} me-2"></i>{{ template.name }}
+                        </h5>
+                        <span class="badge 
+                            {% if template.difficulty == 'beginner' %}bg-success
+                            {% elif template.difficulty == 'intermediate' %}bg-warning text-dark
+                            {% elif template.difficulty == 'advanced' %}bg-light text-dark
+                            {% else %}bg-danger{% endif %}">
+                            {{ template.difficulty|title }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-muted small">{{ template.description }}</p>
+                    
+                    {% if template.roles %}
+                    <div class="mb-3">
+                        <small class="text-muted"><strong>Roles:</strong> {{ template.roles|length }}</small>
+                    </div>
+                    {% endif %}
+                    
+                    {% if template.departments %}
+                    <div class="mb-3">
+                        <small class="text-muted"><strong>Departments:</strong> {{ template.departments|length }}</small>
+                    </div>
+                    {% endif %}
+                    
+                    {% if template.tags %}
+                    <div class="mb-3">
+                        {% for tag in template.tags[:4] %}
+                        <span class="badge bg-light text-dark me-1">{{ tag }}</span>
+                        {% endfor %}
+                        {% if template.tags|length > 4 %}
+                        <span class="badge bg-secondary">+{{ template.tags|length - 4 }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <small class="text-muted">
+                        <i class="bi bi-clock me-1"></i>{{ template.estimated_setup_time }}
+                    </small>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('aiorg_template_detail', template_id=template.template_id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye me-1"></i>View
+                        </a>
+                        <form action="{{ url_for('use_aiorg_template', template_id=template.template_id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn text-white btn-sm" style="background: #fd7e14;">
+                                <i class="bi bi-plus-lg me-1"></i>Use Template
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if not templates %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        No AI Organization templates available. Create your first organization manually with the visual designer.
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const difficultyFilter = document.getElementById('difficultyFilter');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const cards = document.querySelectorAll('.template-card');
+    
+    function filterCards() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const difficulty = difficultyFilter.value;
+        const category = categoryFilter.value;
+        
+        cards.forEach(card => {
+            const name = card.dataset.name;
+            const desc = card.dataset.description;
+            const cardDifficulty = card.dataset.difficulty;
+            const cardCategory = card.dataset.category;
+            
+            const matchesSearch = name.includes(searchTerm) || desc.includes(searchTerm);
+            const matchesDifficulty = !difficulty || cardDifficulty === difficulty;
+            const matchesCategory = !category || cardCategory === category;
+            
+            card.style.display = (matchesSearch && matchesDifficulty && matchesCategory) ? '' : 'none';
+        });
+    }
+    
+    searchInput.addEventListener('input', filterCards);
+    difficultyFilter.addEventListener('change', filterCards);
+    categoryFilter.addEventListener('change', filterCards);
+});
+</script>
+{% endblock %}

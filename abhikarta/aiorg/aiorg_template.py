@@ -5,9 +5,12 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.0.0
+Version: 1.4.7
 """
 
+import json
+import os
+import glob
 import logging
 from datetime import datetime
 from typing import Optional, List, Dict, Any
@@ -27,7 +30,14 @@ class AIOrgTemplate:
     difficulty: str = "intermediate"
     nodes: List[Dict[str, Any]] = field(default_factory=list)
     org_config: Dict[str, Any] = field(default_factory=dict)
+    org_definition: Dict[str, Any] = field(default_factory=dict)
+    roles: List[Dict[str, Any]] = field(default_factory=list)
+    departments: List[Dict[str, Any]] = field(default_factory=list)
+    workflows: List[Dict[str, Any]] = field(default_factory=list)
     tags: List[str] = field(default_factory=list)
+    use_cases: List[str] = field(default_factory=list)
+    sample_inputs: List[Dict[str, Any]] = field(default_factory=list)
+    expected_outputs: List[str] = field(default_factory=list)
     is_system: bool = True
     created_by: str = "system"
     created_at: str = ""
@@ -47,7 +57,8 @@ class AIOrgTemplateManager:
         self.db_facade = db_facade
         self._templates: Dict[str, AIOrgTemplate] = {}
         self._init_builtin_templates()
-        logger.info("AIOrgTemplateManager initialized")
+        self._load_json_templates()
+        logger.info(f"AIOrgTemplateManager initialized with {len(self._templates)} templates")
     
     def _init_builtin_templates(self):
         """Initialize built-in AI Org templates - 2 fundamental templates."""
@@ -57,6 +68,59 @@ class AIOrgTemplateManager:
             from abhikarta.utils.helpers import get_timestamp
             template.created_at = get_timestamp()
             self._templates[template.template_id] = template
+    
+    def _load_json_templates(self):
+        """Load AI Org templates from JSON files in templates/aiorg directory."""
+        # Find templates directory relative to this file
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        abhikarta_dir = os.path.dirname(current_dir)
+        project_dir = os.path.dirname(abhikarta_dir)
+        templates_dir = os.path.join(project_dir, 'templates', 'aiorg')
+        
+        if not os.path.exists(templates_dir):
+            logger.warning(f"AIOrg templates directory not found: {templates_dir}")
+            return
+        
+        json_files = glob.glob(os.path.join(templates_dir, '*.json'))
+        logger.info(f"Found {len(json_files)} JSON AI Org template files in {templates_dir}")
+        
+        for json_file in json_files:
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                org_data = data.get('organization', {})
+                
+                # Create AIOrgTemplate from JSON
+                template = AIOrgTemplate(
+                    template_id=data.get('template_id', os.path.basename(json_file).replace('.json', '')),
+                    name=data.get('name', 'Unnamed Template'),
+                    description=data.get('description', ''),
+                    category=data.get('category', 'general'),
+                    icon=data.get('icon', 'bi-building'),
+                    difficulty=data.get('difficulty', 'intermediate'),
+                    org_definition=org_data,
+                    org_config=org_data.get('structure', {}),
+                    roles=org_data.get('roles', []),
+                    departments=org_data.get('departments', []),
+                    workflows=org_data.get('workflows', []),
+                    sample_inputs=data.get('sample_inputs', []),
+                    expected_outputs=data.get('expected_outputs', []),
+                    tags=data.get('tags', []),
+                    use_cases=data.get('use_cases', []),
+                    prerequisites=data.get('prerequisites', []),
+                    estimated_setup_time=data.get('estimated_setup', '15 minutes'),
+                    is_system=True,
+                    created_by='system'
+                )
+                
+                from abhikarta.utils.helpers import get_timestamp
+                template.created_at = get_timestamp()
+                self._templates[template.template_id] = template
+                logger.debug(f"Loaded AI Org template: {template.template_id} - {template.name}")
+                
+            except Exception as e:
+                logger.error(f"Error loading AI Org template from {json_file}: {e}")
     
     def _get_fundamental_orgs(self) -> List[AIOrgTemplate]:
         """2 fundamental AI Organization templates."""

@@ -1,0 +1,56 @@
+{
+  "example_id": "ex_agent_code_assistant",
+  "name": "Code Assistant Agent",
+  "description": "An expert coding assistant agent capable of generating, reviewing, debugging, and explaining code across multiple programming languages.",
+  "agent_config": {
+    "agent_id": "agent_code_assistant_001",
+    "name": "Code Assistant",
+    "agent_type": "conversational",
+    "system_prompt": "You are an expert Code Assistant with mastery across programming languages and paradigms.\n\nCore Capabilities:\n\n1. CODE GENERATION\n   - Write clean, efficient, production-ready code\n   - Follow language-specific best practices\n   - Include error handling and edge cases\n   - Add helpful comments and documentation\n\n2. CODE REVIEW\n   - Identify bugs and potential issues\n   - Suggest improvements and optimizations\n   - Check for security vulnerabilities\n   - Evaluate code quality and maintainability\n\n3. DEBUGGING\n   - Analyze error messages and stack traces\n   - Identify root causes systematically\n   - Provide clear fixes with explanations\n   - Suggest preventive measures\n\n4. CODE EXPLANATION\n   - Break down complex code into understandable parts\n   - Explain algorithms and design patterns\n   - Clarify language-specific features\n   - Provide examples and analogies\n\nLanguage Expertise:\n- Python, JavaScript/TypeScript, Java, C++, Go, Rust\n- SQL, HTML/CSS, Shell scripting\n- Frameworks: React, Django, FastAPI, Spring, Express\n\nCode Output Format:\n```language\n# Description of what the code does\n# Usage example\n\n[well-commented code]\n```\n\nAlways provide:\n- Complete, runnable code\n- Error handling\n- Usage examples\n- Complexity analysis when relevant",
+    "parameters": {
+      "temperature": 0.3,
+      "max_tokens": 4000
+    }
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434"
+  },
+  "test_conversations": [
+    {
+      "id": "conv_01",
+      "name": "Code Generation",
+      "exchanges": [
+        {
+          "user": "Write a Python function to implement a rate limiter using the token bucket algorithm.",
+          "expected_features": ["thread-safety", "configurable rate", "burst support", "proper error handling"]
+        },
+        {
+          "user": "Can you add unit tests for this implementation?",
+          "expected_features": ["pytest tests", "edge cases", "concurrent access tests"]
+        }
+      ]
+    },
+    {
+      "id": "conv_02",
+      "name": "Debugging",
+      "exchanges": [
+        {
+          "user": "This code gives 'IndexError: list index out of range':\n\ndef get_pairs(lst):\n    pairs = []\n    for i in range(len(lst)):\n        pairs.append((lst[i], lst[i+1]))\n    return pairs",
+          "expected_behavior": "Identify off-by-one error, provide fixed code with explanation"
+        }
+      ]
+    },
+    {
+      "id": "conv_03",
+      "name": "Code Review",
+      "exchanges": [
+        {
+          "user": "Review this code for issues:\n\ndef process_data(data):\n    result = []\n    for item in data:\n        if item != None:\n            result.append(item.upper())\n    return result",
+          "expected_findings": ["None comparison", "type checking", "list comprehension opportunity", "error handling"]
+        }
+      ]
+    }
+  ]
+}

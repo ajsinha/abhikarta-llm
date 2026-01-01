@@ -1,0 +1,115 @@
+{
+  "example_id": "ex_multi_agent_collaboration",
+  "name": "Multi-Agent Collaboration System",
+  "description": "A sophisticated multi-agent system where specialized agents collaborate on complex tasks. Demonstrates agent communication, task delegation, result synthesis, and iterative improvement.",
+  "workflow_config": {
+    "workflow_id": "wf_multi_agent_collab_001",
+    "name": "Multi-Agent Collaboration System",
+    "version": "1.0.0",
+    "agents": [
+      {
+        "id": "coordinator",
+        "name": "Coordinator Agent",
+        "role": "orchestrator",
+        "description": "Manages task allocation and coordinates between agents",
+        "capabilities": ["task_decomposition", "delegation", "synthesis", "quality_control"]
+      },
+      {
+        "id": "researcher",
+        "name": "Research Agent",
+        "role": "specialist",
+        "description": "Conducts research and fact-finding",
+        "capabilities": ["information_gathering", "fact_verification", "source_citation"]
+      },
+      {
+        "id": "analyst",
+        "name": "Analysis Agent",
+        "role": "specialist",
+        "description": "Analyzes data and identifies patterns",
+        "capabilities": ["data_analysis", "pattern_recognition", "statistical_analysis"]
+      },
+      {
+        "id": "writer",
+        "name": "Writing Agent",
+        "role": "specialist",
+        "description": "Creates and refines written content",
+        "capabilities": ["content_creation", "editing", "formatting"]
+      },
+      {
+        "id": "critic",
+        "name": "Critic Agent",
+        "role": "reviewer",
+        "description": "Reviews and provides feedback on outputs",
+        "capabilities": ["quality_review", "feedback", "improvement_suggestions"]
+      }
+    ],
+    "collaboration_protocol": {
+      "communication_style": "structured_messages",
+      "max_iterations": 3,
+      "consensus_threshold": 0.8,
+      "escalation_enabled": true
+    },
+    "task_flow": [
+      {
+        "phase": "understanding",
+        "agents": ["coordinator"],
+        "description": "Analyze task and create execution plan"
+      },
+      {
+        "phase": "research",
+        "agents": ["researcher"],
+        "description": "Gather relevant information",
+        "parallel": true
+      },
+      {
+        "phase": "analysis",
+        "agents": ["analyst"],
+        "description": "Analyze gathered information",
+        "depends_on": ["research"]
+      },
+      {
+        "phase": "creation",
+        "agents": ["writer"],
+        "description": "Create initial output",
+        "depends_on": ["analysis"]
+      },
+      {
+        "phase": "review",
+        "agents": ["critic"],
+        "description": "Review and provide feedback",
+        "depends_on": ["creation"]
+      },
+      {
+        "phase": "refinement",
+        "agents": ["writer"],
+        "description": "Refine based on feedback",
+        "depends_on": ["review"],
+        "conditional": "feedback_requires_changes"
+      },
+      {
+        "phase": "synthesis",
+        "agents": ["coordinator"],
+        "description": "Synthesize final output",
+        "depends_on": ["refinement"]
+      }
+    ]
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.7
+  },
+  "test_inputs": [
+    {
+      "name": "Strategic Analysis Request",
+      "task": "Analyze the potential impact of emerging AI technologies on workforce dynamics and provide strategic recommendations for organizations.",
+      "expected_output_sections": ["Executive Summary", "Research Findings", "Analysis", "Recommendations", "Implementation Plan"]
+    },
+    {
+      "name": "Competitive Landscape Review",
+      "task": "Create a comprehensive analysis of current trends in sustainable technology and their market implications.",
+      "expected_output_sections": ["Market Overview", "Key Trends", "Competitive Analysis", "Opportunities", "Risk Assessment"]
+    }
+  ]
+}

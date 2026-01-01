@@ -1,0 +1,58 @@
+{
+  "example_id": "ex_agent_research_assistant",
+  "name": "Research Assistant Agent",
+  "description": "An advanced research assistant agent that can conduct comprehensive research on any topic, synthesize information from multiple perspectives, and produce well-structured research outputs.",
+  "agent_config": {
+    "agent_id": "agent_research_assistant_001",
+    "name": "Research Assistant",
+    "agent_type": "conversational",
+    "system_prompt": "You are an expert Research Assistant with capabilities in:\n\n1. TOPIC EXPLORATION\n- Break down complex topics into researchable components\n- Identify key questions that need answering\n- Map relationships between concepts\n\n2. INFORMATION SYNTHESIS\n- Combine information from multiple perspectives\n- Identify areas of consensus and disagreement\n- Distinguish facts from opinions\n\n3. CRITICAL ANALYSIS\n- Evaluate source reliability\n- Identify potential biases\n- Assess evidence quality\n\n4. STRUCTURED REPORTING\n- Present findings in clear, organized format\n- Highlight key insights and implications\n- Provide actionable recommendations\n\nResearch Output Format:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 EXECUTIVE SUMMARY\n[Brief overview of findings]\n\n🔍 RESEARCH QUESTIONS\n[Key questions explored]\n\n📊 KEY FINDINGS\n[Main discoveries organized by theme]\n\n💡 INSIGHTS & IMPLICATIONS\n[Analysis and interpretation]\n\n📝 RECOMMENDATIONS\n[Actionable next steps]\n\n⚠️ LIMITATIONS\n[Knowledge gaps and caveats]\n━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    "parameters": {
+      "temperature": 0.5,
+      "max_tokens": 4000
+    },
+    "memory_config": {
+      "enabled": true,
+      "context_window": 10
+    }
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434"
+  },
+  "test_conversations": [
+    {
+      "id": "conv_01",
+      "name": "Technology Research",
+      "exchanges": [
+        {
+          "user": "Research the current state of quantum computing and its potential impact on cryptography.",
+          "expected_topics": ["quantum supremacy", "qubit technology", "post-quantum cryptography", "timeline predictions"]
+        },
+        {
+          "user": "What are the main challenges facing quantum computing adoption?",
+          "expected_topics": ["error correction", "decoherence", "scalability", "cost", "talent shortage"]
+        },
+        {
+          "user": "Summarize the key takeaways from our research conversation.",
+          "expected_behavior": "Reference previous exchanges, synthesize main points"
+        }
+      ]
+    },
+    {
+      "id": "conv_02",
+      "name": "Comparative Analysis",
+      "exchanges": [
+        {
+          "user": "Compare and contrast different approaches to machine learning model deployment.",
+          "expected_topics": ["cloud vs edge", "batch vs real-time", "containerization", "MLOps"]
+        },
+        {
+          "user": "What are the trade-offs between these approaches?",
+          "expected_behavior": "Provide balanced analysis with pros/cons"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,229 @@
+{
+  "template_id": "wf_error_handling_retry",
+  "name": "Error Handling with Retry Logic",
+  "description": "Demonstrates robust error handling, retry mechanisms, and graceful degradation patterns for production workflows.",
+  "category": "advanced",
+  "icon": "bi-shield-check",
+  "difficulty": "advanced",
+  "tags": ["error-handling", "retry", "resilience", "fault-tolerance"],
+  "workflow": {
+    "nodes": [
+      {
+        "id": "input_validator",
+        "type": "function",
+        "name": "Input Validator",
+        "description": "Validate input before processing",
+        "position": {"x": 100, "y": 250},
+        "config": {
+          "function": "validate_input",
+          "validation_rules": {
+            "required_fields": ["input"],
+            "max_length": 10000,
+            "allowed_types": ["string", "object"]
+          },
+          "output_key": "validated_input",
+          "error_key": "validation_error"
+        }
+      },
+      {
+        "id": "validation_check",
+        "type": "condition",
+        "name": "Validation Check",
+        "description": "Check if validation passed",
+        "position": {"x": 250, "y": 250},
+        "config": {
+          "conditions": [
+            {"condition": "validation_error is not None", "target": "validation_error_handler"},
+            {"default": true, "target": "primary_processor"}
+          ]
+        }
+      },
+      {
+        "id": "validation_error_handler",
+        "type": "llm",
+        "name": "Validation Error Handler",
+        "description": "Handle validation errors gracefully",
+        "position": {"x": 400, "y": 100},
+        "config": {
+          "prompt_template": "The input validation failed with error:\n{validation_error}\n\nOriginal input:\n{input}\n\nGenerate a helpful error message explaining what was wrong and how to fix it.",
+          "output_key": "error_response"
+        }
+      },
+      {
+        "id": "primary_processor",
+        "type": "llm",
+        "name": "Primary Processor",
+        "description": "Main processing with potential for errors",
+        "position": {"x": 400, "y": 250},
+        "config": {
+          "prompt_template": "Process this input:\n\n{validated_input}\n\nProvide a comprehensive response. If you encounter any issues or cannot complete the task, respond with ERROR: followed by the reason.",
+          "output_key": "processing_result",
+          "timeout_seconds": 30,
+          "retry_config": {
+            "max_retries": 3,
+            "retry_delay_seconds": 2,
+            "exponential_backoff": true
+          }
+        }
+      },
+      {
+        "id": "result_checker",
+        "type": "condition",
+        "name": "Result Checker",
+        "description": "Check if processing succeeded",
+        "position": {"x": 600, "y": 250},
+        "config": {
+          "conditions": [
+            {"condition": "ERROR in processing_result", "target": "error_classifier"},
+            {"condition": "processing_result is empty", "target": "empty_result_handler"},
+            {"default": true, "target": "result_enhancer"}
+          ]
+        }
+      },
+      {
+        "id": "error_classifier",
+        "type": "llm",
+        "name": "Error Classifier",
+        "description": "Classify the type of error",
+        "position": {"x": 750, "y": 100},
+        "config": {
+          "prompt_template": "Classify this error:\n\n{processing_result}\n\nCategories:\n- RETRYABLE: Temporary issue that might succeed on retry\n- RECOVERABLE: Can be handled with alternative approach\n- FATAL: Cannot be recovered, need human intervention\n\nRespond with the category and brief explanation.",
+          "output_key": "error_classification"
+        }
+      },
+      {
+        "id": "error_router",
+        "type": "condition",
+        "name": "Error Router",
+        "description": "Route based on error type",
+        "position": {"x": 900, "y": 100},
+        "config": {
+          "conditions": [
+            {"condition": "RETRYABLE in error_classification and retry_count < 3", "target": "retry_with_backoff"},
+            {"condition": "RECOVERABLE in error_classification", "target": "fallback_processor"},
+            {"default": true, "target": "fatal_error_handler"}
+          ]
+        }
+      },
+      {
+        "id": "retry_with_backoff",
+        "type": "function",
+        "name": "Retry with Backoff",
+        "description": "Wait and retry with exponential backoff",
+        "position": {"x": 1050, "y": 50},
+        "config": {
+          "function": "exponential_backoff_retry",
+          "base_delay": 2,
+          "max_delay": 30,
+          "target_node": "primary_processor"
+        }
+      },
+      {
+        "id": "fallback_processor",
+        "type": "llm",
+        "name": "Fallback Processor",
+        "description": "Alternative processing approach",
+        "position": {"x": 1050, "y": 150},
+        "config": {
+          "prompt_template": "The primary processing failed. Using fallback approach.\n\nOriginal request:\n{validated_input}\n\nError encountered:\n{processing_result}\n\nProvide a simplified response or alternative solution.",
+          "output_key": "fallback_result"
+        }
+      },
+      {
+        "id": "fatal_error_handler",
+        "type": "hitl",
+        "name": "Fatal Error Handler",
+        "description": "Escalate fatal errors to human",
+        "position": {"x": 1050, "y": 250},
+        "config": {
+          "review_type": "error_escalation",
+          "priority": "high",
+          "instructions": "A fatal error occurred that requires human intervention.",
+          "include_context": ["input", "processing_result", "error_classification", "retry_count"]
+        }
+      },
+      {
+        "id": "empty_result_handler",
+        "type": "llm",
+        "name": "Empty Result Handler",
+        "description": "Handle empty or null results",
+        "position": {"x": 750, "y": 350},
+        "config": {
+          "prompt_template": "The processing returned an empty result for:\n\n{validated_input}\n\nGenerate a response acknowledging the issue and suggesting alternatives or next steps.",
+          "output_key": "empty_handling_result"
+        }
+      },
+      {
+        "id": "result_enhancer",
+        "type": "llm",
+        "name": "Result Enhancer",
+        "description": "Enhance successful results",
+        "position": {"x": 750, "y": 450},
+        "config": {
+          "prompt_template": "Enhance this result for better clarity and usefulness:\n\n{processing_result}\n\nAdd formatting, structure, and any helpful context.",
+          "output_key": "enhanced_result"
+        }
+      },
+      {
+        "id": "output_merger",
+        "type": "aggregator",
+        "name": "Output Merger",
+        "description": "Merge all possible outputs",
+        "position": {"x": 1200, "y": 300},
+        "config": {
+          "merge_strategy": "first_available",
+          "priority_order": ["enhanced_result", "fallback_result", "empty_handling_result", "error_response", "human_decision"]
+        }
+      },
+      {
+        "id": "response_formatter",
+        "type": "llm",
+        "name": "Response Formatter",
+        "description": "Format final response",
+        "position": {"x": 1400, "y": 300},
+        "config": {
+          "prompt_template": "Format this as a final response:\n\n{merged_output}\n\nInclude:\n- Status (success/partial/error)\n- Main content\n- Any warnings or notes\n- Suggested next steps if applicable",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "input_validator", "target": "validation_check"},
+      {"source": "validation_check", "target": "validation_error_handler", "condition": "error"},
+      {"source": "validation_check", "target": "primary_processor", "condition": "success"},
+      {"source": "validation_error_handler", "target": "output_merger"},
+      {"source": "primary_processor", "target": "result_checker"},
+      {"source": "result_checker", "target": "error_classifier", "condition": "error"},
+      {"source": "result_checker", "target": "empty_result_handler", "condition": "empty"},
+      {"source": "result_checker", "target": "result_enhancer", "condition": "success"},
+      {"source": "error_classifier", "target": "error_router"},
+      {"source": "error_router", "target": "retry_with_backoff", "condition": "RETRYABLE"},
+      {"source": "error_router", "target": "fallback_processor", "condition": "RECOVERABLE"},
+      {"source": "error_router", "target": "fatal_error_handler", "condition": "FATAL"},
+      {"source": "retry_with_backoff", "target": "primary_processor"},
+      {"source": "fallback_processor", "target": "output_merger"},
+      {"source": "fatal_error_handler", "target": "output_merger"},
+      {"source": "empty_result_handler", "target": "output_merger"},
+      {"source": "result_enhancer", "target": "output_merger"},
+      {"source": "output_merger", "target": "response_formatter"}
+    ],
+    "entry_point": "input_validator",
+    "output_node": "response_formatter",
+    "error_handling": {
+      "global_timeout_seconds": 300,
+      "max_total_retries": 5,
+      "fallback_response": "We encountered an issue processing your request. Please try again or contact support."
+    }
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://192.168.2.36:11434",
+    "temperature": 0.5
+  },
+  "sample_inputs": [
+    "Process this complex data transformation request with multiple steps.",
+    "",
+    "Invalid input that should trigger validation error"
+  ]
+}

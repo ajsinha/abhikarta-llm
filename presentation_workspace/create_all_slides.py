@@ -7,7 +7,7 @@ def title_slide():
 <body class="col center" style="width: 960px; height: 540px; background: #F4F9FD; padding: 40px; box-sizing: border-box;">
   <h1 style="font-size: 44px; color: #0079C1; margin: 0; font-weight: 700;">Abhikarta-LLM</h1>
   <p style="font-size: 18px; color: #1A3A5C; margin: 10px 0 0 0;">Enterprise AI Orchestration Platform</p>
-  <p style="font-size: 13px; color: #5A7A9C; margin: 6px 0 0 0;">Version 1.4.6</p>
+  <p style="font-size: 13px; color: #5A7A9C; margin: 6px 0 0 0;">Version 1.4.7</p>
   <div class="row gap" style="margin-top: 20px;">
     <div style="background: #E8F4FC; padding: 10px 18px; border-radius: 6px; text-align: center;">
       <p style="font-size: 22px; color: #0079C1; margin: 0; font-weight: 600;">11+</p>
@@ -45,7 +45,7 @@ def content_slide(num, title, content):
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD; padding: 0; box-sizing: border-box;">
   <div class="fit row" style="background: #0079C1; padding: 10px 30px; justify-content: space-between; align-items: center;">
     <p style="font-size: 15px; color: #FFFFFF; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 9px; color: #FFFFFF; margin: 0; opacity: 0.8;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 9px; color: #FFFFFF; margin: 0; opacity: 0.8;">Abhikarta-LLM v1.4.7</p>
   </div>
   <div class="fill-height" style="padding: 14px 30px;">
 {content}
@@ -64,7 +64,7 @@ def thank_you_slide(num):
 <body class="col center" style="width: 960px; height: 540px; background: #F4F9FD; padding: 40px; box-sizing: border-box;">
   <h1 style="font-size: 42px; color: #0079C1; margin: 0; font-weight: 700;">Thank You</h1>
   <p style="font-size: 18px; color: #1A3A5C; margin: 12px 0 0 0;">Abhikarta-LLM</p>
-  <p style="font-size: 12px; color: #5A7A9C; margin: 6px 0 0 0;">Enterprise AI Orchestration Platform v1.4.6</p>
+  <p style="font-size: 12px; color: #5A7A9C; margin: 6px 0 0 0;">Enterprise AI Orchestration Platform v1.4.7</p>
   <div class="row gap" style="margin-top: 20px;">
     <div style="background: #E8F4FC; padding: 10px 16px; border-radius: 6px; text-align: center;">
       <p style="font-size: 16px; color: #ED1C24; margin: 0; font-weight: 600;">11+ Providers</p>
@@ -395,7 +395,7 @@ all_slides.append((47, 'thankyou', None, None))
 # Final copyright slide
 all_slides.append((51, 'content', 'Copyright Notice', '''    <div class="col center" style="height: 100%;">
       <h2 style="font-size: 28px; color: #0079C1; margin: 0; font-weight: 700;">Abhikarta-LLM</h2>
-      <p style="font-size: 14px; color: #1A3A5C; margin: 10px 0 0 0;">Enterprise AI Orchestration Platform v1.4.6</p>
+      <p style="font-size: 14px; color: #1A3A5C; margin: 10px 0 0 0;">Enterprise AI Orchestration Platform v1.4.7</p>
       <div style="background: #FFF; padding: 16px 24px; border-radius: 6px; margin-top: 20px; text-align: center;">
         <p style="font-size: 12px; color: #1A3A5C; margin: 0; font-weight: 600;">Copyright © 2025-2030 Ashutosh Sinha</p>
         <p style="font-size: 11px; color: #5A7A9C; margin: 6px 0 0 0;">All Rights Reserved</p>

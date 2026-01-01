@@ -5,7 +5,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.4.6
+Version: 1.4.7
 """
 
 import json
@@ -55,7 +55,8 @@ class AgentTemplateManager:
         self.db_facade = db_facade
         self._templates: Dict[str, AgentTemplate] = {}
         self._init_builtin_templates()
-        logger.info("AgentTemplateManager initialized")
+        self._load_json_templates()
+        logger.info(f"AgentTemplateManager initialized with {len(self._templates)} templates")
     
     def _init_builtin_templates(self):
         """Initialize built-in system templates - 2 per agent type."""
@@ -70,6 +71,58 @@ class AgentTemplateManager:
             from abhikarta.utils.helpers import get_timestamp
             template.created_at = get_timestamp()
             self._templates[template.template_id] = template
+    
+    def _load_json_templates(self):
+        """Load agent templates from JSON files in templates/agents directory."""
+        import os
+        import glob
+        
+        # Find templates directory relative to this file
+        # Go from agent_template.py -> agent -> abhikarta -> project root
+        agent_dir = os.path.dirname(os.path.abspath(__file__))
+        abhikarta_dir = os.path.dirname(agent_dir)
+        project_dir = os.path.dirname(abhikarta_dir)
+        templates_dir = os.path.join(project_dir, 'templates', 'agents')
+        
+        if not os.path.exists(templates_dir):
+            logger.warning(f"Agent templates directory not found: {templates_dir}")
+            return
+        
+        json_files = glob.glob(os.path.join(templates_dir, '*.json'))
+        logger.info(f"Found {len(json_files)} JSON agent template files in {templates_dir}")
+        
+        for json_file in json_files:
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                # Create AgentTemplate from JSON
+                agent_data = data.get('agent', {})
+                template = AgentTemplate(
+                    template_id=data.get('template_id', os.path.basename(json_file).replace('.json', '')),
+                    name=data.get('name', 'Unnamed Template'),
+                    description=data.get('description', ''),
+                    category=data.get('category', 'General'),
+                    agent_type=agent_data.get('agent_type', 'conversational'),
+                    icon=data.get('icon', 'bi-robot'),
+                    difficulty=data.get('difficulty', 'intermediate'),
+                    workflow={},
+                    llm_config=data.get('llm_config', {}),
+                    tools=agent_data.get('tools', []),
+                    hitl_config=agent_data.get('hitl_config', {}),
+                    sample_prompts=data.get('sample_prompts', []),
+                    tags=data.get('tags', []),
+                    is_system=True,
+                    created_by='system'
+                )
+                
+                from abhikarta.utils.helpers import get_timestamp
+                template.created_at = get_timestamp()
+                self._templates[template.template_id] = template
+                logger.debug(f"Loaded agent template: {template.template_id} - {template.name}")
+                
+            except Exception as e:
+                logger.error(f"Error loading agent template from {json_file}: {e}")
     
     def _get_react_templates(self) -> List[AgentTemplate]:
         """ReAct agent templates - 2 templates."""

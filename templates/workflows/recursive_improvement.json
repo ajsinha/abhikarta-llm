@@ -1,0 +1,173 @@
+{
+  "template_id": "wf_recursive_improvement",
+  "name": "Recursive Self-Improvement Workflow",
+  "description": "A workflow that iteratively improves its own output through self-evaluation and recursive refinement. Demonstrates meta-learning and self-correction patterns.",
+  "category": "advanced",
+  "icon": "bi-arrow-clockwise",
+  "difficulty": "expert",
+  "tags": ["recursive", "self-improvement", "meta-learning", "reflection", "autonomous"],
+  "workflow": {
+    "recursion_config": {
+      "max_depth": 5,
+      "improvement_threshold": 0.85,
+      "diminishing_returns_detection": true
+    },
+    "nodes": [
+      {
+        "id": "initial_generator",
+        "type": "llm",
+        "name": "Initial Generator",
+        "description": "Generate initial response",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "prompt_template": "Generate an initial response to:\n\n{input}\n\nProvide your best attempt at a comprehensive answer.",
+          "output_key": "current_output"
+        }
+      },
+      {
+        "id": "self_evaluator",
+        "type": "llm",
+        "name": "Self Evaluator",
+        "description": "Evaluate current output quality",
+        "position": {"x": 300, "y": 300},
+        "config": {
+          "prompt_template": "Critically evaluate this output:\n\nORIGINAL TASK: {input}\n\nCURRENT OUTPUT:\n{current_output}\n\nITERATION: {iteration_count}\n\nEvaluate on:\n1. Accuracy (0-100)\n2. Completeness (0-100)\n3. Clarity (0-100)\n4. Relevance (0-100)\n5. Depth (0-100)\n\nCalculate OVERALL SCORE (average).\n\nList SPECIFIC WEAKNESSES:\n- [weakness 1]\n- [weakness 2]\n...\n\nSuggest CONCRETE IMPROVEMENTS:\n- [improvement 1]\n- [improvement 2]\n...\n\nVerdict: SATISFACTORY (score >= 85) or NEEDS_IMPROVEMENT",
+          "output_key": "evaluation"
+        }
+      },
+      {
+        "id": "improvement_router",
+        "type": "condition",
+        "name": "Improvement Router",
+        "description": "Decide whether to improve or finalize",
+        "position": {"x": 500, "y": 300},
+        "config": {
+          "conditions": [
+            {"condition": "SATISFACTORY in evaluation", "target": "finalizer"},
+            {"condition": "iteration_count >= 5", "target": "forced_finalizer"},
+            {"default": true, "target": "improvement_strategist"}
+          ]
+        }
+      },
+      {
+        "id": "improvement_strategist",
+        "type": "llm",
+        "name": "Improvement Strategist",
+        "description": "Plan specific improvements",
+        "position": {"x": 500, "y": 450},
+        "config": {
+          "prompt_template": "Create an improvement strategy:\n\nCURRENT OUTPUT:\n{current_output}\n\nEVALUATION FEEDBACK:\n{evaluation}\n\nPREVIOUS IMPROVEMENTS TRIED:\n{improvement_history}\n\nDevelop a strategy that:\n1. Addresses the most critical weaknesses first\n2. Avoids repeating previous unsuccessful approaches\n3. Balances depth with clarity\n4. Considers what information might be missing\n\nProvide specific instructions for the improver.",
+          "output_key": "improvement_strategy"
+        }
+      },
+      {
+        "id": "recursive_improver",
+        "type": "llm",
+        "name": "Recursive Improver",
+        "description": "Apply improvements to output",
+        "position": {"x": 700, "y": 450},
+        "config": {
+          "prompt_template": "Improve this output according to the strategy:\n\nORIGINAL TASK: {input}\n\nCURRENT OUTPUT:\n{current_output}\n\nIMPROVEMENT STRATEGY:\n{improvement_strategy}\n\nEVALUATION FEEDBACK:\n{evaluation}\n\nCreate an improved version that:\n1. Addresses all identified weaknesses\n2. Maintains existing strengths\n3. Follows the improvement strategy\n4. Aims for a score > 85\n\nProvide the complete improved output.",
+          "output_key": "current_output"
+        }
+      },
+      {
+        "id": "progress_tracker",
+        "type": "function",
+        "name": "Progress Tracker",
+        "description": "Track improvement progress",
+        "position": {"x": 700, "y": 300},
+        "config": {
+          "function": "track_progress",
+          "metrics": ["score_history", "improvement_delta", "iteration_count"],
+          "detect_plateau": true
+        }
+      },
+      {
+        "id": "plateau_detector",
+        "type": "condition",
+        "name": "Plateau Detector",
+        "description": "Detect diminishing returns",
+        "position": {"x": 850, "y": 300},
+        "config": {
+          "conditions": [
+            {"condition": "improvement_delta < 2 for 2 iterations", "target": "forced_finalizer"},
+            {"default": true, "target": "self_evaluator"}
+          ]
+        }
+      },
+      {
+        "id": "forced_finalizer",
+        "type": "llm",
+        "name": "Forced Finalizer",
+        "description": "Finalize when max iterations or plateau reached",
+        "position": {"x": 700, "y": 150},
+        "config": {
+          "prompt_template": "Finalize this output (max iterations or plateau reached):\n\nORIGINAL TASK: {input}\n\nBEST OUTPUT:\n{current_output}\n\nITERATION HISTORY:\n{score_history}\n\nApply final polish:\n1. Fix any remaining obvious issues\n2. Ensure coherence and flow\n3. Add appropriate caveats if needed\n4. Format professionally",
+          "output_key": "final_output"
+        }
+      },
+      {
+        "id": "finalizer",
+        "type": "llm",
+        "name": "Finalizer",
+        "description": "Finalize satisfactory output",
+        "position": {"x": 700, "y": 50},
+        "config": {
+          "prompt_template": "Finalize this high-quality output:\n\nORIGINAL TASK: {input}\n\nFINAL OUTPUT:\n{current_output}\n\nFINAL EVALUATION:\n{evaluation}\n\nApply finishing touches:\n1. Ensure professional formatting\n2. Add executive summary if appropriate\n3. Include confidence assessment\n4. Note any limitations",
+          "output_key": "final_output"
+        }
+      },
+      {
+        "id": "meta_analyzer",
+        "type": "llm",
+        "name": "Meta Analyzer",
+        "description": "Analyze the improvement process itself",
+        "position": {"x": 900, "y": 100},
+        "config": {
+          "prompt_template": "Analyze the self-improvement process:\n\nITERATION COUNT: {iteration_count}\nSCORE PROGRESSION: {score_history}\nIMPROVEMENT STRATEGIES USED: {improvement_history}\n\nProvide meta-analysis:\n1. What improvement strategies were most effective?\n2. Where did the process plateau?\n3. What could improve future iterations?\n4. Lessons learned for similar tasks",
+          "output_key": "meta_analysis"
+        }
+      },
+      {
+        "id": "output_assembler",
+        "type": "aggregator",
+        "name": "Output Assembler",
+        "description": "Assemble final output with metadata",
+        "position": {"x": 1050, "y": 100},
+        "config": {
+          "template": "# Final Output\n\n{final_output}\n\n---\n## Process Metadata\n- Iterations: {iteration_count}\n- Final Score: {final_score}\n- Score Progression: {score_history}\n\n## Meta-Analysis\n{meta_analysis}",
+          "output_key": "complete_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "initial_generator", "target": "self_evaluator"},
+      {"source": "self_evaluator", "target": "improvement_router"},
+      {"source": "improvement_router", "target": "finalizer", "condition": "SATISFACTORY"},
+      {"source": "improvement_router", "target": "forced_finalizer", "condition": "max_iterations"},
+      {"source": "improvement_router", "target": "improvement_strategist", "condition": "NEEDS_IMPROVEMENT"},
+      {"source": "improvement_strategist", "target": "recursive_improver"},
+      {"source": "recursive_improver", "target": "progress_tracker"},
+      {"source": "progress_tracker", "target": "plateau_detector"},
+      {"source": "plateau_detector", "target": "forced_finalizer", "condition": "plateau"},
+      {"source": "plateau_detector", "target": "self_evaluator", "condition": "continue"},
+      {"source": "finalizer", "target": "meta_analyzer"},
+      {"source": "forced_finalizer", "target": "meta_analyzer"},
+      {"source": "meta_analyzer", "target": "output_assembler"}
+    ],
+    "entry_point": "initial_generator",
+    "output_node": "output_assembler"
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.7
+  },
+  "sample_inputs": [
+    "Explain the concept of distributed consensus algorithms and their applications.",
+    "Write a comprehensive guide to effective technical writing.",
+    "Analyze the trade-offs between different software architecture patterns."
+  ]
+}

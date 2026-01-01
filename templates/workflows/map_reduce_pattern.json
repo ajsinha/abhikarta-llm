@@ -1,0 +1,184 @@
+{
+  "template_id": "wf_map_reduce",
+  "name": "Map-Reduce Processing Pattern",
+  "description": "Process large datasets by splitting into chunks, processing in parallel (map), and combining results (reduce). Ideal for batch processing and data transformation.",
+  "category": "advanced",
+  "icon": "bi-collection",
+  "difficulty": "advanced",
+  "tags": ["map-reduce", "batch", "parallel", "aggregation", "data-processing"],
+  "workflow": {
+    "nodes": [
+      {
+        "id": "data_splitter",
+        "type": "function",
+        "name": "Data Splitter",
+        "description": "Split input data into processable chunks",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "function": "split_data",
+          "chunk_size": 5,
+          "output_key": "data_chunks",
+          "metadata_key": "chunk_metadata"
+        }
+      },
+      {
+        "id": "chunk_distributor",
+        "type": "router",
+        "name": "Chunk Distributor",
+        "description": "Distribute chunks to parallel mappers",
+        "position": {"x": 250, "y": 300},
+        "config": {
+          "distribution_strategy": "round_robin",
+          "max_parallel": 10
+        }
+      },
+      {
+        "id": "mapper_1",
+        "type": "llm",
+        "name": "Mapper 1",
+        "description": "Process chunk 1",
+        "position": {"x": 450, "y": 100},
+        "config": {
+          "prompt_template": "Process this data chunk:\n\n{chunk_data}\n\nExtract key information, identify patterns, and summarize findings.\n\nChunk ID: {chunk_id}\nTotal Chunks: {total_chunks}",
+          "output_key": "mapped_result_1"
+        }
+      },
+      {
+        "id": "mapper_2",
+        "type": "llm",
+        "name": "Mapper 2",
+        "description": "Process chunk 2",
+        "position": {"x": 450, "y": 200},
+        "config": {
+          "prompt_template": "Process this data chunk:\n\n{chunk_data}\n\nExtract key information, identify patterns, and summarize findings.\n\nChunk ID: {chunk_id}\nTotal Chunks: {total_chunks}",
+          "output_key": "mapped_result_2"
+        }
+      },
+      {
+        "id": "mapper_3",
+        "type": "llm",
+        "name": "Mapper 3",
+        "description": "Process chunk 3",
+        "position": {"x": 450, "y": 300},
+        "config": {
+          "prompt_template": "Process this data chunk:\n\n{chunk_data}\n\nExtract key information, identify patterns, and summarize findings.\n\nChunk ID: {chunk_id}\nTotal Chunks: {total_chunks}",
+          "output_key": "mapped_result_3"
+        }
+      },
+      {
+        "id": "mapper_4",
+        "type": "llm",
+        "name": "Mapper 4",
+        "description": "Process chunk 4",
+        "position": {"x": 450, "y": 400},
+        "config": {
+          "prompt_template": "Process this data chunk:\n\n{chunk_data}\n\nExtract key information, identify patterns, and summarize findings.\n\nChunk ID: {chunk_id}\nTotal Chunks: {total_chunks}",
+          "output_key": "mapped_result_4"
+        }
+      },
+      {
+        "id": "mapper_5",
+        "type": "llm",
+        "name": "Mapper 5",
+        "description": "Process chunk 5",
+        "position": {"x": 450, "y": 500},
+        "config": {
+          "prompt_template": "Process this data chunk:\n\n{chunk_data}\n\nExtract key information, identify patterns, and summarize findings.\n\nChunk ID: {chunk_id}\nTotal Chunks: {total_chunks}",
+          "output_key": "mapped_result_5"
+        }
+      },
+      {
+        "id": "shuffle_sort",
+        "type": "function",
+        "name": "Shuffle & Sort",
+        "description": "Organize mapped results for reduction",
+        "position": {"x": 650, "y": 300},
+        "config": {
+          "function": "shuffle_and_sort",
+          "sort_key": "category",
+          "group_by": "topic",
+          "output_key": "sorted_results"
+        }
+      },
+      {
+        "id": "reducer_aggregator",
+        "type": "llm",
+        "name": "Reducer - Aggregator",
+        "description": "Aggregate similar findings",
+        "position": {"x": 850, "y": 200},
+        "config": {
+          "prompt_template": "Aggregate these related findings:\n\n{sorted_results}\n\nCombine similar points, eliminate duplicates, and create unified summaries for each category.",
+          "output_key": "aggregated_findings"
+        }
+      },
+      {
+        "id": "reducer_synthesizer",
+        "type": "llm",
+        "name": "Reducer - Synthesizer",
+        "description": "Synthesize patterns across all data",
+        "position": {"x": 850, "y": 400},
+        "config": {
+          "prompt_template": "Synthesize cross-cutting patterns from:\n\n{sorted_results}\n\nIdentify:\n1. Common themes\n2. Correlations\n3. Anomalies\n4. Trends",
+          "output_key": "synthesized_patterns"
+        }
+      },
+      {
+        "id": "final_combiner",
+        "type": "llm",
+        "name": "Final Combiner",
+        "description": "Combine all reduced results",
+        "position": {"x": 1050, "y": 300},
+        "config": {
+          "prompt_template": "Create final comprehensive output from:\n\nAggregated Findings:\n{aggregated_findings}\n\nSynthesized Patterns:\n{synthesized_patterns}\n\nProvide:\n1. Executive Summary\n2. Key Findings by Category\n3. Cross-cutting Insights\n4. Recommendations",
+          "output_key": "final_output"
+        }
+      },
+      {
+        "id": "statistics_calculator",
+        "type": "function",
+        "name": "Statistics Calculator",
+        "description": "Calculate processing statistics",
+        "position": {"x": 1050, "y": 450},
+        "config": {
+          "function": "calculate_statistics",
+          "metrics": ["total_chunks", "processing_time", "success_rate", "coverage"]
+        }
+      }
+    ],
+    "edges": [
+      {"source": "data_splitter", "target": "chunk_distributor"},
+      {"source": "chunk_distributor", "target": "mapper_1"},
+      {"source": "chunk_distributor", "target": "mapper_2"},
+      {"source": "chunk_distributor", "target": "mapper_3"},
+      {"source": "chunk_distributor", "target": "mapper_4"},
+      {"source": "chunk_distributor", "target": "mapper_5"},
+      {"source": "mapper_1", "target": "shuffle_sort"},
+      {"source": "mapper_2", "target": "shuffle_sort"},
+      {"source": "mapper_3", "target": "shuffle_sort"},
+      {"source": "mapper_4", "target": "shuffle_sort"},
+      {"source": "mapper_5", "target": "shuffle_sort"},
+      {"source": "shuffle_sort", "target": "reducer_aggregator"},
+      {"source": "shuffle_sort", "target": "reducer_synthesizer"},
+      {"source": "reducer_aggregator", "target": "final_combiner"},
+      {"source": "reducer_synthesizer", "target": "final_combiner"},
+      {"source": "final_combiner", "target": "statistics_calculator"}
+    ],
+    "entry_point": "data_splitter",
+    "output_node": "final_combiner",
+    "parallel_groups": [
+      ["mapper_1", "mapper_2", "mapper_3", "mapper_4", "mapper_5"],
+      ["reducer_aggregator", "reducer_synthesizer"]
+    ]
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.5
+  },
+  "sample_inputs": [
+    "Process and analyze this large dataset of customer feedback entries...",
+    "Analyze the following collection of research abstracts...",
+    "Process these log entries and identify patterns..."
+  ]
+}

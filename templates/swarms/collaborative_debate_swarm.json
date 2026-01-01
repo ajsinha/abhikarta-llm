@@ -1,0 +1,172 @@
+{
+  "template_id": "swarm_collaborative_debate",
+  "name": "Collaborative Debate Swarm",
+  "description": "A swarm where agents engage in structured debate and collaboration. Agents present different viewpoints, challenge each other's arguments, and work together to reach consensus.",
+  "version": "1.0.0",
+  "category": "collaborative",
+  "difficulty": "advanced",
+  "icon": "bi-chat-quote",
+  "tags": ["debate", "collaborative", "consensus", "multi-perspective", "advanced"],
+  "estimated_duration": "3-5 minutes",
+  "use_cases": [
+    "Complex decision making",
+    "Policy evaluation",
+    "Strategy development",
+    "Thorough problem analysis",
+    "Risk assessment with multiple viewpoints"
+  ],
+  
+  "swarm": {
+    "swarm_type": "collaborative",
+    "name": "Collaborative Debate Swarm",
+    "description": "Agents debate and collaborate to reach well-reasoned conclusions",
+    
+    "coordinator": {
+      "type": "debate_moderator",
+      "debate_rounds": 3,
+      "consensus_threshold": 0.7,
+      "synthesis_after_debate": true,
+      "timeout_seconds": 600,
+      "fail_strategy": "best_effort_synthesis"
+    },
+    
+    "agents": [
+      {
+        "agent_id": "proponent",
+        "name": "The Advocate",
+        "role": "Proponent",
+        "stance": "positive",
+        "agent_type": "conversational",
+        "system_prompt": "You are The Advocate. Your role is to argue FOR the proposition or idea being discussed. Present compelling arguments, highlight benefits, provide supporting evidence, and defend against criticisms. Be persuasive but honest.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.6,
+          "max_tokens": 1200
+        }
+      },
+      {
+        "agent_id": "opponent",
+        "name": "The Challenger",
+        "role": "Opponent",
+        "stance": "critical",
+        "agent_type": "conversational",
+        "system_prompt": "You are The Challenger. Your role is to present counterarguments and identify potential problems. Highlight risks, weaknesses, and alternative perspectives. Challenge assumptions and push for rigorous thinking. Be critical but constructive.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.5,
+          "max_tokens": 1200
+        }
+      },
+      {
+        "agent_id": "pragmatist",
+        "name": "The Pragmatist",
+        "role": "Practical Analyst",
+        "stance": "practical",
+        "agent_type": "conversational",
+        "system_prompt": "You are The Pragmatist. Focus on practical implementation, feasibility, and real-world constraints. Evaluate arguments from both sides through the lens of 'what would actually work?' Consider resources, timelines, and practical limitations.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.4,
+          "max_tokens": 1200
+        }
+      },
+      {
+        "agent_id": "synthesizer",
+        "name": "The Synthesizer",
+        "role": "Consensus Builder",
+        "stance": "neutral",
+        "agent_type": "conversational",
+        "system_prompt": "You are The Synthesizer. Listen to all perspectives, identify common ground, and work toward synthesis. Find ways to integrate valid points from all sides. Build bridges between opposing viewpoints and propose balanced solutions.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.5,
+          "max_tokens": 1500
+        }
+      },
+      {
+        "agent_id": "judge",
+        "name": "The Arbiter",
+        "role": "Evaluator",
+        "stance": "judicial",
+        "agent_type": "conversational",
+        "system_prompt": "You are The Arbiter. Evaluate the quality of arguments from all sides. Assess evidence, logic, and reasoning. After the debate, provide a fair assessment of the strongest arguments and render a balanced judgment.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.3,
+          "max_tokens": 1500
+        }
+      }
+    ],
+    
+    "debate_structure": {
+      "rounds": [
+        {
+          "round": 1,
+          "name": "Opening Arguments",
+          "participants": ["proponent", "opponent"],
+          "mode": "sequential",
+          "time_limit": 60
+        },
+        {
+          "round": 2,
+          "name": "Rebuttals and Practical Analysis",
+          "participants": ["opponent", "proponent", "pragmatist"],
+          "mode": "sequential",
+          "time_limit": 60
+        },
+        {
+          "round": 3,
+          "name": "Synthesis and Judgment",
+          "participants": ["synthesizer", "judge"],
+          "mode": "sequential",
+          "time_limit": 90
+        }
+      ]
+    },
+    
+    "execution": {
+      "mode": "debate",
+      "rounds": 3,
+      "allow_rebuttals": true,
+      "shared_context": true,
+      "timeout_per_round": 120
+    },
+    
+    "output": {
+      "format": "structured",
+      "include_debate_transcript": true,
+      "include_argument_analysis": true,
+      "include_final_verdict": true,
+      "include_consensus_score": true
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "topic": "Should our company adopt a fully remote work policy?",
+      "context": "Mid-sized tech company with 200 employees, currently hybrid"
+    },
+    {
+      "topic": "Is it better to build or buy our new CRM system?",
+      "context": "Growing startup, limited dev resources, specific requirements"
+    }
+  ],
+  
+  "expected_outputs": [
+    "Full debate transcript",
+    "Argument strength analysis",
+    "Consensus points identified",
+    "Final balanced recommendation",
+    "Dissenting opinions noted"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model",
+    "Understanding of debate and collaborative patterns"
+  ]
+}

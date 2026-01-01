@@ -1,0 +1,181 @@
+{
+  "template_id": "wf_debate_synthesis",
+  "name": "Debate and Synthesis Workflow",
+  "description": "A multi-perspective debate workflow where different viewpoints argue positions, followed by synthesis of the strongest arguments. Demonstrates adversarial collaboration and consensus building.",
+  "category": "advanced",
+  "icon": "bi-chat-left-quote",
+  "difficulty": "advanced",
+  "tags": ["debate", "synthesis", "multi-perspective", "adversarial", "consensus"],
+  "workflow": {
+    "debate_config": {
+      "rounds": 3,
+      "perspectives": ["proponent", "opponent", "skeptic"],
+      "synthesis_strategy": "dialectical"
+    },
+    "nodes": [
+      {
+        "id": "topic_framer",
+        "type": "llm",
+        "name": "Topic Framer",
+        "description": "Frame the debate topic",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "prompt_template": "Frame this topic for structured debate:\n\n{input}\n\nProvide:\n1. CENTRAL_THESIS: The main proposition to debate\n2. KEY_QUESTIONS: What needs to be resolved\n3. SCOPE: What's in/out of bounds\n4. CRITERIA: How to evaluate arguments\n5. CONTEXT: Relevant background",
+          "output_key": "debate_frame"
+        }
+      },
+      {
+        "id": "proponent",
+        "type": "llm",
+        "name": "Proponent",
+        "description": "Argue in favor of the thesis",
+        "position": {"x": 300, "y": 150},
+        "config": {
+          "prompt_template": "ROLE: PROPONENT (arguing FOR the thesis)\n\nDEBATE FRAME:\n{debate_frame}\n\nROUND: {round_number}\nPREVIOUS ARGUMENTS:\n{debate_history}\n\nPresent your strongest argument FOR the thesis:\n\n1. MAIN_ARGUMENT: Your core position\n2. EVIDENCE: Supporting points and examples\n3. REBUTTAL: Address opponent's previous points\n4. CONCESSIONS: Any valid points from opposition\n5. CONCLUSION: Why your position is stronger",
+          "output_key": "proponent_argument"
+        }
+      },
+      {
+        "id": "opponent",
+        "type": "llm",
+        "name": "Opponent",
+        "description": "Argue against the thesis",
+        "position": {"x": 300, "y": 300},
+        "config": {
+          "prompt_template": "ROLE: OPPONENT (arguing AGAINST the thesis)\n\nDEBATE FRAME:\n{debate_frame}\n\nROUND: {round_number}\nPREVIOUS ARGUMENTS:\n{debate_history}\nPROPONENT'S CURRENT ARGUMENT:\n{proponent_argument}\n\nPresent your strongest argument AGAINST the thesis:\n\n1. MAIN_ARGUMENT: Your core position\n2. EVIDENCE: Supporting points and examples\n3. REBUTTAL: Address proponent's points directly\n4. CONCESSIONS: Any valid points from proponent\n5. CONCLUSION: Why your position is stronger",
+          "output_key": "opponent_argument"
+        }
+      },
+      {
+        "id": "skeptic",
+        "type": "llm",
+        "name": "Skeptic",
+        "description": "Challenge both sides",
+        "position": {"x": 300, "y": 450},
+        "config": {
+          "prompt_template": "ROLE: SKEPTIC (challenging BOTH sides)\n\nDEBATE FRAME:\n{debate_frame}\n\nROUND: {round_number}\nPROPONENT:\n{proponent_argument}\n\nOPPONENT:\n{opponent_argument}\n\nProvide critical analysis:\n\n1. PROPONENT_WEAKNESSES: Gaps in their argument\n2. OPPONENT_WEAKNESSES: Gaps in their argument\n3. SHARED_ASSUMPTIONS: What both sides assume\n4. MISSING_CONSIDERATIONS: What's being ignored\n5. QUESTIONS: What needs clarification",
+          "output_key": "skeptic_analysis"
+        }
+      },
+      {
+        "id": "round_tracker",
+        "type": "function",
+        "name": "Round Tracker",
+        "description": "Track debate rounds",
+        "position": {"x": 500, "y": 300},
+        "config": {
+          "function": "track_round",
+          "max_rounds": 3,
+          "output_key": "round_status"
+        }
+      },
+      {
+        "id": "round_router",
+        "type": "condition",
+        "name": "Round Router",
+        "description": "Route to next round or synthesis",
+        "position": {"x": 650, "y": 300},
+        "config": {
+          "conditions": [
+            {"condition": "round_number < max_rounds", "target": "debate_history_updater"},
+            {"default": true, "target": "argument_analyzer"}
+          ]
+        }
+      },
+      {
+        "id": "debate_history_updater",
+        "type": "function",
+        "name": "History Updater",
+        "description": "Update debate history",
+        "position": {"x": 500, "y": 150},
+        "config": {
+          "function": "update_debate_history",
+          "output_key": "debate_history"
+        }
+      },
+      {
+        "id": "argument_analyzer",
+        "type": "llm",
+        "name": "Argument Analyzer",
+        "description": "Analyze all arguments",
+        "position": {"x": 800, "y": 300},
+        "config": {
+          "prompt_template": "Analyze the complete debate:\n\nDEBATE FRAME:\n{debate_frame}\n\nCOMPLETE DEBATE HISTORY:\n{debate_history}\n\nAnalyze:\n1. STRONGEST_PRO_ARGUMENTS: Best points favoring thesis\n2. STRONGEST_CON_ARGUMENTS: Best points against thesis\n3. UNRESOLVED_ISSUES: Points neither side settled\n4. CONSENSUS_POINTS: Where both sides agree\n5. EVIDENCE_QUALITY: How well-supported were arguments\n6. LOGICAL_VALIDITY: Quality of reasoning used",
+          "output_key": "argument_analysis"
+        }
+      },
+      {
+        "id": "synthesis_generator",
+        "type": "llm",
+        "name": "Synthesis Generator",
+        "description": "Synthesize balanced conclusion",
+        "position": {"x": 950, "y": 200},
+        "config": {
+          "prompt_template": "Synthesize the debate into a balanced conclusion:\n\nDEBATE FRAME:\n{debate_frame}\n\nARGUMENT ANALYSIS:\n{argument_analysis}\n\nCreate dialectical synthesis:\n1. THESIS: The original proposition\n2. ANTITHESIS: The strongest counter-position\n3. SYNTHESIS: A higher-level understanding that incorporates the best of both\n4. NUANCED_CONCLUSION: The balanced, sophisticated answer\n5. REMAINING_QUESTIONS: What still needs exploration",
+          "output_key": "synthesis"
+        }
+      },
+      {
+        "id": "insight_extractor",
+        "type": "llm",
+        "name": "Insight Extractor",
+        "description": "Extract key insights",
+        "position": {"x": 950, "y": 400},
+        "config": {
+          "prompt_template": "Extract key insights from the debate:\n\nSYNTHESIS:\n{synthesis}\n\nARGUMENT ANALYSIS:\n{argument_analysis}\n\nProvide:\n1. KEY_INSIGHTS: Non-obvious learnings\n2. PRACTICAL_IMPLICATIONS: Real-world applications\n3. DECISION_FRAMEWORK: How to apply this analysis\n4. FURTHER_RESEARCH: What needs more investigation",
+          "output_key": "insights"
+        }
+      },
+      {
+        "id": "recommendation_generator",
+        "type": "llm",
+        "name": "Recommendation Generator",
+        "description": "Generate actionable recommendations",
+        "position": {"x": 1100, "y": 300},
+        "config": {
+          "prompt_template": "Generate recommendations based on debate:\n\nORIGINAL QUESTION:\n{input}\n\nSYNTHESIS:\n{synthesis}\n\nINSIGHTS:\n{insights}\n\nProvide actionable recommendations:\n1. PRIMARY_RECOMMENDATION: The main suggested approach\n2. ALTERNATIVES: Other valid approaches\n3. CONSIDERATIONS: What to keep in mind\n4. RISKS: Potential pitfalls\n5. NEXT_STEPS: Concrete actions to take",
+          "output_key": "recommendations"
+        }
+      },
+      {
+        "id": "final_report",
+        "type": "llm",
+        "name": "Final Report",
+        "description": "Compile comprehensive report",
+        "position": {"x": 1250, "y": 300},
+        "config": {
+          "prompt_template": "Create comprehensive debate report:\n\nTOPIC: {input}\nFRAME: {debate_frame}\nDEBATE HISTORY: {debate_history}\nANALYSIS: {argument_analysis}\nSYNTHESIS: {synthesis}\nINSIGHTS: {insights}\nRECOMMENDATIONS: {recommendations}\n\n# Structured Debate Report\n\n## Executive Summary\n[Key takeaway in 2-3 sentences]\n\n## The Question\n[Original topic and framing]\n\n## Arguments For\n[Summary of proponent position]\n\n## Arguments Against\n[Summary of opponent position]\n\n## Critical Analysis\n[Skeptic's contributions]\n\n## Synthesis\n[Balanced conclusion]\n\n## Recommendations\n[Actionable guidance]\n\n## Conclusion\n[Final thoughts]",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "topic_framer", "target": "proponent"},
+      {"source": "proponent", "target": "opponent"},
+      {"source": "opponent", "target": "skeptic"},
+      {"source": "skeptic", "target": "round_tracker"},
+      {"source": "round_tracker", "target": "round_router"},
+      {"source": "round_router", "target": "debate_history_updater", "condition": "continue"},
+      {"source": "round_router", "target": "argument_analyzer", "condition": "complete"},
+      {"source": "debate_history_updater", "target": "proponent"},
+      {"source": "argument_analyzer", "target": "synthesis_generator"},
+      {"source": "argument_analyzer", "target": "insight_extractor"},
+      {"source": "synthesis_generator", "target": "recommendation_generator"},
+      {"source": "insight_extractor", "target": "recommendation_generator"},
+      {"source": "recommendation_generator", "target": "final_report"}
+    ],
+    "entry_point": "topic_framer",
+    "output_node": "final_report"
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.8
+  },
+  "sample_inputs": [
+    "Should organizations prioritize short-term profits or long-term sustainability?",
+    "Is remote work more productive than office work?",
+    "Should AI systems be given more autonomy in decision-making?"
+  ]
+}

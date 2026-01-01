@@ -7,7 +7,7 @@ def content_slide(num, title, content):
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD; padding: 20px 30px; box-sizing: border-box;">
   <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 10px;">
     <p style="font-size: 15px; color: #0079C1; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 9px; color: #5A7A9C; margin: 0;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 9px; color: #5A7A9C; margin: 0;">Abhikarta-LLM v1.4.7</p>
   </div>
   <div style="background: #0079C1; height: 2px; margin-bottom: 10px; border-radius: 2px;"></div>
   <div class="fill-height" style="overflow: hidden;">

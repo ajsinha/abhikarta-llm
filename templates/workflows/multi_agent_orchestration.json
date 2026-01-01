@@ -1,0 +1,228 @@
+{
+  "template_id": "wf_multi_agent_orchestration",
+  "name": "Multi-Agent Orchestration",
+  "description": "Orchestrate multiple specialized agents working together on complex tasks. Demonstrates agent collaboration, task delegation, and result synthesis.",
+  "category": "enterprise",
+  "icon": "bi-people-fill",
+  "difficulty": "expert",
+  "tags": ["multi-agent", "orchestration", "collaboration", "delegation", "ensemble"],
+  "workflow": {
+    "orchestration_config": {
+      "max_concurrent_agents": 5,
+      "agent_timeout_seconds": 120,
+      "allow_agent_communication": true,
+      "result_aggregation": "weighted"
+    },
+    "nodes": [
+      {
+        "id": "task_analyzer",
+        "type": "llm",
+        "name": "Task Analyzer",
+        "description": "Analyze task and determine required agents",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "prompt_template": "Analyze this task and determine which specialized agents are needed:\n\n{input}\n\nAvailable Agent Types:\n1. RESEARCHER - Deep research and fact-finding\n2. ANALYST - Data analysis and pattern recognition\n3. WRITER - Content creation and writing\n4. CRITIC - Quality review and feedback\n5. PLANNER - Strategy and planning\n6. CODER - Code generation and technical tasks\n7. CREATIVE - Creative ideation and brainstorming\n\nIdentify:\n1. Primary agents needed (must have)\n2. Secondary agents (nice to have)\n3. Task breakdown for each agent\n4. Execution order (parallel or sequential)",
+          "output_key": "task_analysis"
+        }
+      },
+      {
+        "id": "agent_allocator",
+        "type": "function",
+        "name": "Agent Allocator",
+        "description": "Allocate agents based on analysis",
+        "position": {"x": 300, "y": 300},
+        "config": {
+          "function": "allocate_agents",
+          "max_agents": 5,
+          "output_key": "agent_allocation"
+        }
+      },
+      {
+        "id": "researcher_agent",
+        "type": "agent",
+        "name": "Researcher Agent",
+        "description": "Specialized research agent",
+        "position": {"x": 500, "y": 100},
+        "config": {
+          "agent_type": "researcher",
+          "prompt_template": "You are a Research Agent specialized in finding and synthesizing information.\n\nTask: {researcher_task}\nContext: {task_analysis}\n\nConduct thorough research and provide:\n1. Key findings\n2. Sources (if available)\n3. Confidence level\n4. Related topics for further exploration",
+          "output_key": "research_output",
+          "tools": ["search", "summarize", "cite"]
+        }
+      },
+      {
+        "id": "analyst_agent",
+        "type": "agent",
+        "name": "Analyst Agent",
+        "description": "Specialized analysis agent",
+        "position": {"x": 500, "y": 200},
+        "config": {
+          "agent_type": "analyst",
+          "prompt_template": "You are an Analyst Agent specialized in data analysis and pattern recognition.\n\nTask: {analyst_task}\nResearch Input: {research_output}\nContext: {task_analysis}\n\nAnalyze the data and provide:\n1. Key patterns identified\n2. Statistical insights (if applicable)\n3. Correlations and relationships\n4. Anomalies or outliers",
+          "output_key": "analysis_output",
+          "tools": ["analyze", "visualize", "compare"]
+        }
+      },
+      {
+        "id": "writer_agent",
+        "type": "agent",
+        "name": "Writer Agent",
+        "description": "Specialized writing agent",
+        "position": {"x": 500, "y": 300},
+        "config": {
+          "agent_type": "writer",
+          "prompt_template": "You are a Writer Agent specialized in creating clear, compelling content.\n\nTask: {writer_task}\nResearch: {research_output}\nAnalysis: {analysis_output}\nContext: {task_analysis}\n\nCreate content that:\n1. Is well-structured and clear\n2. Incorporates research findings\n3. Presents analysis insights\n4. Engages the target audience",
+          "output_key": "writing_output",
+          "tools": ["write", "edit", "format"]
+        }
+      },
+      {
+        "id": "planner_agent",
+        "type": "agent",
+        "name": "Planner Agent",
+        "description": "Specialized planning agent",
+        "position": {"x": 500, "y": 400},
+        "config": {
+          "agent_type": "planner",
+          "prompt_template": "You are a Planner Agent specialized in strategy and planning.\n\nTask: {planner_task}\nContext: {task_analysis}\nAvailable Resources: {agent_allocation}\n\nCreate a comprehensive plan including:\n1. Goals and objectives\n2. Action items with priorities\n3. Timeline and milestones\n4. Risk assessment and mitigation",
+          "output_key": "planning_output",
+          "tools": ["plan", "schedule", "prioritize"]
+        }
+      },
+      {
+        "id": "creative_agent",
+        "type": "agent",
+        "name": "Creative Agent",
+        "description": "Specialized creative agent",
+        "position": {"x": 500, "y": 500},
+        "config": {
+          "agent_type": "creative",
+          "prompt_template": "You are a Creative Agent specialized in ideation and creative thinking.\n\nTask: {creative_task}\nContext: {task_analysis}\n\nGenerate creative ideas including:\n1. Novel approaches\n2. Alternative perspectives\n3. Innovative solutions\n4. Creative enhancements",
+          "output_key": "creative_output",
+          "tools": ["brainstorm", "innovate", "design"]
+        }
+      },
+      {
+        "id": "critic_agent",
+        "type": "agent",
+        "name": "Critic Agent",
+        "description": "Quality review and critique agent",
+        "position": {"x": 700, "y": 300},
+        "config": {
+          "agent_type": "critic",
+          "prompt_template": "You are a Critic Agent specialized in quality review and constructive feedback.\n\nReview these outputs from other agents:\n\nResearch: {research_output}\nAnalysis: {analysis_output}\nWriting: {writing_output}\nPlanning: {planning_output}\nCreative: {creative_output}\n\nProvide:\n1. Strengths of each contribution\n2. Areas for improvement\n3. Inconsistencies or gaps\n4. Overall quality score (1-10)\n5. Specific recommendations",
+          "output_key": "critique_output",
+          "tools": ["review", "critique", "rate"]
+        }
+      },
+      {
+        "id": "improvement_router",
+        "type": "condition",
+        "name": "Improvement Router",
+        "description": "Determine if improvements are needed",
+        "position": {"x": 850, "y": 300},
+        "config": {
+          "conditions": [
+            {"condition": "quality_score < 7", "target": "improvement_coordinator"},
+            {"default": true, "target": "synthesis_agent"}
+          ]
+        }
+      },
+      {
+        "id": "improvement_coordinator",
+        "type": "llm",
+        "name": "Improvement Coordinator",
+        "description": "Coordinate improvements based on critique",
+        "position": {"x": 850, "y": 450},
+        "config": {
+          "prompt_template": "Based on the critique:\n\n{critique_output}\n\nCoordinate improvements:\n1. Identify which agents need to revise their work\n2. Provide specific improvement instructions\n3. Prioritize the most impactful changes",
+          "output_key": "improvement_plan"
+        }
+      },
+      {
+        "id": "synthesis_agent",
+        "type": "llm",
+        "name": "Synthesis Agent",
+        "description": "Synthesize all agent outputs",
+        "position": {"x": 1000, "y": 300},
+        "config": {
+          "prompt_template": "Synthesize all agent contributions into a unified output:\n\nOriginal Task: {input}\n\nAgent Contributions:\n- Research: {research_output}\n- Analysis: {analysis_output}\n- Writing: {writing_output}\n- Planning: {planning_output}\n- Creative: {creative_output}\n\nCritique: {critique_output}\n\nCreate a comprehensive, cohesive final output that:\n1. Integrates all relevant contributions\n2. Addresses critique points\n3. Maintains consistency\n4. Delivers maximum value",
+          "output_key": "synthesized_output"
+        }
+      },
+      {
+        "id": "quality_validator",
+        "type": "llm",
+        "name": "Quality Validator",
+        "description": "Final quality validation",
+        "position": {"x": 1150, "y": 300},
+        "config": {
+          "prompt_template": "Perform final quality validation:\n\nFinal Output:\n{synthesized_output}\n\nValidate against original task:\n{input}\n\nCheck:\n1. Task completion (all requirements met?)\n2. Quality standards\n3. Coherence and consistency\n4. Actionability\n\nProvide: APPROVED or NEEDS_WORK with specific feedback",
+          "output_key": "validation_result"
+        }
+      },
+      {
+        "id": "output_formatter",
+        "type": "llm",
+        "name": "Output Formatter",
+        "description": "Format final output",
+        "position": {"x": 1300, "y": 300},
+        "config": {
+          "prompt_template": "Format the final output for delivery:\n\n{synthesized_output}\n\nInclude:\n1. Executive Summary\n2. Main Content (well-structured)\n3. Supporting Details\n4. Next Steps/Recommendations\n5. Agent Contribution Summary",
+          "output_key": "final_output"
+        }
+      },
+      {
+        "id": "metrics_collector",
+        "type": "function",
+        "name": "Metrics Collector",
+        "description": "Collect orchestration metrics",
+        "position": {"x": 1300, "y": 450},
+        "config": {
+          "function": "collect_orchestration_metrics",
+          "metrics": ["agent_utilization", "execution_time", "quality_scores", "iterations"]
+        }
+      }
+    ],
+    "edges": [
+      {"source": "task_analyzer", "target": "agent_allocator"},
+      {"source": "agent_allocator", "target": "researcher_agent"},
+      {"source": "agent_allocator", "target": "analyst_agent"},
+      {"source": "agent_allocator", "target": "writer_agent"},
+      {"source": "agent_allocator", "target": "planner_agent"},
+      {"source": "agent_allocator", "target": "creative_agent"},
+      {"source": "researcher_agent", "target": "analyst_agent"},
+      {"source": "researcher_agent", "target": "writer_agent"},
+      {"source": "analyst_agent", "target": "writer_agent"},
+      {"source": "analyst_agent", "target": "planner_agent"},
+      {"source": "researcher_agent", "target": "critic_agent"},
+      {"source": "analyst_agent", "target": "critic_agent"},
+      {"source": "writer_agent", "target": "critic_agent"},
+      {"source": "planner_agent", "target": "critic_agent"},
+      {"source": "creative_agent", "target": "critic_agent"},
+      {"source": "critic_agent", "target": "improvement_router"},
+      {"source": "improvement_router", "target": "improvement_coordinator", "condition": "needs_improvement"},
+      {"source": "improvement_router", "target": "synthesis_agent", "condition": "approved"},
+      {"source": "improvement_coordinator", "target": "researcher_agent"},
+      {"source": "synthesis_agent", "target": "quality_validator"},
+      {"source": "quality_validator", "target": "output_formatter"},
+      {"source": "output_formatter", "target": "metrics_collector"}
+    ],
+    "entry_point": "task_analyzer",
+    "output_node": "output_formatter",
+    "parallel_groups": [
+      ["researcher_agent", "planner_agent", "creative_agent"]
+    ]
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.7
+  },
+  "sample_inputs": [
+    "Create a comprehensive market analysis report for a new product launch.",
+    "Develop a strategic plan for digital transformation initiative.",
+    "Research and propose solutions for improving operational efficiency."
+  ]
+}

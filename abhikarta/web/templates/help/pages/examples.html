@@ -1,0 +1,705 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Examples" %}
+{% set description = "Complete working examples with JSON configs & Python implementations" %}
+{% set icon = "bi-journal-code" %}
+{% set header_color = "#198754" %}
+{% set header_color_dark = "#146c43" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#workflow-examples">Workflow Examples</a>
+<a href="#agent-examples">Agent Examples</a>
+<a href="#running">Running Examples</a>
+{% endblock %}
+
+{% block help_content %}
+<style>
+    .example-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    .example-card .card-header {
+        border-bottom: none;
+        padding: 1rem 1.25rem;
+    }
+    .example-card .card-body {
+        padding: 1.25rem;
+    }
+    .code-tabs .nav-link {
+        border-radius: 8px 8px 0 0;
+        color: #6c757d;
+        font-weight: 500;
+    }
+    .code-tabs .nav-link.active {
+        background-color: #f8f9fa;
+        border-color: #dee2e6 #dee2e6 #f8f9fa;
+        color: #212529;
+    }
+    .code-viewer {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0 0 8px 8px;
+        max-height: 500px;
+        overflow: auto;
+    }
+    .code-viewer pre {
+        margin: 0;
+        padding: 1rem;
+        font-size: 0.85rem;
+    }
+    .feature-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+    .file-info {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+    }
+</style>
+
+<h2 id="overview">Overview</h2>
+<p class="lead">Complete working examples demonstrating the full capabilities of Abhikarta-LLM. Each example includes both JSON configuration and Python implementation.</p>
+
+<div class="alert alert-success">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Getting Started:</strong> These examples are ready to run. Install dependencies with <code>pip install langchain-ollama</code> and ensure Ollama is running with the <code>llama3.2:3b</code> model.
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5><i class="bi bi-diagram-3 me-2 text-primary"></i>Workflow Examples</h5>
+                <p class="mb-0">Multi-stage pipelines demonstrating sequential, parallel, and conditional processing patterns.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5><i class="bi bi-robot me-2 text-success"></i>Agent Examples</h5>
+                <p class="mb-0">Interactive agents showcasing conversational AI, decision support, and specialized assistants.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="workflow-examples">Workflow Examples</h2>
+
+<!-- Document Processing Pipeline -->
+<div class="example-card card">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Document Processing Pipeline</h5>
+            <span class="badge bg-light text-primary">9 Nodes</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>A comprehensive document processing workflow that extracts structure, entities, key points, and generates multi-level summaries with insights.</p>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h6>Pipeline Stages:</h6>
+                <ol class="small">
+                    <li>Document intake & validation</li>
+                    <li>Content classification</li>
+                    <li>Parallel extraction (structure, entities, key points)</li>
+                    <li>Summary generation (multiple levels)</li>
+                    <li>Insight generation</li>
+                    <li>Output formatting & metadata</li>
+                </ol>
+            </div>
+            <div class="col-md-6">
+                <h6>Key Features:</h6>
+                <span class="badge feature-badge bg-primary">Parallel Processing</span>
+                <span class="badge feature-badge bg-success">Multi-level Summaries</span>
+                <span class="badge feature-badge bg-info">Entity Extraction</span>
+                <span class="badge feature-badge bg-warning text-dark">Insight Generation</span>
+                
+                <h6 class="mt-3">Usage:</h6>
+                <code class="small">python document_processing_pipeline.py --sample</code>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs code-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#doc-json" type="button">
+                    <i class="bi bi-filetype-json me-1"></i>JSON Config
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#doc-python" type="button">
+                    <i class="bi bi-filetype-py me-1"></i>Python Code
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content code-viewer">
+            <div class="tab-pane fade show active" id="doc-json">
+                <div class="loading-spinner"><div class="spinner-border text-primary"></div></div>
+                <pre><code class="language-json" id="doc-json-code">Loading...</code></pre>
+            </div>
+            <div class="tab-pane fade" id="doc-python">
+                <div class="loading-spinner"><div class="spinner-border text-primary"></div></div>
+                <pre><code class="language-python" id="doc-python-code">Loading...</code></pre>
+            </div>
+        </div>
+        <div class="file-info mt-2">
+            <i class="bi bi-folder me-1"></i>
+            <code>examples/workflow/document_processing_pipeline.json</code> | 
+            <code>examples/workflow/document_processing_pipeline.py</code>
+        </div>
+    </div>
+</div>
+
+<!-- Content Generation Pipeline -->
+<div class="example-card card">
+    <div class="card-header" style="background: linear-gradient(135deg, #6f42c1, #d63384); color: white;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Content Generation Pipeline</h5>
+            <span class="badge bg-light text-dark">11 Nodes</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>A complete content creation workflow from brief parsing through research, ideation, drafting, review, and polishing to final assembly.</p>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h6>Pipeline Stages:</h6>
+                <ol class="small">
+                    <li>Brief parsing & understanding</li>
+                    <li>Research gathering</li>
+                    <li>Ideation & brainstorming</li>
+                    <li>Outline creation</li>
+                    <li>Draft writing</li>
+                    <li>Review & revision</li>
+                    <li>Style polishing & SEO</li>
+                </ol>
+            </div>
+            <div class="col-md-6">
+                <h6>Key Features:</h6>
+                <span class="badge feature-badge bg-primary">7-Stage Pipeline</span>
+                <span class="badge feature-badge bg-success">Quality Scoring</span>
+                <span class="badge feature-badge bg-info">SEO Optimization</span>
+                <span class="badge feature-badge bg-warning text-dark">Iterative Review</span>
+                
+                <h6 class="mt-3">Usage:</h6>
+                <code class="small">python content_generation_pipeline.py --interactive</code>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs code-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#content-json" type="button">
+                    <i class="bi bi-filetype-json me-1"></i>JSON Config
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#content-python" type="button">
+                    <i class="bi bi-filetype-py me-1"></i>Python Code
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content code-viewer">
+            <div class="tab-pane fade show active" id="content-json">
+                <pre><code class="language-json" id="content-json-code">Loading...</code></pre>
+            </div>
+            <div class="tab-pane fade" id="content-python">
+                <pre><code class="language-python" id="content-python-code">Loading...</code></pre>
+            </div>
+        </div>
+        <div class="file-info mt-2">
+            <i class="bi bi-folder me-1"></i>
+            <code>examples/workflow/content_generation_pipeline.json</code> | 
+            <code>examples/workflow/content_generation_pipeline.py</code>
+        </div>
+    </div>
+</div>
+
+<!-- Multi-Agent Collaboration -->
+<div class="example-card card">
+    <div class="card-header" style="background: linear-gradient(135deg, #fd7e14, #dc3545); color: white;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-people me-2"></i>Multi-Agent Collaboration</h5>
+            <span class="badge bg-light text-dark">5 Agents</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>Demonstrates coordinated work between specialized agents: Coordinator, Researcher, Analyst, Writer, and Critic with iterative refinement.</p>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h6>Agent Roles:</h6>
+                <ul class="small">
+                    <li><strong>Coordinator:</strong> Task distribution & synthesis</li>
+                    <li><strong>Researcher:</strong> Information gathering</li>
+                    <li><strong>Analyst:</strong> Data analysis & insights</li>
+                    <li><strong>Writer:</strong> Content creation</li>
+                    <li><strong>Critic:</strong> Quality review & feedback</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Key Features:</h6>
+                <span class="badge feature-badge bg-primary">Agent Coordination</span>
+                <span class="badge feature-badge bg-success">Iterative Refinement</span>
+                <span class="badge feature-badge bg-info">Structured Messages</span>
+                <span class="badge feature-badge bg-warning text-dark">Quality Loop</span>
+                
+                <h6 class="mt-3">Usage:</h6>
+                <code class="small">python multi_agent_collaboration.py --interactive</code>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs code-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#collab-json" type="button">
+                    <i class="bi bi-filetype-json me-1"></i>JSON Config
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#collab-python" type="button">
+                    <i class="bi bi-filetype-py me-1"></i>Python Code
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content code-viewer">
+            <div class="tab-pane fade show active" id="collab-json">
+                <pre><code class="language-json" id="collab-json-code">Loading...</code></pre>
+            </div>
+            <div class="tab-pane fade" id="collab-python">
+                <pre><code class="language-python" id="collab-python-code">Loading...</code></pre>
+            </div>
+        </div>
+        <div class="file-info mt-2">
+            <i class="bi bi-folder me-1"></i>
+            <code>examples/workflow/multi_agent_collaboration.json</code> | 
+            <code>examples/workflow/multi_agent_collaboration.py</code>
+        </div>
+    </div>
+</div>
+
+<!-- Strategic Planning Pipeline -->
+<div class="example-card card">
+    <div class="card-header" style="background: linear-gradient(135deg, #0d6efd, #6610f2); color: white;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-bullseye me-2"></i>Strategic Planning Pipeline</h5>
+            <span class="badge bg-light text-dark">11 Nodes</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>A comprehensive strategic planning workflow with SWOT/PESTLE analysis, option generation, evaluation, and implementation roadmap development.</p>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h6>Analysis Stages:</h6>
+                <ol class="small">
+                    <li>Situation analysis</li>
+                    <li>SWOT analysis (parallel)</li>
+                    <li>PESTLE analysis (parallel)</li>
+                    <li>Strategic issue identification</li>
+                    <li>Option generation & evaluation</li>
+                    <li>Strategy synthesis</li>
+                    <li>Roadmap & risk planning</li>
+                </ol>
+            </div>
+            <div class="col-md-6">
+                <h6>Key Features:</h6>
+                <span class="badge feature-badge bg-primary">SWOT Analysis</span>
+                <span class="badge feature-badge bg-success">PESTLE Analysis</span>
+                <span class="badge feature-badge bg-info">Option Evaluation</span>
+                <span class="badge feature-badge bg-warning text-dark">Risk Mitigation</span>
+                
+                <h6 class="mt-3">Usage:</h6>
+                <code class="small">python strategic_planning_pipeline.py --demo</code>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs code-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#strategic-json" type="button">
+                    <i class="bi bi-filetype-json me-1"></i>JSON Config
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#strategic-python" type="button">
+                    <i class="bi bi-filetype-py me-1"></i>Python Code
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content code-viewer">
+            <div class="tab-pane fade show active" id="strategic-json">
+                <pre><code class="language-json" id="strategic-json-code">Loading...</code></pre>
+            </div>
+            <div class="tab-pane fade" id="strategic-python">
+                <pre><code class="language-python" id="strategic-python-code">Loading...</code></pre>
+            </div>
+        </div>
+        <div class="file-info mt-2">
+            <i class="bi bi-folder me-1"></i>
+            <code>examples/workflow/strategic_planning_pipeline.json</code> | 
+            <code>examples/workflow/strategic_planning_pipeline.py</code>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="agent-examples">Agent Examples</h2>
+
+<!-- Research Assistant -->
+<div class="example-card card">
+    <div class="card-header bg-success text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-search me-2"></i>Research Assistant</h5>
+            <span class="badge bg-light text-success">Conversational</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>An intelligent research assistant that conducts systematic research, tracks findings across sessions, and exports comprehensive reports.</p>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h6>Capabilities:</h6>
+                <ul class="small">
+                    <li>Multi-turn conversation with context</li>
+                    <li>Session-based findings tracking</li>
+                    <li>Multiple research methodologies</li>
+                    <li>Export to JSON with history</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Commands:</h6>
+                <code class="small d-block">/summary</code> - Get research summary<br>
+                <code class="small d-block">/export</code> - Export findings<br>
+                <code class="small d-block">/clear</code> - Clear session<br>
+                
+                <h6 class="mt-3">Usage:</h6>
+                <code class="small">python research_assistant.py --interactive</code>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs code-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#research-json" type="button">
+                    <i class="bi bi-filetype-json me-1"></i>JSON Config
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#research-python" type="button">
+                    <i class="bi bi-filetype-py me-1"></i>Python Code
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content code-viewer">
+            <div class="tab-pane fade show active" id="research-json">
+                <pre><code class="language-json" id="research-json-code">Loading...</code></pre>
+            </div>
+            <div class="tab-pane fade" id="research-python">
+                <pre><code class="language-python" id="research-python-code">Loading...</code></pre>
+            </div>
+        </div>
+        <div class="file-info mt-2">
+            <i class="bi bi-folder me-1"></i>
+            <code>examples/agent/research_assistant.json</code> | 
+            <code>examples/agent/research_assistant.py</code>
+        </div>
+    </div>
+</div>
+
+<!-- Code Assistant -->
+<div class="example-card card">
+    <div class="card-header" style="background: linear-gradient(135deg, #ffc107, #fd7e14); color: #000;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>Code Assistant</h5>
+            <span class="badge bg-dark text-warning">Multi-Mode</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>A versatile code assistant supporting generation, review, debugging, explanation, and optimization across multiple programming languages.</p>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h6>Task Types:</h6>
+                <ul class="small">
+                    <li><strong>Generate:</strong> Create new code</li>
+                    <li><strong>Review:</strong> Analyze code quality</li>
+                    <li><strong>Debug:</strong> Find and fix issues</li>
+                    <li><strong>Explain:</strong> Document code</li>
+                    <li><strong>Optimize:</strong> Improve performance</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Languages:</h6>
+                <span class="badge feature-badge bg-primary">Python</span>
+                <span class="badge feature-badge bg-warning text-dark">JavaScript</span>
+                <span class="badge feature-badge bg-info">TypeScript</span>
+                <span class="badge feature-badge bg-danger">Java</span>
+                <span class="badge feature-badge bg-secondary">Go</span>
+                <span class="badge feature-badge bg-dark">Rust</span>
+                
+                <h6 class="mt-3">Usage:</h6>
+                <code class="small">python code_assistant.py --review file.py</code>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs code-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#code-json" type="button">
+                    <i class="bi bi-filetype-json me-1"></i>JSON Config
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#code-python" type="button">
+                    <i class="bi bi-filetype-py me-1"></i>Python Code
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content code-viewer">
+            <div class="tab-pane fade show active" id="code-json">
+                <pre><code class="language-json" id="code-json-code">Loading...</code></pre>
+            </div>
+            <div class="tab-pane fade" id="code-python">
+                <pre><code class="language-python" id="code-python-code">Loading...</code></pre>
+            </div>
+        </div>
+        <div class="file-info mt-2">
+            <i class="bi bi-folder me-1"></i>
+            <code>examples/agent/code_assistant.json</code> | 
+            <code>examples/agent/code_assistant.py</code>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Tutor -->
+<div class="example-card card">
+    <div class="card-header" style="background: linear-gradient(135deg, #20c997, #0dcaf0); color: white;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-mortarboard me-2"></i>Interactive Tutor</h5>
+            <span class="badge bg-light text-dark">Socratic</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>An intelligent tutoring agent using the Socratic method to guide learners through discovery, adapting to their level and tracking progress.</p>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h6>Teaching Methods:</h6>
+                <ul class="small">
+                    <li>Socratic questioning</li>
+                    <li>Scaffolded learning</li>
+                    <li>Multiple representations</li>
+                    <li>Progress tracking</li>
+                    <li>Level adaptation</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Commands:</h6>
+                <code class="small d-block">/topic <topic></code> - New topic<br>
+                <code class="small d-block">/summary</code> - Progress summary<br>
+                <code class="small d-block">/stats</code> - Session statistics<br>
+                
+                <h6 class="mt-3">Usage:</h6>
+                <code class="small">python interactive_tutor.py --topic "recursion"</code>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs code-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tutor-json" type="button">
+                    <i class="bi bi-filetype-json me-1"></i>JSON Config
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tutor-python" type="button">
+                    <i class="bi bi-filetype-py me-1"></i>Python Code
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content code-viewer">
+            <div class="tab-pane fade show active" id="tutor-json">
+                <pre><code class="language-json" id="tutor-json-code">Loading...</code></pre>
+            </div>
+            <div class="tab-pane fade" id="tutor-python">
+                <pre><code class="language-python" id="tutor-python-code">Loading...</code></pre>
+            </div>
+        </div>
+        <div class="file-info mt-2">
+            <i class="bi bi-folder me-1"></i>
+            <code>examples/agent/interactive_tutor.json</code> | 
+            <code>examples/agent/interactive_tutor.py</code>
+        </div>
+    </div>
+</div>
+
+<!-- Decision Support System -->
+<div class="example-card card">
+    <div class="card-header" style="background: linear-gradient(135deg, #6f42c1, #e83e8c); color: white;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-signpost-2 me-2"></i>Decision Support System</h5>
+            <span class="badge bg-light text-dark">Analytical</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <p>An analytical agent that structures decisions, evaluates options, detects biases, assesses risks, and provides balanced recommendations.</p>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h6>Decision Framework:</h6>
+                <ol class="small">
+                    <li>Problem definition</li>
+                    <li>Option generation</li>
+                    <li>Criteria development</li>
+                    <li>Evaluation & scoring</li>
+                    <li>Bias detection</li>
+                    <li>Recommendation</li>
+                </ol>
+            </div>
+            <div class="col-md-6">
+                <h6>Commands:</h6>
+                <code class="small d-block">/analyze</code> - Full analysis<br>
+                <code class="small d-block">/biases</code> - Bias check<br>
+                <code class="small d-block">/new</code> - New decision<br>
+                
+                <h6 class="mt-3">Usage:</h6>
+                <code class="small">python decision_support_system.py --quick "Should I..."</code>
+            </div>
+        </div>
+        
+        <ul class="nav nav-tabs code-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#decision-json" type="button">
+                    <i class="bi bi-filetype-json me-1"></i>JSON Config
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#decision-python" type="button">
+                    <i class="bi bi-filetype-py me-1"></i>Python Code
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content code-viewer">
+            <div class="tab-pane fade show active" id="decision-json">
+                <pre><code class="language-json" id="decision-json-code">Loading...</code></pre>
+            </div>
+            <div class="tab-pane fade" id="decision-python">
+                <pre><code class="language-python" id="decision-python-code">Loading...</code></pre>
+            </div>
+        </div>
+        <div class="file-info mt-2">
+            <i class="bi bi-folder me-1"></i>
+            <code>examples/agent/decision_support_system.json</code> | 
+            <code>examples/agent/decision_support_system.py</code>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="running">Running Examples</h2>
+
+<h5>Prerequisites</h5>
+<pre><code class="language-bash"># Install dependencies
+pip install langchain-ollama
+
+# Ensure Ollama is running
+ollama serve
+
+# Pull the model
+ollama pull llama3.2:3b</code></pre>
+
+<h5>Running Workflow Examples</h5>
+<pre><code class="language-bash"># Navigate to examples directory
+cd examples/workflow/
+
+# Run document processing with sample data
+python document_processing_pipeline.py --sample
+
+# Run content generation interactively
+python content_generation_pipeline.py --interactive
+
+# Run strategic planning demo
+python strategic_planning_pipeline.py --demo</code></pre>
+
+<h5>Running Agent Examples</h5>
+<pre><code class="language-bash"># Navigate to examples directory
+cd examples/agent/
+
+# Start research assistant
+python research_assistant.py --interactive
+
+# Review a code file
+python code_assistant.py --review your_file.py
+
+# Start tutoring session
+python interactive_tutor.py --topic "machine learning"
+
+# Quick decision analysis
+python decision_support_system.py --quick "Should I accept the job offer?"</code></pre>
+
+<div class="alert alert-info mt-4">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Customization:</strong> All examples support <code>--model</code> and <code>--base-url</code> flags to use different LLM providers or models.
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Documentation
+    </a>
+</div>
+
+<script>
+// Load example files dynamically
+const examples = [
+    {id: 'doc', base: 'workflow/document_processing_pipeline'},
+    {id: 'content', base: 'workflow/content_generation_pipeline'},
+    {id: 'collab', base: 'workflow/multi_agent_collaboration'},
+    {id: 'strategic', base: 'workflow/strategic_planning_pipeline'},
+    {id: 'research', base: 'agent/research_assistant'},
+    {id: 'code', base: 'agent/code_assistant'},
+    {id: 'tutor', base: 'agent/interactive_tutor'},
+    {id: 'decision', base: 'agent/decision_support_system'}
+];
+
+async function loadExample(id, base) {
+    try {
+        // Load JSON
+        const jsonResp = await fetch(`/api/examples/${base}.json`);
+        if (jsonResp.ok) {
+            const jsonText = await jsonResp.text();
+            document.getElementById(`${id}-json-code`).textContent = jsonText;
+        }
+        
+        // Load Python
+        const pyResp = await fetch(`/api/examples/${base}.py`);
+        if (pyResp.ok) {
+            const pyText = await pyResp.text();
+            document.getElementById(`${id}-python-code`).textContent = pyText;
+        }
+    } catch (e) {
+        console.error(`Error loading ${base}:`, e);
+    }
+}
+
+// Load all examples on page load
+document.addEventListener('DOMContentLoaded', function() {
+    examples.forEach(ex => loadExample(ex.id, ex.base));
+    
+    // Initialize syntax highlighting if Prism is available
+    if (typeof Prism !== 'undefined') {
+        setTimeout(() => Prism.highlightAll(), 1000);
+    }
+});
+</script>
+{% endblock %}

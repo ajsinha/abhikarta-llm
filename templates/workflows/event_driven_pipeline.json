@@ -1,0 +1,203 @@
+{
+  "template_id": "wf_event_driven",
+  "name": "Event-Driven Processing Pipeline",
+  "description": "Process events asynchronously with event sourcing, handlers, and event-driven state management. Supports multiple event types and complex event processing patterns.",
+  "category": "advanced",
+  "icon": "bi-lightning",
+  "difficulty": "advanced",
+  "tags": ["event-driven", "async", "event-sourcing", "reactive", "handlers"],
+  "workflow": {
+    "event_config": {
+      "event_store_enabled": true,
+      "replay_supported": true,
+      "max_events_in_memory": 1000,
+      "event_ttl_hours": 168
+    },
+    "event_types": [
+      {"type": "DATA_RECEIVED", "priority": "high", "handler": "data_handler"},
+      {"type": "ANALYSIS_REQUESTED", "priority": "medium", "handler": "analysis_handler"},
+      {"type": "ALERT_TRIGGERED", "priority": "critical", "handler": "alert_handler"},
+      {"type": "REPORT_GENERATED", "priority": "low", "handler": "report_handler"},
+      {"type": "ERROR_OCCURRED", "priority": "critical", "handler": "error_handler"}
+    ],
+    "nodes": [
+      {
+        "id": "event_ingestion",
+        "type": "function",
+        "name": "Event Ingestion",
+        "description": "Receive and validate incoming events",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "function": "ingest_event",
+          "validation_schema": {
+            "required_fields": ["event_type", "payload", "timestamp"],
+            "max_payload_size_kb": 1024
+          },
+          "output_key": "validated_event"
+        }
+      },
+      {
+        "id": "event_classifier",
+        "type": "llm",
+        "name": "Event Classifier",
+        "description": "Classify and enrich event with metadata",
+        "position": {"x": 250, "y": 300},
+        "config": {
+          "prompt_template": "Classify and enrich this event:\n\nEvent Type: {event_type}\nPayload: {payload}\nTimestamp: {timestamp}\n\nProvide:\n1. Event category (data/analysis/alert/report/error)\n2. Priority (critical/high/medium/low)\n3. Required handlers\n4. Estimated processing time\n5. Dependencies on other events",
+          "output_key": "classified_event"
+        }
+      },
+      {
+        "id": "event_router",
+        "type": "condition",
+        "name": "Event Router",
+        "description": "Route events to appropriate handlers",
+        "position": {"x": 400, "y": 300},
+        "config": {
+          "conditions": [
+            {"condition": "priority == 'critical'", "target": "priority_queue"},
+            {"condition": "event_category == 'data'", "target": "data_handler"},
+            {"condition": "event_category == 'analysis'", "target": "analysis_handler"},
+            {"condition": "event_category == 'alert'", "target": "alert_handler"},
+            {"default": true, "target": "standard_queue"}
+          ]
+        }
+      },
+      {
+        "id": "priority_queue",
+        "type": "function",
+        "name": "Priority Queue",
+        "description": "Handle critical events immediately",
+        "position": {"x": 550, "y": 150},
+        "config": {
+          "function": "priority_enqueue",
+          "max_concurrent": 5,
+          "timeout_seconds": 30
+        }
+      },
+      {
+        "id": "standard_queue",
+        "type": "function",
+        "name": "Standard Queue",
+        "description": "Queue for normal priority events",
+        "position": {"x": 550, "y": 450},
+        "config": {
+          "function": "standard_enqueue",
+          "batch_size": 10,
+          "batch_timeout_seconds": 60
+        }
+      },
+      {
+        "id": "data_handler",
+        "type": "llm",
+        "name": "Data Event Handler",
+        "description": "Process data-related events",
+        "position": {"x": 700, "y": 200},
+        "config": {
+          "prompt_template": "Process this data event:\n\n{classified_event}\n\nActions:\n1. Validate data integrity\n2. Transform if necessary\n3. Identify downstream impacts\n4. Generate derived events if needed",
+          "output_key": "data_result",
+          "emit_events": ["DATA_PROCESSED", "ANALYSIS_REQUESTED"]
+        }
+      },
+      {
+        "id": "analysis_handler",
+        "type": "llm",
+        "name": "Analysis Event Handler",
+        "description": "Process analysis request events",
+        "position": {"x": 700, "y": 300},
+        "config": {
+          "prompt_template": "Handle analysis request:\n\n{classified_event}\n\nPerform:\n1. Gather required data\n2. Execute analysis\n3. Generate insights\n4. Determine if alerts needed",
+          "output_key": "analysis_result",
+          "emit_events": ["ANALYSIS_COMPLETED", "ALERT_TRIGGERED"]
+        }
+      },
+      {
+        "id": "alert_handler",
+        "type": "llm",
+        "name": "Alert Event Handler",
+        "description": "Process alert events",
+        "position": {"x": 700, "y": 400},
+        "config": {
+          "prompt_template": "Process alert:\n\n{classified_event}\n\nActions:\n1. Assess severity\n2. Determine notification targets\n3. Generate alert message\n4. Suggest remediation actions",
+          "output_key": "alert_result",
+          "emit_events": ["NOTIFICATION_SENT", "REMEDIATION_STARTED"]
+        }
+      },
+      {
+        "id": "event_aggregator",
+        "type": "aggregator",
+        "name": "Event Aggregator",
+        "description": "Aggregate results from all handlers",
+        "position": {"x": 900, "y": 300},
+        "config": {
+          "aggregation_strategy": "merge_all",
+          "timeout_seconds": 120,
+          "output_key": "aggregated_results"
+        }
+      },
+      {
+        "id": "state_updater",
+        "type": "function",
+        "name": "State Updater",
+        "description": "Update system state based on event processing",
+        "position": {"x": 1050, "y": 300},
+        "config": {
+          "function": "update_event_state",
+          "state_fields": ["last_processed", "event_count", "error_count", "metrics"]
+        }
+      },
+      {
+        "id": "event_emitter",
+        "type": "function",
+        "name": "Event Emitter",
+        "description": "Emit new events based on processing results",
+        "position": {"x": 1200, "y": 300},
+        "config": {
+          "function": "emit_derived_events",
+          "max_events_per_processing": 10
+        }
+      },
+      {
+        "id": "event_store",
+        "type": "function",
+        "name": "Event Store",
+        "description": "Persist events for replay and audit",
+        "position": {"x": 1050, "y": 450},
+        "config": {
+          "function": "store_event",
+          "storage_backend": "database",
+          "enable_compression": true
+        }
+      }
+    ],
+    "edges": [
+      {"source": "event_ingestion", "target": "event_classifier"},
+      {"source": "event_classifier", "target": "event_router"},
+      {"source": "event_router", "target": "priority_queue", "condition": "critical"},
+      {"source": "event_router", "target": "data_handler", "condition": "data"},
+      {"source": "event_router", "target": "analysis_handler", "condition": "analysis"},
+      {"source": "event_router", "target": "alert_handler", "condition": "alert"},
+      {"source": "event_router", "target": "standard_queue", "condition": "default"},
+      {"source": "priority_queue", "target": "alert_handler"},
+      {"source": "standard_queue", "target": "data_handler"},
+      {"source": "data_handler", "target": "event_aggregator"},
+      {"source": "analysis_handler", "target": "event_aggregator"},
+      {"source": "alert_handler", "target": "event_aggregator"},
+      {"source": "event_aggregator", "target": "state_updater"},
+      {"source": "state_updater", "target": "event_emitter"},
+      {"source": "event_aggregator", "target": "event_store"}
+    ],
+    "entry_point": "event_ingestion",
+    "output_node": "event_emitter"
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.5
+  },
+  "sample_events": [
+    {"event_type": "DATA_RECEIVED", "payload": {"source": "sensor_001", "value": 42.5}, "timestamp": "2025-01-01T10:00:00Z"},
+    {"event_type": "ALERT_TRIGGERED", "payload": {"alert_id": "ALT001", "severity": "high", "message": "Threshold exceeded"}, "timestamp": "2025-01-01T10:01:00Z"}
+  ]
+}

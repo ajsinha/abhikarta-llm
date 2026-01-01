@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Migration Script: Set Ollama as Default Provider
-Version: 1.4.6
+Version: 1.4.7
 
 This script:
 1. Adds Ollama provider if not exists

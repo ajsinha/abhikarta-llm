@@ -1,0 +1,198 @@
+{
+  "template_id": "wf_adaptive_learning",
+  "name": "Adaptive Learning Pipeline",
+  "description": "A workflow that learns and adapts from feedback, improving its outputs over time. Demonstrates machine learning patterns with feedback loops and performance optimization.",
+  "category": "advanced",
+  "icon": "bi-mortarboard-fill",
+  "difficulty": "expert",
+  "tags": ["adaptive", "learning", "feedback", "optimization", "improvement"],
+  "workflow": {
+    "learning_config": {
+      "feedback_incorporation": true,
+      "performance_tracking": true,
+      "adaptation_rate": 0.1,
+      "memory_size": 100
+    },
+    "nodes": [
+      {
+        "id": "context_loader",
+        "type": "function",
+        "name": "Context Loader",
+        "description": "Load historical context and learned patterns",
+        "position": {"x": 100, "y": 300},
+        "config": {
+          "function": "load_learning_context",
+          "include_history": true,
+          "include_feedback": true,
+          "output_key": "learning_context"
+        }
+      },
+      {
+        "id": "task_analyzer",
+        "type": "llm",
+        "name": "Task Analyzer",
+        "description": "Analyze current task with context",
+        "position": {"x": 250, "y": 300},
+        "config": {
+          "prompt_template": "Analyze this task with learning context:\n\nTASK:\n{input}\n\nHISTORICAL CONTEXT:\n{learning_context}\n\nConsider:\n1. TASK_TYPE: What kind of task is this\n2. SIMILAR_PAST_TASKS: Related previous tasks\n3. SUCCESSFUL_APPROACHES: What worked before\n4. FAILED_APPROACHES: What didn't work\n5. ADAPTATION_NEEDED: How to adjust approach",
+          "output_key": "task_analysis"
+        }
+      },
+      {
+        "id": "strategy_selector",
+        "type": "llm",
+        "name": "Strategy Selector",
+        "description": "Select best strategy based on learning",
+        "position": {"x": 400, "y": 300},
+        "config": {
+          "prompt_template": "Select execution strategy:\n\nTASK ANALYSIS:\n{task_analysis}\n\nAVAILABLE STRATEGIES:\n1. Standard approach\n2. Conservative approach\n3. Experimental approach\n4. Hybrid approach\n\nBased on past performance, select best strategy and explain why.",
+          "output_key": "selected_strategy"
+        }
+      },
+      {
+        "id": "execution_engine",
+        "type": "llm",
+        "name": "Execution Engine",
+        "description": "Execute task with selected strategy",
+        "position": {"x": 600, "y": 300},
+        "config": {
+          "prompt_template": "Execute task:\n\nTASK:\n{input}\n\nSTRATEGY:\n{selected_strategy}\n\nLEARNED PATTERNS:\n{task_analysis}\n\nApply the strategy while:\n1. Using learned best practices\n2. Avoiding known pitfalls\n3. Documenting decisions made\n4. Flagging uncertain areas",
+          "output_key": "execution_result"
+        }
+      },
+      {
+        "id": "self_evaluator",
+        "type": "llm",
+        "name": "Self Evaluator",
+        "description": "Evaluate execution quality",
+        "position": {"x": 800, "y": 300},
+        "config": {
+          "prompt_template": "Evaluate this execution:\n\nTASK:\n{input}\n\nRESULT:\n{execution_result}\n\nSTRATEGY USED:\n{selected_strategy}\n\nEvaluate:\n1. QUALITY_SCORE: 1-10\n2. COMPLETENESS: Did it address all aspects?\n3. EFFECTIVENESS: Did strategy work?\n4. AREAS_FOR_IMPROVEMENT: What could be better?\n5. CONFIDENCE: How confident in this output?",
+          "output_key": "self_evaluation"
+        }
+      },
+      {
+        "id": "quality_gate",
+        "type": "condition",
+        "name": "Quality Gate",
+        "description": "Check if quality threshold met",
+        "position": {"x": 950, "y": 300},
+        "config": {
+          "conditions": [
+            {"condition": "quality_score >= 8", "target": "output_finalizer"},
+            {"condition": "iteration_count >= 3", "target": "best_effort_output"},
+            {"default": true, "target": "improvement_analyzer"}
+          ]
+        }
+      },
+      {
+        "id": "improvement_analyzer",
+        "type": "llm",
+        "name": "Improvement Analyzer",
+        "description": "Analyze how to improve",
+        "position": {"x": 950, "y": 450},
+        "config": {
+          "prompt_template": "Analyze improvement opportunities:\n\nCURRENT RESULT:\n{execution_result}\n\nEVALUATION:\n{self_evaluation}\n\nProvide:\n1. SPECIFIC_IMPROVEMENTS: Exact changes to make\n2. STRATEGY_ADJUSTMENTS: How to modify approach\n3. ADDITIONAL_CONTEXT_NEEDED: What info would help\n4. PRIORITY_ORDER: Which improvements first",
+          "output_key": "improvement_plan"
+        }
+      },
+      {
+        "id": "iterative_improver",
+        "type": "llm",
+        "name": "Iterative Improver",
+        "description": "Apply improvements",
+        "position": {"x": 1100, "y": 450},
+        "config": {
+          "prompt_template": "Apply improvements:\n\nORIGINAL RESULT:\n{execution_result}\n\nIMPROVEMENT PLAN:\n{improvement_plan}\n\nCreate improved version addressing all improvement points.",
+          "output_key": "execution_result"
+        }
+      },
+      {
+        "id": "output_finalizer",
+        "type": "llm",
+        "name": "Output Finalizer",
+        "description": "Finalize successful output",
+        "position": {"x": 1100, "y": 200},
+        "config": {
+          "prompt_template": "Finalize output:\n\nRESULT:\n{execution_result}\n\nEVALUATION:\n{self_evaluation}\n\nApply final polish and formatting.",
+          "output_key": "final_result"
+        }
+      },
+      {
+        "id": "best_effort_output",
+        "type": "llm",
+        "name": "Best Effort Output",
+        "description": "Produce best effort after max iterations",
+        "position": {"x": 1100, "y": 300},
+        "config": {
+          "prompt_template": "Produce best effort output:\n\nBEST RESULT SO FAR:\n{execution_result}\n\nKNOWN LIMITATIONS:\n{self_evaluation}\n\nProvide the best possible output with appropriate caveats about limitations.",
+          "output_key": "final_result"
+        }
+      },
+      {
+        "id": "learning_extractor",
+        "type": "llm",
+        "name": "Learning Extractor",
+        "description": "Extract learnings from this execution",
+        "position": {"x": 1250, "y": 350},
+        "config": {
+          "prompt_template": "Extract learnings:\n\nTASK:\n{input}\n\nSTRATEGY:\n{selected_strategy}\n\nRESULT:\n{final_result}\n\nEVALUATION:\n{self_evaluation}\n\nDocument:\n1. WHAT_WORKED: Successful approaches\n2. WHAT_DIDNT_WORK: Failed approaches\n3. NEW_PATTERNS: Newly discovered patterns\n4. RECOMMENDATIONS: For future similar tasks\n5. CONFIDENCE: How reliable are these learnings",
+          "output_key": "learnings"
+        }
+      },
+      {
+        "id": "memory_updater",
+        "type": "function",
+        "name": "Memory Updater",
+        "description": "Update learning memory",
+        "position": {"x": 1400, "y": 350},
+        "config": {
+          "function": "update_learning_memory",
+          "input_keys": ["learnings", "task_analysis", "selected_strategy", "self_evaluation"]
+        }
+      },
+      {
+        "id": "output_assembler",
+        "type": "aggregator",
+        "name": "Output Assembler",
+        "description": "Assemble final output",
+        "position": {"x": 1400, "y": 250},
+        "config": {
+          "template": "# Result\n{final_result}\n\n---\n## Performance Metadata\n- Strategy: {selected_strategy}\n- Quality Score: {self_evaluation}\n- Learnings Applied: {task_analysis}\n\n## Learnings Generated\n{learnings}",
+          "output_key": "final_output"
+        }
+      }
+    ],
+    "edges": [
+      {"source": "context_loader", "target": "task_analyzer"},
+      {"source": "task_analyzer", "target": "strategy_selector"},
+      {"source": "strategy_selector", "target": "execution_engine"},
+      {"source": "execution_engine", "target": "self_evaluator"},
+      {"source": "self_evaluator", "target": "quality_gate"},
+      {"source": "quality_gate", "target": "output_finalizer", "condition": "high_quality"},
+      {"source": "quality_gate", "target": "best_effort_output", "condition": "max_iterations"},
+      {"source": "quality_gate", "target": "improvement_analyzer", "condition": "needs_improvement"},
+      {"source": "improvement_analyzer", "target": "iterative_improver"},
+      {"source": "iterative_improver", "target": "self_evaluator"},
+      {"source": "output_finalizer", "target": "learning_extractor"},
+      {"source": "best_effort_output", "target": "learning_extractor"},
+      {"source": "learning_extractor", "target": "memory_updater"},
+      {"source": "learning_extractor", "target": "output_assembler"},
+      {"source": "output_finalizer", "target": "output_assembler"},
+      {"source": "best_effort_output", "target": "output_assembler"}
+    ],
+    "entry_point": "context_loader",
+    "output_node": "output_assembler"
+  },
+  "llm_config": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "base_url": "http://localhost:11434",
+    "temperature": 0.6
+  },
+  "sample_inputs": [
+    "Write a technical explanation of container orchestration.",
+    "Create a summary of best practices for code review.",
+    "Analyze the trade-offs between different database architectures."
+  ]
+}

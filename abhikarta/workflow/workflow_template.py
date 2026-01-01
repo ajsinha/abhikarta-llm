@@ -5,7 +5,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.4.6
+Version: 1.4.7
 """
 
 import json
@@ -52,7 +52,8 @@ class WorkflowTemplateManager:
         self.db_facade = db_facade
         self._templates: Dict[str, WorkflowTemplate] = {}
         self._init_builtin_templates()
-        logger.info("WorkflowTemplateManager initialized")
+        self._load_json_templates()
+        logger.info(f"WorkflowTemplateManager initialized with {len(self._templates)} templates")
     
     def _init_builtin_templates(self):
         """Initialize 5 built-in generic workflow templates."""
@@ -303,6 +304,53 @@ class WorkflowTemplateManager:
             from abhikarta.utils.helpers import get_timestamp
             template.created_at = get_timestamp()
             self._templates[template.template_id] = template
+    
+    def _load_json_templates(self):
+        """Load workflow templates from JSON files in templates/workflows directory."""
+        import os
+        import glob
+        
+        # Find templates directory relative to this file
+        # Go from workflow_template.py -> workflow -> abhikarta -> project root
+        workflow_dir = os.path.dirname(os.path.abspath(__file__))
+        abhikarta_dir = os.path.dirname(workflow_dir)
+        project_dir = os.path.dirname(abhikarta_dir)
+        templates_dir = os.path.join(project_dir, 'templates', 'workflows')
+        
+        if not os.path.exists(templates_dir):
+            logger.warning(f"Templates directory not found: {templates_dir}")
+            return
+        
+        json_files = glob.glob(os.path.join(templates_dir, '*.json'))
+        logger.info(f"Found {len(json_files)} JSON template files in {templates_dir}")
+        
+        for json_file in json_files:
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                # Create WorkflowTemplate from JSON
+                template = WorkflowTemplate(
+                    template_id=data.get('template_id', os.path.basename(json_file).replace('.json', '')),
+                    name=data.get('name', 'Unnamed Template'),
+                    description=data.get('description', ''),
+                    category=data.get('category', 'General'),
+                    icon=data.get('icon', 'bi-diagram-3'),
+                    difficulty=data.get('difficulty', 'intermediate'),
+                    dag_definition=data.get('workflow', {}),
+                    sample_inputs=data.get('sample_inputs', []),
+                    tags=data.get('tags', []),
+                    is_system=True,
+                    created_by='system'
+                )
+                
+                from abhikarta.utils.helpers import get_timestamp
+                template.created_at = get_timestamp()
+                self._templates[template.template_id] = template
+                logger.debug(f"Loaded template: {template.template_id} - {template.name}")
+                
+            except Exception as e:
+                logger.error(f"Error loading template from {json_file}: {e}")
     
     # ============================================
     # PUBLIC API

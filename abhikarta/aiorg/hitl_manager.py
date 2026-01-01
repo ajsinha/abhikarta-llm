@@ -7,7 +7,7 @@ This module handles:
 - Managing HITL timeouts
 - Audit logging of all human interventions
 
-Version: 1.4.6
+Version: 1.4.7
 Copyright © 2025-2030, All Rights Reserved
 """
 

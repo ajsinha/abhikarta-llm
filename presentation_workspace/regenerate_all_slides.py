@@ -25,7 +25,7 @@ def slide_template(num, title, content, is_section=False, is_title=False, is_tha
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD;">
   <div class="fit" style="background: #0079C1; padding: 8px 40px; display: flex; justify-content: space-between;">
     <p style="font-size: 14px; color: #FFFFFF; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 9px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 9px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.7</p>
   </div>
   <div class="fill-height col center" style="background: #F4F9FD; padding: 20px 40px;">
 {content}
@@ -43,7 +43,7 @@ def slide_template(num, title, content, is_section=False, is_title=False, is_tha
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD;">
   <div class="fit" style="background: #0079C1; padding: 8px 40px; display: flex; justify-content: space-between;">
     <p style="font-size: 14px; color: #FFFFFF; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 9px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 9px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.7</p>
   </div>
   <div class="fill-height col center" style="background: #F4F9FD; padding: 20px 40px;">
 {content}
@@ -61,7 +61,7 @@ def slide_template(num, title, content, is_section=False, is_title=False, is_tha
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD;">
   <div class="fit" style="background: #0079C1; padding: 8px 40px; display: flex; justify-content: space-between;">
     <p style="font-size: 14px; color: #FFFFFF; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 9px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 9px; color: #FFFFFF; margin: 0;">Abhikarta-LLM v1.4.7</p>
   </div>
   <div class="fill-height" style="background: #F4F9FD; padding: 12px 40px;">
 {content}
@@ -78,7 +78,7 @@ slides_data = [
     # Slide 1 - Title
     (1, "Title", '''    <h1 style="font-size: 44px; color: #0079C1; margin: 0; font-weight: 700;">Abhikarta-LLM</h1>
     <p style="font-size: 18px; color: #1A3A5C; margin: 10px 0 0 0;">Enterprise AI Orchestration Platform</p>
-    <p style="font-size: 13px; color: #5A7A9C; margin: 6px 0 0 0;">Version 1.4.6</p>
+    <p style="font-size: 13px; color: #5A7A9C; margin: 6px 0 0 0;">Version 1.4.7</p>
     <div style="display: flex; gap: 16px; margin-top: 20px;">
       <div style="background: #FFFFFF; border: 1px solid #D0E4F0; padding: 8px 16px; border-radius: 6px; text-align: center;">
         <p style="font-size: 18px; color: #0079C1; margin: 0; font-weight: 600;">11+</p>

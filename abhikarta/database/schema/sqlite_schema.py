@@ -30,7 +30,7 @@ class SQLiteSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.4.6"
+    SCHEMA_VERSION = "1.4.7"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -813,7 +813,7 @@ class SQLiteSchema:
     """
     
     # ==========================================================================
-    # AI ORGANIZATIONS (v1.4.6)
+    # AI ORGANIZATIONS (v1.4.7)
     # ==========================================================================
     
     CREATE_AI_ORGS_TABLE = """
@@ -1027,7 +1027,7 @@ class SQLiteSchema:
         "CREATE INDEX IF NOT EXISTS idx_webhook_events_endpoint_id ON webhook_events(endpoint_id);",
         "CREATE INDEX IF NOT EXISTS idx_webhook_events_received_at ON webhook_events(received_at);",
         "CREATE INDEX IF NOT EXISTS idx_user_notification_prefs_user_id ON user_notification_preferences(user_id);",
-        # AI Organizations indexes (v1.4.6)
+        # AI Organizations indexes (v1.4.7)
         "CREATE INDEX IF NOT EXISTS idx_ai_orgs_status ON ai_orgs(status);",
         "CREATE INDEX IF NOT EXISTS idx_ai_orgs_created_by ON ai_orgs(created_by);",
         "CREATE INDEX IF NOT EXISTS idx_ai_nodes_org_id ON ai_nodes(org_id);",
@@ -1044,7 +1044,7 @@ class SQLiteSchema:
         "CREATE INDEX IF NOT EXISTS idx_ai_hitl_actions_node_id ON ai_hitl_actions(node_id);",
         "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_org_id ON ai_event_logs(org_id);",
         "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_event_type ON ai_event_logs(event_type);",
-        # Agent executions indexes (v1.4.6.1)
+        # Agent executions indexes (v1.4.7.1)
         "CREATE INDEX IF NOT EXISTS idx_agent_executions_agent_id ON agent_executions(agent_id);",
         "CREATE INDEX IF NOT EXISTS idx_agent_executions_status ON agent_executions(status);",
         "CREATE INDEX IF NOT EXISTS idx_agent_executions_created_at ON agent_executions(created_at);",
@@ -1334,7 +1334,7 @@ class SQLiteSchema:
             self.CREATE_WEBHOOK_ENDPOINTS,
             self.CREATE_WEBHOOK_EVENTS,
             self.CREATE_USER_NOTIFICATION_PREFS,
-            # AI Organizations tables (v1.4.6)
+            # AI Organizations tables (v1.4.7)
             self.CREATE_AI_ORGS_TABLE,
             self.CREATE_AI_NODES_TABLE,
             self.CREATE_AI_TASKS_TABLE,
@@ -1436,7 +1436,7 @@ class SQLiteSchema:
             'swarm_executions',
             'swarm_events',
             'swarm_decisions',
-            # AI Organizations tables (v1.4.6)
+            # AI Organizations tables (v1.4.7)
             'ai_orgs',
             'ai_nodes',
             'ai_tasks',

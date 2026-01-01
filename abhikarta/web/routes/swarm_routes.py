@@ -35,6 +35,7 @@ class SwarmRoutes(AbstractRoutes):
     def register_routes(self):
         """Register all swarm routes."""
         self._register_list_routes()
+        self._register_template_routes()
         self._register_designer_routes()
         self._register_execution_routes()
         self._register_api_routes()
@@ -336,6 +337,92 @@ class SwarmRoutes(AbstractRoutes):
                 roles=session.get('roles', []),
                 is_admin=session.get('is_admin', False)
             )
+    
+    # =========================================================================
+    # TEMPLATE ROUTES
+    # =========================================================================
+    
+    def _register_template_routes(self):
+        """Register swarm template library routes."""
+        
+        @self.app.route('/swarms/templates')
+        @login_required
+        def swarm_templates():
+            """Browse swarm template library."""
+            from abhikarta.swarm.swarm_template import SwarmTemplateManager
+            
+            template_manager = SwarmTemplateManager()
+            templates = template_manager.list_templates()
+            categories = template_manager.get_categories()
+            
+            return render_template(
+                'swarms/templates.html',
+                templates=templates,
+                categories=categories,
+                fullname=session.get('fullname'),
+                userid=session.get('user_id'),
+                roles=session.get('roles', []),
+                is_admin=session.get('is_admin', False)
+            )
+        
+        @self.app.route('/swarms/templates/<template_id>')
+        @login_required
+        def swarm_template_detail(template_id):
+            """View swarm template details."""
+            from abhikarta.swarm.swarm_template import SwarmTemplateManager
+            
+            template_manager = SwarmTemplateManager()
+            template = template_manager.get_template(template_id)
+            
+            if not template:
+                flash("Template not found", "warning")
+                return redirect(url_for('swarm_templates'))
+            
+            return render_template(
+                'swarms/template_detail.html',
+                template=template,
+                fullname=session.get('fullname'),
+                userid=session.get('user_id'),
+                roles=session.get('roles', []),
+                is_admin=session.get('is_admin', False)
+            )
+        
+        @self.app.route('/swarms/templates/<template_id>/use', methods=['POST'])
+        @login_required
+        def use_swarm_template(template_id):
+            """Create a new swarm from a template."""
+            from abhikarta.swarm.swarm_template import SwarmTemplateManager
+            import uuid
+            
+            template_manager = SwarmTemplateManager()
+            template = template_manager.get_template(template_id)
+            
+            if not template:
+                flash("Template not found", "warning")
+                return redirect(url_for('swarm_templates'))
+            
+            try:
+                # Create new swarm from template
+                swarm_id = str(uuid.uuid4())
+                name = request.form.get('name', f"{template.name} (Copy)")
+                
+                # Get swarm definition from template
+                swarm_def = template.swarm_definition
+                
+                # Insert swarm record
+                self.db_facade.execute(
+                    """INSERT INTO swarms (swarm_id, name, description, config, status, created_by)
+                       VALUES (?, ?, ?, ?, 'draft', ?)""",
+                    (swarm_id, name, template.description, json.dumps(swarm_def), session.get('user_id'))
+                )
+                
+                flash(f"Created swarm '{name}' from template", "success")
+                return redirect(url_for('swarm_designer', swarm_id=swarm_id))
+                
+            except Exception as e:
+                logger.error(f"Error creating swarm from template: {e}", exc_info=True)
+                flash(f"Error: {e}", "danger")
+                return redirect(url_for('swarm_templates'))
     
     # =========================================================================
     # DESIGNER ROUTES

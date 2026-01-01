@@ -209,7 +209,7 @@ class AuthRoutes(AbstractRoutes):
                 'mcp-plugins': 'help/pages/mcp.html',  # Redirect old URL to new page
                 'tools-system': 'help/pages/tools_system.html',
                 'prebuilt-tools': 'help/pages/prebuilt_tools.html',
-                'banking-solutions': 'help/pages/banking_solutions.html',
+                'examples': 'help/pages/examples.html',
                 'actors': 'help/pages/actors.html',
                 'swarms': 'help/pages/swarms.html',
                 'messaging': 'help/pages/messaging.html',
@@ -228,8 +228,9 @@ class AuthRoutes(AbstractRoutes):
                 'cot-tot': 'help/pages/cot-tot.html',
                 'goal-based-agents': 'help/pages/goal-based-agents.html',
                 'react-reflect-hierarchical': 'help/pages/react-reflect-hierarchical.html',
+                'tutorials': 'help/pages/tutorials.html',
                 'notifications': 'help/pages/notifications.html',
-                # v1.4.6 AI Organizations
+                # v1.4.7 AI Organizations
                 'aiorg': 'help/pages/aiorg.html',
             }
             

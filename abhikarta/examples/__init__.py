@@ -20,5 +20,5 @@ Configuration:
     Default: http://192.168.2.36:11434
 """
 
-__version__ = "1.4.6"
+__version__ = "1.4.7"
 __all__ = ["workflow", "agent", "swarm", "aiorg"]

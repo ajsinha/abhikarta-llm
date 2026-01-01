@@ -1,0 +1,143 @@
+{
+  "template_id": "swarm_hierarchical",
+  "name": "Hierarchical Manager-Worker Swarm",
+  "description": "A hierarchical swarm with a manager agent that coordinates worker agents. The manager decomposes tasks, assigns work, and synthesizes results.",
+  "version": "1.0.0",
+  "category": "hierarchical",
+  "difficulty": "intermediate",
+  "icon": "bi-diagram-3",
+  "tags": ["hierarchical", "manager", "worker", "coordination", "delegation"],
+  "estimated_duration": "2-3 minutes",
+  "use_cases": [
+    "Complex project decomposition",
+    "Research with multiple focus areas",
+    "Report generation with specialized sections",
+    "Multi-domain analysis"
+  ],
+  
+  "swarm": {
+    "swarm_type": "hierarchical",
+    "name": "Hierarchical Manager-Worker Swarm",
+    "description": "Manager coordinates workers for complex tasks",
+    
+    "coordinator": {
+      "type": "hierarchical_controller",
+      "delegation_strategy": "smart_routing",
+      "synthesis_mode": "manager_driven",
+      "timeout_seconds": 300,
+      "fail_strategy": "reassign_on_failure"
+    },
+    
+    "manager": {
+      "agent_id": "manager",
+      "name": "Project Manager",
+      "role": "Task Coordinator",
+      "agent_type": "react",
+      "system_prompt": "You are the Project Manager. Your responsibilities:\n1. Analyze incoming tasks and decompose them into subtasks\n2. Assign subtasks to appropriate worker agents based on their specializations\n3. Monitor progress and provide guidance when needed\n4. Synthesize worker outputs into cohesive final deliverables\n\nAvailable workers:\n- Research Specialist: For information gathering and analysis\n- Technical Expert: For technical details and implementation\n- Writer: For content creation and formatting\n- Quality Reviewer: For verification and improvement\n\nBe strategic in delegation and ensure high-quality output.",
+      "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b",
+        "temperature": 0.4,
+        "max_tokens": 2000
+      },
+      "tools": ["delegate_task", "request_revision", "synthesize_outputs"]
+    },
+    
+    "workers": [
+      {
+        "agent_id": "researcher",
+        "name": "Research Specialist",
+        "role": "Information Gatherer",
+        "specialization": ["research", "analysis", "data"],
+        "agent_type": "conversational",
+        "system_prompt": "You are a Research Specialist. You excel at gathering information, analyzing data, identifying patterns, and providing well-researched insights. When given a research task, be thorough, cite your reasoning, and provide structured findings.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.3,
+          "max_tokens": 1500
+        }
+      },
+      {
+        "agent_id": "technical_expert",
+        "name": "Technical Expert",
+        "role": "Technical Analyst",
+        "specialization": ["technical", "implementation", "architecture"],
+        "agent_type": "conversational",
+        "system_prompt": "You are a Technical Expert. You specialize in technical analysis, system architecture, implementation details, and technical feasibility. Provide precise, accurate technical information and recommendations.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.2,
+          "max_tokens": 1500
+        }
+      },
+      {
+        "agent_id": "writer",
+        "name": "Content Writer",
+        "role": "Content Creator",
+        "specialization": ["writing", "content", "communication"],
+        "agent_type": "conversational",
+        "system_prompt": "You are a Content Writer. You create clear, engaging, and well-structured content. Transform technical or complex information into readable formats. Focus on clarity, flow, and audience-appropriate language.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.6,
+          "max_tokens": 2000
+        }
+      },
+      {
+        "agent_id": "reviewer",
+        "name": "Quality Reviewer",
+        "role": "Quality Assurance",
+        "specialization": ["review", "quality", "verification"],
+        "agent_type": "conversational",
+        "system_prompt": "You are a Quality Reviewer. You review content for accuracy, completeness, consistency, and quality. Identify issues, suggest improvements, and ensure deliverables meet high standards.",
+        "llm_config": {
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "temperature": 0.3,
+          "max_tokens": 1000
+        }
+      }
+    ],
+    
+    "execution": {
+      "mode": "hierarchical",
+      "manager_driven": true,
+      "allow_parallel_workers": true,
+      "max_delegation_depth": 2,
+      "max_revisions": 2,
+      "timeout_per_worker": 60
+    },
+    
+    "output": {
+      "format": "structured",
+      "include_delegation_log": true,
+      "include_worker_outputs": true,
+      "include_synthesis": true
+    }
+  },
+  
+  "sample_inputs": [
+    {
+      "task": "Create a comprehensive report on implementing microservices architecture",
+      "requirements": ["technical analysis", "implementation guide", "best practices"]
+    },
+    {
+      "task": "Develop a market entry strategy for a new SaaS product",
+      "requirements": ["market research", "competitive analysis", "go-to-market plan"]
+    }
+  ],
+  
+  "expected_outputs": [
+    "Manager's synthesis of all worker contributions",
+    "Individual worker outputs",
+    "Delegation and coordination log"
+  ],
+  
+  "prerequisites": [
+    "Ollama running with llama3.2:3b model",
+    "Understanding of hierarchical agent patterns"
+  ]
+}

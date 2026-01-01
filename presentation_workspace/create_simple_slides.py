@@ -8,7 +8,7 @@ def title_slide():
 <body class="col center" style="width: 960px; height: 540px; background: #F4F9FD; padding: 40px; box-sizing: border-box;">
   <h1 style="font-size: 44px; color: #0079C1; margin: 0; font-weight: 700;">Abhikarta-LLM</h1>
   <p style="font-size: 18px; color: #1A3A5C; margin: 10px 0 0 0;">Enterprise AI Orchestration Platform</p>
-  <p style="font-size: 13px; color: #5A7A9C; margin: 6px 0 0 0;">Version 1.4.6</p>
+  <p style="font-size: 13px; color: #5A7A9C; margin: 6px 0 0 0;">Version 1.4.7</p>
   <div class="row gap" style="margin-top: 20px;">
     <div style="background: #E8F4FC; padding: 10px 18px; border-radius: 6px; text-align: center;">
       <p style="font-size: 22px; color: #0079C1; margin: 0; font-weight: 600;">11+</p>
@@ -46,7 +46,7 @@ def content_slide(num, title, content):
 <body class="col" style="width: 960px; height: 540px; background: #F4F9FD; padding: 20px 30px; box-sizing: border-box;">
   <div class="row" style="justify-content: space-between; align-items: center; margin-bottom: 12px;">
     <p style="font-size: 16px; color: #0079C1; margin: 0; font-weight: 600;">{title}</p>
-    <p style="font-size: 9px; color: #5A7A9C; margin: 0;">Abhikarta-LLM v1.4.6</p>
+    <p style="font-size: 9px; color: #5A7A9C; margin: 0;">Abhikarta-LLM v1.4.7</p>
   </div>
   <div style="background: #0079C1; height: 3px; margin-bottom: 12px; border-radius: 2px;"></div>
   <div class="fill-height" style="overflow: hidden;">
@@ -66,7 +66,7 @@ def thank_you_slide(num):
 <body class="col center" style="width: 960px; height: 540px; background: #F4F9FD; padding: 40px; box-sizing: border-box;">
   <h1 style="font-size: 42px; color: #0079C1; margin: 0; font-weight: 700;">Thank You</h1>
   <p style="font-size: 18px; color: #1A3A5C; margin: 12px 0 0 0;">Abhikarta-LLM</p>
-  <p style="font-size: 12px; color: #5A7A9C; margin: 6px 0 0 0;">Enterprise AI Orchestration Platform v1.4.6</p>
+  <p style="font-size: 12px; color: #5A7A9C; margin: 6px 0 0 0;">Enterprise AI Orchestration Platform v1.4.7</p>
   <div class="row gap" style="margin-top: 20px;">
     <div style="background: #E8F4FC; padding: 10px 16px; border-radius: 6px; text-align: center;">
       <p style="font-size: 16px; color: #ED1C24; margin: 0; font-weight: 600;">11+ Providers</p>
@@ -381,7 +381,7 @@ simple_slides = [
     (48, 'Open Source: Utilities', 'Click, Rich, PyYAML, Requests, aiohttp, NumPy, Pandas, PyPDF, python-docx.'),
     (49, 'Licensing & Intellectual Property', 'Proprietary license. Copyright © 2025-2030 Ashutosh Sinha. Patent pending for AI Org technology.'),
     (50, 'Contact & Resources', 'Docs at /docs. Research paper in docs/research/. Enterprise support available.'),
-    (51, 'Copyright Notice', 'Abhikarta-LLM v1.4.6. Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved. PATENT PENDING.'),
+    (51, 'Copyright Notice', 'Abhikarta-LLM v1.4.7. Copyright © 2025-2030 Ashutosh Sinha. All Rights Reserved. PATENT PENDING.'),
 ]
 
 for num, title, desc in simple_slides:

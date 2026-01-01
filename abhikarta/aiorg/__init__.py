@@ -12,7 +12,7 @@ Key Features:
 - Multi-channel notifications
 - Complete audit trail
 
-Version: 1.4.6
+Version: 1.4.7
 Copyright © 2025-2030, All Rights Reserved
 """
 
@@ -83,7 +83,7 @@ __all__ = [
     'AIOrgTemplateManager',
 ]
 
-__version__ = '1.4.6'
+__version__ = '1.4.7'
 
 
 # Singleton instance for db operations
