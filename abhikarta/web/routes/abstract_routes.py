@@ -100,7 +100,7 @@ class AbstractRoutes(ABC):
                     metadata=json.dumps(details) if details else '{}'
                 )
             except Exception as e:
-                logger.error(f"Error logging audit: {e}")
+                logger.error(f"Error logging audit: {e}", exc_info=True)
 
 
 def login_required(f):

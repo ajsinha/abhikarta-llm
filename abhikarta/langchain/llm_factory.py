@@ -64,6 +64,17 @@ class LLMFactory:
         else:
             return cls._create_generic_llm(provider_type, provider_config, model_config, **kwargs)
     
+    @staticmethod
+    def _parse_config(config_dict: Dict, key: str, default: str = '{}') -> Dict:
+        """Parse JSON config from a dict, trying multiple possible column names."""
+        import json
+        # Try different column names that might exist in the database
+        config_str = config_dict.get(f'{key}_json') or config_dict.get(key) or default
+        try:
+            return json.loads(config_str) if isinstance(config_str, str) else (config_str or {})
+        except:
+            return {}
+    
     @classmethod
     def _create_openai_llm(cls, provider_config: Dict, model_config: Dict, **kwargs):
         """Create OpenAI LLM instance."""
@@ -72,9 +83,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-openai is required. Install with: pip install langchain-openai")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return ChatOpenAI(
             model=model_config.get('model_id', 'gpt-4o'),
@@ -93,9 +103,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-anthropic is required. Install with: pip install langchain-anthropic")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return ChatAnthropic(
             model=model_config.get('model_id', 'claude-3-5-sonnet-20241022'),
@@ -113,9 +122,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-google-genai is required. Install with: pip install langchain-google-genai")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return ChatGoogleGenerativeAI(
             model=model_config.get('model_id', 'gemini-1.5-pro'),
@@ -133,9 +141,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-openai is required. Install with: pip install langchain-openai")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return AzureChatOpenAI(
             azure_deployment=model_config.get('model_id'),
@@ -155,9 +162,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-aws is required. Install with: pip install langchain-aws")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return ChatBedrock(
             model_id=model_config.get('model_id', 'anthropic.claude-3-sonnet-20240229-v1:0'),
@@ -179,12 +185,40 @@ class LLMFactory:
             raise ImportError("langchain-ollama is required. Install with: pip install langchain-ollama")
         
         import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        import os
+        
+        # Read config from both possible column names
+        config_str = provider_config.get('config_json') or provider_config.get('config') or '{}'
+        try:
+            config = json.loads(config_str) if isinstance(config_str, str) else config_str
+        except:
+            config = {}
+        
+        model_params_str = model_config.get('parameters_json') or model_config.get('parameters') or '{}'
+        try:
+            model_params = json.loads(model_params_str) if isinstance(model_params_str, str) else model_params_str
+        except:
+            model_params = {}
+        
+        # Determine base URL with multiple fallbacks:
+        # 1. Config from database (base_url key)
+        # 2. api_endpoint column from database
+        # 3. OLLAMA_HOST environment variable
+        # 4. Hardcoded default
+        DEFAULT_OLLAMA_HOST = 'http://192.168.2.36:11434'
+        
+        base_url = (
+            config.get('base_url') or 
+            provider_config.get('api_endpoint') or
+            os.environ.get('OLLAMA_HOST') or 
+            DEFAULT_OLLAMA_HOST
+        )
+        
+        logger.info(f"Creating Ollama LLM: model={model_config.get('model_id', 'llama3.2:3b')}, base_url={base_url}")
         
         return ChatOllama(
-            model=model_config.get('model_id', 'llama3.2'),
-            base_url=config.get('base_url', 'http://localhost:11434'),
+            model=model_config.get('model_id', 'llama3.2:3b'),
+            base_url=base_url,
             temperature=model_params.get('temperature', kwargs.get('temperature', 0.7)),
             num_predict=model_params.get('max_tokens', kwargs.get('max_tokens', 2000)),
             **kwargs
@@ -198,9 +232,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-mistralai is required. Install with: pip install langchain-mistralai")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return ChatMistralAI(
             model=model_config.get('model_id', 'mistral-large-latest'),
@@ -218,9 +251,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-cohere is required. Install with: pip install langchain-cohere")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return ChatCohere(
             model=model_config.get('model_id', 'command-r-plus'),
@@ -238,9 +270,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-together is required. Install with: pip install langchain-together")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return ChatTogether(
             model=model_config.get('model_id', 'meta-llama/Llama-3-70b-chat-hf'),
@@ -258,9 +289,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-groq is required. Install with: pip install langchain-groq")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return ChatGroq(
             model=model_config.get('model_id', 'llama-3.1-70b-versatile'),
@@ -278,9 +308,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-huggingface is required. Install with: pip install langchain-huggingface")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         # Create endpoint first
         endpoint = HuggingFaceEndpoint(
@@ -302,9 +331,8 @@ class LLMFactory:
         except ImportError:
             raise ImportError("langchain-openai is required for generic LLM support")
         
-        import json
-        config = json.loads(provider_config.get('config_json', '{}'))
-        model_params = json.loads(model_config.get('parameters_json', '{}'))
+        config = cls._parse_config(provider_config, 'config')
+        model_params = cls._parse_config(model_config, 'parameters')
         
         return ChatOpenAI(
             model=model_config.get('model_id'),

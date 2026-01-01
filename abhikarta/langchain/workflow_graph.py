@@ -161,11 +161,15 @@ class LangGraphNodeFactory:
             logger.info(f"Executing LLM node: {node_id}")
             
             try:
+                # Get model and provider IDs - handle both naming conventions
+                model_id = node_config.get('model_id') or node_config.get('model')
+                provider_id = node_config.get('provider_id') or node_config.get('provider')
+                
                 # Get LLM
                 llm = get_langchain_llm(
                     self.db_facade,
-                    model_id=node_config.get('model_id'),
-                    provider_id=node_config.get('provider_id')
+                    model_id=model_id,
+                    provider_id=provider_id
                 )
                 
                 # Build messages
@@ -174,23 +178,38 @@ class LangGraphNodeFactory:
                 if node_config.get('system_prompt'):
                     messages.append(("system", node_config['system_prompt']))
                 
-                # Get input from state
+                # Get input from state - handle various input formats
                 input_key = node_config.get('input_key', 'input')
-                input_value = state.get(input_key, state.get('input', ''))
+                raw_input = state.get(input_key, state.get('input', ''))
+                
+                # Extract actual input value intelligently
+                input_value = self._extract_input_value(raw_input, state)
+                
+                logger.info(f"[NODE:{node_id}] Raw input type: {type(raw_input).__name__}")
+                logger.info(f"[NODE:{node_id}] Extracted input value: {str(input_value)[:200]}...")
                 
                 # Apply template if configured
                 prompt_template = node_config.get('prompt_template', '{input}')
-                prompt = prompt_template.format(
-                    input=input_value,
-                    **state.get('variables', {}),
-                    **state.get('node_outputs', {})
-                )
+                try:
+                    prompt = prompt_template.format(
+                        input=input_value,
+                        **state.get('variables', {}),
+                        **state.get('node_outputs', {})
+                    )
+                except KeyError as e:
+                    # If template variable not found, use input directly
+                    prompt = str(input_value)
+                    logger.warning(f"[NODE:{node_id}] Template formatting failed: {e}, using raw input")
                 
                 messages.append(("human", prompt))
+                
+                logger.info(f"[NODE:{node_id}] LLM Input prompt: {prompt[:500]}...")
                 
                 # Invoke LLM
                 response = llm.invoke(messages)
                 output = response.content if hasattr(response, 'content') else str(response)
+                
+                logger.info(f"[NODE:{node_id}] LLM Output: {output[:500]}...")
                 
                 # Store output
                 output_key = node_config.get('output_key', node_id)
@@ -212,6 +231,67 @@ class LangGraphNodeFactory:
                 }
         
         return llm_node
+    
+    def _extract_input_value(self, raw_input: Any, state: Dict) -> str:
+        """
+        Extract the actual input value from various formats.
+        
+        Handles:
+        - String input: returns as-is
+        - Dict with known keys: extracts value from 'query', 'text', 'input', 'message', 'prompt'
+        - Dict from previous node: looks in node_outputs
+        - Empty dict: looks for input in state variables
+        """
+        import json
+        
+        # If it's already a string, return it
+        if isinstance(raw_input, str):
+            if raw_input.strip():
+                return raw_input
+            # Empty string - try to find input elsewhere
+        
+        # If it's a dict, try to extract meaningful content
+        if isinstance(raw_input, dict):
+            # Check for common input keys
+            for key in ['query', 'text', 'input', 'message', 'prompt', 'question', 'content', 'data']:
+                if key in raw_input and raw_input[key]:
+                    value = raw_input[key]
+                    if isinstance(value, str):
+                        return value
+                    else:
+                        return json.dumps(value, indent=2)
+            
+            # If dict is not empty but has no common keys, serialize it nicely
+            if raw_input:
+                return json.dumps(raw_input, indent=2)
+        
+        # Try to get input from node_outputs (previous node's output)
+        node_outputs = state.get('node_outputs', {})
+        if node_outputs:
+            # Get the most recent output
+            for key in reversed(list(node_outputs.keys())):
+                value = node_outputs[key]
+                if value:
+                    if isinstance(value, str):
+                        return value
+                    elif isinstance(value, dict):
+                        # Try to extract from dict
+                        for subkey in ['output', 'result', 'data', 'text', 'content']:
+                            if subkey in value and value[subkey]:
+                                return str(value[subkey])
+                        return json.dumps(value, indent=2)
+                    else:
+                        return str(value)
+        
+        # Try variables
+        variables = state.get('variables', {})
+        for key in ['query', 'input', 'text', 'message']:
+            if key in variables and variables[key]:
+                return str(variables[key])
+        
+        # Last resort - return empty string with warning
+        logger.warning("Could not extract meaningful input value from state")
+        return str(raw_input) if raw_input else ""
     
     def _create_agent_node(self, config: Dict) -> Callable:
         """Create an agent execution node."""
@@ -323,21 +403,34 @@ class LangGraphNodeFactory:
             try:
                 code = node_config.get('code', '')
                 
+                # Get input value
+                raw_input = state.get('input')
+                input_value = self._extract_input_value(raw_input, state)
+                
+                logger.info(f"[NODE:{node_id}] Code input: {str(input_value)[:200]}...")
+                logger.info(f"[NODE:{node_id}] Code to execute:\n{code[:500]}...")
+                
                 # Create execution context
                 exec_globals = {
                     'state': state,
                     'input': state.get('input'),
+                    'input_data': input_value,  # Add extracted input as input_data
+                    'input_value': input_value,  # Also as input_value
                     'variables': state.get('variables', {}),
                     'node_outputs': state.get('node_outputs', {}),
                     'json': json,
-                    'result': None
+                    'result': None,
+                    'output': None  # Allow setting output directly
                 }
                 
                 # Execute code
                 exec(code, exec_globals)
                 
-                result = exec_globals.get('result')
+                # Get result - check both 'result' and 'output'
+                result = exec_globals.get('result') or exec_globals.get('output')
                 output_key = node_config.get('output_key', node_id)
+                
+                logger.info(f"[NODE:{node_id}] Code output: {str(result)[:200] if result else 'None'}...")
                 
                 return {
                     "current_node": node_id,
@@ -534,33 +627,77 @@ def create_workflow_graph(workflow_config: Dict, db_facade,
     graph = StateGraph(WorkflowState)
     
     # Extract nodes and edges from config
-    nodes = workflow_config.get('nodes', [])
-    edges = workflow_config.get('edges', [])
+    raw_nodes = workflow_config.get('nodes', [])
+    raw_edges = workflow_config.get('edges', [])
     
-    # Add nodes to graph
-    for node_config in nodes:
+    logger.debug(f"Creating workflow graph with {len(raw_nodes)} nodes and {len(raw_edges)} edges")
+    
+    # Normalize node format - handle both 'id'/'node_id' and 'type'/'node_type'
+    nodes = []
+    for n in raw_nodes:
+        node_id = n.get('id') or n.get('node_id')
+        node_type = n.get('type') or n.get('node_type') or 'action'
+        normalized = {
+            'id': node_id,
+            'type': node_type,
+            'name': n.get('name') or n.get('title') or node_id,
+            'config': n.get('config', {})
+        }
+        nodes.append(normalized)
+        logger.debug(f"Normalized node: id={node_id}, type={node_type}")
+    
+    # Normalize edge format - handle both 'source'/'from' and 'target'/'to'
+    edges = []
+    for e in raw_edges:
+        source = e.get('source') or e.get('from') or e.get('source_id')
+        target = e.get('target') or e.get('to') or e.get('target_id')
+        normalized = {
+            'source': source,
+            'target': target,
+            'condition': e.get('condition')
+        }
+        edges.append(normalized)
+        logger.debug(f"Normalized edge: {source} -> {target}")
+    
+    # Find start/input and end/output nodes
+    # Support both 'start'/'end' and 'input'/'output' node types
+    start_types = {'start', 'input'}
+    end_types = {'end', 'output'}
+    
+    start_node_id = None
+    end_node_ids = []
+    executable_nodes = []  # Nodes that actually get added to graph
+    
+    for node in nodes:
+        node_id = node.get('id')
+        node_type = (node.get('type') or '').lower()
+        
+        if node_type in start_types:
+            start_node_id = node_id
+            logger.debug(f"Found start/input node: {node_id}")
+        elif node_type in end_types:
+            end_node_ids.append(node_id)
+            logger.debug(f"Found end/output node: {node_id}")
+        else:
+            executable_nodes.append(node)
+    
+    logger.debug(f"Start node: {start_node_id}, End nodes: {end_node_ids}, Executable: {[n['id'] for n in executable_nodes]}")
+    
+    # Add executable nodes to graph (skip start/end nodes)
+    for node_config in executable_nodes:
         node_id = node_config.get('id')
         if not node_id:
             continue
         
-        # Skip start/end nodes
-        if node_config.get('type') in ['start', 'end']:
-            continue
-        
         node_func = node_factory.create_node_function(node_config)
         graph.add_node(node_id, node_func)
+        logger.debug(f"Added node to graph: {node_id}")
     
-    # Find start and end nodes
-    start_node = None
-    end_nodes = []
+    # Track entry point
+    entry_point_set = False
+    first_executable_node = executable_nodes[0]['id'] if executable_nodes else None
     
-    for node in nodes:
-        if node.get('type') == 'start':
-            start_node = node.get('id')
-        elif node.get('type') == 'end':
-            end_nodes.append(node.get('id'))
-    
-    # Add edges
+    # Process edges
     for edge in edges:
         source = edge.get('source')
         target = edge.get('target')
@@ -569,19 +706,23 @@ def create_workflow_graph(workflow_config: Dict, db_facade,
         if not source or not target:
             continue
         
-        # Handle start node
-        if source == start_node:
-            graph.set_entry_point(target)
+        # Handle start/input node - set entry point to target
+        if source == start_node_id:
+            # Target of start edge is our entry point (if it's an executable node)
+            if target not in end_node_ids:
+                logger.info(f"Setting entry point to: {target} (from start node edge)")
+                graph.set_entry_point(target)
+                entry_point_set = True
             continue
         
-        # Handle end nodes
-        if target in end_nodes:
+        # Handle end/output nodes - connect to END
+        if target in end_node_ids:
+            logger.debug(f"Adding edge to END: {source} -> END")
             graph.add_edge(source, END)
             continue
         
         # Handle conditional edges
         if condition:
-            # Create condition function
             def make_condition(cond, true_target, false_target=None):
                 def check_condition(state: WorkflowState) -> str:
                     try:
@@ -597,7 +738,6 @@ def create_workflow_graph(workflow_config: Dict, db_facade,
                         return false_target or END
                 return check_condition
             
-            # Find alternative target for false condition
             false_target = None
             for e in edges:
                 if e.get('source') == source and e.get('target') != target:
@@ -609,7 +749,40 @@ def create_workflow_graph(workflow_config: Dict, db_facade,
                 make_condition(condition, target, false_target)
             )
         else:
+            logger.debug(f"Adding edge: {source} -> {target}")
             graph.add_edge(source, target)
+    
+    # Fallback entry point detection
+    if not entry_point_set:
+        logger.warning("Entry point not set from edges, trying fallbacks...")
+        
+        # Method 1: First executable node
+        if first_executable_node:
+            logger.info(f"Setting entry point to first executable node: {first_executable_node}")
+            graph.set_entry_point(first_executable_node)
+            entry_point_set = True
+        
+        # Method 2: Find node with no incoming edges (among executable nodes)
+        if not entry_point_set:
+            incoming = set()
+            for edge in edges:
+                target = edge.get('target')
+                if target and target not in end_node_ids:
+                    incoming.add(target)
+            
+            for node in executable_nodes:
+                node_id = node.get('id')
+                if node_id not in incoming:
+                    logger.info(f"Setting entry point to node with no incoming edges: {node_id}")
+                    graph.set_entry_point(node_id)
+                    entry_point_set = True
+                    break
+    
+    if not entry_point_set:
+        logger.error("Could not determine entry point for workflow!")
+        logger.error(f"Nodes: {[n['id'] + ':' + n['type'] for n in nodes]}")
+        logger.error(f"Edges: {[(e['source'], e['target']) for e in edges]}")
+        raise ValueError("Could not determine workflow entry point. Check that edges connect from input node to other nodes.")
     
     # Compile and return
     return graph.compile()

@@ -40,6 +40,7 @@ from .org_manager import OrgManager
 from .task_engine import TaskEngine
 from .hitl_manager import HITLManager
 from .prompts import AIORGPrompts
+from .aiorg_template import AIOrgTemplate, AIOrgTemplateManager
 
 __all__ = [
     # Models
@@ -75,7 +76,11 @@ __all__ = [
     'HITLManager',
     
     # Prompts
-    'AIORGPrompts'
+    'AIORGPrompts',
+    
+    # Templates
+    'AIOrgTemplate',
+    'AIOrgTemplateManager',
 ]
 
 __version__ = '1.4.6'

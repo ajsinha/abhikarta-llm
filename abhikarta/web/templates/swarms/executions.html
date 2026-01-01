@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Executions - {{ swarm.name }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{{ url_for('list_swarms') }}">Swarms</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('view_swarm', swarm_id=swarm.swarm_id) }}">{{ swarm.name }}</a></li>
+                    <li class="breadcrumb-item active">Executions</li>
+                </ol>
+            </nav>
+            <h2>
+                <i class="bi bi-clock-history me-2 text-warning"></i>Swarm Executions
+            </h2>
+            <p class="text-muted mb-0">{{ swarm.name }} - Execution History</p>
+        </div>
+        <div>
+            <a href="{{ url_for('view_swarm', swarm_id=swarm.swarm_id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Swarm
+            </a>
+        </div>
+    </div>
+
+    <!-- Executions Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Execution History</h5>
+            <span class="badge bg-secondary">{{ executions|length }} executions</span>
+        </div>
+        <div class="card-body p-0">
+            {% if executions %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Execution ID</th>
+                            <th>Status</th>
+                            <th>Started</th>
+                            <th>Duration</th>
+                            <th>Messages</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exec in executions %}
+                        <tr>
+                            <td>
+                                <code>{{ exec.execution_id[:12] }}...</code>
+                            </td>
+                            <td>
+                                {% if exec.status == 'completed' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Completed</span>
+                                {% elif exec.status == 'failed' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Failed</span>
+                                {% elif exec.status == 'running' %}
+                                <span class="badge bg-primary"><i class="bi bi-play-circle me-1"></i>Running</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ exec.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if exec.started_at %}
+                                {{ exec.started_at.strftime('%Y-%m-%d %H:%M:%S') if exec.started_at is not string else exec.started_at }}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if exec.duration %}
+                                {{ "%.2f"|format(exec.duration) }}s
+                                {% elif exec.completed_at and exec.started_at %}
+                                -
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ exec.message_count or 0 }}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('view_swarm_execution', swarm_id=swarm.swarm_id, execution_id=exec.execution_id) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye me-1"></i>View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox display-4 text-muted"></i>
+                <p class="text-muted mt-3 mb-0">No executions found for this swarm</p>
+                <p class="text-muted small">Start the swarm and execute a task to see results here</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

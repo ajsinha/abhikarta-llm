@@ -121,7 +121,9 @@ class AgentManager:
         logger.info("AgentManager initialized")
     
     def create_agent(self, name: str, description: str, agent_type: str,
-                     created_by: str, config: Dict = None) -> Agent:
+                     created_by: str, config: Dict = None,
+                     workflow: Dict = None, llm_config: Dict = None,
+                     tools: List = None, hitl_config: Dict = None) -> Agent:
         """
         Create a new agent.
         
@@ -131,6 +133,10 @@ class AgentManager:
             agent_type: Type of agent (react, plan_and_execute, etc.)
             created_by: User ID of creator
             config: Optional configuration
+            workflow: Optional workflow definition
+            llm_config: Optional LLM configuration
+            tools: Optional list of tools
+            hitl_config: Optional HITL configuration
             
         Returns:
             Created Agent object
@@ -140,12 +146,27 @@ class AgentManager:
         agent_id = generate_id("agent")
         now = get_timestamp()
         
+        # Build config with all sub-configs
+        final_config = config.copy() if config else {}
+        if workflow:
+            final_config['workflow'] = workflow
+        if llm_config:
+            final_config['llm_config'] = llm_config
+        if tools:
+            final_config['tools'] = tools
+        if hitl_config:
+            final_config['hitl_config'] = hitl_config
+        
         agent = Agent(
             agent_id=agent_id,
             name=name,
             description=description,
             agent_type=agent_type,
-            config=config or {},
+            config=final_config,
+            workflow=workflow or final_config.get('workflow', {}),
+            llm_config=llm_config or final_config.get('llm_config', {}),
+            tools=tools or final_config.get('tools', []),
+            hitl_config=hitl_config or final_config.get('hitl_config', {}),
             created_by=created_by,
             created_at=now,
             updated_at=now
@@ -253,7 +274,7 @@ class AgentManager:
                 logger.info(f"Deleted agent: {agent_id}")
                 return True
             except Exception as e:
-                logger.error(f"Error deleting agent: {e}")
+                logger.error(f"Error deleting agent: {e}", exc_info=True)
                 return False
         
         return True
@@ -452,7 +473,7 @@ class AgentManager:
                     agent.created_by, agent.created_at, agent.updated_at
                 ))
         except Exception as e:
-            logger.error(f"Error saving agent to DB: {e}")
+            logger.error(f"Error saving agent to DB: {e}", exc_info=True)
     
     def _load_from_db(self, agent_id: str) -> Optional[Agent]:
         """Load agent from database."""
@@ -467,7 +488,7 @@ class AgentManager:
             if row:
                 return self._row_to_agent(row)
         except Exception as e:
-            logger.error(f"Error loading agent from DB: {e}")
+            logger.error(f"Error loading agent from DB: {e}", exc_info=True)
         
         return None
     

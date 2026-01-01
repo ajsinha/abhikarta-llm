@@ -62,7 +62,7 @@ class MCPRoutes(AbstractRoutes):
                     "SELECT * FROM mcp_plugins ORDER BY name"
                 )
             except Exception as e:
-                logger.error(f"Error getting MCP plugins: {e}")
+                logger.error(f"Error getting MCP plugins: {e}", exc_info=True)
             
             return render_template('mcp/plugins.html',
                                    fullname=session.get('fullname'),
@@ -116,7 +116,7 @@ class MCPRoutes(AbstractRoutes):
                     flash(f'MCP plugin "{name}" created successfully', 'success')
                     return redirect(url_for('mcp_plugins'))
                 except Exception as e:
-                    logger.error(f"Error creating MCP plugin: {e}")
+                    logger.error(f"Error creating MCP plugin: {e}", exc_info=True)
                     flash('Failed to create MCP plugin', 'error')
             
             return render_template('mcp/add_plugin.html',
@@ -185,7 +185,7 @@ class MCPRoutes(AbstractRoutes):
                     (plugin_id,)
                 )
             except Exception as e:
-                logger.error(f"Error getting MCP plugin: {e}")
+                logger.error(f"Error getting MCP plugin: {e}", exc_info=True)
             
             if not plugin:
                 flash('MCP plugin not found', 'error')
@@ -234,7 +234,7 @@ class MCPRoutes(AbstractRoutes):
                     flash(f'MCP plugin "{name}" updated successfully', 'success')
                     return redirect(url_for('mcp_plugin_detail', plugin_id=plugin_id))
                 except Exception as e:
-                    logger.error(f"Error updating MCP plugin: {e}")
+                    logger.error(f"Error updating MCP plugin: {e}", exc_info=True)
                     flash('Failed to update MCP plugin', 'error')
             
             return render_template('mcp/edit_plugin.html',
@@ -256,7 +256,7 @@ class MCPRoutes(AbstractRoutes):
                 self.log_audit('activate_mcp_plugin', 'mcp_plugin', plugin_id)
                 flash('MCP plugin activated successfully', 'success')
             except Exception as e:
-                logger.error(f"Error activating MCP plugin: {e}")
+                logger.error(f"Error activating MCP plugin: {e}", exc_info=True)
                 flash('Failed to activate MCP plugin', 'error')
             
             return redirect(url_for('mcp_plugin_detail', plugin_id=plugin_id))
@@ -273,7 +273,7 @@ class MCPRoutes(AbstractRoutes):
                 self.log_audit('deactivate_mcp_plugin', 'mcp_plugin', plugin_id)
                 flash('MCP plugin deactivated successfully', 'success')
             except Exception as e:
-                logger.error(f"Error deactivating MCP plugin: {e}")
+                logger.error(f"Error deactivating MCP plugin: {e}", exc_info=True)
                 flash('Failed to deactivate MCP plugin', 'error')
             
             return redirect(url_for('mcp_plugin_detail', plugin_id=plugin_id))
@@ -290,7 +290,7 @@ class MCPRoutes(AbstractRoutes):
                 self.log_audit('delete_mcp_plugin', 'mcp_plugin', plugin_id)
                 flash('MCP plugin deleted successfully', 'success')
             except Exception as e:
-                logger.error(f"Error deleting MCP plugin: {e}")
+                logger.error(f"Error deleting MCP plugin: {e}", exc_info=True)
                 flash('Failed to delete MCP plugin', 'error')
             
             return redirect(url_for('mcp_plugins'))

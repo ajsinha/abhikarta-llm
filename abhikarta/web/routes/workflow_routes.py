@@ -60,7 +60,7 @@ class WorkflowRoutes(AbstractRoutes):
                     python_modules = request.form.get('python_modules', '{}')
                     
                     # Parse and validate
-                    from ..workflow import DAGParser
+                    from abhikarta.workflow import DAGParser
                     parser = DAGParser()
                     workflow = parser.parse_dict(workflow_data)
                     
@@ -100,7 +100,7 @@ class WorkflowRoutes(AbstractRoutes):
                                          roles=session.get('roles', []),
                                          error=f"Invalid JSON: {e}")
                 except Exception as e:
-                    logger.error(f"Error uploading workflow: {e}")
+                    logger.error(f"Error uploading workflow: {e}", exc_info=True)
                     return render_template('workflows/upload.html',
                                          fullname=session.get('fullname'),
                                          userid=session.get('user_id'),
@@ -164,7 +164,7 @@ class WorkflowRoutes(AbstractRoutes):
                     input_data = json.loads(input_json)
                     
                     # Execute workflow
-                    from ..workflow import WorkflowExecutor, DAGParser
+                    from abhikarta.workflow import WorkflowExecutor, DAGParser
                     
                     dag_def = json.loads(workflow.get('dag_definition', '{}'))
                     dag_def['workflow_id'] = workflow_id
@@ -197,7 +197,7 @@ class WorkflowRoutes(AbstractRoutes):
                     })
                     
                 except Exception as e:
-                    logger.error(f"Workflow execution error: {e}")
+                    logger.error(f"Workflow execution error: {e}", exc_info=True)
                     return jsonify({
                         'success': False,
                         'error': str(e)
@@ -306,7 +306,7 @@ class WorkflowRoutes(AbstractRoutes):
                 if not workflow:
                     return jsonify({'success': False, 'error': 'Workflow not found'}), 404
                 
-                from ..workflow import WorkflowExecutor, DAGParser
+                from abhikarta.workflow import WorkflowExecutor, DAGParser
                 
                 dag_def = json.loads(workflow.get('dag_definition', '{}'))
                 dag_def['workflow_id'] = workflow_id
@@ -334,7 +334,7 @@ class WorkflowRoutes(AbstractRoutes):
                 })
                 
             except Exception as e:
-                logger.error(f"API workflow execution error: {e}")
+                logger.error(f"API workflow execution error: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)})
         
         @self.app.route('/api/workflows/<workflow_id>/validate', methods=['POST'])
@@ -344,7 +344,7 @@ class WorkflowRoutes(AbstractRoutes):
             try:
                 data = request.get_json() or {}
                 
-                from ..workflow import DAGParser
+                from abhikarta.workflow import DAGParser
                 parser = DAGParser()
                 
                 if 'dag_definition' in data:
@@ -526,7 +526,7 @@ class WorkflowRoutes(AbstractRoutes):
                 return redirect(url_for('workflow_designer', workflow_id=workflow_id))
                 
             except Exception as e:
-                logger.error(f"Error creating workflow from template: {e}")
+                logger.error(f"Error creating workflow from template: {e}", exc_info=True)
                 flash(f'Error: {str(e)}', 'error')
             
             return redirect(url_for('workflow_templates'))
@@ -578,7 +578,7 @@ class WorkflowRoutes(AbstractRoutes):
                 })
                 
             except Exception as e:
-                logger.error(f"Error saving workflow design: {e}")
+                logger.error(f"Error saving workflow design: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)})
         
         # =====================================================================

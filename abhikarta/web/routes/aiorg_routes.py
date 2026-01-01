@@ -890,7 +890,7 @@ class AIORGRoutes(AbstractRoutes):
                     return redirect(url_for('aiorg_designer', org_id=org.org_id))
                     
                 except Exception as e:
-                    logger.error(f"Import error: {e}")
+                    logger.error(f"Import error: {e}", exc_info=True)
                     flash(f'Error importing: {str(e)}', 'error')
             
             return render_template('aiorg/import.html',

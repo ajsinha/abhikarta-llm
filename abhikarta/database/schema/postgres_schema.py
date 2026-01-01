@@ -1032,7 +1032,7 @@ class PostgresSchema:
         ('together', 'Together AI', 'Together AI models', 'together', 'TOGETHER_API_KEY', TRUE, FALSE, '{"base_url": "https://api.together.xyz/v1"}'),
         ('cohere', 'Cohere', 'Cohere models', 'cohere', 'COHERE_API_KEY', TRUE, FALSE, '{}'),
         ('bedrock', 'AWS Bedrock', 'Amazon Bedrock', 'bedrock', 'AWS_ACCESS_KEY_ID', FALSE, FALSE, '{"region": "us-east-1"}'),
-        ('ollama', 'Ollama', 'Local Ollama - free and private', 'ollama', '', TRUE, TRUE, '{"base_url": "http://localhost:11434"}'),
+        ('ollama', 'Ollama', 'Local Ollama - free and private', 'ollama', '', TRUE, TRUE, '{"base_url": "http://192.168.2.36:11434"}'),
         ('huggingface', 'Hugging Face', 'HF Inference API', 'huggingface', 'HF_API_TOKEN', TRUE, FALSE, '{"base_url": "https://api-inference.huggingface.co"}')
     ON CONFLICT (provider_id) DO NOTHING;
     """
@@ -1040,10 +1040,11 @@ class PostgresSchema:
     INSERT_DEFAULT_MODELS = """
     INSERT INTO llm_models (model_id, provider_id, name, display_name, description, context_window, max_output_tokens, input_cost_per_1k, output_cost_per_1k, supports_vision, supports_functions, is_active, is_default) VALUES
         -- Ollama Models (Default Provider - FREE)
-        ('llama3.3', 'ollama', 'llama3.3', 'Llama 3.3 70B', 'Best open model, matches 405B quality', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, TRUE),
+        ('llama3.2:3b', 'ollama', 'llama3.2:3b', 'Llama 3.2 3B', 'Lightweight 3B model - RECOMMENDED DEFAULT', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, TRUE),
         ('llama3.2', 'ollama', 'llama3.2', 'Llama 3.2 3B', 'Lightweight, fast, edge deployment', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
         ('llama3.2:1b', 'ollama', 'llama3.2:1b', 'Llama 3.2 1B', 'Ultra-lightweight, mobile', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
         ('llama3.2-vision', 'ollama', 'llama3.2-vision', 'Llama 3.2 Vision 11B', 'Multimodal with image understanding', 131072, 4096, 0, 0, TRUE, TRUE, TRUE, FALSE),
+        ('llama3.3', 'ollama', 'llama3.3', 'Llama 3.3 70B', 'Best open model, matches 405B quality (42GB)', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
         ('llama3.1', 'ollama', 'llama3.1', 'Llama 3.1 8B', 'General purpose, production ready', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
         ('llama3.1:70b', 'ollama', 'llama3.1:70b', 'Llama 3.1 70B', 'High quality general purpose', 131072, 4096, 0, 0, FALSE, TRUE, TRUE, FALSE),
         ('deepseek-r1', 'ollama', 'deepseek-r1', 'DeepSeek R1 7B', 'Reasoning model, rivals o1', 65536, 8192, 0, 0, FALSE, TRUE, TRUE, FALSE),
@@ -1139,16 +1140,21 @@ class PostgresSchema:
     INSERT_DEFAULT_MODEL_PERMISSIONS = """
     INSERT INTO model_permissions (model_id, role_name, can_use, daily_limit, monthly_limit) VALUES
         -- Ollama models (no limits - free local models)
-        ('llama3.3', 'super_admin', TRUE, -1, -1),
-        ('llama3.3', 'domain_admin', TRUE, -1, -1),
-        ('llama3.3', 'agent_developer', TRUE, -1, -1),
-        ('llama3.3', 'agent_user', TRUE, -1, -1),
-        ('llama3.3', 'viewer', TRUE, -1, -1),
+        ('llama3.2:3b', 'super_admin', TRUE, -1, -1),
+        ('llama3.2:3b', 'domain_admin', TRUE, -1, -1),
+        ('llama3.2:3b', 'agent_developer', TRUE, -1, -1),
+        ('llama3.2:3b', 'agent_user', TRUE, -1, -1),
+        ('llama3.2:3b', 'viewer', TRUE, -1, -1),
         ('llama3.2', 'super_admin', TRUE, -1, -1),
         ('llama3.2', 'domain_admin', TRUE, -1, -1),
         ('llama3.2', 'agent_developer', TRUE, -1, -1),
         ('llama3.2', 'agent_user', TRUE, -1, -1),
         ('llama3.2', 'viewer', TRUE, -1, -1),
+        ('llama3.3', 'super_admin', TRUE, -1, -1),
+        ('llama3.3', 'domain_admin', TRUE, -1, -1),
+        ('llama3.3', 'agent_developer', TRUE, -1, -1),
+        ('llama3.3', 'agent_user', TRUE, -1, -1),
+        ('llama3.3', 'viewer', TRUE, -1, -1),
         ('deepseek-r1', 'super_admin', TRUE, -1, -1),
         ('deepseek-r1', 'domain_admin', TRUE, -1, -1),
         ('deepseek-r1', 'agent_developer', TRUE, -1, -1),

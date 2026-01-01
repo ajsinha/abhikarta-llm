@@ -50,6 +50,7 @@ class DAGWorkflow:
     output_schema: Dict[str, Any] = field(default_factory=dict)
     python_modules: Dict[str, str] = field(default_factory=dict)
     environment: Dict[str, str] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
     
     def get_execution_order(self) -> List[str]:
         """Get topologically sorted execution order."""

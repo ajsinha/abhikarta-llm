@@ -136,7 +136,7 @@ class AgentRoutes(AbstractRoutes):
                 return redirect(url_for('agent_designer', agent_id=agent.agent_id))
                 
             except Exception as e:
-                logger.error(f"Error creating agent: {e}")
+                logger.error(f"Error creating agent: {e}", exc_info=True)
                 flash(f'Error creating agent: {str(e)}', 'error')
                 return redirect(url_for('admin_agents'))
         
@@ -313,7 +313,7 @@ class AgentRoutes(AbstractRoutes):
                     flash('Template not found', 'error')
                     
             except Exception as e:
-                logger.error(f"Error creating agent from template: {e}")
+                logger.error(f"Error creating agent from template: {e}", exc_info=True)
                 flash(f'Error: {str(e)}', 'error')
             
             return redirect(url_for('agent_templates'))
@@ -368,7 +368,7 @@ class AgentRoutes(AbstractRoutes):
                     return jsonify({'error': 'Agent not found'}), 404
                     
             except Exception as e:
-                logger.error(f"Error updating workflow: {e}")
+                logger.error(f"Error updating workflow: {e}", exc_info=True)
                 return jsonify({'error': str(e)}), 500
         
         @self.app.route('/api/agents/<agent_id>', methods=['DELETE'])

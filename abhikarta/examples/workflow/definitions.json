@@ -1,0 +1,92 @@
+{
+  "workflows": [
+    {
+      "id": "sequential_pipeline",
+      "name": "Simple Sequential Pipeline",
+      "description": "Basic input -> process -> output pattern",
+      "nodes": [
+        {"node_id": "input", "node_type": "input", "name": "Data Input", "position": {"x": 100, "y": 200}, "config": {}},
+        {"node_id": "validate", "node_type": "python", "name": "Validate", "position": {"x": 300, "y": 200}, "config": {"code": "if not input_data: raise ValueError('No input')\\noutput = {'valid': True, 'data': input_data}"}},
+        {"node_id": "process", "node_type": "llm", "name": "LLM Process", "position": {"x": 500, "y": 200}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Process the input and provide a helpful response."}},
+        {"node_id": "output", "node_type": "output", "name": "Result", "position": {"x": 700, "y": 200}, "config": {}}
+      ],
+      "edges": [
+        {"source": "input", "target": "validate"},
+        {"source": "validate", "target": "process"},
+        {"source": "process", "target": "output"}
+      ]
+    },
+    {
+      "id": "parallel_analysis",
+      "name": "Parallel Analysis Pipeline",
+      "description": "Split work across multiple branches and aggregate",
+      "nodes": [
+        {"node_id": "input", "node_type": "input", "name": "Query", "position": {"x": 100, "y": 300}, "config": {}},
+        {"node_id": "split", "node_type": "split", "name": "Split", "position": {"x": 300, "y": 300}, "config": {"split_type": "parallel"}},
+        {"node_id": "branch_a", "node_type": "llm", "name": "Facts", "position": {"x": 500, "y": 100}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Provide key facts about the topic."}},
+        {"node_id": "branch_b", "node_type": "llm", "name": "Analysis", "position": {"x": 500, "y": 300}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Analyze the implications of the topic."}},
+        {"node_id": "branch_c", "node_type": "llm", "name": "Predictions", "position": {"x": 500, "y": 500}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Predict future developments."}},
+        {"node_id": "join", "node_type": "aggregate", "name": "Aggregate", "position": {"x": 700, "y": 300}, "config": {"strategy": "concat"}},
+        {"node_id": "summarize", "node_type": "llm", "name": "Summarize", "position": {"x": 900, "y": 300}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Synthesize all inputs into a cohesive summary."}},
+        {"node_id": "output", "node_type": "output", "name": "Report", "position": {"x": 1100, "y": 300}, "config": {}}
+      ],
+      "edges": [
+        {"source": "input", "target": "split"},
+        {"source": "split", "target": "branch_a"},
+        {"source": "split", "target": "branch_b"},
+        {"source": "split", "target": "branch_c"},
+        {"source": "branch_a", "target": "join"},
+        {"source": "branch_b", "target": "join"},
+        {"source": "branch_c", "target": "join"},
+        {"source": "join", "target": "summarize"},
+        {"source": "summarize", "target": "output"}
+      ]
+    },
+    {
+      "id": "conditional_routing",
+      "name": "Conditional Routing Workflow",
+      "description": "Route based on input conditions",
+      "nodes": [
+        {"node_id": "input", "node_type": "input", "name": "Request", "position": {"x": 100, "y": 200}, "config": {}},
+        {"node_id": "classify", "node_type": "llm", "name": "Classify", "position": {"x": 300, "y": 200}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Classify the request as 'technical' or 'general'. Reply with just the classification."}},
+        {"node_id": "condition", "node_type": "condition", "name": "Route", "position": {"x": 500, "y": 200}, "config": {"expression": "'technical' in output.lower()"}},
+        {"node_id": "technical", "node_type": "llm", "name": "Technical Response", "position": {"x": 700, "y": 100}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Provide a detailed technical response."}},
+        {"node_id": "general", "node_type": "llm", "name": "General Response", "position": {"x": 700, "y": 300}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Provide a friendly general response."}},
+        {"node_id": "output", "node_type": "output", "name": "Response", "position": {"x": 900, "y": 200}, "config": {}}
+      ],
+      "edges": [
+        {"source": "input", "target": "classify"},
+        {"source": "classify", "target": "condition"},
+        {"source": "condition", "target": "technical", "condition": "true"},
+        {"source": "condition", "target": "general", "condition": "false"},
+        {"source": "technical", "target": "output"},
+        {"source": "general", "target": "output"}
+      ]
+    },
+    {
+      "id": "hitl_approval",
+      "name": "Human-in-the-Loop Approval",
+      "description": "Workflow with human approval step",
+      "nodes": [
+        {"node_id": "input", "node_type": "input", "name": "Draft", "position": {"x": 100, "y": 200}, "config": {}},
+        {"node_id": "generate", "node_type": "llm", "name": "Generate Content", "position": {"x": 300, "y": 200}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Generate professional content based on the input."}},
+        {"node_id": "review", "node_type": "hitl", "name": "Human Review", "position": {"x": 500, "y": 200}, "config": {"task_type": "approval", "message": "Please review the generated content."}},
+        {"node_id": "finalize", "node_type": "llm", "name": "Finalize", "position": {"x": 700, "y": 200}, "config": {"provider": "ollama", "model": "llama3.2:3b", "system_prompt": "Apply any feedback and finalize the content."}},
+        {"node_id": "output", "node_type": "output", "name": "Final Content", "position": {"x": 900, "y": 200}, "config": {}}
+      ],
+      "edges": [
+        {"source": "input", "target": "generate"},
+        {"source": "generate", "target": "review"},
+        {"source": "review", "target": "finalize"},
+        {"source": "finalize", "target": "output"}
+      ]
+    }
+  ],
+  "llm_defaults": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "host": "http://192.168.2.36:11434",
+    "temperature": 0.7,
+    "max_tokens": 1024
+  }
+}

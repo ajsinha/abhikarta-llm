@@ -69,7 +69,7 @@ class SwarmRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error listing swarms: {e}")
+                logger.error(f"Error listing swarms: {e}", exc_info=True)
                 flash(f"Error loading swarms: {e}", "danger")
                 return redirect(url_for('dashboard'))
         
@@ -119,7 +119,7 @@ class SwarmRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error viewing swarm: {e}")
+                logger.error(f"Error viewing swarm: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('list_swarms'))
         
@@ -198,7 +198,7 @@ class SwarmRoutes(AbstractRoutes):
                     return redirect(url_for('view_swarm', swarm_id=swarm_id))
                     
                 except Exception as e:
-                    logger.error(f"Error creating swarm: {e}")
+                    logger.error(f"Error creating swarm: {e}", exc_info=True)
                     flash(f"Error creating swarm: {e}", "danger")
             
             # GET - show form
@@ -212,6 +212,125 @@ class SwarmRoutes(AbstractRoutes):
             return render_template(
                 'swarms/create.html',
                 agents=agents,
+                fullname=session.get('fullname'),
+                userid=session.get('user_id'),
+                roles=session.get('roles', []),
+                is_admin=session.get('is_admin', False)
+            )
+        
+        @self.app.route('/swarms/<swarm_id>/edit', methods=['GET', 'POST'])
+        @login_required
+        def edit_swarm(swarm_id):
+            """Edit an existing swarm."""
+            swarm = self.db_facade.fetch_one(
+                "SELECT * FROM swarms WHERE swarm_id = ?", (swarm_id,)
+            )
+            if not swarm:
+                flash("Swarm not found", "danger")
+                return redirect(url_for('list_swarms'))
+            
+            if request.method == 'POST':
+                try:
+                    name = request.form.get('name', swarm['name'])
+                    description = request.form.get('description', swarm.get('description', ''))
+                    
+                    self.db_facade.execute(
+                        """UPDATE swarms 
+                           SET name = ?, description = ?, updated_at = CURRENT_TIMESTAMP
+                           WHERE swarm_id = ?""",
+                        (name, description, swarm_id)
+                    )
+                    
+                    flash(f"Swarm '{name}' updated successfully!", "success")
+                    return redirect(url_for('view_swarm', swarm_id=swarm_id))
+                    
+                except Exception as e:
+                    logger.error(f"Error updating swarm: {e}", exc_info=True)
+                    flash(f"Error updating swarm: {e}", "danger")
+            
+            # GET - show edit form
+            try:
+                agents = self.db_facade.fetch_all(
+                    "SELECT agent_id, name, description FROM agents WHERE status = 'active' ORDER BY name"
+                ) or []
+                swarm_agents = self.db_facade.fetch_all(
+                    "SELECT agent_id FROM swarm_agents WHERE swarm_id = ?", (swarm_id,)
+                ) or []
+                selected_agent_ids = [a['agent_id'] for a in swarm_agents]
+            except:
+                agents = []
+                selected_agent_ids = []
+            
+            return render_template(
+                'swarms/edit.html',
+                swarm=swarm,
+                agents=agents,
+                selected_agent_ids=selected_agent_ids,
+                fullname=session.get('fullname'),
+                userid=session.get('user_id'),
+                roles=session.get('roles', []),
+                is_admin=session.get('is_admin', False)
+            )
+        
+        @self.app.route('/swarms/<swarm_id>/start', methods=['POST'])
+        @login_required
+        def start_swarm(swarm_id):
+            """Start a swarm."""
+            try:
+                self.db_facade.execute(
+                    """UPDATE swarms 
+                       SET status = 'running', updated_at = CURRENT_TIMESTAMP
+                       WHERE swarm_id = ?""",
+                    (swarm_id,)
+                )
+                flash("Swarm started successfully!", "success")
+            except Exception as e:
+                logger.error(f"Error starting swarm: {e}", exc_info=True)
+                flash(f"Error starting swarm: {e}", "danger")
+            
+            return redirect(url_for('view_swarm', swarm_id=swarm_id))
+        
+        @self.app.route('/swarms/<swarm_id>/stop', methods=['POST'])
+        @login_required
+        def stop_swarm(swarm_id):
+            """Stop a swarm."""
+            try:
+                self.db_facade.execute(
+                    """UPDATE swarms 
+                       SET status = 'stopped', updated_at = CURRENT_TIMESTAMP
+                       WHERE swarm_id = ?""",
+                    (swarm_id,)
+                )
+                flash("Swarm stopped successfully!", "success")
+            except Exception as e:
+                logger.error(f"Error stopping swarm: {e}", exc_info=True)
+                flash(f"Error stopping swarm: {e}", "danger")
+            
+            return redirect(url_for('view_swarm', swarm_id=swarm_id))
+        
+        @self.app.route('/swarms/<swarm_id>/executions')
+        @login_required
+        def swarm_executions(swarm_id):
+            """List executions for a swarm."""
+            swarm = self.db_facade.fetch_one(
+                "SELECT * FROM swarms WHERE swarm_id = ?", (swarm_id,)
+            )
+            if not swarm:
+                flash("Swarm not found", "danger")
+                return redirect(url_for('list_swarms'))
+            
+            executions = self.db_facade.fetch_all(
+                """SELECT * FROM swarm_executions 
+                   WHERE swarm_id = ? 
+                   ORDER BY started_at DESC 
+                   LIMIT 100""",
+                (swarm_id,)
+            ) or []
+            
+            return render_template(
+                'swarms/executions.html',
+                swarm=swarm,
+                executions=executions,
                 fullname=session.get('fullname'),
                 userid=session.get('user_id'),
                 roles=session.get('roles', []),
@@ -287,7 +406,7 @@ class SwarmRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error opening swarm designer: {e}")
+                logger.error(f"Error opening swarm designer: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('list_swarms'))
     
@@ -339,7 +458,7 @@ class SwarmRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error monitoring swarm: {e}")
+                logger.error(f"Error monitoring swarm: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('list_swarms'))
         
@@ -385,7 +504,7 @@ class SwarmRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error viewing execution: {e}")
+                logger.error(f"Error viewing execution: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('view_swarm', swarm_id=swarm_id))
     
@@ -444,7 +563,7 @@ class SwarmRoutes(AbstractRoutes):
                     'message': 'Swarm created successfully'
                 })
             except Exception as e:
-                logger.error(f"Error creating swarm: {e}")
+                logger.error(f"Error creating swarm: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/swarms/<swarm_id>', methods=['PUT'])
@@ -473,7 +592,7 @@ class SwarmRoutes(AbstractRoutes):
                     'message': 'Swarm updated successfully'
                 })
             except Exception as e:
-                logger.error(f"Error updating swarm: {e}")
+                logger.error(f"Error updating swarm: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/swarms/<swarm_id>', methods=['DELETE'])
@@ -491,7 +610,7 @@ class SwarmRoutes(AbstractRoutes):
                     'message': 'Swarm deleted successfully'
                 })
             except Exception as e:
-                logger.error(f"Error deleting swarm: {e}")
+                logger.error(f"Error deleting swarm: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/swarms/<swarm_id>/start', methods=['POST'])
@@ -512,7 +631,7 @@ class SwarmRoutes(AbstractRoutes):
                     'message': 'Swarm started successfully'
                 })
             except Exception as e:
-                logger.error(f"Error starting swarm: {e}")
+                logger.error(f"Error starting swarm: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/swarms/<swarm_id>/stop', methods=['POST'])
@@ -532,7 +651,7 @@ class SwarmRoutes(AbstractRoutes):
                     'message': 'Swarm stopped successfully'
                 })
             except Exception as e:
-                logger.error(f"Error stopping swarm: {e}")
+                logger.error(f"Error stopping swarm: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/swarms/<swarm_id>/execute', methods=['POST'])
@@ -564,7 +683,7 @@ class SwarmRoutes(AbstractRoutes):
                     'message': 'Execution started'
                 })
             except Exception as e:
-                logger.error(f"Error executing swarm: {e}")
+                logger.error(f"Error executing swarm: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/swarms/<swarm_id>/agents', methods=['GET'])

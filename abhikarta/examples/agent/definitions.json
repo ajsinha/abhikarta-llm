@@ -1,0 +1,80 @@
+{
+  "agents": [
+    {
+      "agent_id": "react_calculator",
+      "name": "ReAct Calculator Agent",
+      "description": "Agent using ReAct pattern with calculator tools",
+      "agent_type": "react",
+      "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b",
+        "temperature": 0.1,
+        "max_tokens": 1024
+      },
+      "tools": [
+        {"name": "calculator", "description": "Evaluate math expressions"},
+        {"name": "get_current_time", "description": "Get current date and time"},
+        {"name": "convert_units", "description": "Convert between units"}
+      ],
+      "system_prompt": "You are a helpful assistant using the ReAct pattern. Think step by step."
+    },
+    {
+      "agent_id": "conversational_assistant",
+      "name": "Conversational Assistant",
+      "description": "Multi-turn conversation agent with memory",
+      "agent_type": "conversational",
+      "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b",
+        "temperature": 0.7,
+        "max_tokens": 1024
+      },
+      "memory_config": {
+        "type": "buffer",
+        "max_messages": 10
+      },
+      "system_prompt": "You are a friendly conversational assistant. Remember context from our conversation."
+    },
+    {
+      "agent_id": "code_assistant",
+      "name": "Code Assistant",
+      "description": "Agent specialized in coding tasks",
+      "agent_type": "tool_calling",
+      "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b",
+        "temperature": 0.2,
+        "max_tokens": 2048
+      },
+      "tools": [
+        {"name": "execute_python", "description": "Execute Python code"},
+        {"name": "search_docs", "description": "Search documentation"}
+      ],
+      "system_prompt": "You are a coding assistant. Help users write, debug, and understand code."
+    },
+    {
+      "agent_id": "research_agent",
+      "name": "Research Agent",
+      "description": "Agent for research and information gathering",
+      "agent_type": "plan_execute",
+      "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b",
+        "temperature": 0.5,
+        "max_tokens": 2048
+      },
+      "planning_config": {
+        "max_steps": 5,
+        "replanning_threshold": 0.3
+      },
+      "system_prompt": "You are a research agent. Plan your research, gather information, and synthesize findings."
+    }
+  ],
+  "llm_defaults": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "host": "http://192.168.2.36:11434",
+    "temperature": 0.7,
+    "max_tokens": 1024
+  }
+}

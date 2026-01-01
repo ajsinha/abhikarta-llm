@@ -98,7 +98,7 @@ class MCPClientBase(ABC):
             )
             
             if response.status_code != 200:
-                logger.error(f"Auth endpoint returned {response.status_code}")
+                logger.error(f"Auth endpoint returned {response.status_code}", exc_info=True)
                 return None
             
             # Try to parse as JSON
@@ -111,7 +111,7 @@ class MCPClientBase(ABC):
                         logger.info(f"Successfully authenticated with {self.config.name}")
                         return token
                     else:
-                        logger.error("Auth response missing 'token' field")
+                        logger.error("Auth response missing 'token' field", exc_info=True)
                         return None
                 else:
                     # Response is just the token
@@ -125,7 +125,7 @@ class MCPClientBase(ABC):
                 return None
                 
         except Exception as e:
-            logger.error(f"Error authenticating with {self.config.name}: {e}")
+            logger.error(f"Error authenticating with {self.config.name}: {e}", exc_info=True)
             return None
     
     def _build_headers(self) -> Dict[str, str]:
@@ -172,7 +172,7 @@ class HTTPMCPClient(MCPClientBase):
         if self.config.auth_type == MCPAuthType.BASIC and self.config.auth_endpoint:
             token = self._authenticate_basic()
             if not token:
-                logger.error(f"Failed to authenticate with {self.config.name}")
+                logger.error(f"Failed to authenticate with {self.config.name}", exc_info=True)
                 self._connected = False
                 return False
             self._auth_token = token
@@ -212,7 +212,7 @@ class HTTPMCPClient(MCPClientBase):
             )
             
             if response.status_code != 200:
-                logger.error(f"Failed to list tools: HTTP {response.status_code}")
+                logger.error(f"Failed to list tools: HTTP {response.status_code}", exc_info=True)
                 return []
             
             data = response.json()
@@ -221,7 +221,7 @@ class HTTPMCPClient(MCPClientBase):
             return [MCPToolDefinition.from_dict(t) for t in tools_list]
             
         except Exception as e:
-            logger.error(f"Error listing tools from {self.config.name}: {e}")
+            logger.error(f"Error listing tools from {self.config.name}: {e}", exc_info=True)
             return []
     
     def call_tool(self, tool_name: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
@@ -261,7 +261,7 @@ class HTTPMCPClient(MCPClientBase):
                 'error': f"Request timed out after {self.config.timeout_seconds}s"
             }
         except Exception as e:
-            logger.error(f"Error calling tool {tool_name}: {e}")
+            logger.error(f"Error calling tool {tool_name}: {e}", exc_info=True)
             return {'success': False, 'error': str(e)}
     
     def health_check(self) -> tuple[bool, float]:
@@ -307,7 +307,7 @@ class WebSocketMCPClient(MCPClientBase):
             return True
             
         except Exception as e:
-            logger.error(f"WebSocket connection failed: {e}")
+            logger.error(f"WebSocket connection failed: {e}", exc_info=True)
             return False
     
     def disconnect(self):
@@ -348,7 +348,7 @@ class WebSocketMCPClient(MCPClientBase):
             return []
             
         except Exception as e:
-            logger.error(f"Error listing tools via WebSocket: {e}")
+            logger.error(f"Error listing tools via WebSocket: {e}", exc_info=True)
             return []
     
     def call_tool(self, tool_name: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
@@ -392,7 +392,7 @@ class WebSocketMCPClient(MCPClientBase):
             return {'success': False, 'error': 'Invalid response'}
             
         except Exception as e:
-            logger.error(f"Error calling tool {tool_name}: {e}")
+            logger.error(f"Error calling tool {tool_name}: {e}", exc_info=True)
             return {'success': False, 'error': str(e)}
     
     def health_check(self) -> tuple[bool, float]:

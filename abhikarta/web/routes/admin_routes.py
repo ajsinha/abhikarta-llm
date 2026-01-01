@@ -65,28 +65,28 @@ class AdminRoutes(AbstractRoutes):
             try:
                 agent_count = self.db_facade.agents.get_agents_count()
             except Exception as e:
-                logger.error(f"Error getting agent count: {e}")
+                logger.error(f"Error getting agent count: {e}", exc_info=True)
             
             # Get execution count using delegate
             execution_count = 0
             try:
                 execution_count = self.db_facade.executions.get_executions_count()
             except Exception as e:
-                logger.error(f"Error getting execution count: {e}")
+                logger.error(f"Error getting execution count: {e}", exc_info=True)
             
             # Get MCP plugin count using delegate
             mcp_count = 0
             try:
                 mcp_count = self.db_facade.mcp.get_plugins_count()
             except Exception as e:
-                logger.error(f"Error getting MCP plugin count: {e}")
+                logger.error(f"Error getting MCP plugin count: {e}", exc_info=True)
             
             # Get recent audit logs using delegate
             audit_logs = []
             try:
                 audit_logs = self.db_facade.audit.get_recent_logs(limit=10)
             except Exception as e:
-                logger.error(f"Error getting audit logs: {e}")
+                logger.error(f"Error getting audit logs: {e}", exc_info=True)
             
             return render_template('admin/dashboard.html',
                                    fullname=session.get('fullname'),
@@ -300,7 +300,7 @@ class AdminRoutes(AbstractRoutes):
             try:
                 logs = self.db_facade.audit.get_audit_logs(limit=per_page, offset=offset)
             except Exception as e:
-                logger.error(f"Error getting audit logs: {e}")
+                logger.error(f"Error getting audit logs: {e}", exc_info=True)
             
             total_pages = (total_count + per_page - 1) // per_page
             
@@ -428,7 +428,7 @@ class AdminRoutes(AbstractRoutes):
                 users_dict = {u['user_id']: u for u in users}
                 
             except Exception as e:
-                logger.error(f"Error getting API keys: {e}")
+                logger.error(f"Error getting API keys: {e}", exc_info=True)
             
             return render_template('admin/api_keys.html',
                                    fullname=session.get('fullname'),
@@ -480,7 +480,7 @@ class AdminRoutes(AbstractRoutes):
                     return redirect(url_for('admin_api_keys'))
                     
                 except Exception as e:
-                    logger.error(f"Error creating API key: {e}")
+                    logger.error(f"Error creating API key: {e}", exc_info=True)
                     flash('Error creating API key', 'error')
             
             # Get users for dropdown
@@ -504,7 +504,7 @@ class AdminRoutes(AbstractRoutes):
                 self.log_audit('revoke_api_key', 'api_key', key_id)
                 flash('API key revoked successfully', 'success')
             except Exception as e:
-                logger.error(f"Error revoking API key: {e}")
+                logger.error(f"Error revoking API key: {e}", exc_info=True)
                 flash('Error revoking API key', 'error')
             
             return redirect(url_for('admin_api_keys'))
@@ -521,7 +521,7 @@ class AdminRoutes(AbstractRoutes):
                 self.log_audit('delete_api_key', 'api_key', key_id)
                 flash('API key deleted successfully', 'success')
             except Exception as e:
-                logger.error(f"Error deleting API key: {e}")
+                logger.error(f"Error deleting API key: {e}", exc_info=True)
                 flash('Error deleting API key', 'error')
             
             return redirect(url_for('admin_api_keys'))
@@ -546,7 +546,7 @@ class AdminRoutes(AbstractRoutes):
                         categories.add(f['category'])
                         
             except Exception as e:
-                logger.error(f"Error getting code fragments: {e}")
+                logger.error(f"Error getting code fragments: {e}", exc_info=True)
             
             return render_template('admin/code_fragments.html',
                                    fullname=session.get('fullname'),
@@ -600,7 +600,7 @@ class AdminRoutes(AbstractRoutes):
                         flash('Error creating code fragment', 'error')
                     
                 except Exception as e:
-                    logger.error(f"Error creating code fragment: {e}")
+                    logger.error(f"Error creating code fragment: {e}", exc_info=True)
                     flash(f'Error creating code fragment: {str(e)}', 'error')
             
             return render_template('admin/add_code_fragment.html',
@@ -632,7 +632,7 @@ class AdminRoutes(AbstractRoutes):
                                        fragment=fragment)
                 
             except Exception as e:
-                logger.error(f"Error viewing code fragment: {e}")
+                logger.error(f"Error viewing code fragment: {e}", exc_info=True)
                 flash('Error loading code fragment', 'error')
                 return redirect(url_for('admin_code_fragments'))
         
@@ -702,7 +702,7 @@ class AdminRoutes(AbstractRoutes):
                                        fragment=fragment)
                 
             except Exception as e:
-                logger.error(f"Error editing code fragment: {e}")
+                logger.error(f"Error editing code fragment: {e}", exc_info=True)
                 flash('Error updating code fragment', 'error')
                 return redirect(url_for('admin_code_fragments'))
         
@@ -724,7 +724,7 @@ class AdminRoutes(AbstractRoutes):
                 flash('Code fragment deleted successfully', 'success')
                 
             except Exception as e:
-                logger.error(f"Error deleting code fragment: {e}")
+                logger.error(f"Error deleting code fragment: {e}", exc_info=True)
                 flash('Error deleting code fragment', 'error')
             
             return redirect(url_for('admin_code_fragments'))
@@ -750,7 +750,7 @@ class AdminRoutes(AbstractRoutes):
                 return jsonify({'success': True, 'is_active': new_status})
                 
             except Exception as e:
-                logger.error(f"Error toggling code fragment: {e}")
+                logger.error(f"Error toggling code fragment: {e}", exc_info=True)
                 return jsonify({'error': str(e)}), 500
         
         # ============================================
@@ -765,7 +765,7 @@ class AdminRoutes(AbstractRoutes):
             try:
                 providers = self.db_facade.llm.get_all_providers()
             except Exception as e:
-                logger.error(f"Error getting LLM providers: {e}")
+                logger.error(f"Error getting LLM providers: {e}", exc_info=True)
             
             return render_template('admin/llm_providers.html',
                                    fullname=session.get('fullname'),
@@ -812,7 +812,7 @@ class AdminRoutes(AbstractRoutes):
                     else:
                         flash('Error creating provider', 'error')
                 except Exception as e:
-                    logger.error(f"Error creating LLM provider: {e}")
+                    logger.error(f"Error creating LLM provider: {e}", exc_info=True)
                     flash(f'Error creating provider: {str(e)}', 'error')
             
             return render_template('admin/add_llm_provider.html',
@@ -862,7 +862,7 @@ class AdminRoutes(AbstractRoutes):
                                        roles=session.get('roles', []),
                                        provider=provider)
             except Exception as e:
-                logger.error(f"Error editing LLM provider: {e}")
+                logger.error(f"Error editing LLM provider: {e}", exc_info=True)
                 flash('Error updating provider', 'error')
                 return redirect(url_for('admin_llm_providers'))
         
@@ -881,7 +881,7 @@ class AdminRoutes(AbstractRoutes):
                 self.log_audit('delete_llm_provider', 'llm_provider', provider_id)
                 flash('Provider deleted successfully', 'success')
             except Exception as e:
-                logger.error(f"Error deleting LLM provider: {e}")
+                logger.error(f"Error deleting LLM provider: {e}", exc_info=True)
                 flash('Error deleting provider', 'error')
             
             return redirect(url_for('admin_llm_providers'))
@@ -901,7 +901,7 @@ class AdminRoutes(AbstractRoutes):
                 self.log_audit('set_default_provider', 'llm_provider', provider_id)
                 flash(f'Provider "{provider_id}" set as default', 'success')
             except Exception as e:
-                logger.error(f"Error setting default provider: {e}")
+                logger.error(f"Error setting default provider: {e}", exc_info=True)
                 flash('Error setting default provider', 'error')
             
             return redirect(url_for('admin_llm_providers'))
@@ -922,7 +922,7 @@ class AdminRoutes(AbstractRoutes):
                     self.log_audit(f'toggle_provider_{status_text}', 'llm_provider', provider_id)
                     flash(f'Provider "{provider_id}" {status_text}', 'success')
             except Exception as e:
-                logger.error(f"Error toggling provider status: {e}")
+                logger.error(f"Error toggling provider status: {e}", exc_info=True)
                 flash('Error toggling provider status', 'error')
             
             return redirect(url_for('admin_llm_providers'))
@@ -951,7 +951,7 @@ class AdminRoutes(AbstractRoutes):
                     ]
                 })
             except Exception as e:
-                logger.error(f"Error getting LLM providers: {e}")
+                logger.error(f"Error getting LLM providers: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)})
         
         @self.app.route('/api/llm/providers/<provider_id>/models')
@@ -978,7 +978,7 @@ class AdminRoutes(AbstractRoutes):
                     ]
                 })
             except Exception as e:
-                logger.error(f"Error getting models for provider {provider_id}: {e}")
+                logger.error(f"Error getting models for provider {provider_id}: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)})
         
         @self.app.route('/api/llm/models')
@@ -1018,7 +1018,7 @@ class AdminRoutes(AbstractRoutes):
                     'providers': result
                 })
             except Exception as e:
-                logger.error(f"Error getting all LLM models: {e}")
+                logger.error(f"Error getting all LLM models: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)})
         
         # ============================================
@@ -1043,7 +1043,7 @@ class AdminRoutes(AbstractRoutes):
                 # Get ALL providers for filter (not just active ones)
                 providers = self.db_facade.llm.get_all_providers()
             except Exception as e:
-                logger.error(f"Error getting LLM models: {e}")
+                logger.error(f"Error getting LLM models: {e}", exc_info=True)
             
             return render_template('admin/llm_models.html',
                                    fullname=session.get('fullname'),
@@ -1096,7 +1096,7 @@ class AdminRoutes(AbstractRoutes):
                     flash(f'LLM Model "{display_name or name}" created successfully', 'success')
                     return redirect(url_for('admin_llm_models'))
                 except Exception as e:
-                    logger.error(f"Error creating LLM model: {e}")
+                    logger.error(f"Error creating LLM model: {e}", exc_info=True)
                     flash(f'Error creating model: {str(e)}', 'error')
             
             return render_template('admin/add_llm_model.html',
@@ -1159,7 +1159,7 @@ class AdminRoutes(AbstractRoutes):
                                        model=model,
                                        providers=providers)
             except Exception as e:
-                logger.error(f"Error editing LLM model: {e}")
+                logger.error(f"Error editing LLM model: {e}", exc_info=True)
                 flash('Error updating model', 'error')
                 return redirect(url_for('admin_llm_models'))
         
@@ -1180,7 +1180,7 @@ class AdminRoutes(AbstractRoutes):
                 self.log_audit('delete_llm_model', 'llm_model', model_id)
                 flash('Model deleted successfully', 'success')
             except Exception as e:
-                logger.error(f"Error deleting LLM model: {e}")
+                logger.error(f"Error deleting LLM model: {e}", exc_info=True)
                 flash('Error deleting model', 'error')
             
             return redirect(url_for('admin_llm_models'))
@@ -1200,7 +1200,7 @@ class AdminRoutes(AbstractRoutes):
                 self.log_audit('set_default_model', 'llm_model', model_id)
                 flash(f'Model "{model_id}" set as default', 'success')
             except Exception as e:
-                logger.error(f"Error setting default model: {e}")
+                logger.error(f"Error setting default model: {e}", exc_info=True)
                 flash('Error setting default model', 'error')
             
             return redirect(url_for('admin_llm_models'))
@@ -1224,7 +1224,7 @@ class AdminRoutes(AbstractRoutes):
                     self.log_audit(f'toggle_model_{status_text}', 'llm_model', model_id)
                     flash(f'Model "{model_id}" {status_text}', 'success')
             except Exception as e:
-                logger.error(f"Error toggling model status: {e}")
+                logger.error(f"Error toggling model status: {e}", exc_info=True)
                 flash('Error toggling model status', 'error')
             
             return redirect(url_for('admin_llm_models'))
@@ -1286,7 +1286,7 @@ class AdminRoutes(AbstractRoutes):
                                        roles=roles,
                                        perm_dict=perm_dict)
             except Exception as e:
-                logger.error(f"Error managing model permissions: {e}")
+                logger.error(f"Error managing model permissions: {e}", exc_info=True)
                 flash('Error managing permissions', 'error')
                 return redirect(url_for('admin_llm_models'))
         
@@ -1302,7 +1302,7 @@ class AdminRoutes(AbstractRoutes):
             try:
                 servers = self.db_facade.mcp.get_all_servers()
             except Exception as e:
-                logger.error(f"Error getting MCP tool servers: {e}")
+                logger.error(f"Error getting MCP tool servers: {e}", exc_info=True)
             
             return render_template('admin/mcp_tool_servers.html',
                                    fullname=session.get('fullname'),
@@ -1399,14 +1399,14 @@ class AdminRoutes(AbstractRoutes):
                             
                             flash(f'MCP Tool Server "{name}" added and connected successfully. Loaded {tool_count} tools.', 'success')
                         except Exception as e:
-                            logger.error(f"Error connecting to MCP server: {e}")
+                            logger.error(f"Error connecting to MCP server: {e}", exc_info=True)
                             flash(f'Server added but connection failed: {str(e)}', 'warning')
                     else:
                         flash(f'MCP Tool Server "{name}" added successfully (not active)', 'success')
                     
                     return redirect(url_for('admin_mcp_tool_servers'))
                 except Exception as e:
-                    logger.error(f"Error adding MCP tool server: {e}")
+                    logger.error(f"Error adding MCP tool server: {e}", exc_info=True)
                     flash(f'Error adding server: {str(e)}', 'error')
             
             return render_template('admin/add_mcp_tool_server.html',
@@ -1464,7 +1464,7 @@ class AdminRoutes(AbstractRoutes):
                     flash('Server updated successfully', 'success')
                     return redirect(url_for('admin_mcp_tool_servers'))
                 except Exception as e:
-                    logger.error(f"Error updating MCP tool server: {e}")
+                    logger.error(f"Error updating MCP tool server: {e}", exc_info=True)
                     flash(f'Error updating server: {str(e)}', 'error')
             
             return render_template('admin/edit_mcp_tool_server.html',
@@ -1485,7 +1485,7 @@ class AdminRoutes(AbstractRoutes):
                 self.log_audit('delete', 'mcp_tool_server', server_id)
                 flash('Server deleted successfully', 'success')
             except Exception as e:
-                logger.error(f"Error deleting MCP tool server: {e}")
+                logger.error(f"Error deleting MCP tool server: {e}", exc_info=True)
                 flash(f'Error deleting server: {str(e)}', 'error')
             return redirect(url_for('admin_mcp_tool_servers'))
         
@@ -1694,7 +1694,7 @@ class AdminRoutes(AbstractRoutes):
                     try:
                         data = json.loads(response_text)
                     except json.JSONDecodeError as je:
-                        logger.error(f"JSON parse error. Response starts with: {response_text[:200]}")
+                        logger.error(f"JSON parse error. Response starts with: {response_text[:200]}", exc_info=True)
                         raise ValueError(f"Invalid JSON response: {str(je)[:100]}")
                 
                 # Extract tools list - handle different response formats
@@ -1736,7 +1736,7 @@ class AdminRoutes(AbstractRoutes):
                     error_msg += f" - {error_body}"
                 except:
                     pass
-                logger.error(f"HTTP error refreshing MCP server: {error_msg}")
+                logger.error(f"HTTP error refreshing MCP server: {error_msg}", exc_info=True)
                 self.db_facade.execute(
                     """UPDATE mcp_tool_servers SET
                        last_refresh = CURRENT_TIMESTAMP,
@@ -1748,7 +1748,7 @@ class AdminRoutes(AbstractRoutes):
                 
             except urllib.error.URLError as e:
                 error_msg = f"Connection error: {str(e.reason)}"
-                logger.error(f"URL error refreshing MCP server: {error_msg}")
+                logger.error(f"URL error refreshing MCP server: {error_msg}", exc_info=True)
                 self.db_facade.execute(
                     """UPDATE mcp_tool_servers SET
                        last_refresh = CURRENT_TIMESTAMP,
@@ -1760,7 +1760,7 @@ class AdminRoutes(AbstractRoutes):
                 
             except Exception as e:
                 error_msg = f"{type(e).__name__}: {str(e)}"
-                logger.error(f"Error refreshing MCP tool server: {error_msg}")
+                logger.error(f"Error refreshing MCP tool server: {error_msg}", exc_info=True)
                 self.db_facade.execute(
                     """UPDATE mcp_tool_servers SET
                        last_refresh = CURRENT_TIMESTAMP,
@@ -1899,7 +1899,7 @@ class AdminRoutes(AbstractRoutes):
                     'mcp_count': len([t for t in all_tools if t.get('_source') == 'mcp'])
                 })
             except Exception as e:
-                logger.error(f"Error getting all tools: {e}")
+                logger.error(f"Error getting all tools: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)})
         
         @self.app.route('/admin/mcp-tool-servers/all-tools')
@@ -1933,7 +1933,7 @@ class AdminRoutes(AbstractRoutes):
                             'tools': []
                         }
             except Exception as e:
-                logger.error(f"Error getting all MCP tools: {e}")
+                logger.error(f"Error getting all MCP tools: {e}", exc_info=True)
                 flash(f'Error loading tools: {str(e)}', 'error')
             
             return render_template('admin/all_mcp_tools.html',

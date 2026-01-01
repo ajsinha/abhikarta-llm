@@ -62,14 +62,14 @@ class UserRoutes(AbstractRoutes):
             try:
                 agents = self.db_facade.agents.get_all_agents(status='published')
             except Exception as e:
-                logger.error(f"Error getting agents: {e}")
+                logger.error(f"Error getting agents: {e}", exc_info=True)
             
             # Get user's recent executions
             executions = []
             try:
                 executions = self.db_facade.executions.get_recent_executions(user_id=user_id, limit=10)
             except Exception as e:
-                logger.error(f"Error getting executions: {e}")
+                logger.error(f"Error getting executions: {e}", exc_info=True)
             
             return render_template('user/dashboard.html',
                                    fullname=session.get('fullname'),
@@ -87,7 +87,7 @@ class UserRoutes(AbstractRoutes):
             try:
                 agents = self.db_facade.agents.get_all_agents(status='published')
             except Exception as e:
-                logger.error(f"Error getting agents: {e}")
+                logger.error(f"Error getting agents: {e}", exc_info=True)
             
             return render_template('user/agents.html',
                                    fullname=session.get('fullname'),
@@ -106,7 +106,7 @@ class UserRoutes(AbstractRoutes):
                     (agent_id,)
                 )
             except Exception as e:
-                logger.error(f"Error getting agent: {e}")
+                logger.error(f"Error getting agent: {e}", exc_info=True)
             
             if not agent:
                 flash('Agent not found or not available', 'error')
@@ -129,7 +129,7 @@ class UserRoutes(AbstractRoutes):
                     (agent_id,)
                 )
             except Exception as e:
-                logger.error(f"Error getting agent: {e}")
+                logger.error(f"Error getting agent: {e}", exc_info=True)
             
             if not agent:
                 flash('Agent not found or not available', 'error')
@@ -234,7 +234,7 @@ class UserRoutes(AbstractRoutes):
                 # Get agent/workflow executions
                 executions = self.db_facade.executions.get_all_executions(user_id=user_id)
             except Exception as e:
-                logger.error(f"Error getting executions: {e}")
+                logger.error(f"Error getting executions: {e}", exc_info=True)
             
             try:
                 # Get swarm executions
@@ -243,12 +243,12 @@ class UserRoutes(AbstractRoutes):
                        FROM swarm_executions se
                        LEFT JOIN swarms s ON se.swarm_id = s.swarm_id
                        WHERE se.user_id = ?
-                       ORDER BY se.created_at DESC
+                       ORDER BY se.started_at DESC
                        LIMIT 100""",
                     (user_id,)
                 ) or []
             except Exception as e:
-                logger.error(f"Error getting swarm executions: {e}")
+                logger.error(f"Error getting swarm executions: {e}", exc_info=True)
             
             return render_template('user/executions.html',
                                    fullname=session.get('fullname'),
@@ -271,7 +271,7 @@ class UserRoutes(AbstractRoutes):
                 if execution and not is_admin and execution.get('user_id') != user_id:
                     execution = None
             except Exception as e:
-                logger.error(f"Error getting execution: {e}")
+                logger.error(f"Error getting execution: {e}", exc_info=True)
             
             if not execution:
                 flash('Execution not found', 'error')
@@ -282,7 +282,7 @@ class UserRoutes(AbstractRoutes):
             try:
                 agent = self.db_facade.agents.get_agent(execution['agent_id'])
             except Exception as e:
-                logger.error(f"Error getting agent: {e}")
+                logger.error(f"Error getting agent: {e}", exc_info=True)
             
             return render_template('user/execution_detail.html',
                                    fullname=session.get('fullname'),
@@ -311,7 +311,7 @@ class UserRoutes(AbstractRoutes):
                         (execution_id, user_id)
                     )
             except Exception as e:
-                logger.error(f"Error getting execution: {e}")
+                logger.error(f"Error getting execution: {e}", exc_info=True)
             
             if not execution:
                 flash('Execution not found', 'error')
@@ -377,7 +377,7 @@ class UserRoutes(AbstractRoutes):
                         (execution_id, user_id)
                     )
             except Exception as e:
-                logger.error(f"Error getting execution: {e}")
+                logger.error(f"Error getting execution: {e}", exc_info=True)
             
             if not execution:
                 flash('Execution not found', 'error')
@@ -406,7 +406,7 @@ class UserRoutes(AbstractRoutes):
                         'duration': step.get('duration')
                     })
             except Exception as e:
-                logger.error(f"Error getting execution steps: {e}")
+                logger.error(f"Error getting execution steps: {e}", exc_info=True)
             
             # Calculate statistics
             success_count = len([s for s in trace_steps if s['status'] == 'completed'])
@@ -895,7 +895,7 @@ class UserRoutes(AbstractRoutes):
                     'execution_time_ms': result.execution_time_ms
                 })
             except Exception as e:
-                logger.error(f"Tool execution error: {e}")
+                logger.error(f"Tool execution error: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/tools/refresh-mcp', methods=['POST'])

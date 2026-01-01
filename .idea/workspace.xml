@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cb8075d7-6a43-45a0-aa83-9afdedf815cb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/abhikarta-llm.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/abhikarta-llm.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/agent/agent_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/agent/agent_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/agent/agent_template.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/agent/agent_template.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/aiorg/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/aiorg/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/config/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/database/schema/postgres_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/database/schema/postgres_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/database/schema/sqlite_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/database/schema/sqlite_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/langchain/llm_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/langchain/llm_factory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/langchain/workflow_graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/langchain/workflow_graph.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/llm_provider/llm_facade.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/llm_provider/llm_facade.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/mcp/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/mcp/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/mcp/manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/mcp/manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/swarm/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/swarm/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/abstract_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/abstract_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/admin_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/admin_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/agent_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/agent_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/aiorg_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/aiorg_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/api_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/api_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/mcp_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/mcp_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/notification_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/notification_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/swarm_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/swarm_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/user_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/workflow_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/workflow_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/agents/designer.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/agents/designer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/mcp/plugin_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/mcp/plugin_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/swarms/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/swarms/view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/agent_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/agent_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/user/execution_trace.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/user/execution_trace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/workflows/designer.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/workflows/designer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/workflows/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/workflows/detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/workflow/dag_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/workflow/dag_parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/workflow/executor.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/workflow/executor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/workflow/node_types.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/workflow/node_types.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta/workflow/workflow_template.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/workflow/workflow_template.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/abhikarta.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/abhikarta.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/abhikarta.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/abhikarta.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="37ex6gsMhEZIAqpkPqN0nO5zJ3x" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.run_server.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="run_server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="abhikarta-llm" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run_server.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.run_server" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-f2b7a9f6281b-6e1f45a539f7-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.29346.142" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cb8075d7-6a43-45a0-aa83-9afdedf815cb" name="Changes" comment="" />
+      <created>1767277167698</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1767277167698</updated>
+    </task>
+    <servers />
+  </component>
+</project>

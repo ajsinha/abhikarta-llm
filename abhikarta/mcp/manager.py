@@ -188,7 +188,7 @@ class MCPServerManager:
         """
         server = self._servers.get(server_id)
         if not server:
-            logger.error(f"Server {server_id} not found")
+            logger.warning(f"Server {server_id} not found")
             return False
         
         try:
@@ -223,7 +223,7 @@ class MCPServerManager:
                 return False
                 
         except Exception as e:
-            logger.error(f"Error connecting to {server_id}: {e}")
+            logger.error(f"Error connecting to {server_id}: {e}", exc_info=True)
             server.state.status = MCPServerStatus.ERROR
             server.state.last_error = str(e)
             server.state.error_count += 1
@@ -264,7 +264,7 @@ class MCPServerManager:
             return True
             
         except Exception as e:
-            logger.error(f"Error disconnecting from {server_id}: {e}")
+            logger.error(f"Error disconnecting from {server_id}: {e}", exc_info=True)
             return False
     
     def reconnect_server(self, server_id: str) -> bool:
@@ -315,7 +315,7 @@ class MCPServerManager:
             logger.info(f"Loaded {len(tool_defs)} tools from {server.name}")
             
         except Exception as e:
-            logger.error(f"Error loading tools from {server_id}: {e}")
+            logger.error(f"Error loading tools from {server_id}: {e}", exc_info=True)
     
     def _register_server_tools(self, server_id: str):
         """Register server tools with ToolsRegistry."""
@@ -339,7 +339,7 @@ class MCPServerManager:
                 self._tools_registry.register(mcp_tool, replace=True)
                 
             except Exception as e:
-                logger.error(f"Failed to register tool {tool_def.name}: {e}")
+                logger.error(f"Failed to register tool {tool_def.name}: {e}", exc_info=True)
     
     def _unregister_server_tools(self, server_id: str):
         """Unregister server tools from ToolsRegistry."""
@@ -458,10 +458,10 @@ class MCPServerManager:
                                     self.connect_server(server_id)
                                     
                         except Exception as e:
-                            logger.error(f"Health check error for {server_id}: {e}")
+                            logger.error(f"Health check error for {server_id}: {e}", exc_info=True)
                 
                 except Exception as e:
-                    logger.error(f"Health monitor error: {e}")
+                    logger.error(f"Health monitor error: {e}", exc_info=True)
                 
                 time.sleep(interval_seconds)
         
@@ -512,13 +512,13 @@ class MCPServerManager:
                     self.add_server(config, connect=False)
                     count += 1
                 except Exception as e:
-                    logger.error(f"Failed to load server: {e}")
+                    logger.error(f"Failed to load server: {e}", exc_info=True)
             
             logger.info(f"Loaded {count} MCP servers from database")
             return count
             
         except Exception as e:
-            logger.error(f"Error loading servers from database: {e}")
+            logger.error(f"Error loading servers from database: {e}", exc_info=True)
             return 0
     
     def save_to_database(self, server_id: str) -> bool:
@@ -558,7 +558,7 @@ class MCPServerManager:
             return True
             
         except Exception as e:
-            logger.error(f"Error saving server to database: {e}")
+            logger.error(f"Error saving server to database: {e}", exc_info=True)
             return False
     
     # =========================================================================
@@ -580,7 +580,7 @@ class MCPServerManager:
             try:
                 listener(event, server)
             except Exception as e:
-                logger.error(f"Listener error: {e}")
+                logger.error(f"Listener error: {e}", exc_info=True)
     
     # =========================================================================
     # Statistics

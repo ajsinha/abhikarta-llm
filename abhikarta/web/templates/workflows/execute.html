@@ -21,19 +21,39 @@
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-input-cursor me-2"></i>Input Data</h5>
+                            <h5 class="mb-0"><i class="bi bi-input-cursor me-2"></i>Input</h5>
                         </div>
                         <div class="card-body">
+                            <!-- Simple Query Input -->
                             <div class="mb-3">
-                                <label class="form-label">Input JSON</label>
-                                <textarea class="form-control font-monospace" id="inputData" rows="15" placeholder='{
-  "text": "Hello world",
-  "count": 5,
+                                <label class="form-label fw-bold">Query / Prompt</label>
+                                <textarea class="form-control" id="queryInput" rows="4" 
+                                          placeholder="Enter your query or prompt here...&#10;&#10;Example: What are the top 3 benefits of AI?"></textarea>
+                                <div class="form-text">Enter your query as plain text. This will be passed to the workflow.</div>
+                            </div>
+                            
+                            <!-- Advanced: JSON Input (collapsible) -->
+                            <div class="accordion mb-3" id="advancedInputAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed py-2" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#advancedInput">
+                                            <i class="bi bi-code-slash me-2"></i>Advanced: JSON Input
+                                        </button>
+                                    </h2>
+                                    <div id="advancedInput" class="accordion-collapse collapse" 
+                                         data-bs-parent="#advancedInputAccordion">
+                                        <div class="accordion-body">
+                                            <textarea class="form-control font-monospace" id="inputData" rows="8" placeholder='{
+  "query": "Your query here",
   "options": {
-    "uppercase": true
+    "temperature": 0.7
   }
 }'></textarea>
-                                <div class="form-text">Provide input data as JSON. This will be available as <code>input_data</code> in Python nodes.</div>
+                                            <div class="form-text">Provide additional data as JSON. The "query" field will be used as the main input.</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <button type="button" class="btn btn-success btn-lg w-100" onclick="executeWorkflow()" id="executeBtn">
@@ -77,20 +97,35 @@
 
 <script>
 function executeWorkflow() {
-    const inputData = document.getElementById('inputData').value || '{}';
+    // Get query input (simple text)
+    const queryInput = document.getElementById('queryInput').value.trim();
+    
+    // Get JSON input (advanced)
+    const jsonInput = document.getElementById('inputData').value.trim() || '{}';
+    
+    // Build input data
+    let inputData;
+    try {
+        inputData = jsonInput ? JSON.parse(jsonInput) : {};
+    } catch (e) {
+        document.getElementById('executionResult').innerHTML = `<div class="alert alert-danger">Invalid JSON: ${e.message}</div>`;
+        return;
+    }
+    
+    // If query input is provided, add it to the input data
+    if (queryInput) {
+        inputData.query = queryInput;
+        inputData.input = queryInput;
+        inputData.text = queryInput;
+    }
+    
+    const inputDataStr = JSON.stringify(inputData);
+    
     const btn = document.getElementById('executeBtn');
     const resultDiv = document.getElementById('executionResult');
     const statusBadge = document.getElementById('statusBadge');
     const stepsCard = document.getElementById('stepsCard');
     const stepsDiv = document.getElementById('executionSteps');
-    
-    // Validate JSON
-    try {
-        JSON.parse(inputData);
-    } catch (e) {
-        resultDiv.innerHTML = `<div class="alert alert-danger">Invalid JSON: ${e.message}</div>`;
-        return;
-    }
     
     // Show loading
     btn.disabled = true;
@@ -102,7 +137,7 @@ function executeWorkflow() {
     fetch('{{ url_for("execute_workflow", workflow_id=workflow.workflow_id) }}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'input_data=' + encodeURIComponent(inputData)
+        body: 'input_data=' + encodeURIComponent(inputDataStr)
     })
     .then(response => response.json())
     .then(data => {

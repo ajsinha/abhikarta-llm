@@ -99,7 +99,7 @@ def validate_api_key(api_key):
         }
         
     except Exception as e:
-        logger.error(f"Error validating API key: {e}")
+        logger.error(f"Error validating API key: {e}", exc_info=True)
         return None
 
 
@@ -334,7 +334,7 @@ class APIRoutes(AbstractRoutes):
                     )
                 return self._success_response(agents)
             except Exception as e:
-                logger.error(f"Error listing agents: {e}")
+                logger.error(f"Error listing agents: {e}", exc_info=True)
                 return self._error_response('AGENT_001', 'Failed to list agents', 500)
         
         @self.app.route('/api/agents/<agent_id>', methods=['GET'])
@@ -350,7 +350,7 @@ class APIRoutes(AbstractRoutes):
                     return self._success_response(agent)
                 return self._error_response('AGENT_002', 'Agent not found', 404)
             except Exception as e:
-                logger.error(f"Error getting agent: {e}")
+                logger.error(f"Error getting agent: {e}", exc_info=True)
                 return self._error_response('AGENT_001', 'Failed to get agent', 500)
         
         @self.app.route('/api/agents', methods=['POST'])
@@ -382,7 +382,7 @@ class APIRoutes(AbstractRoutes):
                 )
                 return self._success_response(agent, 'Agent created successfully')
             except Exception as e:
-                logger.error(f"Error creating agent: {e}")
+                logger.error(f"Error creating agent: {e}", exc_info=True)
                 return self._error_response('AGENT_001', 'Failed to create agent', 500)
         
         @self.app.route('/api/agents/<agent_id>', methods=['PUT'])
@@ -410,7 +410,7 @@ class APIRoutes(AbstractRoutes):
                     return self._success_response(agent, 'Agent updated successfully')
                 return self._error_response('AGENT_002', 'Agent not found', 404)
             except Exception as e:
-                logger.error(f"Error updating agent: {e}")
+                logger.error(f"Error updating agent: {e}", exc_info=True)
                 return self._error_response('AGENT_001', 'Failed to update agent', 500)
         
         # Note: DELETE /api/agents/<agent_id> is defined in agent_routes.py
@@ -447,7 +447,7 @@ class APIRoutes(AbstractRoutes):
                     'status': 'pending'
                 }, 'Execution started')
             except Exception as e:
-                logger.error(f"Error executing agent: {e}")
+                logger.error(f"Error executing agent: {e}", exc_info=True)
                 return self._error_response('EXEC_001', 'Failed to execute agent', 500)
         
         # ==================== Executions API ====================
@@ -471,7 +471,7 @@ class APIRoutes(AbstractRoutes):
                     )
                 return self._success_response(executions)
             except Exception as e:
-                logger.error(f"Error listing executions: {e}")
+                logger.error(f"Error listing executions: {e}", exc_info=True)
                 return self._error_response('EXEC_002', 'Failed to list executions', 500)
         
         @self.app.route('/api/executions/<execution_id>', methods=['GET'])
@@ -508,7 +508,7 @@ class APIRoutes(AbstractRoutes):
                     return jsonify({'success': True, 'execution': execution})
                 return self._error_response('EXEC_003', 'Execution not found', 404)
             except Exception as e:
-                logger.error(f"Error getting execution: {e}")
+                logger.error(f"Error getting execution: {e}", exc_info=True)
                 return self._error_response('EXEC_002', 'Failed to get execution', 500)
         
         @self.app.route('/api/executions/<execution_id>/status', methods=['GET'])
@@ -554,7 +554,7 @@ class APIRoutes(AbstractRoutes):
                 })
                 
             except Exception as e:
-                logger.error(f"Error getting execution status: {e}")
+                logger.error(f"Error getting execution status: {e}", exc_info=True)
                 return jsonify({'status': 'error', 'error': str(e)})
         
         @self.app.route('/api/executions/<execution_id>/trace', methods=['GET'])
@@ -588,7 +588,7 @@ class APIRoutes(AbstractRoutes):
                 
                 return jsonify({'success': True, 'steps': steps or []})
             except Exception as e:
-                logger.error(f"Error getting execution trace: {e}")
+                logger.error(f"Error getting execution trace: {e}", exc_info=True)
                 return self._error_response('EXEC_004', 'Failed to get trace', 500)
         
         @self.app.route('/api/executions/<execution_id>/retry', methods=['POST'])
@@ -632,7 +632,7 @@ class APIRoutes(AbstractRoutes):
                 
                 if workflow:
                     # Re-execute workflow
-                    from ..workflow import WorkflowExecutor, DAGParser
+                    from abhikarta.workflow import WorkflowExecutor, DAGParser
                     
                     dag_def = json.loads(workflow.get('dag_definition', '{}'))
                     dag_def['workflow_id'] = agent_id
@@ -653,7 +653,7 @@ class APIRoutes(AbstractRoutes):
                 return self._error_response('EXEC_005', 'Cannot retry this execution type', 400)
                 
             except Exception as e:
-                logger.error(f"Error retrying execution: {e}")
+                logger.error(f"Error retrying execution: {e}", exc_info=True)
                 return self._error_response('EXEC_006', 'Failed to retry execution', 500)
         
         @self.app.route('/api/llm/calls', methods=['GET'])
@@ -677,7 +677,7 @@ class APIRoutes(AbstractRoutes):
                     )
                 return jsonify({'success': True, 'calls': calls or []})
             except Exception as e:
-                logger.error(f"Error listing LLM calls: {e}")
+                logger.error(f"Error listing LLM calls: {e}", exc_info=True)
                 return self._error_response('LLM_001', 'Failed to list LLM calls', 500)
         
         @self.app.route('/api/llm/usage', methods=['GET'])
@@ -716,7 +716,7 @@ class APIRoutes(AbstractRoutes):
                 
                 return jsonify({'success': True, 'stats': stats or {}})
             except Exception as e:
-                logger.error(f"Error getting LLM usage: {e}")
+                logger.error(f"Error getting LLM usage: {e}", exc_info=True)
                 return self._error_response('LLM_002', 'Failed to get usage stats', 500)
         
         # ==================== MCP Plugins API ====================
@@ -731,7 +731,7 @@ class APIRoutes(AbstractRoutes):
                 )
                 return self._success_response(plugins)
             except Exception as e:
-                logger.error(f"Error listing MCP plugins: {e}")
+                logger.error(f"Error listing MCP plugins: {e}", exc_info=True)
                 return self._error_response('MCP_001', 'Failed to list plugins', 500)
         
         @self.app.route('/api/mcp/plugins/<plugin_id>', methods=['GET'])
@@ -747,7 +747,7 @@ class APIRoutes(AbstractRoutes):
                     return self._success_response(plugin)
                 return self._error_response('MCP_002', 'Plugin not found', 404)
             except Exception as e:
-                logger.error(f"Error getting MCP plugin: {e}")
+                logger.error(f"Error getting MCP plugin: {e}", exc_info=True)
                 return self._error_response('MCP_001', 'Failed to get plugin', 500)
         
         # ==================== Health Check ====================
@@ -789,7 +789,7 @@ class APIRoutes(AbstractRoutes):
                     'tool_count': len(all_tools)
                 })
             except Exception as e:
-                logger.error(f"Error getting MCP tools: {e}")
+                logger.error(f"Error getting MCP tools: {e}", exc_info=True)
                 return self._error_response('MCP_TOOLS_001', 'Failed to get tools', 500)
         
         @self.app.route('/api/mcp-tool-servers', methods=['GET'])
@@ -813,7 +813,7 @@ class APIRoutes(AbstractRoutes):
                     'count': len(servers)
                 })
             except Exception as e:
-                logger.error(f"Error getting MCP tool servers: {e}")
+                logger.error(f"Error getting MCP tool servers: {e}", exc_info=True)
                 return self._error_response('MCP_SERVERS_001', 'Failed to get servers', 500)
         
         @self.app.route('/api/mcp-tool-servers/<server_id>/tools', methods=['GET'])
@@ -839,7 +839,7 @@ class APIRoutes(AbstractRoutes):
                     'last_refresh': server.get('last_refresh')
                 })
             except Exception as e:
-                logger.error(f"Error getting server tools: {e}")
+                logger.error(f"Error getting server tools: {e}", exc_info=True)
                 return self._error_response('MCP_SERVERS_003', 'Failed to get tools', 500)
         
         logger.info("API routes registered")

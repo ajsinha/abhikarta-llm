@@ -1064,7 +1064,7 @@ class SQLiteSchema:
         ('together', 'Together AI', 'Together AI hosted models', 'together', 'TOGETHER_API_KEY', 1, 0, '{"base_url": "https://api.together.xyz/v1"}'),
         ('cohere', 'Cohere', 'Cohere Command models', 'cohere', 'COHERE_API_KEY', 1, 0, '{}'),
         ('bedrock', 'AWS Bedrock', 'Amazon Bedrock managed AI service', 'bedrock', 'AWS_ACCESS_KEY_ID', 0, 0, '{"region": "us-east-1"}'),
-        ('ollama', 'Ollama', 'Local Ollama instance - free and private', 'ollama', '', 1, 1, '{"base_url": "http://localhost:11434"}'),
+        ('ollama', 'Ollama', 'Local Ollama instance - free and private', 'ollama', '', 1, 1, '{"base_url": "http://192.168.2.36:11434"}'),
         ('huggingface', 'Hugging Face', 'Hugging Face Inference API', 'huggingface', 'HF_API_TOKEN', 1, 0, '{"base_url": "https://api-inference.huggingface.co"}');
     """
     
@@ -1072,10 +1072,11 @@ class SQLiteSchema:
     INSERT_DEFAULT_MODELS = """
     INSERT OR IGNORE INTO llm_models (model_id, provider_id, name, display_name, description, context_window, max_output_tokens, input_cost_per_1k, output_cost_per_1k, supports_vision, supports_functions, is_active, is_default) VALUES
         -- Ollama Models (Default Provider - FREE)
-        ('llama3.3', 'ollama', 'llama3.3', 'Llama 3.3 70B', 'Best open model, matches 405B quality', 131072, 4096, 0, 0, 0, 1, 1, 1),
+        ('llama3.2:3b', 'ollama', 'llama3.2:3b', 'Llama 3.2 3B', 'Lightweight 3B model - RECOMMENDED DEFAULT', 131072, 4096, 0, 0, 0, 1, 1, 1),
         ('llama3.2', 'ollama', 'llama3.2', 'Llama 3.2 3B', 'Lightweight, fast, edge deployment', 131072, 4096, 0, 0, 0, 1, 1, 0),
         ('llama3.2:1b', 'ollama', 'llama3.2:1b', 'Llama 3.2 1B', 'Ultra-lightweight, mobile', 131072, 4096, 0, 0, 0, 1, 1, 0),
         ('llama3.2-vision', 'ollama', 'llama3.2-vision', 'Llama 3.2 Vision 11B', 'Multimodal with image understanding', 131072, 4096, 0, 0, 1, 1, 1, 0),
+        ('llama3.3', 'ollama', 'llama3.3', 'Llama 3.3 70B', 'Best open model, matches 405B quality (42GB)', 131072, 4096, 0, 0, 0, 1, 1, 0),
         ('llama3.1', 'ollama', 'llama3.1', 'Llama 3.1 8B', 'General purpose, production ready', 131072, 4096, 0, 0, 0, 1, 1, 0),
         ('llama3.1:70b', 'ollama', 'llama3.1:70b', 'Llama 3.1 70B', 'High quality general purpose', 131072, 4096, 0, 0, 0, 1, 1, 0),
         ('deepseek-r1', 'ollama', 'deepseek-r1', 'DeepSeek R1 7B', 'Reasoning model, rivals o1', 65536, 8192, 0, 0, 0, 1, 1, 0),
@@ -1171,16 +1172,21 @@ class SQLiteSchema:
     INSERT_DEFAULT_MODEL_PERMISSIONS = """
     INSERT OR IGNORE INTO model_permissions (model_id, role_name, can_use, daily_limit, monthly_limit) VALUES
         -- Ollama models (no limits - free local models)
-        ('llama3.3', 'super_admin', 1, -1, -1),
-        ('llama3.3', 'domain_admin', 1, -1, -1),
-        ('llama3.3', 'agent_developer', 1, -1, -1),
-        ('llama3.3', 'agent_user', 1, -1, -1),
-        ('llama3.3', 'viewer', 1, -1, -1),
+        ('llama3.2:3b', 'super_admin', 1, -1, -1),
+        ('llama3.2:3b', 'domain_admin', 1, -1, -1),
+        ('llama3.2:3b', 'agent_developer', 1, -1, -1),
+        ('llama3.2:3b', 'agent_user', 1, -1, -1),
+        ('llama3.2:3b', 'viewer', 1, -1, -1),
         ('llama3.2', 'super_admin', 1, -1, -1),
         ('llama3.2', 'domain_admin', 1, -1, -1),
         ('llama3.2', 'agent_developer', 1, -1, -1),
         ('llama3.2', 'agent_user', 1, -1, -1),
         ('llama3.2', 'viewer', 1, -1, -1),
+        ('llama3.3', 'super_admin', 1, -1, -1),
+        ('llama3.3', 'domain_admin', 1, -1, -1),
+        ('llama3.3', 'agent_developer', 1, -1, -1),
+        ('llama3.3', 'agent_user', 1, -1, -1),
+        ('llama3.3', 'viewer', 1, -1, -1),
         ('deepseek-r1', 'super_admin', 1, -1, -1),
         ('deepseek-r1', 'domain_admin', 1, -1, -1),
         ('deepseek-r1', 'agent_developer', 1, -1, -1),

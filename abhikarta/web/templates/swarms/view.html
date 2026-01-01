@@ -161,7 +161,7 @@
                                 {% for e in executions %}
                                 <tr>
                                     <td>
-                                        <a href="{{ url_for('view_execution', swarm_id=swarm.swarm_id, execution_id=e.execution_id) }}">
+                                        <a href="{{ url_for('view_swarm_execution', swarm_id=swarm.swarm_id, execution_id=e.execution_id) }}">
                                             {{ e.start_time[:16] if e.start_time else '-' }}
                                         </a>
                                     </td>

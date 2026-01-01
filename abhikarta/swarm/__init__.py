@@ -73,6 +73,11 @@ from .orchestrator import (
     get_orchestrator
 )
 
+from .swarm_template import (
+    SwarmTemplate,
+    SwarmTemplateManager
+)
+
 __all__ = [
     # Definition
     'SwarmDefinition',
@@ -103,6 +108,10 @@ __all__ = [
     # Orchestrator
     'SwarmOrchestrator',
     'get_orchestrator',
+    
+    # Templates
+    'SwarmTemplate',
+    'SwarmTemplateManager',
 ]
 
 __version__ = '1.3.0'

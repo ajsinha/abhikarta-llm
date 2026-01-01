@@ -71,7 +71,7 @@ class NotificationRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error listing notification channels: {e}")
+                logger.error(f"Error listing notification channels: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('user_dashboard'))
         
@@ -121,7 +121,7 @@ class NotificationRoutes(AbstractRoutes):
                     return redirect(url_for('notification_channels'))
                     
                 except Exception as e:
-                    logger.error(f"Error creating notification channel: {e}")
+                    logger.error(f"Error creating notification channel: {e}", exc_info=True)
                     flash(f"Error: {e}", "danger")
             
             return render_template(
@@ -176,7 +176,7 @@ class NotificationRoutes(AbstractRoutes):
                     return redirect(url_for('notification_channels'))
                     
                 except Exception as e:
-                    logger.error(f"Error updating channel: {e}")
+                    logger.error(f"Error updating channel: {e}", exc_info=True)
                     flash(f"Error: {e}", "danger")
             
             # Parse config for form
@@ -204,7 +204,7 @@ class NotificationRoutes(AbstractRoutes):
                 )
                 flash("Channel deleted successfully!", "success")
             except Exception as e:
-                logger.error(f"Error deleting channel: {e}")
+                logger.error(f"Error deleting channel: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
             
             return redirect(url_for('notification_channels'))
@@ -244,7 +244,7 @@ class NotificationRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error loading notification logs: {e}")
+                logger.error(f"Error loading notification logs: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('notification_channels'))
     
@@ -277,7 +277,7 @@ class NotificationRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error listing webhook endpoints: {e}")
+                logger.error(f"Error listing webhook endpoints: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('user_dashboard'))
         
@@ -322,7 +322,7 @@ class NotificationRoutes(AbstractRoutes):
                     return redirect(url_for('webhook_endpoints'))
                     
                 except Exception as e:
-                    logger.error(f"Error creating webhook endpoint: {e}")
+                    logger.error(f"Error creating webhook endpoint: {e}", exc_info=True)
                     flash(f"Error: {e}", "danger")
             
             # Get available agents, workflows, swarms for target selection
@@ -380,7 +380,7 @@ class NotificationRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error viewing webhook endpoint: {e}")
+                logger.error(f"Error viewing webhook endpoint: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('webhook_endpoints'))
         
@@ -458,7 +458,7 @@ class NotificationRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error editing webhook endpoint: {e}")
+                logger.error(f"Error editing webhook endpoint: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('webhook_endpoints'))
         
@@ -501,7 +501,7 @@ class NotificationRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error listing webhook events: {e}")
+                logger.error(f"Error listing webhook events: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('webhook_endpoints'))
         
@@ -517,7 +517,7 @@ class NotificationRoutes(AbstractRoutes):
                 )
                 flash("Webhook endpoint deactivated!", "success")
             except Exception as e:
-                logger.error(f"Error deleting webhook: {e}")
+                logger.error(f"Error deleting webhook: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
             
             return redirect(url_for('webhook_endpoints'))
@@ -572,7 +572,7 @@ class NotificationRoutes(AbstractRoutes):
                 }), 200
                 
             except Exception as e:
-                logger.error(f"Error receiving webhook: {e}")
+                logger.error(f"Error receiving webhook: {e}", exc_info=True)
                 return jsonify({"error": str(e)}), 500
     
     # =========================================================================
@@ -627,7 +627,7 @@ class NotificationRoutes(AbstractRoutes):
                 return jsonify(result)
                 
             except Exception as e:
-                logger.error(f"Error testing notification channel: {e}")
+                logger.error(f"Error testing notification channel: {e}", exc_info=True)
                 return jsonify({"success": False, "error": str(e)}), 500
         
         @self.app.route('/api/notifications/send', methods=['POST'])
@@ -695,7 +695,7 @@ class NotificationRoutes(AbstractRoutes):
                 })
                 
             except Exception as e:
-                logger.error(f"Error sending notification: {e}")
+                logger.error(f"Error sending notification: {e}", exc_info=True)
                 return jsonify({"success": False, "error": str(e)}), 500
     
     # =========================================================================
@@ -734,7 +734,7 @@ class NotificationRoutes(AbstractRoutes):
                     is_admin=session.get('is_admin', False)
                 )
             except Exception as e:
-                logger.error(f"Error loading notification settings: {e}")
+                logger.error(f"Error loading notification settings: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
                 return redirect(url_for('user_dashboard'))
         
@@ -768,7 +768,7 @@ class NotificationRoutes(AbstractRoutes):
                 flash("Notification preferences saved!", "success")
                 
             except Exception as e:
-                logger.error(f"Error saving notification settings: {e}")
+                logger.error(f"Error saving notification settings: {e}", exc_info=True)
                 flash(f"Error: {e}", "danger")
             
             return redirect(url_for('user_notification_settings'))

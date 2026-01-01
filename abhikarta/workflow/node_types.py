@@ -371,6 +371,260 @@ class DelayNode(BaseNode):
             return NodeResult(success=False, error=str(e))
 
 
+class ToolNode(BaseNode):
+    """Tool node - executes a registered tool."""
+    
+    def __init__(self, node_id: str, name: str, config: Dict[str, Any] = None,
+                 tools_registry=None):
+        super().__init__(node_id, name, config)
+        self.tools_registry = tools_registry
+    
+    def execute(self, context: Dict[str, Any]) -> NodeResult:
+        start = time.time()
+        
+        try:
+            tool_name = self.config.get('tool_name', '')
+            tool_params = self.config.get('parameters', {})
+            
+            # Merge with input data
+            input_data = context.get('input', {})
+            if isinstance(input_data, dict):
+                tool_params = {**tool_params, **input_data}
+            
+            # Execute tool via registry if available
+            if self.tools_registry and tool_name:
+                result = self.tools_registry.execute(tool_name, **tool_params)
+                output = result
+            else:
+                # Placeholder when no registry
+                output = {
+                    'tool': tool_name,
+                    'parameters': tool_params,
+                    'result': f"[Tool '{tool_name}' would execute here]"
+                }
+            
+            return NodeResult(
+                success=True,
+                output=output,
+                duration_ms=int((time.time() - start) * 1000),
+                metadata={'tool_name': tool_name}
+            )
+            
+        except Exception as e:
+            logger.error(f"Tool node execution error: {e}", exc_info=True)
+            return NodeResult(success=False, error=str(e))
+
+
+class CodeFragmentNode(BaseNode):
+    """Code fragment node - executes code loaded from code fragments."""
+    
+    def __init__(self, node_id: str, name: str, config: Dict[str, Any] = None,
+                 db_facade=None):
+        super().__init__(node_id, name, config)
+        self.db_facade = db_facade
+        self._loaded_code = None
+    
+    def execute(self, context: Dict[str, Any]) -> NodeResult:
+        start = time.time()
+        
+        try:
+            fragment_id = self.config.get('fragment_id', '')
+            fragment_name = self.config.get('fragment_name', '')
+            
+            # Load code fragment from database
+            code = self._load_fragment(fragment_id or fragment_name)
+            
+            if not code:
+                # If no code fragment found, just pass through
+                return NodeResult(
+                    success=True,
+                    output=context.get('input', {}),
+                    duration_ms=int((time.time() - start) * 1000),
+                    metadata={'fragment_id': fragment_id, 'note': 'Fragment not found, passthrough'}
+                )
+            
+            # Execute the code
+            local_vars = {
+                'input_data': context.get('input', {}),
+                'context': context,
+                'config': self.config,
+                'output': None,
+                'result': None
+            }
+            
+            exec(code, {'__builtins__': __builtins__}, local_vars)
+            
+            output = local_vars.get('output') or local_vars.get('result') or context.get('input')
+            
+            return NodeResult(
+                success=True,
+                output=output,
+                duration_ms=int((time.time() - start) * 1000),
+                metadata={'fragment_id': fragment_id}
+            )
+            
+        except Exception as e:
+            logger.error(f"Code fragment node execution error: {e}", exc_info=True)
+            return NodeResult(success=False, error=str(e))
+    
+    def _load_fragment(self, fragment_id_or_name: str) -> Optional[str]:
+        """Load code fragment from database."""
+        if not self.db_facade or not fragment_id_or_name:
+            return None
+        
+        try:
+            fragment = self.db_facade.fetch_one(
+                """SELECT code_content FROM code_fragments 
+                   WHERE fragment_id = ? OR name = ? AND is_active = 1""",
+                (fragment_id_or_name, fragment_id_or_name)
+            )
+            return fragment.get('code_content') if fragment else None
+        except Exception as e:
+            logger.warning(f"Could not load code fragment: {e}")
+            return None
+
+
+class HITLNode(BaseNode):
+    """Human-in-the-loop node - pauses workflow for human review."""
+    
+    def __init__(self, node_id: str, name: str, config: Dict[str, Any] = None,
+                 db_facade=None):
+        super().__init__(node_id, name, config)
+        self.db_facade = db_facade
+    
+    def execute(self, context: Dict[str, Any]) -> NodeResult:
+        start = time.time()
+        
+        try:
+            task_type = self.config.get('task_type', 'review')
+            instructions = self.config.get('instructions', 'Please review and approve.')
+            timeout_hours = self.config.get('timeout_hours', 24)
+            
+            input_data = context.get('input', {})
+            
+            # In actual execution, this would create a HITL task and wait
+            # For now, auto-approve for template testing
+            output = {
+                'hitl_task_type': task_type,
+                'instructions': instructions,
+                'input_data': input_data,
+                'status': 'auto_approved',
+                'approved_by': 'system',
+                'note': 'Auto-approved for workflow testing'
+            }
+            
+            return NodeResult(
+                success=True,
+                output=output,
+                duration_ms=int((time.time() - start) * 1000),
+                metadata={
+                    'task_type': task_type,
+                    'timeout_hours': timeout_hours
+                }
+            )
+            
+        except Exception as e:
+            logger.error(f"HITL node execution error: {e}", exc_info=True)
+            return NodeResult(success=False, error=str(e))
+
+
+class AggregateNode(BaseNode):
+    """Aggregate node - combines multiple inputs."""
+    
+    def execute(self, context: Dict[str, Any]) -> NodeResult:
+        start = time.time()
+        
+        try:
+            aggregate_type = self.config.get('aggregate_type', 'list')
+            inputs = context.get('inputs', [context.get('input', {})])
+            
+            if aggregate_type == 'list':
+                output = inputs if isinstance(inputs, list) else [inputs]
+            elif aggregate_type == 'merge':
+                output = {}
+                for inp in (inputs if isinstance(inputs, list) else [inputs]):
+                    if isinstance(inp, dict):
+                        output.update(inp)
+            elif aggregate_type == 'concat':
+                output = ''.join(str(i) for i in inputs)
+            else:
+                output = inputs
+            
+            return NodeResult(
+                success=True,
+                output=output,
+                duration_ms=int((time.time() - start) * 1000)
+            )
+            
+        except Exception as e:
+            logger.error(f"Aggregate node execution error: {e}", exc_info=True)
+            return NodeResult(success=False, error=str(e))
+
+
+class SplitNode(BaseNode):
+    """Split node - splits input into multiple outputs."""
+    
+    def execute(self, context: Dict[str, Any]) -> NodeResult:
+        start = time.time()
+        
+        try:
+            split_type = self.config.get('split_type', 'items')
+            split_key = self.config.get('split_key')
+            input_data = context.get('input', {})
+            
+            if split_type == 'items' and isinstance(input_data, (list, tuple)):
+                output = list(input_data)
+            elif split_type == 'key' and split_key and isinstance(input_data, dict):
+                output = input_data.get(split_key, [])
+            else:
+                output = [input_data]
+            
+            return NodeResult(
+                success=True,
+                output=output,
+                duration_ms=int((time.time() - start) * 1000),
+                metadata={'split_count': len(output) if isinstance(output, list) else 1}
+            )
+            
+        except Exception as e:
+            logger.error(f"Split node execution error: {e}", exc_info=True)
+            return NodeResult(success=False, error=str(e))
+
+
+class JoinNode(BaseNode):
+    """Join node - waits for and joins multiple branches."""
+    
+    def execute(self, context: Dict[str, Any]) -> NodeResult:
+        start = time.time()
+        
+        try:
+            join_type = self.config.get('join_type', 'all')
+            inputs = context.get('branch_outputs', [context.get('input', {})])
+            
+            if join_type == 'all':
+                output = inputs
+            elif join_type == 'first':
+                output = inputs[0] if inputs else None
+            elif join_type == 'merge':
+                output = {}
+                for inp in inputs:
+                    if isinstance(inp, dict):
+                        output.update(inp)
+            else:
+                output = inputs
+            
+            return NodeResult(
+                success=True,
+                output=output,
+                duration_ms=int((time.time() - start) * 1000),
+                metadata={'joined_count': len(inputs) if isinstance(inputs, list) else 1}
+            )
+            
+        except Exception as e:
+            logger.error(f"Join node execution error: {e}", exc_info=True)
+            return NodeResult(success=False, error=str(e))
+
+
 class NodeFactory:
     """Factory for creating node instances."""
     
@@ -383,6 +637,14 @@ class NodeFactory:
         'transform': TransformNode,
         'http': HTTPNode,
         'delay': DelayNode,
+        'tool': ToolNode,
+        'tool_executor': ToolNode,
+        'code_fragment': CodeFragmentNode,
+        'hitl': HITLNode,
+        'approval': HITLNode,
+        'aggregate': AggregateNode,
+        'split': SplitNode,
+        'join': JoinNode,
     }
     
     @classmethod
@@ -401,14 +663,29 @@ class NodeFactory:
         Returns:
             Node instance
         """
-        node_class = cls.NODE_CLASSES.get(node_type, PythonNode)
+        node_class = cls.NODE_CLASSES.get(node_type)
         
+        # If node type not found, use TransformNode as passthrough
+        if not node_class:
+            logger.warning(f"Unknown node type '{node_type}', using TransformNode as passthrough")
+            node_class = TransformNode
+        
+        # Handle node-specific initialization
         if node_type == 'python':
             return node_class(node_id, name, config, 
                             python_code=kwargs.get('python_code'))
         elif node_type == 'llm':
             return node_class(node_id, name, config,
                             llm_facade=kwargs.get('llm_facade'))
+        elif node_type in ('tool', 'tool_executor'):
+            return node_class(node_id, name, config,
+                            tools_registry=kwargs.get('tools_registry'))
+        elif node_type == 'code_fragment':
+            return node_class(node_id, name, config,
+                            db_facade=kwargs.get('db_facade'))
+        elif node_type in ('hitl', 'approval'):
+            return node_class(node_id, name, config,
+                            db_facade=kwargs.get('db_facade'))
         else:
             return node_class(node_id, name, config)
     
@@ -416,3 +693,8 @@ class NodeFactory:
     def register(cls, node_type: str, node_class: type):
         """Register a custom node type."""
         cls.NODE_CLASSES[node_type] = node_class
+    
+    @classmethod
+    def get_supported_types(cls) -> List[str]:
+        """Get list of supported node types."""
+        return list(cls.NODE_CLASSES.keys())

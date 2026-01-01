@@ -624,19 +624,45 @@ const designer = {
 
 // Node type definitions
 const NODE_TYPES = {
+    // Entry/exit nodes - both naming conventions
     start: { name: 'Start', icon: 'bi-play-circle', color: '#198754', hasInput: false, hasOutput: true },
+    input: { name: 'Input', icon: 'bi-box-arrow-in-right', color: '#198754', hasInput: false, hasOutput: true },
     end: { name: 'End', icon: 'bi-stop-circle', color: '#dc3545', hasInput: true, hasOutput: false },
+    output: { name: 'Output', icon: 'bi-box-arrow-right', color: '#dc3545', hasInput: true, hasOutput: false },
+    
+    // LLM nodes
     llm: { name: 'LLM Call', icon: 'bi-chat-dots', color: '#6f42c1', hasInput: true, hasOutput: true },
     agent: { name: 'Agent', icon: 'bi-robot', color: '#0d6efd', hasInput: true, hasOutput: true },
+    
+    // Tool nodes
     tool: { name: 'Tool', icon: 'bi-tools', color: '#fd7e14', hasInput: true, hasOutput: true },
+    
+    // Code nodes - both naming conventions
     code: { name: 'Python Code', icon: 'bi-code-slash', color: '#20c997', hasInput: true, hasOutput: true },
+    python: { name: 'Python', icon: 'bi-filetype-py', color: '#3776ab', hasInput: true, hasOutput: true },
+    code_fragment: { name: 'Code Fragment', icon: 'bi-file-code', color: '#3776ab', hasInput: true, hasOutput: true },
+    
+    // Control flow nodes
     condition: { name: 'Condition', icon: 'bi-signpost-split', color: '#ffc107', hasInput: true, hasOutput: true, hasOutputFalse: true },
     loop: { name: 'Loop', icon: 'bi-arrow-repeat', color: '#6610f2', hasInput: true, hasOutput: true },
     parallel: { name: 'Parallel', icon: 'bi-diagram-3', color: '#0dcaf0', hasInput: true, hasOutput: true },
+    split: { name: 'Split', icon: 'bi-signpost-split-fill', color: '#0dcaf0', hasInput: true, hasOutput: true },
+    join: { name: 'Join', icon: 'bi-sign-merge-right', color: '#0dcaf0', hasInput: true, hasOutput: true },
+    aggregate: { name: 'Aggregate', icon: 'bi-collection', color: '#0dcaf0', hasInput: true, hasOutput: true },
+    
+    // Human-in-the-loop
     hitl: { name: 'HITL Review', icon: 'bi-person-check', color: '#e83e8c', hasInput: true, hasOutput: true },
+    
+    // Data nodes
     rag: { name: 'RAG Query', icon: 'bi-search', color: '#17a2b8', hasInput: true, hasOutput: true },
     transform: { name: 'Transform', icon: 'bi-shuffle', color: '#20c997', hasInput: true, hasOutput: true },
-    memory: { name: 'Memory', icon: 'bi-database', color: '#6c757d', hasInput: true, hasOutput: true }
+    memory: { name: 'Memory', icon: 'bi-database', color: '#6c757d', hasInput: true, hasOutput: true },
+    
+    // HTTP/API nodes
+    http: { name: 'HTTP Request', icon: 'bi-globe', color: '#e83e8c', hasInput: true, hasOutput: true },
+    
+    // Default/action node for unknown types
+    action: { name: 'Action', icon: 'bi-lightning', color: '#6c757d', hasInput: true, hasOutput: true }
 };
 
 // ============================================
@@ -879,23 +905,60 @@ function createNode(type, x, y, existingConfig = null) {
 
 function getDefaultConfig(type) {
     switch(type) {
-        case 'llm': return { model: 'gpt-4o', prompt: '', temperature: 0.7, max_tokens: 1000 };
+        // Entry/exit nodes
+        case 'start':
+        case 'input':
+            return {};
+        case 'end':
+        case 'output':
+            return {};
+        
+        // LLM nodes
+        case 'llm': return { model: 'llama3.2:3b', provider: 'ollama', prompt: '', temperature: 0.7, max_tokens: 1000 };
         case 'agent': return { agent_id: '' };
+        
+        // Tool nodes
         case 'tool': return { tool_name: '', display_name: '', tool_source: '', server_id: '', server_name: '', input_schema: {}, parameters: {} };
-        case 'code': return { code: '# Python code\nresult = input_data' };
+        
+        // Code nodes
+        case 'code':
+        case 'python':
+            return { code: '# Python code\nresult = input_data' };
+        case 'code_fragment':
+            return { fragment_id: '', source: 'db://code_fragments/' };
+        
+        // Control flow nodes
         case 'condition': return { expression: '' };
         case 'loop': return { max_iterations: 10, condition: 'True' };
         case 'parallel': return { branches: 2 };
+        case 'split': return { split_type: 'parallel' };
+        case 'join': return { join_type: 'merge' };
+        case 'aggregate': return { strategy: 'concat' };
+        
+        // Human-in-the-loop
         case 'hitl': return { task_type: 'approval', message: '' };
+        
+        // Data nodes
         case 'rag': return { query: '{input}', top_k: 5, index: '' };
-        case 'transform': return { expression: '' };
+        case 'transform': return { expression: '', transform_type: 'passthrough' };
         case 'memory': return { key: 'context', operation: 'read' };
+        
+        // HTTP/API
+        case 'http': return { url: '', method: 'GET', headers: {}, body: '' };
+        
         default: return {};
     }
 }
 
 function renderNode(node) {
-    const typeDef = NODE_TYPES[node.node_type];
+    // Get type definition with fallback to action type for unknown types
+    const typeDef = NODE_TYPES[node.node_type] || NODE_TYPES['action'] || {
+        name: node.node_type,
+        icon: 'bi-circle',
+        color: '#6c757d',
+        hasInput: true,
+        hasOutput: true
+    };
     
     const html = '<div class="workflow-node" id="' + node.node_id + '" data-type="' + node.node_type + '" ' +
         'style="left: ' + node.x + 'px; top: ' + node.y + 'px;" ' +
@@ -939,17 +1002,47 @@ function renderNode(node) {
 
 function getNodeSummary(node) {
     switch(node.node_type) {
-        case 'llm': return node.config.model || 'gpt-4o';
+        // Entry/exit nodes
+        case 'start':
+        case 'input':
+            return 'Entry point';
+        case 'end':
+        case 'output':
+            return 'Exit point';
+        
+        // LLM nodes
+        case 'llm': return node.config.model || 'llama3.2:3b';
         case 'agent': return node.config.agent_id || 'select agent';
+        
+        // Tool nodes
         case 'tool': return node.config.display_name || node.config.tool_name || 'select tool';
-        case 'code': return 'Python code';
+        
+        // Code nodes
+        case 'code':
+        case 'python':
+            return 'Python code';
+        case 'code_fragment':
+            return node.config.fragment_id || 'select fragment';
+        
+        // Control flow
         case 'condition': return (node.config.expression || '').substring(0, 20) + '...';
         case 'loop': return 'max ' + (node.config.max_iterations || 10) + ' iterations';
         case 'parallel': return (node.config.branches || 2) + ' branches';
+        case 'split': return node.config.split_type || 'parallel';
+        case 'join': return node.config.join_type || 'merge';
+        case 'aggregate': return node.config.strategy || 'concat';
+        
+        // Human-in-the-loop
         case 'hitl': return node.config.task_type || 'approval';
+        
+        // Data nodes
         case 'rag': return node.config.index || 'RAG query';
-        case 'transform': return 'transform';
+        case 'transform': return node.config.transform_type || 'transform';
         case 'memory': return (node.config.operation || 'read') + ': ' + (node.config.key || 'context');
+        
+        // HTTP/API
+        case 'http': return (node.config.method || 'GET') + ' ' + (node.config.url || '').substring(0, 15);
+        
         default: return node.node_type;
     }
 }
@@ -1826,27 +1919,39 @@ function importJson() {
         designer.nodeCounter = 0;
         
         (json.nodes || []).forEach(function(n) {
+            // Handle both formats: template format (node_id, node_type, name) and designer format (id, type, title)
+            var nodeId = n.node_id || n.id || ('node_' + designer.nodeCounter++);
+            var nodeType = n.node_type || n.type || 'action';
+            var nodeName = n.name || n.title || (NODE_TYPES[nodeType] ? NODE_TYPES[nodeType].name : nodeType);
+            
             var node = {
-                node_id: n.id,
-                node_type: n.type,
-                name: n.title || (NODE_TYPES[n.type] ? NODE_TYPES[n.type].name : n.type),
-                x: n.position ? n.position.x : 100,
-                y: n.position ? n.position.y : 100,
+                node_id: nodeId,
+                node_type: nodeType,
+                name: nodeName,
+                x: n.position ? n.position.x : (n.x || 100),
+                y: n.position ? n.position.y : (n.y || 100),
                 config: n.config || {}
             };
             designer.nodes.push(node);
             renderNode(node);
-            var num = parseInt(n.id.split('_')[1]) || 0;
-            designer.nodeCounter = Math.max(designer.nodeCounter, num);
+            
+            // Track max node counter
+            var idParts = nodeId.split('_');
+            var num = parseInt(idParts[idParts.length - 1]) || 0;
+            designer.nodeCounter = Math.max(designer.nodeCounter, num + 1);
         });
         
         (json.edges || []).forEach(function(e) {
+            // Handle both formats: template format (source/target) and designer format (from/to)
+            var sourceId = e.source || e.from;
+            var targetId = e.target || e.to;
+            
             designer.edges.push({
-                id: 'edge_' + e.from + '_' + e.to,
-                source: e.from,
-                target: e.to,
-                sourcePort: e.fromPort || 'output',
-                targetPort: e.toPort || 'input'
+                id: 'edge_' + sourceId + '_' + targetId,
+                source: sourceId,
+                target: targetId,
+                sourcePort: e.fromPort || e.sourcePort || 'output',
+                targetPort: e.toPort || e.targetPort || 'input'
             });
         });
         
@@ -1895,21 +2000,30 @@ function saveWorkflow() {
 function validateWorkflow() {
     var errors = [];
     
-    var startNodes = designer.nodes.filter(function(n) { return n.node_type === 'start'; });
-    var endNodes = designer.nodes.filter(function(n) { return n.node_type === 'end'; });
+    // Check for entry nodes (start OR input)
+    var entryNodes = designer.nodes.filter(function(n) { 
+        return n.node_type === 'start' || n.node_type === 'input'; 
+    });
+    // Check for exit nodes (end OR output)
+    var exitNodes = designer.nodes.filter(function(n) { 
+        return n.node_type === 'end' || n.node_type === 'output'; 
+    });
     
-    if (startNodes.length === 0) errors.push('Missing Start node');
-    if (startNodes.length > 1) errors.push('Multiple Start nodes');
-    if (endNodes.length === 0) errors.push('Missing End node');
+    if (entryNodes.length === 0) errors.push('Missing Start/Input node');
+    if (entryNodes.length > 1) errors.push('Multiple Start/Input nodes');
+    if (exitNodes.length === 0) errors.push('Missing End/Output node');
+    
+    var entryTypes = ['start', 'input'];
+    var exitTypes = ['end', 'output'];
     
     designer.nodes.forEach(function(node) {
         var hasIncoming = designer.edges.some(function(e) { return e.target === node.node_id; });
         var hasOutgoing = designer.edges.some(function(e) { return e.source === node.node_id; });
         
-        if (node.node_type !== 'start' && !hasIncoming) {
+        if (entryTypes.indexOf(node.node_type) === -1 && !hasIncoming) {
             errors.push('Node "' + node.name + '" has no incoming connection');
         }
-        if (node.node_type !== 'end' && !hasOutgoing) {
+        if (exitTypes.indexOf(node.node_type) === -1 && !hasOutgoing) {
             errors.push('Node "' + node.name + '" has no outgoing connection');
         }
     });
@@ -1933,36 +2047,63 @@ function loadExistingWorkflow() {
     {% if workflow and workflow.dag_definition %}
     try {
         var data = {{ workflow.dag_definition | safe }};
+        console.log('Loading workflow with', (data.nodes || []).length, 'nodes and', (data.edges || []).length, 'edges');
+        
         if (data.nodes) {
-            data.nodes.forEach(function(n) {
-                var node = {
-                    node_id: n.id,
-                    node_type: n.type,
-                    name: n.title || (NODE_TYPES[n.type] ? NODE_TYPES[n.type].name : n.type),
-                    x: n.position ? n.position.x : 100,
-                    y: n.position ? n.position.y : 100,
-                    config: n.config || {}
-                };
-                designer.nodes.push(node);
-                renderNode(node);
-                var num = parseInt(n.id.split('_')[1]) || 0;
-                designer.nodeCounter = Math.max(designer.nodeCounter, num);
+            data.nodes.forEach(function(n, idx) {
+                try {
+                    // Handle both formats: template format (node_id, node_type, name) and designer format (id, type, title)
+                    var nodeId = n.node_id || n.id || ('node_' + designer.nodeCounter++);
+                    var nodeType = n.node_type || n.type || 'action';
+                    var nodeName = n.name || n.title || (NODE_TYPES[nodeType] ? NODE_TYPES[nodeType].name : nodeType);
+                    
+                    console.log('Loading node', idx + 1, ':', nodeId, 'type:', nodeType);
+                    
+                    var node = {
+                        node_id: nodeId,
+                        node_type: nodeType,
+                        name: nodeName,
+                        x: n.position ? n.position.x : (n.x || 100),
+                        y: n.position ? n.position.y : (n.y || 100),
+                        config: n.config || {}
+                    };
+                    designer.nodes.push(node);
+                    renderNode(node);
+                    
+                    // Track max node counter
+                    var idParts = nodeId.split('_');
+                    var num = parseInt(idParts[idParts.length - 1]) || 0;
+                    designer.nodeCounter = Math.max(designer.nodeCounter, num + 1);
+                } catch (nodeErr) {
+                    console.error('Error loading node', idx, ':', nodeErr);
+                }
             });
         }
         if (data.edges) {
-            data.edges.forEach(function(e) {
-                designer.edges.push({
-                    id: 'edge_' + e.from + '_' + e.to,
-                    source: e.from,
-                    target: e.to,
-                    sourcePort: e.fromPort || 'output',
-                    targetPort: e.toPort || 'input'
-                });
+            data.edges.forEach(function(e, idx) {
+                try {
+                    // Handle both formats: template format (source/target) and designer format (from/to)
+                    var sourceId = e.source || e.from;
+                    var targetId = e.target || e.to;
+                    
+                    console.log('Loading edge', idx + 1, ':', sourceId, '->', targetId);
+                    
+                    designer.edges.push({
+                        id: 'edge_' + sourceId + '_' + targetId,
+                        source: sourceId,
+                        target: targetId,
+                        sourcePort: e.fromPort || e.sourcePort || 'output',
+                        targetPort: e.toPort || e.targetPort || 'input'
+                    });
+                } catch (edgeErr) {
+                    console.error('Error loading edge', idx, ':', edgeErr);
+                }
             });
         }
         renderConnections();
         updateCounts();
         updateMinimap();
+        console.log('Workflow loaded:', designer.nodes.length, 'nodes,', designer.edges.length, 'edges');
     } catch (err) {
         console.error('Error loading workflow:', err);
     }

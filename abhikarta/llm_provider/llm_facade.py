@@ -222,9 +222,13 @@ class AnthropicProvider(BaseLLMProvider):
 class OllamaProvider(BaseLLMProvider):
     """Ollama local LLM provider."""
     
+    # Default Ollama host - can be overridden via config
+    DEFAULT_BASE_URL = 'http://192.168.2.36:11434'
+    DEFAULT_MODEL = 'llama3.2:3b'
+    
     def __init__(self, api_key: str = None, **kwargs):
         super().__init__(api_key, **kwargs)
-        self.base_url = kwargs.get('base_url', 'http://localhost:11434')
+        self.base_url = kwargs.get('base_url', self.DEFAULT_BASE_URL)
     
     def get_provider_name(self) -> str:
         return 'ollama'
@@ -233,7 +237,7 @@ class OllamaProvider(BaseLLMProvider):
         """Generate completion using Ollama API."""
         import urllib.request
         
-        model = kwargs.get('model', 'llama3.1')
+        model = kwargs.get('model', self.DEFAULT_MODEL)
         temperature = kwargs.get('temperature', 0.7)
         
         start_time = time.time()
@@ -814,7 +818,8 @@ class LLMFacade:
         self.db_facade = db_facade
         self.user_id = user_id
         self.providers: Dict[str, BaseLLMProvider] = {}
-        self.default_provider = 'openai'
+        self.default_provider = 'ollama'
+        self.default_model = 'llama3.2:3b'
     
     def configure_provider(self, provider_name: str, api_key: str = None, **kwargs):
         """Configure an LLM provider."""

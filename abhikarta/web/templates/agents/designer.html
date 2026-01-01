@@ -781,20 +781,47 @@ const designer = {
 
 // Node Type Definitions
 const nodeTypes = {
+    // Entry/exit nodes
     input: { icon: 'bi-box-arrow-in-right', color: '#28a745', name: 'Input', hasInput: false, hasOutput: true },
     output: { icon: 'bi-box-arrow-right', color: '#dc3545', name: 'Output', hasInput: true, hasOutput: false },
+    start: { icon: 'bi-play-circle', color: '#28a745', name: 'Start', hasInput: false, hasOutput: true },
+    end: { icon: 'bi-stop-circle', color: '#dc3545', name: 'End', hasInput: true, hasOutput: false },
+    
+    // LLM/Agent nodes
     llm: { icon: 'bi-robot', color: '#6f42c1', name: 'LLM Call', hasInput: true, hasOutput: true },
+    agent: { icon: 'bi-robot', color: '#0d6efd', name: 'Agent', hasInput: true, hasOutput: true },
+    
+    // Code nodes
     python: { icon: 'bi-code-slash', color: '#3776ab', name: 'Python', hasInput: true, hasOutput: true },
+    code: { icon: 'bi-code-slash', color: '#20c997', name: 'Code', hasInput: true, hasOutput: true },
+    code_fragment: { icon: 'bi-file-code', color: '#3776ab', name: 'Code Fragment', hasInput: true, hasOutput: true },
+    
+    // Tool nodes
     tool: { icon: 'bi-tools', color: '#fd7e14', name: 'Tool', hasInput: true, hasOutput: true },
     http: { icon: 'bi-globe', color: '#e83e8c', name: 'HTTP', hasInput: true, hasOutput: true },
+    
+    // Transform/data nodes
     transform: { icon: 'bi-arrow-left-right', color: '#20c997', name: 'Transform', hasInput: true, hasOutput: true },
+    
+    // Control flow nodes
     condition: { icon: 'bi-diamond', color: '#17a2b8', name: 'Condition', hasInput: true, hasOutput: true },
     loop: { icon: 'bi-arrow-repeat', color: '#6c757d', name: 'Loop', hasInput: true, hasOutput: true },
     parallel: { icon: 'bi-arrows-expand', color: '#0d6efd', name: 'Parallel', hasInput: true, hasOutput: true },
+    split: { icon: 'bi-signpost-split-fill', color: '#0dcaf0', name: 'Split', hasInput: true, hasOutput: true },
+    join: { icon: 'bi-sign-merge-right', color: '#0dcaf0', name: 'Join', hasInput: true, hasOutput: true },
+    aggregate: { icon: 'bi-collection', color: '#0dcaf0', name: 'Aggregate', hasInput: true, hasOutput: true },
+    
+    // Human-in-the-loop nodes
     hitl: { icon: 'bi-person-raised-hand', color: '#ffc107', name: 'HITL', hasInput: true, hasOutput: true },
     approval: { icon: 'bi-check2-square', color: '#28a745', name: 'Approval', hasInput: true, hasOutput: true },
+    
+    // Memory/retrieval nodes
     memory: { icon: 'bi-memory', color: '#6f42c1', name: 'Memory', hasInput: true, hasOutput: true },
-    retrieval: { icon: 'bi-search', color: '#17a2b8', name: 'Retrieval', hasInput: true, hasOutput: true }
+    retrieval: { icon: 'bi-search', color: '#17a2b8', name: 'Retrieval', hasInput: true, hasOutput: true },
+    rag: { icon: 'bi-search', color: '#17a2b8', name: 'RAG', hasInput: true, hasOutput: true },
+    
+    // Default/action for unknown types
+    action: { icon: 'bi-lightning', color: '#6c757d', name: 'Action', hasInput: true, hasOutput: true }
 };
 
 // ============================================
@@ -1072,7 +1099,7 @@ function handleCanvasClick(e) {
 // ============================================
 function createNode(type, x, y, existingConfig = null) {
     const nodeId = existingConfig?.node_id || `node_${++designer.nodeCounter}`;
-    const typeDef = nodeTypes[type];
+    const typeDef = nodeTypes[type] || nodeTypes['action'] || { name: type };
     
     const node = {
         node_id: nodeId,
@@ -1104,7 +1131,14 @@ function getDefaultConfig(type) {
 }
 
 function renderNode(node) {
-    const typeDef = nodeTypes[node.node_type];
+    // Get type definition with fallback for unknown types
+    const typeDef = nodeTypes[node.node_type] || nodeTypes['action'] || {
+        icon: 'bi-circle',
+        color: '#6c757d',
+        name: node.node_type,
+        hasInput: true,
+        hasOutput: true
+    };
     const html = `
         <div class="workflow-node node-${node.node_type}" id="${node.node_id}" 
              style="left:${node.position.x}px;top:${node.position.y}px;">
@@ -1779,11 +1813,30 @@ function loadExistingWorkflow() {
         const wf = {{ agent.workflow | tojson | safe }};
         if (wf && wf.nodes) {
             wf.nodes.forEach(n => {
-                designer.nodeCounter = Math.max(designer.nodeCounter, parseInt(n.node_id.split('_')[1]) || 0);
-                designer.nodes.push(n);
-                renderNode(n);
+                // Handle both formats
+                var nodeId = n.node_id || n.id || ('node_' + designer.nodeCounter++);
+                designer.nodeCounter = Math.max(designer.nodeCounter, parseInt(nodeId.split('_')[1]) || 0);
+                
+                // Normalize node format
+                var node = {
+                    node_id: nodeId,
+                    node_type: n.node_type || n.type || 'action',
+                    name: n.name || n.title || n.node_type || 'Node',
+                    position: n.position || { x: n.x || 100, y: n.y || 100 },
+                    config: n.config || {}
+                };
+                designer.nodes.push(node);
+                renderNode(node);
             });
-            designer.edges = wf.edges || [];
+            
+            // Normalize edges - handle multiple formats
+            designer.edges = (wf.edges || []).map(e => ({
+                id: e.id || e.edge_id || ('edge_' + (e.source || e.source_node || e.from) + '_' + (e.target || e.target_node || e.to)),
+                source: e.source || e.source_node || e.from,
+                target: e.target || e.target_node || e.to,
+                label: e.label || ''
+            }));
+            
             redrawConnections();
         }
     } catch(e) { console.error(e); }

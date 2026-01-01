@@ -67,15 +67,29 @@
                     <ul class="list-group list-group-flush">
                         {% set dag = workflow.dag_definition %}
                         {% if dag and dag.nodes %}
-                            {% for node_id, node in dag.nodes.items() %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>{{ node.name or node_id }}</strong>
-                                    <br><small class="text-muted">{{ node.type or node.node_type }}</small>
-                                </div>
-                                <span class="badge bg-primary rounded-pill">{{ node_id }}</span>
-                            </li>
-                            {% endfor %}
+                            {% if dag.nodes is mapping %}
+                                {# Dict format: {node_id: node_data} #}
+                                {% for node_id, node in dag.nodes.items() %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ node.name or node_id }}</strong>
+                                        <br><small class="text-muted">{{ node.type or node.node_type }}</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ node_id }}</span>
+                                </li>
+                                {% endfor %}
+                            {% else %}
+                                {# List format: [{node_id, node_type, name, ...}] #}
+                                {% for node in dag.nodes %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ node.name or node.node_id or node.id }}</strong>
+                                        <br><small class="text-muted">{{ node.node_type or node.type }}</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ node.node_id or node.id }}</span>
+                                </li>
+                                {% endfor %}
+                            {% endif %}
                         {% else %}
                             <li class="list-group-item text-muted">No nodes defined</li>
                         {% endif %}

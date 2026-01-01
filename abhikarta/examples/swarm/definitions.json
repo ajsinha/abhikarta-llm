@@ -1,0 +1,43 @@
+{
+  "swarms": [
+    {
+      "swarm_id": "research_team",
+      "name": "Research Analysis Team",
+      "description": "Multi-agent team for collaborative research",
+      "swarm_type": "collaborative",
+      "coordination_strategy": "round_robin",
+      "agents": [
+        {"agent_id": "coordinator", "name": "Coordinator", "role": "coordinator", "system_prompt": "Route tasks and synthesize outputs."},
+        {"agent_id": "researcher", "name": "Researcher", "role": "worker", "system_prompt": "Find and present factual information."},
+        {"agent_id": "analyst", "name": "Analyst", "role": "worker", "system_prompt": "Analyze information and provide insights."},
+        {"agent_id": "writer", "name": "Writer", "role": "worker", "system_prompt": "Create clear, well-structured reports."}
+      ],
+      "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b"
+      }
+    },
+    {
+      "swarm_id": "debate_team",
+      "name": "Debate Team",
+      "description": "Agents that debate topics from different perspectives",
+      "swarm_type": "adversarial",
+      "coordination_strategy": "turn_based",
+      "agents": [
+        {"agent_id": "moderator", "name": "Moderator", "role": "coordinator", "system_prompt": "Moderate the debate fairly and summarize key points."},
+        {"agent_id": "proponent", "name": "Proponent", "role": "debater", "system_prompt": "Argue in favor of the proposition with strong evidence."},
+        {"agent_id": "opponent", "name": "Opponent", "role": "debater", "system_prompt": "Argue against the proposition with counterpoints."},
+        {"agent_id": "judge", "name": "Judge", "role": "evaluator", "system_prompt": "Evaluate arguments objectively and declare a winner."}
+      ],
+      "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b"
+      }
+    }
+  ],
+  "llm_defaults": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "host": "http://192.168.2.36:11434"
+  }
+}

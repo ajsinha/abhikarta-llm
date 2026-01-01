@@ -69,7 +69,8 @@ class Settings:
     database: DatabaseSettings = field(default_factory=DatabaseSettings)
     
     # LLM Providers
-    default_llm_provider: str = "openai"
+    default_llm_provider: str = "ollama"
+    default_llm_model: str = "llama3.2:3b"
     llm_providers: Dict[str, LLMProviderSettings] = field(default_factory=dict)
     
     # Logging

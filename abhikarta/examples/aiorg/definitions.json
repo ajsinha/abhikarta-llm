@@ -1,0 +1,72 @@
+{
+  "organizations": [
+    {
+      "org_id": "software_dev_org",
+      "name": "Software Development Organization",
+      "description": "Hierarchical org for software development",
+      "structure_type": "hierarchical",
+      "levels": [
+        {
+          "level": 0,
+          "name": "Executive",
+          "agents": [
+            {"agent_id": "ceo", "name": "CEO", "role": "executive", "system_prompt": "Set strategic direction and make final decisions."}
+          ]
+        },
+        {
+          "level": 1,
+          "name": "Management",
+          "agents": [
+            {"agent_id": "product_manager", "name": "Product Manager", "role": "manager", "reports_to": "ceo", "system_prompt": "Define requirements and prioritize features."},
+            {"agent_id": "tech_lead", "name": "Tech Lead", "role": "manager", "reports_to": "ceo", "system_prompt": "Make technical decisions and guide implementation."}
+          ]
+        },
+        {
+          "level": 2,
+          "name": "Individual Contributors",
+          "agents": [
+            {"agent_id": "developer", "name": "Developer", "role": "worker", "reports_to": "tech_lead", "system_prompt": "Write clean code and implement features."},
+            {"agent_id": "qa", "name": "QA Engineer", "role": "worker", "reports_to": "product_manager", "system_prompt": "Review work and identify issues."}
+          ]
+        }
+      ],
+      "workflows": [
+        {
+          "name": "feature_development",
+          "steps": ["ceo:approve", "product_manager:requirements", "tech_lead:design", "developer:implement", "qa:review", "ceo:approve"]
+        }
+      ],
+      "llm_config": {"provider": "ollama", "model": "llama3.2:3b"}
+    },
+    {
+      "org_id": "content_team",
+      "name": "Content Creation Team",
+      "description": "Flat organization for content creation",
+      "structure_type": "flat",
+      "levels": [
+        {
+          "level": 0,
+          "name": "Team",
+          "agents": [
+            {"agent_id": "editor", "name": "Editor", "role": "coordinator", "system_prompt": "Coordinate content creation and ensure quality."},
+            {"agent_id": "writer_1", "name": "Writer 1", "role": "peer", "system_prompt": "Create engaging written content."},
+            {"agent_id": "writer_2", "name": "Writer 2", "role": "peer", "system_prompt": "Create engaging written content."},
+            {"agent_id": "reviewer", "name": "Reviewer", "role": "peer", "system_prompt": "Review and provide feedback on content."}
+          ]
+        }
+      ],
+      "workflows": [
+        {
+          "name": "content_creation",
+          "steps": ["editor:assign", "writer_1:draft|writer_2:draft", "reviewer:feedback", "editor:finalize"]
+        }
+      ],
+      "llm_config": {"provider": "ollama", "model": "llama3.2:3b"}
+    }
+  ],
+  "llm_defaults": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "host": "http://192.168.2.36:11434"
+  }
+}

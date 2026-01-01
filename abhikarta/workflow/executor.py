@@ -237,28 +237,46 @@ class WorkflowExecutor:
         nodes = []
         edges = []
         
+        logger.debug(f"Converting workflow to LangGraph config: {workflow.workflow_id}")
+        logger.debug(f"Workflow has {len(workflow.nodes)} nodes and {len(workflow.edges)} edges")
+        
         for node in workflow.nodes.values():
             node_config = {
                 'id': node.node_id,
                 'type': node.node_type,
+                'name': node.name,
                 'config': node.config or {}
             }
             nodes.append(node_config)
+            logger.debug(f"Node: id={node.node_id}, type={node.node_type}, name={node.name}")
         
         for edge in workflow.edges:
-            edge_config = {
-                'source': edge.source_id,
-                'target': edge.target_id
-            }
-            if edge.condition:
-                edge_config['condition'] = edge.condition
+            # Handle both dict format and object format for edges
+            if isinstance(edge, dict):
+                edge_config = {
+                    'source': edge.get('source') or edge.get('source_id'),
+                    'target': edge.get('target') or edge.get('target_id'),
+                }
+                if edge.get('condition'):
+                    edge_config['condition'] = edge.get('condition')
+            else:
+                edge_config = {
+                    'source': edge.source_id,
+                    'target': edge.target_id
+                }
+                if edge.condition:
+                    edge_config['condition'] = edge.condition
             edges.append(edge_config)
+            logger.debug(f"Edge: {edge_config.get('source')} -> {edge_config.get('target')}")
         
-        return {
+        config = {
             'nodes': nodes,
             'edges': edges,
             'metadata': workflow.metadata
         }
+        
+        logger.info(f"LangGraph config: {len(nodes)} nodes, {len(edges)} edges")
+        return config
     
     def _execute_native(self, workflow: DAGWorkflow,
                        input_data: Dict[str, Any] = None) -> WorkflowExecution:
@@ -341,7 +359,7 @@ class WorkflowExecutor:
                     execution.output_data = context['accumulated_output']
             
         except Exception as e:
-            logger.error(f"Workflow execution error: {e}")
+            logger.error(f"Workflow execution error: {e}", exc_info=True)
             execution.status = 'failed'
             execution.error_message = str(e)
         
@@ -453,7 +471,7 @@ class WorkflowExecutor:
                 self._log_llm_call(context, dag_node, result)
             
         except Exception as e:
-            logger.error(f"Node execution error ({dag_node.node_id}): {e}")
+            logger.error(f"Node execution error ({dag_node.node_id}): {e}", exc_info=True)
             step.status = 'failed'
             step.error_message = str(e)
         
@@ -555,7 +573,7 @@ class WorkflowExecutor:
                 ))
                 
         except Exception as e:
-            logger.error(f"Failed to save execution: {e}")
+            logger.error(f"Failed to save execution: {e}", exc_info=True)
     
     def _log_llm_call(self, context: Dict[str, Any], dag_node: DAGNode, 
                      result: NodeResult):
@@ -589,7 +607,7 @@ class WorkflowExecutor:
                 json.dumps(result.metadata) if result.metadata else '{}'
             ))
         except Exception as e:
-            logger.error(f"Failed to log LLM call: {e}")
+            logger.error(f"Failed to log LLM call: {e}", exc_info=True)
     
     def add_callback(self, callback: Callable):
         """Add execution callback."""
@@ -637,7 +655,7 @@ class WorkflowManager:
             ))
             return workflow_id
         except Exception as e:
-            logger.error(f"Failed to create workflow: {e}")
+            logger.error(f"Failed to create workflow: {e}", exc_info=True)
             return None
     
     def get_workflow(self, workflow_id: str) -> Optional[Dict[str, Any]]:
@@ -724,5 +742,5 @@ class WorkflowManager:
             )
             return True
         except Exception as e:
-            logger.error(f"Failed to delete workflow: {e}")
+            logger.error(f"Failed to delete workflow: {e}", exc_info=True)
             return False
