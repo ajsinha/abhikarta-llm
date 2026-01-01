@@ -250,11 +250,29 @@ class AIORGRoutes(AbstractRoutes):
                 
                 db_ops.save_org(org)
                 
+                # Map authority levels to NodeType
+                def get_node_type(authority_level):
+                    mapping = {
+                        'c_suite': NodeType.EXECUTIVE,
+                        'executive': NodeType.EXECUTIVE,
+                        'director': NodeType.MANAGER,
+                        'partner': NodeType.MANAGER,
+                        'manager': NodeType.MANAGER,
+                        'lead': NodeType.MANAGER,
+                        'senior': NodeType.ANALYST,
+                        'staff': NodeType.ANALYST,
+                        'specialist': NodeType.ANALYST,
+                        'analyst': NodeType.ANALYST,
+                        'junior': NodeType.ANALYST,
+                        'coordinator': NodeType.COORDINATOR
+                    }
+                    return mapping.get(authority_level.lower(), NodeType.ANALYST) if authority_level else NodeType.ANALYST
+                
                 # Create roles from template
                 for role_def in template.roles:
                     node = AINode.create(
                         org_id=org.org_id,
-                        node_type=NodeType.from_string(role_def.get('authority_level', 'staff')),
+                        node_type=get_node_type(role_def.get('authority_level', 'staff')),
                         name=role_def.get('name', 'Role'),
                         role=role_def.get('role_id', ''),
                         agent_config=role_def.get('agent_config', {}),

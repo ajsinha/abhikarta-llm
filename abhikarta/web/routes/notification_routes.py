@@ -327,10 +327,10 @@ class NotificationRoutes(AbstractRoutes):
             
             # Get available agents, workflows, swarms for target selection
             agents = self.db_facade.fetch_all(
-                "SELECT agent_id, name FROM agents WHERE status = 'active'"
+                "SELECT agent_id, name FROM agents WHERE status IN ('active', 'approved', 'published')"
             ) or []
             workflows = self.db_facade.fetch_all(
-                "SELECT workflow_id, name FROM workflows WHERE status = 'active'"
+                "SELECT workflow_id, name FROM workflows WHERE status IN ('active', 'approved', 'published')"
             ) or []
             swarms = self.db_facade.fetch_all(
                 "SELECT swarm_id, name FROM swarms WHERE status != 'deleted'"
@@ -437,10 +437,10 @@ class NotificationRoutes(AbstractRoutes):
                 
                 # Get available agents, workflows, swarms for target selection
                 agents = self.db_facade.fetch_all(
-                    "SELECT agent_id, name FROM agents WHERE status = 'active'"
+                    "SELECT agent_id, name FROM agents WHERE status IN ('active', 'approved', 'published')"
                 ) or []
                 workflows = self.db_facade.fetch_all(
-                    "SELECT workflow_id, name FROM workflows WHERE status = 'active'"
+                    "SELECT workflow_id, name FROM workflows WHERE status IN ('active', 'approved', 'published')"
                 ) or []
                 swarms = self.db_facade.fetch_all(
                     "SELECT swarm_id, name FROM swarms WHERE status != 'deleted'"

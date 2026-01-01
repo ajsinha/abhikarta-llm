@@ -88,6 +88,16 @@ class SwarmRoutes(AbstractRoutes):
                     flash("Swarm not found", "warning")
                     return redirect(url_for('list_swarms'))
                 
+                # Convert to mutable dict and parse config_json
+                swarm = dict(swarm)
+                if swarm.get('config_json'):
+                    try:
+                        swarm['config'] = json.loads(swarm['config_json'])
+                    except:
+                        swarm['config'] = {}
+                else:
+                    swarm['config'] = {}
+                
                 # Get agents
                 agents = self.db_facade.fetch_all(
                     "SELECT * FROM swarm_agents WHERE swarm_id = ? ORDER BY role, agent_name",
@@ -168,7 +178,7 @@ class SwarmRoutes(AbstractRoutes):
                     # Create swarm
                     self.db_facade.execute(
                         """INSERT INTO swarms 
-                           (swarm_id, name, description, status, config, created_by)
+                           (swarm_id, name, description, status, config_json, created_by)
                            VALUES (?, ?, ?, 'draft', ?, ?)""",
                         (swarm_id, name, description, json.dumps(config), session.get('user_id'))
                     )
@@ -176,7 +186,7 @@ class SwarmRoutes(AbstractRoutes):
                     # Add trigger
                     self.db_facade.execute(
                         """INSERT INTO swarm_triggers 
-                           (trigger_id, swarm_id, trigger_type, name, config)
+                           (trigger_id, swarm_id, trigger_type, name, config_json)
                            VALUES (?, ?, ?, ?, ?)""",
                         (str(uuid.uuid4()), swarm_id, trigger_type, 
                          f'{trigger_type.title()} Trigger', json.dumps(trigger_config))
@@ -205,7 +215,7 @@ class SwarmRoutes(AbstractRoutes):
             # GET - show form
             try:
                 agents = self.db_facade.fetch_all(
-                    "SELECT agent_id, name, description FROM agents WHERE status = 'active' ORDER BY name"
+                    "SELECT agent_id, name, description FROM agents WHERE status IN ('active', 'approved', 'published', 'draft') ORDER BY name"
                 ) or []
             except:
                 agents = []
@@ -252,7 +262,7 @@ class SwarmRoutes(AbstractRoutes):
             # GET - show edit form
             try:
                 agents = self.db_facade.fetch_all(
-                    "SELECT agent_id, name, description FROM agents WHERE status = 'active' ORDER BY name"
+                    "SELECT agent_id, name, description FROM agents WHERE status IN ('active', 'approved', 'published', 'draft') ORDER BY name"
                 ) or []
                 swarm_agents = self.db_facade.fetch_all(
                     "SELECT agent_id FROM swarm_agents WHERE swarm_id = ?", (swarm_id,)
@@ -408,12 +418,13 @@ class SwarmRoutes(AbstractRoutes):
                 
                 # Get swarm definition from template
                 swarm_def = template.swarm_definition
+                config = template.config if hasattr(template, 'config') else {}
                 
                 # Insert swarm record
                 self.db_facade.execute(
-                    """INSERT INTO swarms (swarm_id, name, description, config, status, created_by)
-                       VALUES (?, ?, ?, ?, 'draft', ?)""",
-                    (swarm_id, name, template.description, json.dumps(swarm_def), session.get('user_id'))
+                    """INSERT INTO swarms (swarm_id, name, description, definition_json, config_json, status, created_by)
+                       VALUES (?, ?, ?, ?, ?, 'draft', ?)""",
+                    (swarm_id, name, template.description, json.dumps(swarm_def), json.dumps(config), session.get('user_id'))
                 )
                 
                 flash(f"Created swarm '{name}' from template", "success")
@@ -437,13 +448,13 @@ class SwarmRoutes(AbstractRoutes):
             """Open swarm designer for new swarm."""
             # Get available agents
             agents = self.db_facade.fetch_all(
-                "SELECT agent_id, name, description FROM agents WHERE status = 'active'"
+                "SELECT agent_id, name, description FROM agents WHERE status IN ('active', 'approved', 'published', 'draft')"
             ) or []
             
             return render_template(
                 'swarms/designer.html',
                 swarm=None,
-                available_agents=agents,
+                agents=agents,
                 fullname=session.get('fullname'),
                 userid=session.get('user_id'),
                 roles=session.get('roles', []),
@@ -464,6 +475,16 @@ class SwarmRoutes(AbstractRoutes):
                     flash("Swarm not found", "warning")
                     return redirect(url_for('list_swarms'))
                 
+                # Convert to mutable dict and parse config_json
+                swarm = dict(swarm)
+                if swarm.get('config_json'):
+                    try:
+                        swarm['config_json'] = json.loads(swarm['config_json'])
+                    except:
+                        swarm['config_json'] = {}
+                else:
+                    swarm['config_json'] = {}
+                
                 # Get swarm agents
                 swarm_agents = self.db_facade.fetch_all(
                     "SELECT * FROM swarm_agents WHERE swarm_id = ?",
@@ -478,7 +499,7 @@ class SwarmRoutes(AbstractRoutes):
                 
                 # Get available agents
                 agents = self.db_facade.fetch_all(
-                    "SELECT agent_id, name, description FROM agents WHERE status = 'active'"
+                    "SELECT agent_id, name, description FROM agents WHERE status IN ('active', 'approved', 'published', 'draft')"
                 ) or []
                 
                 return render_template(
@@ -486,7 +507,7 @@ class SwarmRoutes(AbstractRoutes):
                     swarm=swarm,
                     swarm_agents=swarm_agents,
                     triggers=triggers,
-                    available_agents=agents,
+                    agents=agents,
                     fullname=session.get('fullname'),
                     userid=session.get('user_id'),
                     roles=session.get('roles', []),
@@ -651,6 +672,122 @@ class SwarmRoutes(AbstractRoutes):
                 })
             except Exception as e:
                 logger.error(f"Error creating swarm: {e}", exc_info=True)
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/swarms/save', methods=['POST'])
+        @login_required
+        def api_save_swarm():
+            """API: Save swarm from designer (create or update)."""
+            try:
+                data = request.get_json()
+                import uuid
+                
+                swarm_id = data.get('swarm_id')
+                name = data.get('name', 'New Swarm')
+                triggers = data.get('triggers', [])
+                agents = data.get('agents', [])
+                layout = data.get('layout', {})
+                
+                # Build config
+                config = {
+                    'triggers': triggers,
+                    'agents': agents,
+                    'layout': layout
+                }
+                
+                if swarm_id:
+                    # Check if swarm exists
+                    existing = self.db_facade.fetch_one(
+                        "SELECT swarm_id FROM swarms WHERE swarm_id = ?", (swarm_id,)
+                    )
+                    
+                    if existing:
+                        # Update existing swarm
+                        self.db_facade.execute(
+                            """UPDATE swarms 
+                               SET name = ?, config_json = ?, updated_at = CURRENT_TIMESTAMP
+                               WHERE swarm_id = ?""",
+                            (name, json.dumps(config), swarm_id)
+                        )
+                        
+                        # Update swarm_agents - delete old, insert new
+                        self.db_facade.execute(
+                            "DELETE FROM swarm_agents WHERE swarm_id = ?", (swarm_id,)
+                        )
+                        
+                        for agent in agents:
+                            self.db_facade.execute(
+                                """INSERT INTO swarm_agents 
+                                   (membership_id, swarm_id, agent_id, agent_name, role, subscriptions_json, min_instances, max_instances)
+                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                                (str(uuid.uuid4()), swarm_id, agent.get('agent_id'), 
+                                 agent.get('name', 'Agent'), agent.get('role', 'worker'),
+                                 json.dumps(agent.get('subscriptions', ['task.*'])),
+                                 agent.get('pool_size', {}).get('min', 1),
+                                 agent.get('pool_size', {}).get('max', 3))
+                            )
+                        
+                        # Update triggers - delete old, insert new
+                        self.db_facade.execute(
+                            "DELETE FROM swarm_triggers WHERE swarm_id = ?", (swarm_id,)
+                        )
+                        
+                        for trigger in triggers:
+                            self.db_facade.execute(
+                                """INSERT INTO swarm_triggers 
+                                   (trigger_id, swarm_id, trigger_type, name, config_json)
+                                   VALUES (?, ?, ?, ?, ?)""",
+                                (str(uuid.uuid4()), swarm_id, trigger.get('type', 'user_query'),
+                                 trigger.get('name', 'Trigger'), json.dumps(trigger.get('config', {})))
+                            )
+                        
+                        return jsonify({
+                            'success': True,
+                            'swarm_id': swarm_id,
+                            'message': 'Swarm updated successfully'
+                        })
+                
+                # Create new swarm
+                swarm_id = str(uuid.uuid4())
+                
+                self.db_facade.execute(
+                    """INSERT INTO swarms 
+                       (swarm_id, name, description, status, config_json, created_by)
+                       VALUES (?, ?, ?, 'draft', ?, ?)""",
+                    (swarm_id, name, '', json.dumps(config), session.get('user_id'))
+                )
+                
+                # Add agents
+                for agent in agents:
+                    self.db_facade.execute(
+                        """INSERT INTO swarm_agents 
+                           (membership_id, swarm_id, agent_id, agent_name, role, subscriptions_json, min_instances, max_instances)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                        (str(uuid.uuid4()), swarm_id, agent.get('agent_id'),
+                         agent.get('name', 'Agent'), agent.get('role', 'worker'),
+                         json.dumps(agent.get('subscriptions', ['task.*'])),
+                         agent.get('pool_size', {}).get('min', 1),
+                         agent.get('pool_size', {}).get('max', 3))
+                    )
+                
+                # Add triggers
+                for trigger in triggers:
+                    self.db_facade.execute(
+                        """INSERT INTO swarm_triggers 
+                           (trigger_id, swarm_id, trigger_type, name, config_json)
+                           VALUES (?, ?, ?, ?, ?)""",
+                        (str(uuid.uuid4()), swarm_id, trigger.get('type', 'user_query'),
+                         trigger.get('name', 'Trigger'), json.dumps(trigger.get('config', {})))
+                    )
+                
+                return jsonify({
+                    'success': True,
+                    'swarm_id': swarm_id,
+                    'message': 'Swarm created successfully'
+                })
+                
+            except Exception as e:
+                logger.error(f"Error saving swarm: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)}), 500
         
         @self.app.route('/api/swarms/<swarm_id>', methods=['PUT'])

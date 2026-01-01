@@ -650,6 +650,9 @@
                 <a href="{{ url_for('swarm_create') }}" class="btn btn-outline-secondary btn-sm" title="Switch to Simple Form">
                     <i class="bi bi-card-text me-1"></i>Simple Form
                 </a>
+                <button class="btn btn-outline-info btn-sm" onclick="viewSwarmJson()" title="View JSON">
+                    <i class="bi bi-code-slash me-1"></i>View JSON
+                </button>
                 <div class="zoom-controls">
                     <button onclick="zoomOut()" title="Zoom Out"><i class="bi bi-dash"></i></button>
                     <span class="zoom-level" id="zoom-level">100%</span>
@@ -1051,12 +1054,88 @@ function saveSwarm() {
     }).catch(() => showToast('error', 'Error saving swarm'));
 }
 
+function viewSwarmJson() {
+    const data = {
+        swarm_id: Designer.swarmId || null,
+        name: $('#swarm-name').val(),
+        triggers: Designer.triggers.map(t => ({ 
+            type: t.type, 
+            name: t.name, 
+            config: t.config 
+        })),
+        agents: Designer.agents.map(a => ({ 
+            agent_id: a.agentId, 
+            name: a.name, 
+            role: a.role, 
+            subscriptions: a.subscriptions, 
+            pool_size: a.poolSize 
+        })),
+        layout: { 
+            master: Designer.masterPos, 
+            bus: Designer.busPos 
+        }
+    };
+    
+    const jsonStr = JSON.stringify(data, null, 2);
+    
+    // Create modal for JSON display
+    const modal = $(`
+        <div class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-code-slash me-2"></i>Swarm JSON</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <pre class="bg-dark text-light p-3 rounded" style="max-height: 500px; overflow: auto;"><code>${escapeHtml(jsonStr)}</code></pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="copyJsonToClipboard()">
+                            <i class="bi bi-clipboard me-1"></i>Copy to Clipboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
+    
+    // Store JSON for copying
+    window.currentSwarmJson = jsonStr;
+    
+    $('body').append(modal);
+    const bsModal = new bootstrap.Modal(modal[0]);
+    bsModal.show();
+    
+    modal.on('hidden.bs.modal', function() {
+        modal.remove();
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function copyJsonToClipboard() {
+    navigator.clipboard.writeText(window.currentSwarmJson).then(() => {
+        showToast('success', 'JSON copied to clipboard!');
+    }).catch(() => {
+        showToast('error', 'Failed to copy');
+    });
+}
+
 function loadExistingData() {
-    {% if swarm and swarm.config %}
-    const cfg = {{ swarm.config | tojson | safe }};
-    if (cfg.triggers) cfg.triggers.forEach((t, i) => { Designer.counter++; const tr = { id: 'trigger-' + Designer.counter, type: t.type, name: t.name || t.type, config: t.config || {}, x: 100 + i * 180, y: 30 }; Designer.triggers.push(tr); renderTriggerNode(tr); });
-    if (cfg.agents) cfg.agents.forEach((a, i) => { Designer.counter++; const ag = { id: 'agent-' + Designer.counter, agentId: a.agent_id, name: a.name, role: a.role || 'Worker', subscriptions: a.subscriptions || ['task.*'], poolSize: a.pool_size || { min: 1, max: 3 }, x: 100 + i * 200, y: 480, colorIdx: i % Designer.colors.agents.length }; Designer.agents.push(ag); renderAgentNode(ag); });
-    setTimeout(() => autoLayout(), 200);
+    {% if swarm and swarm.config_json %}
+    try {
+        const cfgStr = {{ swarm.config_json | tojson | safe }};
+        const cfg = typeof cfgStr === 'string' ? JSON.parse(cfgStr) : cfgStr;
+        if (cfg.triggers) cfg.triggers.forEach((t, i) => { Designer.counter++; const tr = { id: 'trigger-' + Designer.counter, type: t.type, name: t.name || t.type, config: t.config || {}, x: 100 + i * 180, y: 30 }; Designer.triggers.push(tr); renderTriggerNode(tr); });
+        if (cfg.agents) cfg.agents.forEach((a, i) => { Designer.counter++; const ag = { id: 'agent-' + Designer.counter, agentId: a.agent_id, name: a.name, role: a.role || 'Worker', subscriptions: a.subscriptions || ['task.*'], poolSize: a.pool_size || { min: 1, max: 3 }, x: 100 + i * 200, y: 480, colorIdx: i % Designer.colors.agents.length }; Designer.agents.push(ag); renderAgentNode(ag); });
+        setTimeout(() => autoLayout(), 200);
+    } catch(e) { console.error('Error loading existing data:', e); }
     {% endif %}
 }
 
