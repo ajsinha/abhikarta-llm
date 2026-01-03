@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Script Templates - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .template-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        height: 100%;
+    }
+    .template-card:hover {
+        border-color: #7952b3;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .template-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+    .template-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    .difficulty-beginner { background-color: #28a745; }
+    .difficulty-intermediate { background-color: #ffc107; color: #333; }
+    .difficulty-advanced { background-color: #dc3545; }
+    .type-filter .btn.active {
+        background-color: #7952b3;
+        border-color: #7952b3;
+        color: white;
+    }
+    .template-tags {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+    .template-tags .badge {
+        font-weight: normal;
+    }
+    .code-preview {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 11px;
+        border-radius: 8px;
+        padding: 0.75rem;
+        max-height: 120px;
+        overflow: hidden;
+        position: relative;
+    }
+    .code-preview::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40px;
+        background: linear-gradient(transparent, #1e1e1e);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">
+                <i class="bi bi-file-earmark-code me-2"></i>Script Template Library
+            </h4>
+            <p class="text-muted mb-0">Pre-built Python script templates for agents, workflows, swarms, and AI organizations</p>
+        </div>
+        <div>
+            <a href="{{ url_for('create_script') }}" class="btn btn-outline-primary me-2">
+                <i class="bi bi-plus-circle me-1"></i>Blank Script
+            </a>
+            <a href="{{ url_for('list_scripts') }}" class="btn btn-primary">
+                <i class="bi bi-arrow-left me-1"></i>My Scripts
+            </a>
+        </div>
+    </div>
+
+    <!-- Entity Type Filter -->
+    <div class="card mb-4">
+        <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+                <strong class="me-3">Entity Type:</strong>
+                <div class="btn-group type-filter" role="group">
+                    <a href="{{ url_for('script_templates') }}" 
+                       class="btn btn-outline-secondary {{ 'active' if not selected_type }}">
+                        <i class="bi bi-grid me-1"></i>All
+                    </a>
+                    <a href="{{ url_for('script_templates', type='agent') }}"
+                       class="btn btn-outline-primary {{ 'active' if selected_type == 'agent' }}">
+                        <i class="bi bi-robot me-1"></i>Agents
+                    </a>
+                    <a href="{{ url_for('script_templates', type='workflow') }}"
+                       class="btn btn-outline-success {{ 'active' if selected_type == 'workflow' }}">
+                        <i class="bi bi-diagram-3 me-1"></i>Workflows
+                    </a>
+                    <a href="{{ url_for('script_templates', type='swarm') }}"
+                       class="btn btn-outline-warning {{ 'active' if selected_type == 'swarm' }}">
+                        <i class="bi bi-hive me-1"></i>Swarms
+                    </a>
+                    <a href="{{ url_for('script_templates', type='aiorg') }}"
+                       class="btn btn-outline-info {{ 'active' if selected_type == 'aiorg' }}">
+                        <i class="bi bi-building me-1"></i>AI Orgs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="template-search" 
+                       placeholder="Search templates...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="difficulty-filter">
+                <option value="">All Difficulty Levels</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="category-filter">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category }}">{{ category|title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="row g-4" id="templates-grid">
+        {% for template in templates %}
+        <div class="col-md-6 col-lg-4 template-item" 
+             data-entity-type="{{ template.entity_type }}"
+             data-category="{{ template.category|lower }}"
+             data-difficulty="{{ template.difficulty }}"
+             data-name="{{ template.name|lower }}"
+             data-tags="{{ template.tags|join(' ')|lower }}">
+            <div class="card template-card h-100 position-relative">
+                <span class="template-badge badge difficulty-{{ template.difficulty }}">
+                    {{ template.difficulty|capitalize }}
+                </span>
+                <div class="card-body">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="template-icon bg-light me-3" style="flex-shrink: 0;">
+                            <i class="{{ template.icon }}" style="color: #7952b3;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">{{ template.name }}</h5>
+                            <small class="text-muted">
+                                {% if template.entity_type == 'agent' %}
+                                <span class="badge bg-primary">Agent</span>
+                                {% if template.agent_type %}
+                                <span class="badge bg-secondary">{{ template.agent_type|title }}</span>
+                                {% endif %}
+                                {% elif template.entity_type == 'workflow' %}
+                                <span class="badge bg-success">Workflow</span>
+                                {% elif template.entity_type == 'swarm' %}
+                                <span class="badge bg-warning text-dark">Swarm</span>
+                                {% elif template.entity_type == 'aiorg' %}
+                                <span class="badge bg-info">AI Org</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <p class="card-text text-muted small">{{ template.description }}</p>
+                    
+                    <div class="template-tags">
+                        {% for tag in template.tags[:4] %}
+                        <span class="badge bg-light text-dark">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Code Preview -->
+                    <div class="code-preview mt-3">
+                        <pre style="margin: 0; white-space: pre-wrap;">{{ template.script_content[:250]|safe }}...</pre>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('script_template_detail', template_id=template.template_id) }}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye me-1"></i>View Details
+                        </a>
+                        <a href="{{ url_for('create_script_from_template', template_id=template.template_id) }}" 
+                           class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Use Template
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle me-2"></i>
+                No templates found. Templates are loaded from the <code>templates/scripts</code> directory.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Empty State -->
+    <div class="text-center py-5 d-none" id="no-templates">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h5 class="mt-3">No templates match your search</h5>
+        <p class="text-muted">Try adjusting your filters or search terms</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#template-search').on('input', filterTemplates);
+    $('#difficulty-filter, #category-filter').change(filterTemplates);
+});
+
+function filterTemplates() {
+    const search = $('#template-search').val().toLowerCase();
+    const difficulty = $('#difficulty-filter').val();
+    const category = $('#category-filter').val().toLowerCase();
+    
+    let visibleCount = 0;
+    
+    $('.template-item').each(function() {
+        const $item = $(this);
+        const itemDifficulty = $item.data('difficulty');
+        const itemCategory = $item.data('category');
+        const itemName = $item.data('name');
+        const itemTags = $item.data('tags') || '';
+        
+        let visible = true;
+        
+        if (search && !(itemName.includes(search) || itemTags.includes(search))) {
+            visible = false;
+        }
+        if (difficulty && itemDifficulty !== difficulty) {
+            visible = false;
+        }
+        if (category && itemCategory !== category) {
+            visible = false;
+        }
+        
+        $item.toggle(visible);
+        if (visible) visibleCount++;
+    });
+    
+    $('#no-templates').toggleClass('d-none', visibleCount > 0);
+}
+</script>
+{% endblock %}

@@ -1,28 +1,27 @@
 {% extends "help/help_base.html" %}
 
-{% set title = "Pre-built Tools Library" %}
-{% set description = "Ready-to-use tools for common operations" %}
+{% set title = "Tool Framework" %}
+{% set description = "Extensible tool infrastructure for custom tools" %}
 {% set icon = "bi-tools" %}
 {% set header_color = "#fd7e14" %}
 {% set header_color_dark = "#dc6a12" %}
 
 {% block help_nav %}
 <a href="#overview">Overview</a>
-<a href="#common-tools">Common Tools</a>
-<a href="#banking-tools">Banking Tools</a>
-<a href="#integration-tools">Integration Tools</a>
-<a href="#general-tools">General Tools</a>
+<a href="#tool-types">Tool Types</a>
+<a href="#creating-tools">Creating Tools</a>
+<a href="#mcp-tools">MCP Tools</a>
+<a href="#examples">Example Tools</a>
 <a href="#usage">Usage Guide</a>
-<a href="#extending">Extending Tools</a>
 {% endblock %}
 
 {% block help_content %}
-<h2 id="overview">Pre-built Tools Overview</h2>
-<p class="lead">Abhikarta provides a comprehensive library of 85 pre-built tools that are immediately available for use in agents and workflows.</p>
+<h2 id="overview">Tool Framework Overview</h2>
+<p class="lead">Abhikarta provides an extensible tool framework with 10 base tool types for building custom tools.</p>
 
-<div class="alert alert-info">
-    <i class="bi bi-lightbulb me-2"></i>
-    <strong>Quick Start:</strong> All pre-built tools are automatically registered with the ToolsRegistry on startup. Browse them at <a href="/tools">/tools</a>.
+<div class="alert alert-warning">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Note:</strong> The tool framework provides infrastructure for creating tools. The examples below show tools you CAN build - they are not pre-packaged. Use MCP Tool Servers or create custom tools using the BaseTool classes.
 </div>
 
 <div class="row g-4 mb-5">
@@ -30,35 +29,35 @@
         <div class="card text-center h-100 border-warning">
             <div class="card-body">
                 <i class="bi bi-wrench text-warning" style="font-size: 2.5rem;"></i>
-                <h3 class="mt-2">28</h3>
-                <p class="text-muted mb-0">Common Tools</p>
+                <h3 class="mt-2">10</h3>
+                <p class="text-muted mb-0">Tool Types</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card text-center h-100 border-success">
             <div class="card-body">
-                <i class="bi bi-bank text-success" style="font-size: 2.5rem;"></i>
-                <h3 class="mt-2">13</h3>
-                <p class="text-muted mb-0">Banking Tools</p>
+                <i class="bi bi-plug text-success" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">MCP</h3>
+                <p class="text-muted mb-0">Server Integration</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card text-center h-100 border-primary">
             <div class="card-body">
-                <i class="bi bi-plug text-primary" style="font-size: 2.5rem;"></i>
-                <h3 class="mt-2">20</h3>
-                <p class="text-muted mb-0">Integration Tools</p>
+                <i class="bi bi-code-slash text-primary" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">URI</h3>
+                <p class="text-muted mb-0">Code Fragments</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card text-center h-100 border-info">
             <div class="card-body">
-                <i class="bi bi-globe text-info" style="font-size: 2.5rem;"></i>
-                <h3 class="mt-2">24</h3>
-                <p class="text-muted mb-0">General Tools</p>
+                <i class="bi bi-link-45deg text-info" style="font-size: 2.5rem;"></i>
+                <h3 class="mt-2">HTTP</h3>
+                <p class="text-muted mb-0">API Integration</p>
             </div>
         </div>
     </div>
@@ -66,8 +65,135 @@
 
 <hr class="my-5">
 
-<h2 id="common-tools">Common Utility Tools</h2>
-<p>General-purpose tools for everyday operations.</p>
+<h2 id="tool-types">Available Tool Types</h2>
+<p>The framework provides these base tool classes:</p>
+
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr><th>Tool Type</th><th>Description</th><th>Use Case</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>BaseTool</code></td>
+            <td>Abstract base class for all tools</td>
+            <td>Extend for custom implementations</td>
+        </tr>
+        <tr>
+            <td><code>FunctionTool</code></td>
+            <td>Wrap Python functions as tools</td>
+            <td>Quick tool creation from existing functions</td>
+        </tr>
+        <tr>
+            <td><code>AsyncFunctionTool</code></td>
+            <td>Async version of FunctionTool</td>
+            <td>Non-blocking tool operations</td>
+        </tr>
+        <tr>
+            <td><code>HTTPTool</code></td>
+            <td>Make HTTP/REST API calls</td>
+            <td>External API integration</td>
+        </tr>
+        <tr>
+            <td><code>WebhookTool</code></td>
+            <td>Send webhook notifications</td>
+            <td>Event notifications</td>
+        </tr>
+        <tr>
+            <td><code>MCPTool</code></td>
+            <td>Connect to MCP tool servers</td>
+            <td>External tool servers</td>
+        </tr>
+        <tr>
+            <td><code>MCPPluginTool</code></td>
+            <td>MCP plugin integration</td>
+            <td>Plugin-based tools</td>
+        </tr>
+        <tr>
+            <td><code>CodeFragmentTool</code></td>
+            <td>Execute code from URI (db://, file://, s3://)</td>
+            <td>Dynamic code execution</td>
+        </tr>
+        <tr>
+            <td><code>LangChainToolWrapper</code></td>
+            <td>Wrap LangChain tools</td>
+            <td>LangChain ecosystem integration</td>
+        </tr>
+        <tr>
+            <td><code>PythonExpressionTool</code></td>
+            <td>Safe Python expression evaluation</td>
+            <td>Simple calculations</td>
+        </tr>
+    </tbody>
+</table>
+
+<hr class="my-5">
+
+<h2 id="creating-tools">Creating Custom Tools</h2>
+<p>Create tools using the decorator or class-based approach:</p>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">Decorator Approach (Simple)</div>
+            <div class="card-body">
+<pre><code class="language-python">from abhikarta.tools import tool
+
+@tool(name="calculate_tax", 
+      description="Calculate tax amount")
+def calculate_tax(amount: float, rate: float) -> float:
+    """Calculate tax on an amount."""
+    return amount * (rate / 100)
+
+# Automatically registers with ToolsRegistry</code></pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">Class-Based Approach (Advanced)</div>
+            <div class="card-body">
+<pre><code class="language-python">from abhikarta.tools import BaseTool, ToolResult
+
+class MyCustomTool(BaseTool):
+    def __init__(self):
+        super().__init__(
+            name="my_tool",
+            description="Does something custom"
+        )
+    
+    def execute(self, **kwargs) -> ToolResult:
+        result = self.process(kwargs)
+        return ToolResult(success=True, output=result)</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="mcp-tools">MCP Tool Server Integration</h2>
+<p>Connect to external MCP tool servers to access their tools:</p>
+
+<pre><code class="language-python">from abhikarta.mcp import MCPClient
+
+# Connect to MCP server
+client = MCPClient("http://mcp-server:8080")
+tools = await client.list_tools()
+
+# Use MCP tools in agents
+agent_config = {
+    "tools": ["mcp:server:tool_name"]
+}</code></pre>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    Configure MCP servers in the Admin → MCP Tool Servers page.
+</div>
+
+<hr class="my-5">
+
+<h2 id="examples">Example Tool Implementations</h2>
+<p>Below are examples of tools you can build with the framework. These are reference implementations, not pre-packaged tools.</p>
 
 <div class="accordion" id="commonToolsAccordion">
     <!-- Date/Time Tools -->

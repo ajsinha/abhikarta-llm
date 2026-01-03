@@ -908,7 +908,7 @@ class AIORGRoutes(AbstractRoutes):
                 'org': org.to_dict(),
                 'nodes': [n.to_dict() for n in nodes],
                 'exported_at': datetime.utcnow().isoformat(),
-                'version': '1.4.7'
+                'version': '1.4.8'
             }
             
             response = Response(

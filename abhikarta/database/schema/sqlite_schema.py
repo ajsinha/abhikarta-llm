@@ -30,7 +30,7 @@ class SQLiteSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.4.7"
+    SCHEMA_VERSION = "1.4.8"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -101,6 +101,8 @@ class SQLiteSchema:
         agent_type TEXT NOT NULL DEFAULT 'react',
         version TEXT DEFAULT '1.0.0',
         status TEXT DEFAULT 'draft',
+        source_type TEXT DEFAULT 'json',
+        script_content TEXT,
         config TEXT DEFAULT '{}',
         workflow TEXT DEFAULT '{}',
         llm_config TEXT DEFAULT '{}',
@@ -262,6 +264,8 @@ class SQLiteSchema:
         description TEXT,
         version TEXT DEFAULT '1.0.0',
         workflow_type TEXT DEFAULT 'dag',
+        source_type TEXT DEFAULT 'json',
+        script_content TEXT,
         dag_definition TEXT NOT NULL,
         python_modules TEXT DEFAULT '{}',
         entry_point TEXT,
@@ -597,6 +601,8 @@ class SQLiteSchema:
         description TEXT,
         version TEXT DEFAULT '1.0.0',
         status TEXT DEFAULT 'draft',
+        source_type TEXT DEFAULT 'json',
+        script_content TEXT,
         category TEXT DEFAULT 'general',
         tags TEXT DEFAULT '[]',
         definition_json TEXT,
@@ -823,6 +829,8 @@ class SQLiteSchema:
         name TEXT NOT NULL,
         description TEXT,
         status TEXT DEFAULT 'draft',
+        source_type TEXT DEFAULT 'json',
+        script_content TEXT,
         config TEXT DEFAULT '{}',
         event_bus_channel TEXT,
         created_by TEXT,
@@ -955,6 +963,55 @@ class SQLiteSchema:
     """
     
     # ==========================================================================
+    # PYTHON SCRIPTS TABLES (v1.4.8)
+    # ==========================================================================
+    
+    CREATE_PYTHON_SCRIPTS_TABLE = """
+    CREATE TABLE IF NOT EXISTS python_scripts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        script_id TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        entity_type TEXT NOT NULL,
+        script_content TEXT NOT NULL,
+        entry_point TEXT DEFAULT '__export__',
+        dependencies TEXT DEFAULT '[]',
+        validation_status TEXT DEFAULT 'pending',
+        validation_message TEXT,
+        linked_entity_id TEXT,
+        version INTEGER DEFAULT 1,
+        tags TEXT DEFAULT '[]',
+        is_active INTEGER DEFAULT 1,
+        created_by INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_executed_at TIMESTAMP,
+        execution_count INTEGER DEFAULT 0,
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+    );
+    """
+    
+    CREATE_SCRIPT_EXECUTIONS_TABLE = """
+    CREATE TABLE IF NOT EXISTS script_executions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        execution_id TEXT UNIQUE NOT NULL,
+        script_id TEXT NOT NULL,
+        status TEXT DEFAULT 'pending',
+        input_data TEXT DEFAULT '{}',
+        output_data TEXT,
+        error_message TEXT,
+        stdout TEXT,
+        stderr TEXT,
+        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        completed_at TIMESTAMP,
+        duration_ms INTEGER,
+        executed_by INTEGER,
+        FOREIGN KEY (script_id) REFERENCES python_scripts(script_id) ON DELETE CASCADE,
+        FOREIGN KEY (executed_by) REFERENCES users(id) ON DELETE SET NULL
+    );
+    """
+    
+    # ==========================================================================
     # INDEXES
     # ==========================================================================
     
@@ -1008,6 +1065,14 @@ class SQLiteSchema:
         "CREATE INDEX IF NOT EXISTS idx_swarm_agents_agent_id ON swarm_agents(agent_id);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_triggers_swarm_id ON swarm_triggers(swarm_id);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_triggers_trigger_type ON swarm_triggers(trigger_type);",
+        # Python Scripts indexes (v1.4.8)
+        "CREATE INDEX IF NOT EXISTS idx_python_scripts_entity_type ON python_scripts(entity_type);",
+        "CREATE INDEX IF NOT EXISTS idx_python_scripts_created_by ON python_scripts(created_by);",
+        "CREATE INDEX IF NOT EXISTS idx_python_scripts_is_active ON python_scripts(is_active);",
+        "CREATE INDEX IF NOT EXISTS idx_python_scripts_validation_status ON python_scripts(validation_status);",
+        "CREATE INDEX IF NOT EXISTS idx_script_executions_script_id ON script_executions(script_id);",
+        "CREATE INDEX IF NOT EXISTS idx_script_executions_status ON script_executions(status);",
+        "CREATE INDEX IF NOT EXISTS idx_script_executions_executed_by ON script_executions(executed_by);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_executions_swarm_id ON swarm_executions(swarm_id);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_executions_status ON swarm_executions(status);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_executions_correlation_id ON swarm_executions(correlation_id);",
@@ -1044,7 +1109,7 @@ class SQLiteSchema:
         "CREATE INDEX IF NOT EXISTS idx_ai_hitl_actions_node_id ON ai_hitl_actions(node_id);",
         "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_org_id ON ai_event_logs(org_id);",
         "CREATE INDEX IF NOT EXISTS idx_ai_event_logs_event_type ON ai_event_logs(event_type);",
-        # Agent executions indexes (v1.4.7.1)
+        # Agent executions indexes (v1.4.8)
         "CREATE INDEX IF NOT EXISTS idx_agent_executions_agent_id ON agent_executions(agent_id);",
         "CREATE INDEX IF NOT EXISTS idx_agent_executions_status ON agent_executions(status);",
         "CREATE INDEX IF NOT EXISTS idx_agent_executions_created_at ON agent_executions(created_at);",
@@ -1341,6 +1406,9 @@ class SQLiteSchema:
             self.CREATE_AI_RESPONSES_TABLE,
             self.CREATE_AI_HITL_ACTIONS_TABLE,
             self.CREATE_AI_EVENT_LOGS_TABLE,
+            # Python Scripts tables (v1.4.8)
+            self.CREATE_PYTHON_SCRIPTS_TABLE,
+            self.CREATE_SCRIPT_EXECUTIONS_TABLE,
         ]
     
     def get_all_index_statements(self) -> list:
@@ -1443,4 +1511,7 @@ class SQLiteSchema:
             'ai_responses',
             'ai_hitl_actions',
             'ai_event_logs',
+            # Python Scripts tables (v1.4.8)
+            'python_scripts',
+            'script_executions',
         ]

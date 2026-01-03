@@ -10,7 +10,7 @@ across different message brokers (Kafka, RabbitMQ, ActiveMQ) with:
 - Dead letter queue support
 - Retry mechanisms
 
-Version: 1.3.0
+Version: 1.4.8
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 """
@@ -62,4 +62,4 @@ __all__ = [
     'BrokerFactory',
 ]
 
-__version__ = '1.3.0'
+__version__ = '1.4.8'

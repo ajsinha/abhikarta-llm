@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ script.name }} - Python Scripts{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+<style>
+    .CodeMirror {
+        height: 500px;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        font-size: 14px;
+    }
+    .validation-result {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 0.375rem;
+    }
+    .validation-valid { background: #d1e7dd; border: 1px solid #badbcc; }
+    .validation-invalid { background: #f8d7da; border: 1px solid #f5c2c7; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>
+                <i class="bi bi-pencil me-2"></i>
+                Edit Script: {{ script.name }}
+            </h2>
+            <p class="text-muted mb-0">
+                {{ script.entity_type|title }} Script (Version {{ script.version }})
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('view_script', script_id=script.script_id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Cancel
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column: Form -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Script Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form id="scriptForm">
+                        <input type="hidden" id="scriptId" value="{{ script.script_id }}">
+                        <input type="hidden" id="entityType" value="{{ script.entity_type }}">
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name *</label>
+                            <input type="text" class="form-control" id="name" required 
+                                   value="{{ script.name }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" rows="2">{{ script.description or '' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="entryPoint" class="form-label">Entry Point Variable</label>
+                            <input type="text" class="form-control" id="entryPoint" 
+                                   value="{{ script.entry_point or '__export__' }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Tags</label>
+                            <input type="text" class="form-control" id="tags" 
+                                   value="{% if script.tags %}{{ script.tags|tojson|safe|replace('[', '')|replace(']', '')|replace('\"', '') }}{% endif %}">
+                            <small class="text-muted">Comma-separated tags</small>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-outline-primary" onclick="validateCode()">
+                                <i class="bi bi-check-circle me-2"></i>Validate
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="saveScript()">
+                                <i class="bi bi-save me-2"></i>Save Changes
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="saveAndExecute()">
+                                <i class="bi bi-play-fill me-2"></i>Save & Execute
+                            </button>
+                        </div>
+                        
+                        <div id="validationResult" class="validation-result d-none"></div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Metadata -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Metadata</h5>
+                </div>
+                <div class="card-body">
+                    <small class="text-muted d-block">
+                        <strong>Script ID:</strong> {{ script.script_id }}<br>
+                        <strong>Entity Type:</strong> {{ script.entity_type }}<br>
+                        <strong>Current Version:</strong> {{ script.version }}<br>
+                        <strong>Created:</strong> {{ script.created_at }}<br>
+                        <strong>Last Updated:</strong> {{ script.updated_at }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: Code Editor -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>Python Code</h5>
+                    <span class="badge bg-secondary">Version {{ script.version }}</span>
+                </div>
+                <div class="card-body p-0">
+                    <textarea id="codeEditor">{{ script.script_content|safe }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+<script>
+// Initialize CodeMirror
+const editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+    mode: 'python',
+    theme: 'dracula',
+    lineNumbers: true,
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: false,
+    lineWrapping: true,
+    matchBrackets: true,
+    autoCloseBrackets: true,
+    extraKeys: {
+        'Tab': function(cm) {
+            cm.replaceSelection('    ', 'end');
+        }
+    }
+});
+
+const scriptId = document.getElementById('scriptId').value;
+
+function showValidationResult(isValid, message, warnings = []) {
+    const resultDiv = document.getElementById('validationResult');
+    resultDiv.classList.remove('d-none', 'validation-valid', 'validation-invalid');
+    resultDiv.classList.add(isValid ? 'validation-valid' : 'validation-invalid');
+    
+    let html = `<strong>${isValid ? '✓ Valid' : '✗ Invalid'}</strong><br>${message}`;
+    if (warnings.length > 0) {
+        html += '<br><br><strong>Warnings:</strong><ul>';
+        warnings.forEach(w => html += `<li>${w}</li>`);
+        html += '</ul>';
+    }
+    resultDiv.innerHTML = html;
+}
+
+function validateCode() {
+    const code = editor.getValue();
+    const entityType = document.getElementById('entityType').value;
+    
+    fetch('/api/scripts/validate-code', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({code: code, entity_type: entityType})
+    })
+    .then(r => r.json())
+    .then(data => {
+        showValidationResult(
+            data.validation_status === 'valid',
+            data.message,
+            data.warnings || []
+        );
+    })
+    .catch(err => {
+        showValidationResult(false, 'Error: ' + err.message);
+    });
+}
+
+function saveScript() {
+    const data = {
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        script_content: editor.getValue(),
+        entry_point: document.getElementById('entryPoint').value || '__export__',
+        tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t)
+    };
+    
+    fetch(`/api/scripts/${scriptId}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert('Script updated successfully! New version: ' + data.version);
+            window.location.href = `/scripts/${scriptId}`;
+        } else {
+            alert('Error: ' + data.error);
+            if (data.validation_status) {
+                showValidationResult(false, data.error);
+            }
+        }
+    })
+    .catch(err => {
+        alert('Error: ' + err.message);
+    });
+}
+
+function saveAndExecute() {
+    const data = {
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        script_content: editor.getValue(),
+        entry_point: document.getElementById('entryPoint').value || '__export__',
+        tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t)
+    };
+    
+    // First save
+    fetch(`/api/scripts/${scriptId}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(saveData => {
+        if (!saveData.success) {
+            throw new Error(saveData.error);
+        }
+        
+        // Then execute
+        return fetch(`/api/scripts/${scriptId}/execute`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        }).then(r => r.json());
+    })
+    .then(execData => {
+        if (execData.success) {
+            alert('Script saved and executed successfully!\n\nOutput:\n' + JSON.stringify(execData.output, null, 2));
+        } else {
+            alert('Script saved but execution failed:\n' + execData.error);
+        }
+        window.location.href = `/scripts/${scriptId}`;
+    })
+    .catch(err => {
+        alert('Error: ' + err.message);
+    });
+}
+</script>
+{% endblock %}

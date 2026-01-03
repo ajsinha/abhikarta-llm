@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}{{ script.name }} - Python Scripts{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+    .script-code {
+        background: #282c34;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    .script-code pre {
+        margin: 0;
+        color: #abb2bf;
+    }
+    .execution-item {
+        border-left: 3px solid #dee2e6;
+        padding-left: 1rem;
+    }
+    .execution-item.completed { border-left-color: #198754; }
+    .execution-item.failed { border-left-color: #dc3545; }
+    .execution-item.running { border-left-color: #ffc107; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <h2 class="mb-0">{{ script.name }}</h2>
+                <span class="badge 
+                    {% if script.entity_type == 'agent' %}bg-primary
+                    {% elif script.entity_type == 'workflow' %}bg-success
+                    {% elif script.entity_type == 'swarm' %}bg-warning text-dark
+                    {% else %}bg-purple{% endif %}">
+                    {{ script.entity_type|title }}
+                </span>
+                <span class="badge 
+                    {% if script.validation_status == 'valid' %}bg-success
+                    {% elif script.validation_status == 'invalid' %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+                    {{ script.validation_status|title }}
+                </span>
+            </div>
+            <p class="text-muted mb-0">{{ script.description or 'No description' }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('edit_script', script_id=script.script_id) }}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-2"></i>Edit
+            </a>
+            <button class="btn btn-success" onclick="executeScript()">
+                <i class="bi bi-play-fill me-2"></i>Execute
+            </button>
+            <a href="{{ url_for('list_scripts') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Script Details -->
+        <div class="col-lg-8">
+            <!-- Code -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>Python Code</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyCode()">
+                        <i class="bi bi-clipboard me-1"></i>Copy
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="script-code">
+                        <pre><code class="language-python">{{ script.script_content|safe }}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validation Message -->
+            {% if script.validation_message %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Validation Result</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="mb-0 small">{{ script.validation_message }}</pre>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Execution History -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Execution History</h5>
+                </div>
+                <div class="card-body">
+                    {% if executions %}
+                    <div class="list-group list-group-flush">
+                        {% for exec in executions %}
+                        <div class="list-group-item execution-item {{ exec.status }}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ exec.execution_id }}</strong>
+                                    <span class="badge 
+                                        {% if exec.status == 'completed' %}bg-success
+                                        {% elif exec.status == 'failed' %}bg-danger
+                                        {% elif exec.status == 'running' %}bg-warning text-dark
+                                        {% else %}bg-secondary{% endif %} ms-2">
+                                        {{ exec.status }}
+                                    </span>
+                                </div>
+                                <small class="text-muted">
+                                    {% if exec.duration_ms %}{{ exec.duration_ms }}ms{% endif %}
+                                </small>
+                            </div>
+                            <small class="text-muted d-block">
+                                Started: {{ exec.started_at }}
+                                {% if exec.completed_at %} | Completed: {{ exec.completed_at }}{% endif %}
+                            </small>
+                            {% if exec.error_message %}
+                            <div class="alert alert-danger mt-2 mb-0 py-1 px-2 small">
+                                {{ exec.error_message[:200] }}{% if exec.error_message|length > 200 %}...{% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No executions yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Metadata -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <th class="text-muted">ID</th>
+                            <td><code>{{ script.script_id }}</code></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Entity Type</th>
+                            <td>{{ script.entity_type|title }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Entry Point</th>
+                            <td><code>{{ script.entry_point or '__export__' }}</code></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Version</th>
+                            <td>{{ script.version }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Created</th>
+                            <td>{{ script.created_at }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Updated</th>
+                            <td>{{ script.updated_at }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Executions</th>
+                            <td>{{ script.execution_count }}</td>
+                        </tr>
+                        {% if script.last_executed_at %}
+                        <tr>
+                            <th class="text-muted">Last Run</th>
+                            <td>{{ script.last_executed_at }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tags -->
+            {% if script.tags %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-tags me-2"></i>Tags</h5>
+                </div>
+                <div class="card-body">
+                    {% for tag in script.tags|default('[]', true)|tojson|safe|from_json %}
+                    <span class="badge bg-secondary me-1">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Actions</h5>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    <button class="btn btn-outline-primary" onclick="validateScript()">
+                        <i class="bi bi-check-circle me-2"></i>Re-validate
+                    </button>
+                    <button class="btn btn-outline-success" onclick="executeScript()">
+                        <i class="bi bi-play-fill me-2"></i>Execute Now
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="deleteScript()">
+                        <i class="bi bi-trash me-2"></i>Delete Script
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Execution Output Modal -->
+<div class="modal fade" id="outputModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Execution Output</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="outputContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+hljs.highlightAll();
+
+const scriptId = '{{ script.script_id }}';
+
+function copyCode() {
+    const code = document.querySelector('.script-code code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        alert('Code copied to clipboard!');
+    });
+}
+
+function validateScript() {
+    fetch(`/api/scripts/${scriptId}/validate`, {method: 'POST'})
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Validation: ${data.validation_status}\n\n${data.message}`);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(err => alert('Error: ' + err.message));
+}
+
+function executeScript() {
+    fetch(`/api/scripts/${scriptId}/execute`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        let html = `<p><strong>Status:</strong> ${data.status}</p>`;
+        
+        if (data.success) {
+            html += `<p><strong>Duration:</strong> ${data.duration_ms}ms</p>`;
+            html += `<h6>Output:</h6><pre class="bg-light p-3">${JSON.stringify(data.output, null, 2)}</pre>`;
+        } else {
+            html += `<div class="alert alert-danger">${data.error}</div>`;
+        }
+        
+        if (data.stdout) {
+            html += `<h6>Stdout:</h6><pre class="bg-light p-3">${data.stdout}</pre>`;
+        }
+        if (data.stderr) {
+            html += `<h6>Stderr:</h6><pre class="bg-warning p-3">${data.stderr}</pre>`;
+        }
+        
+        document.getElementById('outputContent').innerHTML = html;
+        new bootstrap.Modal(document.getElementById('outputModal')).show();
+        
+        // Reload to update execution history
+        setTimeout(() => location.reload(), 2000);
+    })
+    .catch(err => alert('Error: ' + err.message));
+}
+
+function deleteScript() {
+    if (!confirm('Are you sure you want to delete this script?')) return;
+    
+    fetch(`/api/scripts/${scriptId}`, {method: 'DELETE'})
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert('Script deleted.');
+            window.location.href = '/scripts';
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(err => alert('Error: ' + err.message));
+}
+</script>
+{% endblock %}

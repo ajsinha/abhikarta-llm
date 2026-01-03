@@ -180,7 +180,7 @@ Abhikarta-LLM follows a layered architecture with clear separation of concerns:
 │  ┌──────────────────────────────────────────────────────────┐       │
 │  │                    DB Facade                              │       │
 │  │         (SQLite / PostgreSQL Abstraction)                │       │
-│  │  33+ Tables: Users, Agents, Workflows, AI Orgs, etc.     │       │
+│  │  43 Tables: Users, Agents, Workflows, AI Orgs, etc.     │       │
 │  └──────────────────────────────────────────────────────────┘       │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -557,7 +557,7 @@ Each provider is configured with API endpoints, rate limits, and cost tracking.
 
 ### 5.3 Database Schema
 
-The platform utilizes 33+ database tables organized into domains:
+The platform utilizes 43 database tables organized into domains:
 
 **Core Tables**: users, roles, user_roles, sessions, api_keys
 **Agent Tables**: agents, agent_versions, agent_templates

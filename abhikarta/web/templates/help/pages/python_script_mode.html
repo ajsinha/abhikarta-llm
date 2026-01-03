@@ -1,0 +1,483 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Python Script Mode" %}
+{% set description = "Create agents, workflows, swarms, and AI orgs using pure Python code" %}
+{% set icon = "bi-file-earmark-code" %}
+{% set header_color = "#dc3545" %}
+{% set header_color_dark = "#b02a37" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#getting-started">Getting Started</a>
+<a href="#agent-scripts">Agent Scripts</a>
+<a href="#workflow-scripts">Workflow Scripts</a>
+<a href="#swarm-scripts">Swarm Scripts</a>
+<a href="#aiorg-scripts">AI Org Scripts</a>
+<a href="#execution">Execution</a>
+<a href="#best-practices">Best Practices</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Python Script Mode Overview</h2>
+<p class="lead">For power users who prefer coding over visual designers - create and manage AI entities using pure Python code.</p>
+
+<div class="alert alert-danger">
+    <i class="bi bi-stars me-2"></i>
+    <strong>New in v1.4.8!</strong> Python Script Mode allows you to define agents, workflows, swarms, and AI organizations using Python code, then save and execute them directly from the UI.
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-primary">
+            <div class="card-body">
+                <i class="bi bi-robot text-primary" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-2">Agents</h5>
+                <p class="text-muted small mb-0">Define agents with custom tools and LLM configs</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-success">
+            <div class="card-body">
+                <i class="bi bi-diagram-3 text-success" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-2">Workflows</h5>
+                <p class="text-muted small mb-0">Create complex DAGs with nodes and edges</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-warning">
+            <div class="card-body">
+                <i class="bi bi-hive text-warning" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-2">Swarms</h5>
+                <p class="text-muted small mb-0">Orchestrate multi-agent systems</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-info">
+            <div class="card-body">
+                <i class="bi bi-building text-info" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-2">AI Orgs</h5>
+                <p class="text-muted small mb-0">Build hierarchical AI organizations</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3>Why Use Python Script Mode?</h3>
+<ul>
+    <li><strong>Full Control:</strong> Define every aspect of your entity programmatically</li>
+    <li><strong>Version Control:</strong> Store scripts in Git alongside your codebase</li>
+    <li><strong>IDE Support:</strong> Use your favorite IDE with syntax highlighting and autocomplete</li>
+    <li><strong>Reusability:</strong> Import and reuse code across scripts</li>
+    <li><strong>Testing:</strong> Test definitions locally before deploying</li>
+</ul>
+
+<hr class="my-5">
+
+<h2 id="getting-started">Getting Started</h2>
+
+<h3>Basic Script Structure</h3>
+<p>Every script must define an <code>__export__</code> variable containing the entity definition:</p>
+
+<pre><code class="language-python"># my_script.py
+
+# Define your entity (dict or class instance)
+my_entity = {
+    "name": "My Entity",
+    "description": "Defined via Python",
+    # ... other properties
+}
+
+# REQUIRED: Export the definition
+__export__ = my_entity
+</code></pre>
+
+<h3>Creating Your First Script</h3>
+<ol>
+    <li>Navigate to <strong>Playground → Python Script Mode → All Scripts</strong></li>
+    <li>Click <strong>New Script</strong> and select the entity type</li>
+    <li>Write your Python code in the editor</li>
+    <li>Click <strong>Validate</strong> to check for errors</li>
+    <li>Click <strong>Save Script</strong> to save</li>
+    <li>Click <strong>Execute</strong> to run and create the entity</li>
+</ol>
+
+<hr class="my-5">
+
+<h2 id="agent-scripts">Agent Scripts</h2>
+<p>Define AI agents with custom configurations, tools, and prompts.</p>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">Example: Research Agent</div>
+    <div class="card-body">
+<pre><code class="language-python">"""
+Research Agent - Searches and summarizes information
+"""
+
+# Define the agent configuration
+agent = {
+    "name": "Research Agent",
+    "description": "An agent that researches topics and provides summaries",
+    "agent_type": "react",  # Options: react, tool_calling, conversational
+    
+    "system_prompt": """You are a research assistant. Your job is to:
+    1. Search for information on the given topic
+    2. Analyze and synthesize the findings
+    3. Provide a clear, well-structured summary
+    
+    Always cite your sources and be objective.""",
+    
+    "tools": [
+        "web_search",
+        "document_reader"
+    ],
+    
+    "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b",
+        "temperature": 0.3,  # Lower for factual accuracy
+        "max_tokens": 4096
+    },
+    
+    "max_iterations": 10,
+    "tags": ["research", "python-script"]
+}
+
+__export__ = agent
+</code></pre>
+    </div>
+</div>
+
+<h3>Agent Configuration Options</h3>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>name</code></td><td>string</td><td>Display name for the agent</td></tr>
+        <tr><td><code>agent_type</code></td><td>string</td><td>react, tool_calling, conversational, plan_and_execute</td></tr>
+        <tr><td><code>system_prompt</code></td><td>string</td><td>Instructions for the agent</td></tr>
+        <tr><td><code>tools</code></td><td>list</td><td>Tool IDs the agent can use</td></tr>
+        <tr><td><code>llm_config</code></td><td>dict</td><td>LLM provider, model, temperature, etc.</td></tr>
+        <tr><td><code>max_iterations</code></td><td>int</td><td>Maximum reasoning loops</td></tr>
+    </tbody>
+</table>
+
+<hr class="my-5">
+
+<h2 id="workflow-scripts">Workflow Scripts</h2>
+<p>Define complex multi-step workflows as directed acyclic graphs (DAGs).</p>
+
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">Example: Document Processing Workflow</div>
+    <div class="card-body">
+<pre><code class="language-python">"""
+Document Processing Workflow
+Extracts, analyzes, and summarizes documents
+"""
+
+workflow = {
+    "name": "Document Processing Pipeline",
+    "description": "Processes documents through extraction, analysis, and summarization",
+    
+    "nodes": [
+        {
+            "node_id": "input",
+            "node_type": "input",
+            "name": "Document Input",
+            "config": {
+                "input_schema": {
+                    "document_url": "string",
+                    "output_format": "string"
+                }
+            }
+        },
+        {
+            "node_id": "extract",
+            "node_type": "tool",
+            "name": "Extract Text",
+            "config": {
+                "tool_name": "document_reader"
+            }
+        },
+        {
+            "node_id": "analyze",
+            "node_type": "llm",
+            "name": "Analyze Content",
+            "config": {
+                "provider": "ollama",
+                "model": "llama3.2:3b",
+                "prompt_template": "Analyze this document:\n\n{extract_output}\n\nProvide key insights."
+            }
+        },
+        {
+            "node_id": "summarize",
+            "node_type": "llm",
+            "name": "Generate Summary",
+            "config": {
+                "provider": "ollama",
+                "model": "llama3.2:3b",
+                "prompt_template": "Create a concise summary:\n\n{analyze_output}"
+            }
+        },
+        {
+            "node_id": "output",
+            "node_type": "output",
+            "name": "Final Output",
+            "config": {}
+        }
+    ],
+    
+    "edges": [
+        {"source": "input", "target": "extract"},
+        {"source": "extract", "target": "analyze"},
+        {"source": "analyze", "target": "summarize"},
+        {"source": "summarize", "target": "output"}
+    ],
+    
+    "tags": ["document-processing", "python-script"]
+}
+
+__export__ = workflow
+</code></pre>
+    </div>
+</div>
+
+<h3>Node Types</h3>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr><th>Node Type</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>input</code></td><td>Entry point - receives workflow input</td></tr>
+        <tr><td><code>output</code></td><td>Exit point - returns final result</td></tr>
+        <tr><td><code>llm</code></td><td>LLM call with prompt template</td></tr>
+        <tr><td><code>tool</code></td><td>Execute a registered tool</td></tr>
+        <tr><td><code>agent</code></td><td>Invoke an agent</td></tr>
+        <tr><td><code>conditional</code></td><td>Branching logic</td></tr>
+        <tr><td><code>parallel</code></td><td>Execute branches in parallel</td></tr>
+        <tr><td><code>hitl</code></td><td>Human-in-the-loop approval</td></tr>
+    </tbody>
+</table>
+
+<hr class="my-5">
+
+<h2 id="swarm-scripts">Swarm Scripts</h2>
+<p>Orchestrate multiple agents working together on complex tasks.</p>
+
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">Example: Content Creation Swarm</div>
+    <div class="card-body">
+<pre><code class="language-python">"""
+Content Creation Swarm
+Multiple agents collaborate to create content
+"""
+
+swarm = {
+    "name": "Content Creation Swarm",
+    "description": "Agents collaborate to research, write, and edit content",
+    
+    "strategy": "hierarchical",  # Options: round_robin, broadcast, hierarchical
+    
+    "agents": [
+        {
+            "role": "coordinator",
+            "agent_id": "coordinator_agent",
+            "min_instances": 1,
+            "max_instances": 1,
+            "description": "Coordinates the content creation process"
+        },
+        {
+            "role": "researcher",
+            "agent_id": "research_agent",
+            "min_instances": 1,
+            "max_instances": 3,
+            "description": "Researches topics and gathers information"
+        },
+        {
+            "role": "writer",
+            "agent_id": "writer_agent",
+            "min_instances": 1,
+            "max_instances": 2,
+            "description": "Writes content based on research"
+        },
+        {
+            "role": "editor",
+            "agent_id": "editor_agent",
+            "min_instances": 1,
+            "max_instances": 1,
+            "description": "Reviews and improves content"
+        }
+    ],
+    
+    "event_bus_config": {
+        "type": "memory"  # Options: memory, kafka, rabbitmq
+    },
+    
+    "tags": ["content-creation", "python-script"]
+}
+
+__export__ = swarm
+</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="aiorg-scripts">AI Organization Scripts</h2>
+<p>Build hierarchical AI organizations with delegation and HITL capabilities.</p>
+
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">Example: Engineering AI Org</div>
+    <div class="card-body">
+<pre><code class="language-python">"""
+Engineering AI Organization
+Hierarchical structure for engineering tasks
+"""
+
+aiorg = {
+    "name": "Engineering AI Org",
+    "description": "AI organization for engineering task management",
+    
+    "root_node_id": "cto",
+    
+    "nodes": [
+        {
+            "node_id": "cto",
+            "name": "CTO Agent",
+            "node_type": "executive",
+            "agent_id": "executive_agent",
+            "authority_level": "c_suite",
+            "human_email": "cto@company.com",
+            "auto_approve_threshold": 0.9,
+            "description": "Chief Technology Officer - strategic decisions"
+        },
+        {
+            "node_id": "eng_director",
+            "name": "Engineering Director",
+            "node_type": "manager",
+            "parent_node_id": "cto",
+            "agent_id": "manager_agent",
+            "authority_level": "director",
+            "human_email": "eng-director@company.com",
+            "description": "Manages engineering teams"
+        },
+        {
+            "node_id": "backend_lead",
+            "name": "Backend Lead",
+            "node_type": "manager",
+            "parent_node_id": "eng_director",
+            "agent_id": "tech_lead_agent",
+            "authority_level": "senior",
+            "description": "Leads backend development"
+        },
+        {
+            "node_id": "frontend_lead",
+            "name": "Frontend Lead",
+            "node_type": "manager",
+            "parent_node_id": "eng_director",
+            "agent_id": "tech_lead_agent",
+            "authority_level": "senior",
+            "description": "Leads frontend development"
+        },
+        {
+            "node_id": "developer_1",
+            "name": "Developer",
+            "node_type": "analyst",
+            "parent_node_id": "backend_lead",
+            "agent_id": "developer_agent",
+            "authority_level": "junior",
+            "description": "Implements backend features"
+        }
+    ],
+    
+    "delegation_strategy": "hierarchical",
+    
+    "hitl_config": {
+        "enabled": True,
+        "escalation_timeout_minutes": 60,
+        "auto_approve_low_risk": True
+    },
+    
+    "tags": ["engineering", "python-script"]
+}
+
+__export__ = aiorg
+</code></pre>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="execution">Script Execution</h2>
+
+<h3>Execution Flow</h3>
+<ol>
+    <li><strong>Validation:</strong> Syntax and structure are checked</li>
+    <li><strong>Execution:</strong> Script runs in a sandboxed environment</li>
+    <li><strong>Export:</strong> The <code>__export__</code> variable is extracted</li>
+    <li><strong>Result:</strong> The definition is returned and can be used to create the entity</li>
+</ol>
+
+<h3>Viewing Execution History</h3>
+<p>Each script tracks its execution history including:</p>
+<ul>
+    <li>Execution status (completed/failed)</li>
+    <li>Duration in milliseconds</li>
+    <li>Output data or error messages</li>
+    <li>Stdout/stderr output</li>
+</ul>
+
+<hr class="my-5">
+
+<h2 id="best-practices">Best Practices</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-success">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-check-circle me-2"></i>Do
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>Always define <code>__export__</code></li>
+                    <li>Use descriptive names and descriptions</li>
+                    <li>Validate before saving</li>
+                    <li>Add tags for organization</li>
+                    <li>Test locally first</li>
+                    <li>Use version control</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-x-circle me-2"></i>Don't
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>Include sensitive data in scripts</li>
+                    <li>Use external network calls during definition</li>
+                    <li>Import untrusted modules</li>
+                    <li>Use infinite loops</li>
+                    <li>Modify system files</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mt-4">
+    <h5><i class="bi bi-lightbulb me-2"></i>Pro Tips</h5>
+    <ul class="mb-0">
+        <li>Use comments to document your script logic</li>
+        <li>Start with simple definitions and add complexity gradually</li>
+        <li>Copy and modify the provided templates</li>
+        <li>Check the execution history to debug issues</li>
+    </ul>
+</div>
+
+{% endblock %}

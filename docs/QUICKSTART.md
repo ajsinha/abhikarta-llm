@@ -282,9 +282,9 @@ validate_regulatory_compliance(account_data)
 
 ## Using Tools
 
-### Pre-built Tools (85)
+### Tool Framework (10 Types)
 
-Abhikarta comes with 85 pre-built tools organized in categories:
+Abhikarta provides 10 extensible tool types for building custom tools:
 
 #### Common Tools (28)
 ```python
@@ -399,7 +399,7 @@ Add tool names to agent configuration:
 | **Execution Progress** | Real-time monitoring | v1.1.5 |
 | **Tools System** | Unified tool architecture | v1.1.6 |
 | **MCP Integration** | External tool servers | v1.1.6 |
-| **Pre-built Tools** | 85 ready-to-use tools | v1.1.7 |
+| **Tool Framework** | 10 extensible tool types | v1.1.7 |
 | **Tools Page** | Browse, search, filter tools | v1.1.7 |
 | **Tool View/Test Pages** | Dedicated tool detail & testing UI | v1.1.8 |
 | **Database Schema Docs** | 22 tables documented with ER diagram | v1.2.0 |
@@ -603,7 +603,7 @@ Receive events from GitHub, Stripe, etc.:
 
 ## Next Steps
 
-1. **Browse Tools**: Visit `/tools` to explore all 85 pre-built tools
+1. **Browse Tools: Visit `/tools` to explore registered tools and MCP servers
 2. **Explore Help**: Click **Help** in navigation for detailed guides
 3. **Try Banking Agents**: Clone and test pre-built banking solutions
 4. **Try CoT/ToT**: Create agents with advanced reasoning patterns
@@ -644,7 +644,7 @@ abhikarta-llm-v1.4.0/
 │   ├── messaging/      # Kafka/RabbitMQ/ActiveMQ (v1.3.0)
 │   ├── notification/   # Slack/Teams/Webhooks (v1.4.0)
 │   ├── swarm/          # Agent Swarms (v1.3.0)
-│   ├── tools/          # Tools system + prebuilt (85)
+│   ├── tools/          # Tools framework (10 types)
 │   │   └── prebuilt/   # Common(28), Banking(13), Integration(20), General(24)
 │   ├── web/            # Flask application
 │   └── workflow/       # DAG execution engine

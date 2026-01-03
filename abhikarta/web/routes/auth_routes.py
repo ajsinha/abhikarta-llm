@@ -232,6 +232,9 @@ class AuthRoutes(AbstractRoutes):
                 'notifications': 'help/pages/notifications.html',
                 # v1.4.7 AI Organizations
                 'aiorg': 'help/pages/aiorg.html',
+                # v1.4.8 Python Script Mode
+                'python-script-mode': 'help/pages/python_scripts.html',
+                'python-scripts': 'help/pages/python_scripts.html',
             }
             
             template = page_map.get(page)

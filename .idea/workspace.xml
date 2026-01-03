@@ -6,12 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="014fc29a-e95d-4fe0-82c3-f3b357c9f648" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/aiorg_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/aiorg_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/notification_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/notification_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/routes/swarm_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/routes/swarm_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta/web/templates/swarms/designer.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta/web/templates/swarms/designer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/abhikarta.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/abhikarta.log" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

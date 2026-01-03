@@ -101,7 +101,7 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 │  │ BaseTool  │ │ MCPTool   │ │ HTTPTool  │ │ ToolsRegistry   │  │
 │  └───────────┘ └───────────┘ └───────────┘ └─────────────────┘  │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │              Pre-built Tools (85)                        │    │
+│  │              Tool Framework (10 Types)                        │    │
 │  │   Common(28)│Banking(13)│Integration(20)│General(24)    │    │
 │  └─────────────────────────────────────────────────────────┘    │
 ├─────────────────────────────────────────────────────────────────┤
@@ -1080,7 +1080,7 @@ class ToolsRegistry:
     def to_langchain_tools(self) -> List[LangChainTool]
 ```
 
-### 8.4 Pre-built Tools (85)
+### 8.4 Tool Framework (10 Types)
 
 #### Common Tools (28)
 - Date/Time: 5 tools

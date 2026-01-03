@@ -17,6 +17,57 @@
     <!-- Custom Theme CSS -->
     <link href="{{ url_for('static', filename='css/theme.css') }}" rel="stylesheet">
     
+    <!-- Nested Submenu CSS -->
+    <style>
+        /* Dropdown Submenu Styles */
+        .dropdown-submenu {
+            position: relative;
+        }
+        .dropdown-submenu > .dropdown-submenu-menu {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            min-width: 200px;
+            margin-top: -1px;
+            border-radius: 0.375rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .dropdown-submenu:hover > .dropdown-submenu-menu,
+        .dropdown-submenu.show > .dropdown-submenu-menu {
+            display: block;
+        }
+        .dropdown-toggle-sub {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .dropdown-toggle-sub::after {
+            display: none; /* Hide default caret */
+        }
+        .dropdown-toggle-sub .float-end {
+            margin-left: auto;
+        }
+        /* Hover effect for parent items */
+        .dropdown-submenu > a:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+        /* Ensure submenus don't go off-screen */
+        @media (max-width: 991.98px) {
+            .dropdown-submenu > .dropdown-submenu-menu {
+                position: static;
+                left: 0;
+                box-shadow: none;
+                border: none;
+                padding-left: 1rem;
+            }
+        }
+        /* Playground dropdown container */
+        .dropdown-menu-playground {
+            min-width: 220px;
+        }
+    </style>
+    
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-light-blue">
@@ -95,78 +146,119 @@
                             <i class="bi bi-grid-3x3-gap me-1"></i> Playground
                         </a>
                         <ul class="dropdown-menu dropdown-menu-playground">
-                            <!-- Agents Section -->
-                            <li class="dropdown-header text-primary fw-bold">
-                                <i class="bi bi-robot me-1"></i>Agents
+                            <!-- Agents Submenu -->
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle-sub" href="#">
+                                    <i class="bi bi-robot me-2 text-primary"></i>Agents
+                                    <i class="bi bi-chevron-right float-end"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-submenu-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('user_agents') }}">
+                                        <i class="bi bi-collection me-2"></i>Browse Agents
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('new_agent_designer') }}">
+                                        <i class="bi bi-diagram-3 me-2"></i>Visual Designer
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('agent_templates') }}">
+                                        <i class="bi bi-file-earmark-code me-2"></i>Template Library
+                                    </a></li>
+                                </ul>
                             </li>
-                            <li><a class="dropdown-item" href="{{ url_for('user_agents') }}">
-                                <i class="bi bi-collection me-2"></i>Browse Agents
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('new_agent_designer') }}">
-                                <i class="bi bi-diagram-3 me-2"></i>Visual Designer
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('agent_templates') }}">
-                                <i class="bi bi-file-earmark-code me-2"></i>Template Library
-                            </a></li>
                             
-                            <li><hr class="dropdown-divider"></li>
-                            
-                            <!-- Workflows Section -->
-                            <li class="dropdown-header text-success fw-bold">
-                                <i class="bi bi-diagram-3 me-1"></i>Workflows
+                            <!-- Workflows Submenu -->
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle-sub" href="#">
+                                    <i class="bi bi-diagram-3 me-2 text-success"></i>Workflows
+                                    <i class="bi bi-chevron-right float-end"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-submenu-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('list_workflows') }}">
+                                        <i class="bi bi-list me-2"></i>All Workflows
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('workflow_designer_new') }}">
+                                        <i class="bi bi-pencil-square me-2"></i>Visual Designer
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('workflow_templates') }}">
+                                        <i class="bi bi-file-earmark-code me-2"></i>Template Library
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('upload_workflow') }}">
+                                        <i class="bi bi-upload me-2"></i>Upload Workflow
+                                    </a></li>
+                                </ul>
                             </li>
-                            <li><a class="dropdown-item" href="{{ url_for('list_workflows') }}">
-                                <i class="bi bi-list me-2"></i>All Workflows
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('workflow_designer_new') }}">
-                                <i class="bi bi-pencil-square me-2"></i>Visual Designer
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('workflow_templates') }}">
-                                <i class="bi bi-file-earmark-code me-2"></i>Template Library
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('upload_workflow') }}">
-                                <i class="bi bi-upload me-2"></i>Upload Workflow
-                            </a></li>
                             
-                            <li><hr class="dropdown-divider"></li>
-                            
-                            <!-- Swarms Section -->
-                            <li class="dropdown-header text-warning fw-bold">
-                                <i class="bi bi-hive me-1"></i>Swarms
-                                <span class="badge bg-warning text-dark ms-1" style="font-size: 0.6rem;">v1.3.0</span>
+                            <!-- Swarms Submenu -->
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle-sub" href="#">
+                                    <i class="bi bi-hive me-2 text-warning"></i>Swarms
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size: 0.6rem;">v1.3</span>
+                                    <i class="bi bi-chevron-right float-end"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-submenu-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('list_swarms') }}">
+                                        <i class="bi bi-list me-2"></i>All Swarms
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('swarm_designer_new') }}">
+                                        <i class="bi bi-palette me-2"></i>Swarm Designer
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('swarm_templates') }}">
+                                        <i class="bi bi-file-earmark-code me-2"></i>Template Library
+                                    </a></li>
+                                </ul>
                             </li>
-                            <li><a class="dropdown-item" href="{{ url_for('list_swarms') }}">
-                                <i class="bi bi-list me-2"></i>All Swarms
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('swarm_designer_new') }}">
-                                <i class="bi bi-palette me-2"></i>Swarm Designer
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('swarm_templates') }}">
-                                <i class="bi bi-file-earmark-code me-2"></i>Template Library
-                            </a></li>
                             
-                            <li><hr class="dropdown-divider"></li>
-                            
-                            <!-- AI Org Section -->
-                            <li class="dropdown-header text-info fw-bold">
-                                <i class="bi bi-building me-1"></i>AI Organizations
-                                <span class="badge bg-info text-white ms-1" style="font-size: 0.6rem;">v1.4.7</span>
+                            <!-- AI Organizations Submenu -->
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle-sub" href="#">
+                                    <i class="bi bi-building me-2 text-info"></i>AI Organizations
+                                    <i class="bi bi-chevron-right float-end"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-submenu-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('aiorg_list') }}">
+                                        <i class="bi bi-list me-2"></i>All AI Orgs
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('aiorg_designer_new') }}">
+                                        <i class="bi bi-diagram-3 me-2"></i>Visual Designer
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('aiorg_templates') }}">
+                                        <i class="bi bi-file-earmark-code me-2"></i>Template Library
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('aiorg_import') }}">
+                                        <i class="bi bi-upload me-2"></i>Import JSON
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('aiorg_hitl_dashboard') }}">
+                                        <i class="bi bi-person-check me-2"></i>HITL Dashboard
+                                    </a></li>
+                                </ul>
                             </li>
-                            <li><a class="dropdown-item" href="{{ url_for('aiorg_list') }}">
-                                <i class="bi bi-list me-2"></i>All AI Orgs
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('aiorg_designer_new') }}">
-                                <i class="bi bi-diagram-3 me-2"></i>Visual Designer
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('aiorg_templates') }}">
-                                <i class="bi bi-file-earmark-code me-2"></i>Template Library
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('aiorg_import') }}">
-                                <i class="bi bi-upload me-2"></i>Import JSON
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('aiorg_hitl_dashboard') }}">
-                                <i class="bi bi-person-check me-2"></i>HITL Dashboard
-                            </a></li>
+                            
+                            <!-- Python Scripts Submenu -->
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle-sub" href="#">
+                                    <i class="bi bi-file-earmark-code me-2 text-danger"></i>Python Scripts
+                                    <span class="badge bg-danger text-white ms-1" style="font-size: 0.6rem;">NEW</span>
+                                    <i class="bi bi-chevron-right float-end"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-submenu-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('list_scripts') }}">
+                                        <i class="bi bi-list me-2"></i>All Scripts
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('create_script', type='agent') }}">
+                                        <i class="bi bi-robot me-2"></i>New Agent Script
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('create_script', type='workflow') }}">
+                                        <i class="bi bi-diagram-3 me-2"></i>New Workflow Script
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('create_script', type='swarm') }}">
+                                        <i class="bi bi-hive me-2"></i>New Swarm Script
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('create_script', type='aiorg') }}">
+                                        <i class="bi bi-building me-2"></i>New AI Org Script
+                                    </a></li>
+                                </ul>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -299,6 +391,32 @@
     
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <!-- Nested Submenu JS -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle submenu click/touch on mobile
+        document.querySelectorAll('.dropdown-submenu > a').forEach(function(element) {
+            element.addEventListener('click', function(e) {
+                // On mobile, prevent navigation and toggle submenu
+                if (window.innerWidth < 992) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.parentElement.classList.toggle('show');
+                }
+            });
+        });
+        
+        // Close submenus when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown-submenu')) {
+                document.querySelectorAll('.dropdown-submenu.show').forEach(function(el) {
+                    el.classList.remove('show');
+                });
+            }
+        });
+    });
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

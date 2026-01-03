@@ -101,11 +101,11 @@ def run_migration(db_path: str = DATABASE_PATH):
             INSERT INTO schema_version (version, description, applied_at)
             VALUES (?, ?, ?)
         """, (
-            '1.4.7.1',
+            '1.4.8',
             'Added agent_executions table and metadata column to executions',
             datetime.utcnow().isoformat()
         ))
-        print("✓ Updated schema version to 1.4.7.1")
+        print("✓ Updated schema version to 1.4.8")
         
         conn.commit()
         print("-" * 60)
@@ -205,11 +205,11 @@ def run_postgres_migration(conn_string: str):
             INSERT INTO schema_version (version, description, applied_at)
             VALUES (%s, %s, %s)
         """, (
-            '1.4.7.1',
+            '1.4.8',
             'Added agent_executions table and metadata column to executions',
             datetime.utcnow().isoformat()
         ))
-        print("✓ Updated schema version to 1.4.7.1")
+        print("✓ Updated schema version to 1.4.8")
         
         conn.commit()
         print("-" * 60)

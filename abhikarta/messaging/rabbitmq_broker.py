@@ -7,7 +7,7 @@ Provides integration with RabbitMQ for reliable messaging with support for:
 - Dead letter queues
 - Priority queues
 
-Version: 1.3.0
+Version: 1.4.8
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 """

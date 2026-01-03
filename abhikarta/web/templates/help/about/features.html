@@ -10,9 +10,9 @@
 <a href="#workflow-dags">Workflow DAGs</a>
 <a href="#code-fragments">Code Fragments</a>
 <a href="#tools-system">Tools System</a>
-<a href="#prebuilt-tools">Pre-built Tools</a>
+<a href="#tool-framework">Tool Framework</a>
 <a href="#template-libraries">Template Libraries</a>
-<a href="#banking-solutions">Banking Solutions</a>
+<a href="#python-script-mode">Python Script Mode</a>
 <a href="#llm-management">LLM Management</a>
 <a href="#hitl">Human-in-the-Loop</a>
 <a href="#ai-organizations">AI Organizations</a>
@@ -121,63 +121,63 @@ openai_funcs = registry.to_openai_functions()</code></pre>
 
 <hr class="my-5">
 
-<h2 id="prebuilt-tools">Pre-built Tools Library <span class="badge bg-success">v1.3.0</span></h2>
+<h2 id="tool-framework">Tool Framework <span class="badge bg-success">v1.3.0</span></h2>
 <div class="row align-items-center mb-5">
     <div class="col-lg-6 order-lg-2">
-        <p class="lead">85+ ready-to-use tools across common categories.</p>
+        <p class="lead">Extensible tool infrastructure with 10 base tool types.</p>
         <ul>
-            <li><strong>Common Tools (28):</strong> Date/time, math, text, validation, conversion</li>
-            <li><strong>Banking Tools (13):</strong> KYC, credit, loan, transaction, compliance</li>
-            <li><strong>Integration Tools (20):</strong> HTTP, notifications, data transformation</li>
-            <li><strong>General Tools (24):</strong> Web, document, file, system, network</li>
-            <li>All tools follow BaseTool architecture</li>
-            <li>Automatically registered on startup</li>
+            <li><strong>BaseTool:</strong> Abstract base class for all tools</li>
+            <li><strong>FunctionTool:</strong> Wrap Python functions as tools</li>
+            <li><strong>HTTPTool:</strong> Make HTTP/REST API calls</li>
+            <li><strong>MCPTool:</strong> Connect to MCP tool servers</li>
+            <li><strong>CodeFragmentTool:</strong> Execute code fragments (db://, file://, s3://)</li>
+            <li><strong>LangChainTool:</strong> Integrate LangChain tools</li>
+            <li>Automatic schema generation</li>
             <li>Compatible with all LLM providers</li>
         </ul>
-        <a href="{{ url_for('help_page', page='prebuilt-tools') }}" class="btn btn-outline-primary">View All Tools →</a>
+        <a href="{{ url_for('help_page', page='prebuilt-tools') }}" class="btn btn-outline-primary">View Tool Framework →</a>
     </div>
     <div class="col-lg-6 order-lg-1">
-        <pre><code class="language-python"># Example banking tools
-verify_identity_document(
-    document_type="passport",
-    document_number="AB1234567",
-    issuing_country="US"
-)
+        <pre><code class="language-python"># Create custom tools easily
+from abhikarta.tools import tool
 
-calculate_credit_score(credit_data={
-    "payment_history": {"on_time_percentage": 95},
-    "credit_utilization": 25,
-    "credit_history_years": 8
-})
+@tool(name="calculate_tax", 
+      description="Calculate tax amount")
+def calculate_tax(amount: float, rate: float) -> float:
+    return amount * (rate / 100)
 
-analyze_transaction(transaction={
-    "amount": 9500,
-    "type": "wire_transfer",
-    "is_international": True
-})</code></pre>
+# Or use the class-based approach
+class MyCustomTool(BaseTool):
+    def execute(self, **kwargs) -> ToolResult:
+        # Your logic here
+        return ToolResult(success=True, output=result)</code></pre>
     </div>
 </div>
 
 <hr class="my-5">
 
-<h2 id="template-libraries">Template Libraries <span class="badge bg-success">v1.3.0</span></h2>
+<h2 id="template-libraries">Template Libraries <span class="badge bg-success">v1.4.8.1</span></h2>
 <div class="row align-items-center mb-5">
     <div class="col-lg-6">
-        <p class="lead">Comprehensive template libraries for rapid deployment.</p>
-        <h6>Agent Templates (36)</h6>
+        <p class="lead">44 ready-to-use templates for rapid deployment.</p>
+        <h6>Agent Templates (13)</h6>
         <ul class="list-unstyled">
-            <li><i class="bi bi-robot text-primary me-2"></i><strong>Analytics (6):</strong> Data Pipeline, ML Inference, Report Generator</li>
-            <li><i class="bi bi-code-slash text-info me-2"></i><strong>Development (4):</strong> Code Reviewer, Debug Assistant, API Tester</li>
-            <li><i class="bi bi-bank text-success me-2"></i><strong>Banking (3):</strong> KYC, Loan Processor, Fraud Detector</li>
-            <li><i class="bi bi-heart-pulse text-danger me-2"></i><strong>Healthcare (2):</strong> Medical Assistant, Claims Processor</li>
-            <li><i class="bi bi-briefcase text-warning me-2"></i><strong>+ 11 more categories...</strong></li>
+            <li><i class="bi bi-robot text-primary me-2"></i><strong>Research & Analysis:</strong> Research Agent, Data Analysis Agent</li>
+            <li><i class="bi bi-code-slash text-info me-2"></i><strong>Development:</strong> Code Generation Agent, Task Decomposition Agent</li>
+            <li><i class="bi bi-lightbulb text-warning me-2"></i><strong>Creative:</strong> Creative Writing Agent, Summarization Agent</li>
+            <li><i class="bi bi-chat text-success me-2"></i><strong>Interactive:</strong> Socratic Tutor, Decision Support Agent</li>
         </ul>
-        <h6>Workflow Templates (33)</h6>
+        <h6>Workflow Templates (22)</h6>
         <ul class="list-unstyled">
-            <li><i class="bi bi-file-earmark-text text-primary me-2"></i><strong>Document Processing (4):</strong> PDF Extraction, Invoice Processing</li>
-            <li><i class="bi bi-database text-info me-2"></i><strong>Data Processing (4):</strong> ETL Pipeline, Data Quality</li>
-            <li><i class="bi bi-currency-dollar text-success me-2"></i><strong>Financial (4):</strong> Loan Application, Fraud Detection</li>
-            <li><i class="bi bi-diagram-3 text-warning me-2"></i><strong>+ 8 more categories...</strong></li>
+            <li><i class="bi bi-diagram-3 text-primary me-2"></i><strong>Sequential & Parallel:</strong> Multi-stage pipelines</li>
+            <li><i class="bi bi-signpost-split text-info me-2"></i><strong>Conditional & Iterative:</strong> Branching logic</li>
+            <li><i class="bi bi-person-check text-success me-2"></i><strong>HITL Patterns:</strong> Human approval workflows</li>
+            <li><i class="bi bi-exclamation-triangle text-danger me-2"></i><strong>Error Handling:</strong> Retry and recovery</li>
+        </ul>
+        <h6>Swarm Templates (5) + AI Org Templates (5)</h6>
+        <ul class="list-unstyled">
+            <li><i class="bi bi-hive text-warning me-2"></i>Multi-agent coordination patterns</li>
+            <li><i class="bi bi-building text-primary me-2"></i>Hierarchical organization structures</li>
         </ul>
     </div>
     <div class="col-lg-6">
@@ -210,46 +210,54 @@ analyze_transaction(transaction={
 
 <hr class="my-5">
 
-<h2 id="banking-solutions">Banking Industry Solutions <span class="badge bg-success">v1.3.0</span></h2>
+<h2 id="python-script-mode">Python Script Mode <span class="badge bg-danger">v1.4.8 NEW</span></h2>
 <div class="row align-items-center mb-5">
     <div class="col-lg-6">
-        <p class="lead">Complete pre-built agents and workflows for banking operations.</p>
-        <h6>Pre-built Agents (10)</h6>
+        <p class="lead">For power users: Create agents, workflows, swarms, and AI orgs using pure Python code.</p>
+        <h6>Supported Entity Types</h6>
         <ul class="list-unstyled">
-            <li><i class="bi bi-check-circle text-success me-2"></i>KYC Verification Agent</li>
-            <li><i class="bi bi-check-circle text-success me-2"></i>Loan Processing Agent</li>
-            <li><i class="bi bi-check-circle text-success me-2"></i>Fraud Detection Agent</li>
-            <li><i class="bi bi-check-circle text-success me-2"></i>Credit Risk Agent</li>
-            <li><i class="bi bi-check-circle text-success me-2"></i>Customer Service Agent</li>
-            <li><i class="bi bi-check-circle text-success me-2"></i>+ 5 more...</li>
+            <li><i class="bi bi-robot text-primary me-2"></i><strong>Agents:</strong> Full control over agent logic</li>
+            <li><i class="bi bi-diagram-3 text-info me-2"></i><strong>Workflows:</strong> Complex DAG definitions</li>
+            <li><i class="bi bi-hive text-warning me-2"></i><strong>Swarms:</strong> Multi-agent orchestration</li>
+            <li><i class="bi bi-building text-success me-2"></i><strong>AI Organizations:</strong> Hierarchical structures</li>
         </ul>
-        <h6>Pre-built Workflows (7)</h6>
+        <h6>Key Features</h6>
         <ul class="list-unstyled">
-            <li><i class="bi bi-diagram-3 text-info me-2"></i>Loan Application Processing</li>
-            <li><i class="bi bi-diagram-3 text-info me-2"></i>Customer Onboarding</li>
-            <li><i class="bi bi-diagram-3 text-info me-2"></i>Transaction Monitoring</li>
-            <li><i class="bi bi-diagram-3 text-info me-2"></i>+ 4 more...</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>Code in your favorite IDE</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>Upload/paste Python scripts via UI</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>Validate before saving</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>Execute directly from UI</li>
+            <li><i class="bi bi-check-circle text-success me-2"></i>Version control friendly</li>
         </ul>
-        <a href="{{ url_for('help_page', page='banking-solutions') }}" class="btn btn-outline-success">View Banking Solutions →</a>
+        <a href="{{ url_for('help_page', page='python-script-mode') }}" class="btn btn-outline-danger">Learn Python Script Mode →</a>
     </div>
     <div class="col-lg-6">
-        <div class="card border-success">
-            <div class="card-header bg-success text-white">Clone & Customize</div>
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">Example: Python Agent Script</div>
             <div class="card-body">
-                <p>All banking solutions are designed to be:</p>
-                <ul>
-                    <li><strong>Cloneable:</strong> Create your own copy</li>
-                    <li><strong>Customizable:</strong> Modify prompts, tools, logic</li>
-                    <li><strong>Production-ready:</strong> Include HITL and compliance</li>
-                </ul>
-                <pre><code class="language-python"># Clone a banking agent
-agent = manager.clone_agent(
-    source_id="banking_kyc_verification",
-    new_name="My KYC Agent",
-    modifications={
-        "temperature": 0.2
+<pre><code class="language-python"># my_research_agent.py
+from abhikarta.agent import AgentDefinition
+from abhikarta.tools import tool
+
+@tool(name="search_arxiv")
+def search_arxiv(query: str) -> dict:
+    # Your custom search logic
+    return {"results": [...]}
+
+# Define agent using SDK
+agent = AgentDefinition(
+    name="Research Agent",
+    description="Searches academic papers",
+    agent_type="react",
+    tools=["search_arxiv", "web_search"],
+    llm_config={
+        "provider": "ollama",
+        "model": "llama3.2:3b"
     }
-)</code></pre>
+)
+
+# This will be saved when uploaded
+__export__ = agent</code></pre>
             </div>
         </div>
     </div>
@@ -436,7 +444,7 @@ def search_database(query: str) -> str:
 
 <hr class="my-5">
 
-<h2 id="ai-organizations">AI Organizations <span class="badge bg-info">v1.4.7</span></h2>
+<h2 id="ai-organizations">AI Organizations <span class="badge bg-info">v1.4.8</span></h2>
 <div class="row align-items-center mb-5">
     <div class="col-lg-6">
         <p class="lead">Create AI-powered digital twins of organizational structures with hierarchical task delegation.</p>

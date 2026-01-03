@@ -11,7 +11,7 @@ Email: ajsinha@gmail.com
 PATENT PENDING - This software contains patentable inventions.
 Unauthorized copying, modification, or distribution is prohibited.
 
-Version: 1.3.0
+Version: 1.4.8
 
 Supported Providers:
     - openai: GPT-4o, GPT-4o-mini, GPT-4-turbo, o1
@@ -54,4 +54,4 @@ __all__ = [
     'generate',
 ]
 
-__version__ = '1.3.0'
+__version__ = '1.4.8'

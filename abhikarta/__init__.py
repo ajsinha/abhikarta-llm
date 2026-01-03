@@ -10,7 +10,7 @@ This software and associated documentation are proprietary and confidential.
 Unauthorized copying, distribution, modification, or use is strictly prohibited.
 """
 
-__version__ = "1.3.0"
+__version__ = "1.4.8"
 __author__ = "Ashutosh Sinha"
 __email__ = "ajsinha@gmail.com"
 

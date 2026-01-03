@@ -1,6 +1,6 @@
 # Abhikarta-LLM v1.4.7
 
-[![Version](https://img.shields.io/badge/version-1.4.7-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.4.8-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 

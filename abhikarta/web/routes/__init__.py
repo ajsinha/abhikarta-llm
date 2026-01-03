@@ -16,6 +16,7 @@ from .api_routes import APIRoutes
 from .workflow_routes import WorkflowRoutes
 from .aiorg_routes import AIORGRoutes
 from .hitl_routes import HITLRoutes
+from .script_routes import ScriptRoutes
 
 __all__ = [
     'AbstractRoutes',
@@ -29,5 +30,6 @@ __all__ = [
     'APIRoutes',
     'WorkflowRoutes',
     'AIORGRoutes',
-    'HITLRoutes'
+    'HITLRoutes',
+    'ScriptRoutes'
 ]

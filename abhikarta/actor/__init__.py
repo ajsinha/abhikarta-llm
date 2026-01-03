@@ -53,7 +53,7 @@ Ashutosh Sinha - ajsinha@gmail.com
 Version: 1.3.0
 """
 
-__version__ = '1.3.0'
+__version__ = '1.4.8'
 
 # Core actor classes
 from .actor import (

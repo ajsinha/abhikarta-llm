@@ -45,7 +45,7 @@
 │  │  Manager   │ │  Manager   │ │  Loader    │ │   Logger   │       │
 │  └────────────┘ └────────────┘ └────────────┘ └────────────┘       │
 ├─────────────────────────────────────────────────────────────────────┤
-│                  AI ORGANIZATIONS (v1.4.7)                           │
+│                  AI ORGANIZATIONS (v1.4.8)                           │
 │  ┌──────────────────────────────────────────────────────────┐       │
 │  │                    AI Org Manager                         │       │
 │  │   (Hierarchical Orgs, Task Delegation, Aggregation)      │       │
@@ -108,7 +108,7 @@
 │  │         (SQLite / PostgreSQL Abstraction)                │       │
 │  └──────────────────────────────────────────────────────────┘       │
 │  ┌────────────────────────────────────────────────────────────────┐ │
-│  │  33+ Tables: Users, Agents, Workflows, Swarms, AI Orgs,       │ │
+│  │  43 Tables: Users, Agents, Workflows, Swarms, AI Orgs,       │ │
 │  │  Notifications, Executions, HITL Tasks, Audit Logs, etc.      │ │
 │  └────────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────┘</code></pre>
@@ -162,7 +162,7 @@
                     <li><strong>HTTPTool:</strong> REST API tool wrappers</li>
                     <li><strong>CodeFragmentTool:</strong> Database code fragments</li>
                     <li><strong>LangChainTool:</strong> LangChain integration</li>
-                    <li><strong>Pre-built Tools (v1.3.0):</strong> 85+ ready-to-use tools</li>
+                    <li><strong>Tool Framework (v1.3.0):</strong> 10 extensible tool types</li>
                 </ul>
             </div>
         </div>
@@ -177,7 +177,7 @@
                     <li><strong>Agent Templates:</strong> 36 templates across 15 categories</li>
                     <li><strong>Workflow Templates:</strong> 33 templates across 11 industries</li>
                     <li><strong>Code Fragment URIs:</strong> db://, s3://, file:// schemes</li>
-                    <li><strong>Industries:</strong> Banking, Healthcare, Legal, HR, Technology</li>
+                    <li><strong>Use Cases:</strong> Research, Analysis, Automation, Support</li>
                 </ul>
             </div>
         </div>
@@ -203,7 +203,7 @@
 
 <hr class="my-5">
 
-<h2 id="ai-org">AI Organizations <span class="badge bg-info">v1.4.7</span></h2>
+<h2 id="ai-org">AI Organizations <span class="badge bg-info">v1.4.8</span></h2>
 <div class="row g-4">
     <div class="col-md-6">
         <div class="card h-100">
@@ -318,7 +318,7 @@
 <hr class="my-5">
 
 <h2 id="database">Database Schema</h2>
-<p>33+ tables supporting the complete data model:</p>
+<p>43 tables supporting the complete data model:</p>
 
 <pre><code class="language-sql">-- Core Tables
 users              -- User accounts and authentication
@@ -365,7 +365,7 @@ webhook_endpoints         -- Registered webhook receivers
 webhook_events            -- Received webhook events
 user_notification_preferences  -- Per-user delivery settings
 
--- AI Organization Tables (v1.4.7)
+-- AI Organization Tables (v1.4.8)
 ai_orgs            -- Organization metadata and config
 ai_nodes           -- Hierarchical nodes with roles
 ai_tasks           -- Task delegation and tracking

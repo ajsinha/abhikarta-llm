@@ -4,7 +4,7 @@ Broker Factory - Dynamic broker creation and management.
 Provides factory pattern for creating message brokers based on configuration,
 with support for singleton instances and connection pooling.
 
-Version: 1.3.0
+Version: 1.4.8
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 """

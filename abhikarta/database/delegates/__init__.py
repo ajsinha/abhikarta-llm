@@ -9,7 +9,7 @@ Legal Notice:
 This software and associated documentation are proprietary and confidential.
 Unauthorized copying, distribution, modification, or use is strictly prohibited.
 
-Version: 1.4.0
+Version: 1.4.8
 
 This package provides specialized delegates for different database domains:
 - UserDelegate: Users, Roles, UserRoles, Sessions, API Keys
@@ -23,6 +23,7 @@ This package provides specialized delegates for different database domains:
 - CodeFragmentDelegate: Code Fragments
 - SwarmDelegate: Swarms, Agent Pools, Triggers, Executions
 - NotificationDelegate: Notification Channels, Logs, Webhooks (v1.4.0)
+- ScriptsDelegate: Python Scripts, Script Executions (v1.4.8)
 """
 
 from .user_delegate import UserDelegate
@@ -36,6 +37,7 @@ from .audit_delegate import AuditDelegate
 from .code_fragment_delegate import CodeFragmentDelegate
 from .swarm_delegate import SwarmDelegate
 from .notification_delegate import NotificationDelegate
+from .scripts_delegate import ScriptsDelegate
 
 __all__ = [
     'UserDelegate',
@@ -49,6 +51,7 @@ __all__ = [
     'CodeFragmentDelegate',
     'SwarmDelegate',
     'NotificationDelegate',
+    'ScriptsDelegate',
 ]
 
-__version__ = '1.4.0'
+__version__ = '1.4.8'

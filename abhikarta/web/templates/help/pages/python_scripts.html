@@ -1,0 +1,937 @@
+{% extends "help/help_base.html" %}
+
+{% set title = "Python Script Mode" %}
+{% set description = "Create agents, workflows, swarms, and AI orgs using Python scripts" %}
+{% set icon = "bi-file-earmark-code" %}
+{% set header_color = "#7952b3" %}
+{% set header_color_dark = "#5e3f8c" %}
+
+{% block help_nav %}
+<a href="#overview">Overview</a>
+<a href="#getting-started">Getting Started</a>
+<a href="#templates">Script Templates</a>
+<a href="#agent-scripts">Agent Scripts</a>
+<a href="#workflow-scripts">Workflow Scripts</a>
+<a href="#swarm-scripts">Swarm Scripts</a>
+<a href="#aiorg-scripts">AI Org Scripts</a>
+<a href="#execution">Execution</a>
+<a href="#best-practices">Best Practices</a>
+<a href="#api-reference">API Reference</a>
+{% endblock %}
+
+{% block help_content %}
+<h2 id="overview">Python Script Mode Overview</h2>
+<p class="lead">Define AI entities using pure Python code instead of JSON or visual designers.</p>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Power User Feature:</strong> Python Script Mode is designed for developers who prefer coding over visual tools. It provides maximum flexibility, version control, and programmatic control over entity definitions.
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-primary">
+            <div class="card-body">
+                <i class="bi bi-robot text-primary" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-2">Agents</h5>
+                <p class="text-muted small mb-0">ReAct, Goal, Reflect, Hierarchical</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-success">
+            <div class="card-body">
+                <i class="bi bi-diagram-3 text-success" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-2">Workflows</h5>
+                <p class="text-muted small mb-0">DAG pipelines with custom nodes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-warning">
+            <div class="card-body">
+                <i class="bi bi-hive text-warning" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-2">Swarms</h5>
+                <p class="text-muted small mb-0">Event-driven multi-agent systems</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center h-100 border-info">
+            <div class="card-body">
+                <i class="bi bi-building text-info" style="font-size: 2.5rem;"></i>
+                <h5 class="mt-2">AI Orgs</h5>
+                <p class="text-muted small mb-0">Hierarchical structures with HITL</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3>Why Python Script Mode?</h3>
+<div class="row">
+    <div class="col-md-6">
+        <ul>
+            <li><strong>Version Control:</strong> Store definitions in Git alongside application code</li>
+            <li><strong>IDE Support:</strong> Full syntax highlighting, autocomplete, and refactoring</li>
+            <li><strong>Dynamic Configuration:</strong> Use environment variables, config files, and runtime logic</li>
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <ul>
+            <li><strong>Custom Classes:</strong> Define custom tool classes, processors, and handlers</li>
+            <li><strong>Type Safety:</strong> Use dataclasses and type hints for validation</li>
+            <li><strong>Testing:</strong> Unit test your definitions like any other Python code</li>
+        </ul>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="getting-started">Getting Started</h2>
+
+<h3>Script Structure</h3>
+<p>Every script must define an <code>__export__</code> variable containing the entity definition:</p>
+
+<pre><code class="language-python">"""My Entity Definition - Python Script Mode"""
+
+from typing import Dict, List, Any
+from dataclasses import dataclass, field
+from enum import Enum
+
+# ==============================================================================
+# CONFIGURATION - Define constants and configuration
+# ==============================================================================
+
+class MyEnum(Enum):
+    OPTION_A = "option_a"
+    OPTION_B = "option_b"
+
+@dataclass
+class MyConfig:
+    name: str
+    value: int = 10
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {"name": self.name, "value": self.value}
+
+# ==============================================================================
+# ENTITY DEFINITION - The core configuration
+# ==============================================================================
+
+entity = {
+    "name": "My Entity",
+    "description": "Description of what this entity does",
+    "version": "1.0.0",
+    # ... entity-specific properties
+}
+
+# ==============================================================================
+# EXPORT - Required! This is what gets saved to the database
+# ==============================================================================
+
+__export__ = entity
+
+# ==============================================================================
+# OPTIONAL: Custom Execution Logic
+# ==============================================================================
+
+def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Custom execution function called when the entity runs."""
+    return {"success": True, "result": "..."}
+
+def validate() -> tuple:
+    """Validate the entity configuration."""
+    return True, "Configuration is valid"
+</code></pre>
+
+<h3>Creating a Script</h3>
+<ol>
+    <li>Navigate to <strong>Playground → Python Scripts → Create Script</strong></li>
+    <li>Select the entity type (Agent, Workflow, Swarm, or AI Org)</li>
+    <li>Choose a template from the <a href="{{ url_for('script_templates') }}">Template Library</a> or start from scratch</li>
+    <li>Write your Python script in the code editor</li>
+    <li>Click <strong>Validate</strong> to check syntax and structure</li>
+    <li>Click <strong>Save</strong> to store the script</li>
+    <li>Click <strong>Execute</strong> to run and test</li>
+</ol>
+
+<hr class="my-5">
+
+<h2 id="templates">Script Templates</h2>
+
+<p>We provide comprehensive templates for each entity type and agent pattern. Each template includes:</p>
+<ul>
+    <li>Complete class definitions with methods</li>
+    <li>Dataclasses for type-safe configuration</li>
+    <li>Enums for standardized options</li>
+    <li>Helper functions and utilities</li>
+    <li>Custom execution logic</li>
+    <li>Extensive comments and documentation</li>
+</ul>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-robot me-2"></i>Agent Templates
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('create_script_from_template', template_id='script_react_agent') }}" class="list-group-item list-group-item-action">
+                    <strong>ReAct Research Agent</strong>
+                    <small class="d-block text-muted">Reasoning and Acting pattern with custom tools</small>
+                </a>
+                <a href="{{ url_for('create_script_from_template', template_id='script_goal_agent') }}" class="list-group-item list-group-item-action">
+                    <strong>Goal-Oriented Planner</strong>
+                    <small class="d-block text-muted">Milestone tracking and plan execution</small>
+                </a>
+                <a href="{{ url_for('create_script_from_template', template_id='script_reflect_agent') }}" class="list-group-item list-group-item-action">
+                    <strong>Self-Reflecting Agent</strong>
+                    <small class="d-block text-muted">Iterative quality improvement</small>
+                </a>
+                <a href="{{ url_for('create_script_from_template', template_id='script_hierarchical_agent') }}" class="list-group-item list-group-item-action">
+                    <strong>Hierarchical Orchestrator</strong>
+                    <small class="d-block text-muted">Task decomposition and delegation</small>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-diagram-3 me-2"></i>Other Templates
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('create_script_from_template', template_id='script_data_pipeline_workflow') }}" class="list-group-item list-group-item-action">
+                    <strong>Data Processing Pipeline</strong>
+                    <small class="d-block text-muted">Workflow with validation, transform, analysis</small>
+                </a>
+                <a href="{{ url_for('create_script_from_template', template_id='script_collaborative_swarm') }}" class="list-group-item list-group-item-action">
+                    <strong>Collaborative Task Team</strong>
+                    <small class="d-block text-muted">Swarm with event-driven coordination</small>
+                </a>
+                <a href="{{ url_for('create_script_from_template', template_id='script_hierarchical_aiorg') }}" class="list-group-item list-group-item-action">
+                    <strong>Hierarchical Project Team</strong>
+                    <small class="d-block text-muted">AI Organization with HITL approval</small>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="{{ url_for('script_templates') }}" class="btn btn-outline-primary">
+    <i class="bi bi-collection me-2"></i>Browse All Templates
+</a>
+
+<hr class="my-5">
+
+<h2 id="agent-scripts">Agent Scripts</h2>
+
+<h3>Agent Types</h3>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr><th>Type</th><th>Pattern</th><th>Best For</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>react</code></td>
+            <td>Reasoning + Acting</td>
+            <td>Tool-using agents, multi-step tasks, research</td>
+        </tr>
+        <tr>
+            <td><code>goal</code></td>
+            <td>Goal-oriented planning</td>
+            <td>Complex objectives, milestone tracking, long-running tasks</td>
+        </tr>
+        <tr>
+            <td><code>reflect</code></td>
+            <td>Self-reflection</td>
+            <td>Quality-focused tasks, iterative refinement, content generation</td>
+        </tr>
+        <tr>
+            <td><code>hierarchical</code></td>
+            <td>Task decomposition</td>
+            <td>Large tasks, sub-agent delegation, orchestration</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Complete ReAct Agent Example</h3>
+<p>This example demonstrates a full-featured ReAct agent with custom tool classes:</p>
+
+<pre><code class="language-python">"""ReAct Research Agent - Complete Example"""
+
+from typing import Dict, List, Any, Optional
+from dataclasses import dataclass, field
+from enum import Enum
+from abc import ABC, abstractmethod
+
+# ==============================================================================
+# ENUMS
+# ==============================================================================
+
+class ConfidenceLevel(Enum):
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+
+# ==============================================================================
+# CUSTOM TOOL CLASSES
+# ==============================================================================
+
+class BaseTool(ABC):
+    """Base class for all custom tools."""
+    
+    def __init__(self, name: str, description: str):
+        self.name = name
+        self.description = description
+        self._call_count = 0
+    
+    @abstractmethod
+    def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute the tool. Override in subclasses."""
+        pass
+    
+    def __call__(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        self._call_count += 1
+        return self.execute(input_data)
+
+
+class WebSearchTool(BaseTool):
+    """Web search tool implementation."""
+    
+    def __init__(self):
+        super().__init__(
+            name="web_search",
+            description="Search the web for information"
+        )
+    
+    def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        query = input_data.get("query", "")
+        # Integrate with actual search API
+        return {
+            "success": True,
+            "results": [{"title": f"Result for {query}", "snippet": "..."}]
+        }
+
+
+class SummarizerTool(BaseTool):
+    """Text summarization tool."""
+    
+    def __init__(self):
+        super().__init__(
+            name="summarizer",
+            description="Summarize long text into concise points"
+        )
+    
+    def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        text = input_data.get("text", "")
+        max_length = input_data.get("max_length", 200)
+        return {
+            "success": True,
+            "summary": text[:max_length] + "..." if len(text) > max_length else text
+        }
+
+
+# ==============================================================================
+# DATA CLASSES
+# ==============================================================================
+
+@dataclass
+class ResearchFinding:
+    """Represents a single research finding."""
+    content: str
+    source: str
+    confidence: ConfidenceLevel
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "content": self.content,
+            "source": self.source,
+            "confidence": self.confidence.value
+        }
+
+
+# ==============================================================================
+# CONFIGURATION
+# ==============================================================================
+
+SYSTEM_PROMPT = """You are a research assistant using the ReAct pattern.
+
+Your approach:
+1. THINK: Analyze what information is needed
+2. ACT: Use appropriate tools to gather information
+3. OBSERVE: Review the results
+4. REPEAT: Continue until sufficient information is gathered
+5. RESPOND: Synthesize findings into a coherent response
+"""
+
+# Instantiate tools
+web_search = WebSearchTool()
+summarizer = SummarizerTool()
+
+# ==============================================================================
+# AGENT DEFINITION
+# ==============================================================================
+
+agent = {
+    "name": "ReAct Research Assistant",
+    "description": "A research agent using ReAct pattern with custom tools",
+    "agent_type": "react",
+    "version": "1.0.0",
+    
+    "system_prompt": SYSTEM_PROMPT,
+    "tools": ["web_search", "summarizer"],
+    
+    "llm_config": {
+        "provider": "ollama",
+        "model": "llama3.2:3b",
+        "temperature": 0.3,
+        "max_tokens": 2048
+    },
+    
+    "hitl_config": {
+        "enabled": True,
+        "approval_required": False,
+        "review_threshold": 0.7
+    },
+    
+    "workflow": {
+        "max_iterations": 10,
+        "timeout_seconds": 300
+    },
+    
+    "tags": ["research", "react", "python-script"],
+    "category": "research"
+}
+
+# ==============================================================================
+# EXPORT
+# ==============================================================================
+
+__export__ = agent
+
+# ==============================================================================
+# EXECUTION LOGIC
+# ==============================================================================
+
+def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Execute the research agent."""
+    prompt = input_data.get("prompt", "")
+    
+    # Use tools
+    search_result = web_search({"query": prompt})
+    
+    findings = []
+    if search_result.get("success"):
+        for item in search_result.get("results", []):
+            findings.append(ResearchFinding(
+                content=item.get("snippet", ""),
+                source=item.get("title", ""),
+                confidence=ConfidenceLevel.MEDIUM
+            ))
+    
+    # Summarize
+    combined_text = " ".join([f.content for f in findings])
+    summary_result = summarizer({"text": combined_text})
+    
+    return {
+        "success": True,
+        "response": summary_result.get("summary", ""),
+        "findings": [f.to_dict() for f in findings]
+    }
+</code></pre>
+
+<hr class="my-5">
+
+<h2 id="workflow-scripts">Workflow Scripts</h2>
+
+<h3>Node Types</h3>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr><th>Type</th><th>Description</th><th>Use Case</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>input</code></td><td>Entry point for workflow data</td><td>Receiving external data</td></tr>
+        <tr><td><code>output</code></td><td>Exit point with final results</td><td>Returning processed data</td></tr>
+        <tr><td><code>llm</code></td><td>LLM processing node</td><td>AI-powered analysis</td></tr>
+        <tr><td><code>code</code></td><td>Custom Python code execution</td><td>Data transformation</td></tr>
+        <tr><td><code>validate</code></td><td>Data validation</td><td>Input/output checking</td></tr>
+        <tr><td><code>conditional</code></td><td>Branching based on conditions</td><td>Decision logic</td></tr>
+        <tr><td><code>parallel</code></td><td>Parallel execution of branches</td><td>Fan-out processing</td></tr>
+        <tr><td><code>aggregate</code></td><td>Combine parallel results</td><td>Fan-in merging</td></tr>
+    </tbody>
+</table>
+
+<h3>Workflow Example with Custom Processors</h3>
+<pre><code class="language-python">"""Data Processing Pipeline - Workflow Example"""
+
+from typing import Dict, List, Any
+from dataclasses import dataclass
+from enum import Enum
+from abc import ABC, abstractmethod
+
+# ==============================================================================
+# NODE PROCESSOR CLASSES
+# ==============================================================================
+
+class NodeProcessor(ABC):
+    """Abstract base class for node processors."""
+    
+    @abstractmethod
+    def process(self, input_data: Any, config: Dict[str, Any]) -> Any:
+        pass
+
+
+class ValidateProcessor(NodeProcessor):
+    """Validates data against rules."""
+    
+    def process(self, input_data: Any, config: Dict[str, Any]) -> Any:
+        rules = config.get("rules", [])
+        errors = []
+        
+        for rule in rules:
+            if rule.get("type") == "required":
+                field = rule.get("field")
+                if field not in input_data:
+                    errors.append(f"Missing field: {field}")
+        
+        return {"data": input_data, "valid": len(errors) == 0, "errors": errors}
+
+
+class TransformProcessor(NodeProcessor):
+    """Transforms data based on configuration."""
+    
+    def process(self, input_data: Any, config: Dict[str, Any]) -> Any:
+        result = input_data.copy() if isinstance(input_data, dict) else input_data
+        
+        for transform in config.get("transformations", []):
+            if transform.get("type") == "uppercase":
+                field = transform.get("field")
+                if field in result:
+                    result[field] = str(result[field]).upper()
+        
+        return result
+
+
+# ==============================================================================
+# NODE DEFINITIONS
+# ==============================================================================
+
+@dataclass
+class NodeConfig:
+    node_id: str
+    name: str
+    node_type: str
+    config: Dict[str, Any] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "node_id": self.node_id,
+            "name": self.name,
+            "node_type": self.node_type,
+            "config": self.config or {}
+        }
+
+
+# Define nodes
+nodes = [
+    NodeConfig("input", "Data Input", "input").to_dict(),
+    NodeConfig("validate", "Validation", "validate", {
+        "rules": [{"type": "required", "field": "data"}]
+    }).to_dict(),
+    NodeConfig("transform", "Transform", "transform", {
+        "transformations": [{"type": "uppercase", "field": "name"}]
+    }).to_dict(),
+    NodeConfig("output", "Output", "output").to_dict()
+]
+
+edges = [
+    {"source": "input", "target": "validate"},
+    {"source": "validate", "target": "transform"},
+    {"source": "transform", "target": "output"}
+]
+
+# ==============================================================================
+# WORKFLOW DEFINITION
+# ==============================================================================
+
+workflow = {
+    "name": "Data Processing Pipeline",
+    "description": "Validates and transforms input data",
+    "workflow_type": "dag",
+    "nodes": nodes,
+    "edges": edges,
+    "tags": ["data", "processing", "python-script"]
+}
+
+__export__ = workflow
+
+def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Execute the workflow."""
+    validator = ValidateProcessor()
+    transformer = TransformProcessor()
+    
+    validated = validator.process(input_data, {"rules": [{"type": "required", "field": "data"}]})
+    if not validated.get("valid"):
+        return {"success": False, "errors": validated.get("errors")}
+    
+    transformed = transformer.process(validated.get("data"), {})
+    return {"success": True, "result": transformed}
+</code></pre>
+
+<hr class="my-5">
+
+<h2 id="swarm-scripts">Swarm Scripts</h2>
+
+<h3>Swarm Coordination Strategies</h3>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr><th>Strategy</th><th>Description</th><th>Best For</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>event_driven</code></td><td>Agents communicate via events</td><td>Loosely coupled workflows</td></tr>
+        <tr><td><code>hierarchical</code></td><td>Master coordinates workers</td><td>Centralized control</td></tr>
+        <tr><td><code>consensus</code></td><td>Agents vote on decisions</td><td>Democratic decision making</td></tr>
+    </tbody>
+</table>
+
+<h3>Swarm Example with Event Bus</h3>
+<pre><code class="language-python">"""Collaborative Swarm - Event-Driven Coordination"""
+
+from typing import Dict, List, Any, Callable
+from dataclasses import dataclass, field
+from enum import Enum
+from queue import Queue
+
+class EventType(Enum):
+    TASK_CREATED = "task_created"
+    RESEARCH_COMPLETE = "research_complete"
+    PROCESSING_COMPLETE = "processing_complete"
+    TASK_COMPLETE = "task_complete"
+
+@dataclass
+class Event:
+    event_type: EventType
+    source: str
+    payload: Dict[str, Any]
+
+class EventBus:
+    """Simple in-memory event bus."""
+    
+    def __init__(self):
+        self.subscribers: Dict[EventType, List[Callable]] = {}
+        self.history: List[Event] = []
+    
+    def subscribe(self, event_type: EventType, handler: Callable):
+        if event_type not in self.subscribers:
+            self.subscribers[event_type] = []
+        self.subscribers[event_type].append(handler)
+    
+    def publish(self, event: Event):
+        self.history.append(event)
+        for handler in self.subscribers.get(event.event_type, []):
+            handler(event)
+
+# Agent configurations
+agents = [
+    {
+        "role": "researcher",
+        "subscriptions": ["task_created"],
+        "publishes": ["research_complete"],
+        "min_instances": 1,
+        "max_instances": 3,
+        "auto_scale": True
+    },
+    {
+        "role": "processor", 
+        "subscriptions": ["research_complete"],
+        "publishes": ["processing_complete"],
+        "min_instances": 1
+    },
+    {
+        "role": "reviewer",
+        "subscriptions": ["processing_complete"],
+        "publishes": ["task_complete"],
+        "min_instances": 1
+    }
+]
+
+swarm = {
+    "name": "Collaborative Team",
+    "description": "Event-driven swarm coordination",
+    "strategy": "event_driven",
+    "agents": agents,
+    "event_routing": {
+        "task_created": ["researcher"],
+        "research_complete": ["processor"],
+        "processing_complete": ["reviewer"],
+        "task_complete": ["_output"]
+    },
+    "tags": ["swarm", "collaboration", "python-script"]
+}
+
+__export__ = swarm
+</code></pre>
+
+<hr class="my-5">
+
+<h2 id="aiorg-scripts">AI Organization Scripts</h2>
+
+<h3>Role Types</h3>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr><th>Type</th><th>Description</th><th>Typical Responsibilities</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>executive</code></td><td>Top-level decision maker</td><td>Strategic decisions, final approvals</td></tr>
+        <tr><td><code>manager</code></td><td>Middle management</td><td>Task coordination, delegation</td></tr>
+        <tr><td><code>specialist</code></td><td>Domain expert</td><td>Specialized task execution</td></tr>
+        <tr><td><code>analyst</code></td><td>Analysis focus</td><td>Data analysis, reporting</td></tr>
+    </tbody>
+</table>
+
+<h3>Delegation Strategies</h3>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr><th>Strategy</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>round_robin</code></td><td>Rotate through subordinates sequentially</td></tr>
+        <tr><td><code>load_balanced</code></td><td>Assign to least loaded subordinate</td></tr>
+        <tr><td><code>skill_based</code></td><td>Match task to subordinate skills</td></tr>
+        <tr><td><code>priority_based</code></td><td>Route based on task priority</td></tr>
+    </tbody>
+</table>
+
+<h3>AI Organization Example</h3>
+<pre><code class="language-python">"""Hierarchical Project Team - AI Organization"""
+
+from typing import Dict, List, Any
+from dataclasses import dataclass, field
+from enum import Enum
+
+class RoleType(Enum):
+    EXECUTIVE = "executive"
+    MANAGER = "manager"
+    SPECIALIST = "specialist"
+
+class DelegationStrategy(Enum):
+    ROUND_ROBIN = "round_robin"
+    SKILL_BASED = "skill_based"
+
+@dataclass
+class HITLConfig:
+    enabled: bool = True
+    approval_required: bool = False
+    timeout_hours: int = 24
+    
+    def to_dict(self):
+        return {
+            "enabled": self.enabled,
+            "approval_required": self.approval_required,
+            "timeout_hours": self.timeout_hours
+        }
+
+@dataclass
+class OrgNode:
+    node_id: str
+    role_name: str
+    role_type: RoleType
+    parent_node_id: str = None
+    skills: List[str] = field(default_factory=list)
+    delegation_strategy: DelegationStrategy = DelegationStrategy.ROUND_ROBIN
+    hitl_config: HITLConfig = field(default_factory=HITLConfig)
+    
+    def to_dict(self):
+        return {
+            "node_id": self.node_id,
+            "role_name": self.role_name,
+            "role_type": self.role_type.value,
+            "parent_node_id": self.parent_node_id,
+            "skills": self.skills,
+            "delegation_strategy": self.delegation_strategy.value,
+            "hitl_config": self.hitl_config.to_dict()
+        }
+
+# Define nodes
+director = OrgNode("director", "Project Director", RoleType.EXECUTIVE,
+                   hitl_config=HITLConfig(approval_required=True))
+
+tech_lead = OrgNode("tech_lead", "Technical Lead", RoleType.MANAGER,
+                    parent_node_id="director",
+                    skills=["technical", "development"],
+                    delegation_strategy=DelegationStrategy.SKILL_BASED)
+
+developer = OrgNode("developer", "Developer", RoleType.SPECIALIST,
+                    parent_node_id="tech_lead",
+                    skills=["coding", "testing"],
+                    hitl_config=HITLConfig(enabled=False))
+
+aiorg = {
+    "name": "Project Team",
+    "description": "Hierarchical project organization",
+    "nodes": [director.to_dict(), tech_lead.to_dict(), developer.to_dict()],
+    "root_node_id": "director",
+    "routing_rules": [
+        {"condition": {"type": "technical"}, "route_to": "tech_lead"},
+        {"condition": {"priority": "high"}, "route_to": "director"}
+    ],
+    "tags": ["organization", "hierarchical", "python-script"]
+}
+
+__export__ = aiorg
+</code></pre>
+
+<hr class="my-5">
+
+<h2 id="execution">Execution</h2>
+
+<h3>The execute() Function</h3>
+<p>Define an <code>execute()</code> function to add custom execution logic:</p>
+
+<pre><code class="language-python">def execute(input_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Custom execution function.
+    
+    Args:
+        input_data: Dictionary with input parameters
+            - prompt: User's input text
+            - context: Optional context from previous interactions
+            - options: Optional execution options
+        
+    Returns:
+        Dictionary with results:
+            - success: Boolean indicating success
+            - response: Main response text
+            - result: Detailed result object
+            - metadata: Optional metadata
+    """
+    prompt = input_data.get('prompt', '')
+    context = input_data.get('context', {})
+    
+    # Your custom logic here
+    result = process(prompt, context)
+    
+    return {
+        "success": True,
+        "response": result.get('text'),
+        "result": result,
+        "metadata": {"timestamp": "..."}
+    }
+</code></pre>
+
+<h3>The validate() Function</h3>
+<pre><code class="language-python">def validate() -> tuple:
+    """
+    Validate the entity configuration.
+    
+    Returns:
+        Tuple of (is_valid: bool, message: str)
+    """
+    errors = []
+    
+    if not entity.get("name"):
+        errors.append("Name is required")
+    if not entity.get("llm_config"):
+        errors.append("LLM configuration is required")
+    
+    if errors:
+        return False, "; ".join(errors)
+    return True, "Configuration is valid"
+</code></pre>
+
+<h3>API Execution</h3>
+<pre><code class="language-bash"># Execute a script via API
+curl -X POST /api/scripts/&lt;script_id&gt;/execute \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Your input here",
+    "options": {"max_iterations": 5}
+  }'
+</code></pre>
+
+<hr class="my-5">
+
+<h2 id="best-practices">Best Practices</h2>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-check-circle me-2"></i>Do
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Use descriptive class and variable names</li>
+                <li class="list-group-item">Add type hints and docstrings</li>
+                <li class="list-group-item">Use dataclasses for structured configuration</li>
+                <li class="list-group-item">Use enums for standardized options</li>
+                <li class="list-group-item">Implement error handling in execute()</li>
+                <li class="list-group-item">Use environment variables for secrets</li>
+                <li class="list-group-item">Keep scripts focused and modular</li>
+                <li class="list-group-item">Include a validate() function</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-x-circle me-2"></i>Don't
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Hardcode API keys or passwords</li>
+                <li class="list-group-item">Use exec() or eval() on untrusted input</li>
+                <li class="list-group-item">Make network calls during script load</li>
+                <li class="list-group-item">Modify global state unexpectedly</li>
+                <li class="list-group-item">Import untrusted or dynamic modules</li>
+                <li class="list-group-item">Create infinite loops without breaks</li>
+                <li class="list-group-item">Ignore exceptions silently</li>
+                <li class="list-group-item">Write monolithic scripts without structure</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning mt-4">
+    <h5><i class="bi bi-shield-exclamation me-2"></i>Security Note</h5>
+    <p class="mb-0">Scripts are executed in a sandboxed environment with limited access. Dangerous operations (unrestricted file system access, arbitrary network calls, subprocess execution) may be restricted depending on your security settings.</p>
+</div>
+
+<hr class="my-5">
+
+<h2 id="api-reference">API Reference</h2>
+
+<h3>Endpoints</h3>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>GET</code></td><td>/scripts</td><td>List all scripts</td></tr>
+        <tr><td><code>GET</code></td><td>/scripts/&lt;id&gt;</td><td>View a script</td></tr>
+        <tr><td><code>POST</code></td><td>/api/scripts</td><td>Create a new script</td></tr>
+        <tr><td><code>PUT</code></td><td>/api/scripts/&lt;id&gt;</td><td>Update a script</td></tr>
+        <tr><td><code>DELETE</code></td><td>/api/scripts/&lt;id&gt;</td><td>Delete a script</td></tr>
+        <tr><td><code>POST</code></td><td>/api/scripts/validate-code</td><td>Validate script syntax</td></tr>
+        <tr><td><code>POST</code></td><td>/api/scripts/&lt;id&gt;/execute</td><td>Execute a script</td></tr>
+        <tr><td><code>GET</code></td><td>/api/scripts/templates</td><td>List all templates</td></tr>
+        <tr><td><code>GET</code></td><td>/api/scripts/templates/&lt;id&gt;</td><td>Get template content</td></tr>
+    </tbody>
+</table>
+
+<h3>Script Object Schema</h3>
+<pre><code class="language-json">{
+  "script_id": "string",
+  "name": "string",
+  "description": "string",
+  "entity_type": "agent|workflow|swarm|aiorg",
+  "script_content": "string (Python code)",
+  "entry_point": "__export__",
+  "validation_status": "valid|invalid|pending",
+  "version": 1,
+  "tags": ["string"],
+  "created_at": "ISO datetime",
+  "updated_at": "ISO datetime"
+}
+</code></pre>
+
+{% endblock %}

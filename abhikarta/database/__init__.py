@@ -9,7 +9,7 @@ Legal Notice:
 This software and associated documentation are proprietary and confidential.
 Unauthorized copying, distribution, modification, or use is strictly prohibited.
 
-Version: 1.3.0
+Version: 1.4.8
 
 The database module provides:
 - DatabaseFacade: Unified interface for database operations
@@ -24,6 +24,9 @@ The database module provides:
   - MCPDelegate: Plugins, Tool Servers
   - AuditDelegate: Audit Logs, Settings
   - CodeFragmentDelegate: Code Fragments
+  - SwarmDelegate: Swarms, Agent Pools, Triggers
+  - NotificationDelegate: Notification Channels, Logs, Webhooks
+  - ScriptsDelegate: Python Scripts, Script Executions (v1.4.8)
 """
 
 from .db_facade import DatabaseFacade, DatabaseHandler
@@ -39,6 +42,9 @@ from .delegates import (
     MCPDelegate,
     AuditDelegate,
     CodeFragmentDelegate,
+    SwarmDelegate,
+    NotificationDelegate,
+    ScriptsDelegate,
 )
 
 __all__ = [
@@ -60,6 +66,9 @@ __all__ = [
     'MCPDelegate',
     'AuditDelegate',
     'CodeFragmentDelegate',
+    'SwarmDelegate',
+    'NotificationDelegate',
+    'ScriptsDelegate',
 ]
 
-__version__ = '1.3.0'
+__version__ = '1.4.8'

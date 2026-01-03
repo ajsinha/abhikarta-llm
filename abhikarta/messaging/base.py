@@ -7,7 +7,7 @@ Provides:
 - Subscription: Topic subscription configuration
 - Backpressure handling strategies
 
-Version: 1.3.0
+Version: 1.4.8
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 """

@@ -1550,7 +1550,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.3.0')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.4.8')
                 
                 # Add auth if configured
                 auth_type = server.get('auth_type', 'none')
@@ -1651,7 +1651,7 @@ class AdminRoutes(AbstractRoutes):
                 req = urllib.request.Request(full_url)
                 req.add_header('Accept', 'application/json')
                 req.add_header('Content-Type', 'application/json')
-                req.add_header('User-Agent', 'Abhikarta-LLM/1.3.0')
+                req.add_header('User-Agent', 'Abhikarta-LLM/1.4.8')
                 
                 # Add auth headers if configured
                 auth_type = server.get('auth_type', 'none')

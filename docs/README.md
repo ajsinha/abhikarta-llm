@@ -1,6 +1,6 @@
 # Abhikarta-LLM Documentation
 
-**Version:** 1.4.7  
+**Version:** 1.4.8  
 **Copyright:** © 2025-2030 Ashutosh Sinha. All Rights Reserved.
 
 ## Documentation Index
@@ -23,7 +23,7 @@
 | [PATENT_APPLICATION.md](PATENT_APPLICATION.md) | Patent application (27 claims) |
 | [PATENT_WORTHINESS_ANALYSIS.md](PATENT_WORTHINESS_ANALYSIS.md) | Patent worthiness analysis |
 
-## Version 1.4.7 Features (Latest)
+## version 1.4.8 Features (Latest)
 
 ### Hierarchical AI Organizations (NEW)
 - **AI Org Module**: Model corporate structures with AI agents
@@ -60,9 +60,9 @@
 - **Integration**: Works with agents, workflows, and swarms
 
 ### Database Updates
-- 33 tables total (6 new for AI Organizations)
+- 43 tables total (6 new for AI Organizations)
 - AIORGDBOps for all AI Org database operations
-- Schema version 1.4.7 with transaction support (PostgreSQL ready)
+- Schema version 1.4.8 with transaction support (PostgreSQL ready)
 
 ## Version 1.3.0 Features
 
@@ -90,7 +90,7 @@
 - **Breadcrumb Navigation**: Easy navigation between tools list, detail, and test pages
 - **Result Display**: Formatted execution results with request/response info
 
-### Pre-built Tools Library (85)
+### Tool Framework (10 Types)
 - **Common Tools (28)**: Date/time, math, text processing, validation, format conversion, ID generation
 - **Banking Tools (13)**: KYC verification, credit scoring, loan processing, transaction analysis, compliance
 - **Integration Tools (20)**: HTTP/API, notifications, data transformation, list/array operations, workflow helpers
@@ -115,7 +115,7 @@
 ## Previous Version Highlights
 
 ### v1.1.7: Pre-built Tools & Banking Solutions
-- 85 pre-built tools (Common, Banking, Integration, General)
+- 10 extensible tool types (FunctionTool, HTTPTool, MCPTool, etc.)
 - 10 banking agents and 7 banking workflows
 - Tools registry page with search/filter
 - MCP auto-connect on startup
@@ -178,7 +178,7 @@
 │    LangChain │ LangGraph │ MCP │ Kafka/RabbitMQ │ Slack/Teams   │
 ├─────────────────────────────────────────────────────────────────┤
 │                        DATA LAYER                                │
-│         PostgreSQL/SQLite │ 33 Tables │ 10 Delegates            │
+│         PostgreSQL/SQLite │ 43 Tables │ 10 Delegates            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -187,10 +187,10 @@
 | Metric | Count |
 |--------|-------|
 | LLM Providers | 11 |
-| Pre-built Tools | 85 |
+| Tool Types | 10 |
 | Banking Agents | 10 |
 | Banking Workflows | 7 |
-| Database Tables | 33 |
+| Database Tables | 43 |
 | Database Delegates | 10 |
 | Workflow Node Types | 10 |
 | Patent Claims | 27 |
@@ -218,11 +218,11 @@
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.4.7 | Dec 2025 | Notifications (Slack/Teams/Webhooks), CoT/ToT Tutorial, 21 Patent Claims |
+| 1.4.8 | Dec 2025 | Notifications (Slack/Teams/Webhooks), CoT/ToT Tutorial, 21 Patent Claims |
 | 1.3.0 | Dec 2025 | Agent Swarms, Messaging (Kafka/RabbitMQ), Actor System |
 | 1.2.0 | Jan 2025 | Database Schema docs (22 tables), Page glossaries |
 | 1.1.8 | Jan 2025 | Tool View/Test pages, form-based testing |
-| 1.1.7 | Jan 2025 | Pre-built tools (85), Tools page, MCP auto-sync |
+| 1.1.7 | Jan 2025 | Tool framework (10 types), Tools page, MCP auto-sync |
 | 1.1.0 | Dec 2024 | LLM Management, Visual Agent Designer |
 | 1.0.0 | Dec 2024 | Initial release |
 

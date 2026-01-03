@@ -11,7 +11,7 @@ Email: ajsinha@gmail.com
 PATENT PENDING - This software contains patentable inventions.
 Unauthorized copying, modification, or distribution is prohibited.
 
-Version: 1.3.0
+Version: 1.4.8
 """
 
 import asyncio
