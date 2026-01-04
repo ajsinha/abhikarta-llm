@@ -1,131 +1,571 @@
 {% extends "help/help_base.html" %}
 
 {% set title = "Configuration" %}
-{% set description = "Application settings and environment variables" %}
+{% set description = "Complete reference for application.properties and all configuration options" %}
 {% set icon = "bi-gear" %}
 {% set header_color = "#fd7e14" %}
 {% set header_color_dark = "#ca6510" %}
 
 {% block help_nav %}
-<a href="#app-settings">Application Settings</a>
-<a href="#database">Database</a>
-<a href="#llm-config">LLM Providers</a>
-<a href="#security">Security</a>
-<a href="#logging">Logging</a>
-<a href="#env-vars">Environment Variables</a>
+<a href="#overview">Overview</a>
+<a href="#how-it-works">How It Works</a>
+<a href="#precedence">Precedence</a>
+<a href="#syntax">Syntax</a>
+<a href="#app-properties">Application</a>
+<a href="#server-properties">Server</a>
+<a href="#database-properties">Database</a>
+<a href="#llm-properties">LLM Providers</a>
+<a href="#agent-properties">Agents</a>
+<a href="#actor-properties">Actor System</a>
+<a href="#code-fragments-properties">Code Fragments</a>
+<a href="#other-properties">Other Settings</a>
 <a href="#docker">Docker</a>
 {% endblock %}
 
 {% block help_content %}
-<h2 id="app-settings">Application Settings</h2>
-<pre><code class="language-properties"># config/application.properties
+<h2 id="overview">Overview</h2>
+<p class="lead">Abhikarta-LLM uses a centralized properties file for all configuration. The <code>PropertiesConfigurator</code> loads settings from <code>config/application.properties</code> with support for environment variable overrides, command-line arguments, and dynamic property resolution.</p>
 
-# Application Information
-app.name=Abhikarta-LLM
-app.version=1.5.0
-app.description=AI Agent Design & Orchestration Platform
-
-# Server Configuration
-server.host=0.0.0.0
-server.port=5000
-server.debug=false
-server.secret_key=your-secret-key-here</code></pre>
+<div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    <strong>Location:</strong> <code>config/application.properties</code> — 70+ configurable properties
+</div>
 
 <hr class="my-5">
 
-<h2 id="database">Database Configuration</h2>
-<pre><code class="language-properties"># Database Type: sqlite or postgresql
-database.type=sqlite
+<h2 id="how-it-works">How It Works</h2>
+<p>The <code>PropertiesConfigurator</code> is a singleton that provides thread-safe access to configuration values throughout the application.</p>
 
-# SQLite Configuration
-database.sqlite.path=./data/abhikarta.db
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-primary">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark-text text-primary fs-1"></i>
+                <h5 class="mt-3">Properties Files</h5>
+                <p class="small text-muted mb-0">Key-value pairs in <code>.properties</code> format</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-success">
+            <div class="card-body text-center">
+                <i class="bi bi-arrow-repeat text-success fs-1"></i>
+                <h5 class="mt-3">Auto-Reload</h5>
+                <p class="small text-muted mb-0">Watches for file changes every 5 minutes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-warning">
+            <div class="card-body text-center">
+                <i class="bi bi-shield-lock text-warning fs-1"></i>
+                <h5 class="mt-3">Thread-Safe</h5>
+                <p class="small text-muted mb-0">Safe concurrent access from multiple threads</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-# PostgreSQL Configuration
-database.postgres.host=localhost
-database.postgres.port=5432
-database.postgres.database=abhikarta
-database.postgres.user=postgres
-database.postgres.password=postgres
-database.postgres.pool_size=10</code></pre>
+<h5>Usage in Code</h5>
+<pre><code class="language-python">from abhikarta.core.config import PropertiesConfigurator
 
-<hr class="my-5">
+# Initialize (typically done once at startup)
+prop_conf = PropertiesConfigurator(properties_files=['config/application.properties'])
 
-<h2 id="llm-config">LLM Provider Settings</h2>
-<pre><code class="language-properties"># Default Provider
-llm.default_provider=openai
+# Get values with type conversion
+debug = prop_conf.get_bool('app.debug', default=False)
+port = prop_conf.get_int('server.port', default=5000)
+name = prop_conf.get('app.name', default='Abhikarta-LLM')
+providers = prop_conf.get_list('hitl.notification.channels')  # Returns ['email', 'in-app']
 
-# OpenAI
-llm.openai.api_key=sk-your-openai-api-key
-llm.openai.default_model=gpt-4o
-
-# Anthropic
-llm.anthropic.api_key=sk-ant-your-anthropic-key
-llm.anthropic.default_model=claude-3-5-sonnet-20241022
-
-# Google
-llm.google.api_key=your-google-api-key
-llm.google.default_model=gemini-1.5-pro
-
-# Mistral
-llm.mistral.api_key=your-mistral-api-key
-llm.mistral.default_model=mistral-large-latest
-
-# Ollama (Local)
-llm.ollama.base_url=http://localhost:11434
-llm.ollama.default_model=llama3.1
-
-# Fallback Chain
-llm.fallback_chain=openai,anthropic,ollama</code></pre>
-
-<hr class="my-5">
-
-<h2 id="security">Security Settings</h2>
-<pre><code class="language-properties"># Session Configuration
-security.session.type=filesystem
-security.session.lifetime_hours=24
-security.session.permanent=true
-
-# Password Policy
-security.password.min_length=8
-security.password.require_uppercase=true
-security.password.require_number=true
-
-# Rate Limiting
-security.rate_limit.enabled=true
-security.rate_limit.requests_per_minute=60</code></pre>
+# Check where a value came from
+source = prop_conf.get_source('app.debug')  # 'file', 'env', or 'commandline'</code></pre>
 
 <hr class="my-5">
 
-<h2 id="logging">Logging Configuration</h2>
-<pre><code class="language-properties"># Log Level: DEBUG, INFO, WARNING, ERROR
-logging.level=INFO
-logging.file=./logs/abhikarta.log
-logging.max_size_mb=10
-logging.backup_count=5
-logging.format=%(asctime)s - %(name)s - %(levelname)s - %(message)s</code></pre>
+<h2 id="precedence">Override Precedence</h2>
+<p>Properties can be set at multiple levels. Higher precedence values override lower ones:</p>
 
-<hr class="my-5">
-
-<h2 id="env-vars">Environment Variables</h2>
-<p>Override settings with environment variables:</p>
 <div class="table-responsive">
-    <table class="table table-hover">
-        <thead class="table-light">
-            <tr><th>Variable</th><th>Description</th></tr>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Priority</th>
+                <th>Source</th>
+                <th>Example</th>
+                <th>Use Case</th>
+            </tr>
         </thead>
         <tbody>
-            <tr><td><code>ABHIKARTA_DATABASE_TYPE</code></td><td>Database type</td></tr>
-            <tr><td><code>ABHIKARTA_OPENAI_API_KEY</code></td><td>OpenAI API key</td></tr>
-            <tr><td><code>ABHIKARTA_ANTHROPIC_API_KEY</code></td><td>Anthropic API key</td></tr>
-            <tr><td><code>ABHIKARTA_SECRET_KEY</code></td><td>Flask secret key</td></tr>
-            <tr><td><code>ABHIKARTA_SERVER_PORT</code></td><td>Server port</td></tr>
+            <tr class="table-danger">
+                <td><strong>1 (Highest)</strong></td>
+                <td>Command Line</td>
+                <td><code>--server.port=8080</code></td>
+                <td>Quick overrides for testing</td>
+            </tr>
+            <tr class="table-warning">
+                <td><strong>2</strong></td>
+                <td>Environment Variables</td>
+                <td><code>export SERVER_PORT=8080</code></td>
+                <td>Docker, CI/CD, secrets</td>
+            </tr>
+            <tr class="table-success">
+                <td><strong>3 (Lowest)</strong></td>
+                <td>Properties File</td>
+                <td><code>server.port=5000</code></td>
+                <td>Default configuration</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-success">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Tip:</strong> Use environment variables for secrets (API keys, passwords) and command-line for temporary overrides during development.
+</div>
+
+<hr class="my-5">
+
+<h2 id="syntax">Property Syntax</h2>
+
+<div class="row">
+<div class="col-md-6">
+<h5>Basic Properties</h5>
+<pre><code class="language-properties"># Simple key=value
+app.name=Abhikarta-LLM
+server.port=5000
+app.debug=false</code></pre>
+
+<h5>Comments</h5>
+<pre><code class="language-properties"># This is a comment (lines starting with #)
+// This is also a comment (lines starting with //)
+
+app.name=Abhikarta-LLM  # Inline NOT supported</code></pre>
+</div>
+<div class="col-md-6">
+<h5>Property References</h5>
+<pre><code class="language-properties"># Reference another property
+app.title=${app.name} v${app.version}
+
+# With default value if not found
+database.host=${DB_HOST:localhost}</code></pre>
+
+<h5>Environment Variables</h5>
+<pre><code class="language-properties"># Reference env var with default
+llm.openai.api.key=${OPENAI_API_KEY:}
+database.postgresql.password=${PG_PASSWORD:}</code></pre>
+</div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="app-properties">Application Properties</h2>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-primary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>app.name</code></td><td>String</td><td>Abhikarta-LLM</td><td>Application display name shown in UI and logs</td></tr>
+            <tr><td><code>app.version</code></td><td>String</td><td>1.5.0</td><td>Application version number</td></tr>
+            <tr><td><code>app.debug</code></td><td>Boolean</td><td>false</td><td>Enable debug mode (verbose logging, stack traces)</td></tr>
+            <tr><td><code>app.secret.key</code></td><td>String</td><td><em>generated</em></td><td>Secret key for session encryption. <strong>Change in production!</strong></td></tr>
         </tbody>
     </table>
 </div>
 
 <hr class="my-5">
 
-<h2 id="docker">Docker Configuration</h2>
+<h2 id="server-properties">Server Properties</h2>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-primary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>server.host</code></td><td>String</td><td>0.0.0.0</td><td>Host address to bind. Use 0.0.0.0 for all interfaces, 127.0.0.1 for localhost only</td></tr>
+            <tr><td><code>server.port</code></td><td>Integer</td><td>5000</td><td>HTTP port to listen on</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Session Properties</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>session.lifetime.seconds</code></td><td>Integer</td><td>3600</td><td>Session timeout in seconds (1 hour default)</td></tr>
+            <tr><td><code>flask.session.dir</code></td><td>String</td><td>./data/flask_session</td><td>Directory for server-side session storage</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="database-properties">Database Properties</h2>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-primary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>database.type</code></td><td>String</td><td>sqlite</td><td>Database type: <code>sqlite</code> or <code>postgresql</code></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>SQLite Properties</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>database.sqlite.path</code></td><td>String</td><td>./data/abhikarta.db</td><td>Path to SQLite database file</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>PostgreSQL Properties</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>database.postgresql.host</code></td><td>String</td><td>localhost</td><td>PostgreSQL server hostname</td></tr>
+            <tr><td><code>database.postgresql.port</code></td><td>Integer</td><td>5432</td><td>PostgreSQL server port</td></tr>
+            <tr><td><code>database.postgresql.database</code></td><td>String</td><td>abhikarta</td><td>Database name</td></tr>
+            <tr><td><code>database.postgresql.user</code></td><td>String</td><td>abhikarta_user</td><td>Database username</td></tr>
+            <tr><td><code>database.postgresql.password</code></td><td>String</td><td><em>empty</em></td><td>Database password. <strong>Use env var in production!</strong></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="llm-properties">LLM Provider Properties</h2>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-primary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>llm.default.provider</code></td><td>String</td><td>openai</td><td>Default LLM provider for new agents</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>OpenAI</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>llm.openai.enabled</code></td><td>Boolean</td><td>true</td><td>Enable OpenAI provider</td></tr>
+            <tr><td><code>llm.openai.api.key</code></td><td>String</td><td><em>empty</em></td><td>OpenAI API key (use OPENAI_API_KEY env var)</td></tr>
+            <tr><td><code>llm.openai.default.model</code></td><td>String</td><td>gpt-4o</td><td>Default OpenAI model</td></tr>
+            <tr><td><code>llm.openai.fallback.model</code></td><td>String</td><td>gpt-3.5-turbo</td><td>Fallback model if default fails</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Anthropic</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>llm.anthropic.enabled</code></td><td>Boolean</td><td>true</td><td>Enable Anthropic provider</td></tr>
+            <tr><td><code>llm.anthropic.api.key</code></td><td>String</td><td><em>empty</em></td><td>Anthropic API key (use ANTHROPIC_API_KEY env var)</td></tr>
+            <tr><td><code>llm.anthropic.default.model</code></td><td>String</td><td>claude-3-5-sonnet-20241022</td><td>Default Anthropic model</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Ollama (Local)</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>llm.ollama.enabled</code></td><td>Boolean</td><td>true</td><td>Enable Ollama local provider</td></tr>
+            <tr><td><code>llm.ollama.base.url</code></td><td>String</td><td>http://localhost:11434</td><td>Ollama server URL</td></tr>
+            <tr><td><code>llm.ollama.default.model</code></td><td>String</td><td>llama3</td><td>Default Ollama model</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>AWS Bedrock</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>llm.bedrock.enabled</code></td><td>Boolean</td><td>false</td><td>Enable AWS Bedrock provider</td></tr>
+            <tr><td><code>llm.bedrock.region</code></td><td>String</td><td>us-east-1</td><td>AWS region for Bedrock</td></tr>
+            <tr><td><code>llm.bedrock.default.model</code></td><td>String</td><td>anthropic.claude-3-sonnet...</td><td>Default Bedrock model ID</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="agent-properties">Agent Execution Properties</h2>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-primary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>agent.execution.timeout.seconds</code></td><td>Integer</td><td>300</td><td>Maximum execution time per agent (5 minutes)</td></tr>
+            <tr><td><code>agent.max.concurrent.executions</code></td><td>Integer</td><td>10</td><td>Maximum parallel agent executions</td></tr>
+            <tr><td><code>agent.default.temperature</code></td><td>Float</td><td>0.7</td><td>Default LLM temperature for new agents</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>HITL (Human-in-the-Loop) Properties</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>hitl.enabled</code></td><td>Boolean</td><td>true</td><td>Enable human-in-the-loop features</td></tr>
+            <tr><td><code>hitl.default.timeout.minutes</code></td><td>Integer</td><td>30</td><td>Default timeout for human review tasks</td></tr>
+            <tr><td><code>hitl.notification.channels</code></td><td>List</td><td>email,in-app</td><td>Notification channels for HITL tasks</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="actor-properties">Actor System Properties</h2>
+<p class="text-muted">The Actor System provides Pekko-inspired concurrent execution for agents and workflows.</p>
+
+<h5>System Settings</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-primary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>actor.system.name</code></td><td>String</td><td>abhikarta-actors</td><td>Actor system identifier for logging</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Dispatcher Configuration</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>actor.dispatcher.default.threads</code></td><td>Integer</td><td>8</td><td>Thread pool size for general actors</td></tr>
+            <tr><td><code>actor.dispatcher.default.throughput</code></td><td>Integer</td><td>5</td><td>Messages processed before yielding</td></tr>
+            <tr><td><code>actor.dispatcher.io.threads</code></td><td>Integer</td><td>16</td><td>Thread pool for blocking I/O (LLM calls)</td></tr>
+            <tr><td><code>actor.dispatcher.io.throughput</code></td><td>Integer</td><td>1</td><td>I/O dispatcher throughput</td></tr>
+            <tr><td><code>actor.dispatcher.forkjoin.parallelism.min</code></td><td>Integer</td><td>4</td><td>Minimum parallelism for CPU tasks</td></tr>
+            <tr><td><code>actor.dispatcher.forkjoin.parallelism.max</code></td><td>Integer</td><td>16</td><td>Maximum parallelism for CPU tasks</td></tr>
+            <tr><td><code>actor.dispatcher.forkjoin.parallelism.factor</code></td><td>Float</td><td>2.0</td><td>Parallelism factor × CPU cores</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Mailbox Configuration</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>actor.mailbox.default.capacity</code></td><td>Integer</td><td>-1</td><td>Default mailbox size (-1 = unbounded)</td></tr>
+            <tr><td><code>actor.mailbox.bounded.capacity</code></td><td>Integer</td><td>1000</td><td>Bounded mailbox maximum messages</td></tr>
+            <tr><td><code>actor.mailbox.bounded.push.timeout.ms</code></td><td>Integer</td><td>10000</td><td>Timeout when mailbox is full (ms)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Supervision & Fault Tolerance</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>actor.supervision.max.retries</code></td><td>Integer</td><td>3</td><td>Max restart attempts before escalating</td></tr>
+            <tr><td><code>actor.supervision.within.seconds</code></td><td>Integer</td><td>60</td><td>Time window for retry counting</td></tr>
+            <tr><td><code>actor.deadletter.logging</code></td><td>Boolean</td><td>true</td><td>Log undeliverable messages</td></tr>
+            <tr><td><code>actor.deadletter.max.logged</code></td><td>Integer</td><td>100</td><td>Max dead letters to log</td></tr>
+            <tr><td><code>actor.circuitbreaker.max.failures</code></td><td>Integer</td><td>5</td><td>Failures before circuit opens</td></tr>
+            <tr><td><code>actor.circuitbreaker.call.timeout.seconds</code></td><td>Integer</td><td>10</td><td>Call timeout before failure</td></tr>
+            <tr><td><code>actor.circuitbreaker.reset.timeout.seconds</code></td><td>Integer</td><td>30</td><td>Wait time before retry after open</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Scheduler</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>actor.scheduler.tick.duration.ms</code></td><td>Integer</td><td>10</td><td>Scheduler tick interval (ms)</td></tr>
+            <tr><td><code>actor.scheduler.ticks.per.wheel</code></td><td>Integer</td><td>512</td><td>Timer wheel size</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="code-fragments-properties">Code Fragments Sync Properties <span class="badge bg-info">v1.5.0</span></h2>
+<p class="text-muted">Controls automatic syncing of approved code fragments to local Python modules.</p>
+
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-primary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>code.fragments.enabled</code></td><td>Boolean</td><td>true</td><td>Enable code fragment sync service</td></tr>
+            <tr><td><code>code.fragments.target.path</code></td><td>String</td><td>./code_fragments</td><td>Directory for synced Python modules</td></tr>
+            <tr><td><code>code.fragments.sync.interval.seconds</code></td><td>Integer</td><td>300</td><td>Background sync interval (5 minutes)</td></tr>
+            <tr><td><code>code.fragments.sync.on.startup</code></td><td>Boolean</td><td>true</td><td>Sync fragments when application starts</td></tr>
+            <tr><td><code>code.fragments.watch.enabled</code></td><td>Boolean</td><td>true</td><td>Enable background watcher thread</td></tr>
+            <tr><td><code>code.fragments.status.filter</code></td><td>List</td><td>approved,published</td><td>Only sync fragments with these statuses</td></tr>
+            <tr><td><code>code.fragments.reload.strategy</code></td><td>String</td><td>graceful</td><td>Module reload: <code>graceful</code> or <code>immediate</code></td></tr>
+            <tr><td><code>code.fragments.max.wait.seconds</code></td><td>Integer</td><td>30</td><td>Max wait for graceful reload</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>S3 Source (Optional)</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>code.fragments.s3.enabled</code></td><td>Boolean</td><td>false</td><td>Enable loading fragments from S3</td></tr>
+            <tr><td><code>code.fragments.s3.bucket</code></td><td>String</td><td><em>empty</em></td><td>S3 bucket name</td></tr>
+            <tr><td><code>code.fragments.s3.prefix</code></td><td>String</td><td><em>empty</em></td><td>S3 key prefix (folder path)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Filesystem Source (Optional)</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>code.fragments.filesystem.enabled</code></td><td>Boolean</td><td>false</td><td>Enable loading fragments from filesystem</td></tr>
+            <tr><td><code>code.fragments.filesystem.paths</code></td><td>List</td><td><em>empty</em></td><td>Comma-separated directory paths</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="other-properties">Other Properties</h2>
+
+<div class="row">
+<div class="col-md-6">
+<h5>User Management</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>users.file</code></td><td>String</td><td>./data/users.json</td><td>Path to users JSON file</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Logging</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>logging.level</code></td><td>String</td><td>INFO</td><td>DEBUG, INFO, WARNING, ERROR</td></tr>
+            <tr><td><code>logging.format</code></td><td>String</td><td>%(asctime)s...</td><td>Python logging format</td></tr>
+            <tr><td><code>logging.file</code></td><td>String</td><td>./logs/abhikarta.log</td><td>Log file path</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>MCP Plugin System</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>mcp.plugins.dir</code></td><td>String</td><td>./data/mcp_plugins</td><td>MCP plugin directory</td></tr>
+            <tr><td><code>mcp.server.names</code></td><td>List</td><td><em>empty</em></td><td>MCP servers to connect</td></tr>
+        </tbody>
+    </table>
+</div>
+</div>
+
+<div class="col-md-6">
+<h5>Security</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>security.cors.origins</code></td><td>String</td><td>*</td><td>Allowed CORS origins</td></tr>
+            <tr><td><code>security.rate.limit</code></td><td>Integer</td><td>100</td><td>API rate limit/min</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>Monitoring</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>monitoring.prometheus.enabled</code></td><td>Boolean</td><td>true</td><td>Enable Prometheus</td></tr>
+            <tr><td><code>monitoring.metrics.path</code></td><td>String</td><td>/metrics</td><td>Metrics endpoint</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h5>UI Settings</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>ui.theme</code></td><td>String</td><td>bmo-dark</td><td>UI color theme</td></tr>
+            <tr><td><code>ui.items.per.page</code></td><td>Integer</td><td>10</td><td>Pagination size</td></tr>
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="docker">Docker Deployment</h2>
 <pre><code class="language-yaml"># docker-compose.yml
 version: '3.8'
 services:
@@ -134,11 +574,15 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - ABHIKARTA_DATABASE_TYPE=postgresql
-      - ABHIKARTA_OPENAI_API_KEY=${OPENAI_API_KEY}
+      - database.type=postgresql
+      - database.postgresql.host=postgres
+      - database.postgresql.password=${PG_PASSWORD}
+      - llm.openai.api.key=${OPENAI_API_KEY}
+      - llm.anthropic.api.key=${ANTHROPIC_API_KEY}
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
+      - ./config:/app/config
     depends_on:
       - postgres
 
@@ -146,11 +590,31 @@ services:
     image: postgres:15
     environment:
       POSTGRES_DB: abhikarta
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: abhikarta_user
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
 volumes:
   pgdata:</code></pre>
+
+<hr class="my-5">
+
+<div class="alert alert-warning">
+    <h5><i class="bi bi-exclamation-triangle me-2"></i>Production Checklist</h5>
+    <ul class="mb-0">
+        <li>Change <code>app.secret.key</code> to a secure random value</li>
+        <li>Set <code>app.debug=false</code></li>
+        <li>Use environment variables for API keys and passwords</li>
+        <li>Configure <code>database.type=postgresql</code> for production</li>
+        <li>Set appropriate <code>security.cors.origins</code></li>
+        <li>Review <code>security.rate.limit</code> for your load</li>
+    </ul>
+</div>
+
+<div class="text-center mt-5">
+    <a href="{{ url_for('help') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Help
+    </a>
+</div>
 {% endblock %}
