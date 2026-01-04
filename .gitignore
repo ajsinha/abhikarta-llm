@@ -1,0 +1,5 @@
+# Python temporary files
+__pycache__/
+*.pyc
+*.pyo  # For optimized bytecode files
+/.venv/
