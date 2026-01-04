@@ -1,0 +1,673 @@
+{% extends "base.html" %}
+
+{% block title %}Metrics Dashboard - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Progress bars */
+    .progress-thin {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #e9ecef;
+    }
+    
+    .progress-thin .progress-bar {
+        border-radius: 4px;
+    }
+    
+    /* System info items */
+    .system-info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .system-info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .system-info-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    
+    .system-info-value {
+        color: #212529;
+        font-weight: 500;
+        font-size: 0.875rem;
+        text-align: right;
+    }
+    
+    /* Process info boxes */
+    .process-box {
+        background: var(--bg-light-blue);
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .process-box-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--bmo-dark-blue);
+    }
+    
+    .process-box-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Category cards */
+    .category-stat {
+        background: var(--bg-light-blue);
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.2s;
+    }
+    
+    .category-stat:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .category-stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--bmo-blue);
+    }
+    
+    .category-stat-label {
+        font-size: 0.7rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.25rem;
+    }
+    
+    /* Tab pills */
+    .nav-pills-custom .nav-link {
+        color: #495057;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .nav-pills-custom .nav-link:hover {
+        background-color: var(--bg-light-blue);
+        color: var(--bmo-blue);
+    }
+    
+    .nav-pills-custom .nav-link.active {
+        background-color: var(--bmo-blue);
+        border-color: var(--bmo-blue);
+        color: white;
+    }
+    
+    .nav-pills-custom .badge {
+        font-size: 0.7rem;
+        padding: 0.2em 0.5em;
+    }
+    
+    /* Metrics table */
+    .metrics-table code {
+        background: #f1f3f4;
+        color: #0d6efd;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+    
+    .metric-label-badge {
+        display: inline-block;
+        background: #e9ecef;
+        color: #495057;
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        margin: 0.1rem;
+        font-family: monospace;
+    }
+    
+    /* Endpoint box */
+    .endpoint-box {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: monospace;
+    }
+    
+    .endpoint-url {
+        color: var(--bmo-blue);
+        font-weight: 500;
+    }
+    
+    /* Config code block */
+    .config-yaml {
+        background: #282c34;
+        color: #abb2bf;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: 'Consolas', monospace;
+        font-size: 0.875rem;
+        white-space: pre;
+    }
+    
+    .config-yaml .comment { color: #5c6370; }
+    .config-yaml .key { color: #e06c75; }
+    .config-yaml .value { color: #98c379; }
+    
+    /* Reference section */
+    .reference-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        height: 100%;
+    }
+    
+    .reference-card h6 {
+        color: var(--bmo-dark-blue);
+        border-bottom: 2px solid var(--bmo-blue);
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .reference-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .reference-list li {
+        padding: 0.25rem 0;
+        font-size: 0.8rem;
+        color: #495057;
+    }
+    
+    .reference-list code {
+        background: #e9ecef;
+        color: #0d6efd;
+        padding: 0.1rem 0.3rem;
+        border-radius: 3px;
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1><i class="bi bi-speedometer2 me-2"></i>Metrics Dashboard</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Admin</a></li>
+                    <li class="breadcrumb-item active">Metrics</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-auto">
+            <span class="text-muted me-3"><i class="bi bi-clock me-1"></i>{{ metrics.server_time }}</span>
+            <button class="btn btn-bmo" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Status Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card stat-card {% if metrics.available %}success{% else %}danger{% endif %} h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-{% if metrics.available %}check-circle{% else %}x-circle{% endif %}"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="stat-value">{% if metrics.available %}Active{% else %}Off{% endif %}</div>
+                        <div class="stat-label">Prometheus</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card stat-card {% if metrics.enabled %}success{% else %}warning{% endif %} h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-{% if metrics.enabled %}check-circle{% else %}pause-circle{% endif %}"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="stat-value">{% if metrics.enabled %}On{% else %}Off{% endif %}</div>
+                        <div class="stat-label">Collection</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card stat-card info h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-bar-chart"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="stat-value">{{ metrics.total_metrics|default(0) }}</div>
+                        <div class="stat-label">Total Metrics</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="stat-value" style="font-size: 1.25rem;">{{ metrics.system.process.uptime|default('N/A') }}</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Information -->
+<div class="card mb-4">
+    <div class="card-header bg-bmo">
+        <h5 class="mb-0"><i class="bi bi-pc-display me-2"></i>System Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- OS Info -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h6 class="text-bmo mb-3"><i class="bi bi-hdd-stack me-2"></i>Operating System</h6>
+                <div class="system-info-item">
+                    <span class="system-info-label">System</span>
+                    <span class="system-info-value">{{ metrics.system.os.system|default('Unknown') }}</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Release</span>
+                    <span class="system-info-value">{{ metrics.system.os.release|default('Unknown') }}</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Machine</span>
+                    <span class="system-info-value">{{ metrics.system.os.machine|default('Unknown') }}</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Hostname</span>
+                    <span class="system-info-value">{{ metrics.system.os.hostname|default('Unknown') }}</span>
+                </div>
+            </div>
+            
+            <!-- Python Info -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h6 class="text-bmo mb-3"><i class="bi bi-filetype-py me-2"></i>Python Environment</h6>
+                <div class="system-info-item">
+                    <span class="system-info-label">Version</span>
+                    <span class="system-info-value">{{ metrics.system.python.version|default('Unknown') }}</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Implementation</span>
+                    <span class="system-info-value">{{ metrics.system.python.implementation|default('Unknown') }}</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Compiler</span>
+                    <span class="system-info-value" title="{{ metrics.system.python.compiler|default('') }}">{{ metrics.system.python.compiler|default('Unknown')|truncate(20) }}</span>
+                </div>
+            </div>
+            
+            <!-- Network Info -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h6 class="text-bmo mb-3"><i class="bi bi-ethernet me-2"></i>Network</h6>
+                <div class="system-info-item">
+                    <span class="system-info-label">Hostname</span>
+                    <span class="system-info-value">{{ metrics.system.network.hostname|default('Unknown') }}</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">IP Address</span>
+                    <span class="system-info-value">{{ metrics.system.network.ip_address|default('Unknown') }}</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Traffic</span>
+                    <span class="system-info-value">↑{{ metrics.system.network.bytes_sent_mb|default(0) }}MB ↓{{ metrics.system.network.bytes_recv_mb|default(0) }}MB</span>
+                </div>
+            </div>
+            
+            <!-- CPU -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h6 class="text-bmo mb-3"><i class="bi bi-cpu me-2"></i>CPU</h6>
+                <div class="system-info-item">
+                    <span class="system-info-label">Cores</span>
+                    <span class="system-info-value">{{ metrics.system.hardware.cpu_count_physical|default('?') }} Physical / {{ metrics.system.hardware.cpu_count_logical|default('?') }} Logical</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Frequency</span>
+                    <span class="system-info-value">{{ metrics.system.hardware.cpu_freq_current|default('N/A') }} MHz</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Usage</span>
+                    <span class="system-info-value">{{ metrics.system.hardware.cpu_percent|default(0) }}%</span>
+                </div>
+                <div class="progress progress-thin mt-2">
+                    <div class="progress-bar bg-info" style="width: {{ metrics.system.hardware.cpu_percent|default(0) }}%"></div>
+                </div>
+            </div>
+            
+            <!-- Memory -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h6 class="text-bmo mb-3"><i class="bi bi-memory me-2"></i>Memory</h6>
+                <div class="system-info-item">
+                    <span class="system-info-label">Total</span>
+                    <span class="system-info-value">{{ metrics.system.memory.total_gb|default(0) }} GB</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Used / Available</span>
+                    <span class="system-info-value">{{ metrics.system.memory.used_gb|default(0) }}GB / {{ metrics.system.memory.available_gb|default(0) }}GB</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Usage</span>
+                    <span class="system-info-value">{{ metrics.system.memory.percent|default(0) }}%</span>
+                </div>
+                <div class="progress progress-thin mt-2">
+                    <div class="progress-bar bg-success" style="width: {{ metrics.system.memory.percent|default(0) }}%"></div>
+                </div>
+            </div>
+            
+            <!-- Disk -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h6 class="text-bmo mb-3"><i class="bi bi-hdd me-2"></i>Disk</h6>
+                <div class="system-info-item">
+                    <span class="system-info-label">Total</span>
+                    <span class="system-info-value">{{ metrics.system.disk.total_gb|default(0) }} GB</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Used / Free</span>
+                    <span class="system-info-value">{{ metrics.system.disk.used_gb|default(0) }}GB / {{ metrics.system.disk.free_gb|default(0) }}GB</span>
+                </div>
+                <div class="system-info-item">
+                    <span class="system-info-label">Usage</span>
+                    <span class="system-info-value">{{ metrics.system.disk.percent|default(0) }}%</span>
+                </div>
+                <div class="progress progress-thin mt-2">
+                    <div class="progress-bar bg-warning" style="width: {{ metrics.system.disk.percent|default(0) }}%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Process Info -->
+        <h6 class="text-bmo mb-3 mt-2"><i class="bi bi-gear me-2"></i>Application Process</h6>
+        <div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="process-box">
+                    <div class="process-box-value">{{ metrics.system.process.pid|default('N/A') }}</div>
+                    <div class="process-box-label">PID</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="process-box">
+                    <div class="process-box-value">{{ metrics.system.process.status|default('N/A') }}</div>
+                    <div class="process-box-label">Status</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="process-box">
+                    <div class="process-box-value">{{ metrics.system.process.cpu_percent|default(0) }}%</div>
+                    <div class="process-box-label">CPU</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="process-box">
+                    <div class="process-box-value">{{ metrics.system.process.memory_mb|default(0) }}MB</div>
+                    <div class="process-box-label">Memory</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="process-box">
+                    <div class="process-box-value">{{ metrics.system.process.threads|default(0) }}</div>
+                    <div class="process-box-label">Threads</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="process-box">
+                    <div class="process-box-value">{{ metrics.system.process.connections|default(0) }}</div>
+                    <div class="process-box-label">Connections</div>
+                </div>
+            </div>
+        </div>
+        <div class="text-muted small mt-3">
+            <i class="bi bi-clock me-1"></i>Started: {{ metrics.system.process.create_time|default('N/A') }} &nbsp;|&nbsp;
+            <i class="bi bi-file-earmark me-1"></i>Open Files: {{ metrics.system.process.open_files|default(0) }}
+        </div>
+    </div>
+</div>
+
+<!-- Prometheus Endpoint -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-bmo">
+                <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Prometheus Endpoint</h5>
+            </div>
+            <div class="card-body">
+                <div class="endpoint-box d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <code class="endpoint-url">GET {{ request.host_url }}{{ metrics.endpoint[1:] }}</code>
+                    <a href="{{ metrics.endpoint }}" target="_blank" class="btn btn-outline-bmo btn-sm">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>Open
+                    </a>
+                </div>
+                <p class="text-muted small mt-3 mb-0">
+                    <i class="bi bi-info-circle me-1"></i>Configure Prometheus to scrape this endpoint for metrics.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-bmo">
+                <h5 class="mb-0"><i class="bi bi-file-code me-2"></i>Configuration</h5>
+            </div>
+            <div class="card-body">
+                <div class="config-yaml"><span class="comment"># prometheus.yml</span>
+<span class="key">scrape_configs:</span>
+  - <span class="key">job_name:</span> <span class="value">'abhikarta-llm'</span>
+    <span class="key">scrape_interval:</span> <span class="value">15s</span>
+    <span class="key">static_configs:</span>
+      - <span class="key">targets:</span> <span class="value">['{{ request.host }}']</span>
+    <span class="key">metrics_path:</span> <span class="value">'{{ metrics.endpoint }}'</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Metrics by Category -->
+{% if metrics.category_counts %}
+<div class="card mb-4">
+    <div class="card-header bg-bmo d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-collection me-2"></i>Metrics by Category</h5>
+        <span class="badge bg-light text-dark">{{ metrics.total_metrics }} total</span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% for category, count in metrics.category_counts.items() %}
+            {% if count > 0 %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="category-stat">
+                    <div class="category-stat-value">{{ count }}</div>
+                    <div class="category-stat-label">{{ category }}</div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Detailed Metrics Table -->
+{% if metrics.metrics_by_category %}
+<div class="card mb-4">
+    <div class="card-header bg-bmo">
+        <h5 class="mb-0"><i class="bi bi-table me-2"></i>Detailed Metrics</h5>
+    </div>
+    <div class="card-body">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-pills nav-pills-custom mb-3 flex-wrap" id="metricsTab" role="tablist">
+            {% set categories = ['agent', 'workflow', 'swarm', 'aiorg', 'llm', 'http', 'db', 'tool', 'system', 'other'] %}
+            {% set ns = namespace(first=true) %}
+            {% for cat in categories %}
+            {% if metrics.metrics_by_category[cat] %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if ns.first %}active{% endif %}" 
+                        id="{{ cat }}-tab" 
+                        data-bs-toggle="pill" 
+                        data-bs-target="#{{ cat }}-pane" 
+                        type="button">
+                    {{ cat|capitalize }}
+                    <span class="badge bg-secondary ms-1">{{ metrics.metrics_by_category[cat]|length }}</span>
+                </button>
+            </li>
+            {% set ns.first = false %}
+            {% endif %}
+            {% endfor %}
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content" id="metricsTabContent">
+            {% set ns = namespace(first=true) %}
+            {% for cat in categories %}
+            {% if metrics.metrics_by_category[cat] %}
+            <div class="tab-pane fade {% if ns.first %}show active{% endif %}" id="{{ cat }}-pane" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover metrics-table">
+                        <thead>
+                            <tr>
+                                <th>Metric Name</th>
+                                <th>Labels</th>
+                                <th class="text-end">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for metric in metrics.metrics_by_category[cat][:50] %}
+                            <tr>
+                                <td><code>{{ metric.name }}</code></td>
+                                <td>
+                                    {% for key, value in metric.labels.items() %}
+                                    <span class="metric-label-badge">{{ key }}={{ value|truncate(15) }}</span>
+                                    {% endfor %}
+                                </td>
+                                <td class="text-end fw-bold text-success">
+                                    {{ "%.4f"|format(metric.value) if metric.value != metric.value|int else metric.value|int }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if metrics.metrics_by_category[cat]|length > 50 %}
+                <p class="text-muted small text-center mt-2">
+                    Showing 50 of {{ metrics.metrics_by_category[cat]|length }} metrics.
+                    <a href="{{ metrics.endpoint }}" target="_blank">View all</a>
+                </p>
+                {% endif %}
+            </div>
+            {% set ns.first = false %}
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Metrics Reference -->
+<div class="card">
+    <div class="card-header bg-bmo">
+        <h5 class="mb-0"><i class="bi bi-book me-2"></i>Available Metrics Reference</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="reference-card">
+                    <h6><i class="bi bi-robot me-2"></i>Agent Metrics</h6>
+                    <ul class="reference-list">
+                        <li><code>abhikarta_agent_executions_total</code> — Executions count</li>
+                        <li><code>abhikarta_agent_execution_duration_seconds</code> — Duration</li>
+                        <li><code>abhikarta_agent_tokens_total</code> — Token usage</li>
+                        <li><code>abhikarta_active_agents</code> — Active count</li>
+                        <li><code>abhikarta_agent_errors_total</code> — Errors</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="reference-card">
+                    <h6><i class="bi bi-diagram-3 me-2"></i>Workflow Metrics</h6>
+                    <ul class="reference-list">
+                        <li><code>abhikarta_workflow_executions_total</code> — Executions</li>
+                        <li><code>abhikarta_workflow_execution_duration_seconds</code> — Duration</li>
+                        <li><code>abhikarta_workflow_node_executions_total</code> — Nodes</li>
+                        <li><code>abhikarta_active_workflows</code> — Active count</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="reference-card">
+                    <h6><i class="bi bi-people me-2"></i>Swarm Metrics</h6>
+                    <ul class="reference-list">
+                        <li><code>abhikarta_swarm_executions_total</code> — Executions</li>
+                        <li><code>abhikarta_swarm_agent_tasks_total</code> — Tasks</li>
+                        <li><code>abhikarta_swarm_events_total</code> — Events</li>
+                        <li><code>abhikarta_active_swarms</code> — Active count</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="reference-card">
+                    <h6><i class="bi bi-cpu me-2"></i>LLM Metrics</h6>
+                    <ul class="reference-list">
+                        <li><code>abhikarta_llm_requests_total</code> — API requests</li>
+                        <li><code>abhikarta_llm_request_duration_seconds</code> — Latency</li>
+                        <li><code>abhikarta_llm_tokens_total</code> — Tokens</li>
+                        <li><code>abhikarta_llm_errors_total</code> — Errors</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="reference-card">
+                    <h6><i class="bi bi-globe me-2"></i>HTTP Metrics</h6>
+                    <ul class="reference-list">
+                        <li><code>abhikarta_http_requests_total</code> — Requests</li>
+                        <li><code>abhikarta_http_request_duration_seconds</code> — Latency</li>
+                        <li><code>abhikarta_active_requests</code> — Active</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="reference-card">
+                    <h6><i class="bi bi-database me-2"></i>Database Metrics</h6>
+                    <ul class="reference-list">
+                        <li><code>abhikarta_db_operations_total</code> — Operations</li>
+                        <li><code>abhikarta_db_operation_duration_seconds</code> — Latency</li>
+                        <li><code>abhikarta_db_connections</code> — Connections</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

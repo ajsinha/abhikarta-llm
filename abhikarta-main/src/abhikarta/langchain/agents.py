@@ -23,6 +23,22 @@ from dataclasses import dataclass, field
 logger = logging.getLogger(__name__)
 
 # =============================================================================
+# Prometheus Metrics
+# =============================================================================
+try:
+    from abhikarta.monitoring import (
+        AGENT_EXECUTIONS,
+        AGENT_EXECUTION_DURATION,
+        AGENT_TOKENS_USED,
+        AGENT_ERRORS,
+        AGENT_TOOL_CALLS,
+    )
+    _metrics_available = True
+except ImportError:
+    _metrics_available = False
+    logger.debug("Prometheus metrics not available for agents")
+
+# =============================================================================
 # LangChain Import Compatibility Layer
 # Handles different LangChain versions and Python 3.14 compatibility
 # =============================================================================
@@ -666,6 +682,25 @@ class AgentExecutor:
             
             logger.info(f"[AGENT:{agent_id}] Execution completed successfully")
             
+            # Track metrics
+            if _metrics_available:
+                AGENT_EXECUTIONS.labels(
+                    agent_id=agent_id,
+                    agent_type=agent_type,
+                    status='success'
+                ).inc()
+                AGENT_EXECUTION_DURATION.labels(
+                    agent_id=agent_id,
+                    agent_type=agent_type
+                ).observe(result.duration_ms / 1000.0)
+                # Track tool calls
+                for tc in result.tool_calls:
+                    AGENT_TOOL_CALLS.labels(
+                        agent_id=agent_id,
+                        tool_name=tc.get('tool', 'unknown'),
+                        status='success'
+                    ).inc()
+            
             # Log execution
             self._log_execution(result, agent_config)
             
@@ -675,6 +710,26 @@ class AgentExecutor:
             result.error_message = str(e)
             result.completed_at = datetime.now(timezone.utc)
             result.duration_ms = int((datetime.now(timezone.utc) - result.started_at).total_seconds() * 1000)
+            
+            # Track failure metrics
+            if _metrics_available:
+                agent_type = 'unknown'
+                try:
+                    agent_config = self._load_agent_config(agent_id)
+                    if agent_config:
+                        agent_type = agent_config.get('agent_type', 'unknown')
+                except:
+                    pass
+                AGENT_EXECUTIONS.labels(
+                    agent_id=agent_id,
+                    agent_type=agent_type,
+                    status='error'
+                ).inc()
+                AGENT_ERRORS.labels(
+                    agent_id=agent_id,
+                    agent_type=agent_type,
+                    error_type=type(e).__name__
+                ).inc()
             
             # Log failed execution
             self._log_execution(result, {})

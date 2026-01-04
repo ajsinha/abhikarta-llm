@@ -89,6 +89,43 @@ def setup_logging(prop_conf):
     logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 
+def setup_prometheus_metrics(prop_conf):
+    """
+    Initialize Prometheus metrics.
+    
+    Args:
+        prop_conf: PropertiesConfigurator instance
+    """
+    logger = logging.getLogger(__name__)
+    
+    # Check if Prometheus is enabled
+    if not prop_conf.get_bool('monitoring.prometheus.enabled', True):
+        logger.info("Prometheus metrics disabled in configuration")
+        return
+    
+    try:
+        from abhikarta.monitoring import (
+            init_app_info,
+            set_start_time,
+            PROMETHEUS_AVAILABLE,
+        )
+        
+        if PROMETHEUS_AVAILABLE:
+            # Initialize application info
+            environment = prop_conf.get('app.environment', 'production')
+            init_app_info(version='1.4.8', environment=environment)
+            
+            # Set system start time
+            set_start_time()
+            
+            logger.info("Prometheus metrics initialized successfully")
+            logger.info(f"Metrics endpoint: {prop_conf.get('monitoring.metrics.path', '/metrics')}")
+        else:
+            logger.warning("prometheus_client not installed - metrics will be disabled")
+    except ImportError as e:
+        logger.warning(f"Could not initialize Prometheus metrics: {e}")
+
+
 def prepare_database(prop_conf):
     """
     Initialize database facade based on configuration.
@@ -450,6 +487,9 @@ def main():
         setup_logging(prop_conf)
         logger.info("Properties configuration initialized")
         print_step(2, TOTAL_STARTUP_STEPS, "Initializing Logging System", 'done')
+        
+        # 2.5 Initialize Prometheus metrics
+        setup_prometheus_metrics(prop_conf)
         
         # 3. Initialize database
         print_step(3, TOTAL_STARTUP_STEPS, f"Connecting to Database ({prop_conf.get('database.type', 'sqlite')})", 'starting')

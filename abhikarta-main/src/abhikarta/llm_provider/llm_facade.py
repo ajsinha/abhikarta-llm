@@ -15,6 +15,22 @@ from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
 
+# =============================================================================
+# Prometheus Metrics
+# =============================================================================
+try:
+    from abhikarta.monitoring import (
+        LLM_REQUESTS,
+        LLM_REQUEST_DURATION,
+        LLM_TOKENS,
+        LLM_ERRORS,
+        LLM_COST,
+    )
+    _metrics_available = True
+except ImportError:
+    _metrics_available = False
+    logger.debug("Prometheus metrics not available for LLM providers")
+
 
 @dataclass
 class LLMResponse:
@@ -886,11 +902,47 @@ class LLMFacade:
             status = 'failed'
             error_message = str(e)
             logger.error(f"LLM call failed: {e}")
+            
+            # Track error metrics
+            if _metrics_available:
+                LLM_ERRORS.labels(
+                    provider=provider_name,
+                    model=model or 'unknown',
+                    error_type=type(e).__name__
+                ).inc()
             raise
         
         finally:
             # Log to database
             latency_ms = int((time.time() - start_time) * 1000)
+            
+            # Track metrics
+            if _metrics_available:
+                LLM_REQUESTS.labels(
+                    provider=provider_name,
+                    model=model or 'unknown',
+                    status=status
+                ).inc()
+                LLM_REQUEST_DURATION.labels(
+                    provider=provider_name,
+                    model=model or 'unknown'
+                ).observe(latency_ms / 1000.0)
+                
+                # Track tokens if response available
+                if response:
+                    if response.input_tokens > 0:
+                        LLM_TOKENS.labels(
+                            provider=provider_name,
+                            model=model or 'unknown',
+                            token_type='prompt'
+                        ).inc(response.input_tokens)
+                    if response.output_tokens > 0:
+                        LLM_TOKENS.labels(
+                            provider=provider_name,
+                            model=model or 'unknown',
+                            token_type='completion'
+                        ).inc(response.output_tokens)
+            
             self._log_call(
                 call_id=call_id,
                 execution_id=execution_id,

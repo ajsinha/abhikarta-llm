@@ -24,6 +24,22 @@ from operator import add
 
 logger = logging.getLogger(__name__)
 
+# =============================================================================
+# Prometheus Metrics
+# =============================================================================
+try:
+    from abhikarta.monitoring import (
+        WORKFLOW_EXECUTIONS,
+        WORKFLOW_EXECUTION_DURATION,
+        WORKFLOW_NODE_EXECUTIONS,
+        WORKFLOW_NODE_DURATION,
+        ACTIVE_WORKFLOWS,
+    )
+    _metrics_available = True
+except ImportError:
+    _metrics_available = False
+    logger.debug("Prometheus metrics not available for workflows")
+
 
 # ============================================================================
 # Reducer Functions for Concurrent State Updates
@@ -943,6 +959,24 @@ class WorkflowGraphExecutor:
             
             result.completed_at = datetime.utcnow()
             
+            # Track metrics
+            if _metrics_available:
+                WORKFLOW_EXECUTIONS.labels(
+                    workflow_id=workflow_id,
+                    status=result.status
+                ).inc()
+                WORKFLOW_EXECUTION_DURATION.labels(
+                    workflow_id=workflow_id
+                ).observe(result.duration_ms / 1000.0)
+                # Track node executions
+                for node_id in result.executed_nodes:
+                    WORKFLOW_NODE_EXECUTIONS.labels(
+                        workflow_id=workflow_id,
+                        node_id=node_id,
+                        node_type='unknown',
+                        status='completed'
+                    ).inc()
+            
             # Log execution
             self._log_execution(result, workflow)
             
@@ -952,6 +986,13 @@ class WorkflowGraphExecutor:
             result.error_message = str(e)
             result.completed_at = datetime.utcnow()
             result.duration_ms = int((datetime.utcnow() - result.started_at).total_seconds() * 1000)
+            
+            # Track failure metrics
+            if _metrics_available:
+                WORKFLOW_EXECUTIONS.labels(
+                    workflow_id=workflow_id,
+                    status='error'
+                ).inc()
             
             self._log_execution(result, {})
         

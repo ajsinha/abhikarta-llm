@@ -211,6 +211,11 @@ class AbhikartaLLMWeb:
         )
         from .routes.swarm_routes import SwarmRoutes
         from .routes.notification_routes import NotificationRoutes  # v1.4.0
+        from .routes.metrics_routes import init_metrics_routes  # v1.4.8 Prometheus
+        
+        # Initialize Prometheus metrics routes first (uses different pattern)
+        init_metrics_routes(self.app, self.prop_conf)
+        logger.info("Prometheus metrics routes registered")
         
         # Route classes to register
         route_classes = [
