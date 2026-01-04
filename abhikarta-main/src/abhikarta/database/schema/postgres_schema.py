@@ -37,7 +37,7 @@ class PostgresSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.4.9"
+    SCHEMA_VERSION = "1.5.0"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -489,6 +489,7 @@ class PostgresSchema:
         id SERIAL PRIMARY KEY,
         fragment_id TEXT UNIQUE NOT NULL,
         name TEXT NOT NULL,
+        module_name TEXT NOT NULL,
         description TEXT,
         language TEXT DEFAULT 'python',
         code TEXT NOT NULL,
@@ -496,10 +497,14 @@ class PostgresSchema:
         category TEXT DEFAULT 'general',
         tags JSONB DEFAULT '[]',
         dependencies JSONB DEFAULT '[]',
+        entry_point TEXT,
         is_active BOOLEAN DEFAULT TRUE,
         is_system BOOLEAN DEFAULT FALSE,
         status TEXT DEFAULT 'draft',
         source TEXT DEFAULT 'web',
+        checksum TEXT,
+        last_synced_at TIMESTAMP WITH TIME ZONE,
+        sync_error TEXT,
         reviewed_by TEXT,
         reviewed_at TIMESTAMP WITH TIME ZONE,
         review_notes TEXT,
@@ -1035,6 +1040,7 @@ class PostgresSchema:
         "CREATE INDEX IF NOT EXISTS idx_code_fragments_is_active ON code_fragments(is_active);",
         "CREATE INDEX IF NOT EXISTS idx_code_fragments_status ON code_fragments(status);",
         "CREATE INDEX IF NOT EXISTS idx_code_fragments_created_by ON code_fragments(created_by);",
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_code_fragments_module_name ON code_fragments(module_name);",
         "CREATE INDEX IF NOT EXISTS idx_llm_providers_is_active ON llm_providers(is_active);",
         "CREATE INDEX IF NOT EXISTS idx_llm_models_provider_id ON llm_models(provider_id);",
         "CREATE INDEX IF NOT EXISTS idx_llm_models_is_active ON llm_models(is_active);",

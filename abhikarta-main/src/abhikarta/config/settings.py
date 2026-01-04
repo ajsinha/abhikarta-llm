@@ -1,9 +1,11 @@
 """
-Settings Module - Application configuration management.
+Settings Module - Application configuration management using PropertiesConfigurator.
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
+
+Version: 1.5.0 - Standardized to use PropertiesConfigurator (no YAML)
 
 Legal Notice:
 This software and associated documentation are proprietary and confidential.
@@ -11,10 +13,9 @@ Unauthorized copying, distribution, modification, or use is strictly prohibited.
 """
 
 import os
-import yaml
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import logging
 
 logger = logging.getLogger(__name__)
@@ -44,14 +45,58 @@ class LLMProviderSettings:
 
 
 @dataclass
+class CodeFragmentsSettings:
+    """
+    Code fragments sync configuration.
+    
+    Controls how code fragments are synced to local Python modules.
+    """
+    # Enable/disable sync service
+    enabled: bool = True
+    
+    # Target path for code_fragments module
+    # Default: {project_root}/code_fragments
+    target_path: str = ""
+    
+    # Sync interval in seconds (default 5 minutes)
+    sync_interval_seconds: int = 300
+    
+    # Sync fragments on startup
+    sync_on_startup: bool = True
+    
+    # Enable background watcher
+    watch_enabled: bool = True
+    
+    # Status filter - only sync these statuses
+    status_filter: List[str] = field(default_factory=lambda: ["approved", "published"])
+    
+    # Reload strategy: 'graceful' or 'immediate'
+    reload_strategy: str = "graceful"
+    
+    # Max wait for graceful reload in seconds
+    max_wait_seconds: int = 30
+    
+    # S3 source configuration
+    s3_enabled: bool = False
+    s3_bucket: str = ""
+    s3_prefix: str = ""
+    
+    # Filesystem source configuration
+    filesystem_enabled: bool = False
+    filesystem_paths: List[str] = field(default_factory=list)
+
+
+@dataclass
 class Settings:
     """
     Central settings manager for Abhikarta-LLM.
-    Loads configuration from YAML file and environment variables.
+    
+    Loads configuration from PropertiesConfigurator (application.properties).
+    All configuration is managed through properties files - no YAML.
     """
     # Application settings
     app_name: str = "Abhikarta-LLM"
-    app_version: str = "1.3.0"
+    app_version: str = "1.5.0"
     debug: bool = False
     secret_key: str = "change-this-secret-key-in-production"
     
@@ -73,103 +118,167 @@ class Settings:
     default_llm_model: str = "llama3.2:3b"
     llm_providers: Dict[str, LLMProviderSettings] = field(default_factory=dict)
     
+    # Code Fragments Sync (v1.5.0)
+    code_fragments: CodeFragmentsSettings = field(default_factory=CodeFragmentsSettings)
+    
     # Logging
     log_level: str = "INFO"
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     log_file: str = "./logs/abhikarta.log"
     
     @classmethod
-    def load(cls, config_path: str = "config.yaml") -> "Settings":
+    def load_from_properties(cls, prop_conf) -> "Settings":
         """
-        Load settings from YAML file and environment variables.
+        Load settings from PropertiesConfigurator.
         
         Args:
-            config_path: Path to YAML configuration file
+            prop_conf: PropertiesConfigurator instance
             
         Returns:
             Settings instance
         """
         settings = cls()
-        config_file = Path(config_path)
         
-        # Set base directory
-        settings.base_dir = str(config_file.parent.absolute())
+        # Application settings
+        settings.app_name = prop_conf.get('app.name', settings.app_name)
+        settings.app_version = prop_conf.get('app.version', settings.app_version)
+        settings.debug = prop_conf.get_bool('app.debug', settings.debug)
+        settings.secret_key = prop_conf.get('app.secret.key', settings.secret_key)
         
-        # Load from YAML if exists
-        if config_file.exists():
-            try:
-                with open(config_file, 'r') as f:
-                    config = yaml.safe_load(f) or {}
-                settings._load_from_dict(config)
-                logger.info(f"Configuration loaded from {config_path}")
-            except Exception as e:
-                logger.warning(f"Error loading config file: {e}")
-        else:
-            logger.warning(f"Config file not found: {config_path}, using defaults")
+        # Server settings
+        settings.host = prop_conf.get('server.host', settings.host)
+        settings.port = prop_conf.get_int('server.port', settings.port)
         
-        # Override with environment variables
-        settings._load_from_env()
+        # Paths
+        settings.data_dir = prop_conf.get('data.dir', settings.data_dir)
+        settings.logs_dir = prop_conf.get('logs.dir', settings.logs_dir)
+        settings.users_file = prop_conf.get('users.file', settings.users_file)
+        
+        # Database settings
+        settings.database.type = prop_conf.get('database.type', settings.database.type)
+        settings.database.sqlite_path = prop_conf.get('database.sqlite.path', settings.database.sqlite_path)
+        settings.database.pg_host = prop_conf.get('database.postgresql.host', settings.database.pg_host)
+        settings.database.pg_port = prop_conf.get_int('database.postgresql.port', settings.database.pg_port)
+        settings.database.pg_database = prop_conf.get('database.postgresql.database', settings.database.pg_database)
+        settings.database.pg_user = prop_conf.get('database.postgresql.user', settings.database.pg_user)
+        settings.database.pg_password = prop_conf.get('database.postgresql.password', settings.database.pg_password)
+        
+        # LLM settings
+        settings.default_llm_provider = prop_conf.get('llm.default.provider', settings.default_llm_provider)
+        
+        # Load LLM providers
+        settings._load_llm_providers(prop_conf)
+        
+        # Logging settings
+        settings.log_level = prop_conf.get('logging.level', settings.log_level)
+        settings.log_format = prop_conf.get('logging.format', settings.log_format)
+        settings.log_file = prop_conf.get('logging.file', settings.log_file)
+        
+        # Code Fragments Sync settings (v1.5.0)
+        settings._load_code_fragments_settings(prop_conf)
         
         # Ensure directories exist
         settings._ensure_directories()
         
+        logger.info(f"Settings loaded from PropertiesConfigurator")
         return settings
     
-    def _load_from_dict(self, config: Dict[str, Any]) -> None:
-        """Load settings from dictionary."""
-        # App settings
-        app_config = config.get('app', {})
-        self.app_name = app_config.get('name', self.app_name)
-        self.app_version = app_config.get('version', self.app_version)
-        self.debug = app_config.get('debug', self.debug)
-        self.secret_key = app_config.get('secret_key', self.secret_key)
+    def _load_llm_providers(self, prop_conf) -> None:
+        """Load LLM provider settings from properties."""
+        providers = ['openai', 'anthropic', 'ollama', 'bedrock', 'google', 'cohere', 
+                     'mistral', 'groq', 'together', 'deepseek', 'xai']
         
-        # Server settings
-        server_config = config.get('server', {})
-        self.host = server_config.get('host', self.host)
-        self.port = server_config.get('port', self.port)
+        for provider in providers:
+            prefix = f'llm.{provider}'
+            enabled = prop_conf.get_bool(f'{prefix}.enabled', False)
+            
+            if enabled or prop_conf.get(f'{prefix}.api.key'):
+                self.llm_providers[provider] = LLMProviderSettings(
+                    enabled=enabled,
+                    api_key=prop_conf.get(f'{prefix}.api.key', ''),
+                    base_url=prop_conf.get(f'{prefix}.base.url', ''),
+                    default_model=prop_conf.get(f'{prefix}.default.model', ''),
+                    fallback_model=prop_conf.get(f'{prefix}.fallback.model', ''),
+                    region=prop_conf.get(f'{prefix}.region', '')
+                )
+    
+    def _load_code_fragments_settings(self, prop_conf) -> None:
+        """Load code fragments sync settings from properties."""
+        prefix = 'code.fragments'
         
-        # Users file
-        users_config = config.get('users', {})
-        self.users_file = users_config.get('file', self.users_file)
+        self.code_fragments.enabled = prop_conf.get_bool(
+            f'{prefix}.enabled', self.code_fragments.enabled)
+        self.code_fragments.target_path = prop_conf.get(
+            f'{prefix}.target.path', self.code_fragments.target_path)
+        self.code_fragments.sync_interval_seconds = prop_conf.get_int(
+            f'{prefix}.sync.interval.seconds', self.code_fragments.sync_interval_seconds)
+        self.code_fragments.sync_on_startup = prop_conf.get_bool(
+            f'{prefix}.sync.on.startup', self.code_fragments.sync_on_startup)
+        self.code_fragments.watch_enabled = prop_conf.get_bool(
+            f'{prefix}.watch.enabled', self.code_fragments.watch_enabled)
         
-        # Database settings
-        db_config = config.get('database', {})
-        self.database.type = db_config.get('type', self.database.type)
+        # Status filter (comma-separated list)
+        status_filter = prop_conf.get_list(f'{prefix}.status.filter')
+        if status_filter:
+            self.code_fragments.status_filter = status_filter
         
-        sqlite_config = db_config.get('sqlite', {})
-        self.database.sqlite_path = sqlite_config.get('path', self.database.sqlite_path)
+        self.code_fragments.reload_strategy = prop_conf.get(
+            f'{prefix}.reload.strategy', self.code_fragments.reload_strategy)
+        self.code_fragments.max_wait_seconds = prop_conf.get_int(
+            f'{prefix}.max.wait.seconds', self.code_fragments.max_wait_seconds)
         
-        pg_config = db_config.get('postgresql', {})
-        self.database.pg_host = pg_config.get('host', self.database.pg_host)
-        self.database.pg_port = pg_config.get('port', self.database.pg_port)
-        self.database.pg_database = pg_config.get('database', self.database.pg_database)
-        self.database.pg_user = pg_config.get('user', self.database.pg_user)
-        self.database.pg_password = pg_config.get('password', self.database.pg_password)
+        # S3 source
+        self.code_fragments.s3_enabled = prop_conf.get_bool(
+            f'{prefix}.s3.enabled', self.code_fragments.s3_enabled)
+        self.code_fragments.s3_bucket = prop_conf.get(
+            f'{prefix}.s3.bucket', self.code_fragments.s3_bucket)
+        self.code_fragments.s3_prefix = prop_conf.get(
+            f'{prefix}.s3.prefix', self.code_fragments.s3_prefix)
         
-        # LLM settings
-        llm_config = config.get('llm', {})
-        self.default_llm_provider = llm_config.get('default_provider', self.default_llm_provider)
+        # Filesystem source
+        self.code_fragments.filesystem_enabled = prop_conf.get_bool(
+            f'{prefix}.filesystem.enabled', self.code_fragments.filesystem_enabled)
+        filesystem_paths = prop_conf.get_list(f'{prefix}.filesystem.paths')
+        if filesystem_paths:
+            self.code_fragments.filesystem_paths = filesystem_paths
+    
+    @classmethod
+    def load(cls, config_path: str = None) -> "Settings":
+        """
+        Load settings - attempts to use PropertiesConfigurator if available.
         
-        providers_config = llm_config.get('providers', {})
-        for provider_name, provider_config in providers_config.items():
-            self.llm_providers[provider_name] = LLMProviderSettings(
-                enabled=provider_config.get('enabled', False),
-                api_key=provider_config.get('api_key', ''),
-                base_url=provider_config.get('base_url', ''),
-                default_model=provider_config.get('default_model', ''),
-                fallback_model=provider_config.get('fallback_model', ''),
-                region=provider_config.get('region', '')
-            )
+        This is a convenience method that works with or without PropertiesConfigurator.
+        For full functionality, use load_from_properties() with an initialized
+        PropertiesConfigurator instance.
         
-        # Logging settings
-        logging_config = config.get('logging', {})
-        self.log_level = logging_config.get('level', self.log_level)
-        self.log_format = logging_config.get('format', self.log_format)
-        self.log_file = logging_config.get('file', self.log_file)
+        Args:
+            config_path: Optional path (ignored, kept for backward compatibility)
+            
+        Returns:
+            Settings instance
+        """
+        settings = cls()
+        
+        # Try to get PropertiesConfigurator singleton if already initialized
+        try:
+            from abhikarta.core.config import PropertiesConfigurator
+            # PropertiesConfigurator is a singleton, so if it's initialized,
+            # we can get it without arguments
+            prop_conf = PropertiesConfigurator.__new__(PropertiesConfigurator)
+            if hasattr(prop_conf, '_initialized') and prop_conf._initialized:
+                return cls.load_from_properties(prop_conf)
+        except Exception:
+            pass
+        
+        # Fall back to environment variables only
+        settings._load_from_env()
+        settings._ensure_directories()
+        
+        logger.warning("PropertiesConfigurator not available, using environment variables only")
+        return settings
     
     def _load_from_env(self) -> None:
-        """Override settings from environment variables."""
+        """Load settings from environment variables (fallback)."""
         # App
         self.debug = os.getenv('DEBUG', str(self.debug)).lower() == 'true'
         self.secret_key = os.getenv('SECRET_KEY', self.secret_key)
@@ -186,20 +295,6 @@ class Settings:
         self.database.pg_database = os.getenv('PG_DATABASE', self.database.pg_database)
         self.database.pg_user = os.getenv('PG_USER', self.database.pg_user)
         self.database.pg_password = os.getenv('PG_PASSWORD', self.database.pg_password)
-        
-        # LLM API Keys
-        if 'openai' in self.llm_providers:
-            self.llm_providers['openai'].api_key = os.getenv(
-                'OPENAI_API_KEY', self.llm_providers['openai'].api_key
-            )
-        if 'anthropic' in self.llm_providers:
-            self.llm_providers['anthropic'].api_key = os.getenv(
-                'ANTHROPIC_API_KEY', self.llm_providers['anthropic'].api_key
-            )
-        if 'ollama' in self.llm_providers:
-            self.llm_providers['ollama'].base_url = os.getenv(
-                'OLLAMA_BASE_URL', self.llm_providers['ollama'].base_url
-            )
     
     def _ensure_directories(self) -> None:
         """Ensure required directories exist."""
@@ -218,3 +313,18 @@ class Settings:
             )
         else:
             raise ValueError(f"Unsupported database type: {self.database.type}")
+
+
+def get_settings(prop_conf=None) -> Settings:
+    """
+    Get Settings instance.
+    
+    Args:
+        prop_conf: Optional PropertiesConfigurator instance
+        
+    Returns:
+        Settings instance
+    """
+    if prop_conf:
+        return Settings.load_from_properties(prop_conf)
+    return Settings.load()

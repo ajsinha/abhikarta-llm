@@ -22,17 +22,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="fragment_id" class="form-label">Fragment ID <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="fragment_id" name="fragment_id" required
-                                           pattern="[a-z0-9-]+" placeholder="e.g., data-utils, string-helpers">
-                                    <div class="form-text">Lowercase letters, numbers, and hyphens only. Used in URI: <code>db://&lt;fragment_id&gt;</code></div>
+                                    <label for="name" class="form-label">Display Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" required
+                                           placeholder="e.g., Data Validator, CSV Parser">
+                                    <div class="form-text">Human-readable name for the fragment</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">Display Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="name" name="name" required
-                                           placeholder="e.g., Data Utilities">
+                                    <label for="module_name" class="form-label">Module Name</label>
+                                    <input type="text" class="form-control" id="module_name" name="module_name"
+                                           pattern="[a-zA-Z_][a-zA-Z0-9_]*" placeholder="e.g., data_validator (auto-generated if blank)">
+                                    <div class="form-text">Python identifier for imports: <code>from code_fragments.module_name import *</code></div>
                                 </div>
                             </div>
                         </div>
@@ -44,7 +45,7 @@
                         </div>
                         
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="language" class="form-label">Language</label>
                                     <select class="form-select" id="language" name="language">
@@ -54,14 +55,22 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="category" class="form-label">Category</label>
                                     <input type="text" class="form-control" id="category" name="category" 
-                                           value="general" placeholder="e.g., data, text, api">
+                                           value="general" placeholder="e.g., data, utils, api">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="entry_point" class="form-label">Entry Point</label>
+                                    <input type="text" class="form-control" id="entry_point" name="entry_point"
+                                           placeholder="e.g., main, run">
+                                    <div class="form-text">Main function name</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="tags" class="form-label">Tags</label>
                                     <input type="text" class="form-control" id="tags" name="tags"
@@ -73,8 +82,8 @@
                         <div class="mb-3">
                             <label for="dependencies" class="form-label">Dependencies</label>
                             <input type="text" class="form-control" id="dependencies" name="dependencies"
-                                   placeholder="Comma-separated fragment IDs this depends on">
-                            <div class="form-text">Other fragment IDs that must be loaded before this one</div>
+                                   placeholder="Comma-separated Python package names">
+                            <div class="form-text">Python packages required (e.g., pandas, requests)</div>
                         </div>
                         
                         <div class="mb-3">

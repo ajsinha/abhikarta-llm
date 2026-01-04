@@ -14,8 +14,8 @@
 
 <div class="alert alert-info mb-4">
     <i class="bi bi-info-circle me-2"></i>
-    Abhikarta-LLM uses a relational database with <strong>45 interconnected tables</strong> and <strong>93 indexes</strong> supporting both SQLite and PostgreSQL backends. 
-    The schema is designed for scalability, auditability, and comprehensive LLM agent management.
+    Abhikarta-LLM uses a relational database with <strong>45 interconnected tables</strong> and <strong>95 indexes</strong> supporting both SQLite and PostgreSQL backends. 
+    The schema is designed for scalability, auditability, and comprehensive LLM agent management. <span class="badge bg-info">v1.5.0</span>
 </div>
 
 <!-- Schema Overview -->
@@ -749,7 +749,7 @@
 
         <!-- code_fragments table -->
         <h6 class="text-secondary border-bottom pb-2 mt-4"><code>code_fragments</code> - Reusable Code Modules</h6>
-        <p class="text-muted">Reusable code modules that can be dynamically loaded into agents and workflows.</p>
+        <p class="text-muted">Reusable code modules synced to local Python package for standard imports. Only approved/published fragments are synced.</p>
         <div class="table-responsive mb-4">
             <table class="table table-sm table-bordered">
                 <thead class="table-light">
@@ -757,16 +757,36 @@
                 </thead>
                 <tbody>
                     <tr><td><code>fragment_id</code></td><td>TEXT UNIQUE</td><td>Fragment identifier</td></tr>
-                    <tr><td><code>name</code></td><td>TEXT</td><td>Fragment name</td></tr>
+                    <tr><td><code>name</code></td><td>TEXT</td><td>Display name</td></tr>
+                    <tr class="table-info"><td><code>module_name</code></td><td>TEXT UNIQUE NOT NULL</td><td>Valid Python identifier for imports (v1.5.0)</td></tr>
+                    <tr><td><code>description</code></td><td>TEXT</td><td>Fragment description</td></tr>
                     <tr><td><code>language</code></td><td>TEXT</td><td>Programming language (python)</td></tr>
                     <tr><td><code>code</code></td><td>TEXT</td><td>Source code content</td></tr>
                     <tr><td><code>version</code></td><td>TEXT</td><td>Code version</td></tr>
                     <tr><td><code>category</code></td><td>TEXT</td><td>Category: tool, utility, transform</td></tr>
-                    <tr><td><code>dependencies</code></td><td>TEXT (JSON)</td><td>Required Python packages</td></tr>
-                    <tr><td><code>is_system</code></td><td>INTEGER</td><td>System-provided fragment flag</td></tr>
+                    <tr><td><code>tags</code></td><td>TEXT/JSONB</td><td>Tags array</td></tr>
+                    <tr><td><code>dependencies</code></td><td>TEXT/JSONB</td><td>Required Python packages</td></tr>
+                    <tr class="table-info"><td><code>entry_point</code></td><td>TEXT</td><td>Main function name (v1.5.0)</td></tr>
+                    <tr><td><code>is_active</code></td><td>BOOLEAN</td><td>Active flag</td></tr>
+                    <tr><td><code>is_system</code></td><td>BOOLEAN</td><td>System-provided fragment flag</td></tr>
+                    <tr><td><code>status</code></td><td>TEXT</td><td>Approval status: draft, testing, pending_review, approved, published, archived</td></tr>
+                    <tr><td><code>source</code></td><td>TEXT</td><td>Creation source: web, python, admin</td></tr>
+                    <tr class="table-info"><td><code>checksum</code></td><td>TEXT</td><td>SHA256 hash for change detection (v1.5.0)</td></tr>
+                    <tr class="table-info"><td><code>last_synced_at</code></td><td>TIMESTAMP</td><td>Last successful sync timestamp (v1.5.0)</td></tr>
+                    <tr class="table-info"><td><code>sync_error</code></td><td>TEXT</td><td>Last sync error message (v1.5.0)</td></tr>
+                    <tr><td><code>reviewed_by</code></td><td>TEXT FK</td><td>Reviewer user ID</td></tr>
+                    <tr><td><code>reviewed_at</code></td><td>TIMESTAMP</td><td>Review timestamp</td></tr>
+                    <tr><td><code>review_notes</code></td><td>TEXT</td><td>Admin review notes</td></tr>
+                    <tr><td><code>created_by</code></td><td>TEXT FK</td><td>Creator user ID</td></tr>
+                    <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>Creation timestamp</td></tr>
+                    <tr><td><code>updated_at</code></td><td>TIMESTAMP</td><td>Last update timestamp</td></tr>
+                    <tr><td><code>updated_by</code></td><td>TEXT</td><td>Last modifier</td></tr>
                     <tr><td><code>usage_count</code></td><td>INTEGER</td><td>Usage statistics</td></tr>
                 </tbody>
             </table>
+        </div>
+        <div class="alert alert-success small">
+            <strong>Usage:</strong> <code>from code_fragments.{module_name} import function_name</code>
         </div>
     </div>
 </div>

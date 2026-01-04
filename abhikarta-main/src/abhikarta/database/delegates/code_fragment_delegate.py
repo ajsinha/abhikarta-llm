@@ -5,13 +5,16 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.3.0
+Version: 1.5.0
 """
 
 from typing import Any, Dict, List, Optional
 import uuid
 import json
 import logging
+import re
+import hashlib
+import keyword
 
 from ..database_delegate import DatabaseDelegate
 
@@ -23,7 +26,83 @@ class CodeFragmentDelegate(DatabaseDelegate):
     Delegate for code fragment database operations.
     
     Handles table: code_fragments
+    
+    Version 1.5.0 adds:
+    - module_name: Valid Python identifier for import
+    - checksum: SHA256 hash for change detection
+    - last_synced_at: Timestamp of last sync
+    - sync_error: Last sync error message
+    - entry_point: Main function/class name
     """
+    
+    # ==========================================================================
+    # MODULE NAME VALIDATION
+    # ==========================================================================
+    
+    @staticmethod
+    def is_valid_python_identifier(name: str) -> bool:
+        """Check if name is a valid Python identifier."""
+        if not name:
+            return False
+        # Must match Python identifier pattern
+        if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', name):
+            return False
+        # Must not be a Python keyword
+        if keyword.iskeyword(name):
+            return False
+        return True
+    
+    @staticmethod
+    def name_to_module_name(name: str) -> str:
+        """
+        Convert a display name to a valid Python module name.
+        
+        Examples:
+            "Data Validator" -> "data_validator"
+            "csv-parser" -> "csv_parser"
+            "API Helper v2" -> "api_helper_v2"
+            "123invalid" -> "_123invalid"
+        """
+        if not name:
+            return "unnamed_fragment"
+        
+        # Convert to lowercase
+        module_name = name.lower()
+        
+        # Replace common separators with underscores
+        module_name = re.sub(r'[-\s.]+', '_', module_name)
+        
+        # Remove any non-alphanumeric characters except underscore
+        module_name = re.sub(r'[^a-z0-9_]', '', module_name)
+        
+        # Remove consecutive underscores
+        module_name = re.sub(r'_+', '_', module_name)
+        
+        # Remove leading/trailing underscores
+        module_name = module_name.strip('_')
+        
+        # If starts with digit, prefix with underscore
+        if module_name and module_name[0].isdigit():
+            module_name = '_' + module_name
+        
+        # If empty or keyword, add suffix
+        if not module_name:
+            module_name = "fragment"
+        if keyword.iskeyword(module_name):
+            module_name = module_name + '_mod'
+        
+        return module_name
+    
+    @staticmethod
+    def calculate_checksum(code: str) -> str:
+        """Calculate SHA256 checksum of code content."""
+        if not code:
+            return ""
+        return hashlib.sha256(code.encode('utf-8')).hexdigest()
+    
+    # ==========================================================================
+    # QUERY METHODS
+    # ==========================================================================
     
     def get_all_fragments(self, category: str = None, language: str = None,
                           is_active: bool = True) -> List[Dict]:
@@ -61,6 +140,13 @@ class CodeFragmentDelegate(DatabaseDelegate):
             (name,)
         )
     
+    def get_fragment_by_module_name(self, module_name: str) -> Optional[Dict]:
+        """Get fragment by module name."""
+        return self.fetch_one(
+            "SELECT * FROM code_fragments WHERE module_name = ?",
+            (module_name,)
+        )
+    
     def get_fragments_count(self, is_active: bool = True) -> int:
         """Get count of fragments."""
         where = "is_active = 1" if is_active else None
@@ -92,24 +178,123 @@ class CodeFragmentDelegate(DatabaseDelegate):
             (category,)
         ) or []
     
+    # ==========================================================================
+    # SYNC-RELATED METHODS (v1.5.0)
+    # ==========================================================================
+    
+    def get_syncable_fragments(self) -> List[Dict]:
+        """
+        Get all fragments that should be synced to the local module.
+        Only approved or published, active, Python fragments.
+        """
+        return self.fetch_all(
+            """SELECT * FROM code_fragments 
+               WHERE status IN ('approved', 'published') 
+               AND is_active = 1
+               AND language = 'python'
+               ORDER BY module_name"""
+        ) or []
+    
+    def get_fragments_needing_sync(self) -> List[Dict]:
+        """
+        Get fragments where checksum has changed since last sync,
+        or never synced.
+        """
+        return self.fetch_all(
+            """SELECT * FROM code_fragments 
+               WHERE status IN ('approved', 'published') 
+               AND is_active = 1
+               AND language = 'python'
+               AND (last_synced_at IS NULL 
+                    OR updated_at > last_synced_at
+                    OR sync_error IS NOT NULL)
+               ORDER BY module_name"""
+        ) or []
+    
+    def update_sync_status(self, fragment_id: str, success: bool,
+                           error: str = None) -> bool:
+        """Update sync status for a fragment."""
+        try:
+            if success:
+                self.execute(
+                    """UPDATE code_fragments 
+                       SET last_synced_at = CURRENT_TIMESTAMP, sync_error = NULL
+                       WHERE fragment_id = ?""",
+                    (fragment_id,)
+                )
+            else:
+                self.execute(
+                    """UPDATE code_fragments 
+                       SET sync_error = ?
+                       WHERE fragment_id = ?""",
+                    (error, fragment_id)
+                )
+            return True
+        except Exception as e:
+            logger.error(f"Error updating sync status: {e}")
+            return False
+    
+    def get_sync_summary(self) -> Dict[str, Any]:
+        """Get summary of sync status for all fragments."""
+        results = self.fetch_one(
+            """SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN status IN ('approved', 'published') AND is_active = 1 AND language = 'python' THEN 1 ELSE 0 END) as syncable,
+                SUM(CASE WHEN last_synced_at IS NOT NULL AND sync_error IS NULL THEN 1 ELSE 0 END) as synced,
+                SUM(CASE WHEN sync_error IS NOT NULL THEN 1 ELSE 0 END) as errors
+               FROM code_fragments"""
+        )
+        return results or {'total': 0, 'syncable': 0, 'synced': 0, 'errors': 0}
+    
+    # ==========================================================================
+    # CREATE / UPDATE METHODS
+    # ==========================================================================
+    
     def create_fragment(self, name: str, code: str, created_by: str,
                         description: str = None, language: str = 'python',
                         version: str = '1.0.0', category: str = 'general',
                         tags: str = '[]', dependencies: str = '[]',
                         is_active: int = 1, is_system: int = 0,
-                        status: str = 'draft', source: str = 'web') -> Optional[str]:
-        """Create a new code fragment and return fragment_id."""
+                        status: str = 'draft', source: str = 'web',
+                        entry_point: str = None,
+                        module_name: str = None) -> Optional[str]:
+        """
+        Create a new code fragment and return fragment_id.
+        
+        Automatically generates:
+        - fragment_id (UUID)
+        - module_name (from name if not provided)
+        - checksum (from code)
+        """
         fragment_id = str(uuid.uuid4())
+        
+        # Generate module_name if not provided
+        if not module_name:
+            module_name = self.name_to_module_name(name)
+        
+        # Validate module_name
+        if not self.is_valid_python_identifier(module_name):
+            logger.error(f"Invalid module name: {module_name}")
+            return None
+        
+        # Check for duplicate module_name
+        if self.module_name_exists(module_name):
+            logger.error(f"Module name already exists: {module_name}")
+            return None
+        
+        # Calculate checksum
+        checksum = self.calculate_checksum(code)
+        
         try:
             self.execute(
                 """INSERT INTO code_fragments 
-                   (fragment_id, name, description, language, code, version,
-                    category, tags, dependencies, is_active, is_system, 
-                    status, source, created_by)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (fragment_id, name, description, language, code, version,
-                 category, tags, dependencies, is_active, is_system,
-                 status, source, created_by)
+                   (fragment_id, name, module_name, description, language, code, 
+                    version, category, tags, dependencies, entry_point,
+                    is_active, is_system, status, source, checksum, created_by)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (fragment_id, name, module_name, description, language, code,
+                 version, category, tags, dependencies, entry_point,
+                 is_active, is_system, status, source, checksum, created_by)
             )
             return fragment_id
         except Exception as e:
@@ -118,15 +303,33 @@ class CodeFragmentDelegate(DatabaseDelegate):
     
     def update_fragment(self, fragment_id: str, updated_by: str = None,
                         **kwargs) -> bool:
-        """Update fragment fields."""
+        """
+        Update fragment fields.
+        
+        Automatically recalculates checksum if code is updated.
+        Updates module_name if name changes (unless module_name explicitly provided).
+        """
         if not kwargs:
             return False
         
-        valid_fields = ['name', 'description', 'language', 'code', 'version',
-                        'category', 'tags', 'dependencies', 'is_active', 'status', 'source']
+        valid_fields = ['name', 'module_name', 'description', 'language', 'code', 
+                        'version', 'category', 'tags', 'dependencies', 'is_active', 
+                        'status', 'source', 'entry_point']
         
         updates = ['updated_by = ?', 'updated_at = CURRENT_TIMESTAMP']
         params = [updated_by]
+        
+        # If code is being updated, recalculate checksum
+        if 'code' in kwargs:
+            kwargs['checksum'] = self.calculate_checksum(kwargs['code'])
+            valid_fields.append('checksum')
+        
+        # If name is being updated and module_name not explicitly set, regenerate module_name
+        if 'name' in kwargs and 'module_name' not in kwargs:
+            new_module_name = self.name_to_module_name(kwargs['name'])
+            # Check if new module_name conflicts with existing (excluding current fragment)
+            if not self.module_name_exists(new_module_name, exclude_id=fragment_id):
+                kwargs['module_name'] = new_module_name
         
         for key, value in kwargs.items():
             if key in valid_fields:
@@ -146,15 +349,31 @@ class CodeFragmentDelegate(DatabaseDelegate):
             logger.error(f"Error updating fragment: {e}")
             return False
     
+    def module_name_exists(self, module_name: str, exclude_id: str = None) -> bool:
+        """Check if module_name already exists."""
+        if exclude_id:
+            result = self.fetch_one(
+                """SELECT COUNT(*) as count FROM code_fragments 
+                   WHERE module_name = ? AND fragment_id != ?""",
+                (module_name, exclude_id)
+            )
+        else:
+            result = self.fetch_one(
+                "SELECT COUNT(*) as count FROM code_fragments WHERE module_name = ?",
+                (module_name,)
+            )
+        return result.get('count', 0) > 0 if result else False
+    
     def update_code(self, fragment_id: str, code: str,
                     updated_by: str = None) -> bool:
-        """Update fragment code."""
+        """Update fragment code and recalculate checksum."""
+        checksum = self.calculate_checksum(code)
         try:
             self.execute(
                 """UPDATE code_fragments 
-                   SET code = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+                   SET code = ?, checksum = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
                    WHERE fragment_id = ?""",
-                (code, updated_by, fragment_id)
+                (code, checksum, updated_by, fragment_id)
             )
             return True
         except Exception as e:

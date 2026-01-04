@@ -997,6 +997,7 @@ class UserRoutes(AbstractRoutes):
             
             if request.method == 'POST':
                 name = request.form.get('name', '').strip()
+                module_name = request.form.get('module_name', '').strip()
                 description = request.form.get('description', '').strip()
                 language = request.form.get('language', 'python')
                 code = request.form.get('code', '')
@@ -1004,6 +1005,7 @@ class UserRoutes(AbstractRoutes):
                 category = request.form.get('category', 'general')
                 tags_str = request.form.get('tags', '')
                 dependencies_str = request.form.get('dependencies', '')
+                entry_point = request.form.get('entry_point', '').strip()
                 
                 # Validation
                 if not name:
@@ -1016,8 +1018,19 @@ class UserRoutes(AbstractRoutes):
                     return render_template('user/create_code_fragment.html',
                                            categories=self.db_facade.code_fragments.get_categories())
                 
-                if self.db_facade.code_fragments.name_exists(name):
-                    flash('Fragment name already exists', 'error')
+                # Generate module_name if not provided
+                if not module_name:
+                    module_name = self.db_facade.code_fragments.name_to_module_name(name)
+                
+                # Validate module_name is a valid Python identifier
+                if not self.db_facade.code_fragments.is_valid_python_identifier(module_name):
+                    flash(f'Invalid module name: "{module_name}". Must be a valid Python identifier.', 'error')
+                    return render_template('user/create_code_fragment.html',
+                                           categories=self.db_facade.code_fragments.get_categories())
+                
+                # Check for duplicate module_name
+                if self.db_facade.code_fragments.module_name_exists(module_name):
+                    flash(f'Module name "{module_name}" already exists. Please choose a different name.', 'error')
                     return render_template('user/create_code_fragment.html',
                                            categories=self.db_facade.code_fragments.get_categories())
                 
@@ -1033,6 +1046,7 @@ class UserRoutes(AbstractRoutes):
                 try:
                     fragment_id = self.db_facade.code_fragments.create_fragment(
                         name=name,
+                        module_name=module_name,
                         description=description,
                         language=language,
                         code=code,
@@ -1040,6 +1054,7 @@ class UserRoutes(AbstractRoutes):
                         category=category,
                         tags=tags,
                         dependencies=dependencies,
+                        entry_point=entry_point,
                         created_by=user_id,
                         status='draft',
                         source='web'

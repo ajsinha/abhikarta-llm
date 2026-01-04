@@ -20,7 +20,7 @@ class TestConfig:
     def test_settings_load(self):
         """Test settings can be loaded."""
         from abhikarta.config import Settings
-        settings = Settings.load('config.yaml')
+        settings = Settings.load()
         assert settings.app_name == "Abhikarta-LLM"
         assert settings.app_version == "1.0.0"
 

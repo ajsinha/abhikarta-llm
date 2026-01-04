@@ -1,16 +1,47 @@
-# Abhikarta-LLM v1.4.9
+# Abhikarta-LLM v1.5.0
 
-[![Version](https://img.shields.io/badge/version-1.4.8-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.10+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
-**Enterprise-grade AI Agent & Workflow Orchestration Platform with Agent Swarms and Enterprise Notifications**
+**Enterprise-grade AI Agent & Workflow Orchestration Platform with Agent Swarms, Code Fragment Module System, and Enterprise Notifications**
 
 Abhikarta-LLM is a comprehensive platform for building, deploying, and managing AI agents, workflows, and intelligent agent swarms with multi-provider LLM support, visual designers, human-in-the-loop controls, enterprise notifications, and industry-specific solutions.
 
 ---
 
-## 🚀 What's New in v1.4.9
+## 🚀 What's New in v1.5.0
+
+### 📦 Code Fragment Module System (NEW!)
+Code fragments are now synced as a proper Python package with standard imports:
+
+```python
+# Standard Python import - works with IDE autocomplete!
+from code_fragments.data_validator import validate_email, validate_required
+from code_fragments.csv_parser import parse_csv
+
+# Use in your code
+if validate_email(user_input):
+    data = parse_csv(file_path)
+```
+
+**Key Features:**
+- **Auto-Sync Service** - Background watcher syncs approved fragments every 5 minutes
+- **Module Name Validation** - Enforces valid Python identifiers
+- **Checksum-Based Change Detection** - SHA256 hashes for efficient sync
+- **Hot Reload Support** - Graceful or immediate module reloading
+- **IDE Support** - Full autocomplete and debugging capabilities
+
+**Configuration (application.properties):**
+```properties
+# Code Fragments Sync Configuration
+code.fragments.enabled=true
+code.fragments.target.path=./code_fragments
+code.fragments.sync.interval.seconds=300
+code.fragments.sync.on.startup=true
+code.fragments.watch.enabled=true
+code.fragments.status.filter=approved,published
+```
 
 ### 📦 Modular SDK Architecture
 Abhikarta-LLM now provides **three standalone packages** for maximum flexibility:
@@ -56,7 +87,7 @@ my_agent = ResearchAgent()
 result = my_agent.run("Find AI trends")
 ```
 
-### 📁 Reorganized Project Structure (v1.4.9)
+### 📁 Reorganized Project Structure (v1.5.0)
 ```
 abhikarta-llm/
 ├── abhikarta-main/               # Core library package
@@ -73,7 +104,7 @@ abhikarta-llm/
 └── run_server.py                 # Application entry point
 ```
 
-### 🐍 Python Script Mode (v1.4.9)
+### 🐍 Python Script Mode (v1.5.0)
 Power users can now define agents, workflows, swarms, and AI organizations using Python scripts instead of JSON/visual designers. See `docs/sdk/` for details.
 
 ---
@@ -349,7 +380,7 @@ New comprehensive tutorial for advanced reasoning patterns:
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.4.9/
+abhikarta-llm-v1.5.0/
 ├── abhikarta-main/                   # Core library package
 │   ├── src/abhikarta/                # Core library
 │   │   ├── agent/                    # Agent management
@@ -386,13 +417,13 @@ abhikarta-llm-v1.4.9/
 │   ├── pyproject.toml                # Package configuration
 │   └── README.md                     # Core library docs
 │
-├── abhikarta-web/                    # Web UI module (v1.4.9)
+├── abhikarta-web/                    # Web UI module (v1.5.0)
 │   └── src/abhikarta_web/
 │       ├── routes/                   # Flask route handlers
 │       ├── templates/                # Jinja2 templates (60+ files)
 │       └── static/                   # CSS, JS, images
 │
-├── abhikarta-sdk-client/             # API Client SDK (v1.4.9)
+├── abhikarta-sdk-client/             # API Client SDK (v1.5.0)
 │   └── src/abhikarta_client/
 │       ├── client.py                 # Main client class
 │       ├── agents.py                 # Agents API
@@ -400,7 +431,7 @@ abhikarta-llm-v1.4.9/
 │       ├── swarms.py                 # Swarms API
 │       └── organizations.py          # Organizations API
 │
-├── abhikarta-sdk-embedded/           # Embedded SDK (v1.4.9)
+├── abhikarta-sdk-embedded/           # Embedded SDK (v1.5.0)
 │   └── src/abhikarta_embedded/
 │       ├── core.py                   # Main Abhikarta class
 │       ├── agents/                   # Agent implementations
@@ -478,7 +509,7 @@ The platform uses 45 tables across these categories:
 | **Swarms** | swarms, swarm_agents, swarm_executions (v1.3.0) |
 | **AI Orgs** | ai_organizations, ai_org_nodes, ai_org_tasks (v1.4.7) |
 | **Notifications** | notification_channels, notification_templates (v1.4.0) |
-| **Scripts** | python_scripts, script_executions (v1.4.9) |
+| **Scripts** | python_scripts, script_executions (v1.5.0) |
 | **Config** | settings, templates |
 
 ---

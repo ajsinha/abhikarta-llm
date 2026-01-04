@@ -724,17 +724,32 @@ class AdminRoutes(AbstractRoutes):
             import json
             
             if request.method == 'POST':
-                fragment_id = request.form.get('fragment_id', '').strip()
                 name = request.form.get('name', '').strip()
+                module_name = request.form.get('module_name', '').strip()
                 description = request.form.get('description', '').strip()
                 language = request.form.get('language', 'python')
                 code = request.form.get('code', '')
                 category = request.form.get('category', 'general').strip()
                 tags = request.form.get('tags', '').strip()
                 dependencies = request.form.get('dependencies', '').strip()
+                entry_point = request.form.get('entry_point', '').strip()
                 
-                if not fragment_id or not name or not code:
-                    flash('Fragment ID, Name, and Code are required', 'error')
+                if not name or not code:
+                    flash('Name and Code are required', 'error')
+                    return redirect(url_for('add_code_fragment'))
+                
+                # Generate module_name if not provided
+                if not module_name:
+                    module_name = self.db_facade.code_fragments.name_to_module_name(name)
+                
+                # Validate module_name
+                if not self.db_facade.code_fragments.is_valid_python_identifier(module_name):
+                    flash(f'Invalid module name: "{module_name}". Must be a valid Python identifier.', 'error')
+                    return redirect(url_for('add_code_fragment'))
+                
+                # Check for duplicate module_name
+                if self.db_facade.code_fragments.module_name_exists(module_name):
+                    flash(f'Module name "{module_name}" already exists.', 'error')
                     return redirect(url_for('add_code_fragment'))
                 
                 # Parse tags and dependencies
@@ -744,6 +759,7 @@ class AdminRoutes(AbstractRoutes):
                 try:
                     result = self.db_facade.code_fragments.create_fragment(
                         name=name,
+                        module_name=module_name,
                         code=code,
                         created_by=session.get('user_id'),
                         description=description,
@@ -751,12 +767,13 @@ class AdminRoutes(AbstractRoutes):
                         category=category,
                         tags=json.dumps(tags_list),
                         dependencies=json.dumps(deps_list),
+                        entry_point=entry_point,
                         status='approved',  # Admin-created fragments are auto-approved
                         source='admin'
                     )
                     
                     if result:
-                        self.log_audit('create_code_fragment', 'code_fragment', fragment_id)
+                        self.log_audit('create_code_fragment', 'code_fragment', result)
                         flash(f'Code fragment "{name}" created successfully', 'success')
                         return redirect(url_for('admin_code_fragments'))
                     else:

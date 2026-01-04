@@ -113,7 +113,7 @@ def setup_prometheus_metrics(prop_conf):
         if PROMETHEUS_AVAILABLE:
             # Initialize application info
             environment = prop_conf.get('app.environment', 'production')
-            init_app_info(version='1.4.8', environment=environment)
+            init_app_info(version='1.5.0', environment=environment)
             
             # Set system start time
             set_start_time()
@@ -624,7 +624,7 @@ def main():
 ║                                                                              ║
 ║     All resources have been released gracefully.                             ║
 ║                                                                              ║
-║     👋  Goodbye! Thank you for using Abhikarta-LLM v1.4.7                    ║
+║     👋  Goodbye! Thank you for using Abhikarta-LLM v1.5.0                    ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 \033[0m''')

@@ -82,9 +82,9 @@
                         <code class="badge bg-dark">v{{ fragment.version or '1.0.0' }}</code>
                     </div>
                     
-                    <div class="bg-light p-2 rounded mb-3">
-                        <code class="small">db://{{ fragment.name }}</code>
-                        <button class="btn btn-sm btn-link p-0 float-end" onclick="copyRef('{{ fragment.name }}')" title="Copy reference">
+                    <div class="bg-dark text-light p-2 rounded mb-3">
+                        <code class="small" id="import-{{ loop.index }}">from code_fragments.{{ fragment.module_name or fragment.name.replace('-', '_') }} import *</code>
+                        <button class="btn btn-sm btn-link p-0 float-end text-light" onclick="copyImportStmt('import-{{ loop.index }}')" title="Copy import">
                             <i class="bi bi-clipboard"></i>
                         </button>
                     </div>
@@ -132,36 +132,37 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-4">
-                    <h6><i class="bi bi-1-circle me-2"></i>In Workflows</h6>
+                    <h6><i class="bi bi-1-circle me-2"></i>Standard Python Import</h6>
+                    <pre class="bg-dark text-light p-2 rounded small"><code>from code_fragments.module_name import *
+# or import specific functions
+from code_fragments.module_name import func1, func2</code></pre>
+                </div>
+                <div class="col-md-4">
+                    <h6><i class="bi bi-2-circle me-2"></i>In Workflows</h6>
                     <pre class="bg-light p-2 rounded small"><code>{
-  "python_modules": {
-    "utils": "db://fragment-name"
-  }
+  "python_code": "from code_fragments.validator import check_email"
 }</code></pre>
                 </div>
                 <div class="col-md-4">
-                    <h6><i class="bi bi-2-circle me-2"></i>In Agents</h6>
-                    <pre class="bg-light p-2 rounded small"><code>{
-  "code_fragments": [
-    "db://validator",
-    "db://helper"
-  ]
-}</code></pre>
+                    <h6><i class="bi bi-3-circle me-2"></i>In Python Scripts</h6>
+                    <pre class="bg-light p-2 rounded small"><code># Your Python script
+from code_fragments.helper import process_data
+result = process_data(input_data)</code></pre>
                 </div>
-                <div class="col-md-4">
-                    <h6><i class="bi bi-3-circle me-2"></i>In Python Code</h6>
-                    <pre class="bg-light p-2 rounded small"><code>from fragment import func
-result = func(data)</code></pre>
-                </div>
+            </div>
+            <div class="mt-3 alert alert-light mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                Code fragments are synced automatically when approved. Simply use standard Python imports.
             </div>
         </div>
     </div>
 </div>
 
 <script>
-function copyRef(name) {
-    navigator.clipboard.writeText('db://' + name).then(() => {
-        alert('Reference copied: db://' + name);
+function copyImportStmt(elementId) {
+    const code = document.getElementById(elementId).innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        alert('Import statement copied!');
     });
 }
 </script>

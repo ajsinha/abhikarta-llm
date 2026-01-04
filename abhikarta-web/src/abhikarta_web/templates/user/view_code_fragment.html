@@ -75,26 +75,27 @@
                 </div>
             </div>
             
-            <!-- Usage Reference -->
+            <!-- Import Reference (for approved/published fragments) -->
             {% if fragment.status in ['approved', 'published'] %}
             <div class="card mt-3 border-success">
                 <div class="card-header bg-success text-white">
-                    <i class="bi bi-link-45deg me-2"></i>Usage Reference
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Import Reference
                 </div>
                 <div class="card-body">
-                    <p>This code fragment can be referenced in workflows, agents, and swarms using:</p>
-                    <div class="bg-light p-3 rounded">
-                        <code class="fs-5">db://{{ fragment.name }}</code>
-                        <button class="btn btn-sm btn-outline-dark float-end" onclick="copyRef()">
-                            <i class="bi bi-clipboard"></i> Copy
+                    <h6>Python Import</h6>
+                    <div class="bg-dark text-light p-3 rounded mb-3">
+                        <code id="importCode">from code_fragments.{{ fragment.module_name or fragment.name.replace('-', '_') }} import *</code>
+                        <button class="btn btn-sm btn-outline-light float-end" onclick="copyImport()">
+                            <i class="bi bi-clipboard"></i>
                         </button>
                     </div>
                     
-                    <h6 class="mt-3">Example in Workflow JSON:</h6>
-                    <pre class="bg-dark text-light p-3 rounded"><code>{
-  "python_modules": {
-    "{{ fragment.name.replace('-', '_') }}": "db://{{ fragment.name }}"
-  }
+                    <h6>Or import specific functions</h6>
+                    <pre class="bg-light p-3 rounded mb-3"><code>from code_fragments.{{ fragment.module_name or fragment.name.replace('-', '_') }} import function_name</code></pre>
+                    
+                    <h6>In Workflow JSON</h6>
+                    <pre class="bg-light p-3 rounded mb-0"><code>{
+  "python_code": "from code_fragments.{{ fragment.module_name or fragment.name.replace('-', '_') }} import validate"
 }</code></pre>
                 </div>
             </div>
@@ -166,6 +167,9 @@
                 </div>
                 <div class="card-body">
                     <dl class="row mb-0">
+                        <dt class="col-5">Module Name</dt>
+                        <dd class="col-7"><code>{{ fragment.module_name or fragment.name.replace('-', '_') }}</code></dd>
+                        
                         <dt class="col-5">Fragment ID</dt>
                         <dd class="col-7"><code class="small">{{ fragment.fragment_id[:8] }}...</code></dd>
                         
@@ -283,6 +287,13 @@ function copyCode() {
     const code = document.getElementById('codeContent').innerText;
     navigator.clipboard.writeText(code).then(() => {
         alert('Code copied to clipboard!');
+    });
+}
+
+function copyImport() {
+    const importCode = document.getElementById('importCode').innerText;
+    navigator.clipboard.writeText(importCode).then(() => {
+        alert('Import statement copied to clipboard!');
     });
 }
 
