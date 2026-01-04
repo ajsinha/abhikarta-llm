@@ -312,12 +312,21 @@ result = my_agent.run("What is 15 * 23?")</code></pre>
         </div>
         <div class="card-body">
             <pre class="bg-dark text-light p-3 rounded"><code>abhikarta-llm/
-├── abhikarta/                    # Core library
-│   ├── agent/                    # Agent management
-│   ├── workflow/                 # Workflow engine
-│   ├── swarm/                    # Swarm orchestration
-│   ├── aiorg/                    # AI Organizations
-│   └── ...
+├── abhikarta-main/               # Core library package
+│   ├── src/abhikarta/            # Core library
+│   │   ├── agent/                # Agent management
+│   │   ├── workflow/             # Workflow engine
+│   │   ├── swarm/                # Swarm orchestration
+│   │   ├── aiorg/                # AI Organizations
+│   │   └── ...
+│   │
+│   ├── entity_definitions/       # JSON templates
+│   │   ├── agents/
+│   │   ├── workflows/
+│   │   ├── swarms/
+│   │   └── aiorg/
+│   │
+│   └── examples/                 # Example code
 │
 ├── abhikarta-web/                # Web UI module
 │   └── src/abhikarta_web/
@@ -338,12 +347,6 @@ result = my_agent.run("What is 15 * 23?")</code></pre>
 │       ├── agents/               # Agent implementations
 │       ├── providers/            # LLM providers
 │       └── decorators.py         # @agent, @tool
-│
-├── entity_definitions/           # JSON templates
-│   ├── agents/
-│   ├── workflows/
-│   ├── swarms/
-│   └── aiorg/
 │
 └── run_server.py                 # Application entry point</code></pre>
         </div>

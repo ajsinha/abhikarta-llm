@@ -86,14 +86,24 @@ result = my_agent.run("Hello!")
 
 ```
 abhikarta-llm/
-├── abhikarta/                    # Core library
-│   ├── agent/                    # Agent management
-│   ├── workflow/                 # Workflow engine
-│   ├── swarm/                    # Swarm orchestration
-│   ├── aiorg/                    # AI Organizations
-│   ├── langchain/                # LangChain integration
-│   ├── database/                 # Persistence layer
-│   └── ...
+├── abhikarta-main/               # Core library package
+│   ├── src/abhikarta/
+│   │   ├── agent/                # Agent management
+│   │   ├── workflow/             # Workflow engine
+│   │   ├── swarm/                # Swarm orchestration
+│   │   ├── aiorg/                # AI Organizations
+│   │   ├── langchain/            # LangChain integration
+│   │   ├── database/             # Persistence layer
+│   │   └── ...
+│   │
+│   ├── entity_definitions/       # Entity JSON templates
+│   │   ├── agents/
+│   │   ├── workflows/
+│   │   ├── swarms/
+│   │   ├── aiorg/
+│   │   └── scripts/
+│   │
+│   └── examples/                 # Example code
 │
 ├── abhikarta-web/                # Web UI module
 │   └── src/abhikarta_web/
@@ -119,13 +129,6 @@ abhikarta-llm/
 │       ├── providers/            # LLM providers
 │       ├── tools/                # Tool framework
 │       └── decorators.py         # @agent, @tool, etc.
-│
-├── entity_definitions/           # Entity JSON templates
-│   ├── agents/
-│   ├── workflows/
-│   ├── swarms/
-│   ├── aiorg/
-│   └── scripts/
 │
 └── run_server.py                 # Application entry point
 ```

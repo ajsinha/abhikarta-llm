@@ -1,0 +1,23 @@
+{
+    "include": [
+        "abhikarta-main/src",
+        "abhikarta-web/src",
+        "abhikarta-sdk-client/src",
+        "abhikarta-sdk-embedded/src"
+    ],
+    "exclude": [
+        "**/__pycache__",
+        "**/node_modules",
+        ".git"
+    ],
+    "extraPaths": [
+        "abhikarta-main/src",
+        "abhikarta-web/src",
+        "abhikarta-sdk-client/src",
+        "abhikarta-sdk-embedded/src"
+    ],
+    "pythonVersion": "3.10",
+    "typeCheckingMode": "basic",
+    "reportMissingImports": false,
+    "reportMissingModuleSource": false
+}

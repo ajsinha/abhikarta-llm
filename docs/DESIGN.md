@@ -174,14 +174,24 @@ Abhikarta v1.4.8 introduces a modular SDK architecture with three standalone pac
 
 ```
 abhikarta-llm/
-├── abhikarta/                    # Core library
-│   ├── agent/                    # Agent management
-│   ├── workflow/                 # Workflow engine
-│   ├── swarm/                    # Swarm orchestration
-│   ├── aiorg/                    # AI Organizations
-│   ├── database/                 # Persistence layer
-│   ├── langchain/                # LangChain integration
-│   └── tools/                    # Tool framework
+├── abhikarta-main/               # Core library package
+│   ├── src/abhikarta/            # Core library
+│   │   ├── agent/                # Agent management
+│   │   ├── workflow/             # Workflow engine
+│   │   ├── swarm/                # Swarm orchestration
+│   │   ├── aiorg/                # AI Organizations
+│   │   ├── database/             # Persistence layer
+│   │   ├── langchain/            # LangChain integration
+│   │   └── tools/                # Tool framework
+│   │
+│   ├── entity_definitions/       # JSON entity templates
+│   │   ├── agents/               # Agent templates
+│   │   ├── workflows/            # Workflow templates
+│   │   ├── swarms/               # Swarm templates
+│   │   ├── aiorg/                # AI Org templates
+│   │   └── scripts/              # Script templates
+│   │
+│   └── examples/                 # Example code
 │
 ├── abhikarta-web/                # Web UI module
 │   └── src/abhikarta_web/
@@ -207,13 +217,6 @@ abhikarta-llm/
 │       ├── providers/            # LLM providers
 │       ├── tools/                # Tool framework
 │       └── decorators.py         # @agent, @workflow, @tool
-│
-├── entity_definitions/           # JSON entity templates
-│   ├── agents/                   # Agent templates
-│   ├── workflows/                # Workflow templates
-│   ├── swarms/                   # Swarm templates
-│   ├── aiorg/                    # AI Org templates
-│   └── scripts/                  # Script templates
 │
 └── run_server.py                 # Application entry point
 ```

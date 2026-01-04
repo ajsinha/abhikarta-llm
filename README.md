@@ -56,14 +56,19 @@ my_agent = ResearchAgent()
 result = my_agent.run("Find AI trends")
 ```
 
-### 📁 Reorganized Project Structure
+### 📁 Reorganized Project Structure (v1.4.8)
 ```
 abhikarta-llm/
-├── abhikarta/                    # Core library (agents, workflows, swarms, orgs)
-├── abhikarta-web/                # Web UI module (Flask routes, templates)
+├── abhikarta-main/               # Core library package
+│   ├── src/abhikarta/            #   Agents, workflows, swarms, orgs, actor system
+│   ├── entity_definitions/       #   JSON templates (agents, workflows, swarms, etc.)
+│   └── examples/                 #   Example code and usage patterns
+├── abhikarta-web/                # Web UI module
+│   └── src/abhikarta_web/        #   Flask routes, templates, static files
 ├── abhikarta-sdk-client/         # API client SDK
+│   └── src/abhikarta_client/     #   Remote server connectivity
 ├── abhikarta-sdk-embedded/       # Standalone embedded SDK
-├── entity_definitions/           # JSON templates (agents, workflows, swarms, etc.)
+│   └── src/abhikarta_embedded/   #   No-server agent development
 ├── docs/sdk/                     # SDK documentation
 └── run_server.py                 # Application entry point
 ```
@@ -345,29 +350,41 @@ New comprehensive tutorial for advanced reasoning patterns:
 
 ```
 abhikarta-llm-v1.4.8/
-├── abhikarta/                        # Core library
-│   ├── agent/                        # Agent management
-│   ├── aiorg/                        # AI Organizations (v1.4.7)
-│   ├── actor/                        # Actor system (v1.3.0)
-│   ├── config/                       # Configuration
-│   ├── core/                         # Core utilities
-│   ├── database/                     # Database layer (44 tables)
-│   │   ├── db_facade.py              # Database abstraction
-│   │   ├── delegates/                # 10 delegate classes
-│   │   └── schema/                   # SQLite/PostgreSQL schemas
-│   ├── hitl/                         # Human-in-the-Loop (v1.1.5)
-│   ├── langchain/                    # LangChain integration
-│   ├── llm/                          # LLM Adapter
-│   ├── llm_provider/                 # LLM provider facade
-│   ├── mcp/                          # MCP Integration (v1.1.6)
-│   ├── messaging/                    # Messaging (v1.3.0)
-│   ├── notification/                 # Notifications (v1.4.0)
-│   ├── scripts/                      # Script template manager
-│   ├── swarm/                        # Swarm orchestration (v1.3.0)
-│   ├── tools/                        # Tool framework (10 types)
-│   ├── user_management/              # User management
-│   ├── utils/                        # Utilities
-│   └── workflow/                     # Workflow engine
+├── abhikarta-main/                   # Core library package
+│   ├── src/abhikarta/                # Core library
+│   │   ├── agent/                    # Agent management
+│   │   ├── aiorg/                    # AI Organizations (v1.4.7)
+│   │   ├── actor/                    # Actor system (v1.3.0)
+│   │   ├── config/                   # Configuration
+│   │   ├── core/                     # Core utilities
+│   │   ├── database/                 # Database layer (44 tables)
+│   │   │   ├── db_facade.py          # Database abstraction
+│   │   │   ├── delegates/            # 10 delegate classes
+│   │   │   └── schema/               # SQLite/PostgreSQL schemas
+│   │   ├── hitl/                     # Human-in-the-Loop (v1.1.5)
+│   │   ├── langchain/                # LangChain integration
+│   │   ├── llm/                      # LLM Adapter
+│   │   ├── llm_provider/             # LLM provider facade
+│   │   ├── mcp/                      # MCP Integration (v1.1.6)
+│   │   ├── messaging/                # Messaging (v1.3.0)
+│   │   ├── notification/             # Notifications (v1.4.0)
+│   │   ├── scripts/                  # Script template manager
+│   │   ├── swarm/                    # Swarm orchestration (v1.3.0)
+│   │   ├── tools/                    # Tool framework (10 types)
+│   │   ├── user_management/          # User management
+│   │   ├── utils/                    # Utilities
+│   │   └── workflow/                 # Workflow engine
+│   │
+│   ├── entity_definitions/           # JSON entity templates
+│   │   ├── agents/                   # Agent templates (12)
+│   │   ├── workflows/                # Workflow templates (22)
+│   │   ├── swarms/                   # Swarm templates (5)
+│   │   ├── aiorg/                    # AI Org templates (5)
+│   │   └── scripts/                  # Script templates (7)
+│   │
+│   ├── examples/                     # Python/JSON examples
+│   ├── pyproject.toml                # Package configuration
+│   └── README.md                     # Core library docs
 │
 ├── abhikarta-web/                    # Web UI module (v1.4.8)
 │   └── src/abhikarta_web/
@@ -394,31 +411,18 @@ abhikarta-llm-v1.4.8/
 │       ├── tools/                    # Tool framework
 │       └── decorators.py             # @agent, @tool, etc.
 │
-├── entity_definitions/               # JSON entity templates
-│   ├── agents/                       # Agent templates (12)
-│   ├── workflows/                    # Workflow templates (22)
-│   ├── swarms/                       # Swarm templates (5)
-│   ├── aiorg/                        # AI Org templates (5)
-│   └── scripts/                      # Script templates (7)
-│
 ├── config/
 │   └── application.properties        # Configuration
 ├── data/                             # Runtime data
 ├── docs/
 │   ├── sdk/                          # SDK documentation
 │   ├── DESIGN.md                     # Architecture design
-│   ├── QUICKSTART.md                 # Quick start guide
-│   └── ...
-├── examples/                         # Python/JSON examples
-└── run_server.py                     # Application entry point
-│   ├── QUICKSTART.md             # Quick start guide
-│   ├── DESIGN.md                 # Architecture design
-│   └── REQUIREMENTS.md           # Requirements spec
-├── logs/                         # Application logs
-├── tests/                        # Test suite
-├── requirements.txt              # Python dependencies
-├── run_server.py                 # Application entry point
-└── LICENSE                       # License file
+│   └── QUICKSTART.md                 # Quick start guide
+├── logs/                             # Application logs
+├── tests/                            # Test suite
+├── requirements.txt                  # Python dependencies
+├── run_server.py                     # Application entry point
+└── LICENSE                           # License file
 ```
 
 ---

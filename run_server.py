@@ -26,11 +26,12 @@ import logging
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Add new module paths
+# Add new module paths for src/ layout packages
 project_root = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(project_root, 'abhikarta-web', 'src'))
-sys.path.insert(0, os.path.join(project_root, 'abhikarta-sdk-client', 'src'))
-sys.path.insert(0, os.path.join(project_root, 'abhikarta-sdk-embedded', 'src'))
+sys.path.insert(0, os.path.join(project_root, 'abhikarta-main', 'src'))      # Main abhikarta module
+sys.path.insert(0, os.path.join(project_root, 'abhikarta-web', 'src'))       # Web UI module
+sys.path.insert(0, os.path.join(project_root, 'abhikarta-sdk-client', 'src'))    # SDK Client
+sys.path.insert(0, os.path.join(project_root, 'abhikarta-sdk-embedded', 'src'))  # SDK Embedded
 
 
 def prepare_prop_conf():
