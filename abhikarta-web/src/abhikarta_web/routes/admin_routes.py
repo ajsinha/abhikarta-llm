@@ -424,7 +424,7 @@ class AdminRoutes(AbstractRoutes):
                 api_keys = result if result else []
                 
                 # Get users for display
-                users = self.user_facade.get_all_users()
+                users = self.user_facade.list_users()
                 users_dict = {u['user_id']: u for u in users}
                 
             except Exception as e:
@@ -484,7 +484,7 @@ class AdminRoutes(AbstractRoutes):
                     flash('Error creating API key', 'error')
             
             # Get users for dropdown
-            users = self.user_facade.get_all_users()
+            users = self.user_facade.list_users()
             
             return render_template('admin/create_api_key.html',
                                    fullname=session.get('fullname'),

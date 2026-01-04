@@ -21,10 +21,17 @@ import os
 import sys
 import platform
 import socket
-import psutil
 from functools import wraps
 from datetime import datetime, timedelta
 from flask import Response, request, render_template, g
+
+# Optional psutil import
+try:
+    import psutil
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    PSUTIL_AVAILABLE = False
+    psutil = None
 
 logger = logging.getLogger(__name__)
 
@@ -73,44 +80,53 @@ def get_system_info():
         info['python']['error'] = str(e)
     
     # Hardware Information (requires psutil)
-    try:
-        info['hardware'] = {
-            'cpu_count_logical': psutil.cpu_count(logical=True),
-            'cpu_count_physical': psutil.cpu_count(logical=False),
-            'cpu_freq_current': round(psutil.cpu_freq().current, 2) if psutil.cpu_freq() else 'N/A',
-            'cpu_freq_max': round(psutil.cpu_freq().max, 2) if psutil.cpu_freq() else 'N/A',
-            'cpu_percent': psutil.cpu_percent(interval=0.1),
-        }
-    except Exception as e:
-        info['hardware']['error'] = str(e)
+    if PSUTIL_AVAILABLE:
+        try:
+            info['hardware'] = {
+                'cpu_count_logical': psutil.cpu_count(logical=True),
+                'cpu_count_physical': psutil.cpu_count(logical=False),
+                'cpu_freq_current': round(psutil.cpu_freq().current, 2) if psutil.cpu_freq() else 'N/A',
+                'cpu_freq_max': round(psutil.cpu_freq().max, 2) if psutil.cpu_freq() else 'N/A',
+                'cpu_percent': psutil.cpu_percent(interval=0.1),
+            }
+        except Exception as e:
+            info['hardware']['error'] = str(e)
+    else:
+        info['hardware'] = {'error': 'psutil not installed'}
     
     # Memory Information
-    try:
-        mem = psutil.virtual_memory()
-        swap = psutil.swap_memory()
-        info['memory'] = {
-            'total_gb': round(mem.total / (1024**3), 2),
-            'available_gb': round(mem.available / (1024**3), 2),
-            'used_gb': round(mem.used / (1024**3), 2),
-            'percent': mem.percent,
-            'swap_total_gb': round(swap.total / (1024**3), 2),
-            'swap_used_gb': round(swap.used / (1024**3), 2),
-            'swap_percent': swap.percent,
-        }
-    except Exception as e:
-        info['memory']['error'] = str(e)
+    if PSUTIL_AVAILABLE:
+        try:
+            mem = psutil.virtual_memory()
+            swap = psutil.swap_memory()
+            info['memory'] = {
+                'total_gb': round(mem.total / (1024**3), 2),
+                'available_gb': round(mem.available / (1024**3), 2),
+                'used_gb': round(mem.used / (1024**3), 2),
+                'percent': mem.percent,
+                'swap_total_gb': round(swap.total / (1024**3), 2),
+                'swap_used_gb': round(swap.used / (1024**3), 2),
+                'swap_percent': swap.percent,
+            }
+        except Exception as e:
+            info['memory']['error'] = str(e)
+    else:
+        info['memory'] = {'error': 'psutil not installed'}
     
     # Disk Information
-    try:
-        disk = psutil.disk_usage('/')
-        info['disk'] = {
-            'total_gb': round(disk.total / (1024**3), 2),
-            'used_gb': round(disk.used / (1024**3), 2),
-            'free_gb': round(disk.free / (1024**3), 2),
-            'percent': disk.percent,
-        }
-    except Exception as e:
-        info['disk']['error'] = str(e)
+    if PSUTIL_AVAILABLE:
+        try:
+            disk = psutil.disk_usage('/')
+            info['disk'] = {
+                'total_gb': round(disk.total / (1024**3), 2),
+                'used_gb': round(disk.used / (1024**3), 2),
+                'free_gb': round(disk.free / (1024**3), 2),
+                'percent': disk.percent,
+            }
+        except Exception as e:
+            info['disk']['error'] = str(e)
+    else:
+        info['disk'] = {'error': 'psutil not installed'}
     
     # Network Information
     try:
@@ -120,41 +136,51 @@ def get_system_info():
         except:
             ip_address = '127.0.0.1'
         
-        net_io = psutil.net_io_counters()
         info['network'] = {
             'hostname': hostname,
             'ip_address': ip_address,
-            'bytes_sent_mb': round(net_io.bytes_sent / (1024**2), 2),
-            'bytes_recv_mb': round(net_io.bytes_recv / (1024**2), 2),
-            'packets_sent': net_io.packets_sent,
-            'packets_recv': net_io.packets_recv,
         }
+        
+        if PSUTIL_AVAILABLE:
+            net_io = psutil.net_io_counters()
+            info['network'].update({
+                'bytes_sent_mb': round(net_io.bytes_sent / (1024**2), 2),
+                'bytes_recv_mb': round(net_io.bytes_recv / (1024**2), 2),
+                'packets_sent': net_io.packets_sent,
+                'packets_recv': net_io.packets_recv,
+            })
     except Exception as e:
         info['network']['error'] = str(e)
     
     # Process Information
-    try:
-        process = psutil.Process(os.getpid())
+    if PSUTIL_AVAILABLE:
+        try:
+            process = psutil.Process(os.getpid())
+            info['process'] = {
+                'pid': os.getpid(),
+                'name': process.name(),
+                'status': process.status(),
+                'cpu_percent': process.cpu_percent(),
+                'memory_percent': round(process.memory_percent(), 2),
+                'memory_mb': round(process.memory_info().rss / (1024**2), 2),
+                'threads': process.num_threads(),
+                'open_files': len(process.open_files()),
+                'connections': len(process.connections()),
+                'create_time': datetime.fromtimestamp(process.create_time()).strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            
+            # Calculate uptime
+            uptime_seconds = time.time() - process.create_time()
+            uptime = timedelta(seconds=int(uptime_seconds))
+            info['process']['uptime'] = str(uptime)
+            info['process']['uptime_seconds'] = int(uptime_seconds)
+        except Exception as e:
+            info['process']['error'] = str(e)
+    else:
         info['process'] = {
             'pid': os.getpid(),
-            'name': process.name(),
-            'status': process.status(),
-            'cpu_percent': process.cpu_percent(),
-            'memory_percent': round(process.memory_percent(), 2),
-            'memory_mb': round(process.memory_info().rss / (1024**2), 2),
-            'threads': process.num_threads(),
-            'open_files': len(process.open_files()),
-            'connections': len(process.connections()),
-            'create_time': datetime.fromtimestamp(process.create_time()).strftime('%Y-%m-%d %H:%M:%S'),
+            'error': 'psutil not installed'
         }
-        
-        # Calculate uptime
-        uptime_seconds = time.time() - process.create_time()
-        uptime = timedelta(seconds=int(uptime_seconds))
-        info['process']['uptime'] = str(uptime)
-        info['process']['uptime_seconds'] = int(uptime_seconds)
-    except Exception as e:
-        info['process']['error'] = str(e)
     
     return info
 
