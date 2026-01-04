@@ -306,7 +306,7 @@ class WorkflowTemplateManager:
             self._templates[template.template_id] = template
     
     def _load_json_templates(self):
-        """Load workflow templates from JSON files in templates/workflows directory."""
+        """Load workflow templates from JSON files in entity_definitions/workflows directory."""
         import os
         import glob
         
@@ -315,7 +315,7 @@ class WorkflowTemplateManager:
         workflow_dir = os.path.dirname(os.path.abspath(__file__))
         abhikarta_dir = os.path.dirname(workflow_dir)
         project_dir = os.path.dirname(abhikarta_dir)
-        templates_dir = os.path.join(project_dir, 'templates', 'workflows')
+        templates_dir = os.path.join(project_dir, 'entity_definitions', 'workflows')
         
         if not os.path.exists(templates_dir):
             logger.warning(f"Templates directory not found: {templates_dir}")

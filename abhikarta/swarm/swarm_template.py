@@ -68,12 +68,12 @@ class SwarmTemplateManager:
             self._templates[template.template_id] = template
     
     def _load_json_templates(self):
-        """Load swarm templates from JSON files in templates/swarms directory."""
+        """Load swarm templates from JSON files in entity_definitions/swarms directory."""
         # Find templates directory relative to this file
         current_dir = os.path.dirname(os.path.abspath(__file__))
         abhikarta_dir = os.path.dirname(current_dir)
         project_dir = os.path.dirname(abhikarta_dir)
-        templates_dir = os.path.join(project_dir, 'templates', 'swarms')
+        templates_dir = os.path.join(project_dir, 'entity_definitions', 'swarms')
         
         if not os.path.exists(templates_dir):
             logger.warning(f"Swarm templates directory not found: {templates_dir}")

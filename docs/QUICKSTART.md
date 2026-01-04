@@ -1,21 +1,22 @@
-# Abhikarta-LLM v1.4.0 - Quick Start Guide
+# Abhikarta-LLM v1.4.8 - Quick Start Guide
 
 This guide will help you get started with Abhikarta-LLM in under 15 minutes.
 
 ## Table of Contents
 
 1. [Installation](#installation)
-2. [Configuration](#configuration)
-3. [First Steps](#first-steps)
-4. [Create Your First Agent](#create-your-first-agent)
-5. [Create Your First Workflow](#create-your-first-workflow)
-6. [Use Pre-built Banking Solutions](#use-pre-built-banking-solutions)
-7. [Using Tools](#using-tools)
-8. [Chain of Thought & Tree of Thought](#chain-of-thought--tree-of-thought)
-9. [Goal-Based Agents](#goal-based-agents)
-10. [ReAct, Reflect & Hierarchical Agents](#react-reflect--hierarchical-agents)
-11. [Notifications (v1.4.0)](#notifications-v140)
-12. [Key Features Overview](#key-features-overview)
+2. [SDK Quick Start (NEW!)](#sdk-quick-start)
+3. [Configuration](#configuration)
+4. [First Steps](#first-steps)
+5. [Create Your First Agent](#create-your-first-agent)
+6. [Create Your First Workflow](#create-your-first-workflow)
+7. [Use Pre-built Banking Solutions](#use-pre-built-banking-solutions)
+8. [Using Tools](#using-tools)
+9. [Chain of Thought & Tree of Thought](#chain-of-thought--tree-of-thought)
+10. [Goal-Based Agents](#goal-based-agents)
+11. [ReAct, Reflect & Hierarchical Agents](#react-reflect--hierarchical-agents)
+12. [Notifications (v1.4.0)](#notifications-v140)
+13. [Key Features Overview](#key-features-overview)
 
 ---
 
@@ -75,6 +76,86 @@ python run_server.py
 Access the application at: **http://localhost:5000**
 
 Default credentials: `admin` / `admin123`
+
+---
+
+## SDK Quick Start
+
+Abhikarta v1.4.8 provides two SDK packages for programmatic access.
+
+### Option A: SDK Client (Requires Server)
+
+Use when you have Abhikarta deployed and want to connect programmatically:
+
+```bash
+pip install abhikarta-sdk-client
+```
+
+```python
+from abhikarta_client import AbhikartaClient
+
+# Connect to server
+client = AbhikartaClient("http://localhost:5000")
+
+# List agents
+agents = client.agents.list()
+
+# Execute an agent
+result = client.agents.execute(
+    agent_id="your-agent-id",
+    prompt="What are the latest AI trends?"
+)
+print(result['response'])
+
+# Create a new agent
+agent = client.agents.create(
+    name="Research Assistant",
+    agent_type="react",
+    model="llama3.2:3b"
+)
+```
+
+### Option B: SDK Embedded (No Server)
+
+Use for standalone applications, notebooks, scripts:
+
+```bash
+pip install abhikarta-sdk-embedded[ollama]
+```
+
+```python
+from abhikarta_embedded import Agent
+
+# Create agent in one line - no server required!
+agent = Agent.create("react", model="ollama/llama3.2:3b")
+
+# Configure provider
+from abhikarta_embedded.providers import Provider
+agent.provider = Provider.create("ollama")
+
+# Run
+result = agent.run("What is quantum computing?")
+print(result.response)
+```
+
+### Decorator Pattern (Most Pythonic)
+
+```python
+from abhikarta_embedded import agent, tool
+
+@tool(description="Calculate math expressions")
+def calculator(expression: str) -> dict:
+    return {"result": eval(expression)}
+
+@agent(type="react", model="ollama/llama3.2:3b")
+class MathAgent:
+    system_prompt = "You are a math assistant."
+
+my_agent = MathAgent()
+result = my_agent.run("What is 15 * 23?")
+```
+
+See the full [SDK Documentation](sdk/README.md) for more details.
 
 ---
 

@@ -73,7 +73,7 @@ class AgentTemplateManager:
             self._templates[template.template_id] = template
     
     def _load_json_templates(self):
-        """Load agent templates from JSON files in templates/agents directory."""
+        """Load agent templates from JSON files in entity_definitions/agents directory."""
         import os
         import glob
         
@@ -82,7 +82,7 @@ class AgentTemplateManager:
         agent_dir = os.path.dirname(os.path.abspath(__file__))
         abhikarta_dir = os.path.dirname(agent_dir)
         project_dir = os.path.dirname(abhikarta_dir)
-        templates_dir = os.path.join(project_dir, 'templates', 'agents')
+        templates_dir = os.path.join(project_dir, 'entity_definitions', 'agents')
         
         if not os.path.exists(templates_dir):
             logger.warning(f"Agent templates directory not found: {templates_dir}")

@@ -52,13 +52,13 @@ class ScriptTemplateManager:
         logger.info(f"ScriptTemplateManager initialized with {len(self._templates)} templates")
     
     def _load_json_templates(self):
-        """Load script templates from JSON files in templates/scripts directory."""
+        """Load script templates from JSON files in entity_definitions/scripts directory."""
         # Find templates directory relative to this file
         current_dir = os.path.dirname(os.path.abspath(__file__))
         # Go from script_template.py -> utils -> abhikarta -> project root
         abhikarta_dir = os.path.dirname(current_dir)
         project_dir = os.path.dirname(abhikarta_dir)
-        templates_dir = os.path.join(project_dir, 'templates', 'scripts')
+        templates_dir = os.path.join(project_dir, 'entity_definitions', 'scripts')
         
         if not os.path.exists(templates_dir):
             logger.warning(f"Script templates directory not found: {templates_dir}")

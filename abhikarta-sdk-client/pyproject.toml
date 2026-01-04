@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "abhikarta-sdk-client"
+version = "1.4.8"
+description = "Python SDK Client for connecting to Abhikarta-LLM server"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Ashutosh Sinha", email = "ajsinha@gmail.com"}
+]
+keywords = [
+    "ai", "llm", "agents", "workflows", "swarms", "sdk", "client"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.24.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+async = ["httpx[http2]>=0.24.0"]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/ajsinha/abhikarta-llm"
+Documentation = "https://abhikarta-llm.readthedocs.io"
+
+[tool.setuptools.packages.find]
+where = ["src"]

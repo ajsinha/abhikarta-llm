@@ -70,12 +70,12 @@ class AIOrgTemplateManager:
             self._templates[template.template_id] = template
     
     def _load_json_templates(self):
-        """Load AI Org templates from JSON files in templates/aiorg directory."""
+        """Load AI Org templates from JSON files in entity_definitions/aiorg directory."""
         # Find templates directory relative to this file
         current_dir = os.path.dirname(os.path.abspath(__file__))
         abhikarta_dir = os.path.dirname(current_dir)
         project_dir = os.path.dirname(abhikarta_dir)
-        templates_dir = os.path.join(project_dir, 'templates', 'aiorg')
+        templates_dir = os.path.join(project_dir, 'entity_definitions', 'aiorg')
         
         if not os.path.exists(templates_dir):
             logger.warning(f"AIOrg templates directory not found: {templates_dir}")

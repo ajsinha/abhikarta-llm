@@ -26,6 +26,12 @@ import logging
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# Add new module paths
+project_root = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(project_root, 'abhikarta-web', 'src'))
+sys.path.insert(0, os.path.join(project_root, 'abhikarta-sdk-client', 'src'))
+sys.path.insert(0, os.path.join(project_root, 'abhikarta-sdk-embedded', 'src'))
+
 
 def prepare_prop_conf():
     """
@@ -267,7 +273,7 @@ def run_webserver(prop_conf, user_facade, db_facade, tools_registry, mcp_manager
         tools_registry: ToolsRegistry instance
         mcp_manager: MCPServerManager instance
     """
-    from abhikarta.web import AbhikartaLLMWeb
+    from abhikarta_web import AbhikartaLLMWeb
     
     # Get secret key from properties or generate
     secret_key = prop_conf.get('app.secret.key', os.urandom(24).hex())

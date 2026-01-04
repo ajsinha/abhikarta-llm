@@ -1,0 +1,378 @@
+{% extends "help/help_base.html" %}
+
+{% block help_title %}SDK Documentation{% endblock %}
+
+{% block help_content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 mb-3">
+                <i class="bi bi-box-seam me-2 text-primary"></i>
+                Abhikarta SDK Documentation
+            </h1>
+            <p class="lead text-muted">
+                Python SDKs for building AI agents, workflows, swarms, and organizations.
+            </p>
+            <span class="badge bg-success">v1.4.8</span>
+        </div>
+    </div>
+
+    <!-- SDK Overview -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>SDK Overview</h5>
+        </div>
+        <div class="card-body">
+            <p>Abhikarta provides two SDK packages for different use cases:</p>
+            
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Package</th>
+                            <th>Use Case</th>
+                            <th>Server Required</th>
+                            <th>Installation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>abhikarta-sdk-client</strong></td>
+                            <td>Connect to deployed Abhikarta server</td>
+                            <td><span class="badge bg-warning text-dark">Yes</span></td>
+                            <td><code>pip install abhikarta-sdk-client</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>abhikarta-sdk-embedded</strong></td>
+                            <td>Standalone usage - no server needed</td>
+                            <td><span class="badge bg-success">No</span></td>
+                            <td><code>pip install abhikarta-sdk-embedded</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- SDK Client Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-cloud me-2"></i>SDK Client (Server Mode)</h5>
+        </div>
+        <div class="card-body">
+            <p>Use when you have Abhikarta-LLM deployed and want to interact programmatically.</p>
+            
+            <h6 class="fw-bold mt-4">Quick Start</h6>
+            <pre class="bg-dark text-light p-3 rounded"><code>from abhikarta_client import AbhikartaClient
+
+# Connect to server
+client = AbhikartaClient("http://localhost:5000")
+
+# List agents
+agents = client.agents.list()
+
+# Execute an agent
+result = client.agents.execute(
+    agent_id="your-agent-id",
+    prompt="What are the latest AI trends?"
+)
+print(result['response'])</code></pre>
+
+            <h6 class="fw-bold mt-4">Create an Agent</h6>
+            <pre class="bg-dark text-light p-3 rounded"><code>agent = client.agents.create(
+    name="Research Assistant",
+    agent_type="react",
+    model="llama3.2:3b",
+    provider="ollama",
+    system_prompt="You are a helpful research assistant."
+)
+
+# Execute the new agent
+result = agent.execute("Research quantum computing")
+print(result['response'])</code></pre>
+
+            <h6 class="fw-bold mt-4">Create a Workflow</h6>
+            <pre class="bg-dark text-light p-3 rounded"><code>workflow = client.workflows.create(
+    name="Data Pipeline",
+    nodes=[
+        {"id": "input", "name": "Input", "node_type": "input"},
+        {"id": "process", "name": "Process", "node_type": "llm", 
+         "config": {"prompt": "Analyze: {input}"}},
+        {"id": "output", "name": "Output", "node_type": "output"}
+    ],
+    edges=[
+        {"source": "input", "target": "process"},
+        {"source": "process", "target": "output"}
+    ]
+)
+
+# Execute workflow
+result = workflow.execute({"input": "Sample data"})</code></pre>
+
+            <h6 class="fw-bold mt-4">Available APIs</h6>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>API</th>
+                            <th>Methods</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>client.agents</code></td>
+                            <td>list(), get(), create(), execute(), delete()</td>
+                        </tr>
+                        <tr>
+                            <td><code>client.workflows</code></td>
+                            <td>list(), get(), create(), execute(), delete()</td>
+                        </tr>
+                        <tr>
+                            <td><code>client.swarms</code></td>
+                            <td>list(), get(), create(), execute(), delete()</td>
+                        </tr>
+                        <tr>
+                            <td><code>client.organizations</code></td>
+                            <td>list(), get(), create(), submit_task(), delete()</td>
+                        </tr>
+                        <tr>
+                            <td><code>client.scripts</code></td>
+                            <td>list(), get(), create(), execute(), delete()</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- SDK Embedded Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>SDK Embedded (Standalone Mode)</h5>
+        </div>
+        <div class="card-body">
+            <p>Use for standalone applications, notebooks, scripts - no server required.</p>
+            
+            <h6 class="fw-bold mt-4">Installation with Providers</h6>
+            <pre class="bg-dark text-light p-3 rounded"><code># Base installation
+pip install abhikarta-sdk-embedded
+
+# With provider support
+pip install abhikarta-sdk-embedded[ollama]
+pip install abhikarta-sdk-embedded[openai]
+pip install abhikarta-sdk-embedded[all]</code></pre>
+
+            <h6 class="fw-bold mt-4">Method 1: Factory Pattern (Simplest)</h6>
+            <pre class="bg-dark text-light p-3 rounded"><code>from abhikarta_embedded import Agent
+
+# Create agent in one line
+agent = Agent.create("react", model="ollama/llama3.2:3b")
+
+# Configure provider
+from abhikarta_embedded.providers import Provider
+agent.provider = Provider.create("ollama")
+
+# Run
+result = agent.run("What is quantum computing?")
+print(result.response)</code></pre>
+
+            <h6 class="fw-bold mt-4">Method 2: Fluent API (More Control)</h6>
+            <pre class="bg-dark text-light p-3 rounded"><code>from abhikarta_embedded import Abhikarta
+
+app = Abhikarta()
+
+agent = (app.agent("Research Assistant")
+    .type("react")
+    .model("llama3.2:3b")
+    .system_prompt("You are a helpful assistant.")
+    .temperature(0.3)
+    .build())
+
+result = agent.run("Explain AI")</code></pre>
+
+            <h6 class="fw-bold mt-4">Method 3: Decorator Pattern (Most Pythonic)</h6>
+            <pre class="bg-dark text-light p-3 rounded"><code>from abhikarta_embedded import agent, tool
+
+@tool(description="Calculate math expressions")
+def calculator(expression: str) -> dict:
+    return {"result": eval(expression)}
+
+@agent(type="react", model="ollama/llama3.2:3b")
+class MathAgent:
+    system_prompt = "You are a math assistant."
+
+my_agent = MathAgent()
+result = my_agent.run("What is 15 * 23?")</code></pre>
+
+            <h6 class="fw-bold mt-4">Agent Types</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card bg-light mb-2">
+                        <div class="card-body py-2">
+                            <strong>ReAct</strong> - Reasoning + Acting pattern
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light mb-2">
+                        <div class="card-body py-2">
+                            <strong>Goal</strong> - Goal-oriented planning
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light mb-2">
+                        <div class="card-body py-2">
+                            <strong>Reflect</strong> - Self-improving quality
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light mb-2">
+                        <div class="card-body py-2">
+                            <strong>Hierarchical</strong> - Task decomposition
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Comparison -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="bi bi-grid-3x3 me-2"></i>Feature Comparison</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Feature</th>
+                            <th>SDK Client</th>
+                            <th>SDK Embedded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Agent Types (ReAct, Goal, Reflect, Hierarchical)</td>
+                            <td><i class="bi bi-check-circle text-success"></i> All</td>
+                            <td><i class="bi bi-check-circle text-success"></i> All</td>
+                        </tr>
+                        <tr>
+                            <td>Workflows</td>
+                            <td><i class="bi bi-check-circle text-success"></i> Full DAG</td>
+                            <td><i class="bi bi-check-circle text-success"></i> Basic DAG</td>
+                        </tr>
+                        <tr>
+                            <td>Swarms</td>
+                            <td><i class="bi bi-check-circle text-success"></i> Full</td>
+                            <td><i class="bi bi-check-circle text-success"></i> Basic</td>
+                        </tr>
+                        <tr>
+                            <td>AI Organizations</td>
+                            <td><i class="bi bi-check-circle text-success"></i> Full</td>
+                            <td><i class="bi bi-check-circle text-success"></i> Basic</td>
+                        </tr>
+                        <tr>
+                            <td>Web UI</td>
+                            <td><i class="bi bi-check-circle text-success"></i></td>
+                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Database Persistence</td>
+                            <td><i class="bi bi-check-circle text-success"></i></td>
+                            <td><i class="bi bi-x-circle text-danger"></i> In-memory</td>
+                        </tr>
+                        <tr>
+                            <td>Multi-user Support</td>
+                            <td><i class="bi bi-check-circle text-success"></i></td>
+                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                        </tr>
+                        <tr>
+                            <td>HITL Integration</td>
+                            <td><i class="bi bi-check-circle text-success"></i></td>
+                            <td><i class="bi bi-x-circle text-danger"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Ollama/OpenAI/Anthropic</td>
+                            <td><i class="bi bi-check-circle text-success"></i></td>
+                            <td><i class="bi bi-check-circle text-success"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Structure -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-folder me-2"></i>Project Structure</h5>
+        </div>
+        <div class="card-body">
+            <pre class="bg-dark text-light p-3 rounded"><code>abhikarta-llm/
+├── abhikarta/                    # Core library
+│   ├── agent/                    # Agent management
+│   ├── workflow/                 # Workflow engine
+│   ├── swarm/                    # Swarm orchestration
+│   ├── aiorg/                    # AI Organizations
+│   └── ...
+│
+├── abhikarta-web/                # Web UI module
+│   └── src/abhikarta_web/
+│       ├── routes/               # Flask routes
+│       ├── templates/            # Jinja2 templates
+│       └── static/               # CSS, JS, images
+│
+├── abhikarta-sdk-client/         # API Client SDK
+│   └── src/abhikarta_client/
+│       ├── client.py             # Main client
+│       ├── agents.py             # Agents API
+│       ├── workflows.py          # Workflows API
+│       └── ...
+│
+├── abhikarta-sdk-embedded/       # Embedded SDK
+│   └── src/abhikarta_embedded/
+│       ├── core.py               # Main class
+│       ├── agents/               # Agent implementations
+│       ├── providers/            # LLM providers
+│       └── decorators.py         # @agent, @tool
+│
+├── entity_definitions/           # JSON templates
+│   ├── agents/
+│   ├── workflows/
+│   ├── swarms/
+│   └── aiorg/
+│
+└── run_server.py                 # Application entry point</code></pre>
+        </div>
+    </div>
+
+    <!-- Documentation Links -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-book me-2"></i>Full Documentation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <a href="/docs/sdk/README" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-file-text me-2"></i>SDK Overview
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="/docs/sdk/CLIENT" class="btn btn-outline-info w-100">
+                        <i class="bi bi-cloud me-2"></i>Client SDK Guide
+                    </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="/docs/sdk/EMBEDDED" class="btn btn-outline-success w-100">
+                        <i class="bi bi-lightning me-2"></i>Embedded SDK Guide
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

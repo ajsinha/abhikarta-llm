@@ -235,6 +235,8 @@ class AuthRoutes(AbstractRoutes):
                 # v1.4.8 Python Script Mode
                 'python-script-mode': 'help/pages/python_scripts.html',
                 'python-scripts': 'help/pages/python_scripts.html',
+                # v1.4.8 SDK Documentation
+                'sdk': 'help/pages/sdk.html',
             }
             
             template = page_map.get(page)
@@ -311,16 +313,29 @@ class AuthRoutes(AbstractRoutes):
         
         @self.app.route('/docs')
         def markdown_docs():
-            """Display list of markdown documentation files."""
+            """Display list of markdown documentation files or redirect to specific doc."""
+            from flask import request, redirect
+            
+            # Check if a specific doc is requested via query parameter
+            doc = request.args.get('doc')
+            if doc:
+                # Redirect to the markdown_viewer with the doc as path parameter
+                # Use direct URL construction to handle slashes properly
+                return redirect(f'/docs/{doc}')
+            
             return render_template('help/markdown_docs.html',
                                    fullname=session.get('fullname'),
                                    userid=session.get('user_id'),
                                    roles=session.get('roles', []),
                                    is_admin=session.get('is_admin', False))
         
-        @self.app.route('/docs/<filename>')
+        @self.app.route('/docs/<path:filename>')
         def markdown_viewer(filename):
             """Display markdown file rendered as HTML."""
+            # Strip .md extension if present (URLs may include it)
+            if filename.endswith('.md'):
+                filename = filename[:-3]
+            
             # Map of allowed markdown files with their titles
             doc_titles = {
                 'README': 'README - Project Overview',
@@ -341,6 +356,12 @@ class AuthRoutes(AbstractRoutes):
                 'AIORG_DESIGN': 'AI Organization Design',
                 'AIORG_QUICKSTART': 'AI Organization Quick Start',
                 'AIORG_REQUIREMENTS': 'AI Organization Requirements',
+                # SDK Documentation (v1.4.8)
+                'sdk/README': 'SDK Overview',
+                'sdk/CLIENT': 'SDK Client Guide',
+                'sdk/EMBEDDED': 'SDK Embedded Guide',
+                'sdk/PROVIDERS': 'SDK Provider Configuration',
+                'sdk/API_REFERENCE': 'SDK API Reference',
             }
             
             title = doc_titles.get(filename, filename)
@@ -353,37 +374,49 @@ class AuthRoutes(AbstractRoutes):
                                    roles=session.get('roles', []),
                                    is_admin=session.get('is_admin', False))
         
-        @self.app.route('/api/markdown/<filename>')
+        @self.app.route('/api/markdown/<path:filename>')
         def api_markdown(filename):
             """API endpoint to serve markdown content."""
             import os
             
-            # Base path for the project
-            base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+            # Strip .md extension if present (URLs may include it)
+            if filename.endswith('.md'):
+                filename = filename[:-3]
+            
+            # Base path for the abhikarta-web module
+            web_base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+            # Project root is one level above abhikarta-web
+            project_root = os.path.dirname(web_base_path)
             
             # Map of allowed files and their paths
             file_map = {
-                'README': os.path.join(base_path, 'README.md'),
-                'QUICKSTART': os.path.join(base_path, 'docs', 'QUICKSTART.md'),
-                'DESIGN': os.path.join(base_path, 'docs', 'DESIGN.md'),
-                'ACTORS': os.path.join(base_path, 'docs', 'ACTORS.md'),
-                'REQUIREMENTS': os.path.join(base_path, 'docs', 'REQUIREMENTS.md'),
-                'PATENT_APPLICATION': os.path.join(base_path, 'docs', 'PATENT_APPLICATION.md'),
-                'PATENT_WORTHINESS_ANALYSIS': os.path.join(base_path, 'docs', 'PATENT_WORTHINESS_ANALYSIS.md'),
-                'LEGAL_NOTICE': os.path.join(base_path, 'LEGAL_NOTICE.md'),
+                'README': os.path.join(project_root, 'README.md'),
+                'QUICKSTART': os.path.join(project_root, 'docs', 'QUICKSTART.md'),
+                'DESIGN': os.path.join(project_root, 'docs', 'DESIGN.md'),
+                'ACTORS': os.path.join(project_root, 'docs', 'ACTORS.md'),
+                'REQUIREMENTS': os.path.join(project_root, 'docs', 'REQUIREMENTS.md'),
+                'PATENT_APPLICATION': os.path.join(project_root, 'docs', 'PATENT_APPLICATION.md'),
+                'PATENT_WORTHINESS_ANALYSIS': os.path.join(project_root, 'docs', 'PATENT_WORTHINESS_ANALYSIS.md'),
+                'LEGAL_NOTICE': os.path.join(project_root, 'LEGAL_NOTICE.md'),
                 # v1.4.0 tutorials
-                'COT_TOT_TUTORIAL': os.path.join(base_path, 'docs', 'COT_TOT_TUTORIAL.md'),
-                'GOAL_BASED_AGENTS_TUTORIAL': os.path.join(base_path, 'docs', 'GOAL_BASED_AGENTS_TUTORIAL.md'),
-                'REACT_REFLECT_HIERARCHICAL_TUTORIAL': os.path.join(base_path, 'docs', 'REACT_REFLECT_HIERARCHICAL_TUTORIAL.md'),
-                'NOTIFICATION_QUICKSTART': os.path.join(base_path, 'docs', 'NOTIFICATION_QUICKSTART.md'),
-                'NOTIFICATION_ARCHITECTURE': os.path.join(base_path, 'docs', 'NOTIFICATION_ARCHITECTURE.md'),
+                'COT_TOT_TUTORIAL': os.path.join(project_root, 'docs', 'COT_TOT_TUTORIAL.md'),
+                'GOAL_BASED_AGENTS_TUTORIAL': os.path.join(project_root, 'docs', 'GOAL_BASED_AGENTS_TUTORIAL.md'),
+                'REACT_REFLECT_HIERARCHICAL_TUTORIAL': os.path.join(project_root, 'docs', 'REACT_REFLECT_HIERARCHICAL_TUTORIAL.md'),
+                'NOTIFICATION_QUICKSTART': os.path.join(project_root, 'docs', 'NOTIFICATION_QUICKSTART.md'),
+                'NOTIFICATION_ARCHITECTURE': os.path.join(project_root, 'docs', 'NOTIFICATION_ARCHITECTURE.md'),
                 # Research paper
-                'RESEARCH_PAPER': os.path.join(base_path, 'docs', 'RESEARCH_PAPER.md'),
+                'RESEARCH_PAPER': os.path.join(project_root, 'docs', 'RESEARCH_PAPER.md'),
                 # AI Organization docs
-                'AIORG_ARCHITECTURE': os.path.join(base_path, 'docs', 'AIORG_ARCHITECTURE.md'),
-                'AIORG_DESIGN': os.path.join(base_path, 'docs', 'AIORG_DESIGN.md'),
-                'AIORG_QUICKSTART': os.path.join(base_path, 'docs', 'AIORG_QUICKSTART.md'),
-                'AIORG_REQUIREMENTS': os.path.join(base_path, 'docs', 'AIORG_REQUIREMENTS.md'),
+                'AIORG_ARCHITECTURE': os.path.join(project_root, 'docs', 'AIORG_ARCHITECTURE.md'),
+                'AIORG_DESIGN': os.path.join(project_root, 'docs', 'AIORG_DESIGN.md'),
+                'AIORG_QUICKSTART': os.path.join(project_root, 'docs', 'AIORG_QUICKSTART.md'),
+                'AIORG_REQUIREMENTS': os.path.join(project_root, 'docs', 'AIORG_REQUIREMENTS.md'),
+                # SDK Documentation (v1.4.8)
+                'sdk/README': os.path.join(project_root, 'docs', 'sdk', 'README.md'),
+                'sdk/CLIENT': os.path.join(project_root, 'docs', 'sdk', 'CLIENT.md'),
+                'sdk/EMBEDDED': os.path.join(project_root, 'docs', 'sdk', 'EMBEDDED.md'),
+                'sdk/PROVIDERS': os.path.join(project_root, 'docs', 'sdk', 'PROVIDERS.md'),
+                'sdk/API_REFERENCE': os.path.join(project_root, 'docs', 'sdk', 'API_REFERENCE.md'),
             }
             
             file_path = file_map.get(filename)

@@ -1,7 +1,7 @@
-# Abhikarta-LLM v1.4.7
+# Abhikarta-LLM v1.4.8
 
 [![Version](https://img.shields.io/badge/version-1.4.8-blue.svg)](https://github.com/abhikarta-llm)
-[![Python](https://img.shields.io/badge/python-3.9+-green.svg)](https://python.org)
+[![Python](https://img.shields.io/badge/python-3.10+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
 **Enterprise-grade AI Agent & Workflow Orchestration Platform with Agent Swarms and Enterprise Notifications**
@@ -10,7 +10,70 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ---
 
-## 🚀 What's New in v1.4.7
+## 🚀 What's New in v1.4.8
+
+### 📦 Modular SDK Architecture
+Abhikarta-LLM now provides **three standalone packages** for maximum flexibility:
+
+| Package | Description | PyPI |
+|---------|-------------|------|
+| **abhikarta-sdk-client** | Connect to deployed Abhikarta server | `pip install abhikarta-sdk-client` |
+| **abhikarta-sdk-embedded** | Standalone usage - no server needed | `pip install abhikarta-sdk-embedded` |
+| **abhikarta-web** | Web UI module for the platform | Part of full installation |
+
+### 🔌 SDK Client (Server Mode)
+```python
+from abhikarta_client import AbhikartaClient
+
+client = AbhikartaClient("http://localhost:5000")
+agent = client.agents.get("my-agent")
+result = agent.execute("Research AI trends")
+```
+
+### 🚀 SDK Embedded (Standalone Mode)
+```python
+from abhikarta_embedded import Agent
+
+# Create an agent in 3 lines - no server required!
+agent = Agent.create("react", model="ollama/llama3.2:3b")
+result = agent.run("What is quantum computing?")
+print(result.response)
+```
+
+### 🎨 Decorator-Based API
+```python
+from abhikarta_embedded import agent, tool
+
+@tool(description="Search the web")
+def web_search(query: str) -> dict:
+    return {"results": ["Result 1", "Result 2"]}
+
+@agent(type="react", model="ollama/llama3.2:3b", tools=[web_search])
+class ResearchAgent:
+    system_prompt = "You are a research assistant."
+
+my_agent = ResearchAgent()
+result = my_agent.run("Find AI trends")
+```
+
+### 📁 Reorganized Project Structure
+```
+abhikarta-llm/
+├── abhikarta/                    # Core library (agents, workflows, swarms, orgs)
+├── abhikarta-web/                # Web UI module (Flask routes, templates)
+├── abhikarta-sdk-client/         # API client SDK
+├── abhikarta-sdk-embedded/       # Standalone embedded SDK
+├── entity_definitions/           # JSON templates (agents, workflows, swarms, etc.)
+├── docs/sdk/                     # SDK documentation
+└── run_server.py                 # Application entry point
+```
+
+### 🐍 Python Script Mode (v1.4.8)
+Power users can now define agents, workflows, swarms, and AI organizations using Python scripts instead of JSON/visual designers. See `docs/sdk/` for details.
+
+---
+
+## 🏢 What's New in v1.4.7
 
 ### 🏢 AI Organizations - Major New Feature
 Introducing **AI Org** - create AI-powered digital twins of organizational structures:
@@ -153,11 +216,11 @@ New comprehensive tutorial for advanced reasoning patterns:
 - **Tool Test Page**: Form-based parameter input with type-specific controls
 - **JSON Schema Display**: View complete tool schema with copy functionality
 
-### Pre-built Tools Library (85 Tools)
-- **Common Tools (28)**: Date/time, math, text processing, validation, format conversion
-- **Banking Tools (13)**: KYC verification, credit scoring, loan processing, compliance
-- **Integration Tools (20)**: HTTP/API, notifications, data transformation, workflow helpers
-- **General Tools (24)**: Web search, document handling, file operations, system utilities
+### Tool Framework Architecture
+- **10 Extensible Base Classes**: BaseTool, FunctionTool, HTTPTool, MCPTool, CodeFragmentTool, etc.
+- **Banking Tool Classes (5)**: KYC, Credit, Loan, Compliance, Fraud detection base classes
+- **Integration Tool Classes (4)**: HTTP/API, notifications, data transformation, workflow helpers
+- **Example Implementations**: Sample tools demonstrating each base class
 
 ### Tools Management Page
 - **Centralized Tools View**: Browse all available tools (pre-built, MCP, code fragments)
@@ -206,7 +269,7 @@ New comprehensive tutorial for advanced reasoning patterns:
 - **Tool Types**: FunctionTool, MCPTool, HTTPTool, CodeFragmentTool, LangChainTool
 - **ToolsRegistry**: Centralized registration, discovery, and execution
 - **Format Conversion**: OpenAI, Anthropic, LangChain compatible outputs
-- **85+ Pre-built Tools**: Ready for immediate use
+- **Tool Framework**: 10 extensible base classes for custom tools
 - **Tools Page**: Browse, search, filter, and test all tools
 
 ### 🔌 MCP Integration (v1.1.6+)
@@ -281,90 +344,73 @@ New comprehensive tutorial for advanced reasoning patterns:
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.4.7/
-├── abhikarta/
-│   ├── __init__.py
-│   ├── agent/                    # Agent management
-│   │   ├── agent_manager.py      # Agent CRUD operations
-│   │   └── agent_template.py     # Agent templates
-│   ├── config/                   # Configuration
-│   │   └── settings.py           # App settings
-│   ├── core/                     # Core utilities
-│   │   └── config/               # Properties configuration
-│   ├── database/                 # Database layer
-│   │   ├── db_facade.py          # Database abstraction
-│   │   ├── sqlite_handler.py     # SQLite implementation
-│   │   ├── postgres_handler.py   # PostgreSQL implementation
-│   │   └── schema/               # 22 database tables
-│   ├── hitl/                     # Human-in-the-Loop (v1.1.5)
-│   │   └── hitl_manager.py       # HITL task management
-│   ├── langchain/                # LangChain integration
-│   │   ├── agents.py             # LangChain agent factory
-│   │   ├── llm_factory.py        # LLM provider factory
-│   │   ├── tools.py              # Tool adapters
-│   │   └── workflow_graph.py     # LangGraph integration
-│   ├── llm/                      # LLM Adapter (v1.4.7) NEW!
-│   │   ├── __init__.py           # Module exports
-│   │   └── adapter.py            # LLMAdapter, async interface
-│   ├── llm_provider/             # LLM abstraction
-│   │   └── llm_facade.py         # Multi-provider facade
-│   ├── mcp/                      # MCP Integration (v1.1.6)
-│   │   ├── server.py             # MCPServer, MCPServerConfig
-│   │   ├── client.py             # HTTP/WebSocket clients
-│   │   └── manager.py            # MCPServerManager singleton
-│   ├── rbac/                     # Role-based access control
-│   │   └── __init__.py           # RBAC decorators
-│   ├── tools/                    # Tools System (v1.1.6)
-│   │   ├── base_tool.py          # BaseTool, ToolSchema, ToolResult
-│   │   ├── function_tool.py      # FunctionTool, @tool decorator
-│   │   ├── mcp_tool.py           # MCPTool wrapper
-│   │   ├── http_tool.py          # HTTPTool, WebhookTool
-│   │   ├── code_fragment_tool.py # CodeFragmentTool
-│   │   ├── langchain_tool.py     # LangChain integration
-│   │   ├── registry.py           # ToolsRegistry singleton
-│   │   └── prebuilt/             # Pre-built tools (v1.4.7)
-│   │       ├── common_tools.py   # 28 common utilities
-│   │       ├── banking_tools.py  # 13 banking tools
-│   │       ├── integration_tools.py  # 20 integration tools
-│   │       └── general_tools.py  # 24 general-purpose tools
-│   ├── user_management/          # User management
-│   │   └── user_facade.py        # User CRUD operations
-│   ├── utils/                    # Utilities
-│   │   ├── code_loader.py        # Code fragment loader
-│   │   ├── helpers.py            # Helper functions
-│   │   ├── llm_logger.py         # LLM call logging
-│   │   └── logger.py             # Application logging
-│   ├── web/                      # Web application
-│   │   ├── app.py                # Flask app factory
-│   │   ├── routes/               # Route blueprints
-│   │   │   ├── admin_routes.py   # Admin endpoints
-│   │   │   ├── agent_routes.py   # Agent endpoints
-│   │   │   ├── api_routes.py     # REST API
-│   │   │   ├── auth_routes.py    # Authentication
-│   │   │   ├── mcp_routes.py     # MCP management
-│   │   │   ├── user_routes.py    # User endpoints + Tools
-│   │   │   └── workflow_routes.py # Workflow endpoints
-│   │   ├── static/               # CSS, JS, images
-│   │   └── templates/            # Jinja2 templates (50+ files)
-│   │       ├── admin/            # Admin UI
-│   │       ├── agents/           # Agent UI
-│   │       ├── help/             # Documentation (30+ pages)
-│   │       ├── user/             # User UI + tools.html
-│   │       └── workflows/        # Workflow UI
-│   └── workflow/                 # Workflow engine
-│       ├── dag_parser.py         # DAG parsing
-│       ├── executor.py           # Workflow execution
-│       └── node_types.py         # Node implementations
+abhikarta-llm-v1.4.8/
+├── abhikarta/                        # Core library
+│   ├── agent/                        # Agent management
+│   ├── aiorg/                        # AI Organizations (v1.4.7)
+│   ├── actor/                        # Actor system (v1.3.0)
+│   ├── config/                       # Configuration
+│   ├── core/                         # Core utilities
+│   ├── database/                     # Database layer (44 tables)
+│   │   ├── db_facade.py              # Database abstraction
+│   │   ├── delegates/                # 10 delegate classes
+│   │   └── schema/                   # SQLite/PostgreSQL schemas
+│   ├── hitl/                         # Human-in-the-Loop (v1.1.5)
+│   ├── langchain/                    # LangChain integration
+│   ├── llm/                          # LLM Adapter
+│   ├── llm_provider/                 # LLM provider facade
+│   ├── mcp/                          # MCP Integration (v1.1.6)
+│   ├── messaging/                    # Messaging (v1.3.0)
+│   ├── notification/                 # Notifications (v1.4.0)
+│   ├── scripts/                      # Script template manager
+│   ├── swarm/                        # Swarm orchestration (v1.3.0)
+│   ├── tools/                        # Tool framework (10 types)
+│   ├── user_management/              # User management
+│   ├── utils/                        # Utilities
+│   └── workflow/                     # Workflow engine
+│
+├── abhikarta-web/                    # Web UI module (v1.4.8)
+│   └── src/abhikarta_web/
+│       ├── routes/                   # Flask route handlers
+│       ├── templates/                # Jinja2 templates (60+ files)
+│       └── static/                   # CSS, JS, images
+│
+├── abhikarta-sdk-client/             # API Client SDK (v1.4.8)
+│   └── src/abhikarta_client/
+│       ├── client.py                 # Main client class
+│       ├── agents.py                 # Agents API
+│       ├── workflows.py              # Workflows API
+│       ├── swarms.py                 # Swarms API
+│       └── organizations.py          # Organizations API
+│
+├── abhikarta-sdk-embedded/           # Embedded SDK (v1.4.8)
+│   └── src/abhikarta_embedded/
+│       ├── core.py                   # Main Abhikarta class
+│       ├── agents/                   # Agent implementations
+│       ├── workflows/                # Workflow engine
+│       ├── swarms/                   # Swarm engine
+│       ├── orgs/                     # Organization engine
+│       ├── providers/                # LLM providers
+│       ├── tools/                    # Tool framework
+│       └── decorators.py             # @agent, @tool, etc.
+│
+├── entity_definitions/               # JSON entity templates
+│   ├── agents/                       # Agent templates (12)
+│   ├── workflows/                    # Workflow templates (22)
+│   ├── swarms/                       # Swarm templates (5)
+│   ├── aiorg/                        # AI Org templates (5)
+│   └── scripts/                      # Script templates (7)
+│
 ├── config/
-│   └── application.properties    # Configuration file
-├── data/
-│   └── prebuilt/                 # Pre-built solutions (v1.4.7)
-│       ├── agents/
-│       │   └── banking/          # 10 banking agents
-│       └── workflows/
-│           └── banking/          # 7 banking workflows
+│   └── application.properties        # Configuration
+├── data/                             # Runtime data
 ├── docs/
-│   ├── README.md                 # Documentation index
+│   ├── sdk/                          # SDK documentation
+│   ├── DESIGN.md                     # Architecture design
+│   ├── QUICKSTART.md                 # Quick start guide
+│   └── ...
+├── examples/                         # Python/JSON examples
+└── run_server.py                     # Application entry point
 │   ├── QUICKSTART.md             # Quick start guide
 │   ├── DESIGN.md                 # Architecture design
 │   └── REQUIREMENTS.md           # Requirements spec
@@ -416,7 +462,7 @@ python run_server.py
 
 ## 📊 Database Schema
 
-The platform uses 22 tables across these categories:
+The platform uses 44 tables across these categories:
 
 | Category | Tables |
 |----------|--------|
@@ -425,6 +471,10 @@ The platform uses 22 tables across these categories:
 | **LLM** | llm_providers, llm_models, llm_model_permissions, llm_logs |
 | **Tools** | mcp_servers, mcp_tools, code_fragments |
 | **HITL** | hitl_tasks, hitl_comments, hitl_assignments |
+| **Swarms** | swarms, swarm_agents, swarm_executions (v1.3.0) |
+| **AI Orgs** | ai_organizations, ai_org_nodes, ai_org_tasks (v1.4.7) |
+| **Notifications** | notification_channels, notification_templates (v1.4.0) |
+| **Scripts** | python_scripts, script_executions (v1.4.8) |
 | **Config** | settings, templates |
 
 ---
@@ -460,37 +510,46 @@ The platform uses 22 tables across these categories:
 
 ---
 
-## 🔧 Pre-built Tools (85 Total)
+## 🔧 Tool Framework Architecture
 
-### Common Tools (28)
-- **Date/Time**: get_current_datetime, parse_date, calculate_date_difference, add_days_to_date, get_business_days
-- **Math**: calculate_expression, calculate_percentage, calculate_compound_interest, calculate_loan_emi, convert_currency
-- **Text**: extract_text_patterns, clean_text, extract_entities, generate_summary_stats, mask_sensitive_data
-- **Validation**: validate_email, validate_phone, validate_credit_card, validate_iban, validate_ssn
-- **Conversion**: json_to_csv, csv_to_json, base64_encode, base64_decode, generate_hash
-- **ID Generation**: generate_uuid, generate_reference_number, generate_account_number
+Abhikarta provides a **comprehensive tool framework** with 10 extensible base classes. The platform does NOT include pre-packaged tools - instead it provides the infrastructure for you to build custom tools.
 
-### Banking Tools (13)
-- **KYC**: verify_identity_document, calculate_kyc_risk_score, verify_address
-- **Credit**: calculate_credit_score, assess_debt_to_income
-- **Loan**: calculate_loan_eligibility, generate_amortization_schedule
-- **Transaction**: analyze_transaction, detect_transaction_patterns, calculate_transaction_limits
-- **Compliance**: check_sanctions_list, generate_aml_report, validate_regulatory_compliance
+### Tool Base Classes
 
-### Integration Tools (20)
-- **HTTP/API**: make_http_request, build_query_string, parse_json_response, validate_api_response
-- **Notifications**: format_email_template, create_notification, format_sms_message
-- **Data Transform**: map_fields, flatten_nested_dict, unflatten_dict, merge_dicts, filter_dict_keys
-- **List/Array**: filter_list, sort_list, group_by, aggregate_list, paginate_list
-- **Workflow**: create_workflow_context, update_workflow_context, evaluate_condition
+| Class | Purpose |
+|-------|---------|
+| `BaseTool` | Abstract base for all tools |
+| `FunctionTool` | Python function wrapper |
+| `HTTPTool` | REST API integration |
+| `MCPTool` | Model Context Protocol tools |
+| `CodeFragmentTool` | Database-stored code |
+| `LangChainTool` | LangChain integration |
 
-### General Tools (24) - NEW
-- **Web/Search**: web_search, web_fetch, intranet_search, news_search
-- **Document Handling**: read_document, write_document, convert_document, extract_document_metadata
-- **File Operations**: list_files, copy_file, move_file, delete_file
-- **System Utilities**: get_system_info, execute_shell_command, get_environment_variable, set_environment_variable
-- **Network Tools**: check_url_status, ping_host, dns_lookup, parse_url
-- **Encoding**: url_encode, url_decode, html_encode, html_decode
+### Banking Tool Classes (Example Implementations)
+- **KYCTool**: Identity verification, risk scoring
+- **CreditTool**: Credit assessment, scoring
+- **LoanTool**: Loan processing, EMI calculation
+- **ComplianceTool**: AML, sanctions screening
+- **FraudTool**: Transaction analysis
+
+### Integration Tool Patterns
+- **HTTP/API**: REST client patterns with retry
+- **Notifications**: Email, SMS, webhook patterns
+- **Data Transform**: Field mapping, conversion
+- **Workflow**: Context management, conditions
+
+### Creating Custom Tools
+```python
+from abhikarta.tools import BaseTool
+
+class MyTool(BaseTool):
+    name = "my_tool"
+    description = "My custom tool"
+    
+    def execute(self, **params):
+        # Your implementation
+        return {"result": "success"}
+```
 
 ---
 
@@ -535,12 +594,13 @@ The platform uses 22 tables across these categories:
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.8 | 2025-01 | Modular SDK Architecture: SDK Client, SDK Embedded, abhikarta-web module, Python Script Mode enhancements, decorator-based API |
 | 1.4.7 | 2025-01 | AI Organizations: AI-powered org charts with hierarchical delegation, HITL, visual designer, task aggregation |
 | 1.4.0 | 2025-01 | Visual Designer bug fixes (MCP tool nodes), Tool selection in properties, Agent Designer How-To Guide |
 | 1.2.3 | 2025-01 | Template Libraries (36 agent, 33 workflow), Code Fragment URIs, Actor System, Modular Database Delegates |
-| 1.2.0 | 2025-01 | Database Schema documentation (22 tables), Page glossaries, Enhanced help system |
+| 1.2.0 | 2025-01 | Database Schema documentation (44 tables), Page glossaries, Enhanced help system |
 | 1.1.8 | 2025-01 | Tool View/Test pages, dedicated tool detail UI, form-based testing |
-| 1.1.7 | 2025-01 | Pre-built tools (85), Tools page, General tools, MCP auto-sync, Banking solutions |
+| 1.1.7 | 2025-01 | Tool framework (10 base classes), Tools page, MCP auto-sync, Banking tool classes |
 | 1.1.6 | 2025-01 | Tools System, MCP Integration, ToolsRegistry |
 | 1.1.5 | 2025-01 | HITL System, Execution Progress, Visual Workflow Designer |
 | 1.1.0 | 2024-12 | LLM Management, Visual Agent Designer, LangChain integration |

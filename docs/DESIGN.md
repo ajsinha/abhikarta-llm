@@ -1,21 +1,22 @@
-# Abhikarta-LLM v1.4.0 - Architecture Design Document
+# Abhikarta-LLM v1.4.8 - Architecture Design Document
 
 ## Table of Contents
 
 1. [Overview](#1-overview)
 2. [System Architecture](#2-system-architecture)
-3. [Actor System](#3-actor-system)
-4. [Notification System (v1.4.0)](#4-notification-system)
-5. [Database Design](#5-database-design)
-6. [Agent System Design](#6-agent-system-design)
-7. [Workflow Engine Design](#7-workflow-engine-design)
-8. [LLM Provider Integration](#8-llm-provider-integration)
-9. [Human-in-the-Loop System](#9-human-in-the-loop-system)
-10. [Tools System Design](#10-tools-system-design)
-11. [MCP Plugin Framework](#11-mcp-plugin-framework)
-12. [Pre-built Solutions](#12-pre-built-solutions)
-13. [Security Architecture](#13-security-architecture)
-14. [API Design](#14-api-design)
+3. [SDK Architecture (v1.4.8)](#3-sdk-architecture)
+4. [Actor System](#4-actor-system)
+5. [Notification System (v1.4.0)](#5-notification-system)
+6. [Database Design](#6-database-design)
+7. [Agent System Design](#7-agent-system-design)
+8. [Workflow Engine Design](#8-workflow-engine-design)
+9. [LLM Provider Integration](#9-llm-provider-integration)
+10. [Human-in-the-Loop System](#10-human-in-the-loop-system)
+11. [Tools System Design](#11-tools-system-design)
+12. [MCP Plugin Framework](#12-mcp-plugin-framework)
+13. [Pre-built Solutions](#13-pre-built-solutions)
+14. [Security Architecture](#14-security-architecture)
+15. [API Design](#15-api-design)
 
 ---
 
@@ -157,9 +158,137 @@ Abhikarta-LLM is an enterprise-grade platform for building, deploying, and manag
 
 ---
 
-## 3. Actor System
+## 3. SDK Architecture (v1.4.8)
 
 ### 3.1 Overview
+
+Abhikarta v1.4.8 introduces a modular SDK architecture with three standalone packages:
+
+| Package | Purpose | Server Required |
+|---------|---------|-----------------|
+| `abhikarta-sdk-client` | Connect to deployed Abhikarta server | Yes |
+| `abhikarta-sdk-embedded` | Standalone usage without server | No |
+| `abhikarta-web` | Web UI module | N/A (module) |
+
+### 3.2 Project Structure
+
+```
+abhikarta-llm/
+├── abhikarta/                    # Core library
+│   ├── agent/                    # Agent management
+│   ├── workflow/                 # Workflow engine
+│   ├── swarm/                    # Swarm orchestration
+│   ├── aiorg/                    # AI Organizations
+│   ├── database/                 # Persistence layer
+│   ├── langchain/                # LangChain integration
+│   └── tools/                    # Tool framework
+│
+├── abhikarta-web/                # Web UI module
+│   └── src/abhikarta_web/
+│       ├── routes/               # Flask routes
+│       ├── templates/            # Jinja2 templates
+│       └── static/               # CSS, JS, images
+│
+├── abhikarta-sdk-client/         # API Client SDK
+│   └── src/abhikarta_client/
+│       ├── client.py             # Main client
+│       ├── agents.py             # Agents API
+│       ├── workflows.py          # Workflows API
+│       ├── swarms.py             # Swarms API
+│       └── organizations.py      # Organizations API
+│
+├── abhikarta-sdk-embedded/       # Embedded SDK
+│   └── src/abhikarta_embedded/
+│       ├── core.py               # Main Abhikarta class
+│       ├── agents/               # Agent implementations
+│       ├── workflows/            # Workflow engine
+│       ├── swarms/               # Swarm engine
+│       ├── orgs/                 # Organization engine
+│       ├── providers/            # LLM providers
+│       ├── tools/                # Tool framework
+│       └── decorators.py         # @agent, @workflow, @tool
+│
+├── entity_definitions/           # JSON entity templates
+│   ├── agents/                   # Agent templates
+│   ├── workflows/                # Workflow templates
+│   ├── swarms/                   # Swarm templates
+│   ├── aiorg/                    # AI Org templates
+│   └── scripts/                  # Script templates
+│
+└── run_server.py                 # Application entry point
+```
+
+### 3.3 SDK Client Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    AbhikartaClient                          │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │                    HTTP Client                        │  │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐     │  │
+│  │  │ Agents  │ │Workflows│ │ Swarms  │ │  Orgs   │     │  │
+│  │  │ Client  │ │ Client  │ │ Client  │ │ Client  │     │  │
+│  │  └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘     │  │
+│  │       │           │           │           │          │  │
+│  │       └───────────┴─────┬─────┴───────────┘          │  │
+│  │                         │                            │  │
+│  │              ┌──────────▼──────────┐                │  │
+│  │              │   REST API Layer    │                │  │
+│  │              └──────────┬──────────┘                │  │
+│  └───────────────────────────────────────────────────────┘  │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ HTTP/HTTPS
+                    ┌──────────▼──────────┐
+                    │  Abhikarta Server   │
+                    └─────────────────────┘
+```
+
+### 3.4 SDK Embedded Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Abhikarta                              │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │                 Core Components                       │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │  │
+│  │  │   Agents    │  │  Workflows  │  │   Swarms    │   │  │
+│  │  │  ReAct      │  │  DAGWorkflow│  │ Collaborative│  │  │
+│  │  │  Goal       │  │  Nodes      │  │ Sequential  │   │  │
+│  │  │  Reflect    │  │  Edges      │  │ Parallel    │   │  │
+│  │  │  Hierarchical│ │             │  │             │   │  │
+│  │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘   │  │
+│  │         │                │                │          │  │
+│  │         └────────────────┼────────────────┘          │  │
+│  │                          │                           │  │
+│  │              ┌───────────▼───────────┐              │  │
+│  │              │   Provider Layer      │              │  │
+│  │              │  Ollama│OpenAI│Anthropic│             │  │
+│  │              └───────────────────────┘              │  │
+│  └───────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 3.5 Decorator Pattern
+
+The SDK Embedded supports Pythonic decorator-based definitions:
+
+```python
+from abhikarta_embedded import agent, tool
+
+@tool(description="Search the web")
+def web_search(query: str) -> dict:
+    return {"results": [...]}
+
+@agent(type="react", model="ollama/llama3.2:3b", tools=[web_search])
+class ResearchAgent:
+    system_prompt = "You are a research assistant."
+```
+
+---
+
+## 4. Actor System
+
+### 5.1 Overview
 
 The Actor System provides a Pekko-inspired framework for highly concurrent, distributed, and fault-tolerant agent execution. It enables running millions of agents and workflows in real-time, message-driven fashion.
 
@@ -317,13 +446,13 @@ agents = [
 
 ---
 
-## 4. Notification System (v1.4.0)
+## 5. Notification System (v1.4.0)
 
-### 4.1 Overview
+### 5.1 Overview
 
 The Notification System provides enterprise-grade multi-channel notifications for agents, workflows, and swarms. It supports outgoing notifications (Slack, Teams, Email) and incoming webhooks from external systems.
 
-### 4.2 Architecture
+### 5.2 Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -369,7 +498,7 @@ The Notification System provides enterprise-grade multi-channel notifications fo
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.3 NotificationManager
+### 5.3 NotificationManager
 
 Central orchestrator for all notification operations:
 
@@ -541,7 +670,7 @@ class TokenBucketRateLimiter:
 
 ---
 
-## 5. Database Design
+## 6. Database Design
 
 ### 5.1 Schema Overview (27 Tables)
 
@@ -586,7 +715,7 @@ class TokenBucketRateLimiter:
 └─────────────────┴───────────────────────────────────────────────┘
 ```
 
-### 4.2 Key Table Schemas
+### 5.2 Key Table Schemas
 
 #### agents
 ```sql
@@ -646,7 +775,7 @@ CREATE TABLE hitl_tasks (
 
 ## 4. Agent System Design
 
-### 4.1 Agent Types
+### 5.1 Agent Types
 
 | Type | Description | Use Case |
 |------|-------------|----------|
@@ -655,7 +784,7 @@ CREATE TABLE hitl_tasks (
 | **Plan-and-Execute** | Plan then execute | Multi-step tasks |
 | **Custom** | User-defined | Specialized needs |
 
-### 4.2 Agent Configuration Schema
+### 5.2 Agent Configuration Schema
 
 ```json
 {
@@ -674,7 +803,7 @@ CREATE TABLE hitl_tasks (
 }
 ```
 
-### 4.3 Visual Agent Designer
+### 5.3 Visual Agent Designer
 
 The designer supports 14 node types with drag-and-drop functionality:
 

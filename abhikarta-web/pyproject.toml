@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "abhikarta-web"
+version = "1.4.8"
+description = "Web UI for Abhikarta-LLM - AI Agent Orchestration Platform"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Ashutosh Sinha", email = "ajsinha@gmail.com"}
+]
+keywords = [
+    "ai", "llm", "agents", "web", "ui", "flask", "dashboard"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Flask",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "abhikarta>=1.4.8",
+    "flask>=2.0.0",
+    "flask-login>=0.6.0",
+    "flask-session>=0.5.0",
+    "werkzeug>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/ajsinha/abhikarta-llm"
+Documentation = "https://abhikarta-llm.readthedocs.io"
+
+[project.scripts]
+abhikarta-web = "abhikarta_web.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+abhikarta_web = [
+    "templates/**/*",
+    "static/**/*",
+]
