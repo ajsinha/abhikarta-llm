@@ -107,7 +107,7 @@
                             <td>{{ fragment.created_by or 'Unknown' }}</td>
                             <td>
                                 <small class="text-muted">
-                                    {{ fragment.updated_at[:10] if fragment.updated_at else 'N/A' }}
+                                    {{ fragment.updated_at.strftime('%Y-%m-%d') if fragment.updated_at else 'N/A' }}
                                 </small>
                             </td>
                             <td>

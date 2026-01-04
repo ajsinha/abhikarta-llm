@@ -139,7 +139,7 @@
                                 {% endif %}
                             </td>
                             <td>{{ fragment.created_by or 'Unknown' }}</td>
-                            <td><small>{{ fragment.updated_at[:10] if fragment.updated_at else 'N/A' }}</small></td>
+                            <td><small>{{ fragment.updated_at.strftime('%Y-%m-%d') if fragment.updated_at else 'N/A' }}</small></td>
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ url_for('view_code_fragment', fragment_id=fragment.fragment_id) }}" 

@@ -72,11 +72,11 @@
                             <table class="table table-sm">
                                 <tr>
                                     <th width="120">Created:</th>
-                                    <td>{{ fragment.created_at[:10] if fragment.created_at else 'N/A' }} by {{ fragment.created_by or 'Unknown' }}</td>
+                                    <td>{{ fragment.created_at.strftime('%Y-%m-%d') if fragment.created_at else 'N/A' }} by {{ fragment.created_by or 'Unknown' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Updated:</th>
-                                    <td>{{ fragment.updated_at[:10] if fragment.updated_at else 'N/A' }}{% if fragment.updated_by %} by {{ fragment.updated_by }}{% endif %}</td>
+                                    <td>{{ fragment.updated_at.strftime('%Y-%m-%d') if fragment.updated_at else 'N/A' }}{% if fragment.updated_by %} by {{ fragment.updated_by }}{% endif %}</td>
                                 </tr>
                                 <tr>
                                     <th>Usage Count:</th>
@@ -217,7 +217,7 @@
                     <small class="text-muted">
                         {% if fragment.reviewed_by %}
                         Reviewed by {{ fragment.reviewed_by }}
-                        {% if fragment.reviewed_at %} on {{ fragment.reviewed_at[:10] }}{% endif %}
+                        {% if fragment.reviewed_at %} on {{ fragment.reviewed_at.strftime('%Y-%m-%d') }}{% endif %}
                         {% endif %}
                     </small>
                 </div>
