@@ -965,4 +965,308 @@ class UserRoutes(AbstractRoutes):
                 'servers': results
             })
         
+        # ======================================================================
+        # USER CODE FRAGMENTS ROUTES (v1.4.8)
+        # ======================================================================
+        
+        @self.app.route('/user/code-fragments')
+        @login_required
+        def user_code_fragments():
+            """Display user's code fragments."""
+            user_id = session.get('user_id')
+            
+            try:
+                fragments = self.db_facade.code_fragments.get_user_fragments(user_id)
+                categories = self.db_facade.code_fragments.get_categories()
+                status_counts = self.db_facade.code_fragments.get_user_fragment_stats(user_id)
+                
+                return render_template('user/code_fragments.html',
+                                       fragments=fragments,
+                                       categories=categories,
+                                       status_counts=status_counts)
+            except Exception as e:
+                logger.error(f"Error loading user code fragments: {e}", exc_info=True)
+                flash('Error loading code fragments', 'error')
+                return redirect(url_for('user_dashboard'))
+        
+        @self.app.route('/user/code-fragments/create', methods=['GET', 'POST'])
+        @login_required
+        def create_code_fragment():
+            """Create a new code fragment."""
+            user_id = session.get('user_id')
+            
+            if request.method == 'POST':
+                name = request.form.get('name', '').strip()
+                description = request.form.get('description', '').strip()
+                language = request.form.get('language', 'python')
+                code = request.form.get('code', '')
+                version = request.form.get('version', '1.0.0')
+                category = request.form.get('category', 'general')
+                tags_str = request.form.get('tags', '')
+                dependencies_str = request.form.get('dependencies', '')
+                
+                # Validation
+                if not name:
+                    flash('Fragment name is required', 'error')
+                    return render_template('user/create_code_fragment.html',
+                                           categories=self.db_facade.code_fragments.get_categories())
+                
+                if not code:
+                    flash('Fragment code is required', 'error')
+                    return render_template('user/create_code_fragment.html',
+                                           categories=self.db_facade.code_fragments.get_categories())
+                
+                if self.db_facade.code_fragments.name_exists(name):
+                    flash('Fragment name already exists', 'error')
+                    return render_template('user/create_code_fragment.html',
+                                           categories=self.db_facade.code_fragments.get_categories())
+                
+                # Parse tags and dependencies
+                import json
+                try:
+                    tags = json.dumps([t.strip() for t in tags_str.split(',') if t.strip()]) if tags_str else '[]'
+                    dependencies = json.dumps([d.strip() for d in dependencies_str.split(',') if d.strip()]) if dependencies_str else '[]'
+                except:
+                    tags = '[]'
+                    dependencies = '[]'
+                
+                try:
+                    fragment_id = self.db_facade.code_fragments.create_fragment(
+                        name=name,
+                        description=description,
+                        language=language,
+                        code=code,
+                        version=version,
+                        category=category,
+                        tags=tags,
+                        dependencies=dependencies,
+                        created_by=user_id,
+                        status='draft',
+                        source='web'
+                    )
+                    
+                    if fragment_id:
+                        self.log_audit('create_code_fragment', 'code_fragment', fragment_id)
+                        flash('Code fragment created successfully', 'success')
+                        return redirect(url_for('user_view_code_fragment', fragment_id=fragment_id))
+                    else:
+                        flash('Error creating code fragment', 'error')
+                except Exception as e:
+                    logger.error(f"Error creating code fragment: {e}", exc_info=True)
+                    flash(f'Error creating code fragment: {str(e)}', 'error')
+            
+            categories = self.db_facade.code_fragments.get_categories()
+            return render_template('user/create_code_fragment.html',
+                                   categories=categories)
+        
+        @self.app.route('/user/code-fragments/<fragment_id>')
+        @login_required
+        def user_view_code_fragment(fragment_id):
+            """View a code fragment."""
+            user_id = session.get('user_id')
+            
+            try:
+                fragment = self.db_facade.code_fragments.get_fragment(fragment_id)
+                
+                if not fragment:
+                    flash('Code fragment not found', 'error')
+                    return redirect(url_for('user_code_fragments'))
+                
+                # Check ownership (users can only view their own drafts/pending, but can view any approved/published)
+                is_owner = fragment.get('created_by') == user_id
+                is_public = fragment.get('status') in ('approved', 'published')
+                
+                if not is_owner and not is_public:
+                    flash('You do not have permission to view this fragment', 'error')
+                    return redirect(url_for('user_code_fragments'))
+                
+                return render_template('user/view_code_fragment.html',
+                                       fragment=fragment,
+                                       is_owner=is_owner)
+            except Exception as e:
+                logger.error(f"Error viewing code fragment: {e}", exc_info=True)
+                flash('Error loading code fragment', 'error')
+                return redirect(url_for('user_code_fragments'))
+        
+        @self.app.route('/user/code-fragments/<fragment_id>/edit', methods=['GET', 'POST'])
+        @login_required
+        def user_edit_code_fragment(fragment_id):
+            """Edit a code fragment (only owner and only if status allows)."""
+            user_id = session.get('user_id')
+            
+            try:
+                fragment = self.db_facade.code_fragments.get_fragment(fragment_id)
+                
+                if not fragment:
+                    flash('Code fragment not found', 'error')
+                    return redirect(url_for('user_code_fragments'))
+                
+                # Check ownership
+                if fragment.get('created_by') != user_id:
+                    flash('You can only edit your own code fragments', 'error')
+                    return redirect(url_for('user_code_fragments'))
+                
+                # Check if editable (draft or testing only)
+                if fragment.get('status') not in ('draft', 'testing'):
+                    flash('This code fragment cannot be edited in its current status', 'warning')
+                    return redirect(url_for('user_view_code_fragment', fragment_id=fragment_id))
+                
+                if request.method == 'POST':
+                    name = request.form.get('name', '').strip()
+                    description = request.form.get('description', '').strip()
+                    language = request.form.get('language', 'python')
+                    code = request.form.get('code', '')
+                    version = request.form.get('version', fragment.get('version', '1.0.0'))
+                    category = request.form.get('category', 'general')
+                    tags_str = request.form.get('tags', '')
+                    dependencies_str = request.form.get('dependencies', '')
+                    
+                    # Validation
+                    if not name:
+                        flash('Fragment name is required', 'error')
+                        return render_template('user/edit_code_fragment.html',
+                                               fragment=fragment,
+                                               categories=self.db_facade.code_fragments.get_categories())
+                    
+                    if self.db_facade.code_fragments.name_exists(name, exclude_id=fragment_id):
+                        flash('Fragment name already exists', 'error')
+                        return render_template('user/edit_code_fragment.html',
+                                               fragment=fragment,
+                                               categories=self.db_facade.code_fragments.get_categories())
+                    
+                    import json
+                    try:
+                        tags = json.dumps([t.strip() for t in tags_str.split(',') if t.strip()]) if tags_str else '[]'
+                        dependencies = json.dumps([d.strip() for d in dependencies_str.split(',') if d.strip()]) if dependencies_str else '[]'
+                    except:
+                        tags = fragment.get('tags', '[]')
+                        dependencies = fragment.get('dependencies', '[]')
+                    
+                    success = self.db_facade.code_fragments.update_fragment(
+                        fragment_id,
+                        updated_by=user_id,
+                        name=name,
+                        description=description,
+                        language=language,
+                        code=code,
+                        version=version,
+                        category=category,
+                        tags=tags,
+                        dependencies=dependencies
+                    )
+                    
+                    if success:
+                        self.log_audit('update_code_fragment', 'code_fragment', fragment_id)
+                        flash('Code fragment updated successfully', 'success')
+                        return redirect(url_for('user_view_code_fragment', fragment_id=fragment_id))
+                    else:
+                        flash('Error updating code fragment', 'error')
+                
+                categories = self.db_facade.code_fragments.get_categories()
+                return render_template('user/edit_code_fragment.html',
+                                       fragment=fragment,
+                                       categories=categories)
+            except Exception as e:
+                logger.error(f"Error editing code fragment: {e}", exc_info=True)
+                flash('Error loading code fragment', 'error')
+                return redirect(url_for('user_code_fragments'))
+        
+        @self.app.route('/user/code-fragments/<fragment_id>/submit', methods=['POST'])
+        @login_required
+        def submit_code_fragment_for_review(fragment_id):
+            """Submit a code fragment for admin review."""
+            user_id = session.get('user_id')
+            
+            try:
+                fragment = self.db_facade.code_fragments.get_fragment(fragment_id)
+                
+                if not fragment:
+                    flash('Code fragment not found', 'error')
+                    return redirect(url_for('user_code_fragments'))
+                
+                # Check ownership
+                if fragment.get('created_by') != user_id:
+                    flash('You can only submit your own code fragments', 'error')
+                    return redirect(url_for('user_code_fragments'))
+                
+                # Check current status
+                if fragment.get('status') not in ('draft', 'testing'):
+                    flash('This code fragment cannot be submitted for review', 'warning')
+                    return redirect(url_for('user_view_code_fragment', fragment_id=fragment_id))
+                
+                success = self.db_facade.code_fragments.submit_for_review(fragment_id, user_id)
+                
+                if success:
+                    self.log_audit('submit_code_fragment_review', 'code_fragment', fragment_id)
+                    flash('Code fragment submitted for review', 'success')
+                else:
+                    flash('Error submitting code fragment for review', 'error')
+                
+                return redirect(url_for('user_view_code_fragment', fragment_id=fragment_id))
+            except Exception as e:
+                logger.error(f"Error submitting code fragment for review: {e}", exc_info=True)
+                flash('Error submitting for review', 'error')
+                return redirect(url_for('user_code_fragments'))
+        
+        @self.app.route('/user/code-fragments/<fragment_id>/delete', methods=['POST'])
+        @login_required
+        def delete_user_code_fragment(fragment_id):
+            """Delete a code fragment (only owner and only if draft)."""
+            user_id = session.get('user_id')
+            
+            try:
+                fragment = self.db_facade.code_fragments.get_fragment(fragment_id)
+                
+                if not fragment:
+                    flash('Code fragment not found', 'error')
+                    return redirect(url_for('user_code_fragments'))
+                
+                # Check ownership
+                if fragment.get('created_by') != user_id:
+                    flash('You can only delete your own code fragments', 'error')
+                    return redirect(url_for('user_code_fragments'))
+                
+                # Only allow deletion of drafts
+                if fragment.get('status') != 'draft':
+                    flash('Only draft code fragments can be deleted', 'warning')
+                    return redirect(url_for('user_view_code_fragment', fragment_id=fragment_id))
+                
+                success = self.db_facade.code_fragments.delete_fragment(fragment_id)
+                
+                if success:
+                    self.log_audit('delete_code_fragment', 'code_fragment', fragment_id)
+                    flash('Code fragment deleted', 'success')
+                else:
+                    flash('Error deleting code fragment', 'error')
+                
+                return redirect(url_for('user_code_fragments'))
+            except Exception as e:
+                logger.error(f"Error deleting code fragment: {e}", exc_info=True)
+                flash('Error deleting code fragment', 'error')
+                return redirect(url_for('user_code_fragments'))
+        
+        @self.app.route('/user/code-fragments/browse')
+        @login_required
+        def browse_code_fragments():
+            """Browse approved/published code fragments."""
+            category = request.args.get('category')
+            language = request.args.get('language')
+            
+            try:
+                fragments = self.db_facade.code_fragments.get_usable_fragments(
+                    category=category,
+                    language=language
+                )
+                categories = self.db_facade.code_fragments.get_categories()
+                
+                return render_template('user/browse_code_fragments.html',
+                                       fragments=fragments,
+                                       categories=categories,
+                                       selected_category=category,
+                                       selected_language=language)
+            except Exception as e:
+                logger.error(f"Error browsing code fragments: {e}", exc_info=True)
+                flash('Error loading code fragments', 'error')
+                return redirect(url_for('user_dashboard'))
+        
         logger.info("User routes registered")

@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Create Code Fragment - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+<style>
+    .CodeMirror {
+        height: 400px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('user_code_fragments') }}">Code Fragments</a></li>
+                    <li class="breadcrumb-item active">Create New</li>
+                </ol>
+            </nav>
+            <h2><i class="bi bi-plus-circle me-2"></i>Create Code Fragment</h2>
+            <p class="text-muted">Create a new reusable code module</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="POST" action="{{ url_for('create_code_fragment') }}">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-info-circle me-2"></i>Fragment Details
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required
+                                       placeholder="e.g., data-validator, csv-parser, api-helper">
+                                <small class="text-muted">Unique name for this code fragment (used as db://name)</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="language" class="form-label">Language</label>
+                                <select class="form-select" id="language" name="language">
+                                    <option value="python" selected>Python</option>
+                                    <option value="javascript">JavaScript</option>
+                                    <option value="shell">Shell/Bash</option>
+                                    <option value="sql">SQL</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2"
+                                      placeholder="What does this code fragment do?"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <input type="text" class="form-control" id="category" name="category" 
+                                       list="category-list" value="general" placeholder="e.g., data, utils, api">
+                                <datalist id="category-list">
+                                    {% for cat in categories %}
+                                    <option value="{{ cat }}">
+                                    {% endfor %}
+                                    <option value="general">
+                                    <option value="data">
+                                    <option value="utils">
+                                    <option value="api">
+                                    <option value="validation">
+                                    <option value="transformation">
+                                </datalist>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="version" class="form-label">Version</label>
+                                <input type="text" class="form-control" id="version" name="version" value="1.0.0"
+                                       pattern="\d+\.\d+\.\d+" placeholder="1.0.0">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="tags" class="form-label">Tags</label>
+                                <input type="text" class="form-control" id="tags" name="tags"
+                                       placeholder="comma, separated, tags">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="dependencies" class="form-label">Dependencies</label>
+                            <input type="text" class="form-control" id="dependencies" name="dependencies"
+                                   placeholder="comma, separated, package names">
+                            <small class="text-muted">Python packages required (e.g., pandas, requests)</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-code-slash me-2"></i>Code <span class="text-danger">*</span></span>
+                        <select class="form-select form-select-sm" style="width: auto;" id="themeSelect" onchange="changeTheme()">
+                            <option value="default">Light Theme</option>
+                            <option value="monokai" selected>Dark Theme</option>
+                        </select>
+                    </div>
+                    <div class="card-body p-0">
+                        <textarea id="code" name="code" style="display: none;"></textarea>
+                        <div id="codeEditor"></div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 d-flex justify-content-between">
+                    <a href="{{ url_for('user_code_fragments') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Cancel
+                    </a>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-2"></i>Create Fragment
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-lightbulb me-2"></i>Tips
+                </div>
+                <div class="card-body">
+                    <h6>Using Code Fragments</h6>
+                    <p class="small">Once approved, your code fragment can be referenced using:</p>
+                    <pre class="bg-light p-2 rounded small"><code>db://fragment-name</code></pre>
+                    
+                    <h6 class="mt-3">Example in Workflow</h6>
+                    <pre class="bg-light p-2 rounded small"><code>{
+  "python_modules": {
+    "utils": "db://my-utils"
+  }
+}</code></pre>
+                    
+                    <h6 class="mt-3">Approval Workflow</h6>
+                    <ol class="small mb-0">
+                        <li>Create as <span class="badge bg-secondary">Draft</span></li>
+                        <li>Test locally</li>
+                        <li>Submit for <span class="badge bg-warning text-dark">Review</span></li>
+                        <li>Admin approves → <span class="badge bg-success">Approved</span></li>
+                        <li>Admin publishes → <span class="badge bg-primary">Published</span></li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-code-square me-2"></i>Example Code
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-2 rounded small mb-0"><code>"""
+Data validation utilities.
+"""
+
+def validate_email(email: str) -> bool:
+    import re
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return bool(re.match(pattern, email))
+
+def validate_required(data: dict, fields: list) -> list:
+    missing = []
+    for field in fields:
+        if not data.get(field):
+            missing.append(field)
+    return missing</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<script>
+var editor = CodeMirror(document.getElementById('codeEditor'), {
+    mode: 'python',
+    theme: 'monokai',
+    lineNumbers: true,
+    lineWrapping: true,
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: false,
+    value: '"""\nYour code fragment here.\n"""\n\ndef example_function():\n    pass\n'
+});
+
+// Sync editor content to hidden textarea
+document.querySelector('form').addEventListener('submit', function() {
+    document.getElementById('code').value = editor.getValue();
+});
+
+// Change language mode
+document.getElementById('language').addEventListener('change', function() {
+    const modes = {
+        'python': 'python',
+        'javascript': 'javascript',
+        'shell': 'shell',
+        'sql': 'sql'
+    };
+    editor.setOption('mode', modes[this.value] || 'python');
+});
+
+// Change theme
+function changeTheme() {
+    const theme = document.getElementById('themeSelect').value;
+    editor.setOption('theme', theme);
+}
+</script>
+{% endblock %}

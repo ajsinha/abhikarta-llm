@@ -130,7 +130,7 @@ class AdminRoutes(AbstractRoutes):
         def admin_entity_approvals():
             """
             Unified entity approval dashboard.
-            Shows all entities (agents, workflows, swarms, AI orgs) with their status
+            Shows all entities (agents, workflows, swarms, AI orgs, code fragments) with their status
             and allows admins to approve, reject, or change status.
             """
             try:
@@ -149,6 +149,11 @@ class AdminRoutes(AbstractRoutes):
                 
                 aiorgs = self.db_facade.fetch_all(
                     "SELECT org_id, name, status, source_type, created_by, updated_at FROM ai_orgs ORDER BY updated_at DESC"
+                ) or []
+                
+                # Code fragments (v1.4.8)
+                code_fragments = self.db_facade.fetch_all(
+                    "SELECT fragment_id, name, status, source, created_by, updated_at FROM code_fragments ORDER BY updated_at DESC"
                 ) or []
                 
                 # Transform to unified format
@@ -202,6 +207,19 @@ class AdminRoutes(AbstractRoutes):
                         'detail_url': url_for('aiorg_detail', org_id=o['org_id'])
                     })
                 
+                # Code fragments (v1.4.8)
+                for cf in code_fragments:
+                    all_entities.append({
+                        'entity_type': 'code_fragment',
+                        'id': cf['fragment_id'],
+                        'name': cf['name'],
+                        'status': cf.get('status', 'draft'),
+                        'source_type': cf.get('source', 'web'),
+                        'created_by': cf.get('created_by'),
+                        'updated_at': str(cf.get('updated_at', '')),
+                        'detail_url': url_for('view_code_fragment', fragment_id=cf['fragment_id'])
+                    })
+                
                 # Sort by updated_at descending
                 all_entities.sort(key=lambda x: x['updated_at'], reverse=True)
                 
@@ -213,6 +231,7 @@ class AdminRoutes(AbstractRoutes):
                 workflows_list = [e for e in all_entities if e['entity_type'] == 'workflow']
                 swarms_list = [e for e in all_entities if e['entity_type'] == 'swarm']
                 aiorgs_list = [e for e in all_entities if e['entity_type'] == 'aiorg']
+                code_fragments_list = [e for e in all_entities if e['entity_type'] == 'code_fragment']
                 
                 # Count by status
                 pending_review_count = len([e for e in all_entities if e['status'] == 'pending_review'])
@@ -230,6 +249,7 @@ class AdminRoutes(AbstractRoutes):
                                        workflows=workflows_list,
                                        swarms=swarms_list,
                                        aiorgs=aiorgs_list,
+                                       code_fragments=code_fragments_list,
                                        pending_review_count=pending_review_count,
                                        testing_count=testing_count,
                                        approved_count=approved_count,
@@ -730,7 +750,9 @@ class AdminRoutes(AbstractRoutes):
                         language=language,
                         category=category,
                         tags=json.dumps(tags_list),
-                        dependencies=json.dumps(deps_list)
+                        dependencies=json.dumps(deps_list),
+                        status='approved',  # Admin-created fragments are auto-approved
+                        source='admin'
                     )
                     
                     if result:
@@ -893,6 +915,135 @@ class AdminRoutes(AbstractRoutes):
             except Exception as e:
                 logger.error(f"Error toggling code fragment: {e}", exc_info=True)
                 return jsonify({'error': str(e)}), 500
+        
+        # ------------------------------------------
+        # Code Fragment Status Management (v1.4.8)
+        # ------------------------------------------
+        
+        @self.app.route('/api/code-fragments/<fragment_id>/status', methods=['POST'])
+        @admin_required
+        def api_update_code_fragment_status(fragment_id):
+            """API endpoint to update code fragment status."""
+            try:
+                data = request.get_json() or {}
+                new_status = data.get('status')
+                review_notes = data.get('notes', '')
+                
+                if not new_status:
+                    return jsonify({'error': 'Status is required'}), 400
+                
+                valid_statuses = ['draft', 'testing', 'pending_review', 'approved', 'published', 'archived']
+                if new_status not in valid_statuses:
+                    return jsonify({'error': f'Invalid status. Must be one of: {valid_statuses}'}), 400
+                
+                success = self.db_facade.code_fragments.update_status(
+                    fragment_id,
+                    new_status,
+                    reviewed_by=session.get('user_id'),
+                    review_notes=review_notes
+                )
+                
+                if success:
+                    self.log_audit('update_code_fragment_status', 'code_fragment', fragment_id,
+                                   {'new_status': new_status, 'notes': review_notes})
+                    return jsonify({'success': True, 'status': new_status})
+                else:
+                    return jsonify({'error': 'Invalid status transition or fragment not found'}), 400
+                    
+            except Exception as e:
+                logger.error(f"Error updating code fragment status: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/admin/code-fragments/<fragment_id>/approve', methods=['POST'])
+        @admin_required
+        def approve_code_fragment(fragment_id):
+            """Approve a code fragment."""
+            try:
+                review_notes = request.form.get('review_notes', '')
+                
+                success = self.db_facade.code_fragments.approve_fragment(
+                    fragment_id,
+                    approved_by=session.get('user_id'),
+                    review_notes=review_notes
+                )
+                
+                if success:
+                    self.log_audit('approve_code_fragment', 'code_fragment', fragment_id)
+                    flash('Code fragment approved', 'success')
+                else:
+                    flash('Error approving code fragment', 'error')
+                    
+            except Exception as e:
+                logger.error(f"Error approving code fragment: {e}", exc_info=True)
+                flash('Error approving code fragment', 'error')
+            
+            return redirect(url_for('view_code_fragment', fragment_id=fragment_id))
+        
+        @self.app.route('/admin/code-fragments/<fragment_id>/reject', methods=['POST'])
+        @admin_required
+        def reject_code_fragment(fragment_id):
+            """Reject a code fragment back to draft."""
+            try:
+                review_notes = request.form.get('review_notes', '')
+                
+                success = self.db_facade.code_fragments.reject_fragment(
+                    fragment_id,
+                    rejected_by=session.get('user_id'),
+                    review_notes=review_notes
+                )
+                
+                if success:
+                    self.log_audit('reject_code_fragment', 'code_fragment', fragment_id)
+                    flash('Code fragment rejected and returned to draft', 'warning')
+                else:
+                    flash('Error rejecting code fragment', 'error')
+                    
+            except Exception as e:
+                logger.error(f"Error rejecting code fragment: {e}", exc_info=True)
+                flash('Error rejecting code fragment', 'error')
+            
+            return redirect(url_for('view_code_fragment', fragment_id=fragment_id))
+        
+        @self.app.route('/admin/code-fragments/<fragment_id>/publish', methods=['POST'])
+        @admin_required
+        def publish_code_fragment(fragment_id):
+            """Publish an approved code fragment."""
+            try:
+                success = self.db_facade.code_fragments.publish_fragment(
+                    fragment_id,
+                    published_by=session.get('user_id')
+                )
+                
+                if success:
+                    self.log_audit('publish_code_fragment', 'code_fragment', fragment_id)
+                    flash('Code fragment published and available to all users', 'success')
+                else:
+                    flash('Error publishing code fragment', 'error')
+                    
+            except Exception as e:
+                logger.error(f"Error publishing code fragment: {e}", exc_info=True)
+                flash('Error publishing code fragment', 'error')
+            
+            return redirect(url_for('view_code_fragment', fragment_id=fragment_id))
+        
+        @self.app.route('/admin/code-fragments/pending')
+        @admin_required
+        def pending_code_fragments():
+            """Display code fragments pending review."""
+            try:
+                fragments = self.db_facade.code_fragments.get_pending_review_fragments()
+                status_counts = self.db_facade.code_fragments.get_status_counts()
+                
+                return render_template('admin/pending_code_fragments.html',
+                                       fullname=session.get('fullname'),
+                                       userid=session.get('user_id'),
+                                       roles=session.get('roles', []),
+                                       fragments=fragments,
+                                       status_counts=status_counts)
+            except Exception as e:
+                logger.error(f"Error loading pending code fragments: {e}", exc_info=True)
+                flash('Error loading pending code fragments', 'error')
+                return redirect(url_for('admin_code_fragments'))
         
         # ============================================
         # LLM PROVIDERS MANAGEMENT

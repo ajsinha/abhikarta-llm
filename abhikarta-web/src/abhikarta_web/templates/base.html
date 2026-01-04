@@ -262,6 +262,26 @@
                                     </a></li>
                                 </ul>
                             </li>
+                            
+                            <!-- Code Fragments Submenu -->
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle-sub" href="#">
+                                    <i class="bi bi-code-square me-2 text-secondary"></i>Code Fragments
+                                    <i class="bi bi-chevron-right float-end"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-submenu-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('user_code_fragments') }}">
+                                        <i class="bi bi-folder me-2"></i>My Fragments
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('browse_code_fragments') }}">
+                                        <i class="bi bi-search me-2"></i>Browse All
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('create_code_fragment') }}">
+                                        <i class="bi bi-plus-lg me-2"></i>Create Fragment
+                                    </a></li>
+                                </ul>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item">

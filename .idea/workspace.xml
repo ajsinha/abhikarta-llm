@@ -6,21 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="014fc29a-e95d-4fe0-82c3-f3b357c9f648" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/admin_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/admin_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/agent_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/agent_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/aiorg_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/aiorg_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/script_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/script_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/swarm_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/swarm_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/user_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/workflow_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/workflow_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/admin/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/admin/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/agents/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/agents/detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/aiorg/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/aiorg/detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/scripts/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/scripts/view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/swarms/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/swarms/view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/user/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/user/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/workflows/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/workflows/detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta-main/src/abhikarta/database/schema/sqlite_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-main/src/abhikarta/database/schema/sqlite_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/about.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/about.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/about/comparison.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/about/comparison.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/about/roadmap.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/about/roadmap.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/help.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/help.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/pages/database_schema.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/help/pages/database_schema.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/abhikarta.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/abhikarta.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/abhikarta.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/abhikarta.log" afterDir="false" />
     </list>

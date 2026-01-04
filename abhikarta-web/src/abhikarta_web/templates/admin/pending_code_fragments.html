@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Code Fragments - Admin - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="bi bi-hourglass-split me-2 text-warning"></i>Pending Code Fragments</h2>
+                    <p class="text-muted mb-0">Review and approve code fragments submitted by users</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin_code_fragments') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>All Fragments
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card text-center border-secondary">
+                <div class="card-body py-3">
+                    <h3 class="mb-0">{{ status_counts.get('draft', 0) }}</h3>
+                    <small class="text-muted">Draft</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-info">
+                <div class="card-body py-3">
+                    <h3 class="mb-0 text-info">{{ status_counts.get('testing', 0) }}</h3>
+                    <small class="text-muted">Testing</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-warning bg-warning bg-opacity-10">
+                <div class="card-body py-3">
+                    <h3 class="mb-0 text-warning">{{ status_counts.get('pending_review', 0) }}</h3>
+                    <small class="text-muted">Pending Review</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-success">
+                <div class="card-body py-3">
+                    <h3 class="mb-0 text-success">{{ status_counts.get('approved', 0) }}</h3>
+                    <small class="text-muted">Approved</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-primary">
+                <div class="card-body py-3">
+                    <h3 class="mb-0 text-primary">{{ status_counts.get('published', 0) }}</h3>
+                    <small class="text-muted">Published</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-dark">
+                <div class="card-body py-3">
+                    <h3 class="mb-0">{{ status_counts.get('archived', 0) }}</h3>
+                    <small class="text-muted">Archived</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Fragments Table -->
+    <div class="card">
+        <div class="card-header bg-warning text-dark">
+            <i class="bi bi-hourglass-split me-2"></i>Fragments Pending Review ({{ fragments|length }})
+        </div>
+        <div class="card-body">
+            {% if fragments %}
+            <div class="table-responsive">
+                <table class="table table-hover" id="pendingTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Language</th>
+                            <th>Created By</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fragment in fragments %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_code_fragment', fragment_id=fragment.fragment_id) }}" class="fw-bold text-decoration-none">
+                                    {{ fragment.name }}
+                                </a>
+                                {% if fragment.description %}
+                                <br><small class="text-muted">{{ fragment.description[:60] }}{% if fragment.description|length > 60 %}...{% endif %}</small>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge bg-light text-dark">{{ fragment.category or 'general' }}</span></td>
+                            <td><span class="badge bg-info">{{ fragment.language or 'python' }}</span></td>
+                            <td>{{ fragment.created_by or 'Unknown' }}</td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ fragment.updated_at[:10] if fragment.updated_at else 'N/A' }}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('view_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                       class="btn btn-outline-primary" title="View & Review">
+                                        <i class="bi bi-eye"></i> Review
+                                    </a>
+                                    <form action="{{ url_for('approve_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                          method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-success" title="Approve">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-danger" 
+                                            onclick="showRejectModal('{{ fragment.fragment_id }}', '{{ fragment.name }}')"
+                                            title="Reject">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-check-circle display-4 text-success"></i>
+                <h5 class="mt-3">All Caught Up!</h5>
+                <p class="text-muted">No code fragments are pending review.</p>
+                <a href="{{ url_for('admin_code_fragments') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i>View All Fragments
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="rejectForm" method="POST">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Reject Code Fragment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Reject <strong id="rejectFragmentName"></strong> and return it to draft status?</p>
+                    <div class="mb-3">
+                        <label for="rejectNotes" class="form-label">Review Notes (required)</label>
+                        <textarea class="form-control" id="rejectNotes" name="review_notes" rows="3" required
+                                  placeholder="Explain why this fragment is being rejected..."></textarea>
+                        <small class="text-muted">This will be visible to the author.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-lg me-1"></i>Reject
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function showRejectModal(fragmentId, fragmentName) {
+    document.getElementById('rejectFragmentName').textContent = fragmentName;
+    document.getElementById('rejectForm').action = '/admin/code-fragments/' + fragmentId + '/reject';
+    new bootstrap.Modal(document.getElementById('rejectModal')).show();
+}
+</script>
+{% endblock %}

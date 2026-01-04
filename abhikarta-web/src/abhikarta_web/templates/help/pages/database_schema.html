@@ -14,7 +14,7 @@
 
 <div class="alert alert-info mb-4">
     <i class="bi bi-info-circle me-2"></i>
-    Abhikarta-LLM uses a relational database with <strong>22 interconnected tables</strong> supporting both SQLite and PostgreSQL backends. 
+    Abhikarta-LLM uses a relational database with <strong>45 interconnected tables</strong> and <strong>93 indexes</strong> supporting both SQLite and PostgreSQL backends. 
     The schema is designed for scalability, auditability, and comprehensive LLM agent management.
 </div>
 
@@ -26,7 +26,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-md-4">
-                <h6 class="text-primary"><i class="bi bi-people me-2"></i>Identity & Access</h6>
+                <h6 class="text-primary"><i class="bi bi-people me-2"></i>Identity & Access (5)</h6>
                 <ul class="list-unstyled">
                     <li><code>users</code> - User accounts</li>
                     <li><code>roles</code> - Role definitions</li>
@@ -36,7 +36,7 @@
                 </ul>
             </div>
             <div class="col-md-4">
-                <h6 class="text-success"><i class="bi bi-robot me-2"></i>Agents & Workflows</h6>
+                <h6 class="text-success"><i class="bi bi-robot me-2"></i>Agents & Workflows (5)</h6>
                 <ul class="list-unstyled">
                     <li><code>agents</code> - Agent definitions</li>
                     <li><code>agent_versions</code> - Version history</li>
@@ -46,9 +46,10 @@
                 </ul>
             </div>
             <div class="col-md-4">
-                <h6 class="text-info"><i class="bi bi-play-circle me-2"></i>Execution & Tracking</h6>
+                <h6 class="text-info"><i class="bi bi-play-circle me-2"></i>Execution & Tracking (5)</h6>
                 <ul class="list-unstyled">
                     <li><code>executions</code> - Execution records</li>
+                    <li><code>agent_executions</code> - Agent exec details</li>
                     <li><code>execution_steps</code> - Step details</li>
                     <li><code>llm_calls</code> - LLM interactions</li>
                     <li><code>audit_logs</code> - Activity audit</li>
@@ -58,7 +59,7 @@
         <hr>
         <div class="row">
             <div class="col-md-4">
-                <h6 class="text-warning"><i class="bi bi-cpu me-2"></i>LLM Configuration</h6>
+                <h6 class="text-warning"><i class="bi bi-cpu me-2"></i>LLM Configuration (3)</h6>
                 <ul class="list-unstyled">
                     <li><code>llm_providers</code> - Provider configs</li>
                     <li><code>llm_models</code> - Model definitions</li>
@@ -66,7 +67,7 @@
                 </ul>
             </div>
             <div class="col-md-4">
-                <h6 class="text-danger"><i class="bi bi-person-check me-2"></i>HITL & Tools</h6>
+                <h6 class="text-danger"><i class="bi bi-person-check me-2"></i>HITL & Tools (5)</h6>
                 <ul class="list-unstyled">
                     <li><code>hitl_tasks</code> - Human review tasks</li>
                     <li><code>hitl_comments</code> - Task comments</li>
@@ -76,12 +77,62 @@
                 </ul>
             </div>
             <div class="col-md-4">
-                <h6 class="text-secondary"><i class="bi bi-gear me-2"></i>Configuration</h6>
+                <h6 class="text-secondary"><i class="bi bi-gear me-2"></i>Configuration (3)</h6>
                 <ul class="list-unstyled">
                     <li><code>code_fragments</code> - Reusable code</li>
                     <li><code>system_settings</code> - App settings</li>
                     <li><code>schema_version</code> - Migration tracking</li>
                 </ul>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <h6 class="text-purple" style="color: #6f42c1;"><i class="bi bi-hive me-2"></i>Swarms (6)</h6>
+                <ul class="list-unstyled">
+                    <li><code>swarms</code> - Swarm definitions</li>
+                    <li><code>swarm_agents</code> - Agent membership</li>
+                    <li><code>swarm_triggers</code> - Event triggers</li>
+                    <li><code>swarm_executions</code> - Execution records</li>
+                    <li><code>swarm_events</code> - Event logs</li>
+                    <li><code>swarm_decisions</code> - Master decisions</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6 style="color: #20c997;"><i class="bi bi-bell me-2"></i>Notifications (5)</h6>
+                <ul class="list-unstyled">
+                    <li><code>notification_channels</code> - Channel configs</li>
+                    <li><code>notification_logs</code> - Send history</li>
+                    <li><code>webhook_endpoints</code> - Webhook receivers</li>
+                    <li><code>webhook_events</code> - Received events</li>
+                    <li><code>user_notification_preferences</code> - User prefs</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6 style="color: #fd7e14;"><i class="bi bi-building me-2"></i>AI Organizations (6)</h6>
+                <ul class="list-unstyled">
+                    <li><code>ai_orgs</code> - Organization definitions</li>
+                    <li><code>ai_nodes</code> - Org chart nodes</li>
+                    <li><code>ai_tasks</code> - Task management</li>
+                    <li><code>ai_responses</code> - Node responses</li>
+                    <li><code>ai_hitl_actions</code> - Human interventions</li>
+                    <li><code>ai_event_logs</code> - Event history</li>
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <h6 style="color: #e83e8c;"><i class="bi bi-file-earmark-code me-2"></i>Python Scripts (2)</h6>
+                <ul class="list-unstyled">
+                    <li><code>python_scripts</code> - Script definitions</li>
+                    <li><code>script_executions</code> - Execution history</li>
+                </ul>
+            </div>
+            <div class="col-md-8">
+                <div class="alert alert-light mb-0">
+                    <strong>Total: 45 tables</strong> organized into 9 categories supporting agents, workflows, swarms, AI organizations, notifications, and Python Script Mode.
+                </div>
             </div>
         </div>
     </div>

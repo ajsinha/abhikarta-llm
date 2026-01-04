@@ -37,7 +37,7 @@ class PostgresSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.4.8"
+    SCHEMA_VERSION = "1.4.9"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -498,12 +498,18 @@ class PostgresSchema:
         dependencies JSONB DEFAULT '[]',
         is_active BOOLEAN DEFAULT TRUE,
         is_system BOOLEAN DEFAULT FALSE,
+        status TEXT DEFAULT 'draft',
+        source TEXT DEFAULT 'web',
+        reviewed_by TEXT,
+        reviewed_at TIMESTAMP WITH TIME ZONE,
+        review_notes TEXT,
         created_by TEXT NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_by TEXT,
         usage_count INTEGER DEFAULT 0,
-        FOREIGN KEY (created_by) REFERENCES users(user_id)
+        FOREIGN KEY (created_by) REFERENCES users(user_id),
+        FOREIGN KEY (reviewed_by) REFERENCES users(user_id)
     );
     """
     
@@ -1027,6 +1033,8 @@ class PostgresSchema:
         "CREATE INDEX IF NOT EXISTS idx_code_fragments_category ON code_fragments(category);",
         "CREATE INDEX IF NOT EXISTS idx_code_fragments_language ON code_fragments(language);",
         "CREATE INDEX IF NOT EXISTS idx_code_fragments_is_active ON code_fragments(is_active);",
+        "CREATE INDEX IF NOT EXISTS idx_code_fragments_status ON code_fragments(status);",
+        "CREATE INDEX IF NOT EXISTS idx_code_fragments_created_by ON code_fragments(created_by);",
         "CREATE INDEX IF NOT EXISTS idx_llm_providers_is_active ON llm_providers(is_active);",
         "CREATE INDEX IF NOT EXISTS idx_llm_models_provider_id ON llm_models(provider_id);",
         "CREATE INDEX IF NOT EXISTS idx_llm_models_is_active ON llm_models(is_active);",

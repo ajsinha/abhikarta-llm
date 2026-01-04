@@ -11,6 +11,7 @@
 <a href="#langchain">vs LangChain</a>
 <a href="#crewai">vs CrewAI</a>
 <a href="#autogen">vs AutoGen</a>
+<a href="#sdk-advantage">SDK Advantage</a>
 <a href="#strengths">Our Strengths</a>
 {% endblock %}
 
@@ -158,7 +159,56 @@
             <tr>
                 <td>Webhook Receiver</td>
                 <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> HMAC/JWT</td>
-                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Manual</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td><strong>Modular SDK Architecture</strong></td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> <span class="badge bg-primary">v1.4.8</span></td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Monolithic</td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Monolithic</td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Monolithic</td>
+            </tr>
+            <tr>
+                <td>Standalone Embedded Mode</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> No server</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+            </tr>
+            <tr>
+                <td>Client SDK (Remote API)</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> Full API</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Limited</td>
+            </tr>
+            <tr>
+                <td><strong>Python Script Mode</strong></td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> <span class="badge bg-primary">v1.4.8</span></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td>Decorator-Based API (@agent, @tool)</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> @tool only</td>
+                <td class="text-center text-warning"><i class="bi bi-dash-circle"></i> Limited</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td>Entity Approval Workflow</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> 5-stage</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
+            </tr>
+            <tr>
+                <td>Script → UI → API Interop</td>
+                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i> Unified</td>
+                <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
                 <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
                 <td class="text-center text-danger"><i class="bi bi-x-circle"></i></td>
             </tr>
@@ -220,6 +270,9 @@
                     <li>External code loading (db://, file://, s3://)</li>
                     <li><strong>Actor System for million-scale concurrency</strong> <span class="badge bg-danger">v1.3.0</span></li>
                     <li><strong>Supervision & fault tolerance built-in</strong></li>
+                    <li><strong>Modular SDK:</strong> Client + Embedded + Web as separate packages <span class="badge bg-primary">v1.4.8</span></li>
+                    <li><strong>Python Script Mode:</strong> Define entities via code with approval workflow</li>
+                    <li><strong>Decorator API:</strong> @agent and @tool for rapid development</li>
                 </ul>
             </div>
         </div>
@@ -254,6 +307,9 @@
                     <li>Complete execution tracking</li>
                     <li>Cost management and budgets</li>
                     <li>Production-ready web interface</li>
+                    <li><strong>Modular SDK:</strong> Use standalone or with server</li>
+                    <li><strong>Python Script Mode:</strong> Full interop with UI/API</li>
+                    <li><strong>Entity Approval:</strong> 5-stage governance workflow</li>
                 </ul>
             </div>
         </div>
@@ -287,6 +343,9 @@
                     <li>JSON-based workflow definitions</li>
                     <li>Complete cost tracking</li>
                     <li>MCP plugin ecosystem</li>
+                    <li><strong>SDK flexibility:</strong> Embedded (no server) OR Client (remote API)</li>
+                    <li><strong>Python Script Mode:</strong> Code + UI + API all interoperable</li>
+                    <li><strong>Decorator API:</strong> @agent and @tool decorators</li>
                 </ul>
             </div>
         </div>
@@ -302,6 +361,96 @@
                     <li>Strong code execution sandbox</li>
                     <li>Azure integration</li>
                 </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<h2 id="sdk-advantage">SDK & Python Script Mode Advantage <span class="badge bg-primary">v1.4.8</span></h2>
+
+<div class="alert alert-success mb-4">
+    <i class="bi bi-lightbulb me-2"></i>
+    <strong>Unique Competitive Edge:</strong> Abhikarta-LLM is the only framework offering true interoperability between Python code, visual designers, and REST API - all with enterprise governance.
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-box-seam me-2"></i>Modular SDK Architecture
+            </div>
+            <div class="card-body">
+                <p>Three standalone packages that can be used independently or together:</p>
+                <table class="table table-sm">
+                    <tr>
+                        <td><code>abhikarta-sdk-client</code></td>
+                        <td>Connect to deployed server via REST API</td>
+                    </tr>
+                    <tr>
+                        <td><code>abhikarta-sdk-embedded</code></td>
+                        <td>Run agents locally - <strong>no server required</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>abhikarta-web</code></td>
+                        <td>Web UI module for visual designers</td>
+                    </tr>
+                </table>
+                <p class="text-muted small mb-0"><strong>Why it matters:</strong> LangChain, CrewAI, and AutoGen are monolithic - you get everything or nothing. Abhikarta lets you choose.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-file-earmark-code me-2"></i>Python Script Mode
+            </div>
+            <div class="card-body">
+                <p>Define entities using pure Python with full IDE support:</p>
+                <pre class="bg-light p-2 rounded"><code>from abhikarta_embedded import agent, tool
+
+@tool(description="Search the web")
+def web_search(query: str) -> dict:
+    return {"results": [...]}
+
+@agent(type="react", model="ollama/llama3.2:3b")
+class ResearchAgent:
+    tools = [web_search]
+
+agent = ResearchAgent()
+result = agent.run("Find AI trends")</code></pre>
+                <p class="text-muted small mb-0"><strong>Why it matters:</strong> No other framework offers decorator-based agent definition with automatic deployment to a governed platform.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-arrows-angle-contract display-4 text-info"></i>
+                <h5 class="mt-3">Full Interoperability</h5>
+                <p class="text-muted small">Agents created via Python Script can be edited in Visual Designer and executed via REST API. All three paths lead to the same governance workflow.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-shield-check display-4 text-success"></i>
+                <h5 class="mt-3">Enterprise Governance</h5>
+                <p class="text-muted small">5-stage approval workflow (Draft → Testing → Pending Review → Approved → Published) applies regardless of creation method.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-git display-4 text-warning"></i>
+                <h5 class="mt-3">Version Control Friendly</h5>
+                <p class="text-muted small">Store Python scripts in Git, deploy via API, track changes with audit logs. Full CI/CD compatibility.</p>
             </div>
         </div>
     </div>
@@ -341,6 +490,24 @@
     <div class="col-md-4">
         <div class="card h-100 text-center">
             <div class="card-body">
+                <i class="bi bi-box-seam display-4" style="color: #20c997;"></i>
+                <h5 class="mt-3">Modular SDK <span class="badge bg-primary">v1.4.8</span></h5>
+                <p class="text-muted">Three standalone packages: Client SDK for remote API, Embedded SDK for no-server usage, Web module for UI. Mix and match as needed.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-file-earmark-code display-4" style="color: #dc3545;"></i>
+                <h5 class="mt-3">Python Script Mode <span class="badge bg-primary">v1.4.8</span></h5>
+                <p class="text-muted">Define agents, workflows, swarms, and AI orgs using Python code. Full interop between scripts, UI designer, and API.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
                 <i class="bi bi-diagram-3 display-4 text-info"></i>
                 <h5 class="mt-3">AI Organizations <span class="badge bg-info">v1.4.8</span></h5>
                 <p class="text-muted">Unique hierarchical AI org charts that mirror real business structures with task delegation and response aggregation.</p>
@@ -362,6 +529,15 @@
                 <i class="bi bi-hive display-4 text-purple" style="color: #6f42c1;"></i>
                 <h5 class="mt-3">Agent Swarms <span class="badge bg-danger">v1.3.0</span></h5>
                 <p class="text-muted">LLM-powered choreography with master actors, event buses, and multi-agent coordination.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-check2-square display-4" style="color: #fd7e14;"></i>
+                <h5 class="mt-3">Entity Approval Workflow</h5>
+                <p class="text-muted">5-stage approval process (Draft → Testing → Pending Review → Approved → Published) for production governance.</p>
             </div>
         </div>
     </div>

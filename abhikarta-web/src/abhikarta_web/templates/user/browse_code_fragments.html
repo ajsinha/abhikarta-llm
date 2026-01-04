@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Code Fragments - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="bi bi-search me-2"></i>Browse Code Fragments</h2>
+                    <p class="text-muted mb-0">Discover approved code modules you can use in your projects</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('user_code_fragments') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-folder me-2"></i>My Fragments
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('browse_code_fragments') }}" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="language" class="form-label">Language</label>
+                    <select class="form-select" id="language" name="language">
+                        <option value="">All Languages</option>
+                        <option value="python" {% if selected_language == 'python' %}selected{% endif %}>Python</option>
+                        <option value="javascript" {% if selected_language == 'javascript' %}selected{% endif %}>JavaScript</option>
+                        <option value="shell" {% if selected_language == 'shell' %}selected{% endif %}>Shell/Bash</option>
+                        <option value="sql" {% if selected_language == 'sql' %}selected{% endif %}>SQL</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-filter me-2"></i>Apply Filters
+                    </button>
+                    <a href="{{ url_for('browse_code_fragments') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg me-1"></i>Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Fragments Grid -->
+    {% if fragments %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for fragment in fragments %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">
+                        <i class="bi bi-code-square me-2 text-primary"></i>{{ fragment.name }}
+                    </span>
+                    {% if fragment.status == 'published' %}
+                    <span class="badge bg-primary">Published</span>
+                    {% else %}
+                    <span class="badge bg-success">Approved</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-muted small">
+                        {{ fragment.description[:100] if fragment.description else 'No description provided' }}{% if fragment.description and fragment.description|length > 100 %}...{% endif %}
+                    </p>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-light text-dark">{{ fragment.category or 'general' }}</span>
+                        <span class="badge bg-info">{{ fragment.language or 'python' }}</span>
+                        <code class="badge bg-dark">v{{ fragment.version or '1.0.0' }}</code>
+                    </div>
+                    
+                    <div class="bg-light p-2 rounded mb-3">
+                        <code class="small">db://{{ fragment.name }}</code>
+                        <button class="btn btn-sm btn-link p-0 float-end" onclick="copyRef('{{ fragment.name }}')" title="Copy reference">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="bi bi-graph-up me-1"></i>{{ fragment.usage_count or 0 }} uses
+                        </small>
+                        <a href="{{ url_for('user_view_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye me-1"></i>View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-inbox display-4 text-muted"></i>
+            <h5 class="mt-3">No Code Fragments Found</h5>
+            <p class="text-muted">
+                {% if selected_category or selected_language %}
+                No fragments match your current filters. Try adjusting your search criteria.
+                {% else %}
+                No approved code fragments are available yet.
+                {% endif %}
+            </p>
+            {% if selected_category or selected_language %}
+            <a href="{{ url_for('browse_code_fragments') }}" class="btn btn-outline-primary">
+                <i class="bi bi-x-lg me-1"></i>Clear Filters
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Usage Guide -->
+    <div class="card mt-4 border-info">
+        <div class="card-header bg-info text-white">
+            <i class="bi bi-lightbulb me-2"></i>How to Use Code Fragments
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6><i class="bi bi-1-circle me-2"></i>In Workflows</h6>
+                    <pre class="bg-light p-2 rounded small"><code>{
+  "python_modules": {
+    "utils": "db://fragment-name"
+  }
+}</code></pre>
+                </div>
+                <div class="col-md-4">
+                    <h6><i class="bi bi-2-circle me-2"></i>In Agents</h6>
+                    <pre class="bg-light p-2 rounded small"><code>{
+  "code_fragments": [
+    "db://validator",
+    "db://helper"
+  ]
+}</code></pre>
+                </div>
+                <div class="col-md-4">
+                    <h6><i class="bi bi-3-circle me-2"></i>In Python Code</h6>
+                    <pre class="bg-light p-2 rounded small"><code>from fragment import func
+result = func(data)</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyRef(name) {
+    navigator.clipboard.writeText('db://' + name).then(() => {
+        alert('Reference copied: db://' + name);
+    });
+}
+</script>
+{% endblock %}

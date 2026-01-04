@@ -9,9 +9,18 @@
             <h2><i class="bi bi-code-square me-2"></i>Code Fragments</h2>
             <p class="text-muted mb-0">Manage reusable code modules for workflows</p>
         </div>
-        <a href="{{ url_for('add_code_fragment') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-2"></i>Add Fragment
-        </a>
+        <div>
+            <a href="{{ url_for('pending_code_fragments') }}" class="btn btn-warning me-2">
+                <i class="bi bi-hourglass-split me-2"></i>Pending Review
+                {% set pending_count = fragments|selectattr('status', 'equalto', 'pending_review')|list|length %}
+                {% if pending_count > 0 %}
+                <span class="badge bg-dark">{{ pending_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('add_code_fragment') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-2"></i>Add Fragment
+            </a>
+        </div>
     </div>
     
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -28,25 +37,32 @@
     <!-- Usage Info -->
     <div class="alert alert-info mb-4">
         <h5><i class="bi bi-info-circle me-2"></i>How to Use Code Fragments</h5>
-        <p class="mb-2">Reference code fragments in your workflows using URI patterns:</p>
+        <p class="mb-2">Reference <strong>approved</strong> or <strong>published</strong> code fragments in your workflows using URI patterns:</p>
         <ul class="mb-0">
-            <li><code>db://&lt;fragment_id&gt;</code> - Load from database (e.g., <code>db://data-utils</code>)</li>
+            <li><code>db://&lt;fragment-name&gt;</code> - Load from database (e.g., <code>db://data-utils</code>)</li>
             <li><code>file://&lt;path&gt;</code> - Load from filesystem (e.g., <code>file:///opt/code/utils.py</code>)</li>
             <li><code>s3://&lt;bucket&gt;/&lt;key&gt;</code> - Load from S3 (e.g., <code>s3://my-bucket/code/helpers.py</code>)</li>
         </ul>
     </div>
     
-    <!-- Filter by Category -->
-    {% if categories %}
-    <div class="mb-4">
+    <!-- Filter by Category and Status -->
+    <div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        {% if categories %}
         <div class="btn-group" role="group">
-            <button type="button" class="btn btn-outline-primary active" onclick="filterCategory('all')">All</button>
+            <button type="button" class="btn btn-outline-primary active" onclick="filterCategory('all')">All Categories</button>
             {% for cat in categories %}
             <button type="button" class="btn btn-outline-primary" onclick="filterCategory('{{ cat }}')">{{ cat|capitalize }}</button>
             {% endfor %}
         </div>
+        {% endif %}
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-secondary active" onclick="filterStatus('all')">All Status</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterStatus('draft')">Draft</button>
+            <button type="button" class="btn btn-outline-warning" onclick="filterStatus('pending_review')">Pending</button>
+            <button type="button" class="btn btn-outline-success" onclick="filterStatus('approved')">Approved</button>
+            <button type="button" class="btn btn-outline-primary" onclick="filterStatus('published')">Published</button>
+        </div>
     </div>
-    {% endif %}
     
     <div class="card">
         <div class="card-header bg-bmo-blue text-white">
@@ -58,69 +74,106 @@
                 <table class="table table-hover" id="fragmentsTable">
                     <thead class="table-light">
                         <tr>
-                            <th>Fragment ID</th>
                             <th>Name</th>
                             <th>Category</th>
                             <th>Language</th>
                             <th>Version</th>
                             <th>Status</th>
-                            <th>Usage</th>
+                            <th>Source</th>
+                            <th>Created By</th>
                             <th>Updated</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for fragment in fragments %}
-                        <tr data-category="{{ fragment.category }}">
-                            <td>
-                                <code class="text-primary">{{ fragment.fragment_id }}</code>
-                                <br><small class="text-muted">db://{{ fragment.fragment_id }}</small>
-                            </td>
+                        <tr data-category="{{ fragment.category }}" data-status="{{ fragment.status or 'draft' }}">
                             <td>
                                 <strong>{{ fragment.name }}</strong>
+                                <br><small class="text-muted"><code>db://{{ fragment.name }}</code></small>
                                 {% if fragment.description %}
-                                <br><small class="text-muted">{{ fragment.description[:50] }}{% if fragment.description|length > 50 %}...{% endif %}</small>
+                                <br><small class="text-muted">{{ fragment.description[:40] }}{% if fragment.description|length > 40 %}...{% endif %}</small>
                                 {% endif %}
                             </td>
-                            <td><span class="badge bg-secondary">{{ fragment.category }}</span></td>
+                            <td><span class="badge bg-light text-dark">{{ fragment.category or 'general' }}</span></td>
                             <td>
                                 {% if fragment.language == 'python' %}
                                 <i class="bi bi-filetype-py text-primary"></i>
                                 {% else %}
                                 <i class="bi bi-file-code"></i>
                                 {% endif %}
-                                {{ fragment.language }}
+                                {{ fragment.language or 'python' }}
                             </td>
-                            <td><code>v{{ fragment.version }}</code></td>
+                            <td><code>v{{ fragment.version or '1.0.0' }}</code></td>
                             <td>
-                                {% if fragment.is_active %}
-                                <span class="badge bg-success">Active</span>
+                                {% set status = fragment.status or 'draft' %}
+                                {% if status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                {% elif status == 'testing' %}
+                                    <span class="badge bg-info">Testing</span>
+                                {% elif status == 'pending_review' %}
+                                    <span class="badge bg-warning text-dark">Pending Review</span>
+                                {% elif status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif status == 'published' %}
+                                    <span class="badge bg-primary">Published</span>
+                                {% elif status == 'archived' %}
+                                    <span class="badge bg-dark">Archived</span>
                                 {% else %}
-                                <span class="badge bg-danger">Inactive</span>
+                                    <span class="badge bg-secondary">{{ status }}</span>
                                 {% endif %}
                                 {% if fragment.is_system %}
                                 <span class="badge bg-info">System</span>
                                 {% endif %}
-                            </td>
-                            <td>{{ fragment.usage_count or 0 }}</td>
-                            <td><small>{{ fragment.updated_at }}</small></td>
-                            <td>
-                                <a href="{{ url_for('view_code_fragment', fragment_id=fragment.fragment_id) }}" 
-                                   class="btn btn-sm btn-outline-primary" title="View">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ url_for('edit_code_fragment', fragment_id=fragment.fragment_id) }}" 
-                                   class="btn btn-sm btn-outline-secondary" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                {% if not fragment.is_system %}
-                                <form method="POST" action="{{ url_for('delete_code_fragment', fragment_id=fragment.fragment_id) }}" 
-                                      style="display: inline;" onsubmit="return confirm('Delete this code fragment?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                                {% if not fragment.is_active %}
+                                <span class="badge bg-danger">Inactive</span>
                                 {% endif %}
+                            </td>
+                            <td>
+                                {% if fragment.source == 'python' %}
+                                <span class="badge bg-dark"><i class="bi bi-filetype-py me-1"></i>Python</span>
+                                {% elif fragment.source == 'designer' %}
+                                <span class="badge bg-purple"><i class="bi bi-palette me-1"></i>Designer</span>
+                                {% else %}
+                                <span class="badge bg-secondary"><i class="bi bi-globe me-1"></i>Web</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ fragment.created_by or 'Unknown' }}</td>
+                            <td><small>{{ fragment.updated_at[:10] if fragment.updated_at else 'N/A' }}</small></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('view_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                       class="btn btn-outline-primary" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('edit_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                       class="btn btn-outline-secondary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if fragment.status == 'pending_review' %}
+                                    <form method="POST" action="{{ url_for('approve_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                          style="display: inline;">
+                                        <button type="submit" class="btn btn-success" title="Approve">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+                                    {% elif fragment.status == 'approved' %}
+                                    <form method="POST" action="{{ url_for('publish_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                          style="display: inline;">
+                                        <button type="submit" class="btn btn-primary" title="Publish">
+                                            <i class="bi bi-rocket"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    {% if not fragment.is_system %}
+                                    <form method="POST" action="{{ url_for('delete_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                          style="display: inline;" onsubmit="return confirm('Delete this code fragment?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -139,27 +192,46 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
 $(document).ready(function() {
     $('#fragmentsTable').DataTable({
-        order: [[2, 'asc'], [1, 'asc']],
+        order: [[4, 'asc'], [0, 'asc']],
         pageLength: 25
     });
 });
 
 function filterCategory(category) {
-    const table = document.getElementById('fragmentsTable');
-    const rows = table.querySelectorAll('tbody tr');
+    const rows = document.querySelectorAll('#fragmentsTable tbody tr');
     
-    document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.btn-group:first-of-type .btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
     
     rows.forEach(row => {
-        if (category === 'all' || row.dataset.category === category) {
+        const matchesCategory = category === 'all' || row.dataset.category === category;
+        const currentDisplay = row.style.display;
+        if (matchesCategory && !row.classList.contains('status-hidden')) {
+            row.style.display = '';
+        } else if (!matchesCategory) {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function filterStatus(status) {
+    const rows = document.querySelectorAll('#fragmentsTable tbody tr');
+    
+    document.querySelectorAll('.btn-group:last-of-type .btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.classList.remove('status-hidden');
             row.style.display = '';
         } else {
+            row.classList.add('status-hidden');
             row.style.display = 'none';
         }
     });

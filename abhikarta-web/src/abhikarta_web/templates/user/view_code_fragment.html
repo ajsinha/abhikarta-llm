@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}{{ fragment.name }} - Code Fragment - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('user_code_fragments') }}">Code Fragments</a></li>
+                    <li class="breadcrumb-item active">{{ fragment.name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Fragment Header -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3 class="mb-1">
+                                <i class="bi bi-code-square me-2 text-primary"></i>{{ fragment.name }}
+                            </h3>
+                            <p class="text-muted mb-2">{{ fragment.description or 'No description provided' }}</p>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <span class="badge bg-light text-dark">{{ fragment.category or 'general' }}</span>
+                                <span class="badge bg-info">{{ fragment.language or 'python' }}</span>
+                                <code class="badge bg-dark">v{{ fragment.version or '1.0.0' }}</code>
+                                {% set status = fragment.status or 'draft' %}
+                                {% if status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                {% elif status == 'testing' %}
+                                    <span class="badge bg-info">Testing</span>
+                                {% elif status == 'pending_review' %}
+                                    <span class="badge bg-warning text-dark">Pending Review</span>
+                                {% elif status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif status == 'published' %}
+                                    <span class="badge bg-primary">Published</span>
+                                {% elif status == 'archived' %}
+                                    <span class="badge bg-dark">Archived</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            {% if is_owner and fragment.status in ['draft', 'testing'] %}
+                            <a href="{{ url_for('user_edit_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-pencil me-1"></i>Edit
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Code Display -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-code-slash me-2"></i>Code</span>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="copyCode()">
+                        <i class="bi bi-clipboard me-1"></i>Copy
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <pre class="mb-0"><code class="language-{{ fragment.language or 'python' }}" id="codeContent">{{ fragment.code }}</code></pre>
+                </div>
+            </div>
+            
+            <!-- Usage Reference -->
+            {% if fragment.status in ['approved', 'published'] %}
+            <div class="card mt-3 border-success">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-link-45deg me-2"></i>Usage Reference
+                </div>
+                <div class="card-body">
+                    <p>This code fragment can be referenced in workflows, agents, and swarms using:</p>
+                    <div class="bg-light p-3 rounded">
+                        <code class="fs-5">db://{{ fragment.name }}</code>
+                        <button class="btn btn-sm btn-outline-dark float-end" onclick="copyRef()">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                    
+                    <h6 class="mt-3">Example in Workflow JSON:</h6>
+                    <pre class="bg-dark text-light p-3 rounded"><code>{
+  "python_modules": {
+    "{{ fragment.name.replace('-', '_') }}": "db://{{ fragment.name }}"
+  }
+}</code></pre>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Review Notes -->
+            {% if fragment.review_notes %}
+            <div class="card mt-3 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <i class="bi bi-chat-left-text me-2"></i>Review Notes
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ fragment.review_notes }}</p>
+                    {% if fragment.reviewed_by %}
+                    <small class="text-muted">
+                        Reviewed by {{ fragment.reviewed_by }} 
+                        {% if fragment.reviewed_at %}on {{ fragment.reviewed_at[:10] }}{% endif %}
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Actions -->
+            {% if is_owner %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-gear me-2"></i>Actions
+                </div>
+                <div class="card-body">
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% if fragment.status in ['draft', 'testing'] %}
+                        <a href="{{ url_for('user_edit_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                           class="btn btn-outline-primary">
+                            <i class="bi bi-pencil me-1"></i>Edit Fragment
+                        </a>
+                        <form action="{{ url_for('submit_code_fragment_for_review', fragment_id=fragment.fragment_id) }}" 
+                              method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-send me-1"></i>Submit for Review
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% if fragment.status == 'draft' %}
+                        <form action="{{ url_for('delete_user_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                              method="POST" class="d-inline"
+                              onsubmit="return confirm('Are you sure you want to delete this code fragment?');">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="bi bi-trash me-1"></i>Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% if fragment.status == 'pending_review' %}
+                        <span class="text-muted align-self-center">
+                            <i class="bi bi-hourglass-split me-1"></i>Waiting for admin review...
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Fragment Info -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-info-circle me-2"></i>Information
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-5">Fragment ID</dt>
+                        <dd class="col-7"><code class="small">{{ fragment.fragment_id[:8] }}...</code></dd>
+                        
+                        <dt class="col-5">Status</dt>
+                        <dd class="col-7">{{ fragment.status or 'draft' }}</dd>
+                        
+                        <dt class="col-5">Source</dt>
+                        <dd class="col-7">{{ fragment.source or 'web' }}</dd>
+                        
+                        <dt class="col-5">Language</dt>
+                        <dd class="col-7">{{ fragment.language or 'python' }}</dd>
+                        
+                        <dt class="col-5">Category</dt>
+                        <dd class="col-7">{{ fragment.category or 'general' }}</dd>
+                        
+                        <dt class="col-5">Version</dt>
+                        <dd class="col-7">{{ fragment.version or '1.0.0' }}</dd>
+                        
+                        <dt class="col-5">Usage Count</dt>
+                        <dd class="col-7">{{ fragment.usage_count or 0 }}</dd>
+                        
+                        <dt class="col-5">Created</dt>
+                        <dd class="col-7">{{ fragment.created_at[:10] if fragment.created_at else 'N/A' }}</dd>
+                        
+                        <dt class="col-5">Updated</dt>
+                        <dd class="col-7">{{ fragment.updated_at[:10] if fragment.updated_at else 'N/A' }}</dd>
+                        
+                        <dt class="col-5">Created By</dt>
+                        <dd class="col-7">{{ fragment.created_by or 'Unknown' }}</dd>
+                    </dl>
+                </div>
+            </div>
+            
+            <!-- Tags -->
+            {% if fragment.tags %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-tags me-2"></i>Tags
+                </div>
+                <div class="card-body">
+                    {% set tags = fragment.tags if fragment.tags is iterable and fragment.tags is not string else [] %}
+                    {% for tag in tags %}
+                    <span class="badge bg-light text-dark me-1">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Dependencies -->
+            {% if fragment.dependencies %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-box-seam me-2"></i>Dependencies
+                </div>
+                <div class="card-body">
+                    {% set deps = fragment.dependencies if fragment.dependencies is iterable and fragment.dependencies is not string else [] %}
+                    {% for dep in deps %}
+                    <span class="badge bg-secondary me-1">{{ dep }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Status Workflow -->
+            <div class="card mt-3 border-info">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-diagram-3 me-2"></i>Approval Workflow
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column gap-2">
+                        {% set current = fragment.status or 'draft' %}
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'draft' %}bg-secondary{% else %}bg-light text-muted{% endif %} me-2">1</span>
+                            <span {% if current == 'draft' %}class="fw-bold"{% endif %}>Draft</span>
+                            {% if current == 'draft' %}<i class="bi bi-arrow-left ms-auto text-secondary"></i>{% endif %}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'testing' %}bg-info{% else %}bg-light text-muted{% endif %} me-2">2</span>
+                            <span {% if current == 'testing' %}class="fw-bold"{% endif %}>Testing</span>
+                            {% if current == 'testing' %}<i class="bi bi-arrow-left ms-auto text-info"></i>{% endif %}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'pending_review' %}bg-warning text-dark{% else %}bg-light text-muted{% endif %} me-2">3</span>
+                            <span {% if current == 'pending_review' %}class="fw-bold"{% endif %}>Pending Review</span>
+                            {% if current == 'pending_review' %}<i class="bi bi-arrow-left ms-auto text-warning"></i>{% endif %}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'approved' %}bg-success{% else %}bg-light text-muted{% endif %} me-2">4</span>
+                            <span {% if current == 'approved' %}class="fw-bold"{% endif %}>Approved</span>
+                            {% if current == 'approved' %}<i class="bi bi-arrow-left ms-auto text-success"></i>{% endif %}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'published' %}bg-primary{% else %}bg-light text-muted{% endif %} me-2">5</span>
+                            <span {% if current == 'published' %}class="fw-bold"{% endif %}>Published</span>
+                            {% if current == 'published' %}<i class="bi bi-arrow-left ms-auto text-primary"></i>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<script>
+hljs.highlightAll();
+
+function copyCode() {
+    const code = document.getElementById('codeContent').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        alert('Code copied to clipboard!');
+    });
+}
+
+function copyRef() {
+    navigator.clipboard.writeText('db://{{ fragment.name }}').then(() => {
+        alert('Reference copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}

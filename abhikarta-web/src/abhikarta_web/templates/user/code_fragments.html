@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}My Code Fragments - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="bi bi-code-square me-2"></i>My Code Fragments</h2>
+                    <p class="text-muted mb-0">Manage your reusable code modules</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('browse_code_fragments') }}" class="btn btn-outline-info me-2">
+                        <i class="bi bi-search me-2"></i>Browse All
+                    </a>
+                    <a href="{{ url_for('create_code_fragment') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-2"></i>Create Fragment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card text-center border-secondary">
+                <div class="card-body py-3">
+                    <h3 class="mb-0">{{ status_counts.get('draft', 0) }}</h3>
+                    <small class="text-muted">Draft</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-info">
+                <div class="card-body py-3">
+                    <h3 class="mb-0 text-info">{{ status_counts.get('testing', 0) }}</h3>
+                    <small class="text-muted">Testing</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-warning">
+                <div class="card-body py-3">
+                    <h3 class="mb-0 text-warning">{{ status_counts.get('pending_review', 0) }}</h3>
+                    <small class="text-muted">Pending Review</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-success">
+                <div class="card-body py-3">
+                    <h3 class="mb-0 text-success">{{ status_counts.get('approved', 0) }}</h3>
+                    <small class="text-muted">Approved</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-primary">
+                <div class="card-body py-3">
+                    <h3 class="mb-0 text-primary">{{ status_counts.get('published', 0) }}</h3>
+                    <small class="text-muted">Published</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center border-dark">
+                <div class="card-body py-3">
+                    <h3 class="mb-0">{{ fragments|length }}</h3>
+                    <small class="text-muted">Total</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fragments Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-list me-2"></i>Your Code Fragments</span>
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary active" onclick="filterStatus('all')">All</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="filterStatus('draft')">Draft</button>
+                <button type="button" class="btn btn-outline-warning" onclick="filterStatus('pending_review')">Pending</button>
+                <button type="button" class="btn btn-outline-success" onclick="filterStatus('approved')">Approved</button>
+                <button type="button" class="btn btn-outline-primary" onclick="filterStatus('published')">Published</button>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if fragments %}
+            <div class="table-responsive">
+                <table class="table table-hover" id="fragmentsTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Language</th>
+                            <th>Status</th>
+                            <th>Version</th>
+                            <th>Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fragment in fragments %}
+                        <tr data-status="{{ fragment.status or 'draft' }}">
+                            <td>
+                                <a href="{{ url_for('user_view_code_fragment', fragment_id=fragment.fragment_id) }}" class="fw-bold text-decoration-none">
+                                    {{ fragment.name }}
+                                </a>
+                                {% if fragment.description %}
+                                <br><small class="text-muted">{{ fragment.description[:60] }}{% if fragment.description|length > 60 %}...{% endif %}</small>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge bg-light text-dark">{{ fragment.category or 'general' }}</span></td>
+                            <td><span class="badge bg-info">{{ fragment.language or 'python' }}</span></td>
+                            <td>
+                                {% set status = fragment.status or 'draft' %}
+                                {% if status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                {% elif status == 'testing' %}
+                                    <span class="badge bg-info">Testing</span>
+                                {% elif status == 'pending_review' %}
+                                    <span class="badge bg-warning text-dark">Pending Review</span>
+                                {% elif status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif status == 'published' %}
+                                    <span class="badge bg-primary">Published</span>
+                                {% elif status == 'archived' %}
+                                    <span class="badge bg-dark">Archived</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ status }}</span>
+                                {% endif %}
+                            </td>
+                            <td><code>{{ fragment.version or '1.0.0' }}</code></td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ fragment.updated_at[:10] if fragment.updated_at else 'N/A' }}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('user_view_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                       class="btn btn-outline-primary" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if fragment.status in ['draft', 'testing'] %}
+                                    <a href="{{ url_for('user_edit_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                       class="btn btn-outline-secondary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ url_for('submit_code_fragment_for_review', fragment_id=fragment.fragment_id) }}" 
+                                          method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-warning" title="Submit for Review">
+                                            <i class="bi bi-send"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    {% if fragment.status == 'draft' %}
+                                    <form action="{{ url_for('delete_user_code_fragment', fragment_id=fragment.fragment_id) }}" 
+                                          method="POST" class="d-inline"
+                                          onsubmit="return confirm('Delete this code fragment?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-code-square display-4 text-muted"></i>
+                <h5 class="mt-3">No Code Fragments Yet</h5>
+                <p class="text-muted">Create reusable code modules to use in your workflows, agents, and swarms.</p>
+                <a href="{{ url_for('create_code_fragment') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Create Your First Fragment
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Info Card -->
+    <div class="card mt-4 border-info">
+        <div class="card-body">
+            <h6 class="card-title"><i class="bi bi-info-circle me-2 text-info"></i>About Code Fragment Approval</h6>
+            <p class="card-text small text-muted mb-0">
+                Code fragments go through an approval workflow before they can be used in production:
+                <strong>Draft</strong> → <strong>Testing</strong> → <strong>Pending Review</strong> → <strong>Approved</strong> → <strong>Published</strong>.
+                Submit your fragments for review when ready, and an admin will approve them for use in workflows, agents, swarms, and AI organizations.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterStatus(status) {
+    const rows = document.querySelectorAll('#fragmentsTable tbody tr');
+    const buttons = document.querySelectorAll('.btn-group .btn');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -2,14 +2,18 @@
 
 {% block title %}{{ fragment.name }} - Code Fragment{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row">
-        <div class="col-lg-10 mx-auto">
+        <div class="col-lg-8">
             <nav aria-label="breadcrumb" class="mb-3">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url_for('admin_code_fragments') }}">Code Fragments</a></li>
-                    <li class="breadcrumb-item active">{{ fragment.fragment_id }}</li>
+                    <li class="breadcrumb-item active">{{ fragment.name }}</li>
                 </ol>
             </nav>
             
@@ -19,11 +23,20 @@
                         <i class="bi bi-code-square me-2"></i>{{ fragment.name }}
                     </h5>
                     <div>
-                        <span class="badge bg-light text-dark me-2">v{{ fragment.version }}</span>
-                        {% if fragment.is_active %}
-                        <span class="badge bg-success">Active</span>
-                        {% else %}
-                        <span class="badge bg-danger">Inactive</span>
+                        <span class="badge bg-light text-dark me-2">v{{ fragment.version or '1.0.0' }}</span>
+                        {% set status = fragment.status or 'draft' %}
+                        {% if status == 'draft' %}
+                            <span class="badge bg-secondary">Draft</span>
+                        {% elif status == 'testing' %}
+                            <span class="badge bg-info">Testing</span>
+                        {% elif status == 'pending_review' %}
+                            <span class="badge bg-warning text-dark">Pending Review</span>
+                        {% elif status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                        {% elif status == 'published' %}
+                            <span class="badge bg-primary">Published</span>
+                        {% elif status == 'archived' %}
+                            <span class="badge bg-dark">Archived</span>
                         {% endif %}
                     </div>
                 </div>
@@ -34,24 +47,24 @@
                             <table class="table table-sm">
                                 <tr>
                                     <th width="120">Fragment ID:</th>
-                                    <td><code class="text-primary">{{ fragment.fragment_id }}</code></td>
+                                    <td><code class="text-primary small">{{ fragment.fragment_id[:16] }}...</code></td>
                                 </tr>
                                 <tr>
                                     <th>URI:</th>
                                     <td>
-                                        <code class="bg-light px-2 py-1 rounded user-select-all">db://{{ fragment.fragment_id }}</code>
-                                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('db://{{ fragment.fragment_id }}')">
+                                        <code class="bg-light px-2 py-1 rounded user-select-all">db://{{ fragment.name }}</code>
+                                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('db://{{ fragment.name }}')">
                                             <i class="bi bi-clipboard"></i>
                                         </button>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Language:</th>
-                                    <td>{{ fragment.language }}</td>
+                                    <td>{{ fragment.language or 'python' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Category:</th>
-                                    <td><span class="badge bg-secondary">{{ fragment.category }}</span></td>
+                                    <td><span class="badge bg-secondary">{{ fragment.category or 'general' }}</span></td>
                                 </tr>
                             </table>
                         </div>
@@ -59,23 +72,24 @@
                             <table class="table table-sm">
                                 <tr>
                                     <th width="120">Created:</th>
-                                    <td>{{ fragment.created_at }} by {{ fragment.created_by }}</td>
+                                    <td>{{ fragment.created_at[:10] if fragment.created_at else 'N/A' }} by {{ fragment.created_by or 'Unknown' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Updated:</th>
-                                    <td>{{ fragment.updated_at }}{% if fragment.updated_by %} by {{ fragment.updated_by }}{% endif %}</td>
+                                    <td>{{ fragment.updated_at[:10] if fragment.updated_at else 'N/A' }}{% if fragment.updated_by %} by {{ fragment.updated_by }}{% endif %}</td>
                                 </tr>
                                 <tr>
                                     <th>Usage Count:</th>
                                     <td>{{ fragment.usage_count or 0 }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Tags:</th>
+                                    <th>Source:</th>
                                     <td>
-                                        {% for tag in fragment.tags %}
-                                        <span class="badge bg-info me-1">{{ tag }}</span>
-                                        {% endfor %}
-                                        {% if not fragment.tags %}<span class="text-muted">None</span>{% endif %}
+                                        {% if fragment.source == 'python' %}
+                                        <span class="badge bg-dark">Python Script</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ fragment.source or 'web' }}</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             </table>
@@ -89,34 +103,99 @@
                     </div>
                     {% endif %}
                     
+                    {% if fragment.tags %}
+                    <div class="mb-3">
+                        <h6>Tags</h6>
+                        {% set tags = fragment.tags if fragment.tags is iterable and fragment.tags is not string else [] %}
+                        {% for tag in tags %}
+                        <span class="badge bg-info me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
                     {% if fragment.dependencies %}
                     <div class="mb-4">
                         <h6>Dependencies</h6>
-                        <p>This fragment depends on:
-                            {% for dep in fragment.dependencies %}
-                            <code class="me-2">db://{{ dep }}</code>
-                            {% endfor %}
-                        </p>
+                        {% set deps = fragment.dependencies if fragment.dependencies is iterable and fragment.dependencies is not string else [] %}
+                        {% for dep in deps %}
+                        <span class="badge bg-secondary me-1">{{ dep }}</span>
+                        {% endfor %}
                     </div>
                     {% endif %}
                     
                     <!-- Code -->
                     <h6>Code</h6>
-                    <pre><code class="language-{{ fragment.language }}">{{ fragment.code }}</code></pre>
+                    <pre class="bg-dark rounded"><code class="language-{{ fragment.language or 'python' }}">{{ fragment.code }}</code></pre>
+                </div>
+            </div>
+            
+            <!-- Usage Example -->
+            {% if fragment.status in ['approved', 'published'] %}
+            <div class="card mt-4 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-journal-code me-2"></i>Usage in Workflow</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light rounded p-3"><code class="language-json">{
+  "python_modules": {
+    "{{ fragment.name.replace('-', '_') }}": "db://{{ fragment.name }}"
+  }
+}</code></pre>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Right Sidebar - Admin Controls -->
+        <div class="col-lg-4">
+            <!-- Status & Actions Card -->
+            <div class="card border-primary mb-3">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-gear me-2"></i>Admin Actions
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted mb-3">Current Status: 
+                        <strong>{{ fragment.status or 'draft' }}</strong>
+                    </p>
                     
-                    <hr>
-                    
-                    <div class="d-flex gap-2">
-                        <a href="{{ url_for('edit_code_fragment', fragment_id=fragment.fragment_id) }}" class="btn btn-primary">
-                            <i class="bi bi-pencil me-2"></i>Edit
+                    <div class="d-grid gap-2">
+                        {% set status = fragment.status or 'draft' %}
+                        
+                        {% if status == 'pending_review' %}
+                        <form method="POST" action="{{ url_for('approve_code_fragment', fragment_id=fragment.fragment_id) }}">
+                            <div class="mb-2">
+                                <textarea class="form-control form-control-sm" name="review_notes" 
+                                          placeholder="Review notes (optional)" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-check-lg me-2"></i>Approve
+                            </button>
+                        </form>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                            <i class="bi bi-x-lg me-2"></i>Reject
+                        </button>
+                        {% elif status == 'approved' %}
+                        <form method="POST" action="{{ url_for('publish_code_fragment', fragment_id=fragment.fragment_id) }}">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-rocket me-2"></i>Publish
+                            </button>
+                        </form>
+                        {% elif status == 'draft' or status == 'testing' %}
+                        <p class="text-muted small">Waiting for user to submit for review.</p>
+                        {% elif status == 'published' %}
+                        <p class="text-success small"><i class="bi bi-check-circle me-1"></i>This fragment is published and available to all users.</p>
+                        {% endif %}
+                        
+                        <hr>
+                        
+                        <a href="{{ url_for('edit_code_fragment', fragment_id=fragment.fragment_id) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil me-2"></i>Edit Fragment
                         </a>
-                        <a href="{{ url_for('admin_code_fragments') }}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left me-2"></i>Back to List
-                        </a>
+                        
                         {% if not fragment.is_system %}
                         <form method="POST" action="{{ url_for('delete_code_fragment', fragment_id=fragment.fragment_id) }}" 
-                              class="ms-auto" onsubmit="return confirm('Delete this code fragment?');">
-                            <button type="submit" class="btn btn-outline-danger">
+                              onsubmit="return confirm('Delete this code fragment?');">
+                            <button type="submit" class="btn btn-outline-danger w-100">
                                 <i class="bi bi-trash me-2"></i>Delete
                             </button>
                         </form>
@@ -125,25 +204,92 @@
                 </div>
             </div>
             
-            <!-- Usage Example -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-journal-code me-2"></i>Usage in Workflow</h5>
+            <!-- Review History -->
+            {% if fragment.reviewed_by or fragment.review_notes %}
+            <div class="card border-warning mb-3">
+                <div class="card-header bg-warning text-dark">
+                    <i class="bi bi-chat-left-text me-2"></i>Review History
                 </div>
                 <div class="card-body">
-                    <pre><code class="language-json">{
-  "python_modules": {
-    "{{ fragment.fragment_id|replace('-', '_') }}": "db://{{ fragment.fragment_id }}"
-  },
-  "nodes": {
-    "my_node": {
-      "type": "python",
-      "code": "from {{ fragment.fragment_id|replace('-', '_') }} import *\n# Use functions from the fragment..."
-    }
-  }
-}</code></pre>
+                    {% if fragment.review_notes %}
+                    <p class="mb-2">{{ fragment.review_notes }}</p>
+                    {% endif %}
+                    <small class="text-muted">
+                        {% if fragment.reviewed_by %}
+                        Reviewed by {{ fragment.reviewed_by }}
+                        {% if fragment.reviewed_at %} on {{ fragment.reviewed_at[:10] }}{% endif %}
+                        {% endif %}
+                    </small>
                 </div>
             </div>
+            {% endif %}
+            
+            <!-- Status Workflow -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-diagram-3 me-2"></i>Approval Workflow
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column gap-2">
+                        {% set current = fragment.status or 'draft' %}
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'draft' %}bg-secondary{% else %}bg-light text-muted{% endif %} me-2">1</span>
+                            <span {% if current == 'draft' %}class="fw-bold"{% endif %}>Draft</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'testing' %}bg-info{% else %}bg-light text-muted{% endif %} me-2">2</span>
+                            <span {% if current == 'testing' %}class="fw-bold"{% endif %}>Testing</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'pending_review' %}bg-warning text-dark{% else %}bg-light text-muted{% endif %} me-2">3</span>
+                            <span {% if current == 'pending_review' %}class="fw-bold"{% endif %}>Pending Review</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'approved' %}bg-success{% else %}bg-light text-muted{% endif %} me-2">4</span>
+                            <span {% if current == 'approved' %}class="fw-bold"{% endif %}>Approved</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge {% if current == 'published' %}bg-primary{% else %}bg-light text-muted{% endif %} me-2">5</span>
+                            <span {% if current == 'published' %}class="fw-bold"{% endif %}>Published</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <a href="{{ url_for('admin_code_fragments') }}" class="btn btn-secondary w-100">
+                    <i class="bi bi-arrow-left me-2"></i>Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('reject_code_fragment', fragment_id=fragment.fragment_id) }}">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Reject Code Fragment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Reject <strong>{{ fragment.name }}</strong> and return it to draft status?</p>
+                    <div class="mb-3">
+                        <label for="rejectNotes" class="form-label">Review Notes (required)</label>
+                        <textarea class="form-control" id="rejectNotes" name="review_notes" rows="3" required
+                                  placeholder="Explain why this fragment is being rejected..."></textarea>
+                        <small class="text-muted">This will be visible to the author.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-lg me-1"></i>Reject
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -151,8 +297,14 @@
 <script>
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text);
-    // Show toast or feedback
     alert('Copied: ' + text);
 }
 </script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>hljs.highlightAll();</script>
 {% endblock %}
