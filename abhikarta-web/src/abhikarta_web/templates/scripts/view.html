@@ -55,6 +55,15 @@
             <button class="btn btn-success" onclick="executeScript()">
                 <i class="bi bi-play-fill me-2"></i>Execute
             </button>
+            {% if script.validation_status == 'valid' %}
+            <button class="btn btn-primary" onclick="deployScript()" title="Deploy as {{ script.entity_type }} with draft status">
+                <i class="bi bi-rocket me-2"></i>Deploy
+            </button>
+            {% else %}
+            <button class="btn btn-primary" disabled title="Script must be validated before deployment">
+                <i class="bi bi-rocket me-2"></i>Deploy
+            </button>
+            {% endif %}
             <a href="{{ url_for('list_scripts') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left me-2"></i>Back
             </a>
@@ -302,6 +311,33 @@ function deleteScript() {
             window.location.href = '/scripts';
         } else {
             alert('Error: ' + data.error);
+        }
+    })
+    .catch(err => alert('Error: ' + err.message));
+}
+
+function deployScript() {
+    if (!confirm('Deploy this script as a new {{ script.entity_type }}?\n\nThe entity will be created with status "draft" and must follow the approval workflow before being published.')) return;
+    
+    fetch(`/api/scripts/${scriptId}/deploy`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            let redirectUrl;
+            switch(data.entity_type) {
+                case 'agent': redirectUrl = `/agents/${data.entity_id}`; break;
+                case 'workflow': redirectUrl = `/workflows/${data.entity_id}`; break;
+                case 'swarm': redirectUrl = `/swarms/${data.entity_id}`; break;
+                case 'aiorg': redirectUrl = `/aiorg/${data.entity_id}`; break;
+                default: redirectUrl = '/scripts';
+            }
+            alert(data.message);
+            window.location.href = redirectUrl;
+        } else {
+            alert('Deployment failed: ' + data.error);
         }
     })
     .catch(err => alert('Error: ' + err.message));

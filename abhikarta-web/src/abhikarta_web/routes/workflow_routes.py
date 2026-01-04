@@ -7,7 +7,7 @@ Ashutosh Sinha
 
 import json
 import logging
-from flask import render_template, request, jsonify, session, redirect, url_for
+from flask import render_template, request, jsonify, session, redirect, url_for, Response, flash
 
 from .abstract_routes import AbstractRoutes, login_required, admin_required
 
@@ -625,5 +625,267 @@ class WorkflowRoutes(AbstractRoutes):
                                    total_steps=total_steps,
                                    completed_steps=completed_steps,
                                    progress_percent=progress_percent)
+        
+        # ============================================
+        # WORKFLOW EXPORT, EDIT & STATUS ROUTES
+        # ============================================
+        
+        @self.app.route('/workflows/<workflow_id>/export/json')
+        @admin_required
+        def export_workflow_json(workflow_id):
+            """Export workflow configuration as JSON file."""
+            workflow = self.db_facade.fetch_one(
+                "SELECT * FROM workflows WHERE workflow_id = ?",
+                (workflow_id,)
+            )
+            if not workflow:
+                flash('Workflow not found', 'error')
+                return redirect(url_for('list_workflows'))
+            
+            # Parse JSON fields
+            workflow_dict = dict(workflow)
+            for field in ['dag_definition', 'python_modules', 'input_schema', 
+                         'output_schema', 'dependencies', 'environment', 'tags']:
+                if field in workflow_dict and isinstance(workflow_dict[field], str):
+                    try:
+                        workflow_dict[field] = json.loads(workflow_dict[field])
+                    except:
+                        pass
+            
+            response = Response(
+                json.dumps(workflow_dict, indent=2, default=str),
+                mimetype='application/json',
+                headers={
+                    'Content-Disposition': f'attachment; filename=workflow_{workflow["name"].lower().replace(" ", "_")}_{workflow_id}.json'
+                }
+            )
+            return response
+        
+        @self.app.route('/workflows/<workflow_id>/export/python')
+        @admin_required
+        def export_workflow_python(workflow_id):
+            """Export workflow as Python SDK code."""
+            from abhikarta_web.utils.export_utils import generate_workflow_python_code
+            
+            workflow = self.db_facade.fetch_one(
+                "SELECT * FROM workflows WHERE workflow_id = ?",
+                (workflow_id,)
+            )
+            if not workflow:
+                flash('Workflow not found', 'error')
+                return redirect(url_for('list_workflows'))
+            
+            # Parse JSON fields
+            workflow_dict = dict(workflow)
+            for field in ['dag_definition', 'python_modules', 'input_schema', 
+                         'output_schema', 'dependencies', 'environment', 'tags']:
+                if field in workflow_dict and isinstance(workflow_dict[field], str):
+                    try:
+                        workflow_dict[field] = json.loads(workflow_dict[field])
+                    except:
+                        pass
+            
+            python_code = generate_workflow_python_code(workflow_dict)
+            
+            response = Response(
+                python_code,
+                mimetype='text/x-python',
+                headers={
+                    'Content-Disposition': f'attachment; filename=workflow_{workflow["name"].lower().replace(" ", "_")}.py'
+                }
+            )
+            return response
+        
+        @self.app.route('/api/workflows/<workflow_id>/json')
+        @admin_required
+        def api_workflow_json(workflow_id):
+            """API: Get full workflow JSON configuration."""
+            workflow = self.db_facade.fetch_one(
+                "SELECT * FROM workflows WHERE workflow_id = ?",
+                (workflow_id,)
+            )
+            if not workflow:
+                return jsonify({'error': 'Workflow not found'}), 404
+            
+            workflow_dict = dict(workflow)
+            for field in ['dag_definition', 'python_modules', 'input_schema', 
+                         'output_schema', 'dependencies', 'environment', 'tags']:
+                if field in workflow_dict and isinstance(workflow_dict[field], str):
+                    try:
+                        workflow_dict[field] = json.loads(workflow_dict[field])
+                    except:
+                        pass
+            
+            return jsonify(workflow_dict)
+        
+        @self.app.route('/api/workflows/<workflow_id>/python')
+        @admin_required
+        def api_workflow_python(workflow_id):
+            """API: Get workflow as Python SDK code."""
+            from abhikarta_web.utils.export_utils import generate_workflow_python_code
+            
+            workflow = self.db_facade.fetch_one(
+                "SELECT * FROM workflows WHERE workflow_id = ?",
+                (workflow_id,)
+            )
+            if not workflow:
+                return jsonify({'error': 'Workflow not found'}), 404
+            
+            workflow_dict = dict(workflow)
+            for field in ['dag_definition', 'python_modules', 'input_schema', 
+                         'output_schema', 'dependencies', 'environment', 'tags']:
+                if field in workflow_dict and isinstance(workflow_dict[field], str):
+                    try:
+                        workflow_dict[field] = json.loads(workflow_dict[field])
+                    except:
+                        pass
+            
+            python_code = generate_workflow_python_code(workflow_dict)
+            return Response(python_code, mimetype='text/plain')
+        
+        @self.app.route('/api/workflows/<workflow_id>/status', methods=['PUT'])
+        @admin_required
+        def api_change_workflow_status(workflow_id):
+            """API: Change workflow status."""
+            from abhikarta_web.utils.export_utils import is_valid_transition
+            
+            try:
+                data = request.get_json()
+                new_status = data.get('status')
+                
+                # Get current workflow
+                workflow = self.db_facade.fetch_one(
+                    "SELECT status FROM workflows WHERE workflow_id = ?",
+                    (workflow_id,)
+                )
+                if not workflow:
+                    return jsonify({'error': 'Workflow not found'}), 404
+                
+                current_status = workflow['status']
+                
+                # Validate transition
+                if not is_valid_transition(current_status, new_status):
+                    return jsonify({'error': f'Invalid status transition from {current_status} to {new_status}'}), 400
+                
+                # Update status
+                self.db_facade.execute(
+                    "UPDATE workflows SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE workflow_id = ?",
+                    (new_status, workflow_id)
+                )
+                
+                self.log_audit('change_status', 'workflow', workflow_id, {'new_status': new_status})
+                
+                return jsonify({'success': True, 'status': new_status})
+                
+            except Exception as e:
+                logger.error(f"Error changing workflow status: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/workflows/<workflow_id>/edit', methods=['GET', 'POST'])
+        @admin_required
+        def edit_workflow(workflow_id):
+            """Edit workflow properties."""
+            workflow = self.db_facade.fetch_one(
+                "SELECT * FROM workflows WHERE workflow_id = ?",
+                (workflow_id,)
+            )
+            if not workflow:
+                flash('Workflow not found', 'error')
+                return redirect(url_for('list_workflows'))
+            
+            # Parse JSON fields
+            workflow_dict = dict(workflow)
+            for field in ['dag_definition', 'python_modules', 'input_schema', 
+                         'output_schema', 'dependencies', 'environment', 'tags']:
+                if field in workflow_dict and isinstance(workflow_dict[field], str):
+                    try:
+                        workflow_dict[field] = json.loads(workflow_dict[field])
+                    except:
+                        pass
+            
+            if request.method == 'POST':
+                try:
+                    name = request.form.get('name', '').strip()
+                    description = request.form.get('description', '').strip()
+                    tags = request.form.get('tags', '').strip()
+                    
+                    tag_list = [t.strip() for t in tags.split(',') if t.strip()]
+                    
+                    self.db_facade.execute(
+                        """UPDATE workflows 
+                           SET name = ?, description = ?, tags = ?, updated_at = CURRENT_TIMESTAMP 
+                           WHERE workflow_id = ?""",
+                        (name, description, json.dumps(tag_list), workflow_id)
+                    )
+                    
+                    self.log_audit('update_workflow', 'workflow', workflow_id)
+                    flash('Workflow updated successfully', 'success')
+                    return redirect(url_for('view_workflow', workflow_id=workflow_id))
+                    
+                except Exception as e:
+                    logger.error(f"Error updating workflow: {e}", exc_info=True)
+                    flash(f'Error: {str(e)}', 'error')
+            
+            return render_template('workflows/edit.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   workflow=workflow_dict)
+        
+        @self.app.route('/api/workflows/<workflow_id>/edit', methods=['POST'])
+        @admin_required
+        def api_edit_workflow(workflow_id):
+            """API: Update workflow from JSON."""
+            try:
+                data = request.get_json()
+                
+                # Protected fields
+                for field in ['workflow_id', 'created_at', 'created_by']:
+                    if field in data:
+                        del data[field]
+                
+                # Build update query
+                updates = []
+                values = []
+                for field in ['name', 'description', 'dag_definition', 'input_schema', 
+                             'output_schema', 'tags', 'environment', 'dependencies']:
+                    if field in data:
+                        updates.append(f"{field} = ?")
+                        value = data[field]
+                        if isinstance(value, (dict, list)):
+                            value = json.dumps(value)
+                        values.append(value)
+                
+                if updates:
+                    updates.append("updated_at = CURRENT_TIMESTAMP")
+                    values.append(workflow_id)
+                    
+                    self.db_facade.execute(
+                        f"UPDATE workflows SET {', '.join(updates)} WHERE workflow_id = ?",
+                        tuple(values)
+                    )
+                    
+                    self.log_audit('update_workflow_json', 'workflow', workflow_id)
+                
+                return jsonify({'success': True})
+                
+            except Exception as e:
+                logger.error(f"Error updating workflow: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/workflows/<workflow_id>', methods=['DELETE'])
+        @admin_required
+        def api_delete_workflow(workflow_id):
+            """API: Delete a workflow."""
+            try:
+                self.db_facade.execute(
+                    "DELETE FROM workflows WHERE workflow_id = ?",
+                    (workflow_id,)
+                )
+                self.log_audit('delete_workflow', 'workflow', workflow_id)
+                return jsonify({'success': True})
+            except Exception as e:
+                logger.error(f"Error deleting workflow: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
         
         logger.info("Workflow routes registered")

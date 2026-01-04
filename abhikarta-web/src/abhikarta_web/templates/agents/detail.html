@@ -21,8 +21,11 @@
             </h4>
         </div>
         <div class="btn-group">
+            <a href="{{ url_for('edit_agent', agent_id=agent.agent_id) }}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
             <a href="{{ url_for('agent_designer', agent_id=agent.agent_id) }}" class="btn btn-primary">
-                <i class="bi bi-pencil me-1"></i> Edit in Designer
+                <i class="bi bi-diagram-3 me-1"></i> Designer
             </a>
             <a href="{{ url_for('test_agent', agent_id=agent.agent_id) }}" class="btn btn-success">
                 <i class="bi bi-play me-1"></i> Test
@@ -98,7 +101,7 @@
             </div>
 
             <!-- LLM Configuration -->
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-header">
                     <h6 class="mb-0"><i class="bi bi-cpu me-2"></i>LLM Configuration</h6>
                 </div>
@@ -108,6 +111,56 @@
                     {% else %}
                     <p class="text-muted mb-0">No LLM configuration</p>
                     {% endif %}
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="bi bi-download me-2"></i>Export Agent</h6>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{{ url_for('export_agent_json', agent_id=agent.agent_id) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-filetype-json me-1"></i>JSON
+                        </a>
+                        <a href="{{ url_for('export_agent_python', agent_id=agent.agent_id) }}" class="btn btn-outline-success">
+                            <i class="bi bi-filetype-py me-1"></i>Python
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Tabs for JSON/Python preview -->
+                    <ul class="nav nav-tabs" id="exportTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="json-tab" data-bs-toggle="tab" data-bs-target="#json-pane" type="button">
+                                <i class="bi bi-braces me-1"></i>JSON
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="python-tab" data-bs-toggle="tab" data-bs-target="#python-pane" type="button">
+                                <i class="bi bi-filetype-py me-1"></i>Python SDK
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="exportTabContent">
+                        <!-- JSON Tab -->
+                        <div class="tab-pane fade show active" id="json-pane" role="tabpanel">
+                            <div class="position-relative mt-3">
+                                <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2" onclick="copyJson()">
+                                    <i class="bi bi-clipboard me-1"></i>Copy
+                                </button>
+                                <pre class="json-viewer" id="jsonContent" style="max-height: 400px; overflow-y: auto;">{{ agent.to_dict() | tojson(indent=2) }}</pre>
+                            </div>
+                        </div>
+                        <!-- Python Tab -->
+                        <div class="tab-pane fade" id="python-pane" role="tabpanel">
+                            <div class="position-relative mt-3">
+                                <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2" onclick="copyPython()">
+                                    <i class="bi bi-clipboard me-1"></i>Copy
+                                </button>
+                                <pre class="code-block" id="pythonContent" style="max-height: 400px; overflow-y: auto;"><code class="language-python">Loading...</code></pre>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -240,6 +293,43 @@
 
 {% block extra_js %}
 <script>
+// Load Python code when tab is shown
+document.getElementById('python-tab').addEventListener('shown.bs.tab', function() {
+    loadPythonCode();
+});
+
+function loadPythonCode() {
+    const container = document.querySelector('#pythonContent code');
+    if (container.textContent !== 'Loading...') return; // Already loaded
+    
+    $.get('/api/agents/{{ agent.agent_id }}/python', function(data) {
+        container.textContent = data;
+        if (typeof hljs !== 'undefined') {
+            hljs.highlightElement(container);
+        }
+    }).fail(function() {
+        container.textContent = '# Error loading Python code';
+    });
+}
+
+function copyJson() {
+    const content = document.getElementById('jsonContent').textContent;
+    navigator.clipboard.writeText(content).then(function() {
+        showToast('JSON copied to clipboard', 'success');
+    }).catch(function() {
+        showToast('Failed to copy', 'error');
+    });
+}
+
+function copyPython() {
+    const content = document.querySelector('#pythonContent code').textContent;
+    navigator.clipboard.writeText(content).then(function() {
+        showToast('Python code copied to clipboard', 'success');
+    }).catch(function() {
+        showToast('Failed to copy', 'error');
+    });
+}
+
 function changeStatus(newStatus) {
     if (!confirm(`Change agent status to "${newStatus}"?`)) return;
     

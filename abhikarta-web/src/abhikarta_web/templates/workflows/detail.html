@@ -1,74 +1,115 @@
 {% extends "base.html" %}
 
-{% block title %}{{ workflow.name }} - Workflow - Abhikarta LLM{% endblock %}
+{% block title %}{{ workflow.name }} - Workflow - {{ app_name }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid py-4">
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2><i class="bi bi-diagram-3 me-2"></i>{{ workflow.name }}</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('list_workflows') }}">Workflows</a></li>
+                    <li class="breadcrumb-item active">{{ workflow.name }}</li>
+                </ol>
+            </nav>
+            <h4 class="mb-0">
+                <i class="bi bi-diagram-3 me-2"></i>{{ workflow.name }}
+                {% if workflow.status == 'published' %}
+                <span class="badge bg-success ms-2">Published</span>
+                {% elif workflow.status == 'pending_review' %}
+                <span class="badge bg-info ms-2">Pending Review</span>
+                {% elif workflow.status == 'approved' %}
+                <span class="badge bg-primary ms-2">Approved</span>
+                {% elif workflow.status == 'testing' %}
+                <span class="badge bg-warning text-dark ms-2">Testing</span>
+                {% elif workflow.status == 'deprecated' %}
+                <span class="badge bg-warning ms-2">Deprecated</span>
+                {% elif workflow.status == 'archived' %}
+                <span class="badge bg-dark ms-2">Archived</span>
+                {% else %}
+                <span class="badge bg-secondary ms-2">{{ workflow.status|title }}</span>
+                {% endif %}
+            </h4>
             <p class="text-muted mb-0">{{ workflow.description or 'No description' }}</p>
         </div>
-        <div>
-            <a href="{{ url_for('execute_workflow', workflow_id=workflow.workflow_id) }}" class="btn btn-success me-2">
-                <i class="bi bi-play-fill me-1"></i>Execute
+        <div class="btn-group">
+            <a href="{{ url_for('edit_workflow', workflow_id=workflow.workflow_id) }}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-1"></i> Edit
             </a>
-            <a href="{{ url_for('list_workflows') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>Back
+            <a href="{{ url_for('workflow_designer', workflow_id=workflow.workflow_id) }}" class="btn btn-primary">
+                <i class="bi bi-palette me-1"></i> Designer
+            </a>
+            <a href="{{ url_for('execute_workflow', workflow_id=workflow.workflow_id) }}" class="btn btn-success">
+                <i class="bi bi-play-fill me-1"></i> Execute
             </a>
         </div>
     </div>
 
     <div class="row">
-        <!-- Workflow Info -->
-        <div class="col-md-4">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Details Card -->
             <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Details</h5>
+                <div class="card-header bg-bmo">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Workflow Details</h5>
                 </div>
                 <div class="card-body">
-                    <table class="table table-borderless table-sm">
-                        <tr>
-                            <td class="text-muted">ID</td>
-                            <td><code>{{ workflow.workflow_id }}</code></td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Status</td>
-                            <td>
-                                {% if workflow.status == 'published' %}
-                                    <span class="badge bg-success">Published</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">{{ workflow.status }}</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Version</td>
-                            <td>{{ workflow.version or '1.0.0' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Created</td>
-                            <td>{{ workflow.created_at }}</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Executions</td>
-                            <td>{{ workflow.execution_count or 0 }}</td>
-                        </tr>
-                    </table>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless table-sm">
+                                <tr>
+                                    <td class="text-muted" width="120">ID</td>
+                                    <td><code>{{ workflow.workflow_id }}</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Version</td>
+                                    <td>{{ workflow.version or '1.0.0' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Type</td>
+                                    <td><span class="badge bg-info">{{ workflow.workflow_type or 'dag' }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Created By</td>
+                                    <td>{{ workflow.created_by }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless table-sm">
+                                <tr>
+                                    <td class="text-muted" width="120">Created</td>
+                                    <td>{{ workflow.created_at }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Updated</td>
+                                    <td>{{ workflow.updated_at }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Executions</td>
+                                    <td>{{ workflow.execution_count or 0 }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Avg Duration</td>
+                                    <td>{{ workflow.avg_duration_ms or 0 }} ms</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Nodes List -->
+            <!-- DAG Nodes -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-diagram-2 me-2"></i>Nodes</h5>
+                    <h5 class="mb-0"><i class="bi bi-diagram-2 me-2"></i>DAG Nodes</h5>
                 </div>
                 <div class="card-body p-0">
                     <ul class="list-group list-group-flush">
                         {% set dag = workflow.dag_definition %}
                         {% if dag and dag.nodes %}
                             {% if dag.nodes is mapping %}
-                                {# Dict format: {node_id: node_data} #}
                                 {% for node_id, node in dag.nodes.items() %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
@@ -78,171 +119,262 @@
                                     <span class="badge bg-primary rounded-pill">{{ node_id }}</span>
                                 </li>
                                 {% endfor %}
-                            {% else %}
-                                {# List format: [{node_id, node_type, name, ...}] #}
+                            {% elif dag.nodes is iterable %}
                                 {% for node in dag.nodes %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <strong>{{ node.name or node.node_id or node.id }}</strong>
-                                        <br><small class="text-muted">{{ node.node_type or node.type }}</small>
+                                        <strong>{{ node.name or node.node_id }}</strong>
+                                        <br><small class="text-muted">{{ node.type or node.node_type }}</small>
                                     </div>
-                                    <span class="badge bg-primary rounded-pill">{{ node.node_id or node.id }}</span>
+                                    <span class="badge bg-primary rounded-pill">{{ node.node_id or loop.index }}</span>
                                 </li>
                                 {% endfor %}
                             {% endif %}
                         {% else %}
-                            <li class="list-group-item text-muted">No nodes defined</li>
+                        <li class="list-group-item text-muted">No nodes defined</li>
                         {% endif %}
                     </ul>
                 </div>
             </div>
-        </div>
 
-        <!-- DAG Definition & Code -->
-        <div class="col-md-8">
-            <!-- DAG JSON -->
+            <!-- Export Options -->
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-code me-2"></i>DAG Definition</h5>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard('dagCode')">
-                        <i class="bi bi-clipboard"></i> Copy
-                    </button>
+                    <h5 class="mb-0"><i class="bi bi-download me-2"></i>Export</h5>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{{ url_for('export_workflow_json', workflow_id=workflow.workflow_id) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-filetype-json me-1"></i>JSON
+                        </a>
+                        <a href="{{ url_for('export_workflow_python', workflow_id=workflow.workflow_id) }}" class="btn btn-outline-success">
+                            <i class="bi bi-filetype-py me-1"></i>Python
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <pre id="dagCode" class="json-viewer" style="max-height: 400px; overflow: auto;">{{ workflow.dag_definition | tojson(indent=2) }}</pre>
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#json-pane">
+                                <i class="bi bi-braces me-1"></i>JSON
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#python-pane" id="python-tab">
+                                <i class="bi bi-filetype-py me-1"></i>Python SDK
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="json-pane">
+                            <div class="position-relative mt-3">
+                                <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2" onclick="copyJson()">
+                                    <i class="bi bi-clipboard me-1"></i>Copy
+                                </button>
+                                <pre class="json-viewer" id="jsonContent" style="max-height: 400px; overflow-y: auto;">{{ workflow | tojson(indent=2) }}</pre>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="python-pane">
+                            <div class="position-relative mt-3">
+                                <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2" onclick="copyPython()">
+                                    <i class="bi bi-clipboard me-1"></i>Copy
+                                </button>
+                                <pre class="code-block" id="pythonContent" style="max-height: 400px; overflow-y: auto;"><code class="language-python">Loading...</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Status & Actions -->
+            <div class="card mb-4">
+                <div class="card-header bg-bmo">
+                    <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Status & Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if workflow.status == 'draft' %}
+                        <div class="alert alert-secondary py-2 mb-2">
+                            <i class="bi bi-pencil me-1"></i><strong>Draft</strong>
+                            <br><small>Work in progress</small>
+                        </div>
+                        <button class="btn btn-outline-warning" onclick="changeStatus('testing')">
+                            <i class="bi bi-flask me-1"></i> Move to Testing
+                        </button>
+                        
+                        {% elif workflow.status == 'testing' %}
+                        <div class="alert alert-warning py-2 mb-2">
+                            <i class="bi bi-flask me-1"></i><strong>Testing</strong>
+                            <br><small>Under validation</small>
+                        </div>
+                        <button class="btn btn-outline-info" onclick="changeStatus('pending_review')">
+                            <i class="bi bi-eye me-1"></i> Submit for Review
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="changeStatus('draft')">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Draft
+                        </button>
+                        
+                        {% elif workflow.status == 'pending_review' %}
+                        <div class="alert alert-info py-2 mb-2">
+                            <i class="bi bi-hourglass-split me-1"></i><strong>Pending Review</strong>
+                            <br><small>Awaiting admin approval</small>
+                        </div>
+                        <button class="btn btn-success" onclick="changeStatus('approved')">
+                            <i class="bi bi-check-circle me-1"></i> Approve
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="changeStatus('testing')">
+                            <i class="bi bi-x-circle me-1"></i> Reject
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="changeStatus('draft')">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Draft
+                        </button>
+                        
+                        {% elif workflow.status == 'approved' %}
+                        <div class="alert alert-primary py-2 mb-2">
+                            <i class="bi bi-check-circle me-1"></i><strong>Approved</strong>
+                            <br><small>Ready to publish</small>
+                        </div>
+                        <button class="btn btn-success" onclick="changeStatus('published')">
+                            <i class="bi bi-rocket me-1"></i> Publish
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="changeStatus('draft')">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Draft
+                        </button>
+                        
+                        {% elif workflow.status == 'published' %}
+                        <div class="alert alert-success py-2 mb-2">
+                            <i class="bi bi-globe me-1"></i><strong>Published</strong>
+                            <br><small>Available for use</small>
+                        </div>
+                        <button class="btn btn-outline-warning" onclick="changeStatus('deprecated')">
+                            <i class="bi bi-archive me-1"></i> Deprecate
+                        </button>
+                        
+                        {% elif workflow.status == 'deprecated' %}
+                        <div class="alert alert-warning py-2 mb-2">
+                            <i class="bi bi-exclamation-triangle me-1"></i><strong>Deprecated</strong>
+                            <br><small>No longer recommended</small>
+                        </div>
+                        <button class="btn btn-outline-success" onclick="changeStatus('published')">
+                            <i class="bi bi-arrow-up me-1"></i> Re-publish
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="changeStatus('archived')">
+                            <i class="bi bi-archive me-1"></i> Archive
+                        </button>
+                        
+                        {% elif workflow.status == 'archived' %}
+                        <div class="alert alert-dark py-2 mb-2">
+                            <i class="bi bi-archive me-1"></i><strong>Archived</strong>
+                        </div>
+                        <button class="btn btn-outline-primary" onclick="changeStatus('draft')">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Restore to Draft
+                        </button>
+                        {% endif %}
+                        
+                        <hr class="my-2">
+                        <button class="btn btn-outline-danger" onclick="deleteWorkflow()">
+                            <i class="bi bi-trash me-1"></i> Delete Workflow
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Python Modules -->
-            {% if workflow.python_modules and workflow.python_modules != {} %}
+            <!-- Tags -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-filetype-py me-2"></i>Python Modules</h5>
+                    <h5 class="mb-0"><i class="bi bi-tags me-2"></i>Tags</h5>
                 </div>
                 <div class="card-body">
-                    <pre class="json-viewer" style="max-height: 300px; overflow: auto;">{{ workflow.python_modules | tojson(indent=2) }}</pre>
+                    {% if workflow.tags %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tag in workflow.tags %}
+                        <span class="badge bg-secondary">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No tags</p>
+                    {% endif %}
                 </div>
             </div>
-            {% endif %}
 
-            <!-- Recent Executions -->
+            <!-- Input Schema -->
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Executions</h5>
+                    <h5 class="mb-0"><i class="bi bi-input-cursor me-2"></i>Input Schema</h5>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Execution ID</th>
-                                    <th>Status</th>
-                                    <th>Duration</th>
-                                    <th>Started</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if executions %}
-                                    {% for exec in executions %}
-                                    <tr>
-                                        <td><code>{{ exec.execution_id[:8] }}...</code></td>
-                                        <td>
-                                            {% if exec.status == 'completed' %}
-                                                <span class="badge bg-success">Completed</span>
-                                            {% elif exec.status == 'failed' %}
-                                                <span class="badge bg-danger">Failed</span>
-                                            {% else %}
-                                                <span class="badge bg-warning">{{ exec.status }}</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ exec.duration_ms }}ms</td>
-                                        <td>{{ exec.started_at }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">No executions yet</td>
-                                    </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="card-body">
+                    {% if workflow.input_schema %}
+                    <pre class="json-viewer mb-0" style="max-height: 200px;">{{ workflow.input_schema | tojson(indent=2) }}</pre>
+                    {% else %}
+                    <p class="text-muted mb-0">No input schema defined</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-function copyToClipboard(elementId) {
-    const el = document.getElementById(elementId);
-    navigator.clipboard.writeText(el.textContent);
-    alert('Copied to clipboard!');
-}
-</script>
 {% endblock %}
 
-{% block page_glossary %}
-<div class="container-fluid py-4 bg-light border-top">
-    <div class="row">
-        <div class="col-12">
-            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Workflow</strong>
-                            <p class="small text-muted mb-0">A defined sequence of steps that accomplish a specific task.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">DAG (Directed Acyclic Graph)</strong>
-                            <p class="small text-muted mb-0">Graph structure representing workflow steps and execution order.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Node</strong>
-                            <p class="small text-muted mb-0">A single unit of work (LLM call, tool, conditional, etc.).</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Edge</strong>
-                            <p class="small text-muted mb-0">Connection between nodes defining execution order.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Published</strong>
-                            <p class="small text-muted mb-0">Workflow status indicating it's ready for production use.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Input Schema</strong>
-                            <p class="small text-muted mb-0">Definition of parameters required to run the workflow.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-3">
-                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-book me-1"></i>View Full Glossary
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+{% block extra_js %}
+<script>
+document.getElementById('python-tab')?.addEventListener('shown.bs.tab', loadPythonCode);
+
+function loadPythonCode() {
+    const container = document.querySelector('#pythonContent code');
+    if (container.textContent !== 'Loading...') return;
+    
+    $.get('/api/workflows/{{ workflow.workflow_id }}/python', function(data) {
+        container.textContent = data;
+        if (typeof hljs !== 'undefined') hljs.highlightElement(container);
+    }).fail(function() {
+        container.textContent = '# Error loading Python code';
+    });
+}
+
+function copyJson() {
+    navigator.clipboard.writeText(document.getElementById('jsonContent').textContent)
+        .then(() => showToast('JSON copied', 'success'))
+        .catch(() => showToast('Failed to copy', 'error'));
+}
+
+function copyPython() {
+    navigator.clipboard.writeText(document.querySelector('#pythonContent code').textContent)
+        .then(() => showToast('Python code copied', 'success'))
+        .catch(() => showToast('Failed to copy', 'error'));
+}
+
+function changeStatus(newStatus) {
+    if (!confirm(`Change workflow status to "${newStatus}"?`)) return;
+    
+    $.ajax({
+        url: '/api/workflows/{{ workflow.workflow_id }}/status',
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({ status: newStatus }),
+        success: function() {
+            showToast('Status updated', 'success');
+            location.reload();
+        },
+        error: function(xhr) {
+            showToast('Error: ' + (xhr.responseJSON?.error || 'Failed'), 'error');
+        }
+    });
+}
+
+function deleteWorkflow() {
+    if (!confirm('Delete this workflow? This cannot be undone.')) return;
+    
+    $.ajax({
+        url: '/api/workflows/{{ workflow.workflow_id }}',
+        method: 'DELETE',
+        success: function() {
+            window.location.href = '{{ url_for("list_workflows") }}';
+        },
+        error: function() {
+            showToast('Error deleting workflow', 'error');
+        }
+    });
+}
+</script>
 {% endblock %}

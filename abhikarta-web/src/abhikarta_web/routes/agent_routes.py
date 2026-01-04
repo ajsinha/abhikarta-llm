@@ -17,7 +17,7 @@ Patent Pending: Certain architectural patterns and implementations described in 
 document may be subject to patent applications.
 """
 
-from flask import render_template, request, redirect, url_for, session, flash, jsonify
+from flask import render_template, request, redirect, url_for, session, flash, jsonify, Response
 import logging
 import json
 
@@ -36,6 +36,123 @@ AGENT_TYPE_COLORS = {
     'retrieval': '#17a2b8',
     'custom': '#6c757d'
 }
+
+
+def generate_agent_python_code(agent) -> str:
+    """
+    Generate Python SDK code for an agent configuration.
+    
+    Args:
+        agent: Agent object with configuration
+        
+    Returns:
+        Python code string
+    """
+    code_lines = [
+        '"""',
+        f'Agent: {agent.name}',
+        f'Description: {agent.description}',
+        f'Type: {agent.agent_type}',
+        f'Generated from Abhikarta-LLM',
+        '"""',
+        '',
+        'from abhikarta_client import AbhikartaClient',
+        'from abhikarta_embedded import Agent, Workflow',
+        '',
+        '# Initialize client (for remote execution)',
+        'client = AbhikartaClient(',
+        '    base_url="http://localhost:5000",',
+        '    api_key="your_api_key_here"',
+        ')',
+        '',
+        '# Agent configuration',
+        f'AGENT_ID = "{agent.agent_id}"',
+        f'AGENT_NAME = "{agent.name}"',
+        '',
+        '# LLM Configuration',
+        'llm_config = ' + json.dumps(agent.llm_config or {}, indent=4),
+        '',
+        '# Tools',
+        'tools = ' + json.dumps(agent.tools or [], indent=4),
+        '',
+    ]
+    
+    # Add workflow if exists
+    if agent.workflow:
+        code_lines.extend([
+            '# Workflow Definition',
+            'workflow = ' + json.dumps(
+                agent.workflow if isinstance(agent.workflow, dict) else {},
+                indent=4,
+                default=str
+            ),
+            '',
+        ])
+    
+    # Add full config
+    code_lines.extend([
+        '# Full Agent Configuration',
+        'agent_config = ' + json.dumps(agent.to_dict(), indent=4, default=str),
+        '',
+        '',
+        '# ============================================',
+        '# Option 1: Use existing agent via API',
+        '# ============================================',
+        '',
+        'def run_existing_agent(input_text: str):',
+        '    """Execute the agent via API."""',
+        '    result = client.agents.execute(',
+        f'        agent_id="{agent.agent_id}",',
+        '        input=input_text',
+        '    )',
+        '    return result',
+        '',
+        '',
+        '# ============================================',
+        '# Option 2: Create agent programmatically',
+        '# ============================================',
+        '',
+        'def create_agent_from_config():',
+        '    """Create agent using SDK."""',
+        '    agent = Agent(',
+        f'        name="{agent.name}",',
+        f'        description="{agent.description}",',
+        f'        agent_type="{agent.agent_type}",',
+        '        llm_config=llm_config,',
+        '        tools=tools',
+        '    )',
+        '    return agent',
+        '',
+        '',
+        '# ============================================',
+        '# Option 3: Local embedded execution',
+        '# ============================================',
+        '',
+        'def run_local():', 
+        '    """Run agent locally using embedded SDK."""',
+        '    from abhikarta_embedded import create_agent',
+        '    ',
+        '    agent = create_agent(',
+        '        config=agent_config,',
+        '        llm_config=llm_config',
+        '    )',
+        '    ',
+        '    result = agent.run("Your input here")',
+        '    return result',
+        '',
+        '',
+        'if __name__ == "__main__":',
+        '    # Example usage',
+        '    print(f"Agent: {AGENT_NAME}")',
+        '    print(f"ID: {AGENT_ID}")',
+        '    ',
+        '    # Run via API',
+        '    # result = run_existing_agent("Hello, agent!")',
+        '    # print(result)',
+        '',
+    ])
+    
+    return '\n'.join(code_lines)
 
 
 class AgentRoutes(AbstractRoutes):
@@ -431,5 +548,165 @@ class AgentRoutes(AbstractRoutes):
             if template:
                 return jsonify(template.to_dict())
             return jsonify({'error': 'Template not found'}), 404
+        
+        # ============================================
+        # AGENT EXPORT & EDIT ROUTES
+        # ============================================
+        
+        @self.app.route('/admin/agents/<agent_id>/export/json')
+        @admin_required
+        def export_agent_json(agent_id):
+            """Export agent configuration as JSON file."""
+            self._ensure_managers()
+            
+            agent = self.agent_manager.get_agent(agent_id)
+            if not agent:
+                flash('Agent not found', 'error')
+                return redirect(url_for('admin_agents'))
+            
+            agent_dict = agent.to_dict()
+            
+            # Create downloadable JSON response
+            response = Response(
+                json.dumps(agent_dict, indent=2, default=str),
+                mimetype='application/json',
+                headers={
+                    'Content-Disposition': f'attachment; filename=agent_{agent.name.lower().replace(" ", "_")}_{agent_id}.json'
+                }
+            )
+            return response
+        
+        @self.app.route('/admin/agents/<agent_id>/export/python')
+        @admin_required
+        def export_agent_python(agent_id):
+            """Export agent as Python SDK code."""
+            self._ensure_managers()
+            
+            agent = self.agent_manager.get_agent(agent_id)
+            if not agent:
+                flash('Agent not found', 'error')
+                return redirect(url_for('admin_agents'))
+            
+            # Generate Python SDK code
+            python_code = generate_agent_python_code(agent)
+            
+            # Create downloadable Python file
+            response = Response(
+                python_code,
+                mimetype='text/x-python',
+                headers={
+                    'Content-Disposition': f'attachment; filename=agent_{agent.name.lower().replace(" ", "_")}.py'
+                }
+            )
+            return response
+        
+        @self.app.route('/api/agents/<agent_id>/json')
+        @admin_required
+        def api_agent_json(agent_id):
+            """API: Get full agent JSON configuration."""
+            self._ensure_managers()
+            
+            agent = self.agent_manager.get_agent(agent_id)
+            if not agent:
+                return jsonify({'error': 'Agent not found'}), 404
+            
+            return jsonify(agent.to_dict())
+        
+        @self.app.route('/api/agents/<agent_id>/python')
+        @admin_required
+        def api_agent_python(agent_id):
+            """API: Get agent as Python SDK code."""
+            self._ensure_managers()
+            
+            agent = self.agent_manager.get_agent(agent_id)
+            if not agent:
+                return jsonify({'error': 'Agent not found'}), 404
+            
+            python_code = generate_agent_python_code(agent)
+            return Response(python_code, mimetype='text/plain')
+        
+        @self.app.route('/admin/agents/<agent_id>/edit', methods=['GET', 'POST'])
+        @admin_required
+        def edit_agent(agent_id):
+            """Edit agent properties."""
+            self._ensure_managers()
+            
+            agent = self.agent_manager.get_agent(agent_id)
+            if not agent:
+                flash('Agent not found', 'error')
+                return redirect(url_for('admin_agents'))
+            
+            if request.method == 'POST':
+                try:
+                    # Get form data
+                    name = request.form.get('name', '').strip()
+                    description = request.form.get('description', '').strip()
+                    tags = request.form.get('tags', '').strip()
+                    
+                    # Parse tags
+                    tag_list = [t.strip() for t in tags.split(',') if t.strip()]
+                    
+                    # Build updates dict
+                    updates = {
+                        'name': name,
+                        'description': description,
+                        'tags': tag_list
+                    }
+                    
+                    # Update agent
+                    updated = self.agent_manager.update_agent(agent_id, updates)
+                    
+                    if updated:
+                        self.log_audit('update_agent', 'agent', agent_id)
+                        flash('Agent updated successfully', 'success')
+                    else:
+                        flash('Failed to update agent', 'error')
+                    
+                    return redirect(url_for('view_agent', agent_id=agent_id))
+                    
+                except Exception as e:
+                    logger.error(f"Error updating agent: {e}", exc_info=True)
+                    flash(f'Error: {str(e)}', 'error')
+            
+            agent_types = self.agent_manager.get_agent_types()
+            
+            return render_template('agents/edit.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   agent=agent,
+                                   agent_types=agent_types)
+        
+        @self.app.route('/admin/agents/<agent_id>/edit/json', methods=['POST'])
+        @admin_required
+        def edit_agent_json(agent_id):
+            """Update agent from raw JSON."""
+            self._ensure_managers()
+            
+            try:
+                data = request.get_json()
+                
+                # Don't allow changing agent_id or status via JSON edit
+                if 'agent_id' in data:
+                    del data['agent_id']
+                if 'status' in data:
+                    del data['status']
+                if 'created_at' in data:
+                    del data['created_at']
+                if 'created_by' in data:
+                    del data['created_by']
+                
+                # Update agent with provided fields
+                updated = self.agent_manager.update_agent(agent_id, data)
+                
+                if updated:
+                    self.log_audit('update_agent_json', 'agent', agent_id)
+                    return jsonify({'success': True, 'agent': updated.to_dict()})
+                else:
+                    return jsonify({'error': 'Failed to update agent'}), 500
+                    
+            except Exception as e:
+                logger.error(f"Error updating agent from JSON: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
         
         logger.info("Agent routes registered")

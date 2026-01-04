@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ agent.name }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_agents') }}">Agents</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('view_agent', agent_id=agent.agent_id) }}">{{ agent.name }}</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </nav>
+            <h4 class="mb-0">
+                <i class="bi bi-pencil me-2"></i>Edit Agent
+            </h4>
+        </div>
+        <div class="btn-group">
+            <a href="{{ url_for('view_agent', agent_id=agent.agent_id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Details
+            </a>
+            <a href="{{ url_for('agent_designer', agent_id=agent.agent_id) }}" class="btn btn-primary">
+                <i class="bi bi-diagram-3 me-1"></i> Visual Designer
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Basic Info Form -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header bg-bmo">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('edit_agent', agent_id=agent.agent_id) }}">
+                        <div class="mb-3">
+                            <label class="form-label">Agent ID</label>
+                            <input type="text" class="form-control" value="{{ agent.agent_id }}" readonly disabled>
+                            <small class="text-muted">Cannot be changed</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" value="{{ agent.name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="3">{{ agent.description }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Agent Type</label>
+                            <input type="text" class="form-control" value="{{ agent.agent_type }}" readonly disabled>
+                            <small class="text-muted">Use Visual Designer to change workflow structure</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tags</label>
+                            <input type="text" name="tags" class="form-control" 
+                                   value="{{ agent.tags | join(', ') if agent.tags else '' }}"
+                                   placeholder="tag1, tag2, tag3">
+                            <small class="text-muted">Comma-separated list</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <input type="text" class="form-control" value="{{ agent.status | title }}" readonly disabled>
+                            <small class="text-muted">Change status from the Agent Details page</small>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check me-1"></i> Save Changes
+                            </button>
+                            <a href="{{ url_for('view_agent', agent_id=agent.agent_id) }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- JSON Editor -->
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header bg-bmo d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>JSON Configuration</h5>
+                    <button class="btn btn-sm btn-light" onclick="saveJson()">
+                        <i class="bi bi-save me-1"></i> Save JSON
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div id="jsonEditor" style="height: 500px; font-family: monospace;"></div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Tip:</strong> Use the JSON editor for advanced configuration changes. 
+                For workflow modifications, use the <a href="{{ url_for('agent_designer', agent_id=agent.agent_id) }}">Visual Designer</a>.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Monaco Editor -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+<script>
+// Agent JSON data
+const agentData = {{ agent.to_dict() | tojson | safe }};
+
+let editor;
+
+// Initialize Monaco Editor
+require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
+
+require(['vs/editor/editor.main'], function () {
+    editor = monaco.editor.create(document.getElementById('jsonEditor'), {
+        value: JSON.stringify(agentData, null, 2),
+        language: 'json',
+        theme: 'vs-dark',
+        automaticLayout: true,
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+        fontSize: 13
+    });
+});
+
+function saveJson() {
+    if (!editor) return;
+    
+    try {
+        const jsonData = JSON.parse(editor.getValue());
+        
+        // Confirm save
+        if (!confirm('Save JSON configuration? This will update the agent.')) return;
+        
+        $.ajax({
+            url: '/admin/agents/{{ agent.agent_id }}/edit/json',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(jsonData),
+            success: function(response) {
+                showToast('Agent updated successfully', 'success');
+                setTimeout(() => location.reload(), 1000);
+            },
+            error: function(xhr) {
+                showToast('Error: ' + (xhr.responseJSON?.error || 'Failed to save'), 'error');
+            }
+        });
+    } catch (e) {
+        showToast('Invalid JSON: ' + e.message, 'error');
+    }
+}
+</script>
+{% endblock %}

@@ -54,7 +54,7 @@ class UserRoutes(AbstractRoutes):
         @self.app.route('/user/dashboard')
         @login_required
         def user_dashboard():
-            """User dashboard with available agents and recent executions."""
+            """User dashboard with available entities and recent executions."""
             user_id = session.get('user_id')
             
             # Get published agents available to this user
@@ -63,6 +63,33 @@ class UserRoutes(AbstractRoutes):
                 agents = self.db_facade.agents.get_all_agents(status='published')
             except Exception as e:
                 logger.error(f"Error getting agents: {e}", exc_info=True)
+            
+            # Get published workflows
+            workflows = []
+            try:
+                workflows = self.db_facade.fetch_all(
+                    "SELECT * FROM workflows WHERE status = 'published' ORDER BY updated_at DESC"
+                ) or []
+            except Exception as e:
+                logger.error(f"Error getting workflows: {e}", exc_info=True)
+            
+            # Get published swarms
+            swarms = []
+            try:
+                swarms = self.db_facade.fetch_all(
+                    "SELECT * FROM swarms WHERE status = 'published' ORDER BY updated_at DESC"
+                ) or []
+            except Exception as e:
+                logger.error(f"Error getting swarms: {e}", exc_info=True)
+            
+            # Get published AI orgs
+            aiorgs = []
+            try:
+                aiorgs = self.db_facade.fetch_all(
+                    "SELECT * FROM ai_orgs WHERE status = 'published' ORDER BY updated_at DESC"
+                ) or []
+            except Exception as e:
+                logger.error(f"Error getting AI orgs: {e}", exc_info=True)
             
             # Get user's recent executions
             executions = []
@@ -76,6 +103,9 @@ class UserRoutes(AbstractRoutes):
                                    userid=session.get('user_id'),
                                    roles=session.get('roles', []),
                                    agents=agents,
+                                   workflows=workflows,
+                                   swarms=swarms,
+                                   aiorgs=aiorgs,
                                    executions=executions)
         
         @self.app.route('/user/agents')

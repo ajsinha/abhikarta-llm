@@ -1506,3 +1506,216 @@ class ScriptRoutes(AbstractRoutes):
                                  from_template=template)
         
         logger.info("Script routes registered")
+        
+        # Register deploy routes
+        self._register_deploy_routes()
+    
+    # ======================================================================
+    # DEPLOY SCRIPT TO ENTITY
+    # ======================================================================
+    
+    def _deploy_agent_from_script(self, script: dict, entity_def: dict, user_id: str) -> tuple:
+        """Deploy agent from script execution result."""
+        import uuid
+        from datetime import datetime
+        
+        agent_id = f"agent_{uuid.uuid4().hex[:12]}"
+        
+        # Extract fields from entity definition
+        name = entity_def.get('name', script['name'])
+        description = entity_def.get('description', script.get('description', ''))
+        agent_type = entity_def.get('agent_type', 'react')
+        config = json.dumps(entity_def.get('config', {}))
+        workflow = json.dumps(entity_def.get('workflow', {}))
+        llm_config = json.dumps(entity_def.get('llm_config', {}))
+        tools = json.dumps(entity_def.get('tools', []))
+        hitl_config = json.dumps(entity_def.get('hitl_config', {}))
+        tags = json.dumps(entity_def.get('tags', []))
+        
+        try:
+            self.db_facade.execute(
+                """INSERT INTO agents 
+                   (agent_id, name, description, agent_type, version, status, source_type,
+                    script_content, config, workflow, llm_config, tools, hitl_config, tags, created_by)
+                   VALUES (?, ?, ?, ?, '1.0.0', 'draft', 'python', ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (agent_id, name, description, agent_type, script['script_content'],
+                 config, workflow, llm_config, tools, hitl_config, tags, user_id)
+            )
+            return True, agent_id
+        except Exception as e:
+            logger.error(f"Error deploying agent: {e}", exc_info=True)
+            return False, str(e)
+    
+    def _deploy_workflow_from_script(self, script: dict, entity_def: dict, user_id: str) -> tuple:
+        """Deploy workflow from script execution result."""
+        import uuid
+        
+        workflow_id = f"workflow_{uuid.uuid4().hex[:12]}"
+        
+        name = entity_def.get('name', script['name'])
+        description = entity_def.get('description', script.get('description', ''))
+        dag_definition = json.dumps(entity_def.get('dag_definition', entity_def.get('nodes', {})))
+        input_schema = json.dumps(entity_def.get('input_schema', {}))
+        output_schema = json.dumps(entity_def.get('output_schema', {}))
+        tags = json.dumps(entity_def.get('tags', []))
+        
+        try:
+            self.db_facade.execute(
+                """INSERT INTO workflows 
+                   (workflow_id, name, description, version, status, source_type,
+                    script_content, dag_definition, input_schema, output_schema, tags, created_by)
+                   VALUES (?, ?, ?, '1.0.0', 'draft', 'python', ?, ?, ?, ?, ?, ?)""",
+                (workflow_id, name, description, script['script_content'],
+                 dag_definition, input_schema, output_schema, tags, user_id)
+            )
+            return True, workflow_id
+        except Exception as e:
+            logger.error(f"Error deploying workflow: {e}", exc_info=True)
+            return False, str(e)
+    
+    def _deploy_swarm_from_script(self, script: dict, entity_def: dict, user_id: str) -> tuple:
+        """Deploy swarm from script execution result."""
+        import uuid
+        
+        swarm_id = f"swarm_{uuid.uuid4().hex[:12]}"
+        
+        name = entity_def.get('name', script['name'])
+        description = entity_def.get('description', script.get('description', ''))
+        definition_json = json.dumps(entity_def.get('definition', entity_def.get('agents', {})))
+        config_json = json.dumps(entity_def.get('config', {}))
+        tags = json.dumps(entity_def.get('tags', []))
+        category = entity_def.get('category', 'general')
+        
+        try:
+            self.db_facade.execute(
+                """INSERT INTO swarms 
+                   (swarm_id, name, description, version, status, source_type,
+                    script_content, definition_json, config_json, tags, category, created_by)
+                   VALUES (?, ?, ?, '1.0.0', 'draft', 'python', ?, ?, ?, ?, ?, ?)""",
+                (swarm_id, name, description, script['script_content'],
+                 definition_json, config_json, tags, category, user_id)
+            )
+            return True, swarm_id
+        except Exception as e:
+            logger.error(f"Error deploying swarm: {e}", exc_info=True)
+            return False, str(e)
+    
+    def _deploy_aiorg_from_script(self, script: dict, entity_def: dict, user_id: str) -> tuple:
+        """Deploy AI organization from script execution result."""
+        import uuid
+        
+        org_id = f"aiorg_{uuid.uuid4().hex[:12]}"
+        
+        name = entity_def.get('name', script['name'])
+        description = entity_def.get('description', script.get('description', ''))
+        config = json.dumps(entity_def.get('config', {}))
+        
+        try:
+            self.db_facade.execute(
+                """INSERT INTO ai_orgs 
+                   (org_id, name, description, status, source_type, script_content, config, created_by)
+                   VALUES (?, ?, ?, 'draft', 'python', ?, ?, ?)""",
+                (org_id, name, description, script['script_content'], config, user_id)
+            )
+            
+            # Create nodes if defined
+            nodes = entity_def.get('nodes', [])
+            for node_def in nodes:
+                node_id = f"node_{uuid.uuid4().hex[:12]}"
+                self.db_facade.execute(
+                    """INSERT INTO ai_nodes 
+                       (node_id, org_id, role_name, role_type, description, agent_id, agent_config)
+                       VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                    (node_id, org_id, node_def.get('role_name', 'Worker'),
+                     node_def.get('role_type', 'analyst'), node_def.get('description', ''),
+                     node_def.get('agent_id'), json.dumps(node_def.get('agent_config', {})))
+                )
+            
+            return True, org_id
+        except Exception as e:
+            logger.error(f"Error deploying AI org: {e}", exc_info=True)
+            return False, str(e)
+    
+    def _register_deploy_routes(self):
+        """Register deploy routes."""
+        
+        @self.app.route('/api/scripts/<script_id>/deploy', methods=['POST'])
+        @login_required
+        def api_deploy_script(script_id):
+            """
+            Deploy a script as an actual entity.
+            
+            This executes the script, extracts the __export__ definition,
+            and creates the corresponding entity (agent, workflow, swarm, or aiorg)
+            with source_type='python' and status='draft'.
+            """
+            try:
+                delegate = self._get_delegate()
+                if not delegate:
+                    return jsonify({'success': False, 'error': 'Database not available'}), 500
+                
+                script = delegate.get_script(script_id)
+                if not script:
+                    return jsonify({'success': False, 'error': 'Script not found'}), 404
+                
+                # Check validation status
+                if script.get('validation_status') != 'valid':
+                    return jsonify({'success': False, 'error': 'Script must be validated before deployment'}), 400
+                
+                # Execute script to get entity definition
+                success, result, stdout, stderr = safe_execute_script(
+                    script['script_content'],
+                    script.get('entry_point') or '__export__'
+                )
+                
+                if not success:
+                    return jsonify({
+                        'success': False, 
+                        'error': f'Script execution failed: {result}',
+                        'stdout': stdout,
+                        'stderr': stderr
+                    }), 400
+                
+                # Result should be a dict with entity definition
+                if not isinstance(result, dict):
+                    return jsonify({
+                        'success': False,
+                        'error': f'__export__ must be a dictionary, got {type(result).__name__}'
+                    }), 400
+                
+                user_id = session.get('user_id')
+                entity_type = script['entity_type']
+                
+                # Deploy based on entity type
+                if entity_type == 'agent':
+                    success, entity_id = self._deploy_agent_from_script(script, result, user_id)
+                elif entity_type == 'workflow':
+                    success, entity_id = self._deploy_workflow_from_script(script, result, user_id)
+                elif entity_type == 'swarm':
+                    success, entity_id = self._deploy_swarm_from_script(script, result, user_id)
+                elif entity_type == 'aiorg':
+                    success, entity_id = self._deploy_aiorg_from_script(script, result, user_id)
+                else:
+                    return jsonify({'success': False, 'error': f'Unknown entity type: {entity_type}'}), 400
+                
+                if success:
+                    # Link script to entity
+                    delegate.update_script(script_id, linked_entity_id=entity_id)
+                    
+                    self.log_audit('deploy_script', 'script', script_id, {
+                        'entity_type': entity_type,
+                        'entity_id': entity_id
+                    })
+                    
+                    return jsonify({
+                        'success': True,
+                        'entity_type': entity_type,
+                        'entity_id': entity_id,
+                        'message': f'{entity_type.title()} created with status "draft". Follow approval workflow to publish.'
+                    })
+                else:
+                    return jsonify({'success': False, 'error': entity_id}), 500
+                    
+            except Exception as e:
+                logger.error(f"Error deploying script: {e}", exc_info=True)
+                return jsonify({'success': False, 'error': str(e)}), 500

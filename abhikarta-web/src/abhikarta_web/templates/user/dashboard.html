@@ -2,225 +2,562 @@
 
 {% block title %}Dashboard - {{ app_name }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    .entity-table-container {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .search-box {
+        max-width: 300px;
+    }
+    .nav-tabs .nav-link {
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+    .nav-tabs .nav-link.active {
+        font-weight: 600;
+    }
+    .entity-count-badge {
+        font-size: 0.75rem;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,0.03);
+    }
+    .status-badge {
+        font-size: 0.7rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="page-header">
-    <div class="row align-items-center">
-        <div class="col">
-            <h1><i class="bi bi-house me-2"></i>Welcome, {{ fullname }}</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item active">Dashboard</li>
-                </ol>
-            </nav>
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-0">
+                <i class="bi bi-house me-2"></i>Welcome, {{ fullname or userid }}
+            </h4>
+            <p class="text-muted mb-0">Your dashboard for AI entities and executions</p>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <!-- Available Agents -->
-    <div class="col-lg-8 mb-4">
-        <div class="card h-100">
-            <div class="card-header bg-bmo">
-                <h5 class="mb-0"><i class="bi bi-robot me-2"></i>Available Agents</h5>
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center py-3">
+                    <h3 class="text-primary mb-0">{{ agents|length }}</h3>
+                    <small class="text-muted">Available Agents</small>
+                </div>
             </div>
-            <div class="card-body">
-                {% if agents %}
-                <div class="row">
-                    {% for agent in agents %}
-                    <div class="col-md-6 mb-3">
-                        <div class="card h-100 border">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <i class="bi bi-cpu me-2 text-bmo"></i>{{ agent.name }}
-                                </h5>
-                                <p class="card-text text-muted small">
-                                    {{ agent.description|truncate(100) if agent.description else 'No description' }}
-                                </p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="badge badge-status badge-{{ agent.agent_type or 'react' }}">
-                                        {{ agent.agent_type or 'react' }}
-                                    </span>
-                                    <a href="{{ url_for('execute_agent', agent_id=agent.agent_id) }}" 
-                                       class="btn btn-sm btn-bmo">
-                                        <i class="bi bi-play-fill me-1"></i>Execute
-                                    </a>
-                                </div>
-                            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success h-100">
+                <div class="card-body text-center py-3">
+                    <h3 class="text-success mb-0">{{ workflows|length }}</h3>
+                    <small class="text-muted">Available Workflows</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning h-100">
+                <div class="card-body text-center py-3">
+                    <h3 class="text-warning mb-0">{{ swarms|length }}</h3>
+                    <small class="text-muted">Available Swarms</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info h-100">
+                <div class="card-body text-center py-3">
+                    <h3 class="text-info mb-0">{{ aiorgs|length }}</h3>
+                    <small class="text-muted">Available AI Orgs</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entity Tables with Tabs -->
+    <div class="card mb-4">
+        <div class="card-header bg-bmo p-0">
+            <ul class="nav nav-tabs card-header-tabs" id="entityTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="agents-tab" data-bs-toggle="tab" data-bs-target="#agents-pane" type="button">
+                        <i class="bi bi-robot text-primary me-1"></i>Agents
+                        <span class="badge bg-primary entity-count-badge ms-1">{{ agents|length }}</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="workflows-tab" data-bs-toggle="tab" data-bs-target="#workflows-pane" type="button">
+                        <i class="bi bi-diagram-3 text-success me-1"></i>Workflows
+                        <span class="badge bg-success entity-count-badge ms-1">{{ workflows|length }}</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="swarms-tab" data-bs-toggle="tab" data-bs-target="#swarms-pane" type="button">
+                        <i class="bi bi-hive text-warning me-1"></i>Swarms
+                        <span class="badge bg-warning text-dark entity-count-badge ms-1">{{ swarms|length }}</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="aiorgs-tab" data-bs-toggle="tab" data-bs-target="#aiorgs-pane" type="button">
+                        <i class="bi bi-building text-info me-1"></i>AI Orgs
+                        <span class="badge bg-info entity-count-badge ms-1">{{ aiorgs|length }}</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <!-- Agents Tab -->
+                <div class="tab-pane fade show active" id="agents-pane">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="input-group search-box">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="agentSearch" placeholder="Search agents..." onkeyup="filterTable('agentSearch', 'agentsTable')">
+                        </div>
+                        <div>
+                            <span class="text-muted small me-2">Show:</span>
+                            <select class="form-select form-select-sm d-inline-block w-auto" id="agentPageSize" onchange="changePageSize('agents')">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
                         </div>
                     </div>
-                    {% endfor %}
+                    <div class="entity-table-container">
+                        <table class="table table-hover table-sm" id="agentsTable">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th onclick="sortTable('agentsTable', 0)" style="cursor:pointer">Name <i class="bi bi-arrow-down-up text-muted"></i></th>
+                                    <th onclick="sortTable('agentsTable', 1)" style="cursor:pointer">Type <i class="bi bi-arrow-down-up text-muted"></i></th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for agent in agents %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('user_agent_detail', agent_id=agent.agent_id) }}" class="text-decoration-none fw-bold">
+                                            {{ agent.name }}
+                                        </a>
+                                    </td>
+                                    <td><span class="badge bg-secondary">{{ agent.agent_type or 'general' }}</span></td>
+                                    <td class="text-muted small">{{ (agent.description or '-')[:60] }}{% if agent.description and agent.description|length > 60 %}...{% endif %}</td>
+                                    <td>
+                                        <a href="{{ url_for('execute_agent', agent_id=agent.agent_id) }}" class="btn btn-sm btn-primary" title="Execute">
+                                            <i class="bi bi-play-fill"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">No agents available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted" id="agentsPaginationInfo">Showing all {{ agents|length }} agents</small>
+                        <nav id="agentsPagination"></nav>
+                    </div>
                 </div>
-                {% else %}
-                <div class="text-center text-muted py-4">
-                    <i class="bi bi-robot fs-1 d-block mb-2"></i>
-                    No agents available yet
+
+                <!-- Workflows Tab -->
+                <div class="tab-pane fade" id="workflows-pane">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="input-group search-box">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="workflowSearch" placeholder="Search workflows..." onkeyup="filterTable('workflowSearch', 'workflowsTable')">
+                        </div>
+                        <div>
+                            <span class="text-muted small me-2">Show:</span>
+                            <select class="form-select form-select-sm d-inline-block w-auto" id="workflowPageSize" onchange="changePageSize('workflows')">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="entity-table-container">
+                        <table class="table table-hover table-sm" id="workflowsTable">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th onclick="sortTable('workflowsTable', 0)" style="cursor:pointer">Name <i class="bi bi-arrow-down-up text-muted"></i></th>
+                                    <th onclick="sortTable('workflowsTable', 1)" style="cursor:pointer">Type <i class="bi bi-arrow-down-up text-muted"></i></th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for wf in workflows %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('workflow_detail', workflow_id=wf.workflow_id) }}" class="text-decoration-none fw-bold">
+                                            {{ wf.name }}
+                                        </a>
+                                    </td>
+                                    <td><span class="badge bg-success">{{ wf.workflow_type or 'sequential' }}</span></td>
+                                    <td class="text-muted small">{{ (wf.description or '-')[:60] }}{% if wf.description and wf.description|length > 60 %}...{% endif %}</td>
+                                    <td>
+                                        <a href="{{ url_for('execute_workflow', workflow_id=wf.workflow_id) }}" class="btn btn-sm btn-success" title="Execute">
+                                            <i class="bi bi-play-fill"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">No workflows available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted" id="workflowsPaginationInfo">Showing all {{ workflows|length }} workflows</small>
+                        <nav id="workflowsPagination"></nav>
+                    </div>
                 </div>
-                {% endif %}
+
+                <!-- Swarms Tab -->
+                <div class="tab-pane fade" id="swarms-pane">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="input-group search-box">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="swarmSearch" placeholder="Search swarms..." onkeyup="filterTable('swarmSearch', 'swarmsTable')">
+                        </div>
+                        <div>
+                            <span class="text-muted small me-2">Show:</span>
+                            <select class="form-select form-select-sm d-inline-block w-auto" id="swarmPageSize" onchange="changePageSize('swarms')">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="entity-table-container">
+                        <table class="table table-hover table-sm" id="swarmsTable">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th onclick="sortTable('swarmsTable', 0)" style="cursor:pointer">Name <i class="bi bi-arrow-down-up text-muted"></i></th>
+                                    <th onclick="sortTable('swarmsTable', 1)" style="cursor:pointer">Category <i class="bi bi-arrow-down-up text-muted"></i></th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for swarm in swarms %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('view_swarm', swarm_id=swarm.swarm_id) }}" class="text-decoration-none fw-bold">
+                                            {{ swarm.name }}
+                                        </a>
+                                    </td>
+                                    <td><span class="badge bg-warning text-dark">{{ swarm.category or 'general' }}</span></td>
+                                    <td class="text-muted small">{{ (swarm.description or '-')[:60] }}{% if swarm.description and swarm.description|length > 60 %}...{% endif %}</td>
+                                    <td>
+                                        <a href="{{ url_for('view_swarm', swarm_id=swarm.swarm_id) }}" class="btn btn-sm btn-warning" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">No swarms available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted" id="swarmsPaginationInfo">Showing all {{ swarms|length }} swarms</small>
+                        <nav id="swarmsPagination"></nav>
+                    </div>
+                </div>
+
+                <!-- AI Orgs Tab -->
+                <div class="tab-pane fade" id="aiorgs-pane">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="input-group search-box">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="aiorgSearch" placeholder="Search AI orgs..." onkeyup="filterTable('aiorgSearch', 'aiorgsTable')">
+                        </div>
+                        <div>
+                            <span class="text-muted small me-2">Show:</span>
+                            <select class="form-select form-select-sm d-inline-block w-auto" id="aiorgPageSize" onchange="changePageSize('aiorgs')">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="entity-table-container">
+                        <table class="table table-hover table-sm" id="aiorgsTable">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th onclick="sortTable('aiorgsTable', 0)" style="cursor:pointer">Name <i class="bi bi-arrow-down-up text-muted"></i></th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for org in aiorgs %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('aiorg_detail', org_id=org.org_id) }}" class="text-decoration-none fw-bold">
+                                            {{ org.name }}
+                                        </a>
+                                    </td>
+                                    <td class="text-muted small">{{ (org.description or '-')[:80] }}{% if org.description and org.description|length > 80 %}...{% endif %}</td>
+                                    <td>
+                                        <a href="{{ url_for('aiorg_tasks', org_id=org.org_id) }}" class="btn btn-sm btn-info" title="Tasks">
+                                            <i class="bi bi-list-task"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="3" class="text-center text-muted py-4">No AI organizations available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted" id="aiorgsPaginationInfo">Showing all {{ aiorgs|length }} AI orgs</small>
+                        <nav id="aiorgsPagination"></nav>
+                    </div>
+                </div>
             </div>
-            {% if agents %}
-            <div class="card-footer">
-                <a href="{{ url_for('user_agents') }}" class="text-bmo">
-                    View all agents <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
-            {% endif %}
         </div>
     </div>
-    
+
     <!-- Recent Executions -->
-    <div class="col-lg-4 mb-4">
-        <div class="card h-100">
-            <div class="card-header bg-bmo">
-                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Executions</h5>
-            </div>
-            <div class="card-body">
-                {% if executions %}
-                <div class="list-group list-group-flush">
-                    {% for exec in executions[:5] %}
-                    <a href="{{ url_for('execution_detail', execution_id=exec.execution_id) }}" 
-                       class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ exec.agent_id }}</h6>
-                            <span class="badge badge-status badge-{{ exec.status }}">
-                                {{ exec.status }}
-                            </span>
-                        </div>
-                        <small class="text-muted">{{ exec.created_at }}</small>
-                    </a>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center text-muted py-4">
-                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                    No recent executions
-                </div>
-                {% endif %}
-            </div>
-            {% if executions %}
-            <div class="card-footer">
-                <a href="{{ url_for('user_executions') }}" class="text-bmo">
-                    View all executions <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
-            {% endif %}
+    <div class="card">
+        <div class="card-header bg-bmo d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Executions</h5>
+            <a href="{{ url_for('user_executions') }}" class="btn btn-sm btn-outline-secondary">View All</a>
         </div>
-    </div>
-</div>
-
-<!-- Quick Help -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h5><i class="bi bi-question-circle me-2 text-bmo"></i>Getting Started</h5>
-                <div class="row mt-3">
-                    <div class="col-md-4">
-                        <div class="d-flex">
-                            <div class="me-3">
-                                <span class="badge bg-bmo rounded-circle p-2">1</span>
-                            </div>
-                            <div>
-                                <h6>Browse Agents</h6>
-                                <p class="text-muted small mb-0">
-                                    View available agents in the catalog
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="d-flex">
-                            <div class="me-3">
-                                <span class="badge bg-bmo rounded-circle p-2">2</span>
-                            </div>
-                            <div>
-                                <h6>Execute Agent</h6>
-                                <p class="text-muted small mb-0">
-                                    Run an agent with your input
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="d-flex">
-                            <div class="me-3">
-                                <span class="badge bg-bmo rounded-circle p-2">3</span>
-                            </div>
-                            <div>
-                                <h6>View Results</h6>
-                                <p class="text-muted small mb-0">
-                                    Check execution history for results
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Entity</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Started</th>
+                            <th>Duration</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exec in executions %}
+                        <tr>
+                            <td>
+                                <span class="fw-bold">{{ exec.entity_name or exec.agent_name or exec.execution_id[:12] }}...</span>
+                            </td>
+                            <td>
+                                {% if exec.entity_type == 'agent' %}
+                                <span class="badge bg-primary">Agent</span>
+                                {% elif exec.entity_type == 'workflow' %}
+                                <span class="badge bg-success">Workflow</span>
+                                {% elif exec.entity_type == 'swarm' %}
+                                <span class="badge bg-warning text-dark">Swarm</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ exec.entity_type or 'Unknown' }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if exec.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                                {% elif exec.status == 'running' %}
+                                <span class="badge bg-primary">Running</span>
+                                {% elif exec.status == 'failed' %}
+                                <span class="badge bg-danger">Failed</span>
+                                {% elif exec.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ exec.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="small text-muted">{% if exec.created_at %}{% if exec.created_at is string %}{{ exec.created_at[:16] }}{% else %}{{ exec.created_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}{% else %}-{% endif %}</td>
+                            <td class="small">{{ exec.duration or '-' }}</td>
+                            <td>
+                                <a href="{{ url_for('execution_detail', execution_id=exec.execution_id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No recent executions</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
-{% block page_glossary %}
-<div class="container-fluid py-4 bg-light border-top">
-    <div class="row">
-        <div class="col-12">
-            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Dashboard</strong>
-                            <p class="small text-muted mb-0">The main interface showing system overview, statistics, and quick access to features.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Agent</strong>
-                            <p class="small text-muted mb-0">An autonomous AI entity that combines LLMs with tools to perform tasks.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Execution</strong>
-                            <p class="small text-muted mb-0">A single run of an agent or workflow with tracked status and results.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">HITL (Human-in-the-Loop)</strong>
-                            <p class="small text-muted mb-0">Tasks requiring human review, approval, or intervention.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Tool</strong>
-                            <p class="small text-muted mb-0">A function that agents use to perform actions like search or calculations.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Workflow</strong>
-                            <p class="small text-muted mb-0">A defined sequence of steps that accomplish a specific task.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-3">
-                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-book me-1"></i>View Full Glossary
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+{% block extra_js %}
+<script>
+// Table filtering
+function filterTable(inputId, tableId) {
+    const input = document.getElementById(inputId);
+    const filter = input.value.toLowerCase();
+    const table = document.getElementById(tableId);
+    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    
+    let visibleCount = 0;
+    for (let row of rows) {
+        const cells = row.getElementsByTagName('td');
+        let found = false;
+        for (let cell of cells) {
+            if (cell.textContent.toLowerCase().includes(filter)) {
+                found = true;
+                break;
+            }
+        }
+        row.style.display = found ? '' : 'none';
+        if (found) visibleCount++;
+    }
+    
+    // Update pagination info
+    const entityType = tableId.replace('Table', '');
+    const infoEl = document.getElementById(entityType + 'PaginationInfo');
+    if (infoEl) {
+        infoEl.textContent = `Showing ${visibleCount} matching items`;
+    }
+}
+
+// Table sorting
+let sortDirections = {};
+function sortTable(tableId, columnIndex) {
+    const table = document.getElementById(tableId);
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = Array.from(tbody.getElementsByTagName('tr'));
+    
+    // Toggle sort direction
+    const key = tableId + '_' + columnIndex;
+    sortDirections[key] = !sortDirections[key];
+    const ascending = sortDirections[key];
+    
+    rows.sort((a, b) => {
+        const aText = a.cells[columnIndex]?.textContent.trim().toLowerCase() || '';
+        const bText = b.cells[columnIndex]?.textContent.trim().toLowerCase() || '';
+        return ascending ? aText.localeCompare(bText) : bText.localeCompare(aText);
+    });
+    
+    // Re-append sorted rows
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+// Pagination state
+const paginationState = {
+    agents: { page: 1, pageSize: 10 },
+    workflows: { page: 1, pageSize: 10 },
+    swarms: { page: 1, pageSize: 10 },
+    aiorgs: { page: 1, pageSize: 10 }
+};
+
+function changePageSize(entityType) {
+    const selectEl = document.getElementById(entityType.slice(0, -1) + 'PageSize') || 
+                     document.getElementById(entityType + 'PageSize');
+    if (selectEl) {
+        paginationState[entityType].pageSize = parseInt(selectEl.value);
+        paginationState[entityType].page = 1;
+        applyPagination(entityType);
+    }
+}
+
+function applyPagination(entityType) {
+    const tableId = entityType + 'Table';
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = tbody.getElementsByTagName('tr');
+    const state = paginationState[entityType];
+    
+    const totalRows = rows.length;
+    const totalPages = Math.ceil(totalRows / state.pageSize);
+    const startIdx = (state.page - 1) * state.pageSize;
+    const endIdx = startIdx + state.pageSize;
+    
+    // Show/hide rows based on pagination
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].style.display = (i >= startIdx && i < endIdx) ? '' : 'none';
+    }
+    
+    // Update pagination info
+    const infoEl = document.getElementById(entityType + 'PaginationInfo');
+    if (infoEl) {
+        const showStart = Math.min(startIdx + 1, totalRows);
+        const showEnd = Math.min(endIdx, totalRows);
+        infoEl.textContent = `Showing ${showStart}-${showEnd} of ${totalRows}`;
+    }
+    
+    // Render pagination controls
+    renderPagination(entityType, totalPages);
+}
+
+function renderPagination(entityType, totalPages) {
+    const navEl = document.getElementById(entityType + 'Pagination');
+    if (!navEl || totalPages <= 1) {
+        if (navEl) navEl.innerHTML = '';
+        return;
+    }
+    
+    const state = paginationState[entityType];
+    let html = '<ul class="pagination pagination-sm mb-0">';
+    
+    // Previous button
+    html += `<li class="page-item ${state.page === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="goToPage('${entityType}', ${state.page - 1}); return false;">«</a>
+    </li>`;
+    
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= state.page - 1 && i <= state.page + 1)) {
+            html += `<li class="page-item ${i === state.page ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="goToPage('${entityType}', ${i}); return false;">${i}</a>
+            </li>`;
+        } else if (i === state.page - 2 || i === state.page + 2) {
+            html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+    }
+    
+    // Next button
+    html += `<li class="page-item ${state.page === totalPages ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="goToPage('${entityType}', ${state.page + 1}); return false;">»</a>
+    </li>`;
+    
+    html += '</ul>';
+    navEl.innerHTML = html;
+}
+
+function goToPage(entityType, page) {
+    const state = paginationState[entityType];
+    const tableId = entityType + 'Table';
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    const totalRows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr').length;
+    const totalPages = Math.ceil(totalRows / state.pageSize);
+    
+    if (page >= 1 && page <= totalPages) {
+        state.page = page;
+        applyPagination(entityType);
+    }
+}
+
+// Initialize pagination on load
+document.addEventListener('DOMContentLoaded', function() {
+    applyPagination('agents');
+    applyPagination('workflows');
+    applyPagination('swarms');
+    applyPagination('aiorgs');
+});
+</script>
 {% endblock %}

@@ -3,289 +3,244 @@
 {% block title %}Admin Dashboard - {{ app_name }}{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div class="row align-items-center">
-        <div class="col">
-            <h1><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item active">Dashboard</li>
-                </ol>
-            </nav>
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-0">
+                <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
+            </h4>
+            <p class="text-muted mb-0">System overview and entity management</p>
         </div>
-        <div class="col-auto">
-            <span class="badge bg-bmo fs-6">
-                <i class="bi bi-person me-1"></i>{{ fullname }}
-            </span>
-        </div>
+        <a href="{{ url_for('admin_entity_approvals') }}" class="btn btn-primary">
+            <i class="bi bi-check-circle me-1"></i> Entity Approvals
+        </a>
     </div>
-</div>
 
-<!-- Statistics Cards -->
-<div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="stat-icon">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <div class="ms-3">
-                        <div class="stat-value">{{ stats.total_users or 0 }}</div>
-                        <div class="stat-label">Total Users</div>
-                    </div>
+    <!-- System Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center">
+                    <h2 class="text-primary mb-0">{{ stats.total_users or 0 }}</h2>
+                    <small class="text-muted">Total Users</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <h2 class="text-success mb-0">{{ agent_count or 0 }}</h2>
+                    <small class="text-muted">Total Agents</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <h2 class="text-info mb-0">{{ execution_count or 0 }}</h2>
+                    <small class="text-muted">Executions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning h-100">
+                <div class="card-body text-center">
+                    <h2 class="text-warning mb-0">{{ mcp_count or 0 }}</h2>
+                    <small class="text-muted">MCP Plugins</small>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card success h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="stat-icon">
-                        <i class="bi bi-robot"></i>
-                    </div>
-                    <div class="ms-3">
-                        <div class="stat-value">{{ agent_count or 0 }}</div>
-                        <div class="stat-label">Agents</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card info h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="stat-icon">
-                        <i class="bi bi-play-circle"></i>
-                    </div>
-                    <div class="ms-3">
-                        <div class="stat-value">{{ execution_count or 0 }}</div>
-                        <div class="stat-label">Executions</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card warning h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="stat-icon">
-                        <i class="bi bi-plug"></i>
-                    </div>
-                    <div class="ms-3">
-                        <div class="stat-value">{{ mcp_count or 0 }}</div>
-                        <div class="stat-label">MCP Plugins</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Quick Actions and Recent Activity -->
-<div class="row">
-    <!-- Quick Actions -->
-    <div class="col-lg-4 mb-4">
-        <div class="card h-100">
-            <div class="card-header bg-bmo">
-                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{{ url_for('add_user') }}" class="btn btn-outline-bmo">
-                        <i class="bi bi-person-plus me-2"></i>Add User
-                    </a>
-                    <a href="{{ url_for('agent_create') }}" class="btn btn-outline-bmo">
-                        <i class="bi bi-plus-circle me-2"></i>Create Agent
-                    </a>
-                    <a href="{{ url_for('add_mcp_plugin') }}" class="btn btn-outline-bmo">
-                        <i class="bi bi-plug me-2"></i>Add MCP Plugin
-                    </a>
-                    <a href="{{ url_for('audit_logs') }}" class="btn btn-outline-bmo">
-                        <i class="bi bi-journal-text me-2"></i>View Audit Logs
-                    </a>
+    <!-- Entity Management Cards -->
+    <h5 class="mb-3"><i class="bi bi-grid me-2"></i>Entity Management</h5>
+    <div class="row mb-4">
+        <!-- Agents Card -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-robot me-2"></i>Agents</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Create, configure and manage AI agents</p>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('admin_agents') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-list me-1"></i> View All
+                        </a>
+                        <a href="{{ url_for('agent_create') }}" class="btn btn-outline-success">
+                            <i class="bi bi-plus me-1"></i> Create New
+                        </a>
+                        <a href="{{ url_for('agent_templates') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-collection me-1"></i> Templates
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">Total: {{ agent_count or 0 }} agents</small>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Recent Activity -->
-    <div class="col-lg-8 mb-4">
-        <div class="card h-100">
-            <div class="card-header bg-bmo">
-                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Activity</h5>
-            </div>
-            <div class="card-body">
-                {% if audit_logs %}
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Resource</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for log in audit_logs %}
-                            <tr>
-                                <td class="text-muted small">{{ log.created_at }}</td>
-                                <td>{{ log.user_id or 'System' }}</td>
-                                <td>
-                                    <span class="badge bg-secondary">{{ log.action }}</span>
-                                </td>
-                                <td>{{ log.resource_type }}{% if log.resource_id %}: {{ log.resource_id }}{% endif %}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-center text-muted py-4">
-                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                    No recent activity
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Management Cards -->
-<div class="row">
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-people text-bmo fs-1 mb-3 d-block"></i>
-                <h5>User Management</h5>
-                <p class="text-muted">Manage users, roles, and permissions</p>
-                <a href="{{ url_for('manage_users') }}" class="btn btn-bmo">
-                    Manage Users
-                </a>
+        <!-- Workflows Card -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Workflows</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Design and manage workflow pipelines</p>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('list_workflows') }}" class="btn btn-outline-success">
+                            <i class="bi bi-list me-1"></i> View All
+                        </a>
+                        <a href="{{ url_for('workflow_designer_new') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-plus me-1"></i> Create New
+                        </a>
+                        <a href="{{ url_for('workflow_templates') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-collection me-1"></i> Templates
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">Total: {{ workflow_count or 0 }} workflows</small>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-robot text-bmo fs-1 mb-3 d-block"></i>
-                <h5>Agent Management</h5>
-                <p class="text-muted">Create, configure, and publish agents</p>
-                <a href="{{ url_for('admin_agents') }}" class="btn btn-bmo">
-                    Manage Agents
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-plug text-bmo fs-1 mb-3 d-block"></i>
-                <h5>MCP Plugins</h5>
-                <p class="text-muted">Configure MCP server plugins</p>
-                <a href="{{ url_for('mcp_plugins') }}" class="btn btn-bmo">
-                    Manage Plugins
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-server text-info fs-1 mb-3 d-block"></i>
-                <h5>MCP Tool Servers</h5>
-                <p class="text-muted">Connect external MCP servers for dynamic tools</p>
-                <a href="{{ url_for('admin_mcp_tool_servers') }}" class="btn btn-info">
-                    Manage Servers
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-bell text-warning fs-1 mb-3 d-block"></i>
-                <h5>Notifications <span class="badge bg-warning text-dark">v1.4.0</span></h5>
-                <p class="text-muted">Slack, Teams, and webhook integrations</p>
-                <a href="{{ url_for('notification_channels') }}" class="btn btn-warning">
-                    Manage Notifications
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
 
-{% block page_glossary %}
-<div class="container-fluid py-4 bg-light border-top">
+        <!-- Swarms Card -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-hive me-2"></i>Swarms</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Configure multi-agent swarm systems</p>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('list_swarms') }}" class="btn btn-outline-warning">
+                            <i class="bi bi-list me-1"></i> View All
+                        </a>
+                        <a href="{{ url_for('swarm_designer_new') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-plus me-1"></i> Create New
+                        </a>
+                        <a href="{{ url_for('swarm_templates') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-collection me-1"></i> Templates
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">Total: {{ swarm_count or 0 }} swarms</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Orgs Card -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-building me-2"></i>AI Organizations</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Build hierarchical AI organizations</p>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('aiorg_list') }}" class="btn btn-outline-info">
+                            <i class="bi bi-list me-1"></i> View All
+                        </a>
+                        <a href="{{ url_for('aiorg_designer_new') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-plus me-1"></i> Create New
+                        </a>
+                        <a href="{{ url_for('aiorg_templates') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-collection me-1"></i> Templates
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">Total: {{ aiorg_count or 0 }} organizations</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
-        <div class="col-12">
-            <h6 class="text-muted mb-3"><i class="bi bi-book me-2"></i>Key Terms on This Page</h6>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Admin Dashboard</strong>
-                            <p class="small text-muted mb-0">Central management interface for system administrators.</p>
-                        </div>
-                    </div>
+        <!-- Quick Actions -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-bmo">
+                    <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
                 </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">LLM Provider</strong>
-                            <p class="small text-muted mb-0">Service hosting language models via APIs (OpenAI, Anthropic, etc.).</p>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <a href="{{ url_for('manage_users') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-people me-1"></i> Users
+                            </a>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">MCP Tool Server</strong>
-                            <p class="small text-muted mb-0">External server exposing tools via Model Context Protocol.</p>
+                        <div class="col-6">
+                            <a href="{{ url_for('admin_llm_providers') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-cloud me-1"></i> LLM Providers
+                            </a>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Code Fragment</strong>
-                            <p class="small text-muted mb-0">Reusable Python code module that can be loaded as a tool.</p>
+                        <div class="col-6">
+                            <a href="{{ url_for('admin_llm_models') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-cpu me-1"></i> LLM Models
+                            </a>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">Audit Log</strong>
-                            <p class="small text-muted mb-0">Chronological record of system activities for security and compliance.</p>
+                        <div class="col-6">
+                            <a href="{{ url_for('admin_mcp_tool_servers') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-server me-1"></i> MCP Servers
+                            </a>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 bg-white">
-                        <div class="card-body py-2">
-                            <strong class="text-primary">API Key</strong>
-                            <p class="small text-muted mb-0">Authentication credential for programmatic API access.</p>
+                        <div class="col-6">
+                            <a href="{{ url_for('admin_api_keys') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-key me-1"></i> API Keys
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ url_for('admin_hitl_tasks') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-person-check me-1"></i> HITL Tasks
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ url_for('list_scripts') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-file-code me-1"></i> Python Scripts
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ url_for('metrics_dashboard') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-graph-up me-1"></i> Metrics
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="text-center mt-3">
-                <a href="{{ url_for('help_page', page='glossary') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-book me-1"></i>View Full Glossary
-                </a>
+        </div>
+
+        <!-- Recent Audit Logs -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-bmo d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>Recent Activity</h5>
+                    <a href="{{ url_for('audit_logs') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% if audit_logs %}
+                            {% for log in audit_logs[:8] %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                                <div>
+                                    <span class="badge bg-{{ 'success' if log.action == 'create' else 'warning' if log.action == 'update' else 'danger' if log.action == 'delete' else 'secondary' }} me-2">
+                                        {{ log.action }}
+                                    </span>
+                                    <small>{{ log.entity_type }}: {{ log.entity_id[:12] if log.entity_id else '-' }}...</small>
+                                </div>
+                                <small class="text-muted">{{ log.created_at.strftime('%Y-%m-%d %H:%M') if log.created_at else '' }}</small>
+                            </li>
+                            {% endfor %}
+                        {% else %}
+                        <li class="list-group-item text-muted text-center py-4">No recent activity</li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

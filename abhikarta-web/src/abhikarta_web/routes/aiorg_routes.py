@@ -1109,3 +1109,265 @@ class AIORGRoutes(AbstractRoutes):
             stats = db_ops.get_org_stats(org_id)
             
             return jsonify(stats)
+        
+        # =====================================================================
+        # EXPORT, EDIT & STATUS ROUTES
+        # =====================================================================
+        
+        @self.app.route('/aiorg/<org_id>/export/json')
+        @admin_required
+        def export_aiorg_json(org_id):
+            """Export AI organization configuration as JSON file."""
+            org = self.db_facade.fetch_one(
+                "SELECT * FROM ai_orgs WHERE org_id = ?",
+                (org_id,)
+            )
+            if not org:
+                flash('Organization not found', 'error')
+                return redirect(url_for('aiorg_list'))
+            
+            org_dict = dict(org)
+            if 'config' in org_dict and isinstance(org_dict['config'], str):
+                try:
+                    org_dict['config'] = json.loads(org_dict['config'])
+                except:
+                    pass
+            
+            # Get nodes
+            nodes = self.db_facade.fetch_all(
+                "SELECT * FROM ai_nodes WHERE org_id = ?",
+                (org_id,)
+            ) or []
+            org_dict['nodes'] = [dict(n) for n in nodes]
+            
+            response = Response(
+                json.dumps(org_dict, indent=2, default=str),
+                mimetype='application/json',
+                headers={
+                    'Content-Disposition': f'attachment; filename=aiorg_{org["name"].lower().replace(" ", "_")}_{org_id}.json'
+                }
+            )
+            return response
+        
+        @self.app.route('/aiorg/<org_id>/export/python')
+        @admin_required
+        def export_aiorg_python(org_id):
+            """Export AI organization as Python SDK code."""
+            from abhikarta_web.utils.export_utils import generate_aiorg_python_code
+            
+            org = self.db_facade.fetch_one(
+                "SELECT * FROM ai_orgs WHERE org_id = ?",
+                (org_id,)
+            )
+            if not org:
+                flash('Organization not found', 'error')
+                return redirect(url_for('aiorg_list'))
+            
+            org_dict = dict(org)
+            if 'config' in org_dict and isinstance(org_dict['config'], str):
+                try:
+                    org_dict['config'] = json.loads(org_dict['config'])
+                except:
+                    pass
+            
+            python_code = generate_aiorg_python_code(org_dict)
+            
+            response = Response(
+                python_code,
+                mimetype='text/x-python',
+                headers={
+                    'Content-Disposition': f'attachment; filename=aiorg_{org["name"].lower().replace(" ", "_")}.py'
+                }
+            )
+            return response
+        
+        @self.app.route('/api/aiorg/<org_id>/json')
+        @admin_required
+        def api_aiorg_json(org_id):
+            """API: Get full AI organization JSON configuration."""
+            org = self.db_facade.fetch_one(
+                "SELECT * FROM ai_orgs WHERE org_id = ?",
+                (org_id,)
+            )
+            if not org:
+                return jsonify({'error': 'Organization not found'}), 404
+            
+            org_dict = dict(org)
+            if 'config' in org_dict and isinstance(org_dict['config'], str):
+                try:
+                    org_dict['config'] = json.loads(org_dict['config'])
+                except:
+                    pass
+            
+            # Include nodes
+            nodes = self.db_facade.fetch_all(
+                "SELECT * FROM ai_nodes WHERE org_id = ?",
+                (org_id,)
+            ) or []
+            org_dict['nodes'] = [dict(n) for n in nodes]
+            
+            return jsonify(org_dict)
+        
+        @self.app.route('/api/aiorg/<org_id>/python')
+        @admin_required
+        def api_aiorg_python(org_id):
+            """API: Get AI organization as Python SDK code."""
+            from abhikarta_web.utils.export_utils import generate_aiorg_python_code
+            
+            org = self.db_facade.fetch_one(
+                "SELECT * FROM ai_orgs WHERE org_id = ?",
+                (org_id,)
+            )
+            if not org:
+                return jsonify({'error': 'Organization not found'}), 404
+            
+            org_dict = dict(org)
+            if 'config' in org_dict and isinstance(org_dict['config'], str):
+                try:
+                    org_dict['config'] = json.loads(org_dict['config'])
+                except:
+                    pass
+            
+            python_code = generate_aiorg_python_code(org_dict)
+            return Response(python_code, mimetype='text/plain')
+        
+        @self.app.route('/api/aiorg/<org_id>/status', methods=['PUT'])
+        @admin_required
+        def api_change_aiorg_status(org_id):
+            """API: Change AI organization status."""
+            from abhikarta_web.utils.export_utils import is_valid_transition
+            
+            try:
+                data = request.get_json()
+                new_status = data.get('status')
+                
+                org = self.db_facade.fetch_one(
+                    "SELECT status FROM ai_orgs WHERE org_id = ?",
+                    (org_id,)
+                )
+                if not org:
+                    return jsonify({'error': 'Organization not found'}), 404
+                
+                current_status = org['status']
+                
+                if not is_valid_transition(current_status, new_status):
+                    return jsonify({'error': f'Invalid status transition from {current_status} to {new_status}'}), 400
+                
+                self.db_facade.execute(
+                    "UPDATE ai_orgs SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE org_id = ?",
+                    (new_status, org_id)
+                )
+                
+                self.log_audit('change_status', 'aiorg', org_id, {'new_status': new_status})
+                
+                return jsonify({'success': True, 'status': new_status})
+                
+            except Exception as e:
+                logger.error(f"Error changing AI org status: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/aiorg/<org_id>/edit', methods=['GET', 'POST'])
+        @admin_required
+        def edit_aiorg(org_id):
+            """Edit AI organization properties."""
+            org = self.db_facade.fetch_one(
+                "SELECT * FROM ai_orgs WHERE org_id = ?",
+                (org_id,)
+            )
+            if not org:
+                flash('Organization not found', 'error')
+                return redirect(url_for('aiorg_list'))
+            
+            org_dict = dict(org)
+            if 'config' in org_dict and isinstance(org_dict['config'], str):
+                try:
+                    org_dict['config'] = json.loads(org_dict['config'])
+                except:
+                    pass
+            
+            if request.method == 'POST':
+                try:
+                    name = request.form.get('name', '').strip()
+                    description = request.form.get('description', '').strip()
+                    
+                    self.db_facade.execute(
+                        """UPDATE ai_orgs 
+                           SET name = ?, description = ?, updated_at = CURRENT_TIMESTAMP 
+                           WHERE org_id = ?""",
+                        (name, description, org_id)
+                    )
+                    
+                    self.log_audit('update_aiorg', 'aiorg', org_id)
+                    flash('Organization updated successfully', 'success')
+                    return redirect(url_for('view_aiorg', org_id=org_id))
+                    
+                except Exception as e:
+                    logger.error(f"Error updating organization: {e}", exc_info=True)
+                    flash(f'Error: {str(e)}', 'error')
+            
+            return render_template('aiorg/edit.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   org=org_dict)
+        
+        @self.app.route('/api/aiorg/<org_id>/edit', methods=['POST'])
+        @admin_required
+        def api_edit_aiorg_json(org_id):
+            """API: Update AI organization from JSON."""
+            try:
+                data = request.get_json()
+                
+                for field in ['org_id', 'created_at', 'created_by']:
+                    if field in data:
+                        del data[field]
+                
+                updates = []
+                values = []
+                for field in ['name', 'description', 'config']:
+                    if field in data:
+                        updates.append(f"{field} = ?")
+                        value = data[field]
+                        if isinstance(value, (dict, list)):
+                            value = json.dumps(value)
+                        values.append(value)
+                
+                if updates:
+                    updates.append("updated_at = CURRENT_TIMESTAMP")
+                    values.append(org_id)
+                    
+                    self.db_facade.execute(
+                        f"UPDATE ai_orgs SET {', '.join(updates)} WHERE org_id = ?",
+                        tuple(values)
+                    )
+                    
+                    self.log_audit('update_aiorg_json', 'aiorg', org_id)
+                
+                return jsonify({'success': True})
+                
+            except Exception as e:
+                logger.error(f"Error updating organization: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/aiorg/<org_id>', methods=['DELETE'])
+        @admin_required
+        def api_delete_aiorg(org_id):
+            """API: Delete an AI organization."""
+            try:
+                # Delete nodes first
+                self.db_facade.execute(
+                    "DELETE FROM ai_nodes WHERE org_id = ?",
+                    (org_id,)
+                )
+                # Delete org
+                self.db_facade.execute(
+                    "DELETE FROM ai_orgs WHERE org_id = ?",
+                    (org_id,)
+                )
+                self.log_audit('delete_aiorg', 'aiorg', org_id)
+                return jsonify({'success': True})
+            except Exception as e:
+                logger.error(f"Error deleting organization: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
+        logger.info("AI Org routes registered")

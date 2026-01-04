@@ -19,7 +19,7 @@ from datetime import datetime
 from functools import wraps
 from flask import (
     render_template, request, redirect, url_for,
-    flash, jsonify, session
+    flash, jsonify, session, Response
 )
 
 from .abstract_routes import AbstractRoutes, login_required, admin_required
@@ -39,6 +39,7 @@ class SwarmRoutes(AbstractRoutes):
         self._register_designer_routes()
         self._register_execution_routes()
         self._register_api_routes()
+        self._register_export_routes()
     
     # =========================================================================
     # LIST ROUTES
@@ -1065,3 +1066,192 @@ class SwarmRoutes(AbstractRoutes):
                 })
             except Exception as e:
                 return jsonify({'success': False, 'error': str(e)}), 500
+    
+    # =========================================================================
+    # EXPORT, EDIT & STATUS ROUTES
+    # =========================================================================
+    
+    def _register_export_routes(self):
+        """Register export, edit and status change routes."""
+        
+        @self.app.route('/swarms/<swarm_id>/export/json')
+        @admin_required
+        def export_swarm_json(swarm_id):
+            """Export swarm configuration as JSON file."""
+            swarm = self.db_facade.fetch_one(
+                "SELECT * FROM swarms WHERE swarm_id = ?",
+                (swarm_id,)
+            )
+            if not swarm:
+                flash('Swarm not found', 'error')
+                return redirect(url_for('list_swarms'))
+            
+            swarm_dict = dict(swarm)
+            for field in ['definition_json', 'config_json', 'tags']:
+                if field in swarm_dict and isinstance(swarm_dict[field], str):
+                    try:
+                        swarm_dict[field] = json.loads(swarm_dict[field])
+                    except:
+                        pass
+            
+            response = Response(
+                json.dumps(swarm_dict, indent=2, default=str),
+                mimetype='application/json',
+                headers={
+                    'Content-Disposition': f'attachment; filename=swarm_{swarm["name"].lower().replace(" ", "_")}_{swarm_id}.json'
+                }
+            )
+            return response
+        
+        @self.app.route('/swarms/<swarm_id>/export/python')
+        @admin_required
+        def export_swarm_python(swarm_id):
+            """Export swarm as Python SDK code."""
+            from abhikarta_web.utils.export_utils import generate_swarm_python_code
+            
+            swarm = self.db_facade.fetch_one(
+                "SELECT * FROM swarms WHERE swarm_id = ?",
+                (swarm_id,)
+            )
+            if not swarm:
+                flash('Swarm not found', 'error')
+                return redirect(url_for('list_swarms'))
+            
+            swarm_dict = dict(swarm)
+            for field in ['definition_json', 'config_json', 'tags']:
+                if field in swarm_dict and isinstance(swarm_dict[field], str):
+                    try:
+                        swarm_dict[field] = json.loads(swarm_dict[field])
+                    except:
+                        pass
+            
+            python_code = generate_swarm_python_code(swarm_dict)
+            
+            response = Response(
+                python_code,
+                mimetype='text/x-python',
+                headers={
+                    'Content-Disposition': f'attachment; filename=swarm_{swarm["name"].lower().replace(" ", "_")}.py'
+                }
+            )
+            return response
+        
+        @self.app.route('/api/swarms/<swarm_id>/json')
+        @admin_required
+        def api_swarm_json(swarm_id):
+            """API: Get full swarm JSON configuration."""
+            swarm = self.db_facade.fetch_one(
+                "SELECT * FROM swarms WHERE swarm_id = ?",
+                (swarm_id,)
+            )
+            if not swarm:
+                return jsonify({'error': 'Swarm not found'}), 404
+            
+            swarm_dict = dict(swarm)
+            for field in ['definition_json', 'config_json', 'tags']:
+                if field in swarm_dict and isinstance(swarm_dict[field], str):
+                    try:
+                        swarm_dict[field] = json.loads(swarm_dict[field])
+                    except:
+                        pass
+            
+            return jsonify(swarm_dict)
+        
+        @self.app.route('/api/swarms/<swarm_id>/python')
+        @admin_required
+        def api_swarm_python(swarm_id):
+            """API: Get swarm as Python SDK code."""
+            from abhikarta_web.utils.export_utils import generate_swarm_python_code
+            
+            swarm = self.db_facade.fetch_one(
+                "SELECT * FROM swarms WHERE swarm_id = ?",
+                (swarm_id,)
+            )
+            if not swarm:
+                return jsonify({'error': 'Swarm not found'}), 404
+            
+            swarm_dict = dict(swarm)
+            for field in ['definition_json', 'config_json', 'tags']:
+                if field in swarm_dict and isinstance(swarm_dict[field], str):
+                    try:
+                        swarm_dict[field] = json.loads(swarm_dict[field])
+                    except:
+                        pass
+            
+            python_code = generate_swarm_python_code(swarm_dict)
+            return Response(python_code, mimetype='text/plain')
+        
+        @self.app.route('/api/swarms/<swarm_id>/status', methods=['PUT'])
+        @admin_required
+        def api_change_swarm_status(swarm_id):
+            """API: Change swarm status."""
+            from abhikarta_web.utils.export_utils import is_valid_transition
+            
+            try:
+                data = request.get_json()
+                new_status = data.get('status')
+                
+                swarm = self.db_facade.fetch_one(
+                    "SELECT status FROM swarms WHERE swarm_id = ?",
+                    (swarm_id,)
+                )
+                if not swarm:
+                    return jsonify({'error': 'Swarm not found'}), 404
+                
+                current_status = swarm['status']
+                
+                if not is_valid_transition(current_status, new_status):
+                    return jsonify({'error': f'Invalid status transition from {current_status} to {new_status}'}), 400
+                
+                self.db_facade.execute(
+                    "UPDATE swarms SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE swarm_id = ?",
+                    (new_status, swarm_id)
+                )
+                
+                self.log_audit('change_status', 'swarm', swarm_id, {'new_status': new_status})
+                
+                return jsonify({'success': True, 'status': new_status})
+                
+            except Exception as e:
+                logger.error(f"Error changing swarm status: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/swarms/<swarm_id>/edit', methods=['POST'])
+        @admin_required
+        def api_edit_swarm_json(swarm_id):
+            """API: Update swarm from JSON."""
+            try:
+                data = request.get_json()
+                
+                for field in ['swarm_id', 'created_at', 'created_by']:
+                    if field in data:
+                        del data[field]
+                
+                updates = []
+                values = []
+                for field in ['name', 'description', 'definition_json', 'config_json', 'tags', 'category']:
+                    if field in data:
+                        updates.append(f"{field} = ?")
+                        value = data[field]
+                        if isinstance(value, (dict, list)):
+                            value = json.dumps(value)
+                        values.append(value)
+                
+                if updates:
+                    updates.append("updated_at = CURRENT_TIMESTAMP")
+                    values.append(swarm_id)
+                    
+                    self.db_facade.execute(
+                        f"UPDATE swarms SET {', '.join(updates)} WHERE swarm_id = ?",
+                        tuple(values)
+                    )
+                    
+                    self.log_audit('update_swarm_json', 'swarm', swarm_id)
+                
+                return jsonify({'success': True})
+                
+            except Exception as e:
+                logger.error(f"Error updating swarm: {e}", exc_info=True)
+                return jsonify({'error': str(e)}), 500
+        
+        logger.info("Swarm export routes registered")

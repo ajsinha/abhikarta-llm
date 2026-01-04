@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+{% block title %}Entity Approval Dashboard - Admin - {{ app_name }}{% endblock %}
+
+{% macro render_entity_table(entities, tab_id) %}
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Source</th>
+                        <th>Created By</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entity in entities %}
+                    <tr>
+                        <td>
+                            {% if entity.entity_type == 'agent' %}
+                            <span class="badge bg-primary"><i class="bi bi-robot me-1"></i>Agent</span>
+                            {% elif entity.entity_type == 'workflow' %}
+                            <span class="badge bg-success"><i class="bi bi-diagram-3 me-1"></i>Workflow</span>
+                            {% elif entity.entity_type == 'swarm' %}
+                            <span class="badge bg-warning text-dark"><i class="bi bi-hive me-1"></i>Swarm</span>
+                            {% elif entity.entity_type == 'aiorg' %}
+                            <span class="badge bg-info"><i class="bi bi-building me-1"></i>AI Org</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ entity.detail_url }}" class="fw-bold text-decoration-none">
+                                {{ entity.name }}
+                            </a>
+                            <br><small class="text-muted">{{ entity.id[:16] }}...</small>
+                        </td>
+                        <td>
+                            {% if entity.status == 'draft' %}
+                            <span class="badge bg-secondary">Draft</span>
+                            {% elif entity.status == 'testing' %}
+                            <span class="badge bg-warning text-dark">Testing</span>
+                            {% elif entity.status == 'pending_review' %}
+                            <span class="badge bg-info">Pending Review</span>
+                            {% elif entity.status == 'approved' %}
+                            <span class="badge bg-primary">Approved</span>
+                            {% elif entity.status == 'published' %}
+                            <span class="badge bg-success">Published</span>
+                            {% elif entity.status == 'deprecated' %}
+                            <span class="badge bg-warning">Deprecated</span>
+                            {% elif entity.status == 'archived' %}
+                            <span class="badge bg-dark">Archived</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ entity.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if entity.source_type == 'python' %}
+                            <span class="badge bg-dark"><i class="bi bi-filetype-py me-1"></i>Python</span>
+                            {% elif entity.source_type == 'designer' %}
+                            <span class="badge bg-purple"><i class="bi bi-palette me-1"></i>Designer</span>
+                            {% else %}
+                            <span class="badge bg-secondary"><i class="bi bi-braces me-1"></i>JSON</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ entity.created_by or 'Unknown' }}</td>
+                        <td>{{ entity.updated_at[:16] if entity.updated_at else '-' }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ entity.detail_url }}" class="btn btn-outline-primary" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <button class="btn btn-outline-secondary" onclick="showStatusModal('{{ entity.entity_type }}', '{{ entity.id }}', '{{ entity.name }}', '{{ entity.status }}')" title="Change Status">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+                                {% if entity.status == 'pending_review' %}
+                                <button class="btn btn-success" onclick="changeStatus('{{ entity.entity_type }}', '{{ entity.id }}', 'approved')" title="Approve">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                                <button class="btn btn-danger" onclick="changeStatus('{{ entity.entity_type }}', '{{ entity.id }}', 'testing')" title="Reject">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                                {% elif entity.status == 'approved' %}
+                                <button class="btn btn-success" onclick="changeStatus('{{ entity.entity_type }}', '{{ entity.id }}', 'published')" title="Publish">
+                                    <i class="bi bi-rocket"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No entities found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-0">
+                <i class="bi bi-check-circle me-2"></i>Entity Approval Dashboard
+            </h4>
+            <p class="text-muted mb-0">Manage approval workflow for all entity types</p>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-outline-secondary" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center py-3">
+                    <h3 class="text-warning mb-0">{{ pending_review_count }}</h3>
+                    <small class="text-muted">Pending Review</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center py-3">
+                    <h3 class="text-info mb-0">{{ testing_count }}</h3>
+                    <small class="text-muted">In Testing</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center py-3">
+                    <h3 class="text-primary mb-0">{{ approved_count }}</h3>
+                    <small class="text-muted">Approved</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center py-3">
+                    <h3 class="text-success mb-0">{{ published_count }}</h3>
+                    <small class="text-muted">Published</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <ul class="nav nav-tabs mb-4" id="entityTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-pane" type="button">
+                All <span class="badge bg-secondary ms-1">{{ all_entities|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-pane" type="button">
+                <i class="bi bi-hourglass-split text-warning"></i> Pending Review 
+                <span class="badge bg-warning text-dark ms-1">{{ pending_entities|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="agents-tab" data-bs-toggle="tab" data-bs-target="#agents-pane" type="button">
+                <i class="bi bi-robot text-primary"></i> Agents
+                <span class="badge bg-primary ms-1">{{ agents|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="workflows-tab" data-bs-toggle="tab" data-bs-target="#workflows-pane" type="button">
+                <i class="bi bi-diagram-3 text-success"></i> Workflows
+                <span class="badge bg-success ms-1">{{ workflows|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="swarms-tab" data-bs-toggle="tab" data-bs-target="#swarms-pane" type="button">
+                <i class="bi bi-hive text-warning"></i> Swarms
+                <span class="badge bg-warning text-dark ms-1">{{ swarms|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="aiorgs-tab" data-bs-toggle="tab" data-bs-target="#aiorgs-pane" type="button">
+                <i class="bi bi-building text-info"></i> AI Orgs
+                <span class="badge bg-info ms-1">{{ aiorgs|length }}</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- All Entities -->
+        <div class="tab-pane fade show active" id="all-pane">
+            {{ render_entity_table(all_entities, 'all') }}
+        </div>
+        
+        <!-- Pending Review -->
+        <div class="tab-pane fade" id="pending-pane">
+            {% if pending_entities %}
+            {{ render_entity_table(pending_entities, 'pending') }}
+            {% else %}
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle me-2"></i>No entities pending review!
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Agents -->
+        <div class="tab-pane fade" id="agents-pane">
+            {{ render_entity_table(agents, 'agents') }}
+        </div>
+        
+        <!-- Workflows -->
+        <div class="tab-pane fade" id="workflows-pane">
+            {{ render_entity_table(workflows, 'workflows') }}
+        </div>
+        
+        <!-- Swarms -->
+        <div class="tab-pane fade" id="swarms-pane">
+            {{ render_entity_table(swarms, 'swarms') }}
+        </div>
+        
+        <!-- AI Orgs -->
+        <div class="tab-pane fade" id="aiorgs-pane">
+            {{ render_entity_table(aiorgs, 'aiorgs') }}
+        </div>
+    </div>
+</div>
+
+<!-- Status Change Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Change status of <strong id="modalEntityName"></strong>?</p>
+                <div class="d-grid gap-2" id="statusActions">
+                    <!-- Actions populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const STATUS_TRANSITIONS = {
+    'draft': ['testing', 'archived'],
+    'testing': ['draft', 'pending_review', 'archived'],
+    'pending_review': ['testing', 'approved', 'draft'],
+    'approved': ['published', 'draft'],
+    'published': ['deprecated', 'draft'],
+    'deprecated': ['published', 'archived'],
+    'archived': ['draft']
+};
+
+const STATUS_LABELS = {
+    'draft': '<i class="bi bi-pencil me-1"></i> Draft',
+    'testing': '<i class="bi bi-flask me-1"></i> Testing',
+    'pending_review': '<i class="bi bi-eye me-1"></i> Pending Review',
+    'approved': '<i class="bi bi-check-circle me-1"></i> Approved',
+    'published': '<i class="bi bi-rocket me-1"></i> Published',
+    'deprecated': '<i class="bi bi-archive me-1"></i> Deprecated',
+    'archived': '<i class="bi bi-box me-1"></i> Archived'
+};
+
+const STATUS_CLASSES = {
+    'draft': 'btn-outline-secondary',
+    'testing': 'btn-outline-warning',
+    'pending_review': 'btn-outline-info',
+    'approved': 'btn-outline-primary',
+    'published': 'btn-success',
+    'deprecated': 'btn-warning',
+    'archived': 'btn-dark'
+};
+
+let currentEntity = {};
+
+function showStatusModal(entityType, entityId, entityName, currentStatus) {
+    currentEntity = { type: entityType, id: entityId, name: entityName, status: currentStatus };
+    
+    document.getElementById('modalEntityName').textContent = entityName;
+    
+    const actionsDiv = document.getElementById('statusActions');
+    const allowedTransitions = STATUS_TRANSITIONS[currentStatus] || [];
+    
+    let html = '';
+    allowedTransitions.forEach(newStatus => {
+        html += `<button class="btn ${STATUS_CLASSES[newStatus]}" onclick="changeStatus('${entityType}', '${entityId}', '${newStatus}')">${STATUS_LABELS[newStatus]}</button>`;
+    });
+    
+    if (!allowedTransitions.length) {
+        html = '<p class="text-muted">No status transitions available</p>';
+    }
+    
+    actionsDiv.innerHTML = html;
+    new bootstrap.Modal(document.getElementById('statusModal')).show();
+}
+
+function changeStatus(entityType, entityId, newStatus) {
+    let apiUrl;
+    switch(entityType) {
+        case 'agent': apiUrl = `/api/agents/${entityId}/status`; break;
+        case 'workflow': apiUrl = `/api/workflows/${entityId}/status`; break;
+        case 'swarm': apiUrl = `/api/swarms/${entityId}/status`; break;
+        case 'aiorg': apiUrl = `/api/aiorg/${entityId}/status`; break;
+        default: return alert('Unknown entity type');
+    }
+    
+    fetch(apiUrl, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`Status changed to ${newStatus}`, 'success');
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast('Error: ' + (data.error || 'Failed'), 'error');
+        }
+    })
+    .catch(err => showToast('Error: ' + err.message, 'error'));
+}
+</script>
+{% endblock %}

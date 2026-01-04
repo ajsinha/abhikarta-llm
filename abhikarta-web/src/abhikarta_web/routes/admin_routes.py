@@ -67,6 +67,30 @@ class AdminRoutes(AbstractRoutes):
             except Exception as e:
                 logger.error(f"Error getting agent count: {e}", exc_info=True)
             
+            # Get workflow count
+            workflow_count = 0
+            try:
+                result = self.db_facade.fetch_one("SELECT COUNT(*) as cnt FROM workflows")
+                workflow_count = result['cnt'] if result else 0
+            except Exception as e:
+                logger.error(f"Error getting workflow count: {e}", exc_info=True)
+            
+            # Get swarm count
+            swarm_count = 0
+            try:
+                result = self.db_facade.fetch_one("SELECT COUNT(*) as cnt FROM swarms")
+                swarm_count = result['cnt'] if result else 0
+            except Exception as e:
+                logger.error(f"Error getting swarm count: {e}", exc_info=True)
+            
+            # Get AI org count
+            aiorg_count = 0
+            try:
+                result = self.db_facade.fetch_one("SELECT COUNT(*) as cnt FROM ai_orgs")
+                aiorg_count = result['cnt'] if result else 0
+            except Exception as e:
+                logger.error(f"Error getting AI org count: {e}", exc_info=True)
+            
             # Get execution count using delegate
             execution_count = 0
             try:
@@ -94,9 +118,126 @@ class AdminRoutes(AbstractRoutes):
                                    roles=session.get('roles', []),
                                    stats=stats,
                                    agent_count=agent_count,
+                                   workflow_count=workflow_count,
+                                   swarm_count=swarm_count,
+                                   aiorg_count=aiorg_count,
                                    execution_count=execution_count,
                                    mcp_count=mcp_count,
                                    audit_logs=audit_logs)
+        
+        @self.app.route('/admin/approvals')
+        @admin_required
+        def admin_entity_approvals():
+            """
+            Unified entity approval dashboard.
+            Shows all entities (agents, workflows, swarms, AI orgs) with their status
+            and allows admins to approve, reject, or change status.
+            """
+            try:
+                # Get all entities with their statuses
+                agents = self.db_facade.fetch_all(
+                    "SELECT agent_id, name, status, source_type, created_by, updated_at FROM agents ORDER BY updated_at DESC"
+                ) or []
+                
+                workflows = self.db_facade.fetch_all(
+                    "SELECT workflow_id, name, status, source_type, created_by, updated_at FROM workflows ORDER BY updated_at DESC"
+                ) or []
+                
+                swarms = self.db_facade.fetch_all(
+                    "SELECT swarm_id, name, status, source_type, created_by, updated_at FROM swarms ORDER BY updated_at DESC"
+                ) or []
+                
+                aiorgs = self.db_facade.fetch_all(
+                    "SELECT org_id, name, status, source_type, created_by, updated_at FROM ai_orgs ORDER BY updated_at DESC"
+                ) or []
+                
+                # Transform to unified format
+                all_entities = []
+                
+                for a in agents:
+                    all_entities.append({
+                        'entity_type': 'agent',
+                        'id': a['agent_id'],
+                        'name': a['name'],
+                        'status': a['status'],
+                        'source_type': a.get('source_type', 'json'),
+                        'created_by': a.get('created_by'),
+                        'updated_at': str(a.get('updated_at', '')),
+                        'detail_url': url_for('view_agent', agent_id=a['agent_id'])
+                    })
+                
+                for w in workflows:
+                    all_entities.append({
+                        'entity_type': 'workflow',
+                        'id': w['workflow_id'],
+                        'name': w['name'],
+                        'status': w['status'],
+                        'source_type': w.get('source_type', 'json'),
+                        'created_by': w.get('created_by'),
+                        'updated_at': str(w.get('updated_at', '')),
+                        'detail_url': url_for('workflow_detail', workflow_id=w['workflow_id'])
+                    })
+                
+                for s in swarms:
+                    all_entities.append({
+                        'entity_type': 'swarm',
+                        'id': s['swarm_id'],
+                        'name': s['name'],
+                        'status': s['status'],
+                        'source_type': s.get('source_type', 'json'),
+                        'created_by': s.get('created_by'),
+                        'updated_at': str(s.get('updated_at', '')),
+                        'detail_url': url_for('view_swarm', swarm_id=s['swarm_id'])
+                    })
+                
+                for o in aiorgs:
+                    all_entities.append({
+                        'entity_type': 'aiorg',
+                        'id': o['org_id'],
+                        'name': o['name'],
+                        'status': o['status'],
+                        'source_type': o.get('source_type', 'json'),
+                        'created_by': o.get('created_by'),
+                        'updated_at': str(o.get('updated_at', '')),
+                        'detail_url': url_for('aiorg_detail', org_id=o['org_id'])
+                    })
+                
+                # Sort by updated_at descending
+                all_entities.sort(key=lambda x: x['updated_at'], reverse=True)
+                
+                # Filter pending review entities
+                pending_entities = [e for e in all_entities if e['status'] == 'pending_review']
+                
+                # Prepare entity lists by type
+                agents_list = [e for e in all_entities if e['entity_type'] == 'agent']
+                workflows_list = [e for e in all_entities if e['entity_type'] == 'workflow']
+                swarms_list = [e for e in all_entities if e['entity_type'] == 'swarm']
+                aiorgs_list = [e for e in all_entities if e['entity_type'] == 'aiorg']
+                
+                # Count by status
+                pending_review_count = len([e for e in all_entities if e['status'] == 'pending_review'])
+                testing_count = len([e for e in all_entities if e['status'] == 'testing'])
+                approved_count = len([e for e in all_entities if e['status'] == 'approved'])
+                published_count = len([e for e in all_entities if e['status'] == 'published'])
+                
+                return render_template('admin/entity_approvals.html',
+                                       fullname=session.get('fullname'),
+                                       userid=session.get('user_id'),
+                                       roles=session.get('roles', []),
+                                       all_entities=all_entities,
+                                       pending_entities=pending_entities,
+                                       agents=agents_list,
+                                       workflows=workflows_list,
+                                       swarms=swarms_list,
+                                       aiorgs=aiorgs_list,
+                                       pending_review_count=pending_review_count,
+                                       testing_count=testing_count,
+                                       approved_count=approved_count,
+                                       published_count=published_count)
+            except Exception as e:
+                logger.error(f"Error loading entity approvals: {e}", exc_info=True)
+                flash(f'Error loading entities: {str(e)}', 'error')
+                return redirect(url_for('admin_dashboard'))
         
         @self.app.route('/admin/users')
         @admin_required
