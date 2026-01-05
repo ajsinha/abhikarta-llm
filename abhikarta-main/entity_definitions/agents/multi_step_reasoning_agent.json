@@ -5,7 +5,13 @@
   "category": "reasoning",
   "icon": "bi-lightbulb",
   "difficulty": "advanced",
-  "tags": ["reasoning", "logic", "problem-solving", "chain-of-thought", "analysis"],
+  "tags": [
+    "reasoning",
+    "logic",
+    "problem-solving",
+    "chain-of-thought",
+    "analysis"
+  ],
   "agent": {
     "agent_type": "react",
     "name": "Multi-Step Reasoning Agent",
@@ -15,7 +21,10 @@
       "max_tokens": 5000
     },
     "tools_config": {
-      "builtin_tools": ["calculator", "logic_checker"],
+      "builtin_tools": [
+        "calculator",
+        "logic_checker"
+      ],
       "include_mcp": true
     }
   },
@@ -32,6 +41,20 @@
     {
       "user": "A project needs 3 people working 8 hours to complete in 5 days. How long with 5 people working 6 hours?",
       "expected_approach": "Calculate total work units, adjust for variables, show step-by-step math"
+    }
+  ],
+  "sample_inputs": [
+    {
+      "query": "How would increasing minimum wage by 15% affect small businesses and employment rates?",
+      "input": "How would increasing minimum wage by 15% affect small businesses and employment rates?"
+    },
+    {
+      "query": "What would be the long-term effects of autonomous vehicles on urban planning?",
+      "input": "What would be the long-term effects of autonomous vehicles on urban planning?"
+    },
+    {
+      "query": "Analyze the chain of events that could lead from AI advancement to job market transformation",
+      "input": "Analyze the chain of events that could lead from AI advancement to job market transformation"
     }
   ]
 }

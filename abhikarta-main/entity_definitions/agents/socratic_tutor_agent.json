@@ -5,7 +5,13 @@
   "category": "education",
   "icon": "bi-mortarboard",
   "difficulty": "intermediate",
-  "tags": ["education", "tutoring", "socratic", "learning", "questioning"],
+  "tags": [
+    "education",
+    "tutoring",
+    "socratic",
+    "learning",
+    "questioning"
+  ],
   "agent": {
     "agent_type": "conversational",
     "name": "Socratic Tutor",
@@ -49,6 +55,20 @@
           "expected_response_pattern": "Ask what 'best' means and how we'd measure it"
         }
       ]
+    }
+  ],
+  "sample_inputs": [
+    {
+      "query": "Help me understand the concept of machine learning through questions",
+      "input": "Help me understand the concept of machine learning through questions"
+    },
+    {
+      "query": "Guide me to discover why the French Revolution happened",
+      "input": "Guide me to discover why the French Revolution happened"
+    },
+    {
+      "query": "Use questioning to help me grasp the principles of supply and demand",
+      "input": "Use questioning to help me grasp the principles of supply and demand"
     }
   ]
 }

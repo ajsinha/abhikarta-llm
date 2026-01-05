@@ -330,6 +330,14 @@ class WorkflowTemplateManager:
                 with open(json_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 
+                # Get workflow definition
+                workflow_def = data.get('workflow', {})
+                
+                # Get template-level LLM config (if any) and apply to LLM nodes
+                llm_config = data.get('llm_config', {})
+                if llm_config and workflow_def.get('nodes'):
+                    workflow_def = self._apply_llm_config_to_nodes(workflow_def, llm_config)
+                
                 # Create WorkflowTemplate from JSON
                 template = WorkflowTemplate(
                     template_id=data.get('template_id', os.path.basename(json_file).replace('.json', '')),
@@ -338,7 +346,7 @@ class WorkflowTemplateManager:
                     category=data.get('category', 'General'),
                     icon=data.get('icon', 'bi-diagram-3'),
                     difficulty=data.get('difficulty', 'intermediate'),
-                    dag_definition=data.get('workflow', {}),
+                    dag_definition=workflow_def,
                     sample_inputs=data.get('sample_inputs', []),
                     tags=data.get('tags', []),
                     is_system=True,
@@ -351,7 +359,52 @@ class WorkflowTemplateManager:
                 logger.debug(f"Loaded template: {template.template_id} - {template.name}")
                 
             except Exception as e:
-                logger.error(f"Error loading template from {json_file}: {e}")
+                logger.error(f"Error loading template from {json_file}: {e}", exc_info=True)
+    
+    def _apply_llm_config_to_nodes(self, workflow_def: Dict, llm_config: Dict) -> Dict:
+        """
+        Apply template-level LLM config to LLM nodes that don't have their own config.
+        
+        This ensures LLM nodes in JSON templates have provider/model/base_url configured.
+        """
+        if not workflow_def.get('nodes') or not llm_config:
+            return workflow_def
+        
+        # Make a deep copy to avoid modifying original
+        import copy
+        workflow_def = copy.deepcopy(workflow_def)
+        
+        nodes = workflow_def.get('nodes', [])
+        llm_node_count = 0
+        
+        for node in nodes:
+            node_type = node.get('type', '').lower()
+            
+            # Apply to LLM-type nodes
+            if node_type == 'llm':
+                config = node.get('config', {})
+                
+                # Apply template LLM config if node doesn't have its own
+                if not config.get('provider') and llm_config.get('provider'):
+                    config['provider'] = llm_config['provider']
+                if not config.get('model') and llm_config.get('model'):
+                    config['model'] = llm_config['model']
+                if not config.get('base_url') and llm_config.get('base_url'):
+                    config['base_url'] = llm_config['base_url']
+                if not config.get('temperature') and llm_config.get('temperature'):
+                    config['temperature'] = llm_config['temperature']
+                if not config.get('api_key') and llm_config.get('api_key'):
+                    config['api_key'] = llm_config['api_key']
+                
+                node['config'] = config
+                llm_node_count += 1
+        
+        # Also store the llm_config in metadata for reference
+        if 'llm_config' not in workflow_def:
+            workflow_def['llm_config'] = llm_config
+        
+        logger.debug(f"Applied LLM config to {llm_node_count} LLM nodes")
+        return workflow_def
     
     # ============================================
     # PUBLIC API

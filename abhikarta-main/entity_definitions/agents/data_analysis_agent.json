@@ -5,7 +5,14 @@
   "category": "analytics",
   "icon": "bi-graph-up",
   "difficulty": "advanced",
-  "tags": ["data", "analysis", "statistics", "visualization", "insights", "patterns"],
+  "tags": [
+    "data",
+    "analysis",
+    "statistics",
+    "visualization",
+    "insights",
+    "patterns"
+  ],
   "agent": {
     "agent_type": "conversational",
     "name": "Data Analysis Agent",
@@ -15,7 +22,11 @@
       "max_tokens": 5000
     },
     "tools_config": {
-      "builtin_tools": ["calculator", "data_processor", "chart_generator"],
+      "builtin_tools": [
+        "calculator",
+        "data_processor",
+        "chart_generator"
+      ],
       "include_mcp": true
     }
   },
@@ -32,6 +43,20 @@
     {
       "user": "Analyze this dataset and tell me what factors correlate with customer churn.",
       "expected_approach": "Perform correlation analysis, feature importance, segment comparison, statistical significance testing"
+    }
+  ],
+  "sample_inputs": [
+    {
+      "query": "Analyze sales trends for Q1 2024 and identify key patterns",
+      "input": "Analyze sales trends for Q1 2024 and identify key patterns"
+    },
+    {
+      "query": "Compare customer demographics across different regions",
+      "input": "Compare customer demographics across different regions"
+    },
+    {
+      "query": "Identify correlations between marketing spend and revenue growth",
+      "input": "Identify correlations between marketing spend and revenue growth"
     }
   ]
 }

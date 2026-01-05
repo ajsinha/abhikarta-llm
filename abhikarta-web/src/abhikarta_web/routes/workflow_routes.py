@@ -166,10 +166,26 @@ class WorkflowRoutes(AbstractRoutes):
                     # Execute workflow
                     from abhikarta.workflow import WorkflowExecutor, DAGParser
                     
-                    dag_def = json.loads(workflow.get('dag_definition', '{}'))
+                    # Load and parse dag_definition
+                    raw_dag_def = workflow.get('dag_definition', '{}')
+                    logger.info(f"Raw dag_definition type: {type(raw_dag_def)}")
+                    logger.info(f"Raw dag_definition preview: {str(raw_dag_def)[:500]}...")
+                    
+                    dag_def = json.loads(raw_dag_def) if isinstance(raw_dag_def, str) else raw_dag_def
                     dag_def['workflow_id'] = workflow_id
                     dag_def['name'] = workflow['name']
                     dag_def['python_modules'] = json.loads(workflow.get('python_modules', '{}'))
+                    
+                    # Log the parsed dag_def structure
+                    logger.info(f"Parsed dag_def keys: {list(dag_def.keys())}")
+                    logger.info(f"dag_def['nodes'] count: {len(dag_def.get('nodes', []))}")
+                    logger.info(f"dag_def['edges'] count: {len(dag_def.get('edges', []))}")
+                    logger.info(f"dag_def['entry_point']: {dag_def.get('entry_point')}")
+                    
+                    # Log first few edges to debug
+                    edges = dag_def.get('edges', [])
+                    if edges:
+                        logger.info(f"First edge: type={type(edges[0])}, value={edges[0]}")
                     
                     parser = DAGParser()
                     wf = parser.parse_dict(dag_def)
@@ -546,13 +562,57 @@ class WorkflowRoutes(AbstractRoutes):
                 nodes = data.get('nodes', [])
                 edges = data.get('edges', [])
                 
-                # Build dag_definition
-                dag_definition = json.dumps({
+                # Get existing workflow to preserve certain fields
+                existing_def = {}
+                if workflow_id:
+                    existing = self.db_facade.fetch_one(
+                        "SELECT dag_definition FROM workflows WHERE workflow_id = ?",
+                        (workflow_id,)
+                    )
+                    if existing and existing.get('dag_definition'):
+                        try:
+                            existing_def = json.loads(existing['dag_definition'])
+                        except:
+                            pass
+                
+                # Build dag_definition, preserving important fields from existing workflow
+                dag_def = {
                     'name': name,
                     'description': description,
                     'nodes': nodes,
                     'edges': edges
-                })
+                }
+                
+                # Preserve entry_point - try from request, then from existing, then auto-detect
+                entry_point = data.get('entry_point') or existing_def.get('entry_point')
+                if not entry_point and nodes:
+                    # Auto-detect: find first function node or first node overall
+                    for n in nodes:
+                        if n.get('type') == 'function' or n.get('type') == 'input' or n.get('type') == 'start':
+                            entry_point = n.get('id')
+                            break
+                    if not entry_point:
+                        entry_point = nodes[0].get('id')
+                
+                if entry_point:
+                    dag_def['entry_point'] = entry_point
+                
+                # Preserve output_node
+                output_node = data.get('output_node') or existing_def.get('output_node')
+                if output_node:
+                    dag_def['output_node'] = output_node
+                
+                # Preserve llm_config
+                llm_config = data.get('llm_config') or existing_def.get('llm_config')
+                if llm_config:
+                    dag_def['llm_config'] = llm_config
+                
+                # Preserve learning_config (for adaptive learning workflows)
+                learning_config = data.get('learning_config') or existing_def.get('learning_config')
+                if learning_config:
+                    dag_def['learning_config'] = learning_config
+                
+                dag_definition = json.dumps(dag_def)
                 
                 if workflow_id:
                     # Update existing

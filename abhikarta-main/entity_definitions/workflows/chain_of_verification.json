@@ -5,7 +5,13 @@
   "category": "advanced",
   "icon": "bi-patch-check",
   "difficulty": "advanced",
-  "tags": ["verification", "validation", "chain", "quality", "multi-stage"],
+  "tags": [
+    "verification",
+    "validation",
+    "chain",
+    "quality",
+    "multi-stage"
+  ],
   "workflow": {
     "verification_config": {
       "min_verifiers": 3,
@@ -19,10 +25,17 @@
         "type": "llm",
         "name": "Input Processor",
         "description": "Process and prepare input for verification",
-        "position": {"x": 100, "y": 300},
+        "position": {
+          "x": 100,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Process this input for verification:\n\n{input}\n\nPrepare:\n1. Extract key claims or assertions\n2. Identify verifiable elements\n3. Note context and constraints\n4. Flag ambiguous areas",
-          "output_key": "processed_input"
+          "output_key": "processed_input",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -30,10 +43,17 @@
         "type": "llm",
         "name": "Claim Extractor",
         "description": "Extract individual claims for verification",
-        "position": {"x": 250, "y": 300},
+        "position": {
+          "x": 250,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Extract all verifiable claims from:\n\n{processed_input}\n\nFor each claim provide:\n- Claim ID\n- Claim text\n- Claim type (factual/logical/computational/consistency)\n- Verification method needed\n- Confidence that claim is verifiable",
-          "output_key": "extracted_claims"
+          "output_key": "extracted_claims",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -41,10 +61,17 @@
         "type": "llm",
         "name": "Factual Verifier",
         "description": "Verify factual accuracy",
-        "position": {"x": 450, "y": 150},
+        "position": {
+          "x": 450,
+          "y": 150
+        },
         "config": {
           "prompt_template": "Verify factual accuracy of these claims:\n\n{extracted_claims}\n\nFor each factual claim:\n1. Assess accuracy (TRUE/FALSE/UNCERTAIN)\n2. Provide evidence or reasoning\n3. Note any corrections needed\n4. Confidence score (0-100)",
-          "output_key": "factual_verification"
+          "output_key": "factual_verification",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -52,10 +79,17 @@
         "type": "llm",
         "name": "Logical Verifier",
         "description": "Verify logical consistency",
-        "position": {"x": 450, "y": 300},
+        "position": {
+          "x": 450,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Verify logical consistency:\n\n{extracted_claims}\n\nCheck:\n1. Internal consistency (no contradictions)\n2. Logical validity of arguments\n3. Proper inference chains\n4. Assumption validity\n\nFor each issue found, explain the logical flaw.",
-          "output_key": "logical_verification"
+          "output_key": "logical_verification",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -63,10 +97,17 @@
         "type": "llm",
         "name": "Computational Verifier",
         "description": "Verify calculations and computations",
-        "position": {"x": 450, "y": 450},
+        "position": {
+          "x": 450,
+          "y": 450
+        },
         "config": {
           "prompt_template": "Verify all calculations and computations:\n\n{extracted_claims}\n\nFor each computation:\n1. Recalculate independently\n2. Verify formulas used\n3. Check units and conversions\n4. Note any discrepancies",
-          "output_key": "computational_verification"
+          "output_key": "computational_verification",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -74,10 +115,17 @@
         "type": "llm",
         "name": "Consistency Verifier",
         "description": "Verify overall consistency",
-        "position": {"x": 450, "y": 600},
+        "position": {
+          "x": 450,
+          "y": 600
+        },
         "config": {
           "prompt_template": "Verify overall consistency:\n\n{extracted_claims}\n\nCheck:\n1. Consistency with context\n2. Terminology consistency\n3. Temporal consistency\n4. Cross-reference accuracy",
-          "output_key": "consistency_verification"
+          "output_key": "consistency_verification",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -85,10 +133,17 @@
         "type": "llm",
         "name": "Verification Aggregator",
         "description": "Aggregate all verification results",
-        "position": {"x": 650, "y": 300},
+        "position": {
+          "x": 650,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Aggregate verification results:\n\nFactual: {factual_verification}\nLogical: {logical_verification}\nComputational: {computational_verification}\nConsistency: {consistency_verification}\n\nProvide:\n1. Overall verification status (VERIFIED/PARTIALLY_VERIFIED/FAILED)\n2. Summary of issues found\n3. Confidence score (0-100)\n4. Required corrections",
-          "output_key": "aggregated_verification"
+          "output_key": "aggregated_verification",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -96,12 +151,24 @@
         "type": "condition",
         "name": "Verification Decision Gate",
         "description": "Decide based on verification results",
-        "position": {"x": 800, "y": 300},
+        "position": {
+          "x": 800,
+          "y": 300
+        },
         "config": {
           "conditions": [
-            {"condition": "VERIFIED in aggregated_verification and confidence >= 80", "target": "approval_processor"},
-            {"condition": "PARTIALLY_VERIFIED in aggregated_verification and revision_count < 2", "target": "revision_generator"},
-            {"default": true, "target": "rejection_processor"}
+            {
+              "condition": "VERIFIED in aggregated_verification and confidence >= 80",
+              "target": "approval_processor"
+            },
+            {
+              "condition": "PARTIALLY_VERIFIED in aggregated_verification and revision_count < 2",
+              "target": "revision_generator"
+            },
+            {
+              "default": true,
+              "target": "rejection_processor"
+            }
           ]
         }
       },
@@ -110,10 +177,17 @@
         "type": "llm",
         "name": "Revision Generator",
         "description": "Generate revisions based on verification feedback",
-        "position": {"x": 950, "y": 450},
+        "position": {
+          "x": 950,
+          "y": 450
+        },
         "config": {
           "prompt_template": "Generate revisions based on verification feedback:\n\nOriginal: {processed_input}\nVerification Results: {aggregated_verification}\n\nCreate revised version that:\n1. Addresses all identified issues\n2. Maintains original intent\n3. Improves accuracy\n4. Clarifies ambiguities",
-          "output_key": "revised_content"
+          "output_key": "revised_content",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -121,10 +195,17 @@
         "type": "llm",
         "name": "Approval Processor",
         "description": "Process verified content for final output",
-        "position": {"x": 950, "y": 200},
+        "position": {
+          "x": 950,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Prepare verified content for output:\n\nContent: {processed_input}\nVerification: {aggregated_verification}\n\nGenerate final output with:\n1. Verified content\n2. Verification certificate/summary\n3. Confidence metrics\n4. Any caveats or limitations",
-          "output_key": "approved_output"
+          "output_key": "approved_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -132,10 +213,17 @@
         "type": "llm",
         "name": "Rejection Processor",
         "description": "Process rejected content with detailed feedback",
-        "position": {"x": 950, "y": 600},
+        "position": {
+          "x": 950,
+          "y": 600
+        },
         "config": {
           "prompt_template": "Process rejection:\n\nContent: {processed_input}\nVerification: {aggregated_verification}\n\nProvide:\n1. Clear rejection reason\n2. Specific issues that cannot be resolved\n3. Recommendations for improvement\n4. Alternative approaches if applicable",
-          "output_key": "rejection_output"
+          "output_key": "rejection_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -143,10 +231,17 @@
         "type": "aggregator",
         "name": "Output Formatter",
         "description": "Format final output",
-        "position": {"x": 1100, "y": 300},
+        "position": {
+          "x": 1100,
+          "y": 300
+        },
         "config": {
           "merge_strategy": "first_available",
-          "priority_order": ["approved_output", "rejection_output", "revised_content"]
+          "priority_order": [
+            "approved_output",
+            "rejection_output",
+            "revised_content"
+          ]
         }
       },
       {
@@ -154,36 +249,103 @@
         "type": "function",
         "name": "Audit Logger",
         "description": "Log verification audit trail",
-        "position": {"x": 1100, "y": 500},
+        "position": {
+          "x": 1100,
+          "y": 500
+        },
         "config": {
           "function": "log_verification_audit",
-          "include": ["all_verifications", "decisions", "revisions", "final_status"]
+          "include": [
+            "all_verifications",
+            "decisions",
+            "revisions",
+            "final_status"
+          ]
         }
       }
     ],
     "edges": [
-      {"source": "input_processor", "target": "claim_extractor"},
-      {"source": "claim_extractor", "target": "factual_verifier"},
-      {"source": "claim_extractor", "target": "logical_verifier"},
-      {"source": "claim_extractor", "target": "computational_verifier"},
-      {"source": "claim_extractor", "target": "consistency_verifier"},
-      {"source": "factual_verifier", "target": "verification_aggregator"},
-      {"source": "logical_verifier", "target": "verification_aggregator"},
-      {"source": "computational_verifier", "target": "verification_aggregator"},
-      {"source": "consistency_verifier", "target": "verification_aggregator"},
-      {"source": "verification_aggregator", "target": "decision_gate"},
-      {"source": "decision_gate", "target": "approval_processor", "condition": "VERIFIED"},
-      {"source": "decision_gate", "target": "revision_generator", "condition": "NEEDS_REVISION"},
-      {"source": "decision_gate", "target": "rejection_processor", "condition": "FAILED"},
-      {"source": "revision_generator", "target": "claim_extractor"},
-      {"source": "approval_processor", "target": "output_formatter"},
-      {"source": "rejection_processor", "target": "output_formatter"},
-      {"source": "output_formatter", "target": "audit_logger"}
+      {
+        "source": "input_processor",
+        "target": "claim_extractor"
+      },
+      {
+        "source": "claim_extractor",
+        "target": "factual_verifier"
+      },
+      {
+        "source": "claim_extractor",
+        "target": "logical_verifier"
+      },
+      {
+        "source": "claim_extractor",
+        "target": "computational_verifier"
+      },
+      {
+        "source": "claim_extractor",
+        "target": "consistency_verifier"
+      },
+      {
+        "source": "factual_verifier",
+        "target": "verification_aggregator"
+      },
+      {
+        "source": "logical_verifier",
+        "target": "verification_aggregator"
+      },
+      {
+        "source": "computational_verifier",
+        "target": "verification_aggregator"
+      },
+      {
+        "source": "consistency_verifier",
+        "target": "verification_aggregator"
+      },
+      {
+        "source": "verification_aggregator",
+        "target": "decision_gate"
+      },
+      {
+        "source": "decision_gate",
+        "target": "approval_processor",
+        "condition": "VERIFIED"
+      },
+      {
+        "source": "decision_gate",
+        "target": "revision_generator",
+        "condition": "NEEDS_REVISION"
+      },
+      {
+        "source": "decision_gate",
+        "target": "rejection_processor",
+        "condition": "FAILED"
+      },
+      {
+        "source": "revision_generator",
+        "target": "claim_extractor"
+      },
+      {
+        "source": "approval_processor",
+        "target": "output_formatter"
+      },
+      {
+        "source": "rejection_processor",
+        "target": "output_formatter"
+      },
+      {
+        "source": "output_formatter",
+        "target": "audit_logger"
+      }
     ],
     "entry_point": "input_processor",
     "output_node": "output_formatter",
     "parallel_groups": [
-      ["factual_verifier", "logical_verifier", "computational_verifier", "consistency_verifier"]
+      [
+        "factual_verifier",
+        "logical_verifier",
+        "computational_verifier",
+        "consistency_verifier"
+      ]
     ]
   },
   "llm_config": {
@@ -193,7 +355,13 @@
     "temperature": 0.3
   },
   "sample_inputs": [
-    "The project completed 3 months ahead of schedule, saving $500,000 in costs. This 25% time reduction led to a 40% increase in team productivity.",
-    "Our analysis shows that implementing the new system will reduce errors by 75% and improve processing speed by 300%."
+    {
+      "query": "The project completed 3 months ahead of schedule, saving $500,000 in costs. This 25% time reduction led to a 40% increase in team productivity.",
+      "input": "The project completed 3 months ahead of schedule, saving $500,000 in costs. This 25% time reduction led to a 40% increase in team productivity."
+    },
+    {
+      "query": "Our analysis shows that implementing the new system will reduce errors by 75% and improve processing speed by 300%.",
+      "input": "Our analysis shows that implementing the new system will reduce errors by 75% and improve processing speed by 300%."
+    }
   ]
 }

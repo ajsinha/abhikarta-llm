@@ -718,8 +718,8 @@ class AgentExecutor:
                     agent_config = self._load_agent_config(agent_id)
                     if agent_config:
                         agent_type = agent_config.get('agent_type', 'unknown')
-                except:
-                    pass
+                except Exception as cfg_err:
+                    logger.debug(f"Could not load agent config for metrics: {cfg_err}")
                 AGENT_EXECUTIONS.labels(
                     agent_id=agent_id,
                     agent_type=agent_type,
@@ -755,7 +755,8 @@ class AgentExecutor:
         if isinstance(main_config, str):
             try:
                 main_config = json.loads(main_config)
-            except:
+            except json.JSONDecodeError as e:
+                logger.warning(f"Failed to parse agent config JSON: {e}")
                 main_config = {}
         
         # Store parsed config for easy access
@@ -789,7 +790,8 @@ class AgentExecutor:
             if field in config and config[field] and isinstance(config[field], str):
                 try:
                     config[field] = json.loads(config[field])
-                except:
+                except json.JSONDecodeError as e:
+                    logger.warning(f"Failed to parse agent {field}: {e}")
                     config[field] = {}
         
         logger.info(f"[AGENT] Agent type: {config.get('agent_type')}")
@@ -814,7 +816,8 @@ class AgentExecutor:
         if isinstance(config, str):
             try:
                 config = json.loads(config)
-            except:
+            except json.JSONDecodeError as e:
+                logger.warning(f"Failed to parse config_json for LLM config: {e}")
                 config = {}
         
         llm_config = config.get('llm_config', {})

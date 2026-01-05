@@ -5,7 +5,13 @@
   "category": "advanced",
   "icon": "bi-people",
   "difficulty": "advanced",
-  "tags": ["ensemble", "voting", "consensus", "multi-model", "aggregation"],
+  "tags": [
+    "ensemble",
+    "voting",
+    "consensus",
+    "multi-model",
+    "aggregation"
+  ],
   "workflow": {
     "ensemble_config": {
       "voting_strategy": "weighted_majority",
@@ -19,7 +25,10 @@
         "type": "function",
         "name": "Input Broadcaster",
         "description": "Broadcast input to all ensemble members",
-        "position": {"x": 100, "y": 300},
+        "position": {
+          "x": 100,
+          "y": 300
+        },
         "config": {
           "function": "broadcast_to_ensemble",
           "output_key": "broadcast_input"
@@ -30,11 +39,17 @@
         "type": "llm",
         "name": "Conservative Model",
         "description": "Risk-averse, cautious analysis",
-        "position": {"x": 300, "y": 100},
+        "position": {
+          "x": 300,
+          "y": 100
+        },
         "config": {
           "prompt_template": "ROLE: Conservative Analyst\nApproach: Cautious, risk-averse, focus on potential downsides\n\nAnalyze:\n{broadcast_input}\n\nProvide:\n1. ANALYSIS: Your conservative perspective\n2. DECISION: Your recommendation\n3. CONFIDENCE: 0-100%\n4. KEY_CONCERNS: Main risks identified\n5. REASONING: Why you reached this conclusion",
           "output_key": "conservative_vote",
-          "temperature": 0.3
+          "temperature": 0.3,
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -42,11 +57,17 @@
         "type": "llm",
         "name": "Balanced Model",
         "description": "Neutral, balanced analysis",
-        "position": {"x": 300, "y": 300},
+        "position": {
+          "x": 300,
+          "y": 300
+        },
         "config": {
           "prompt_template": "ROLE: Balanced Analyst\nApproach: Objective, weighing all factors equally\n\nAnalyze:\n{broadcast_input}\n\nProvide:\n1. ANALYSIS: Your balanced perspective\n2. DECISION: Your recommendation\n3. CONFIDENCE: 0-100%\n4. TRADE_OFFS: Key trade-offs identified\n5. REASONING: Why you reached this conclusion",
           "output_key": "balanced_vote",
-          "temperature": 0.5
+          "temperature": 0.5,
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -54,11 +75,17 @@
         "type": "llm",
         "name": "Aggressive Model",
         "description": "Opportunity-focused, optimistic analysis",
-        "position": {"x": 300, "y": 500},
+        "position": {
+          "x": 300,
+          "y": 500
+        },
         "config": {
           "prompt_template": "ROLE: Aggressive Analyst\nApproach: Opportunity-focused, optimistic, growth-oriented\n\nAnalyze:\n{broadcast_input}\n\nProvide:\n1. ANALYSIS: Your optimistic perspective\n2. DECISION: Your recommendation\n3. CONFIDENCE: 0-100%\n4. OPPORTUNITIES: Key opportunities identified\n5. REASONING: Why you reached this conclusion",
           "output_key": "aggressive_vote",
-          "temperature": 0.7
+          "temperature": 0.7,
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -66,11 +93,17 @@
         "type": "llm",
         "name": "Creative Model",
         "description": "Out-of-box thinking, novel perspectives",
-        "position": {"x": 300, "y": 700},
+        "position": {
+          "x": 300,
+          "y": 700
+        },
         "config": {
           "prompt_template": "ROLE: Creative Analyst\nApproach: Unconventional thinking, novel solutions\n\nAnalyze:\n{broadcast_input}\n\nProvide:\n1. ANALYSIS: Your creative perspective\n2. DECISION: Your recommendation (can be unconventional)\n3. CONFIDENCE: 0-100%\n4. NOVEL_IDEAS: Unique insights others might miss\n5. REASONING: Why you reached this conclusion",
           "output_key": "creative_vote",
-          "temperature": 0.9
+          "temperature": 0.9,
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -78,11 +111,17 @@
         "type": "llm",
         "name": "Critic Model",
         "description": "Devil's advocate, challenge assumptions",
-        "position": {"x": 300, "y": 900},
+        "position": {
+          "x": 300,
+          "y": 900
+        },
         "config": {
           "prompt_template": "ROLE: Critical Analyst (Devil's Advocate)\nApproach: Challenge assumptions, find flaws\n\nAnalyze:\n{broadcast_input}\n\nProvide:\n1. ANALYSIS: Your critical perspective\n2. DECISION: Your recommendation after critique\n3. CONFIDENCE: 0-100%\n4. CHALLENGES: Key assumptions challenged\n5. REASONING: Why you reached this conclusion",
           "output_key": "critic_vote",
-          "temperature": 0.4
+          "temperature": 0.4,
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -90,10 +129,19 @@
         "type": "function",
         "name": "Vote Collector",
         "description": "Collect all votes",
-        "position": {"x": 550, "y": 300},
+        "position": {
+          "x": 550,
+          "y": 300
+        },
         "config": {
           "function": "collect_votes",
-          "inputs": ["conservative_vote", "balanced_vote", "aggressive_vote", "creative_vote", "critic_vote"],
+          "inputs": [
+            "conservative_vote",
+            "balanced_vote",
+            "aggressive_vote",
+            "creative_vote",
+            "critic_vote"
+          ],
           "output_key": "all_votes"
         }
       },
@@ -102,10 +150,16 @@
         "type": "llm",
         "name": "Vote Analyzer",
         "description": "Analyze voting patterns",
-        "position": {"x": 700, "y": 200},
+        "position": {
+          "x": 700,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Analyze these ensemble votes:\n\n{all_votes}\n\nProvide analysis:\n1. AGREEMENT_LEVEL: How much do models agree?\n2. DECISION_DISTRIBUTION: Count of each decision\n3. CONFIDENCE_RANGE: Range of confidence levels\n4. KEY_DISAGREEMENTS: Where models differ most\n5. STRONGEST_ARGUMENTS: Best points from each side",
-          "output_key": "vote_analysis"
+          "output_key": "vote_analysis",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -113,10 +167,16 @@
         "type": "llm",
         "name": "Weighted Aggregator",
         "description": "Apply weighted voting",
-        "position": {"x": 700, "y": 400},
+        "position": {
+          "x": 700,
+          "y": 400
+        },
         "config": {
           "prompt_template": "Apply weighted voting to these votes:\n\nVOTES:\n{all_votes}\n\nANALYSIS:\n{vote_analysis}\n\nWEIGHTING RULES:\n- Higher confidence = higher weight\n- Balanced model gets 1.2x weight (least biased)\n- If agreement > 80%: high confidence in result\n- If agreement < 50%: flag as uncertain\n\nCalculate:\n1. WEIGHTED_DECISION: Final decision\n2. WEIGHTED_CONFIDENCE: Overall confidence\n3. WEIGHT_BREAKDOWN: How weights were applied\n4. MINORITY_REPORT: Notable dissenting views",
-          "output_key": "weighted_result"
+          "output_key": "weighted_result",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -124,12 +184,24 @@
         "type": "condition",
         "name": "Consensus Checker",
         "description": "Check if consensus reached",
-        "position": {"x": 900, "y": 300},
+        "position": {
+          "x": 900,
+          "y": 300
+        },
         "config": {
           "conditions": [
-            {"condition": "agreement >= 80%", "target": "high_confidence_output"},
-            {"condition": "agreement >= 60%", "target": "moderate_confidence_output"},
-            {"default": true, "target": "low_confidence_handler"}
+            {
+              "condition": "agreement >= 80%",
+              "target": "high_confidence_output"
+            },
+            {
+              "condition": "agreement >= 60%",
+              "target": "moderate_confidence_output"
+            },
+            {
+              "default": true,
+              "target": "low_confidence_handler"
+            }
           ]
         }
       },
@@ -138,10 +210,16 @@
         "type": "llm",
         "name": "High Confidence Output",
         "description": "Generate output for high consensus",
-        "position": {"x": 1100, "y": 150},
+        "position": {
+          "x": 1100,
+          "y": 150
+        },
         "config": {
           "prompt_template": "Generate high-confidence ensemble output:\n\nWEIGHTED RESULT:\n{weighted_result}\n\nVOTE ANALYSIS:\n{vote_analysis}\n\nCreate output:\n1. DECISION: Clear final decision\n2. CONFIDENCE: HIGH (X%)\n3. CONSENSUS: Strong agreement across models\n4. KEY_FACTORS: Main reasons for decision\n5. CAVEATS: Any minor concerns noted",
-          "output_key": "ensemble_output"
+          "output_key": "ensemble_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -149,10 +227,16 @@
         "type": "llm",
         "name": "Moderate Confidence Output",
         "description": "Generate output for moderate consensus",
-        "position": {"x": 1100, "y": 350},
+        "position": {
+          "x": 1100,
+          "y": 350
+        },
         "config": {
           "prompt_template": "Generate moderate-confidence ensemble output:\n\nWEIGHTED RESULT:\n{weighted_result}\n\nVOTE ANALYSIS:\n{vote_analysis}\n\nCreate output:\n1. DECISION: Final decision with nuance\n2. CONFIDENCE: MODERATE (X%)\n3. AGREEMENT: Majority agreement with some dissent\n4. DISSENTING_VIEWS: Notable alternative perspectives\n5. RECOMMENDATIONS: Suggested next steps given uncertainty",
-          "output_key": "ensemble_output"
+          "output_key": "ensemble_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -160,10 +244,16 @@
         "type": "llm",
         "name": "Low Confidence Handler",
         "description": "Handle low consensus situations",
-        "position": {"x": 1100, "y": 550},
+        "position": {
+          "x": 1100,
+          "y": 550
+        },
         "config": {
           "prompt_template": "Handle low-consensus ensemble result:\n\nWEIGHTED RESULT:\n{weighted_result}\n\nVOTE ANALYSIS:\n{vote_analysis}\n\nALL VOTES:\n{all_votes}\n\nCreate output:\n1. STATUS: No clear consensus\n2. OPTIONS: Present all viable options\n3. KEY_DEBATES: Main points of disagreement\n4. RECOMMENDATION: Suggest how to resolve\n5. ADDITIONAL_INFO: What would help clarify",
-          "output_key": "ensemble_output"
+          "output_key": "ensemble_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       },
       {
@@ -171,39 +261,114 @@
         "type": "llm",
         "name": "Final Formatter",
         "description": "Format final ensemble output",
-        "position": {"x": 1300, "y": 350},
+        "position": {
+          "x": 1300,
+          "y": 350
+        },
         "config": {
           "prompt_template": "Format the ensemble decision:\n\nENSEMBLE OUTPUT:\n{ensemble_output}\n\nORIGINAL INPUT:\n{broadcast_input}\n\nCreate final report:\n\n# Ensemble Decision Report\n\n## Decision\n[Clear statement]\n\n## Confidence Level\n[HIGH/MODERATE/LOW with percentage]\n\n## Ensemble Breakdown\n- Conservative: [vote + confidence]\n- Balanced: [vote + confidence]\n- Aggressive: [vote + confidence]\n- Creative: [vote + confidence]\n- Critic: [vote + confidence]\n\n## Analysis\n[Key insights from ensemble]\n\n## Recommendations\n[Action items]",
-          "output_key": "final_output"
+          "output_key": "final_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434"
         }
       }
     ],
     "edges": [
-      {"source": "input_broadcaster", "target": "model_conservative"},
-      {"source": "input_broadcaster", "target": "model_balanced"},
-      {"source": "input_broadcaster", "target": "model_aggressive"},
-      {"source": "input_broadcaster", "target": "model_creative"},
-      {"source": "input_broadcaster", "target": "model_critic"},
-      {"source": "model_conservative", "target": "vote_collector"},
-      {"source": "model_balanced", "target": "vote_collector"},
-      {"source": "model_aggressive", "target": "vote_collector"},
-      {"source": "model_creative", "target": "vote_collector"},
-      {"source": "model_critic", "target": "vote_collector"},
-      {"source": "vote_collector", "target": "vote_analyzer"},
-      {"source": "vote_collector", "target": "weighted_aggregator"},
-      {"source": "vote_analyzer", "target": "weighted_aggregator"},
-      {"source": "weighted_aggregator", "target": "consensus_checker"},
-      {"source": "consensus_checker", "target": "high_confidence_output", "condition": "high"},
-      {"source": "consensus_checker", "target": "moderate_confidence_output", "condition": "moderate"},
-      {"source": "consensus_checker", "target": "low_confidence_handler", "condition": "low"},
-      {"source": "high_confidence_output", "target": "final_formatter"},
-      {"source": "moderate_confidence_output", "target": "final_formatter"},
-      {"source": "low_confidence_handler", "target": "final_formatter"}
+      {
+        "source": "input_broadcaster",
+        "target": "model_conservative"
+      },
+      {
+        "source": "input_broadcaster",
+        "target": "model_balanced"
+      },
+      {
+        "source": "input_broadcaster",
+        "target": "model_aggressive"
+      },
+      {
+        "source": "input_broadcaster",
+        "target": "model_creative"
+      },
+      {
+        "source": "input_broadcaster",
+        "target": "model_critic"
+      },
+      {
+        "source": "model_conservative",
+        "target": "vote_collector"
+      },
+      {
+        "source": "model_balanced",
+        "target": "vote_collector"
+      },
+      {
+        "source": "model_aggressive",
+        "target": "vote_collector"
+      },
+      {
+        "source": "model_creative",
+        "target": "vote_collector"
+      },
+      {
+        "source": "model_critic",
+        "target": "vote_collector"
+      },
+      {
+        "source": "vote_collector",
+        "target": "vote_analyzer"
+      },
+      {
+        "source": "vote_collector",
+        "target": "weighted_aggregator"
+      },
+      {
+        "source": "vote_analyzer",
+        "target": "weighted_aggregator"
+      },
+      {
+        "source": "weighted_aggregator",
+        "target": "consensus_checker"
+      },
+      {
+        "source": "consensus_checker",
+        "target": "high_confidence_output",
+        "condition": "high"
+      },
+      {
+        "source": "consensus_checker",
+        "target": "moderate_confidence_output",
+        "condition": "moderate"
+      },
+      {
+        "source": "consensus_checker",
+        "target": "low_confidence_handler",
+        "condition": "low"
+      },
+      {
+        "source": "high_confidence_output",
+        "target": "final_formatter"
+      },
+      {
+        "source": "moderate_confidence_output",
+        "target": "final_formatter"
+      },
+      {
+        "source": "low_confidence_handler",
+        "target": "final_formatter"
+      }
     ],
     "entry_point": "input_broadcaster",
     "output_node": "final_formatter",
     "parallel_groups": [
-      ["model_conservative", "model_balanced", "model_aggressive", "model_creative", "model_critic"]
+      [
+        "model_conservative",
+        "model_balanced",
+        "model_aggressive",
+        "model_creative",
+        "model_critic"
+      ]
     ]
   },
   "llm_config": {
@@ -212,8 +377,17 @@
     "base_url": "http://localhost:11434"
   },
   "sample_inputs": [
-    "Should we invest in expanding to a new market given current economic uncertainty?",
-    "Evaluate this proposal: Implement a 4-day work week for all employees.",
-    "Assess the risk of adopting this new technology stack for our core product."
+    {
+      "query": "Should we invest in expanding to a new market given current economic uncertainty?",
+      "input": "Should we invest in expanding to a new market given current economic uncertainty?"
+    },
+    {
+      "query": "Evaluate this proposal: Implement a 4-day work week for all employees.",
+      "input": "Evaluate this proposal: Implement a 4-day work week for all employees."
+    },
+    {
+      "query": "Assess the risk of adopting this new technology stack for our core product.",
+      "input": "Assess the risk of adopting this new technology stack for our core product."
+    }
   ]
 }

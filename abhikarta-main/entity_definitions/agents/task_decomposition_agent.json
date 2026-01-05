@@ -5,7 +5,13 @@
   "category": "planning",
   "icon": "bi-diagram-3",
   "difficulty": "intermediate",
-  "tags": ["planning", "decomposition", "project-management", "task-breakdown", "execution"],
+  "tags": [
+    "planning",
+    "decomposition",
+    "project-management",
+    "task-breakdown",
+    "execution"
+  ],
   "agent": {
     "agent_type": "conversational",
     "name": "Task Decomposition Agent",
@@ -15,7 +21,10 @@
       "max_tokens": 4000
     },
     "tools_config": {
-      "builtin_tools": ["calculator", "note_taker"],
+      "builtin_tools": [
+        "calculator",
+        "note_taker"
+      ],
       "include_mcp": true
     }
   },
@@ -32,6 +41,20 @@
     {
       "user": "Break down the process of building a mobile application from scratch.",
       "expected_approach": "Create phases: Requirements, Design, Development, Testing, Deployment, Maintenance with technical subtasks"
+    }
+  ],
+  "sample_inputs": [
+    {
+      "query": "Break down the process of launching a new mobile app",
+      "input": "Break down the process of launching a new mobile app"
+    },
+    {
+      "query": "Decompose the steps needed to organize a company conference",
+      "input": "Decompose the steps needed to organize a company conference"
+    },
+    {
+      "query": "Create a detailed task breakdown for building a data pipeline",
+      "input": "Create a detailed task breakdown for building a data pipeline"
     }
   ]
 }

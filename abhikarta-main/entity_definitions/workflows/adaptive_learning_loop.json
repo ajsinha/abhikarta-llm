@@ -5,7 +5,13 @@
   "category": "enterprise",
   "icon": "bi-graph-up-arrow",
   "difficulty": "expert",
-  "tags": ["adaptive", "learning", "feedback", "optimization", "continuous-improvement"],
+  "tags": [
+    "adaptive",
+    "learning",
+    "feedback",
+    "optimization",
+    "continuous-improvement"
+  ],
   "workflow": {
     "learning_config": {
       "max_iterations": 10,
@@ -19,7 +25,10 @@
         "type": "function",
         "name": "State Initializer",
         "description": "Initialize learning state",
-        "position": {"x": 100, "y": 300},
+        "position": {
+          "x": 100,
+          "y": 300
+        },
         "config": {
           "function": "initialize_learning_state",
           "initial_strategy": "balanced",
@@ -31,10 +40,17 @@
         "type": "llm",
         "name": "Strategy Selector",
         "description": "Select strategy based on current state",
-        "position": {"x": 250, "y": 300},
+        "position": {
+          "x": 250,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Select the best strategy for this task:\n\nTASK:\n{input}\n\nCURRENT LEARNING STATE:\n{learning_state}\n\nPREVIOUS PERFORMANCE:\n{performance_history}\n\nAVAILABLE STRATEGIES:\n1. THOROUGH: Deep, comprehensive analysis (slow but accurate)\n2. BALANCED: Moderate depth and speed\n3. QUICK: Fast, high-level analysis\n4. CREATIVE: Novel, unconventional approach\n5. SYSTEMATIC: Step-by-step methodical approach\n\nBased on past performance, select strategy and explain why.\nAlso consider exploration: {exploration_rate}% chance to try new approach.",
-          "output_key": "selected_strategy"
+          "output_key": "selected_strategy",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.6
         }
       },
       {
@@ -42,10 +58,17 @@
         "type": "llm",
         "name": "Task Executor",
         "description": "Execute task with selected strategy",
-        "position": {"x": 450, "y": 300},
+        "position": {
+          "x": 450,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Execute this task using the selected strategy:\n\nTASK:\n{input}\n\nSTRATEGY:\n{selected_strategy}\n\nApply the strategy and provide:\n1. EXECUTION: Your output following the strategy\n2. APPROACH_NOTES: How you applied the strategy\n3. CONFIDENCE: How confident in this output\n4. CHALLENGES: Any difficulties encountered\n5. ALTERNATIVES: What you might do differently",
-          "output_key": "execution_result"
+          "output_key": "execution_result",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.6
         }
       },
       {
@@ -53,10 +76,17 @@
         "type": "llm",
         "name": "Output Evaluator",
         "description": "Evaluate execution quality",
-        "position": {"x": 650, "y": 300},
+        "position": {
+          "x": 650,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Evaluate this execution:\n\nORIGINAL TASK:\n{input}\n\nSTRATEGY USED:\n{selected_strategy}\n\nEXECUTION RESULT:\n{execution_result}\n\nEvaluate on:\n1. TASK_COMPLETION: Did it fully address the task? (0-100)\n2. QUALITY: How good is the output? (0-100)\n3. EFFICIENCY: Was the strategy appropriate? (0-100)\n4. CREATIVITY: Any novel insights? (0-100)\n5. OVERALL_SCORE: Weighted average (0-100)\n\nProvide:\n- Scores for each dimension\n- Specific feedback\n- What worked well\n- What could improve",
-          "output_key": "evaluation"
+          "output_key": "evaluation",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.6
         }
       },
       {
@@ -64,10 +94,17 @@
         "type": "llm",
         "name": "Feedback Analyzer",
         "description": "Analyze feedback for learning",
-        "position": {"x": 850, "y": 200},
+        "position": {
+          "x": 850,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Analyze this feedback for learning:\n\nSTRATEGY USED:\n{selected_strategy}\n\nEVALUATION:\n{evaluation}\n\nPERFORMANCE HISTORY:\n{performance_history}\n\nExtract learning signals:\n1. STRATEGY_EFFECTIVENESS: How well did this strategy work?\n2. PATTERNS: Any patterns in what works/doesn't?\n3. ADJUSTMENTS: Specific adjustments to make\n4. INSIGHTS: Key learnings from this iteration\n5. RECOMMENDATIONS: Changes for next iteration",
-          "output_key": "learning_signals"
+          "output_key": "learning_signals",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.6
         }
       },
       {
@@ -75,10 +112,17 @@
         "type": "llm",
         "name": "State Updater",
         "description": "Update learning state",
-        "position": {"x": 850, "y": 400},
+        "position": {
+          "x": 850,
+          "y": 400
+        },
         "config": {
           "prompt_template": "Update the learning state:\n\nCURRENT STATE:\n{learning_state}\n\nLEARNING SIGNALS:\n{learning_signals}\n\nLEARNING RATE: {learning_rate}\n\nUpdate:\n1. STRATEGY_WEIGHTS: Adjust weights for each strategy\n2. PERFORMANCE_TRENDS: Track performance over time\n3. BEST_PRACTICES: Accumulate what works\n4. AVOID_LIST: What to avoid\n5. NEXT_ITERATION_PLAN: Suggestions for next round",
-          "output_key": "updated_state"
+          "output_key": "updated_state",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.6
         }
       },
       {
@@ -86,13 +130,28 @@
         "type": "condition",
         "name": "Convergence Checker",
         "description": "Check if learning has converged",
-        "position": {"x": 1050, "y": 300},
+        "position": {
+          "x": 1050,
+          "y": 300
+        },
         "config": {
           "conditions": [
-            {"condition": "overall_score >= 95", "target": "learning_complete"},
-            {"condition": "iteration >= max_iterations", "target": "max_iterations_reached"},
-            {"condition": "improvement_rate < 0.01", "target": "plateau_reached"},
-            {"default": true, "target": "continue_learning"}
+            {
+              "condition": "overall_score >= 95",
+              "target": "learning_complete"
+            },
+            {
+              "condition": "iteration >= max_iterations",
+              "target": "max_iterations_reached"
+            },
+            {
+              "condition": "improvement_rate < 0.01",
+              "target": "plateau_reached"
+            },
+            {
+              "default": true,
+              "target": "continue_learning"
+            }
           ]
         }
       },
@@ -101,7 +160,10 @@
         "type": "function",
         "name": "Continue Learning",
         "description": "Prepare for next iteration",
-        "position": {"x": 1200, "y": 450},
+        "position": {
+          "x": 1200,
+          "y": 450
+        },
         "config": {
           "function": "prepare_next_iteration",
           "increment_counter": true,
@@ -113,10 +175,17 @@
         "type": "llm",
         "name": "Learning Complete",
         "description": "Handle successful convergence",
-        "position": {"x": 1200, "y": 150},
+        "position": {
+          "x": 1200,
+          "y": 150
+        },
         "config": {
           "prompt_template": "Learning successfully converged!\n\nFINAL STATE:\n{updated_state}\n\nPERFORMANCE HISTORY:\n{performance_history}\n\nBEST RESULT:\n{execution_result}\n\nGenerate final report:\n1. FINAL_OUTPUT: The best execution\n2. LEARNING_JOURNEY: How we improved\n3. OPTIMAL_STRATEGY: What works best\n4. KEY_INSIGHTS: Main learnings\n5. RECOMMENDATIONS: For future similar tasks",
-          "output_key": "final_output"
+          "output_key": "final_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.6
         }
       },
       {
@@ -124,10 +193,17 @@
         "type": "llm",
         "name": "Max Iterations Handler",
         "description": "Handle max iterations reached",
-        "position": {"x": 1200, "y": 300},
+        "position": {
+          "x": 1200,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Maximum iterations reached without full convergence.\n\nFINAL STATE:\n{updated_state}\n\nPERFORMANCE HISTORY:\n{performance_history}\n\nBEST RESULT:\n{execution_result}\n\nProvide:\n1. BEST_OUTPUT: Highest scoring execution\n2. PROGRESS_MADE: How much we improved\n3. REMAINING_CHALLENGES: What prevented convergence\n4. RECOMMENDATIONS: For continued improvement",
-          "output_key": "final_output"
+          "output_key": "final_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.6
         }
       },
       {
@@ -135,10 +211,17 @@
         "type": "llm",
         "name": "Plateau Handler",
         "description": "Handle learning plateau",
-        "position": {"x": 1200, "y": 600},
+        "position": {
+          "x": 1200,
+          "y": 600
+        },
         "config": {
           "prompt_template": "Learning has plateaued - no further improvement.\n\nFINAL STATE:\n{updated_state}\n\nPERFORMANCE:\n{performance_history}\n\nAnalyze:\n1. PLATEAU_REASON: Why no more improvement?\n2. LOCAL_OPTIMUM: Are we stuck at local optimum?\n3. BREAKTHROUGH_IDEAS: How to break through?\n4. FINAL_RECOMMENDATION: Best current output",
-          "output_key": "final_output"
+          "output_key": "final_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.6
         }
       },
       {
@@ -146,29 +229,85 @@
         "type": "llm",
         "name": "Output Compiler",
         "description": "Compile final output",
-        "position": {"x": 1400, "y": 300},
+        "position": {
+          "x": 1400,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Compile the adaptive learning results:\n\n{final_output}\n\nCreate comprehensive report:\n\n# Adaptive Learning Results\n\n## Executive Summary\n[Key outcome]\n\n## Learning Process\n- Iterations: X\n- Starting score: X\n- Final score: X\n- Improvement: X%\n\n## Optimal Strategy Discovered\n[Best approach found]\n\n## Final Output\n[The result]\n\n## Insights & Recommendations\n[Key learnings]",
-          "output_key": "compiled_output"
+          "output_key": "compiled_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.6
         }
       }
     ],
     "edges": [
-      {"source": "state_initializer", "target": "strategy_selector"},
-      {"source": "strategy_selector", "target": "task_executor"},
-      {"source": "task_executor", "target": "output_evaluator"},
-      {"source": "output_evaluator", "target": "feedback_analyzer"},
-      {"source": "output_evaluator", "target": "state_updater"},
-      {"source": "feedback_analyzer", "target": "state_updater"},
-      {"source": "state_updater", "target": "convergence_checker"},
-      {"source": "convergence_checker", "target": "learning_complete", "condition": "converged"},
-      {"source": "convergence_checker", "target": "max_iterations_reached", "condition": "max_iter"},
-      {"source": "convergence_checker", "target": "plateau_reached", "condition": "plateau"},
-      {"source": "convergence_checker", "target": "continue_learning", "condition": "continue"},
-      {"source": "continue_learning", "target": "strategy_selector"},
-      {"source": "learning_complete", "target": "output_compiler"},
-      {"source": "max_iterations_reached", "target": "output_compiler"},
-      {"source": "plateau_reached", "target": "output_compiler"}
+      {
+        "source": "state_initializer",
+        "target": "strategy_selector"
+      },
+      {
+        "source": "strategy_selector",
+        "target": "task_executor"
+      },
+      {
+        "source": "task_executor",
+        "target": "output_evaluator"
+      },
+      {
+        "source": "output_evaluator",
+        "target": "feedback_analyzer"
+      },
+      {
+        "source": "output_evaluator",
+        "target": "state_updater"
+      },
+      {
+        "source": "feedback_analyzer",
+        "target": "state_updater"
+      },
+      {
+        "source": "state_updater",
+        "target": "convergence_checker"
+      },
+      {
+        "source": "convergence_checker",
+        "target": "learning_complete",
+        "condition": "converged"
+      },
+      {
+        "source": "convergence_checker",
+        "target": "max_iterations_reached",
+        "condition": "max_iter"
+      },
+      {
+        "source": "convergence_checker",
+        "target": "plateau_reached",
+        "condition": "plateau"
+      },
+      {
+        "source": "convergence_checker",
+        "target": "continue_learning",
+        "condition": "continue"
+      },
+      {
+        "source": "continue_learning",
+        "target": "strategy_selector"
+      },
+      {
+        "source": "learning_complete",
+        "target": "output_compiler"
+      },
+      {
+        "source": "max_iterations_reached",
+        "target": "output_compiler"
+      },
+      {
+        "source": "plateau_reached",
+        "target": "output_compiler"
+      }
     ],
     "entry_point": "state_initializer",
     "output_node": "output_compiler"
@@ -180,8 +319,17 @@
     "temperature": 0.6
   },
   "sample_inputs": [
-    "Find the best approach to explain quantum computing to a general audience.",
-    "Develop an optimal strategy for summarizing technical documents.",
-    "Determine the most effective way to generate creative product names."
+    {
+      "query": "Find the best approach to explain quantum computing to a general audience.",
+      "input": "Find the best approach to explain quantum computing to a general audience."
+    },
+    {
+      "query": "Develop an optimal strategy for summarizing technical documents.",
+      "input": "Develop an optimal strategy for summarizing technical documents."
+    },
+    {
+      "query": "Determine the most effective way to generate creative product names.",
+      "input": "Determine the most effective way to generate creative product names."
+    }
   ]
 }

@@ -5,7 +5,11 @@
   "category": "basic",
   "icon": "bi-arrow-right",
   "difficulty": "beginner",
-  "tags": ["sequential", "pipeline", "basic"],
+  "tags": [
+    "sequential",
+    "pipeline",
+    "basic"
+  ],
   "workflow": {
     "nodes": [
       {
@@ -13,10 +17,17 @@
         "type": "llm",
         "name": "Input Processor",
         "description": "Process and validate input data",
-        "position": {"x": 100, "y": 200},
+        "position": {
+          "x": 100,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Process the following input and extract key information:\n\n{input}\n\nExtract and structure the main points.",
-          "output_key": "processed_input"
+          "output_key": "processed_input",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -24,10 +35,17 @@
         "type": "llm",
         "name": "Analyzer",
         "description": "Analyze the processed data",
-        "position": {"x": 350, "y": 200},
+        "position": {
+          "x": 350,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Analyze the following processed data:\n\n{processed_input}\n\nProvide detailed analysis with insights.",
-          "output_key": "analysis"
+          "output_key": "analysis",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -35,10 +53,17 @@
         "type": "llm",
         "name": "Synthesizer",
         "description": "Synthesize analysis into conclusions",
-        "position": {"x": 600, "y": 200},
+        "position": {
+          "x": 600,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Based on this analysis:\n\n{analysis}\n\nSynthesize the key conclusions and actionable insights.",
-          "output_key": "synthesis"
+          "output_key": "synthesis",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -46,17 +71,33 @@
         "type": "llm",
         "name": "Output Formatter",
         "description": "Format the final output",
-        "position": {"x": 850, "y": 200},
+        "position": {
+          "x": 850,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Format the following conclusions into a clear, well-structured report:\n\n{synthesis}\n\nUse clear headings and bullet points where appropriate.",
-          "output_key": "final_output"
+          "output_key": "final_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       }
     ],
     "edges": [
-      {"source": "input_processor", "target": "analyzer"},
-      {"source": "analyzer", "target": "synthesizer"},
-      {"source": "synthesizer", "target": "formatter"}
+      {
+        "source": "input_processor",
+        "target": "analyzer"
+      },
+      {
+        "source": "analyzer",
+        "target": "synthesizer"
+      },
+      {
+        "source": "synthesizer",
+        "target": "formatter"
+      }
     ],
     "entry_point": "input_processor",
     "output_node": "formatter"
@@ -68,8 +109,17 @@
     "temperature": 0.7
   },
   "sample_inputs": [
-    "Analyze the trends in remote work adoption over the past 5 years and predict future developments.",
-    "Review the key factors affecting urban transportation systems.",
-    "Examine the evolution of communication technologies."
+    {
+      "query": "Analyze the trends in remote work adoption over the past 5 years and predict future developments.",
+      "input": "Analyze the trends in remote work adoption over the past 5 years and predict future developments."
+    },
+    {
+      "query": "Review the key factors affecting urban transportation systems.",
+      "input": "Review the key factors affecting urban transportation systems."
+    },
+    {
+      "query": "Examine the evolution of communication technologies.",
+      "input": "Examine the evolution of communication technologies."
+    }
   ]
 }

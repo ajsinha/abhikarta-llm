@@ -5,7 +5,14 @@
   "category": "enterprise",
   "icon": "bi-arrow-left-right",
   "difficulty": "expert",
-  "tags": ["saga", "distributed", "transactions", "compensation", "rollback", "enterprise"],
+  "tags": [
+    "saga",
+    "distributed",
+    "transactions",
+    "compensation",
+    "rollback",
+    "enterprise"
+  ],
   "workflow": {
     "saga_config": {
       "compensation_strategy": "backward",
@@ -19,7 +26,10 @@
         "type": "function",
         "name": "Saga Coordinator",
         "description": "Initialize and coordinate saga execution",
-        "position": {"x": 100, "y": 300},
+        "position": {
+          "x": 100,
+          "y": 300
+        },
         "config": {
           "function": "initialize_saga",
           "saga_id_generator": "uuid",
@@ -31,11 +41,18 @@
         "type": "llm",
         "name": "Step 1: Validate Request",
         "description": "First saga step - validate the request",
-        "position": {"x": 300, "y": 300},
+        "position": {
+          "x": 300,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Saga Step 1: Validate Request\n\nInput: {input}\nSaga ID: {saga_id}\n\nValidate:\n1. All required fields present\n2. Data format correct\n3. Business rules satisfied\n\nRespond with: SUCCESS or FAILURE with reason",
           "output_key": "step_1_result",
-          "compensating_action": "step_1_compensate"
+          "compensating_action": "step_1_compensate",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -43,10 +60,17 @@
         "type": "llm",
         "name": "Step 1: Compensate",
         "description": "Compensation for step 1",
-        "position": {"x": 300, "y": 450},
+        "position": {
+          "x": 300,
+          "y": 450
+        },
         "config": {
           "prompt_template": "Compensate Step 1:\n\nOriginal action: Validation\nSaga ID: {saga_id}\n\nGenerate compensation action to undo any state changes from step 1.",
-          "output_key": "step_1_compensation"
+          "output_key": "step_1_compensation",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         },
         "is_compensation": true
       },
@@ -55,11 +79,18 @@
         "type": "llm",
         "name": "Step 2: Reserve Resources",
         "description": "Second saga step - reserve necessary resources",
-        "position": {"x": 500, "y": 300},
+        "position": {
+          "x": 500,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Saga Step 2: Reserve Resources\n\nValidation Result: {step_1_result}\nSaga ID: {saga_id}\n\nReserve:\n1. Identify required resources\n2. Check availability\n3. Create reservations\n\nRespond with: SUCCESS (with reservation IDs) or FAILURE",
           "output_key": "step_2_result",
-          "compensating_action": "step_2_compensate"
+          "compensating_action": "step_2_compensate",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -67,10 +98,17 @@
         "type": "llm",
         "name": "Step 2: Compensate",
         "description": "Compensation for step 2 - release reservations",
-        "position": {"x": 500, "y": 450},
+        "position": {
+          "x": 500,
+          "y": 450
+        },
         "config": {
           "prompt_template": "Compensate Step 2:\n\nOriginal action: Resource reservation\nReservation details: {step_2_result}\nSaga ID: {saga_id}\n\nGenerate compensation to release all reservations.",
-          "output_key": "step_2_compensation"
+          "output_key": "step_2_compensation",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         },
         "is_compensation": true
       },
@@ -79,11 +117,18 @@
         "type": "llm",
         "name": "Step 3: Process Core Action",
         "description": "Third saga step - execute core business logic",
-        "position": {"x": 700, "y": 300},
+        "position": {
+          "x": 700,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Saga Step 3: Execute Core Action\n\nReservation Details: {step_2_result}\nSaga ID: {saga_id}\n\nExecute:\n1. Process main business action\n2. Update primary records\n3. Generate transaction ID\n\nRespond with: SUCCESS (with transaction details) or FAILURE",
           "output_key": "step_3_result",
-          "compensating_action": "step_3_compensate"
+          "compensating_action": "step_3_compensate",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -91,10 +136,17 @@
         "type": "llm",
         "name": "Step 3: Compensate",
         "description": "Compensation for step 3 - reverse core action",
-        "position": {"x": 700, "y": 450},
+        "position": {
+          "x": 700,
+          "y": 450
+        },
         "config": {
           "prompt_template": "Compensate Step 3:\n\nOriginal action: Core processing\nTransaction details: {step_3_result}\nSaga ID: {saga_id}\n\nGenerate compensation to reverse the core action and restore previous state.",
-          "output_key": "step_3_compensation"
+          "output_key": "step_3_compensation",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         },
         "is_compensation": true
       },
@@ -103,11 +155,18 @@
         "type": "llm",
         "name": "Step 4: Update External Systems",
         "description": "Fourth saga step - sync with external systems",
-        "position": {"x": 900, "y": 300},
+        "position": {
+          "x": 900,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Saga Step 4: Update External Systems\n\nTransaction Details: {step_3_result}\nSaga ID: {saga_id}\n\nUpdate:\n1. Sync with external system A\n2. Update external system B\n3. Record synchronization status\n\nRespond with: SUCCESS or FAILURE",
           "output_key": "step_4_result",
-          "compensating_action": "step_4_compensate"
+          "compensating_action": "step_4_compensate",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -115,10 +174,17 @@
         "type": "llm",
         "name": "Step 4: Compensate",
         "description": "Compensation for step 4 - revert external updates",
-        "position": {"x": 900, "y": 450},
+        "position": {
+          "x": 900,
+          "y": 450
+        },
         "config": {
           "prompt_template": "Compensate Step 4:\n\nOriginal action: External system updates\nSync details: {step_4_result}\nSaga ID: {saga_id}\n\nGenerate compensation to notify external systems of rollback.",
-          "output_key": "step_4_compensation"
+          "output_key": "step_4_compensation",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         },
         "is_compensation": true
       },
@@ -127,11 +193,18 @@
         "type": "llm",
         "name": "Step 5: Finalize & Commit",
         "description": "Fifth saga step - finalize transaction",
-        "position": {"x": 1100, "y": 300},
+        "position": {
+          "x": 1100,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Saga Step 5: Finalize Transaction\n\nAll Previous Results:\n- Validation: {step_1_result}\n- Reservations: {step_2_result}\n- Core Action: {step_3_result}\n- External Sync: {step_4_result}\n\nSaga ID: {saga_id}\n\nFinalize:\n1. Commit all changes\n2. Release temporary locks\n3. Generate final confirmation\n\nRespond with: SUCCESS (with final confirmation) or FAILURE",
           "output_key": "step_5_result",
-          "compensating_action": "step_5_compensate"
+          "compensating_action": "step_5_compensate",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -139,10 +212,17 @@
         "type": "llm",
         "name": "Step 5: Compensate",
         "description": "Compensation for step 5 - mark as rolled back",
-        "position": {"x": 1100, "y": 450},
+        "position": {
+          "x": 1100,
+          "y": 450
+        },
         "config": {
           "prompt_template": "Compensate Step 5:\n\nOriginal action: Finalization\nSaga ID: {saga_id}\n\nGenerate compensation to mark saga as rolled back and notify stakeholders.",
-          "output_key": "step_5_compensation"
+          "output_key": "step_5_compensation",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         },
         "is_compensation": true
       },
@@ -151,11 +231,20 @@
         "type": "condition",
         "name": "Step Result Checker",
         "description": "Check if step succeeded or needs compensation",
-        "position": {"x": 600, "y": 150},
+        "position": {
+          "x": 600,
+          "y": 150
+        },
         "config": {
           "conditions": [
-            {"condition": "FAILURE in current_step_result", "target": "compensation_orchestrator"},
-            {"default": true, "target": "next_step"}
+            {
+              "condition": "FAILURE in current_step_result",
+              "target": "compensation_orchestrator"
+            },
+            {
+              "default": true,
+              "target": "next_step"
+            }
           ]
         }
       },
@@ -164,7 +253,10 @@
         "type": "function",
         "name": "Compensation Orchestrator",
         "description": "Orchestrate backward compensation",
-        "position": {"x": 600, "y": 600},
+        "position": {
+          "x": 600,
+          "y": 600
+        },
         "config": {
           "function": "orchestrate_compensation",
           "strategy": "backward",
@@ -176,10 +268,17 @@
         "type": "llm",
         "name": "Saga Finalizer",
         "description": "Generate final saga report",
-        "position": {"x": 1300, "y": 300},
+        "position": {
+          "x": 1300,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Generate Saga Completion Report:\n\nSaga ID: {saga_id}\nFinal Status: {saga_status}\n\nStep Results:\n{all_step_results}\n\nCompensation Results (if any):\n{compensation_results}\n\nProvide comprehensive summary including:\n1. Final outcome\n2. Steps completed\n3. Any compensations executed\n4. Recommendations",
-          "output_key": "final_output"
+          "output_key": "final_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.3
         }
       },
       {
@@ -187,32 +286,99 @@
         "type": "function",
         "name": "Audit Recorder",
         "description": "Record complete saga audit trail",
-        "position": {"x": 1300, "y": 450},
+        "position": {
+          "x": 1300,
+          "y": 450
+        },
         "config": {
           "function": "record_saga_audit",
-          "include": ["all_steps", "compensations", "timing", "state_snapshots"]
+          "include": [
+            "all_steps",
+            "compensations",
+            "timing",
+            "state_snapshots"
+          ]
         }
       }
     ],
     "edges": [
-      {"source": "saga_coordinator", "target": "step_1_execute"},
-      {"source": "step_1_execute", "target": "step_checker"},
-      {"source": "step_checker", "target": "step_2_execute", "condition": "SUCCESS"},
-      {"source": "step_2_execute", "target": "step_checker"},
-      {"source": "step_checker", "target": "step_3_execute", "condition": "SUCCESS"},
-      {"source": "step_3_execute", "target": "step_checker"},
-      {"source": "step_checker", "target": "step_4_execute", "condition": "SUCCESS"},
-      {"source": "step_4_execute", "target": "step_checker"},
-      {"source": "step_checker", "target": "step_5_execute", "condition": "SUCCESS"},
-      {"source": "step_5_execute", "target": "saga_finalizer"},
-      {"source": "step_checker", "target": "compensation_orchestrator", "condition": "FAILURE"},
-      {"source": "compensation_orchestrator", "target": "step_5_compensate"},
-      {"source": "step_5_compensate", "target": "step_4_compensate"},
-      {"source": "step_4_compensate", "target": "step_3_compensate"},
-      {"source": "step_3_compensate", "target": "step_2_compensate"},
-      {"source": "step_2_compensate", "target": "step_1_compensate"},
-      {"source": "step_1_compensate", "target": "saga_finalizer"},
-      {"source": "saga_finalizer", "target": "audit_recorder"}
+      {
+        "source": "saga_coordinator",
+        "target": "step_1_execute"
+      },
+      {
+        "source": "step_1_execute",
+        "target": "step_checker"
+      },
+      {
+        "source": "step_checker",
+        "target": "step_2_execute",
+        "condition": "SUCCESS"
+      },
+      {
+        "source": "step_2_execute",
+        "target": "step_checker"
+      },
+      {
+        "source": "step_checker",
+        "target": "step_3_execute",
+        "condition": "SUCCESS"
+      },
+      {
+        "source": "step_3_execute",
+        "target": "step_checker"
+      },
+      {
+        "source": "step_checker",
+        "target": "step_4_execute",
+        "condition": "SUCCESS"
+      },
+      {
+        "source": "step_4_execute",
+        "target": "step_checker"
+      },
+      {
+        "source": "step_checker",
+        "target": "step_5_execute",
+        "condition": "SUCCESS"
+      },
+      {
+        "source": "step_5_execute",
+        "target": "saga_finalizer"
+      },
+      {
+        "source": "step_checker",
+        "target": "compensation_orchestrator",
+        "condition": "FAILURE"
+      },
+      {
+        "source": "compensation_orchestrator",
+        "target": "step_5_compensate"
+      },
+      {
+        "source": "step_5_compensate",
+        "target": "step_4_compensate"
+      },
+      {
+        "source": "step_4_compensate",
+        "target": "step_3_compensate"
+      },
+      {
+        "source": "step_3_compensate",
+        "target": "step_2_compensate"
+      },
+      {
+        "source": "step_2_compensate",
+        "target": "step_1_compensate"
+      },
+      {
+        "source": "step_1_compensate",
+        "target": "saga_finalizer"
+      },
+      {
+        "source": "saga_finalizer",
+        "target": "audit_recorder"
+      }
     ],
     "entry_point": "saga_coordinator",
     "output_node": "saga_finalizer"
@@ -224,8 +390,17 @@
     "temperature": 0.3
   },
   "sample_inputs": [
-    {"operation": "complex_transaction", "data": {"amount": 1000, "from": "A", "to": "B"}},
-    {"operation": "multi_system_update", "systems": ["inventory", "billing", "shipping"]},
-    {"operation": "orchestrated_process", "steps": ["validate", "reserve", "execute", "notify"]}
+    {
+      "query": "Process a multi-step order: reserve inventory, charge payment, confirm shipment",
+      "input": "Process a multi-step order: reserve inventory, charge payment, confirm shipment"
+    },
+    {
+      "query": "Execute distributed transaction: update user profile across auth, billing, and notification systems",
+      "input": "Execute distributed transaction: update user profile across auth, billing, and notification systems"
+    },
+    {
+      "query": "Handle refund workflow: reverse payment, restore inventory, send confirmation",
+      "input": "Handle refund workflow: reverse payment, restore inventory, send confirmation"
+    }
   ]
 }

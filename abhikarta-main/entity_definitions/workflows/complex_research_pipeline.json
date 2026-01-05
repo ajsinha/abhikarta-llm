@@ -5,7 +5,13 @@
   "category": "enterprise",
   "icon": "bi-diagram-3-fill",
   "difficulty": "expert",
-  "tags": ["complex", "research", "multi-stage", "enterprise", "comprehensive"],
+  "tags": [
+    "complex",
+    "research",
+    "multi-stage",
+    "enterprise",
+    "comprehensive"
+  ],
   "workflow": {
     "nodes": [
       {
@@ -13,10 +19,17 @@
         "type": "llm",
         "name": "Research Intake",
         "description": "Process and categorize research request",
-        "position": {"x": 50, "y": 400},
+        "position": {
+          "x": 50,
+          "y": 400
+        },
         "config": {
           "prompt_template": "Analyze this research request:\n\n{input}\n\nExtract:\n1. Main research question\n2. Scope and boundaries\n3. Required depth (QUICK/STANDARD/DEEP)\n4. Key topics to investigate\n5. Expected output format",
-          "output_key": "intake_analysis"
+          "output_key": "intake_analysis",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -24,12 +37,24 @@
         "type": "condition",
         "name": "Depth Router",
         "description": "Route based on required depth",
-        "position": {"x": 200, "y": 400},
+        "position": {
+          "x": 200,
+          "y": 400
+        },
         "config": {
           "conditions": [
-            {"condition": "DEEP in intake_analysis", "target": "deep_research_splitter"},
-            {"condition": "STANDARD in intake_analysis", "target": "standard_research"},
-            {"default": true, "target": "quick_research"}
+            {
+              "condition": "DEEP in intake_analysis",
+              "target": "deep_research_splitter"
+            },
+            {
+              "condition": "STANDARD in intake_analysis",
+              "target": "standard_research"
+            },
+            {
+              "default": true,
+              "target": "quick_research"
+            }
           ]
         }
       },
@@ -38,10 +63,17 @@
         "type": "llm",
         "name": "Quick Research",
         "description": "Fast, concise research for simple queries",
-        "position": {"x": 400, "y": 600},
+        "position": {
+          "x": 400,
+          "y": 600
+        },
         "config": {
           "prompt_template": "Provide a quick, focused response to:\n\n{intake_analysis}\n\nKeep it concise but accurate.",
-          "output_key": "research_output"
+          "output_key": "research_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -49,10 +81,17 @@
         "type": "llm",
         "name": "Standard Research",
         "description": "Balanced research with moderate depth",
-        "position": {"x": 400, "y": 400},
+        "position": {
+          "x": 400,
+          "y": 400
+        },
         "config": {
           "prompt_template": "Conduct standard research on:\n\n{intake_analysis}\n\nProvide:\n1. Overview\n2. Key findings\n3. Analysis\n4. Conclusions",
-          "output_key": "research_output"
+          "output_key": "research_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -60,10 +99,17 @@
         "type": "llm",
         "name": "Deep Research Splitter",
         "description": "Split deep research into parallel tracks",
-        "position": {"x": 400, "y": 150},
+        "position": {
+          "x": 400,
+          "y": 150
+        },
         "config": {
           "prompt_template": "Break down this deep research request into parallel investigation tracks:\n\n{intake_analysis}\n\nIdentify distinct areas for:\n1. Historical/background research\n2. Current state analysis\n3. Comparative analysis\n4. Future projections",
-          "output_key": "research_tracks"
+          "output_key": "research_tracks",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -71,10 +117,17 @@
         "type": "llm",
         "name": "Historical Research",
         "description": "Research historical context and evolution",
-        "position": {"x": 600, "y": 50},
+        "position": {
+          "x": 600,
+          "y": 50
+        },
         "config": {
           "prompt_template": "Research the historical background and evolution:\n\n{research_tracks}\n\nFocus on origins, key milestones, and historical trends.",
-          "output_key": "historical_findings"
+          "output_key": "historical_findings",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -82,10 +135,17 @@
         "type": "llm",
         "name": "Current State Analysis",
         "description": "Analyze current state and landscape",
-        "position": {"x": 600, "y": 150},
+        "position": {
+          "x": 600,
+          "y": 150
+        },
         "config": {
           "prompt_template": "Analyze the current state:\n\n{research_tracks}\n\nFocus on present conditions, key players, and recent developments.",
-          "output_key": "current_findings"
+          "output_key": "current_findings",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -93,10 +153,17 @@
         "type": "llm",
         "name": "Comparative Analysis",
         "description": "Compare different approaches or alternatives",
-        "position": {"x": 600, "y": 250},
+        "position": {
+          "x": 600,
+          "y": 250
+        },
         "config": {
           "prompt_template": "Conduct comparative analysis:\n\n{research_tracks}\n\nCompare different approaches, methodologies, or alternatives.",
-          "output_key": "comparative_findings"
+          "output_key": "comparative_findings",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -104,10 +171,17 @@
         "type": "llm",
         "name": "Future Projections",
         "description": "Project future trends and possibilities",
-        "position": {"x": 600, "y": 350},
+        "position": {
+          "x": 600,
+          "y": 350
+        },
         "config": {
           "prompt_template": "Project future trends and possibilities:\n\n{research_tracks}\n\nConsider emerging trends, potential disruptions, and likely scenarios.",
-          "output_key": "future_findings"
+          "output_key": "future_findings",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -115,10 +189,17 @@
         "type": "llm",
         "name": "Research Synthesizer",
         "description": "Synthesize all research findings",
-        "position": {"x": 800, "y": 200},
+        "position": {
+          "x": 800,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Synthesize these research findings into a comprehensive analysis:\n\nHistorical:\n{historical_findings}\n\nCurrent State:\n{current_findings}\n\nComparative:\n{comparative_findings}\n\nFuture:\n{future_findings}\n\nCreate a unified narrative with key insights.",
-          "output_key": "synthesized_research"
+          "output_key": "synthesized_research",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -126,10 +207,17 @@
         "type": "llm",
         "name": "Quality Check",
         "description": "Review research quality and completeness",
-        "position": {"x": 1000, "y": 300},
+        "position": {
+          "x": 1000,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Evaluate this research output:\n\n{research_output}\n\nCheck for:\n1. Completeness (1-10)\n2. Accuracy signals (1-10)\n3. Coherence (1-10)\n4. Actionability (1-10)\n\nOverall: PASS (avg >= 7) or NEEDS_IMPROVEMENT",
-          "output_key": "quality_assessment"
+          "output_key": "quality_assessment",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -137,11 +225,20 @@
         "type": "condition",
         "name": "Quality Gate",
         "description": "Check if quality threshold is met",
-        "position": {"x": 1150, "y": 300},
+        "position": {
+          "x": 1150,
+          "y": 300
+        },
         "config": {
           "conditions": [
-            {"condition": "PASS in quality_assessment", "target": "expert_review_check"},
-            {"default": true, "target": "improvement_loop"}
+            {
+              "condition": "PASS in quality_assessment",
+              "target": "expert_review_check"
+            },
+            {
+              "default": true,
+              "target": "improvement_loop"
+            }
           ]
         }
       },
@@ -150,11 +247,18 @@
         "type": "llm",
         "name": "Improvement Loop",
         "description": "Improve research based on quality feedback",
-        "position": {"x": 1150, "y": 450},
+        "position": {
+          "x": 1150,
+          "y": 450
+        },
         "config": {
           "prompt_template": "Improve this research based on quality feedback:\n\nCurrent Output:\n{research_output}\n\nQuality Assessment:\n{quality_assessment}\n\nAddress all identified gaps and weaknesses.",
           "output_key": "research_output",
-          "max_iterations": 2
+          "max_iterations": 2,
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -162,11 +266,20 @@
         "type": "condition",
         "name": "Expert Review Check",
         "description": "Determine if expert review is needed",
-        "position": {"x": 1300, "y": 300},
+        "position": {
+          "x": 1300,
+          "y": 300
+        },
         "config": {
           "conditions": [
-            {"condition": "DEEP in intake_analysis", "target": "expert_review"},
-            {"default": true, "target": "report_generator"}
+            {
+              "condition": "DEEP in intake_analysis",
+              "target": "expert_review"
+            },
+            {
+              "default": true,
+              "target": "report_generator"
+            }
           ]
         }
       },
@@ -175,13 +288,20 @@
         "type": "hitl",
         "name": "Expert Review",
         "description": "Human expert review for deep research",
-        "position": {"x": 1450, "y": 200},
+        "position": {
+          "x": 1450,
+          "y": 200
+        },
         "config": {
           "review_type": "expert",
           "timeout_hours": 72,
           "required_reviewers": 1,
           "instructions": "Please review this deep research report for accuracy, completeness, and insights quality.",
-          "actions": ["approve", "request_revisions", "add_insights"]
+          "actions": [
+            "approve",
+            "request_revisions",
+            "add_insights"
+          ]
         }
       },
       {
@@ -189,10 +309,17 @@
         "type": "llm",
         "name": "Report Generator",
         "description": "Generate final research report",
-        "position": {"x": 1600, "y": 300},
+        "position": {
+          "x": 1600,
+          "y": 300
+        },
         "config": {
           "prompt_template": "Generate a comprehensive research report:\n\nResearch Content:\n{research_output}\n\nExpert Feedback (if any):\n{expert_feedback}\n\nFormat as a professional report with:\n1. Executive Summary\n2. Introduction\n3. Methodology\n4. Findings\n5. Analysis\n6. Conclusions\n7. Recommendations",
-          "output_key": "draft_report"
+          "output_key": "draft_report",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -200,10 +327,17 @@
         "type": "llm",
         "name": "Executive Summary",
         "description": "Create executive summary",
-        "position": {"x": 1750, "y": 200},
+        "position": {
+          "x": 1750,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Create a compelling executive summary (max 500 words) from:\n\n{draft_report}\n\nHighlight key findings and actionable recommendations.",
-          "output_key": "executive_summary"
+          "output_key": "executive_summary",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.7
         }
       },
       {
@@ -211,7 +345,10 @@
         "type": "function",
         "name": "Visualization Generator",
         "description": "Generate data visualizations if applicable",
-        "position": {"x": 1750, "y": 400},
+        "position": {
+          "x": 1750,
+          "y": 400
+        },
         "config": {
           "function": "generate_visualizations",
           "input_key": "draft_report",
@@ -223,7 +360,10 @@
         "type": "aggregator",
         "name": "Final Assembler",
         "description": "Assemble final deliverable",
-        "position": {"x": 1900, "y": 300},
+        "position": {
+          "x": 1900,
+          "y": 300
+        },
         "config": {
           "template": "# Research Report\n\n## Executive Summary\n{executive_summary}\n\n## Full Report\n{draft_report}\n\n## Visualizations\n{visualizations}",
           "output_key": "final_output"
@@ -231,38 +371,131 @@
       }
     ],
     "edges": [
-      {"source": "intake", "target": "depth_router"},
-      {"source": "depth_router", "target": "quick_research", "condition": "QUICK"},
-      {"source": "depth_router", "target": "standard_research", "condition": "STANDARD"},
-      {"source": "depth_router", "target": "deep_research_splitter", "condition": "DEEP"},
-      {"source": "deep_research_splitter", "target": "historical_research"},
-      {"source": "deep_research_splitter", "target": "current_state_research"},
-      {"source": "deep_research_splitter", "target": "comparative_research"},
-      {"source": "deep_research_splitter", "target": "future_projections"},
-      {"source": "historical_research", "target": "research_synthesizer"},
-      {"source": "current_state_research", "target": "research_synthesizer"},
-      {"source": "comparative_research", "target": "research_synthesizer"},
-      {"source": "future_projections", "target": "research_synthesizer"},
-      {"source": "research_synthesizer", "target": "quality_check"},
-      {"source": "quick_research", "target": "quality_check"},
-      {"source": "standard_research", "target": "quality_check"},
-      {"source": "quality_check", "target": "quality_gate"},
-      {"source": "quality_gate", "target": "improvement_loop", "condition": "NEEDS_IMPROVEMENT"},
-      {"source": "quality_gate", "target": "expert_review_check", "condition": "PASS"},
-      {"source": "improvement_loop", "target": "quality_check"},
-      {"source": "expert_review_check", "target": "expert_review", "condition": "DEEP"},
-      {"source": "expert_review_check", "target": "report_generator", "condition": "default"},
-      {"source": "expert_review", "target": "report_generator"},
-      {"source": "report_generator", "target": "executive_summary"},
-      {"source": "report_generator", "target": "visualization_generator"},
-      {"source": "executive_summary", "target": "final_assembler"},
-      {"source": "visualization_generator", "target": "final_assembler"}
+      {
+        "source": "intake",
+        "target": "depth_router"
+      },
+      {
+        "source": "depth_router",
+        "target": "quick_research",
+        "condition": "QUICK"
+      },
+      {
+        "source": "depth_router",
+        "target": "standard_research",
+        "condition": "STANDARD"
+      },
+      {
+        "source": "depth_router",
+        "target": "deep_research_splitter",
+        "condition": "DEEP"
+      },
+      {
+        "source": "deep_research_splitter",
+        "target": "historical_research"
+      },
+      {
+        "source": "deep_research_splitter",
+        "target": "current_state_research"
+      },
+      {
+        "source": "deep_research_splitter",
+        "target": "comparative_research"
+      },
+      {
+        "source": "deep_research_splitter",
+        "target": "future_projections"
+      },
+      {
+        "source": "historical_research",
+        "target": "research_synthesizer"
+      },
+      {
+        "source": "current_state_research",
+        "target": "research_synthesizer"
+      },
+      {
+        "source": "comparative_research",
+        "target": "research_synthesizer"
+      },
+      {
+        "source": "future_projections",
+        "target": "research_synthesizer"
+      },
+      {
+        "source": "research_synthesizer",
+        "target": "quality_check"
+      },
+      {
+        "source": "quick_research",
+        "target": "quality_check"
+      },
+      {
+        "source": "standard_research",
+        "target": "quality_check"
+      },
+      {
+        "source": "quality_check",
+        "target": "quality_gate"
+      },
+      {
+        "source": "quality_gate",
+        "target": "improvement_loop",
+        "condition": "NEEDS_IMPROVEMENT"
+      },
+      {
+        "source": "quality_gate",
+        "target": "expert_review_check",
+        "condition": "PASS"
+      },
+      {
+        "source": "improvement_loop",
+        "target": "quality_check"
+      },
+      {
+        "source": "expert_review_check",
+        "target": "expert_review",
+        "condition": "DEEP"
+      },
+      {
+        "source": "expert_review_check",
+        "target": "report_generator",
+        "condition": "default"
+      },
+      {
+        "source": "expert_review",
+        "target": "report_generator"
+      },
+      {
+        "source": "report_generator",
+        "target": "executive_summary"
+      },
+      {
+        "source": "report_generator",
+        "target": "visualization_generator"
+      },
+      {
+        "source": "executive_summary",
+        "target": "final_assembler"
+      },
+      {
+        "source": "visualization_generator",
+        "target": "final_assembler"
+      }
     ],
     "entry_point": "intake",
     "output_node": "final_assembler",
     "parallel_groups": [
-      ["historical_research", "current_state_research", "comparative_research", "future_projections"],
-      ["executive_summary", "visualization_generator"]
+      [
+        "historical_research",
+        "current_state_research",
+        "comparative_research",
+        "future_projections"
+      ],
+      [
+        "executive_summary",
+        "visualization_generator"
+      ]
     ]
   },
   "llm_config": {
@@ -272,13 +505,27 @@
     "temperature": 0.7
   },
   "hitl_config": {
-    "notification_channels": ["email"],
-    "escalation_path": ["expert", "lead_researcher"],
+    "notification_channels": [
+      "email"
+    ],
+    "escalation_path": [
+      "expert",
+      "lead_researcher"
+    ],
     "sla_hours": 72
   },
   "sample_inputs": [
-    "Conduct deep research on the evolution and future of distributed computing architectures.",
-    "Provide a standard analysis of current trends in sustainable packaging materials.",
-    "Quick overview of the main differences between SQL and NoSQL databases."
+    {
+      "query": "Conduct deep research on the evolution and future of distributed computing architectures.",
+      "input": "Conduct deep research on the evolution and future of distributed computing architectures."
+    },
+    {
+      "query": "Provide a standard analysis of current trends in sustainable packaging materials.",
+      "input": "Provide a standard analysis of current trends in sustainable packaging materials."
+    },
+    {
+      "query": "Quick overview of the main differences between SQL and NoSQL databases.",
+      "input": "Quick overview of the main differences between SQL and NoSQL databases."
+    }
   ]
 }

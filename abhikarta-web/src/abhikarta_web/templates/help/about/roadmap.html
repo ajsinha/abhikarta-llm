@@ -152,7 +152,7 @@
 
     <div class="card border-success mb-3">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Phase 8: Code Fragment Module System (Complete - v1.5.0) <span class="badge bg-info ms-2">LATEST</span></h5>
+            <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Phase 8: Code Fragment Module System (Complete - v1.5.1) <span class="badge bg-info ms-2">LATEST</span></h5>
         </div>
         <div class="card-body">
             <h6 class="text-primary">Code Fragment Sync Service</h6>
@@ -166,17 +166,28 @@
                 <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Auto-Generated __init__.py</strong> - Exports all synced modules</li>
                 <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>IDE Support</strong> - Full autocomplete and debugging capabilities</li>
             </ul>
+            <h6 class="text-warning mt-3">Execution Logging (v1.5.1)</h6>
+            <ul>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Comprehensive Execution Logs</strong> - Detailed log files for workflow, agent, swarm, AI org executions</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Configurable Log Path</strong> - Default: executionlog/{entity_type}/{execution_id}.log</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Full Input Capture</strong> - User input, LLM config, entity definition, environment config</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Step-by-Step Tracking</strong> - Node executions, LLM calls, output at each step</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Sensitive Data Masking</strong> - API keys, passwords automatically masked</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>UI Integration</strong> - View Log button in executions page with JSON viewer</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>API Endpoint</strong> - <code>/api/executions/{id}/log</code> for programmatic access</li>
+            </ul>
             <h6 class="text-secondary mt-3">Database Updates</h6>
             <ul>
                 <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>New Columns</strong> - module_name, entry_point, checksum, last_synced_at, sync_error</li>
                 <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>95 Indexes</strong> - Added unique index on module_name</li>
-                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Schema v1.5.0</strong> - SQLite and PostgreSQL synchronized</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Schema v1.5.1</strong> - SQLite and PostgreSQL synchronized</li>
             </ul>
             <h6 class="text-info mt-3">Configuration</h6>
             <ul>
                 <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>CodeFragmentsSettings</strong> - Comprehensive configuration via properties</li>
                 <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Source Support</strong> - Database, S3, Filesystem sources (configurable)</li>
                 <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Reload Strategy</strong> - Graceful or immediate reload options</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Execution Log Settings</strong> - Enable/disable, path, format (JSON/text), LLM response inclusion, retention</li>
             </ul>
         </div>
     </div>

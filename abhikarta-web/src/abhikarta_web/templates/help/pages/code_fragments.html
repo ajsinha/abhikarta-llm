@@ -22,7 +22,7 @@
 
 <div class="alert alert-success">
     <i class="bi bi-lightbulb me-2"></i>
-    <strong>v1.5.0 Update:</strong> Code fragments now use standard Python imports instead of URI schemes. 
+    <strong>v1.5.1 Update:</strong> Code fragments now use standard Python imports instead of URI schemes. 
     Approved fragments are automatically synced to a local <code>code_fragments</code> package.
 </div>
 
@@ -30,7 +30,7 @@
     <div class="col-md-6">
         <div class="card border-success h-100">
             <div class="card-header bg-success text-white">
-                <i class="bi bi-check-circle me-2"></i>New Way (v1.5.0+)
+                <i class="bi bi-check-circle me-2"></i>New Way (v1.5.1+)
             </div>
             <div class="card-body">
 <pre class="mb-0"><code class="language-python"># Standard Python import - IDE autocomplete works!
@@ -186,7 +186,7 @@ def validate_required(data: Dict, fields: List[str]) -> List[str]:
 
 <h2 id="configuration">Configuration</h2>
 <p>Configure the sync service in your <code>application.properties</code>:</p>
-<pre><code class="language-properties"># Code Fragments Sync Configuration (v1.5.0)
+<pre><code class="language-properties"># Code Fragments Sync Configuration (v1.5.1)
 code.fragments.enabled=true
 code.fragments.target.path=./code_fragments
 code.fragments.sync.interval.seconds=300

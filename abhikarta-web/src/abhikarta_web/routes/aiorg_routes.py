@@ -241,11 +241,15 @@ class AIORGRoutes(AbstractRoutes):
                 # Create org from template definition
                 org_def = template.org_definition
                 
+                # Get current user
+                user_id = session.get('user_id', 'system')
+                
                 # Create the organization
                 org = AIOrg.create(
                     name=name,
                     description=template.description,
-                    config=org_def.get('structure', {})
+                    config=org_def.get('structure', {}),
+                    created_by=user_id
                 )
                 
                 db_ops.save_org(org)

@@ -4,3 +4,4 @@ __pycache__/
 *.pyo  # For optimized bytecode files
 *.db
 /.venv/
+/executionlog/

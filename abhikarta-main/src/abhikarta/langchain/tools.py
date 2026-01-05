@@ -278,7 +278,8 @@ class CodeFragmentTool:
                 # Parse input as JSON if possible
                 try:
                     params = json.loads(input_data) if input_data else {}
-                except:
+                except json.JSONDecodeError:
+                    logger.debug(f"Tool input is not JSON, treating as plain text")
                     params = {'input': input_data}
                 
                 # Load and execute the code

@@ -5,7 +5,13 @@
   "category": "knowledge",
   "icon": "bi-search",
   "difficulty": "intermediate",
-  "tags": ["research", "analysis", "fact-finding", "knowledge", "investigation"],
+  "tags": [
+    "research",
+    "analysis",
+    "fact-finding",
+    "knowledge",
+    "investigation"
+  ],
   "agent": {
     "agent_type": "conversational",
     "name": "Research Agent",
@@ -15,7 +21,11 @@
       "max_tokens": 4000
     },
     "tools_config": {
-      "builtin_tools": ["web_search", "document_reader", "summarizer"],
+      "builtin_tools": [
+        "web_search",
+        "document_reader",
+        "summarizer"
+      ],
       "include_mcp": true
     },
     "memory_config": {
@@ -37,6 +47,20 @@
     {
       "user": "What are the main arguments for and against remote work?",
       "expected_approach": "Present balanced analysis with: Pro arguments, Con arguments, Evidence for each, Contextual factors"
+    }
+  ],
+  "sample_inputs": [
+    {
+      "query": "Research the latest developments in quantum computing applications",
+      "input": "Research the latest developments in quantum computing applications"
+    },
+    {
+      "query": "Compile information about sustainable packaging alternatives",
+      "input": "Compile information about sustainable packaging alternatives"
+    },
+    {
+      "query": "Investigate current trends in remote work technologies",
+      "input": "Investigate current trends in remote work technologies"
     }
   ]
 }

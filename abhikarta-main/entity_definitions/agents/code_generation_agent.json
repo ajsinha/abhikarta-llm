@@ -5,7 +5,13 @@
   "category": "technical",
   "icon": "bi-code-slash",
   "difficulty": "advanced",
-  "tags": ["coding", "programming", "development", "debugging", "optimization"],
+  "tags": [
+    "coding",
+    "programming",
+    "development",
+    "debugging",
+    "optimization"
+  ],
   "agent": {
     "agent_type": "conversational",
     "name": "Code Generation Agent",
@@ -15,7 +21,11 @@
       "max_tokens": 6000
     },
     "tools_config": {
-      "builtin_tools": ["code_executor", "syntax_checker", "file_reader"],
+      "builtin_tools": [
+        "code_executor",
+        "syntax_checker",
+        "file_reader"
+      ],
       "include_mcp": true
     }
   },
@@ -32,6 +42,20 @@
     {
       "user": "Debug this code: [code with bug]. It's not returning expected results.",
       "expected_approach": "Analyze systematically, identify root cause, provide fixed code with explanation"
+    }
+  ],
+  "sample_inputs": [
+    {
+      "query": "Write a Python function to calculate the Fibonacci sequence",
+      "input": "Write a Python function to calculate the Fibonacci sequence"
+    },
+    {
+      "query": "Create a REST API endpoint for user authentication in Flask",
+      "input": "Create a REST API endpoint for user authentication in Flask"
+    },
+    {
+      "query": "Implement a binary search tree in JavaScript",
+      "input": "Implement a binary search tree in JavaScript"
     }
   ]
 }

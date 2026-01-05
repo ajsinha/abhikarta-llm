@@ -7,11 +7,14 @@ Supports two execution modes:
 
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
+
+Version: 1.5.1
 """
 
 import json
 import logging
 import time
+import traceback
 import uuid
 from typing import Dict, Any, Optional, List, Callable
 from dataclasses import dataclass, field
@@ -20,6 +23,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from .dag_parser import DAGParser, DAGWorkflow, DAGNode
 from .node_types import NodeFactory, NodeResult, BaseNode
+
+# Import execution logger
+try:
+    from ..services.execution_logger import (
+        get_execution_logger, EntityType, ExecutionLogConfig
+    )
+    EXECUTION_LOGGING_AVAILABLE = True
+except ImportError:
+    EXECUTION_LOGGING_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -150,10 +162,100 @@ class WorkflowExecutor:
             status='running',
             input_data=input_data,
             started_at=datetime.now(),
-            metadata={'execution_mode': 'langgraph'}
+            metadata={
+                'execution_mode': 'langgraph',
+                'entity_type': 'workflow'  # Explicitly mark as workflow for log retrieval
+            }
         )
         
         logger.info(f"Starting LangGraph workflow execution: {execution.execution_id}")
+        
+        # Initialize execution logging
+        exec_log = None
+        if EXECUTION_LOGGING_AVAILABLE:
+            try:
+                import os
+                exec_logger = get_execution_logger()
+                exec_log = exec_logger.start_execution(
+                    execution_id=execution.execution_id,
+                    entity_type=EntityType.WORKFLOW,
+                    entity_id=workflow.workflow_id,
+                    entity_name=workflow.name,
+                    user_id=self.user_id
+                )
+                
+                # Log user input
+                exec_log.user_input = input_data
+                
+                # Log entity configuration (comprehensive)
+                exec_log.entity_config = {
+                    'workflow_id': workflow.workflow_id,
+                    'workflow_name': workflow.name,
+                    'entry_point': workflow.entry_point,
+                    'version': workflow.version,
+                    'node_count': len(workflow.nodes),
+                    'edge_count': len(workflow.edges),
+                    'nodes': list(workflow.nodes.keys()),
+                    'dependencies': {k: list(v) for k, v in workflow.dependencies.items()} if workflow.dependencies else {}
+                }
+                
+                # Log LLM config from workflow metadata (masked)
+                llm_config = workflow.metadata.get('llm_config', {})
+                if not llm_config and workflow.metadata.get('dag_definition'):
+                    llm_config = workflow.metadata['dag_definition'].get('llm_config', {})
+                
+                # Also extract LLM config from individual nodes
+                node_llm_configs = {}
+                for node_id, node in workflow.nodes.items():
+                    if node.node_type == 'llm' and node.config:
+                        node_llm_configs[node_id] = {
+                            'provider': node.config.get('provider'),
+                            'model': node.config.get('model'),
+                            'temperature': node.config.get('temperature'),
+                        }
+                
+                exec_log.llm_config = self._mask_sensitive_config({
+                    'workflow_level': llm_config,
+                    'node_level': node_llm_configs
+                })
+                
+                # Log environment configuration (LLM settings from env)
+                exec_log.environment_config = self._mask_sensitive_config({
+                    'OLLAMA_BASE_URL': os.environ.get('OLLAMA_BASE_URL', 'not set'),
+                    'OPENAI_API_KEY': 'set' if os.environ.get('OPENAI_API_KEY') else 'not set',
+                    'ANTHROPIC_API_KEY': 'set' if os.environ.get('ANTHROPIC_API_KEY') else 'not set',
+                    'GOOGLE_API_KEY': 'set' if os.environ.get('GOOGLE_API_KEY') else 'not set',
+                    'LLM_PROVIDER': os.environ.get('LLM_PROVIDER', 'not set'),
+                    'LLM_MODEL': os.environ.get('LLM_MODEL', 'not set'),
+                })
+                
+                # Log the full workflow definition (JSON being executed)
+                exec_log.execution_json = {
+                    'workflow_id': workflow.workflow_id,
+                    'name': workflow.name,
+                    'description': workflow.description,
+                    'entry_point': workflow.entry_point,
+                    'output_node': workflow.output_node,
+                    'nodes': [
+                        {
+                            'id': node_id,
+                            'type': node.node_type,
+                            'name': node.name,
+                            'config': node.config,
+                            'python_code': node.python_code[:500] + '...' if node.python_code and len(node.python_code) > 500 else node.python_code
+                        }
+                        for node_id, node in workflow.nodes.items()
+                    ],
+                    'edges': workflow.edges,
+                    'python_modules': workflow.python_modules,
+                    'metadata': workflow.metadata
+                }
+                
+                exec_logger.log_entry(execution.execution_id, "INFO", 
+                                     "Workflow execution started with LangGraph",
+                                     {'input_preview': str(input_data)[:500] if input_data else None})
+            except Exception as e:
+                logger.warning(f"Failed to initialize execution logging: {e}")
         
         try:
             # Convert workflow to LangGraph config format
@@ -208,6 +310,19 @@ class WorkflowExecutor:
                     completed_at=datetime.now()
                 )
                 execution.steps.append(step)
+                
+                # Log node execution
+                if EXECUTION_LOGGING_AVAILABLE and exec_log:
+                    try:
+                        exec_logger = get_execution_logger()
+                        exec_logger.log_node_execution(
+                            execution.execution_id,
+                            node_id=node_id,
+                            node_type='langgraph_node',
+                            output_data=final_state.get('node_outputs', {}).get(node_id)
+                        )
+                    except:
+                        pass
             
             if final_state.get('error'):
                 execution.status = 'failed'
@@ -220,12 +335,79 @@ class WorkflowExecutor:
             
             execution.completed_at = datetime.now()
             
+            # Complete execution logging (success)
+            if EXECUTION_LOGGING_AVAILABLE:
+                try:
+                    exec_logger = get_execution_logger()
+                    exec_logger.complete_execution(
+                        execution.execution_id,
+                        status=execution.status,
+                        output=execution.output_data,
+                        error=execution.error_message if execution.status == 'failed' else None
+                    )
+                except Exception as log_err:
+                    logger.warning(f"Failed to complete execution logging: {log_err}")
+            
         except Exception as e:
-            logger.error(f"LangGraph workflow execution failed: {e}", exc_info=True)
+            full_traceback = traceback.format_exc()
+            logger.error(f"LangGraph workflow execution failed: {e}")
+            logger.error(f"Exception type: {type(e).__name__}")
+            logger.error(f"Full traceback:\n{full_traceback}")
+            
+            # Create user-friendly error messages for common issues
+            error_type = type(e).__name__
+            error_msg = str(e)
+            user_friendly_error = error_msg
+            
+            if 'RecursionError' in error_type or 'recursion' in error_msg.lower():
+                user_friendly_error = (
+                    "Workflow Recursion Limit Reached\n\n"
+                    "The workflow exceeded the maximum number of steps (25).\n\n"
+                    "This usually happens when:\n"
+                    "  • An LLM node failed and the workflow kept trying to continue\n"
+                    "  • Conditional routing created an infinite loop\n"
+                    "  • The workflow design has a circular path without exit conditions\n\n"
+                    "Check the execution log for details on which node failed first.\n\n"
+                    f"Original error: {error_msg}"
+                )
+            elif 'model' in error_msg.lower() and 'not found' in error_msg.lower():
+                user_friendly_error = (
+                    "LLM Model Not Found\n\n"
+                    "The workflow failed because the configured LLM model is not available.\n\n"
+                    "To fix this:\n"
+                    "  1. For Ollama: Run 'ollama pull <model_name>'\n"
+                    "  2. Or update the workflow template to use an available model\n"
+                    "  3. Check 'ollama list' to see installed models\n\n"
+                    f"Original error: {error_msg}"
+                )
+            elif 'connection' in error_msg.lower():
+                user_friendly_error = (
+                    "LLM Connection Failed\n\n"
+                    "Could not connect to the LLM provider.\n\n"
+                    "Please check:\n"
+                    "  • Ollama is running (start with: ollama serve)\n"
+                    "  • API keys are configured correctly\n"
+                    "  • Network connectivity\n\n"
+                    f"Original error: {error_msg}"
+                )
+            
             execution.status = 'failed'
-            execution.error_message = str(e)
+            execution.error_message = user_friendly_error
             execution.completed_at = datetime.now()
             execution.duration_ms = int((datetime.now() - execution.started_at).total_seconds() * 1000)
+            
+            # Complete execution logging (failure)
+            if EXECUTION_LOGGING_AVAILABLE:
+                try:
+                    exec_logger = get_execution_logger()
+                    exec_logger.complete_execution(
+                        execution.execution_id,
+                        status='failed',
+                        error=user_friendly_error,
+                        error_traceback=full_traceback
+                    )
+                except Exception as log_err:
+                    logger.warning(f"Failed to complete execution logging: {log_err}")
         
         # Log execution to database
         self._save_execution(execution)
@@ -237,8 +419,10 @@ class WorkflowExecutor:
         nodes = []
         edges = []
         
-        logger.debug(f"Converting workflow to LangGraph config: {workflow.workflow_id}")
-        logger.debug(f"Workflow has {len(workflow.nodes)} nodes and {len(workflow.edges)} edges")
+        logger.info(f"=== Converting workflow to LangGraph config ===")
+        logger.info(f"Workflow ID: {workflow.workflow_id}")
+        logger.info(f"DAGWorkflow has {len(workflow.nodes)} nodes and {len(workflow.edges)} edges")
+        logger.info(f"DAGWorkflow.entry_point: '{workflow.entry_point}'")
         
         for node in workflow.nodes.values():
             node_config = {
@@ -248,18 +432,33 @@ class WorkflowExecutor:
                 'config': node.config or {}
             }
             nodes.append(node_config)
-            logger.debug(f"Node: id={node.node_id}, type={node.node_type}, name={node.name}")
+            logger.debug(f"  Node: id={node.node_id}, type={node.node_type}")
         
-        for edge in workflow.edges:
+        # Process edges from DAGWorkflow
+        logger.info(f"Processing {len(workflow.edges)} edges from DAGWorkflow")
+        for i, edge in enumerate(workflow.edges):
             # Handle both dict format and object format for edges
             if isinstance(edge, dict):
+                # Handle BOTH edge formats:
+                # Format 1 (template/JSON): {"source": "node1", "target": "node2"}
+                # Format 2 (designer UI): {"from": "node1", "to": "node2"}
+                source = edge.get('source') or edge.get('from') or edge.get('source_id')
+                target = edge.get('target') or edge.get('to') or edge.get('target_id')
+                
+                # Skip edges without valid source/target
+                if not source or not target:
+                    logger.warning(f"  Edge {i}: Skipping - missing source='{source}' or target='{target}'")
+                    continue
+                    
                 edge_config = {
-                    'source': edge.get('source') or edge.get('source_id'),
-                    'target': edge.get('target') or edge.get('target_id'),
+                    'source': source,
+                    'target': target,
                 }
                 if edge.get('condition'):
                     edge_config['condition'] = edge.get('condition')
             else:
+                if not edge.source_id or not edge.target_id:
+                    continue
                 edge_config = {
                     'source': edge.source_id,
                     'target': edge.target_id
@@ -267,7 +466,7 @@ class WorkflowExecutor:
                 if edge.condition:
                     edge_config['condition'] = edge.condition
             edges.append(edge_config)
-            logger.debug(f"Edge: {edge_config.get('source')} -> {edge_config.get('target')}")
+            logger.debug(f"  Edge {i}: {edge_config.get('source')} -> {edge_config.get('target')}")
         
         config = {
             'nodes': nodes,
@@ -275,7 +474,64 @@ class WorkflowExecutor:
             'metadata': workflow.metadata
         }
         
-        logger.info(f"LangGraph config: {len(nodes)} nodes, {len(edges)} edges")
+        # Set entry_point - check multiple sources
+        entry_point = None
+        
+        # Priority 1: DAGWorkflow.entry_point (directly from workflow object)
+        if workflow.entry_point:
+            entry_point = workflow.entry_point
+            logger.info(f"Entry point from DAGWorkflow.entry_point: '{entry_point}'")
+        
+        # Priority 2: From metadata
+        if not entry_point and workflow.metadata:
+            if 'entry_point' in workflow.metadata:
+                entry_point = workflow.metadata['entry_point']
+                logger.info(f"Entry point from metadata['entry_point']: '{entry_point}'")
+            
+            # Also check dag_definition if present in metadata
+            if not entry_point and 'dag_definition' in workflow.metadata:
+                dag_def = workflow.metadata['dag_definition']
+                if isinstance(dag_def, dict):
+                    if 'entry_point' in dag_def:
+                        entry_point = dag_def['entry_point']
+                        logger.info(f"Entry point from metadata['dag_definition']['entry_point']: '{entry_point}'")
+                    if 'output_node' in dag_def:
+                        config['output_node'] = dag_def['output_node']
+        
+        if entry_point:
+            config['entry_point'] = entry_point
+            logger.info(f"Final entry_point set in config: '{entry_point}'")
+        else:
+            logger.warning("No entry_point found in any source!")
+        
+        # Also try to get edges from dag_definition in metadata (as backup)
+        if len(edges) == 0 and workflow.metadata and 'dag_definition' in workflow.metadata:
+            dag_def = workflow.metadata['dag_definition']
+            if isinstance(dag_def, dict) and 'edges' in dag_def:
+                logger.info(f"Loading edges from dag_definition in metadata (backup)")
+                for edge in dag_def['edges']:
+                    if isinstance(edge, dict):
+                        # Handle both formats: source/target and from/to
+                        source = edge.get('source') or edge.get('from')
+                        target = edge.get('target') or edge.get('to')
+                        if source and target:
+                            edge_config = {'source': source, 'target': target}
+                            if edge.get('condition'):
+                                edge_config['condition'] = edge['condition']
+                            edges.append(edge_config)
+                config['edges'] = edges
+        
+        logger.info(f"=== LangGraph config result ===")
+        logger.info(f"  Nodes: {len(nodes)}")
+        logger.info(f"  Edges: {len(edges)}")
+        logger.info(f"  Entry point: '{config.get('entry_point', 'NOT SET')}'")
+        
+        # Log first few edges for debugging
+        if edges:
+            logger.info(f"  First 5 edges: {edges[:5]}")
+        else:
+            logger.warning("  No edges in config!")
+        
         return config
     
     def _execute_native(self, workflow: DAGWorkflow,
@@ -295,7 +551,11 @@ class WorkflowExecutor:
             workflow_id=workflow.workflow_id,
             status='running',
             input_data=input_data,
-            started_at=datetime.now()
+            started_at=datetime.now(),
+            metadata={
+                'execution_mode': 'native',
+                'entity_type': 'workflow'
+            }
         )
         
         logger.info(f"Starting workflow execution: {execution.execution_id}")
@@ -620,6 +880,34 @@ class WorkflowExecutor:
                 callback(event, *args)
             except Exception as e:
                 logger.warning(f"Callback error: {e}")
+    
+    def _mask_sensitive_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Mask sensitive values in configuration for logging.
+        
+        Args:
+            config: Configuration dictionary
+            
+        Returns:
+            Configuration with sensitive values masked
+        """
+        if not config:
+            return config
+        
+        sensitive_keys = {'api_key', 'secret', 'password', 'token', 'key', 'credential', 'auth'}
+        
+        def mask_value(key: str, value: Any) -> Any:
+            if any(s in key.lower() for s in sensitive_keys):
+                if isinstance(value, str) and len(value) > 4:
+                    return value[:4] + "****"
+                return "****"
+            if isinstance(value, dict):
+                return {k: mask_value(k, v) for k, v in value.items()}
+            if isinstance(value, list):
+                return [mask_value(key, v) for v in value]
+            return value
+        
+        return {k: mask_value(k, v) for k, v in config.items()}
 
 
 class WorkflowManager:
@@ -728,8 +1016,8 @@ class WorkflowManager:
                     execution_count = execution_count + 1
                 WHERE workflow_id = ?
             """, (workflow_id,))
-        except:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to update workflow stats for {workflow_id}: {e}")
         
         return execution
     

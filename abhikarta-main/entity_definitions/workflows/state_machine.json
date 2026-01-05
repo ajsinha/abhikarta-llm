@@ -5,66 +5,126 @@
   "category": "advanced",
   "icon": "bi-diagram-2",
   "difficulty": "advanced",
-  "tags": ["state-machine", "fsm", "transitions", "stateful", "workflow-management"],
+  "tags": [
+    "state-machine",
+    "fsm",
+    "transitions",
+    "stateful",
+    "workflow-management"
+  ],
   "workflow": {
     "states": {
       "DRAFT": {
         "description": "Initial draft state",
-        "allowed_transitions": ["PENDING_REVIEW", "CANCELLED"],
-        "entry_actions": ["create_draft_record"],
-        "exit_actions": ["save_draft"]
+        "allowed_transitions": [
+          "PENDING_REVIEW",
+          "CANCELLED"
+        ],
+        "entry_actions": [
+          "create_draft_record"
+        ],
+        "exit_actions": [
+          "save_draft"
+        ]
       },
       "PENDING_REVIEW": {
         "description": "Awaiting review",
-        "allowed_transitions": ["IN_REVIEW", "DRAFT", "CANCELLED"],
-        "entry_actions": ["notify_reviewers"],
+        "allowed_transitions": [
+          "IN_REVIEW",
+          "DRAFT",
+          "CANCELLED"
+        ],
+        "entry_actions": [
+          "notify_reviewers"
+        ],
         "timeout_hours": 48,
         "timeout_transition": "DRAFT"
       },
       "IN_REVIEW": {
         "description": "Currently being reviewed",
-        "allowed_transitions": ["APPROVED", "REJECTED", "NEEDS_REVISION"],
-        "entry_actions": ["assign_reviewer", "start_review_timer"],
-        "exit_actions": ["record_review_duration"]
+        "allowed_transitions": [
+          "APPROVED",
+          "REJECTED",
+          "NEEDS_REVISION"
+        ],
+        "entry_actions": [
+          "assign_reviewer",
+          "start_review_timer"
+        ],
+        "exit_actions": [
+          "record_review_duration"
+        ]
       },
       "NEEDS_REVISION": {
         "description": "Requires changes",
-        "allowed_transitions": ["PENDING_REVIEW", "CANCELLED"],
-        "entry_actions": ["notify_author", "create_revision_task"],
+        "allowed_transitions": [
+          "PENDING_REVIEW",
+          "CANCELLED"
+        ],
+        "entry_actions": [
+          "notify_author",
+          "create_revision_task"
+        ],
         "max_revisions": 3
       },
       "APPROVED": {
         "description": "Approved for next stage",
-        "allowed_transitions": ["PUBLISHED", "ARCHIVED"],
-        "entry_actions": ["notify_stakeholders", "schedule_publication"]
+        "allowed_transitions": [
+          "PUBLISHED",
+          "ARCHIVED"
+        ],
+        "entry_actions": [
+          "notify_stakeholders",
+          "schedule_publication"
+        ]
       },
       "REJECTED": {
         "description": "Rejected permanently",
-        "allowed_transitions": ["ARCHIVED"],
-        "entry_actions": ["notify_author", "record_rejection_reason"],
+        "allowed_transitions": [
+          "ARCHIVED"
+        ],
+        "entry_actions": [
+          "notify_author",
+          "record_rejection_reason"
+        ],
         "is_terminal": false
       },
       "PUBLISHED": {
         "description": "Published and live",
-        "allowed_transitions": ["ARCHIVED", "NEEDS_UPDATE"],
-        "entry_actions": ["publish_content", "notify_subscribers"],
+        "allowed_transitions": [
+          "ARCHIVED",
+          "NEEDS_UPDATE"
+        ],
+        "entry_actions": [
+          "publish_content",
+          "notify_subscribers"
+        ],
         "is_terminal": false
       },
       "NEEDS_UPDATE": {
         "description": "Published but needs update",
-        "allowed_transitions": ["PENDING_REVIEW", "PUBLISHED"],
-        "entry_actions": ["create_update_task"]
+        "allowed_transitions": [
+          "PENDING_REVIEW",
+          "PUBLISHED"
+        ],
+        "entry_actions": [
+          "create_update_task"
+        ]
       },
       "ARCHIVED": {
         "description": "Archived/completed",
         "allowed_transitions": [],
-        "entry_actions": ["archive_record"],
+        "entry_actions": [
+          "archive_record"
+        ],
         "is_terminal": true
       },
       "CANCELLED": {
         "description": "Cancelled",
         "allowed_transitions": [],
-        "entry_actions": ["record_cancellation"],
+        "entry_actions": [
+          "record_cancellation"
+        ],
         "is_terminal": true
       }
     },
@@ -74,7 +134,10 @@
         "type": "function",
         "name": "State Initializer",
         "description": "Initialize state machine",
-        "position": {"x": 100, "y": 300},
+        "position": {
+          "x": 100,
+          "y": 300
+        },
         "config": {
           "function": "initialize_state_machine",
           "initial_state": "DRAFT",
@@ -86,7 +149,10 @@
         "type": "function",
         "name": "Transition Validator",
         "description": "Validate requested transition",
-        "position": {"x": 300, "y": 300},
+        "position": {
+          "x": 300,
+          "y": 300
+        },
         "config": {
           "function": "validate_transition",
           "check_permissions": true,
@@ -99,10 +165,17 @@
         "type": "llm",
         "name": "Draft Processor",
         "description": "Process draft state activities",
-        "position": {"x": 500, "y": 100},
+        "position": {
+          "x": 500,
+          "y": 100
+        },
         "config": {
           "prompt_template": "Process this draft content:\n\n{input}\n\nCurrent State: DRAFT\nContext: {state_context}\n\nPrepare for submission by:\n1. Validating completeness\n2. Checking formatting\n3. Identifying missing elements",
-          "output_key": "draft_output"
+          "output_key": "draft_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.5
         }
       },
       {
@@ -110,10 +183,17 @@
         "type": "llm",
         "name": "Review Processor",
         "description": "Process review state activities",
-        "position": {"x": 500, "y": 250},
+        "position": {
+          "x": 500,
+          "y": 250
+        },
         "config": {
           "prompt_template": "Review this content:\n\n{current_content}\n\nCurrent State: IN_REVIEW\nReview Criteria:\n1. Quality standards\n2. Accuracy\n3. Completeness\n4. Compliance\n\nProvide detailed review with recommendation: APPROVE, REJECT, or NEEDS_REVISION",
-          "output_key": "review_output"
+          "output_key": "review_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.5
         }
       },
       {
@@ -121,10 +201,17 @@
         "type": "llm",
         "name": "Revision Processor",
         "description": "Process revision requirements",
-        "position": {"x": 500, "y": 400},
+        "position": {
+          "x": 500,
+          "y": 400
+        },
         "config": {
           "prompt_template": "Create revision plan for:\n\n{current_content}\n\nReview Feedback:\n{review_output}\n\nRevision Count: {revision_count}/{max_revisions}\n\nProvide specific changes needed.",
-          "output_key": "revision_plan"
+          "output_key": "revision_plan",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.5
         }
       },
       {
@@ -132,10 +219,17 @@
         "type": "llm",
         "name": "Approval Processor",
         "description": "Process approval activities",
-        "position": {"x": 700, "y": 200},
+        "position": {
+          "x": 700,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Prepare approved content for publication:\n\n{current_content}\n\nFinalize:\n1. Apply final formatting\n2. Generate metadata\n3. Create publication summary",
-          "output_key": "approved_content"
+          "output_key": "approved_content",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.5
         }
       },
       {
@@ -143,10 +237,17 @@
         "type": "llm",
         "name": "Publication Processor",
         "description": "Handle publication activities",
-        "position": {"x": 900, "y": 200},
+        "position": {
+          "x": 900,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Publish this content:\n\n{approved_content}\n\nGenerate:\n1. Publication announcement\n2. Distribution list\n3. Archive metadata",
-          "output_key": "publication_result"
+          "output_key": "publication_result",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://localhost:11434",
+          "temperature": 0.5
         }
       },
       {
@@ -154,10 +255,19 @@
         "type": "function",
         "name": "State History Logger",
         "description": "Log all state transitions",
-        "position": {"x": 700, "y": 450},
+        "position": {
+          "x": 700,
+          "y": 450
+        },
         "config": {
           "function": "log_state_transition",
-          "log_fields": ["from_state", "to_state", "timestamp", "actor", "reason"]
+          "log_fields": [
+            "from_state",
+            "to_state",
+            "timestamp",
+            "actor",
+            "reason"
+          ]
         }
       },
       {
@@ -165,10 +275,17 @@
         "type": "function",
         "name": "Notification Dispatcher",
         "description": "Send state change notifications",
-        "position": {"x": 900, "y": 450},
+        "position": {
+          "x": 900,
+          "y": 450
+        },
         "config": {
           "function": "dispatch_notifications",
-          "channels": ["email", "in_app", "webhook"]
+          "channels": [
+            "email",
+            "in_app",
+            "webhook"
+          ]
         }
       },
       {
@@ -176,14 +293,32 @@
         "type": "condition",
         "name": "State Router",
         "description": "Route to appropriate state handler",
-        "position": {"x": 300, "y": 150},
+        "position": {
+          "x": 300,
+          "y": 150
+        },
         "config": {
           "conditions": [
-            {"condition": "current_state == 'DRAFT'", "target": "draft_processor"},
-            {"condition": "current_state == 'IN_REVIEW'", "target": "review_processor"},
-            {"condition": "current_state == 'NEEDS_REVISION'", "target": "revision_processor"},
-            {"condition": "current_state == 'APPROVED'", "target": "approval_processor"},
-            {"condition": "current_state == 'PUBLISHED'", "target": "publication_processor"}
+            {
+              "condition": "current_state == 'DRAFT'",
+              "target": "draft_processor"
+            },
+            {
+              "condition": "current_state == 'IN_REVIEW'",
+              "target": "review_processor"
+            },
+            {
+              "condition": "current_state == 'NEEDS_REVISION'",
+              "target": "revision_processor"
+            },
+            {
+              "condition": "current_state == 'APPROVED'",
+              "target": "approval_processor"
+            },
+            {
+              "condition": "current_state == 'PUBLISHED'",
+              "target": "publication_processor"
+            }
           ]
         }
       },
@@ -192,7 +327,10 @@
         "type": "aggregator",
         "name": "Output Assembler",
         "description": "Assemble final output",
-        "position": {"x": 1100, "y": 300},
+        "position": {
+          "x": 1100,
+          "y": 300
+        },
         "config": {
           "output_key": "final_output",
           "include_metadata": true,
@@ -201,19 +339,62 @@
       }
     ],
     "edges": [
-      {"source": "state_initializer", "target": "state_router"},
-      {"source": "state_router", "target": "draft_processor", "condition": "DRAFT"},
-      {"source": "state_router", "target": "review_processor", "condition": "IN_REVIEW"},
-      {"source": "state_router", "target": "revision_processor", "condition": "NEEDS_REVISION"},
-      {"source": "state_router", "target": "approval_processor", "condition": "APPROVED"},
-      {"source": "draft_processor", "target": "transition_validator"},
-      {"source": "review_processor", "target": "transition_validator"},
-      {"source": "revision_processor", "target": "transition_validator"},
-      {"source": "transition_validator", "target": "state_history_logger"},
-      {"source": "state_history_logger", "target": "notification_dispatcher"},
-      {"source": "approval_processor", "target": "publication_processor"},
-      {"source": "publication_processor", "target": "output_assembler"},
-      {"source": "notification_dispatcher", "target": "output_assembler"}
+      {
+        "source": "state_initializer",
+        "target": "state_router"
+      },
+      {
+        "source": "state_router",
+        "target": "draft_processor",
+        "condition": "DRAFT"
+      },
+      {
+        "source": "state_router",
+        "target": "review_processor",
+        "condition": "IN_REVIEW"
+      },
+      {
+        "source": "state_router",
+        "target": "revision_processor",
+        "condition": "NEEDS_REVISION"
+      },
+      {
+        "source": "state_router",
+        "target": "approval_processor",
+        "condition": "APPROVED"
+      },
+      {
+        "source": "draft_processor",
+        "target": "transition_validator"
+      },
+      {
+        "source": "review_processor",
+        "target": "transition_validator"
+      },
+      {
+        "source": "revision_processor",
+        "target": "transition_validator"
+      },
+      {
+        "source": "transition_validator",
+        "target": "state_history_logger"
+      },
+      {
+        "source": "state_history_logger",
+        "target": "notification_dispatcher"
+      },
+      {
+        "source": "approval_processor",
+        "target": "publication_processor"
+      },
+      {
+        "source": "publication_processor",
+        "target": "output_assembler"
+      },
+      {
+        "source": "notification_dispatcher",
+        "target": "output_assembler"
+      }
     ],
     "entry_point": "state_initializer",
     "output_node": "output_assembler"
@@ -225,8 +406,17 @@
     "temperature": 0.5
   },
   "sample_inputs": [
-    {"action": "create", "content": "New document content here..."},
-    {"action": "transition", "to_state": "PENDING_REVIEW", "document_id": "doc_123"},
-    {"action": "review", "document_id": "doc_123", "decision": "APPROVE"}
+    {
+      "query": "Create a new document draft for the quarterly report",
+      "input": "Create a new document draft for the quarterly report"
+    },
+    {
+      "query": "Submit the project proposal for team review",
+      "input": "Submit the project proposal for team review"
+    },
+    {
+      "query": "Approve and publish the updated company policy document",
+      "input": "Approve and publish the updated company policy document"
+    }
   ]
 }

@@ -453,6 +453,438 @@ class UserRoutes(AbstractRoutes):
                                    error_count=error_count,
                                    tool_calls=tool_calls)
         
+        @self.app.route('/user/executions/<execution_id>/log')
+        @login_required
+        def execution_log(execution_id):
+            """View detailed execution log file."""
+            import json
+            from pathlib import Path
+            from datetime import datetime
+            import os
+            
+            user_id = session.get('user_id')
+            is_admin = session.get('is_admin', False)
+            
+            # Verify user has access to this execution
+            execution = None
+            try:
+                if is_admin:
+                    execution = self.db_facade.fetch_one(
+                        "SELECT * FROM executions WHERE execution_id = ?",
+                        (execution_id,)
+                    )
+                else:
+                    execution = self.db_facade.fetch_one(
+                        "SELECT * FROM executions WHERE execution_id = ? AND user_id = ?",
+                        (execution_id, user_id)
+                    )
+            except Exception as e:
+                logger.error(f"Error getting execution: {e}", exc_info=True)
+            
+            if not execution:
+                flash('Execution not found', 'error')
+                return redirect(url_for('user_executions'))
+            
+            # Convert execution dict to mutable and format datetime fields
+            execution = dict(execution) if execution else {}
+            
+            # Format started_at for template
+            if execution.get('started_at'):
+                started = execution['started_at']
+                if isinstance(started, datetime):
+                    execution['started_at_formatted'] = started.strftime('%Y-%m-%d %H:%M:%S')
+                elif isinstance(started, str):
+                    execution['started_at_formatted'] = started[:19] if len(started) > 19 else started
+                else:
+                    execution['started_at_formatted'] = str(started)
+            else:
+                execution['started_at_formatted'] = 'N/A'
+            
+            # Determine entity type from execution
+            # Note: The executions table uses agent_id to store workflow_id for workflow executions
+            # We need to check metadata and validate against actual tables
+            entity_type = 'workflow'  # default
+            
+            # Check metadata for explicit entity type or execution mode
+            metadata = execution.get('metadata', {})
+            if isinstance(metadata, str):
+                try:
+                    import json as json_mod
+                    metadata = json_mod.loads(metadata)
+                except:
+                    metadata = {}
+            
+            execution_mode = metadata.get('execution_mode', '')
+            explicit_entity_type = metadata.get('entity_type', '')
+            
+            if explicit_entity_type:
+                entity_type = explicit_entity_type
+            elif execution_mode == 'langgraph':
+                # LangGraph execution mode is used for workflows
+                entity_type = 'workflow'
+            elif execution.get('swarm_id'):
+                entity_type = 'swarm'
+            elif execution.get('aiorg_id'):
+                entity_type = 'aiorg'
+            else:
+                # Check if agent_id is actually a workflow_id or agent_id
+                # by looking up in the respective tables
+                ref_id = execution.get('agent_id') or execution.get('workflow_id')
+                if ref_id:
+                    try:
+                        # Check workflows table first
+                        workflow = self.db_facade.fetch_one(
+                            "SELECT workflow_id FROM workflows WHERE workflow_id = ?",
+                            (ref_id,)
+                        )
+                        if workflow:
+                            entity_type = 'workflow'
+                        else:
+                            # Check agents table
+                            agent = self.db_facade.fetch_one(
+                                "SELECT agent_id FROM agents WHERE agent_id = ?",
+                                (ref_id,)
+                            )
+                            if agent:
+                                entity_type = 'agent'
+                    except Exception as db_err:
+                        logger.warning(f"Error determining entity type: {db_err}")
+            
+            logger.info(f"Determined entity_type: {entity_type} for execution {execution_id}")
+            
+            # Try to load execution log
+            log_content = None
+            log_found = False
+            log_error = None
+            
+            # Try multiple approaches to find the log file
+            possible_paths = []
+            
+            # Get the project root directory (where run_server.py is)
+            import sys
+            project_root = os.getcwd()  # Usually where server was started
+            
+            # Also try to find it via the module paths
+            for path in sys.path:
+                if 'abhikarta' in path.lower() or path.endswith('src'):
+                    # Go up to find project root
+                    potential_root = os.path.dirname(os.path.dirname(path))
+                    if os.path.exists(os.path.join(potential_root, 'executionlog')):
+                        project_root = potential_root
+                        break
+                    # Also try just the parent
+                    potential_root = os.path.dirname(path)
+                    if os.path.exists(os.path.join(potential_root, 'executionlog')):
+                        project_root = potential_root
+                        break
+            
+            # Try to find project root by looking for run_server.py
+            for check_dir in [os.getcwd(), os.path.dirname(os.getcwd())] + sys.path[:5]:
+                if os.path.exists(os.path.join(check_dir, 'run_server.py')):
+                    project_root = check_dir
+                    break
+                if os.path.exists(os.path.join(check_dir, 'executionlog')):
+                    project_root = check_dir
+                    break
+            
+            logger.info(f"Execution log search - Project root: {project_root}, CWD: {os.getcwd()}, Entity: {entity_type}")
+            
+            # Approach 1: Use the execution logger service
+            try:
+                from abhikarta.services.execution_logger import get_execution_logger, EntityType
+                exec_logger = get_execution_logger()
+                
+                # Map entity type string to EntityType enum
+                entity_type_enum = {
+                    'workflow': EntityType.WORKFLOW,
+                    'agent': EntityType.AGENT,
+                    'swarm': EntityType.SWARM,
+                    'aiorg': EntityType.AIORG
+                }.get(entity_type, EntityType.WORKFLOW)
+                
+                # Get path from logger and check with absolute path
+                log_path = exec_logger.get_log_path(entity_type_enum, execution_id)
+                abs_log_path = os.path.abspath(log_path)
+                possible_paths.append(f"Logger: {abs_log_path}")
+                
+                # Try reading via logger first
+                log_data = exec_logger.read_log_file(entity_type_enum, execution_id)
+                
+                if log_data:
+                    log_found = True
+                    if isinstance(log_data, dict):
+                        log_content = json.dumps(log_data, indent=2, default=str)
+                    else:
+                        log_content = str(log_data)
+                    logger.info(f"Found execution log via logger service: {abs_log_path}")
+                else:
+                    # Logger didn't find it, try direct read with absolute path
+                    if os.path.exists(abs_log_path):
+                        with open(abs_log_path, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                        try:
+                            log_data = json.loads(content)
+                            log_content = json.dumps(log_data, indent=2, default=str)
+                        except json.JSONDecodeError:
+                            log_content = content
+                        log_found = True
+                        logger.info(f"Found execution log via direct read: {abs_log_path}")
+                    
+            except ImportError as ie:
+                logger.warning(f"Execution logger import failed: {ie}")
+            except Exception as e:
+                logger.warning(f"Execution logger read failed: {e}")
+            
+            # Approach 2: Direct file search if logger didn't find it
+            if not log_found:
+                # Build list of base paths to search
+                base_paths = [
+                    os.path.join(project_root, 'executionlog'),
+                    'executionlog',
+                    './executionlog',
+                    os.path.join(os.getcwd(), 'executionlog'),
+                    os.path.abspath('executionlog'),
+                ]
+                
+                # Also check parent directories
+                current = os.getcwd()
+                for _ in range(3):  # Go up 3 levels max
+                    parent = os.path.dirname(current)
+                    if parent != current:
+                        base_paths.append(os.path.join(parent, 'executionlog'))
+                        current = parent
+                
+                # Remove duplicates while preserving order
+                seen = set()
+                unique_base_paths = []
+                for p in base_paths:
+                    abs_p = os.path.abspath(p)
+                    if abs_p not in seen:
+                        seen.add(abs_p)
+                        unique_base_paths.append(p)
+                
+                for base in unique_base_paths:
+                    for ext in ['.json', '.log']:
+                        check_path = os.path.join(base, entity_type, f"{execution_id}{ext}")
+                        abs_check_path = os.path.abspath(check_path)
+                        possible_paths.append(abs_check_path)
+                        
+                        logger.debug(f"Checking path: {abs_check_path} (exists: {os.path.exists(abs_check_path)})")
+                        
+                        if os.path.exists(abs_check_path):
+                            try:
+                                with open(abs_check_path, 'r', encoding='utf-8') as f:
+                                    content = f.read()
+                                
+                                # Try to parse as JSON
+                                if ext == '.json':
+                                    try:
+                                        log_data = json.loads(content)
+                                        log_content = json.dumps(log_data, indent=2, default=str)
+                                    except json.JSONDecodeError:
+                                        log_content = content
+                                else:
+                                    log_content = content
+                                
+                                log_found = True
+                                logger.info(f"Found execution log at: {abs_check_path}")
+                                break
+                            except Exception as read_err:
+                                logger.warning(f"Failed to read {abs_check_path}: {read_err}")
+                    
+                    if log_found:
+                        break
+            
+            if not log_found:
+                # List files in executionlog directory for debugging
+                debug_info = []
+                for base in ['executionlog', os.path.join(project_root, 'executionlog')]:
+                    entity_dir = os.path.join(base, entity_type)
+                    if os.path.exists(entity_dir):
+                        try:
+                            files = os.listdir(entity_dir)[:5]  # First 5 files
+                            debug_info.append(f"Files in {entity_dir}: {files}")
+                        except:
+                            pass
+                
+                log_error = (
+                    f"Execution log file not found for execution {execution_id}.\n\n"
+                    f"Entity type: {entity_type}\n"
+                    f"Working directory: {os.getcwd()}\n\n"
+                    f"Searched paths:\n" + "\n".join(f"  • {p}" for p in possible_paths[:8]) +
+                    (f"\n\nDebug info:\n" + "\n".join(debug_info) if debug_info else "") +
+                    f"\n\nLog files are generated for executions started after v1.5.1."
+                )
+                logger.warning(f"Execution log not found. Entity: {entity_type}, ID: {execution_id}")
+            
+            return render_template('user/execution_log.html',
+                                   fullname=session.get('fullname'),
+                                   userid=session.get('user_id'),
+                                   roles=session.get('roles', []),
+                                   execution=execution,
+                                   entity_type=entity_type,
+                                   log_content=log_content,
+                                   log_found=log_found,
+                                   log_error=log_error)
+        
+        @self.app.route('/api/executions/<execution_id>/log')
+        @login_required
+        def api_execution_log(execution_id):
+            """API endpoint to get execution log as JSON."""
+            from flask import jsonify
+            import json
+            import os
+            import sys
+            
+            user_id = session.get('user_id')
+            is_admin = session.get('is_admin', False)
+            
+            # Verify user has access
+            execution = None
+            try:
+                if is_admin:
+                    execution = self.db_facade.fetch_one(
+                        "SELECT * FROM executions WHERE execution_id = ?",
+                        (execution_id,)
+                    )
+                else:
+                    execution = self.db_facade.fetch_one(
+                        "SELECT * FROM executions WHERE execution_id = ? AND user_id = ?",
+                        (execution_id, user_id)
+                    )
+            except Exception as e:
+                return jsonify({'success': False, 'error': str(e)}), 500
+            
+            if not execution:
+                return jsonify({'success': False, 'error': 'Execution not found'}), 404
+            
+            # Determine entity type - check metadata and validate against tables
+            entity_type = 'workflow'  # default
+            
+            # Check metadata for explicit entity type or execution mode
+            metadata = execution.get('metadata', {})
+            if isinstance(metadata, str):
+                try:
+                    metadata = json.loads(metadata)
+                except:
+                    metadata = {}
+            
+            execution_mode = metadata.get('execution_mode', '')
+            explicit_entity_type = metadata.get('entity_type', '')
+            
+            if explicit_entity_type:
+                entity_type = explicit_entity_type
+            elif execution_mode == 'langgraph':
+                entity_type = 'workflow'
+            elif execution.get('swarm_id'):
+                entity_type = 'swarm'
+            elif execution.get('aiorg_id'):
+                entity_type = 'aiorg'
+            else:
+                # Check if agent_id is actually a workflow_id
+                ref_id = execution.get('agent_id') or execution.get('workflow_id')
+                if ref_id:
+                    try:
+                        workflow = self.db_facade.fetch_one(
+                            "SELECT workflow_id FROM workflows WHERE workflow_id = ?",
+                            (ref_id,)
+                        )
+                        if workflow:
+                            entity_type = 'workflow'
+                        else:
+                            agent = self.db_facade.fetch_one(
+                                "SELECT agent_id FROM agents WHERE agent_id = ?",
+                                (ref_id,)
+                            )
+                            if agent:
+                                entity_type = 'agent'
+                    except:
+                        pass
+            
+            log_data = None
+            possible_paths = []
+            
+            # Find project root
+            project_root = os.getcwd()
+            for check_dir in [os.getcwd()] + sys.path[:5]:
+                if os.path.exists(os.path.join(check_dir, 'run_server.py')) or \
+                   os.path.exists(os.path.join(check_dir, 'executionlog')):
+                    project_root = check_dir
+                    break
+            
+            # Approach 1: Try execution logger service
+            try:
+                from abhikarta.services.execution_logger import get_execution_logger, EntityType
+                exec_logger = get_execution_logger()
+                
+                entity_type_enum = {
+                    'workflow': EntityType.WORKFLOW,
+                    'agent': EntityType.AGENT,
+                    'swarm': EntityType.SWARM,
+                    'aiorg': EntityType.AIORG
+                }.get(entity_type, EntityType.WORKFLOW)
+                
+                log_path = exec_logger.get_log_path(entity_type_enum, execution_id)
+                abs_log_path = os.path.abspath(log_path)
+                possible_paths.append(abs_log_path)
+                
+                log_data = exec_logger.read_log_file(entity_type_enum, execution_id)
+                
+                # Try direct read if logger didn't find it
+                if not log_data and os.path.exists(abs_log_path):
+                    with open(abs_log_path, 'r', encoding='utf-8') as f:
+                        log_data = json.load(f)
+                    
+            except ImportError:
+                pass
+            except Exception as e:
+                logger.warning(f"Execution logger read failed: {e}")
+            
+            # Approach 2: Direct file search
+            if not log_data:
+                base_paths = [
+                    os.path.join(project_root, 'executionlog'),
+                    'executionlog',
+                    './executionlog',
+                    os.path.join(os.getcwd(), 'executionlog'),
+                ]
+                
+                for base in base_paths:
+                    for ext in ['.json', '.log']:
+                        check_path = os.path.join(base, entity_type, f"{execution_id}{ext}")
+                        possible_paths.append(check_path)
+                        
+                        if os.path.exists(check_path):
+                            try:
+                                with open(check_path, 'r', encoding='utf-8') as f:
+                                    content = f.read()
+                                
+                                if ext == '.json':
+                                    log_data = json.loads(content)
+                                else:
+                                    log_data = {'content': content}
+                                break
+                            except Exception as read_err:
+                                logger.warning(f"Failed to read {check_path}: {read_err}")
+                    
+                    if log_data:
+                        break
+            
+            if log_data:
+                return jsonify({
+                    'success': True,
+                    'execution_id': execution_id,
+                    'entity_type': entity_type,
+                    'log': log_data
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': 'Execution log not found',
+                    'searched_paths': possible_paths[:5],
+                    'message': 'Log files are generated for executions started after v1.5.1'
+                }), 404
+        
         # =====================================================================
         # HITL (Human-in-the-Loop) Routes
         # =====================================================================

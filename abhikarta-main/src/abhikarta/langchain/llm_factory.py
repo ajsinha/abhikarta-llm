@@ -72,7 +72,8 @@ class LLMFactory:
         config_str = config_dict.get(f'{key}_json') or config_dict.get(key) or default
         try:
             return json.loads(config_str) if isinstance(config_str, str) else (config_str or {})
-        except:
+        except json.JSONDecodeError as e:
+            logger.debug(f"Failed to parse {key} config: {e}")
             return {}
     
     @classmethod
@@ -224,13 +225,15 @@ class LLMFactory:
         config_str = provider_config.get('config_json') or provider_config.get('config') or '{}'
         try:
             config = json.loads(config_str) if isinstance(config_str, str) else config_str
-        except:
+        except json.JSONDecodeError as e:
+            logger.debug(f"Failed to parse Ollama config: {e}")
             config = {}
         
         model_params_str = model_config.get('parameters_json') or model_config.get('parameters') or '{}'
         try:
             model_params = json.loads(model_params_str) if isinstance(model_params_str, str) else model_params_str
-        except:
+        except json.JSONDecodeError as e:
+            logger.debug(f"Failed to parse Ollama model params: {e}")
             model_params = {}
         
         # Determine base URL with multiple fallbacks:

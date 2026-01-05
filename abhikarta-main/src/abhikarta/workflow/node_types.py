@@ -174,7 +174,7 @@ class PythonNode(BaseNode):
             )
             
         except Exception as e:
-            logger.error(f"Python node execution error: {e}")
+            logger.error(f"Python node execution error: {e}", exc_info=True)
             return NodeResult(
                 success=False,
                 error=str(e),
@@ -337,7 +337,8 @@ class HTTPNode(BaseNode):
                 response_data = response.read().decode('utf-8')
                 try:
                     output = json.loads(response_data)
-                except:
+                except json.JSONDecodeError:
+                    logger.debug(f"Response is not JSON, using raw text")
                     output = response_data
             
             return NodeResult(

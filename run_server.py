@@ -113,7 +113,7 @@ def setup_prometheus_metrics(prop_conf):
         if PROMETHEUS_AVAILABLE:
             # Initialize application info
             environment = prop_conf.get('app.environment', 'production')
-            init_app_info(version='1.5.0', environment=environment)
+            init_app_info(version='1.5.1', environment=environment)
             
             # Set system start time
             set_start_time()
@@ -155,6 +155,37 @@ def prepare_database(prop_conf):
     db_facade.init_schema()
     
     return db_facade
+
+
+def prepare_execution_logger(prop_conf):
+    """
+    Initialize the execution logger for detailed execution tracing.
+    
+    Args:
+        prop_conf: PropertiesConfigurator instance
+        
+    Returns:
+        ExecutionLogger instance
+    """
+    from abhikarta.services.execution_logger import init_execution_logger_from_properties
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        exec_logger = init_execution_logger_from_properties(prop_conf)
+        
+        enabled = prop_conf.get('execution.log.enabled', 'true').lower() == 'true'
+        log_path = prop_conf.get('execution.log.path', 'executionlog')
+        
+        if enabled:
+            logger.info(f"Execution logger initialized: path={log_path}")
+        else:
+            logger.info("Execution logging disabled")
+        
+        return exec_logger
+    except Exception as e:
+        logger.warning(f"Failed to initialize execution logger: {e}")
+        return None
 
 
 def prepare_user_facade(prop_conf):
@@ -497,6 +528,11 @@ def main():
         logger.info(f"Database initialized: {prop_conf.get('database.type', 'sqlite')}")
         print_step(3, TOTAL_STARTUP_STEPS, f"Connecting to Database ({prop_conf.get('database.type', 'sqlite')})", 'done')
         
+        # 3.5 Initialize execution logger (for detailed execution debugging)
+        exec_logger = prepare_execution_logger(prop_conf)
+        if exec_logger:
+            logger.info(f"Execution logger ready: {exec_logger.config.base_path}")
+        
         # 4. Initialize user facade
         print_step(4, TOTAL_STARTUP_STEPS, "Loading User Management System", 'starting')
         user_facade = prepare_user_facade(prop_conf)
@@ -624,7 +660,7 @@ def main():
 ║                                                                              ║
 ║     All resources have been released gracefully.                             ║
 ║                                                                              ║
-║     👋  Goodbye! Thank you for using Abhikarta-LLM v1.5.0                    ║
+║     👋  Goodbye! Thank you for using Abhikarta-LLM v1.5.1                    ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 \033[0m''')

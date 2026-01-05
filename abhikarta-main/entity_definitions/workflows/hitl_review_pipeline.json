@@ -5,7 +5,12 @@
   "category": "advanced",
   "icon": "bi-person-check",
   "difficulty": "advanced",
-  "tags": ["hitl", "human-review", "approval", "oversight"],
+  "tags": [
+    "hitl",
+    "human-review",
+    "approval",
+    "oversight"
+  ],
   "workflow": {
     "nodes": [
       {
@@ -13,10 +18,17 @@
         "type": "llm",
         "name": "Initial Processor",
         "description": "Process and structure input",
-        "position": {"x": 100, "y": 200},
+        "position": {
+          "x": 100,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Process this input and structure it for review:\n\n{input}\n\nOrganize the key points and identify any areas that need human attention.",
-          "output_key": "processed_input"
+          "output_key": "processed_input",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.5
         }
       },
       {
@@ -24,10 +36,17 @@
         "type": "llm",
         "name": "Risk Assessor",
         "description": "Assess risk level and flag for review",
-        "position": {"x": 300, "y": 200},
+        "position": {
+          "x": 300,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Assess the risk level of this content:\n\n{processed_input}\n\nDetermine:\n- Risk Level: LOW, MEDIUM, or HIGH\n- Confidence Score: 1-100\n- Reason for assessment\n- Specific areas of concern",
-          "output_key": "risk_assessment"
+          "output_key": "risk_assessment",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.5
         }
       },
       {
@@ -35,12 +54,24 @@
         "type": "condition",
         "name": "Risk Router",
         "description": "Route based on risk level",
-        "position": {"x": 500, "y": 200},
+        "position": {
+          "x": 500,
+          "y": 200
+        },
         "config": {
           "conditions": [
-            {"condition": "HIGH in risk_assessment", "target": "human_review_critical"},
-            {"condition": "MEDIUM in risk_assessment", "target": "human_review_standard"},
-            {"default": true, "target": "auto_processor"}
+            {
+              "condition": "HIGH in risk_assessment",
+              "target": "human_review_critical"
+            },
+            {
+              "condition": "MEDIUM in risk_assessment",
+              "target": "human_review_standard"
+            },
+            {
+              "default": true,
+              "target": "auto_processor"
+            }
           ]
         }
       },
@@ -49,13 +80,21 @@
         "type": "hitl",
         "name": "Critical Review",
         "description": "Human review for high-risk items",
-        "position": {"x": 700, "y": 50},
+        "position": {
+          "x": 700,
+          "y": 50
+        },
         "config": {
           "review_type": "critical",
           "timeout_hours": 24,
           "required_reviewers": 2,
           "instructions": "This item has been flagged as HIGH RISK. Please carefully review all aspects before approving or rejecting.",
-          "actions": ["approve", "reject", "request_changes", "escalate"]
+          "actions": [
+            "approve",
+            "reject",
+            "request_changes",
+            "escalate"
+          ]
         }
       },
       {
@@ -63,13 +102,20 @@
         "type": "hitl",
         "name": "Standard Review",
         "description": "Human review for medium-risk items",
-        "position": {"x": 700, "y": 200},
+        "position": {
+          "x": 700,
+          "y": 200
+        },
         "config": {
           "review_type": "standard",
           "timeout_hours": 48,
           "required_reviewers": 1,
           "instructions": "Please review this medium-risk item and provide your decision.",
-          "actions": ["approve", "reject", "request_changes"]
+          "actions": [
+            "approve",
+            "reject",
+            "request_changes"
+          ]
         }
       },
       {
@@ -77,10 +123,17 @@
         "type": "llm",
         "name": "Auto Processor",
         "description": "Automatic processing for low-risk items",
-        "position": {"x": 700, "y": 350},
+        "position": {
+          "x": 700,
+          "y": 350
+        },
         "config": {
           "prompt_template": "This low-risk item can be processed automatically:\n\n{processed_input}\n\nGenerate the appropriate response or action.",
-          "output_key": "auto_result"
+          "output_key": "auto_result",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.5
         }
       },
       {
@@ -88,10 +141,16 @@
         "type": "aggregator",
         "name": "Result Merger",
         "description": "Merge results from all paths",
-        "position": {"x": 900, "y": 200},
+        "position": {
+          "x": 900,
+          "y": 200
+        },
         "config": {
           "merge_strategy": "first_available",
-          "input_keys": ["human_decision", "auto_result"]
+          "input_keys": [
+            "human_decision",
+            "auto_result"
+          ]
         }
       },
       {
@@ -99,10 +158,17 @@
         "type": "llm",
         "name": "Final Processor",
         "description": "Apply final processing based on decision",
-        "position": {"x": 1100, "y": 200},
+        "position": {
+          "x": 1100,
+          "y": 200
+        },
         "config": {
           "prompt_template": "Based on the review decision and original input:\n\nOriginal: {processed_input}\nDecision/Result: {merged_result}\n\nGenerate the final output incorporating any feedback or modifications.",
-          "output_key": "final_output"
+          "output_key": "final_output",
+          "provider": "ollama",
+          "model": "llama3.2:3b",
+          "base_url": "http://192.168.2.36:11434",
+          "temperature": 0.5
         }
       },
       {
@@ -110,31 +176,80 @@
         "type": "function",
         "name": "Audit Logger",
         "description": "Log the decision for audit trail",
-        "position": {"x": 1100, "y": 350},
+        "position": {
+          "x": 1100,
+          "y": 350
+        },
         "config": {
           "function": "log_audit_trail",
-          "log_fields": ["input", "risk_assessment", "decision", "reviewer", "timestamp"]
+          "log_fields": [
+            "input",
+            "risk_assessment",
+            "decision",
+            "reviewer",
+            "timestamp"
+          ]
         }
       }
     ],
     "edges": [
-      {"source": "initial_processor", "target": "risk_assessor"},
-      {"source": "risk_assessor", "target": "risk_router"},
-      {"source": "risk_router", "target": "human_review_critical", "condition": "HIGH"},
-      {"source": "risk_router", "target": "human_review_standard", "condition": "MEDIUM"},
-      {"source": "risk_router", "target": "auto_processor", "condition": "LOW"},
-      {"source": "human_review_critical", "target": "result_merger"},
-      {"source": "human_review_standard", "target": "result_merger"},
-      {"source": "auto_processor", "target": "result_merger"},
-      {"source": "result_merger", "target": "final_processor"},
-      {"source": "final_processor", "target": "audit_logger"}
+      {
+        "source": "initial_processor",
+        "target": "risk_assessor"
+      },
+      {
+        "source": "risk_assessor",
+        "target": "risk_router"
+      },
+      {
+        "source": "risk_router",
+        "target": "human_review_critical",
+        "condition": "HIGH"
+      },
+      {
+        "source": "risk_router",
+        "target": "human_review_standard",
+        "condition": "MEDIUM"
+      },
+      {
+        "source": "risk_router",
+        "target": "auto_processor",
+        "condition": "LOW"
+      },
+      {
+        "source": "human_review_critical",
+        "target": "result_merger"
+      },
+      {
+        "source": "human_review_standard",
+        "target": "result_merger"
+      },
+      {
+        "source": "auto_processor",
+        "target": "result_merger"
+      },
+      {
+        "source": "result_merger",
+        "target": "final_processor"
+      },
+      {
+        "source": "final_processor",
+        "target": "audit_logger"
+      }
     ],
     "entry_point": "initial_processor",
     "output_node": "final_processor"
   },
   "hitl_config": {
-    "notification_channels": ["email", "slack"],
-    "escalation_path": ["reviewer", "supervisor", "admin"],
+    "notification_channels": [
+      "email",
+      "slack"
+    ],
+    "escalation_path": [
+      "reviewer",
+      "supervisor",
+      "admin"
+    ],
     "sla_hours": 48,
     "auto_escalate_after_hours": 24
   },
@@ -145,8 +260,17 @@
     "temperature": 0.5
   },
   "sample_inputs": [
-    "Process a contract amendment that modifies payment terms.",
-    "Review a customer complaint about service quality.",
-    "Evaluate a vendor proposal for new equipment."
+    {
+      "query": "Process a contract amendment that modifies payment terms.",
+      "input": "Process a contract amendment that modifies payment terms."
+    },
+    {
+      "query": "Review a customer complaint about service quality.",
+      "input": "Review a customer complaint about service quality."
+    },
+    {
+      "query": "Evaluate a vendor proposal for new equipment.",
+      "input": "Evaluate a vendor proposal for new equipment."
+    }
   ]
 }
