@@ -147,9 +147,14 @@
                                     <td><span class="badge bg-secondary">{{ agent.agent_type or 'general' }}</span></td>
                                     <td class="text-muted small">{{ (agent.description or '-')[:60] }}{% if agent.description and agent.description|length > 60 %}...{% endif %}</td>
                                     <td>
-                                        <a href="{{ url_for('execute_agent', agent_id=agent.agent_id) }}" class="btn btn-sm btn-primary" title="Execute">
-                                            <i class="bi bi-play-fill"></i>
-                                        </a>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('agent_chat_page', agent_id=agent.agent_id) }}" class="btn btn-outline-primary" title="Chat (with memory)">
+                                                <i class="bi bi-chat-dots"></i>
+                                            </a>
+                                            <a href="{{ url_for('execute_agent', agent_id=agent.agent_id) }}" class="btn btn-primary" title="Execute (one-shot)">
+                                                <i class="bi bi-play-fill"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% else %}
@@ -202,9 +207,14 @@
                                     <td><span class="badge bg-success">{{ wf.workflow_type or 'sequential' }}</span></td>
                                     <td class="text-muted small">{{ (wf.description or '-')[:60] }}{% if wf.description and wf.description|length > 60 %}...{% endif %}</td>
                                     <td>
-                                        <a href="{{ url_for('execute_workflow', workflow_id=wf.workflow_id) }}" class="btn btn-sm btn-success" title="Execute">
-                                            <i class="bi bi-play-fill"></i>
-                                        </a>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('workflow_chat_page', workflow_id=wf.workflow_id) }}" class="btn btn-outline-success" title="Chat (with memory)">
+                                                <i class="bi bi-chat-dots"></i>
+                                            </a>
+                                            <a href="{{ url_for('execute_workflow', workflow_id=wf.workflow_id) }}" class="btn btn-success" title="Execute (one-shot)">
+                                                <i class="bi bi-play-fill"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% else %}

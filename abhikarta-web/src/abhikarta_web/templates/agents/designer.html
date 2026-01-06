@@ -446,8 +446,11 @@
                     <button class="btn btn-light" onclick="validateWorkflow()" title="Validate">
                         <i class="bi bi-check-circle"></i>
                     </button>
-                    <button class="btn btn-warning" onclick="testAgent()" title="Test">
+                    <button class="btn btn-warning" onclick="testAgent()" title="Test (one-shot)">
                         <i class="bi bi-play"></i>
+                    </button>
+                    <button class="btn btn-info" onclick="openChat()" title="Chat (with memory)" id="btn-chat">
+                        <i class="bi bi-chat-dots"></i>
                     </button>
                     <button class="btn btn-success" onclick="saveAgent()">
                         <i class="bi bi-save me-1"></i>Save
@@ -2229,6 +2232,26 @@ function clearCanvasQuiet() {
     designer.nodeCounter = 0;
     $('#workflow-canvas').find('.workflow-node').remove();
     $('#connections-svg').find('path').remove();
+}
+
+// ============================================
+// CHAT (Conversational with Memory)
+// ============================================
+function openChat() {
+    const agentId = '{{ agent.agent_id if agent else "" }}';
+    
+    if (!agentId) {
+        // Agent not saved yet - prompt to save first
+        const saveFirst = confirm('The agent needs to be saved before you can chat with it.\n\nWould you like to save the agent now?');
+        if (saveFirst) {
+            saveAgent();
+        }
+        return;
+    }
+    
+    // Open chat page in new tab
+    const chatUrl = `/agents/${agentId}/chat`;
+    window.open(chatUrl, '_blank');
 }
 
 // ============================================

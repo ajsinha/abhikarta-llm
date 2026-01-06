@@ -1,0 +1,911 @@
+{% extends "base.html" %}
+
+{% block title %}{{ workflow.get('name', 'Workflow') }} - Chat{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================
+   PROFESSIONAL CHAT UI - WORKFLOW VERSION
+   ============================================ */
+
+:root {
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    
+    --bg-primary: #ffffff;
+    --bg-secondary: #f7f7f8;
+    --bg-tertiary: #ececf1;
+    --bg-chat: #ffffff;
+    
+    --text-primary: #202123;
+    --text-secondary: #6e6e80;
+    --text-tertiary: #8e8ea0;
+    
+    --border-light: #e5e5e5;
+    --border-medium: #d9d9e3;
+    
+    --accent-primary: #059669;
+    --accent-hover: #047857;
+    --accent-light: rgba(5, 150, 105, 0.1);
+    
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+}
+
+[data-bs-theme="dark"] {
+    --bg-primary: #202123;
+    --bg-secondary: #2a2b32;
+    --bg-tertiary: #343541;
+    --bg-chat: #343541;
+    
+    --text-primary: #ececf1;
+    --text-secondary: #c5c5d2;
+    --text-tertiary: #8e8ea0;
+    
+    --border-light: #4e4f60;
+    --border-medium: #565869;
+    
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+* { font-family: var(--font-primary); }
+
+.chat-page {
+    height: calc(100vh - 80px);
+    display: flex;
+    background: var(--bg-secondary);
+    margin: -1rem;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.chat-sidebar {
+    width: 260px;
+    background: var(--bg-primary);
+    border-right: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.new-chat-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.new-chat-btn:hover {
+    background: var(--bg-secondary);
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.sidebar-section-title {
+    padding: 12px 12px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.conv-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    margin-bottom: 2px;
+}
+
+.conv-item:hover { background: var(--bg-secondary); }
+.conv-item.active { background: var(--bg-tertiary); }
+
+.conv-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.conv-text { flex: 1; min-width: 0; }
+
+.conv-title {
+    font-size: 14px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conv-meta {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+}
+
+.sidebar-empty {
+    padding: 24px 16px;
+    text-align: center;
+}
+
+.sidebar-empty-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    background: var(--bg-tertiary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    font-size: 20px;
+}
+
+.sidebar-empty p {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: 0;
+}
+
+/* Main Chat */
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--bg-chat);
+}
+
+.chat-header {
+    height: 60px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg-primary);
+}
+
+.chat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mobile-menu-btn {
+    display: none;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.mobile-menu-btn:hover { background: var(--bg-secondary); }
+
+.chat-agent-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.agent-logo {
+    width: 36px;
+    height: 36px;
+    background: var(--accent-primary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+.agent-details h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.agent-details span {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+.chat-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.header-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Messages */
+.chat-messages-wrapper {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-messages {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.message {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border-light);
+    animation: messageIn 0.3s ease;
+}
+
+.message:last-child { border-bottom: none; }
+
+@keyframes messageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-container {
+    display: flex;
+    gap: 16px;
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.message.user .message-avatar {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+}
+
+.message.assistant .message-avatar {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.message-content { flex: 1; min-width: 0; }
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.message-author {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.message-time {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+.message-body {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+.message-body p { margin: 0 0 12px; }
+.message-body p:last-child { margin-bottom: 0; }
+
+.message-body pre {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-size: 13px;
+}
+
+.message-body code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+}
+
+.message-body code:not(pre code) {
+    background: var(--bg-tertiary);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.empty-logo {
+    width: 64px;
+    height: 64px;
+    background: var(--accent-primary);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 28px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+}
+
+.empty-state h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 8px;
+}
+
+.empty-state p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin: 0 0 32px;
+    line-height: 1.6;
+}
+
+.suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.suggestion-chip {
+    padding: 10px 16px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.suggestion-chip:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-primary);
+}
+
+/* Typing */
+.typing-indicator { display: none; padding: 24px 0; }
+.typing-indicator.show { display: block; }
+
+.typing-container {
+    display: flex;
+    gap: 16px;
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.typing-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-primary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.typing-dots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 0;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--text-tertiary);
+    border-radius: 50%;
+    animation: typingPulse 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingPulse {
+    0%, 60%, 100% { transform: scale(1); opacity: 0.4; }
+    30% { transform: scale(1.2); opacity: 1; }
+}
+
+/* Input */
+.chat-input-area {
+    padding: 16px 24px 24px;
+    background: var(--bg-chat);
+}
+
+.input-wrapper { max-width: 768px; margin: 0 auto; }
+
+.input-container {
+    position: relative;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.15s ease;
+}
+
+.input-container:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.chat-textarea {
+    width: 100%;
+    padding: 16px 56px 16px 20px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-primary);
+    resize: none;
+    max-height: 200px;
+    min-height: 56px;
+}
+
+.chat-textarea:focus { outline: none; }
+.chat-textarea::placeholder { color: var(--text-tertiary); }
+
+.send-btn {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.send-btn:hover:not(:disabled) { background: var(--accent-hover); }
+
+.send-btn:disabled {
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+}
+
+.input-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+.input-footer span {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+.input-footer kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 11px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    margin: 0 2px;
+}
+
+/* Scrollbar */
+.chat-messages-wrapper::-webkit-scrollbar,
+.sidebar-content::-webkit-scrollbar { width: 6px; }
+
+.chat-messages-wrapper::-webkit-scrollbar-track,
+.sidebar-content::-webkit-scrollbar-track { background: transparent; }
+
+.chat-messages-wrapper::-webkit-scrollbar-thumb,
+.sidebar-content::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+    border-radius: 3px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chat-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1050;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .chat-sidebar.open { transform: translateX(0); }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+    }
+    
+    .sidebar-overlay.show { display: block; }
+    .mobile-menu-btn { display: flex; }
+    .chat-messages { padding: 16px; }
+    .chat-input-area { padding: 12px 16px 20px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<div class="chat-page">
+    <aside class="chat-sidebar" id="chatSidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="newConversation()">
+                <i class="bi bi-plus-lg"></i>
+                <span>New chat</span>
+            </button>
+        </div>
+        
+        <div class="sidebar-content" id="conversationList">
+            {% if conversations %}
+            <div class="sidebar-section-title">Recent</div>
+            {% for conv in conversations %}
+            <div class="conv-item" data-id="{{ conv.conversation_id }}" onclick="loadConversation('{{ conv.conversation_id }}')">
+                <div class="conv-icon"><i class="bi bi-chat-left-text"></i></div>
+                <div class="conv-text">
+                    <div class="conv-title">{{ conv.title or 'New conversation' }}</div>
+                    <div class="conv-meta">{{ conv.messages|length }} messages</div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="sidebar-empty">
+                <div class="sidebar-empty-icon"><i class="bi bi-chat-square-text"></i></div>
+                <p>No conversations yet.<br>Start a new chat!</p>
+            </div>
+            {% endif %}
+        </div>
+    </aside>
+    
+    <main class="chat-main">
+        <header class="chat-header">
+            <div class="chat-header-left">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+                <div class="chat-agent-info">
+                    <div class="agent-logo"><i class="bi bi-diagram-3"></i></div>
+                    <div class="agent-details">
+                        <h1>{{ workflow.get('name', 'Workflow') }}</h1>
+                        <span>{{ workflow_type|title if workflow_type else 'Sequential' }} Workflow</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-header-right">
+                <button class="header-btn" onclick="clearChat()" title="Clear chat"><i class="bi bi-trash3"></i></button>
+                <a href="{{ url_for('user_workflows') if 'user_workflows' in dir() else url_for('workflows_list') }}" class="header-btn" title="Back"><i class="bi bi-x-lg"></i></a>
+            </div>
+        </header>
+        
+        <div class="chat-messages-wrapper">
+            <div class="chat-messages" id="chatMessages">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-logo"><i class="bi bi-diagram-3"></i></div>
+                    <h2>How can I help you today?</h2>
+                    <p>I'm {{ workflow.get('name', 'your workflow assistant') }}. Send a message to run the workflow with your input.</p>
+                    <div class="suggestion-chips">
+                        <button class="suggestion-chip" onclick="useSuggestion('Hello! What can you do?')">👋 Say hello</button>
+                        <button class="suggestion-chip" onclick="useSuggestion('Help me get started')">🚀 Get started</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-container">
+                    <div class="typing-avatar"><i class="bi bi-diagram-3"></i></div>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-area">
+            <div class="input-wrapper">
+                <div class="input-container">
+                    <textarea class="chat-textarea" id="chatInput" placeholder="Send a message..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send"><i class="bi bi-arrow-up"></i></button>
+                </div>
+                <div class="input-footer">
+                    <span><kbd>Enter</kbd> to send · <kbd>Shift</kbd>+<kbd>Enter</kbd> for new line</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+const workflowId = '{{ workflow.get("workflow_id", "") }}';
+const workflowName = '{{ workflow.get("name", "Workflow") }}';
+let currentConversationId = null;
+let isProcessing = false;
+
+const chatInput = document.getElementById('chatInput');
+const chatMessages = document.getElementById('chatMessages');
+const sendBtn = document.getElementById('sendBtn');
+
+chatInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+});
+
+function handleKeyDown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+function toggleSidebar() {
+    document.getElementById('chatSidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+
+function useSuggestion(text) {
+    chatInput.value = text;
+    sendMessage();
+}
+
+function newConversation() {
+    currentConversationId = null;
+    chatMessages.innerHTML = `
+        <div class="empty-state" id="emptyState">
+            <div class="empty-logo"><i class="bi bi-diagram-3"></i></div>
+            <h2>How can I help you today?</h2>
+            <p>I'm ${workflowName}. Send a message to run the workflow.</p>
+        </div>
+    `;
+    document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
+    if (window.innerWidth <= 768) toggleSidebar();
+    chatInput.focus();
+}
+
+async function loadConversation(conversationId) {
+    try {
+        const res = await fetch(`/api/conversations/${conversationId}`);
+        const data = await res.json();
+        
+        if (data.success && data.conversation) {
+            currentConversationId = conversationId;
+            chatMessages.innerHTML = '';
+            
+            if (data.conversation.messages?.length > 0) {
+                data.conversation.messages.forEach(m => appendMessage(m.role, m.content, m.timestamp));
+                scrollToBottom();
+            }
+            
+            document.querySelectorAll('.conv-item').forEach(i => 
+                i.classList.toggle('active', i.dataset.id === conversationId));
+            
+            if (window.innerWidth <= 768) toggleSidebar();
+        }
+    } catch (e) { console.error(e); }
+}
+
+async function sendMessage() {
+    if (isProcessing) return;
+    
+    const message = chatInput.value.trim();
+    if (!message) return;
+    
+    isProcessing = true;
+    sendBtn.disabled = true;
+    
+    document.getElementById('emptyState')?.remove();
+    appendMessage('user', message);
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    
+    document.getElementById('typingIndicator').classList.add('show');
+    scrollToBottom();
+    
+    try {
+        const res = await fetch(`/api/workflows/${workflowId}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, conversation_id: currentConversationId })
+        });
+        
+        const data = await res.json();
+        document.getElementById('typingIndicator').classList.remove('show');
+        
+        if (data.success) {
+            currentConversationId = data.conversation_id;
+            appendMessage('assistant', data.response);
+            refreshConversationList();
+        } else {
+            appendMessage('assistant', data.response || data.error || 'Something went wrong.');
+        }
+        scrollToBottom();
+    } catch (e) {
+        console.error(e);
+        document.getElementById('typingIndicator').classList.remove('show');
+        appendMessage('assistant', 'Connection error. Please try again.');
+    } finally {
+        isProcessing = false;
+        sendBtn.disabled = false;
+        chatInput.focus();
+    }
+}
+
+function appendMessage(role, content, timestamp = null) {
+    const div = document.createElement('div');
+    div.className = `message ${role === 'human' ? 'user' : role}`;
+    
+    let html = escapeHtml(content);
+    html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\n\n/g, '</p><p>');
+    html = html.replace(/\n/g, '<br>');
+    html = `<p>${html}</p>`;
+    
+    const time = formatTime(timestamp ? new Date(timestamp) : new Date());
+    const author = role === 'human' || role === 'user' ? 'You' : workflowName;
+    const icon = role === 'human' || role === 'user' ? 'bi-person-fill' : 'bi-diagram-3';
+    
+    div.innerHTML = `
+        <div class="message-container">
+            <div class="message-avatar"><i class="bi ${icon}"></i></div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-author">${author}</span>
+                    <span class="message-time">${time}</span>
+                </div>
+                <div class="message-body">${html}</div>
+            </div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(div);
+}
+
+function escapeHtml(t) {
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
+}
+
+function formatTime(d) {
+    const now = new Date();
+    if (d.toDateString() === now.toDateString()) {
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + 
+           d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function scrollToBottom() {
+    const w = document.querySelector('.chat-messages-wrapper');
+    w.scrollTo({ top: w.scrollHeight, behavior: 'smooth' });
+}
+
+async function clearChat() {
+    if (!currentConversationId) { newConversation(); return; }
+    if (!confirm('Clear all messages?')) return;
+    
+    try {
+        await fetch(`/api/conversations/${currentConversationId}/clear`, { method: 'POST' });
+        chatMessages.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-logo"><i class="bi bi-arrow-clockwise"></i></div>
+                <h2>Conversation cleared</h2>
+                <p>Start fresh by sending a new message.</p>
+            </div>
+        `;
+    } catch (e) { console.error(e); }
+}
+
+async function refreshConversationList() {
+    try {
+        const res = await fetch(`/api/conversations/entity/workflow/${workflowId}`);
+        const data = await res.json();
+        
+        if (data.success && data.conversations?.length > 0) {
+            document.getElementById('conversationList').innerHTML = `
+                <div class="sidebar-section-title">Recent</div>
+                ${data.conversations.map(c => `
+                    <div class="conv-item ${c.conversation_id === currentConversationId ? 'active' : ''}" 
+                         data-id="${c.conversation_id}" onclick="loadConversation('${c.conversation_id}')">
+                        <div class="conv-icon"><i class="bi bi-chat-left-text"></i></div>
+                        <div class="conv-text">
+                            <div class="conv-title">${c.title || 'New conversation'}</div>
+                            <div class="conv-meta">${c.messages?.length || 0} messages</div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+    } catch (e) { console.error(e); }
+}
+
+document.addEventListener('DOMContentLoaded', () => chatInput.focus());
+</script>
+{% endblock %}

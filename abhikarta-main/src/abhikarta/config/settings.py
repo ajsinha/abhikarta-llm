@@ -5,7 +5,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.5.2 - Standardized to use PropertiesConfigurator (no YAML)
+Version: 1.5.3 - Standardized to use PropertiesConfigurator (no YAML)
 
 Legal Notice:
 This software and associated documentation are proprietary and confidential.
@@ -96,7 +96,7 @@ class Settings:
     """
     # Application settings
     app_name: str = "Abhikarta-LLM"
-    app_version: str = "1.5.2"
+    app_version: str = "1.5.3"
     debug: bool = False
     secret_key: str = "change-this-secret-key-in-production"
     

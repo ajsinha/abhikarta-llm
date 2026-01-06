@@ -4,7 +4,7 @@ DAG Parser - Parse and validate DAG workflow definitions.
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 
-Version: 1.5.2-fix2 (edge format fix for from/to)
+Version: 1.5.3-fix2 (edge format fix for from/to)
 """
 
 import json

@@ -598,6 +598,14 @@ def main():
         except Exception as e:
             logger.warning(f"LLM Config Resolver not initialized: {e}")
         
+        # 3.7 Initialize Conversation Memory Manager (for chat history)
+        try:
+            from abhikarta.services.conversation_memory import init_conversation_memory_manager
+            conv_memory = init_conversation_memory_manager(db_facade)
+            logger.info("Conversation memory manager initialized")
+        except Exception as e:
+            logger.warning(f"Conversation memory manager not initialized: {e}")
+        
         # 4. Initialize user facade
         print_step(4, TOTAL_STARTUP_STEPS, "Loading User Management System", 'starting')
         user_facade = prepare_user_facade(prop_conf)

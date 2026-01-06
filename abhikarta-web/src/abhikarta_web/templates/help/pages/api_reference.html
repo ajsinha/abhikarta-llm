@@ -47,6 +47,7 @@ Authorization: Bearer API_KEY</code></pre>
             <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/agents/{id}</code></td><td>Update agent</td></tr>
             <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/agents/{id}</code></td><td>Delete agent</td></tr>
             <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/agents/{id}/execute</code></td><td>Execute agent</td></tr>
+            <tr><td><span class="badge bg-info">POST</span></td><td><code>/api/agents/{id}/chat</code></td><td>Chat with agent (maintains conversation memory) <span class="badge bg-success">v1.5.3</span></td></tr>
         </tbody>
     </table>
 </div>
@@ -66,6 +67,26 @@ Authorization: Bearer API_KEY</code></pre>
             <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/workflows/{id}</code></td><td>Delete workflow</td></tr>
             <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/workflows/{id}/execute</code></td><td>Execute workflow</td></tr>
             <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/workflows/{id}/validate</code></td><td>Validate DAG</td></tr>
+            <tr><td><span class="badge bg-info">POST</span></td><td><code>/api/workflows/{id}/chat</code></td><td>Chat with workflow (maintains conversation memory) <span class="badge bg-success">v1.5.3</span></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="my-5">
+
+<h2 id="conversations-api">Conversations API <span class="badge bg-success">v1.5.3</span></h2>
+<p class="text-muted">Manage conversation sessions with memory for conversational agents and workflows.</p>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/conversations</code></td><td>Create new conversation session</td></tr>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/conversations/{id}</code></td><td>Get conversation with messages</td></tr>
+            <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/conversations/{id}</code></td><td>Delete conversation</td></tr>
+            <tr><td><span class="badge bg-warning text-dark">POST</span></td><td><code>/api/conversations/{id}/clear</code></td><td>Clear messages (keep session)</td></tr>
+            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/conversations/entity/{type}/{id}</code></td><td>List conversations for an agent/workflow</td></tr>
         </tbody>
     </table>
 </div>

@@ -16,7 +16,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.5.2
+Version: 1.5.3
 """
 
 import os

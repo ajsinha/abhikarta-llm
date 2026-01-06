@@ -212,6 +212,7 @@ class AbhikartaLLMWeb:
         from .routes.swarm_routes import SwarmRoutes
         from .routes.notification_routes import NotificationRoutes  # v1.4.0
         from .routes.metrics_routes import init_metrics_routes  # v1.4.8 Prometheus
+        from .routes.conversation_routes import ConversationRoutes  # v1.5.3 Chat Memory
         
         # Initialize Prometheus metrics routes first (uses different pattern)
         init_metrics_routes(self.app, self.prop_conf)
@@ -248,6 +249,11 @@ class AbhikartaLLMWeb:
             
             # Register routes
             route_handler.register_routes()
+        
+        # Register conversation routes (v1.5.3 - different initialization pattern)
+        if self.db_facade:
+            ConversationRoutes(self.app, self.db_facade)
+            logger.info("Registered conversation routes for chat memory")
         
         # Note: The index '/' route is registered in AuthRoutes
         

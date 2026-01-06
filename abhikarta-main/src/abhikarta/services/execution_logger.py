@@ -6,7 +6,7 @@ Creates detailed log files for each execution to aid in debugging and traceabili
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 
-Version: 1.5.2
+Version: 1.5.3
 """
 
 import json

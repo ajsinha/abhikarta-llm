@@ -1,6 +1,6 @@
-# Abhikarta-LLM v1.5.2
+# Abhikarta-LLM v1.5.3
 
-[![Version](https://img.shields.io/badge/version-1.5.2-blue.svg)](https://github.com/abhikarta-llm)
+[![Version](https://img.shields.io/badge/version-1.5.3-blue.svg)](https://github.com/abhikarta-llm)
 [![Python](https://img.shields.io/badge/python-3.10+-green.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
@@ -10,9 +10,31 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ---
 
-## 🚀 What's New in v1.5.2
+## 🚀 What's New in v1.5.3
 
-### 📝 Enhanced Execution Logging (NEW!)
+### 💬 Conversational Memory (NEW!)
+Chat with agents and workflows that remember past conversations:
+
+**Key Features:**
+- **Persistent Chat History** - Conversations are stored and recalled across sessions
+- **Chat-Style Interface** - Modern chatbot UI with message history sidebar
+- **Multi-Turn Context** - Agents use previous messages for better understanding
+- **Separate Sessions** - Create multiple conversation threads per agent/workflow
+- **Clear/Delete** - Manage conversation history easily
+
+**Usage:**
+- Navigate to any **conversational** agent and click the "Chat" button
+- Start a new conversation or continue existing ones from the sidebar
+- Messages flow naturally with typing indicators and timestamps
+
+**Configuration:**
+```python
+# Chat history is automatically stored in the database
+# conversations table tracks all chat sessions
+# No additional configuration required
+```
+
+### 📝 Enhanced Execution Logging
 Comprehensive execution logging with automatic cleanup:
 
 ```properties
@@ -116,7 +138,7 @@ my_agent = ResearchAgent()
 result = my_agent.run("Find AI trends")
 ```
 
-### 📁 Reorganized Project Structure (v1.5.2)
+### 📁 Reorganized Project Structure (v1.5.3)
 ```
 abhikarta-llm/
 ├── abhikarta-main/               # Core library package
@@ -133,7 +155,7 @@ abhikarta-llm/
 └── run_server.py                 # Application entry point
 ```
 
-### 🐍 Python Script Mode (v1.5.2)
+### 🐍 Python Script Mode (v1.5.3)
 Power users can now define agents, workflows, swarms, and AI organizations using Python scripts instead of JSON/visual designers. See `docs/sdk/` for details.
 
 ---
@@ -409,7 +431,7 @@ New comprehensive tutorial for advanced reasoning patterns:
 ## 📁 Project Structure
 
 ```
-abhikarta-llm-v1.5.2/
+abhikarta-llm-v1.5.3/
 ├── abhikarta-main/                   # Core library package
 │   ├── src/abhikarta/                # Core library
 │   │   ├── agent/                    # Agent management
@@ -446,13 +468,13 @@ abhikarta-llm-v1.5.2/
 │   ├── pyproject.toml                # Package configuration
 │   └── README.md                     # Core library docs
 │
-├── abhikarta-web/                    # Web UI module (v1.5.2)
+├── abhikarta-web/                    # Web UI module (v1.5.3)
 │   └── src/abhikarta_web/
 │       ├── routes/                   # Flask route handlers
 │       ├── templates/                # Jinja2 templates (60+ files)
 │       └── static/                   # CSS, JS, images
 │
-├── abhikarta-sdk-client/             # API Client SDK (v1.5.2)
+├── abhikarta-sdk-client/             # API Client SDK (v1.5.3)
 │   └── src/abhikarta_client/
 │       ├── client.py                 # Main client class
 │       ├── agents.py                 # Agents API
@@ -460,7 +482,7 @@ abhikarta-llm-v1.5.2/
 │       ├── swarms.py                 # Swarms API
 │       └── organizations.py          # Organizations API
 │
-├── abhikarta-sdk-embedded/           # Embedded SDK (v1.5.2)
+├── abhikarta-sdk-embedded/           # Embedded SDK (v1.5.3)
 │   └── src/abhikarta_embedded/
 │       ├── core.py                   # Main Abhikarta class
 │       ├── agents/                   # Agent implementations
@@ -538,7 +560,7 @@ The platform uses 45 tables across these categories:
 | **Swarms** | swarms, swarm_agents, swarm_executions (v1.3.0) |
 | **AI Orgs** | ai_organizations, ai_org_nodes, ai_org_tasks (v1.4.7) |
 | **Notifications** | notification_channels, notification_templates (v1.4.0) |
-| **Scripts** | python_scripts, script_executions (v1.5.2) |
+| **Scripts** | python_scripts, script_executions (v1.5.3) |
 | **Config** | settings, templates |
 
 ---

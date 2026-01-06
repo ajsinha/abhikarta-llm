@@ -30,7 +30,7 @@ class SQLiteSchema:
     # SCHEMA VERSION
     # ==========================================================================
     
-    SCHEMA_VERSION = "1.5.2"
+    SCHEMA_VERSION = "1.5.3"
     
     # ==========================================================================
     # TABLE DEFINITIONS
@@ -1022,6 +1022,22 @@ class SQLiteSchema:
     );
     """
     
+    # Conversations table (v1.5.3) - Chat memory for conversational agents/workflows
+    CREATE_CONVERSATIONS_TABLE = """
+    CREATE TABLE IF NOT EXISTS conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        conversation_id TEXT UNIQUE NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        title TEXT,
+        messages_json TEXT DEFAULT '[]',
+        metadata_json TEXT DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+    
     # ==========================================================================
     # INDEXES
     # ==========================================================================
@@ -1087,6 +1103,10 @@ class SQLiteSchema:
         "CREATE INDEX IF NOT EXISTS idx_script_executions_script_id ON script_executions(script_id);",
         "CREATE INDEX IF NOT EXISTS idx_script_executions_status ON script_executions(status);",
         "CREATE INDEX IF NOT EXISTS idx_script_executions_executed_by ON script_executions(executed_by);",
+        # Conversations indexes (v1.5.3)
+        "CREATE INDEX IF NOT EXISTS idx_conversations_entity ON conversations(entity_type, entity_id);",
+        "CREATE INDEX IF NOT EXISTS idx_conversations_user ON conversations(user_id);",
+        "CREATE INDEX IF NOT EXISTS idx_conversations_updated ON conversations(updated_at);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_executions_swarm_id ON swarm_executions(swarm_id);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_executions_status ON swarm_executions(status);",
         "CREATE INDEX IF NOT EXISTS idx_swarm_executions_correlation_id ON swarm_executions(correlation_id);",
@@ -1423,6 +1443,8 @@ class SQLiteSchema:
             # Python Scripts tables (v1.4.8)
             self.CREATE_PYTHON_SCRIPTS_TABLE,
             self.CREATE_SCRIPT_EXECUTIONS_TABLE,
+            # Conversations table (v1.5.3 - Chat memory)
+            self.CREATE_CONVERSATIONS_TABLE,
         ]
     
     def get_all_index_statements(self) -> list:
@@ -1537,4 +1559,6 @@ class SQLiteSchema:
             # Python Scripts tables (v1.4.8)
             'python_scripts',
             'script_executions',
+            # Conversations table (v1.5.3 - Chat memory)
+            'conversations',
         ]
