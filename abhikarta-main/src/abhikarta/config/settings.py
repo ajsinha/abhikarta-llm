@@ -5,7 +5,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.5.1 - Standardized to use PropertiesConfigurator (no YAML)
+Version: 1.5.2 - Standardized to use PropertiesConfigurator (no YAML)
 
 Legal Notice:
 This software and associated documentation are proprietary and confidential.
@@ -96,7 +96,7 @@ class Settings:
     """
     # Application settings
     app_name: str = "Abhikarta-LLM"
-    app_version: str = "1.5.1"
+    app_version: str = "1.5.2"
     debug: bool = False
     secret_key: str = "change-this-secret-key-in-production"
     
@@ -118,7 +118,7 @@ class Settings:
     default_llm_model: str = "llama3.2:3b"
     llm_providers: Dict[str, LLMProviderSettings] = field(default_factory=dict)
     
-    # Code Fragments Sync (v1.5.1)
+    # Code Fragments Sync (v1.5.2)
     code_fragments: CodeFragmentsSettings = field(default_factory=CodeFragmentsSettings)
     
     # Logging
@@ -174,7 +174,7 @@ class Settings:
         settings.log_format = prop_conf.get('logging.format', settings.log_format)
         settings.log_file = prop_conf.get('logging.file', settings.log_file)
         
-        # Code Fragments Sync settings (v1.5.1)
+        # Code Fragments Sync settings (v1.5.2)
         settings._load_code_fragments_settings(prop_conf)
         
         # Ensure directories exist

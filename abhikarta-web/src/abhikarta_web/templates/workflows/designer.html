@@ -588,22 +588,77 @@
     </div>
 </div>
 
-<!-- Node Edit Modal -->
+<!-- Node Edit Modal (Enhanced) -->
 <div class="modal fade" id="nodeEditModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Edit Node</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i><span id="modal-node-title">Edit Node</span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="node-edit-content"></div>
+            <div class="modal-body" id="node-edit-content">
+                <!-- Dynamic content -->
+            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveNodeEdit()">Save Changes</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveNodeEdit()">
+                    <i class="bi bi-check-lg me-1"></i>Save Changes
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Node Edit Modal Styles */
+.default-hint {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.default-hint:hover {
+    background-color: var(--bs-primary);
+    color: white !important;
+    border-radius: 4px;
+    padding: 0 4px;
+}
+.default-hint code {
+    pointer-events: none;
+}
+.clickable-hint {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border: 1px dashed #dee2e6;
+}
+.clickable-hint:hover {
+    background-color: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+.clickable-hint:hover code {
+    color: white !important;
+}
+.form-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+.form-section-title {
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #495057;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 8px;
+}
+.node-edit-textarea {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -852,6 +907,37 @@ function updateLLMConfigField(nodeId, fieldName, value) {
         console.log('Updated LLM config field:', fieldName, '=', value);
     }
     redrawCanvas();
+}
+
+// Apply default value to field and update node config
+function applyDefault(fieldId, value, nodeId, configKey, isNumber) {
+    var field = document.getElementById(fieldId);
+    if (field) {
+        field.value = value;
+        // Visual feedback
+        $(field).addClass('border-success').delay(500).queue(function(next) {
+            $(this).removeClass('border-success');
+            next();
+        });
+        // Update node config
+        var actualValue = isNumber ? parseInt(value) : value;
+        updateConfig(nodeId, configKey, actualValue);
+    }
+}
+
+function applyDefaultTemp(fieldId, value, nodeId) {
+    var field = document.getElementById(fieldId);
+    if (field) {
+        field.value = value;
+        $('#' + fieldId + '-val').text(value);
+        // Visual feedback
+        $(field).addClass('border-success').delay(500).queue(function(next) {
+            $(this).removeClass('border-success');
+            next();
+        });
+        // Update node config
+        updateConfig(nodeId, 'temperature', parseFloat(value));
+    }
 }
 
 // Edit modal helpers for LLM
@@ -1307,7 +1393,14 @@ function drawTempConnection(x1, y1, x2, y2) {
 // PROPERTIES PANEL
 // ============================================
 function showNodeProperties(node) {
-    var html = '<div class="property-group">' +
+    var typeDef = NODE_TYPES[node.node_type] || NODE_TYPES.action;
+    
+    var html = '<div class="d-flex justify-content-between align-items-center mb-2">' +
+        '<span class="badge" style="background-color:' + typeDef.color + '"><i class="bi ' + typeDef.icon + ' me-1"></i>' + typeDef.name + '</span>' +
+        '<button class="btn btn-sm btn-primary" onclick="openNodeEditModal(\'' + node.node_id + '\')">' +
+        '<i class="bi bi-pencil-square me-1"></i>Edit</button>' +
+        '</div>' +
+        '<div class="property-group">' +
         '<label>Node ID</label>' +
         '<input type="text" class="form-control form-control-sm" value="' + node.node_id + '" readonly>' +
         '</div>' +
@@ -1317,9 +1410,127 @@ function showNodeProperties(node) {
         'onchange="updateNodeName(\'' + node.node_id + '\', this.value)">' +
         '</div><hr class="my-2">';
     
-    html += getTypeProperties(node);
+    // Show quick properties (summary view)
+    html += getQuickProperties(node);
+    
+    // Add edit hint
+    html += '<div class="text-center mt-3">' +
+        '<small class="text-muted">Double-click node or click Edit for full editor</small>' +
+        '</div>';
     
     $('#properties-content').html(html);
+}
+
+function getQuickProperties(node) {
+    // Show a compact summary of node config in the side panel
+    var summary = '';
+    
+    switch(node.node_type) {
+        case 'llm':
+            var provider = node.config.provider || getAdminDefault('provider') || 'ollama';
+            var model = node.config.model || getAdminDefault('model') || 'llama3.2:3b';
+            var temp = node.config.temperature !== undefined ? node.config.temperature : (getAdminDefault('temperature') || 0.7);
+            var baseUrl = node.config.base_url || getAdminDefault('base_url') || '';
+            
+            summary = '<div class="property-group">' +
+                '<label>Provider / Model</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small">' +
+                '<strong>' + provider + '</strong> / ' + model + '</div></div>' +
+                '<div class="property-group">' +
+                '<label>Base URL</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small text-truncate" title="' + baseUrl + '">' +
+                (baseUrl || '<em class="text-muted">Using admin default</em>') + '</div></div>' +
+                '<div class="property-group">' +
+                '<label>Temperature</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small">' + temp + '</div></div>';
+            
+            if (node.config.system_prompt) {
+                summary += '<div class="property-group">' +
+                    '<label>System Prompt</label>' +
+                    '<div class="form-control-sm bg-light rounded px-2 py-1 small text-truncate" style="max-height:60px;overflow:hidden;">' +
+                    escapeHtml(node.config.system_prompt.substring(0, 100)) + '...</div></div>';
+            }
+            break;
+            
+        case 'code':
+        case 'python':
+        case 'function':
+            summary = '<div class="property-group">' +
+                '<label>Code</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small font-monospace" style="max-height:80px;overflow:hidden;">' +
+                (node.config.code ? escapeHtml(node.config.code.substring(0, 150)) + '...' : '<em class="text-muted">No code defined</em>') +
+                '</div></div>';
+            if (node.config.uri) {
+                summary += '<div class="property-group">' +
+                    '<label>URI</label>' +
+                    '<div class="form-control-sm bg-light rounded px-2 py-1 small">' + node.config.uri + '</div></div>';
+            }
+            break;
+            
+        case 'tool':
+            summary = '<div class="property-group">' +
+                '<label>Tool</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small">' +
+                (node.config.display_name || node.config.tool_name || '<em class="text-muted">Not selected</em>') +
+                '</div></div>' +
+                '<div class="property-group">' +
+                '<label>Source</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small">' +
+                (node.config.tool_source || 'mcp') + '</div></div>';
+            break;
+            
+        case 'condition':
+            summary = '<div class="property-group">' +
+                '<label>Expression</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small font-monospace">' +
+                (node.config.expression || '<em class="text-muted">Not defined</em>') +
+                '</div></div>';
+            break;
+            
+        case 'hitl':
+            summary = '<div class="property-group">' +
+                '<label>Task Type</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small">' +
+                (node.config.task_type || 'approval') + '</div></div>';
+            break;
+            
+        case 'http':
+            summary = '<div class="property-group">' +
+                '<label>Request</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small">' +
+                '<strong>' + (node.config.method || 'GET') + '</strong> ' + 
+                (node.config.url || '<em class="text-muted">No URL</em>') +
+                '</div></div>';
+            break;
+            
+        case 'memory':
+            summary = '<div class="property-group">' +
+                '<label>Operation</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small">' +
+                (node.config.operation || 'read') + ': <strong>' + (node.config.key || 'context') + '</strong></div></div>';
+            break;
+            
+        default:
+            // Show JSON config summary
+            var configStr = JSON.stringify(node.config || {});
+            summary = '<div class="property-group">' +
+                '<label>Config</label>' +
+                '<div class="form-control-sm bg-light rounded px-2 py-1 small font-monospace text-truncate">' +
+                configStr.substring(0, 100) + (configStr.length > 100 ? '...' : '') +
+                '</div></div>';
+    }
+    
+    return summary;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 function getAdminDefault(key) {
@@ -1379,8 +1590,11 @@ function getTypeProperties(node) {
                 'value="' + currentBaseUrl + '" ' +
                 'placeholder="' + adminBaseUrl + '" ' +
                 'onchange="updateLLMConfigField(\'' + node.node_id + '\',\'base_url\',this.value)">' +
-                '<small class="form-text text-muted" id="' + baseUrlId + '-hint">' +
-                'Admin default: <code>' + adminBaseUrl + '</code></small>' +
+                '<small class="form-text">' +
+                '<span class="text-muted">Default: </span>' +
+                '<a href="#" class="clickable-default" onclick="applyDefault(\'' + baseUrlId + '\', \'' + adminBaseUrl + '\', \'' + node.node_id + '\', \'base_url\'); return false;">' +
+                '<code>' + adminBaseUrl + '</code> <i class="bi bi-arrow-up-circle text-primary"></i></a>' +
+                '</small>' +
                 '</div>' +
                 
                 '<div class="property-group">' +
@@ -1392,7 +1606,11 @@ function getTypeProperties(node) {
                 'onchange="updateLLMConfigField(\'' + node.node_id + '\',\'temperature\',parseFloat(this.value))">' +
                 '<span id="' + tempId + '-val" class="badge bg-secondary">' + (currentTemp !== '' ? currentTemp : adminTemp) + '</span>' +
                 '</div>' +
-                '<small class="form-text text-muted">Admin default: ' + adminTemp + '</small>' +
+                '<small class="form-text">' +
+                '<span class="text-muted">Default: </span>' +
+                '<a href="#" class="clickable-default" onclick="applyDefaultTemp(\'' + tempId + '\', ' + adminTemp + ', \'' + node.node_id + '\'); return false;">' +
+                adminTemp + ' <i class="bi bi-arrow-up-circle text-primary"></i></a>' +
+                '</small>' +
                 '</div>' +
                 
                 '<div class="property-group">' +
@@ -1401,7 +1619,11 @@ function getTypeProperties(node) {
                 'value="' + currentMaxTokens + '" min="1" max="128000" ' +
                 'placeholder="' + adminMaxTokens + '" ' +
                 'onchange="updateLLMConfigField(\'' + node.node_id + '\',\'max_tokens\',this.value ? parseInt(this.value) : null)">' +
-                '<small class="form-text text-muted">Admin default: ' + adminMaxTokens + '</small>' +
+                '<small class="form-text">' +
+                '<span class="text-muted">Default: </span>' +
+                '<a href="#" class="clickable-default" onclick="applyDefault(\'' + maxTokensId + '\', \'' + adminMaxTokens + '\', \'' + node.node_id + '\', \'max_tokens\', true); return false;">' +
+                adminMaxTokens + ' <i class="bi bi-arrow-up-circle text-primary"></i></a>' +
+                '</small>' +
                 '</div>' +
                 
                 '<div class="property-group">' +
@@ -1413,7 +1635,7 @@ function getTypeProperties(node) {
                 '</div>' +
                 
                 '<div class="alert alert-info py-2 mt-2">' +
-                '<small><i class="bi bi-info-circle me-1"></i>Empty fields will use admin-configured defaults at execution time.</small>' +
+                '<small><i class="bi bi-info-circle me-1"></i>Click default values to use them. Empty fields use admin defaults at execution.</small>' +
                 '</div>';
         case 'agent':
             return '<div class="property-group">' +
@@ -1825,66 +2047,365 @@ function addToolToCanvas(idx) {
 }
 
 // ============================================
-// EDIT NODE MODAL
+// EDIT NODE MODAL (Enhanced)
 // ============================================
+var currentEditNodeId = null;
+
+function openNodeEditModal(nodeId) {
+    editNode(nodeId);
+}
+
 function editNode(nodeId) {
     var node = designer.nodes.find(function(n) { return n.node_id === nodeId; });
     if (!node) return;
     
-    var typeDef = NODE_TYPES[node.node_type];
+    currentEditNodeId = nodeId;
+    var typeDef = NODE_TYPES[node.node_type] || NODE_TYPES.action;
+    
+    // Update modal title
+    $('#modal-node-title').html('<i class="bi ' + typeDef.icon + ' me-2" style="color:' + typeDef.color + '"></i>' + typeDef.name + ' Configuration');
+    
     var editor = '';
     
+    // Common header section
+    var headerSection = '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-info-circle me-2"></i>Basic Information</div>' +
+        '<div class="row">' +
+        '<div class="col-md-6 mb-3">' +
+        '<label class="form-label fw-bold">Node Name</label>' +
+        '<input type="text" class="form-control" id="edit-name" value="' + escapeHtml(node.name) + '">' +
+        '</div>' +
+        '<div class="col-md-3 mb-3">' +
+        '<label class="form-label fw-bold">Node ID</label>' +
+        '<input type="text" class="form-control" value="' + node.node_id + '" readonly disabled>' +
+        '</div>' +
+        '<div class="col-md-3 mb-3">' +
+        '<label class="form-label fw-bold">Type</label>' +
+        '<div class="form-control bg-light"><i class="bi ' + typeDef.icon + '" style="color:' + typeDef.color + '"></i> ' + typeDef.name + '</div>' +
+        '</div></div></div>';
+    
     if (node.node_type === 'llm') {
-        editor = '<div class="row">' +
-            '<div class="col-md-6 mb-3">' +
-            '<label class="form-label">Provider</label>' +
-            '<select class="form-select" id="edit-provider" onchange="loadWorkflowEditModalModels(this.value, null)">' +
-            '<option value="">Loading...</option></select></div>' +
-            '<div class="col-md-6 mb-3">' +
-            '<label class="form-label">Model</label>' +
-            '<select class="form-select" id="edit-model">' +
-            '<option value="">Select provider first</option></select></div></div>' +
-            '<div class="row">' +
-            '<div class="col-md-6 mb-3">' +
-            '<label class="form-label">Temperature</label>' +
-            '<input type="number" class="form-control" id="edit-temp" value="' + (node.config.temperature||0.7) + '" min="0" max="2" step="0.1">' +
-            '</div>' +
-            '<div class="col-md-6 mb-3">' +
-            '<label class="form-label">Max Tokens</label>' +
-            '<input type="number" class="form-control" id="edit-max-tokens" value="' + (node.config.max_tokens||1000) + '">' +
-            '</div></div>' +
-            '<div class="mb-3">' +
-            '<label class="form-label">Prompt Template</label>' +
-            '<textarea class="form-control" id="edit-prompt" rows="6">' + (node.config.prompt||'') + '</textarea>' +
-            '</div>';
-        
-        // Schedule provider/model loading after modal renders
-        setTimeout(function() { loadWorkflowEditModalProviders(node.config.provider, node.config.model); }, 100);
-    } else if (node.node_type === 'code') {
-        editor = '<div class="mb-3">' +
-            '<label class="form-label">Python Code</label>' +
-            '<textarea class="form-control font-monospace" id="edit-code" rows="15">' + (node.config.code||'') + '</textarea>' +
-            '</div>';
+        editor = buildLLMNodeEditor(node);
+    } else if (node.node_type === 'code' || node.node_type === 'python' || node.node_type === 'function') {
+        editor = buildCodeNodeEditor(node);
+    } else if (node.node_type === 'tool') {
+        editor = buildToolNodeEditor(node);
+    } else if (node.node_type === 'condition') {
+        editor = buildConditionNodeEditor(node);
+    } else if (node.node_type === 'hitl') {
+        editor = buildHITLNodeEditor(node);
+    } else if (node.node_type === 'http') {
+        editor = buildHTTPNodeEditor(node);
+    } else if (node.node_type === 'memory') {
+        editor = buildMemoryNodeEditor(node);
     } else {
-        editor = '<div class="mb-3">' +
-            '<label class="form-label">Configuration (JSON)</label>' +
-            '<textarea class="form-control font-monospace" id="edit-json" rows="12">' + JSON.stringify(node.config, null, 2) + '</textarea>' +
-            '</div>';
+        editor = buildGenericNodeEditor(node);
     }
     
-    $('#node-edit-content').html('<input type="hidden" id="edit-node-id" value="' + nodeId + '">' +
+    $('#node-edit-content').html(
+        '<input type="hidden" id="edit-node-id" value="' + nodeId + '">' +
         '<input type="hidden" id="edit-node-type" value="' + node.node_type + '">' +
-        '<div class="row mb-3">' +
-        '<div class="col-md-8">' +
-        '<label class="form-label">Name</label>' +
-        '<input type="text" class="form-control" id="edit-name" value="' + node.name + '">' +
-        '</div>' +
-        '<div class="col-md-4">' +
-        '<label class="form-label">Type</label>' +
-        '<div class="form-control-plaintext"><i class="bi ' + typeDef.icon + '" style="color:' + typeDef.color + '"></i> ' + typeDef.name + '</div>' +
-        '</div></div>' + editor);
+        headerSection + editor
+    );
+    
+    // Schedule post-render actions
+    if (node.node_type === 'llm') {
+        setTimeout(function() { loadModalLLMProviders(node.config.provider, node.config.model); }, 100);
+    }
     
     new bootstrap.Modal('#nodeEditModal').show();
+}
+
+function buildLLMNodeEditor(node) {
+    var adminBaseUrl = getAdminDefault('base_url') || 'http://localhost:11434';
+    var adminTemp = getAdminDefault('temperature') || 0.7;
+    var adminMaxTokens = getAdminDefault('max_tokens') || 2048;
+    
+    var currentBaseUrl = node.config.base_url || '';
+    var currentTemp = node.config.temperature !== undefined ? node.config.temperature : '';
+    var currentMaxTokens = node.config.max_tokens || '';
+    
+    return '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-robot me-2"></i>LLM Provider Configuration</div>' +
+        '<div class="row">' +
+        '<div class="col-md-6 mb-3">' +
+        '<label class="form-label fw-bold">Provider</label>' +
+        '<select class="form-select" id="edit-provider" onchange="onModalProviderChange(this.value)">' +
+        '<option value="">Loading...</option></select>' +
+        '</div>' +
+        '<div class="col-md-6 mb-3">' +
+        '<label class="form-label fw-bold">Model</label>' +
+        '<select class="form-select" id="edit-model">' +
+        '<option value="">Select provider first</option></select>' +
+        '</div></div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">Base URL <small class="text-muted">(leave empty to use admin default)</small></label>' +
+        '<input type="text" class="form-control" id="edit-base-url" value="' + currentBaseUrl + '" placeholder="' + adminBaseUrl + '">' +
+        '<small class="form-text text-muted">Click to use: ' +
+        '<span class="clickable-hint default-hint" onclick="populateField(\'edit-base-url\', \'' + adminBaseUrl + '\')">' +
+        '<code>' + adminBaseUrl + '</code></span></small>' +
+        '</div></div>' +
+        
+        '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-sliders me-2"></i>Generation Parameters</div>' +
+        '<div class="row">' +
+        '<div class="col-md-4 mb-3">' +
+        '<label class="form-label fw-bold">Temperature <span id="edit-temp-display" class="badge bg-primary ms-2">' + (currentTemp !== '' ? currentTemp : adminTemp) + '</span></label>' +
+        '<input type="range" class="form-range" id="edit-temp" min="0" max="2" step="0.1" ' +
+        'value="' + (currentTemp !== '' ? currentTemp : adminTemp) + '" ' +
+        'oninput="$(\'#edit-temp-display\').text(this.value)">' +
+        '<small class="form-text text-muted">Click to use default: ' +
+        '<span class="clickable-hint default-hint" onclick="populateField(\'edit-temp\', ' + adminTemp + '); $(\'#edit-temp-display\').text(' + adminTemp + ')">' +
+        '<code>' + adminTemp + '</code></span></small>' +
+        '</div>' +
+        '<div class="col-md-4 mb-3">' +
+        '<label class="form-label fw-bold">Max Tokens</label>' +
+        '<input type="number" class="form-control" id="edit-max-tokens" value="' + currentMaxTokens + '" placeholder="' + adminMaxTokens + '" min="1" max="128000">' +
+        '<small class="form-text text-muted">Click to use default: ' +
+        '<span class="clickable-hint default-hint" onclick="populateField(\'edit-max-tokens\', ' + adminMaxTokens + ')">' +
+        '<code>' + adminMaxTokens + '</code></span></small>' +
+        '</div>' +
+        '<div class="col-md-4 mb-3">' +
+        '<label class="form-label fw-bold">Top P</label>' +
+        '<input type="number" class="form-control" id="edit-top-p" value="' + (node.config.top_p || '') + '" placeholder="1.0" min="0" max="1" step="0.1">' +
+        '<small class="form-text text-muted">Click to use default: ' +
+        '<span class="clickable-hint default-hint" onclick="populateField(\'edit-top-p\', 1.0)">' +
+        '<code>1.0</code></span></small>' +
+        '</div></div></div>' +
+        
+        '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-chat-left-text me-2"></i>Prompts</div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">System Prompt</label>' +
+        '<textarea class="form-control node-edit-textarea" id="edit-system-prompt" rows="4" ' +
+        'placeholder="Enter system instructions for the LLM...">' + escapeHtml(node.config.system_prompt || '') + '</textarea>' +
+        '</div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">User Prompt Template <small class="text-muted">(use {input} for user input)</small></label>' +
+        '<textarea class="form-control node-edit-textarea" id="edit-prompt" rows="6" ' +
+        'placeholder="Enter the prompt template. Use {input} or {query} as placeholders for user input.">' + escapeHtml(node.config.prompt || node.config.user_prompt || '') + '</textarea>' +
+        '</div></div>' +
+        
+        '<div class="alert alert-info py-2">' +
+        '<i class="bi bi-info-circle me-2"></i><strong>Tip:</strong> Click on any default value hint to automatically populate that field. ' +
+        'Empty fields will use admin-configured defaults at execution time.' +
+        '</div>';
+}
+
+function buildCodeNodeEditor(node) {
+    return '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-code-slash me-2"></i>Python Code</div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">Code</label>' +
+        '<textarea class="form-control node-edit-textarea" id="edit-code" rows="15" ' +
+        'placeholder="def execute(input_data):\n    # Your code here\n    return result">' + escapeHtml(node.config.code || '') + '</textarea>' +
+        '</div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">Code Fragment URI <small class="text-muted">(optional - load from database)</small></label>' +
+        '<input type="text" class="form-control" id="edit-uri" value="' + (node.config.uri || '') + '" placeholder="db://fragment_id">' +
+        '</div></div>';
+}
+
+function buildToolNodeEditor(node) {
+    var displayName = node.config.display_name || node.config.tool_name || '';
+    return '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-tools me-2"></i>Tool Configuration</div>' +
+        '<div class="row">' +
+        '<div class="col-md-6 mb-3">' +
+        '<label class="form-label fw-bold">Tool Name</label>' +
+        '<input type="text" class="form-control" id="edit-tool-name" value="' + displayName + '" readonly>' +
+        '</div>' +
+        '<div class="col-md-6 mb-3">' +
+        '<label class="form-label fw-bold">Tool Source</label>' +
+        '<input type="text" class="form-control" value="' + (node.config.tool_source || 'mcp') + '" readonly>' +
+        '</div></div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">Tool Parameters (JSON)</label>' +
+        '<textarea class="form-control node-edit-textarea" id="edit-tool-params" rows="6">' + 
+        JSON.stringify(node.config.parameters || {}, null, 2) + '</textarea>' +
+        '</div></div>';
+}
+
+function buildConditionNodeEditor(node) {
+    return '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-signpost-split me-2"></i>Condition Configuration</div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">Condition Expression</label>' +
+        '<input type="text" class="form-control" id="edit-expression" value="' + escapeHtml(node.config.expression || '') + '" ' +
+        'placeholder="e.g., state.get(\'score\') > 0.8">' +
+        '<small class="form-text text-muted">Python expression that evaluates to True or False</small>' +
+        '</div></div>';
+}
+
+function buildHITLNodeEditor(node) {
+    return '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-person-check me-2"></i>Human-in-the-Loop Configuration</div>' +
+        '<div class="row">' +
+        '<div class="col-md-6 mb-3">' +
+        '<label class="form-label fw-bold">Task Type</label>' +
+        '<select class="form-select" id="edit-task-type">' +
+        '<option value="approval" ' + (node.config.task_type === 'approval' ? 'selected' : '') + '>Approval</option>' +
+        '<option value="review" ' + (node.config.task_type === 'review' ? 'selected' : '') + '>Review</option>' +
+        '<option value="data_input" ' + (node.config.task_type === 'data_input' ? 'selected' : '') + '>Data Input</option>' +
+        '<option value="edit" ' + (node.config.task_type === 'edit' ? 'selected' : '') + '>Edit</option>' +
+        '</select></div>' +
+        '<div class="col-md-6 mb-3">' +
+        '<label class="form-label fw-bold">Timeout (seconds)</label>' +
+        '<input type="number" class="form-control" id="edit-timeout" value="' + (node.config.timeout || 3600) + '">' +
+        '</div></div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">Instructions for Human Reviewer</label>' +
+        '<textarea class="form-control" id="edit-instructions" rows="4">' + escapeHtml(node.config.instructions || '') + '</textarea>' +
+        '</div></div>';
+}
+
+function buildHTTPNodeEditor(node) {
+    return '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-globe me-2"></i>HTTP Request Configuration</div>' +
+        '<div class="row">' +
+        '<div class="col-md-3 mb-3">' +
+        '<label class="form-label fw-bold">Method</label>' +
+        '<select class="form-select" id="edit-method">' +
+        '<option ' + (node.config.method === 'GET' ? 'selected' : '') + '>GET</option>' +
+        '<option ' + (node.config.method === 'POST' ? 'selected' : '') + '>POST</option>' +
+        '<option ' + (node.config.method === 'PUT' ? 'selected' : '') + '>PUT</option>' +
+        '<option ' + (node.config.method === 'DELETE' ? 'selected' : '') + '>DELETE</option>' +
+        '</select></div>' +
+        '<div class="col-md-9 mb-3">' +
+        '<label class="form-label fw-bold">URL</label>' +
+        '<input type="text" class="form-control" id="edit-url" value="' + escapeHtml(node.config.url || '') + '" placeholder="https://api.example.com/endpoint">' +
+        '</div></div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">Headers (JSON)</label>' +
+        '<textarea class="form-control node-edit-textarea" id="edit-headers" rows="3">' + 
+        JSON.stringify(node.config.headers || {}, null, 2) + '</textarea>' +
+        '</div>' +
+        '<div class="mb-3">' +
+        '<label class="form-label fw-bold">Body Template</label>' +
+        '<textarea class="form-control node-edit-textarea" id="edit-body" rows="4">' + escapeHtml(node.config.body || '') + '</textarea>' +
+        '</div></div>';
+}
+
+function buildMemoryNodeEditor(node) {
+    return '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-database me-2"></i>Memory Configuration</div>' +
+        '<div class="row">' +
+        '<div class="col-md-4 mb-3">' +
+        '<label class="form-label fw-bold">Operation</label>' +
+        '<select class="form-select" id="edit-operation">' +
+        '<option value="read" ' + (node.config.operation === 'read' ? 'selected' : '') + '>Read</option>' +
+        '<option value="write" ' + (node.config.operation === 'write' ? 'selected' : '') + '>Write</option>' +
+        '<option value="append" ' + (node.config.operation === 'append' ? 'selected' : '') + '>Append</option>' +
+        '<option value="delete" ' + (node.config.operation === 'delete' ? 'selected' : '') + '>Delete</option>' +
+        '</select></div>' +
+        '<div class="col-md-8 mb-3">' +
+        '<label class="form-label fw-bold">Key</label>' +
+        '<input type="text" class="form-control" id="edit-key" value="' + escapeHtml(node.config.key || 'context') + '">' +
+        '</div></div></div>';
+}
+
+function buildGenericNodeEditor(node) {
+    return '<div class="form-section">' +
+        '<div class="form-section-title"><i class="bi bi-gear me-2"></i>Configuration (JSON)</div>' +
+        '<div class="mb-3">' +
+        '<textarea class="form-control node-edit-textarea" id="edit-json" rows="12">' + 
+        JSON.stringify(node.config, null, 2) + '</textarea>' +
+        '</div></div>';
+}
+
+function populateField(fieldId, value) {
+    var field = document.getElementById(fieldId);
+    if (field) {
+        field.value = value;
+        // Trigger change event for reactive updates
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Visual feedback
+        $(field).addClass('border-success').delay(500).queue(function(next) {
+            $(this).removeClass('border-success');
+            next();
+        });
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function loadModalLLMProviders(currentProvider, currentModel) {
+    var provSelect = $('#edit-provider');
+    
+    if (llmProvidersCache && llmProvidersCache.length > 0) {
+        provSelect.empty();
+        llmProvidersCache.forEach(function(p) {
+            var isDefault = p.is_default ? ' (default)' : '';
+            provSelect.append('<option value="' + p.provider_id + '" data-api-endpoint="' + (p.api_endpoint || '') + '">' + p.name + isDefault + '</option>');
+        });
+        
+        if (currentProvider) {
+            provSelect.val(currentProvider);
+        } else {
+            var defaultProv = llmProvidersCache.find(function(p) { return p.is_default; });
+            if (defaultProv) provSelect.val(defaultProv.provider_id);
+        }
+        
+        loadModalLLMModels(provSelect.val(), currentModel);
+    } else {
+        fetch('/api/llm/providers')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success && data.providers) {
+                    llmProvidersCache = data.providers;
+                    provSelect.empty();
+                    data.providers.forEach(function(p) {
+                        var isDefault = p.is_default ? ' (default)' : '';
+                        provSelect.append('<option value="' + p.provider_id + '" data-api-endpoint="' + (p.api_endpoint || '') + '">' + p.name + isDefault + '</option>');
+                    });
+                    if (currentProvider) provSelect.val(currentProvider);
+                    loadModalLLMModels(provSelect.val(), currentModel);
+                }
+            });
+    }
+}
+
+function onModalProviderChange(providerId) {
+    loadModalLLMModels(providerId, null);
+    
+    // Update base_url hint for selected provider
+    var provider = llmProvidersCache ? llmProvidersCache.find(function(p) { return p.provider_id === providerId; }) : null;
+    if (provider && provider.api_endpoint) {
+        $('#edit-base-url').attr('placeholder', provider.api_endpoint);
+        $('#edit-base-url').next('small').html('Click to use: <span class="clickable-hint default-hint" onclick="populateField(\'edit-base-url\', \'' + provider.api_endpoint + '\')"><code>' + provider.api_endpoint + '</code></span>');
+    }
+}
+
+function loadModalLLMModels(providerId, currentModel) {
+    var modelSelect = $('#edit-model');
+    if (!providerId) return;
+    
+    modelSelect.empty().append('<option value="">Loading...</option>');
+    
+    fetch('/api/llm/providers/' + providerId + '/models')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            modelSelect.empty();
+            if (data.success && data.models && data.models.length > 0) {
+                data.models.forEach(function(m) {
+                    var isDefault = m.is_default ? ' (default)' : '';
+                    modelSelect.append('<option value="' + m.model_id + '">' + (m.display_name || m.name) + isDefault + '</option>');
+                });
+                if (currentModel) modelSelect.val(currentModel);
+            } else {
+                modelSelect.append('<option value="">No models available</option>');
+            }
+        });
 }
 
 function saveNodeEdit() {
@@ -1893,31 +2414,90 @@ function saveNodeEdit() {
     var node = designer.nodes.find(function(n) { return n.node_id === nodeId; });
     if (!node) return;
     
+    // Update name
     node.name = $('#edit-name').val();
     
+    // Update type-specific config
     if (nodeType === 'llm') {
-        node.config.provider = $('#edit-provider').val();
-        node.config.model = $('#edit-model').val();
-        node.config.temperature = parseFloat($('#edit-temp').val());
-        node.config.max_tokens = parseInt($('#edit-max-tokens').val()) || 1000;
-        node.config.prompt = $('#edit-prompt').val();
-    } else if (nodeType === 'code') {
+        var provider = $('#edit-provider').val();
+        var model = $('#edit-model').val();
+        var baseUrl = $('#edit-base-url').val().trim();
+        var temp = parseFloat($('#edit-temp').val());
+        var maxTokens = $('#edit-max-tokens').val();
+        var topP = $('#edit-top-p').val();
+        var systemPrompt = $('#edit-system-prompt').val().trim();
+        var prompt = $('#edit-prompt').val().trim();
+        
+        node.config.provider = provider;
+        node.config.model = model;
+        
+        // Only set if user provided a value (otherwise admin default applies)
+        if (baseUrl) node.config.base_url = baseUrl;
+        else delete node.config.base_url;
+        
+        if (!isNaN(temp)) node.config.temperature = temp;
+        else delete node.config.temperature;
+        
+        if (maxTokens) node.config.max_tokens = parseInt(maxTokens);
+        else delete node.config.max_tokens;
+        
+        if (topP) node.config.top_p = parseFloat(topP);
+        else delete node.config.top_p;
+        
+        if (systemPrompt) node.config.system_prompt = systemPrompt;
+        else delete node.config.system_prompt;
+        
+        if (prompt) {
+            node.config.prompt = prompt;
+            node.config.user_prompt = prompt;
+        }
+        
+    } else if (nodeType === 'code' || nodeType === 'python' || nodeType === 'function') {
         node.config.code = $('#edit-code').val();
+        node.config.uri = $('#edit-uri').val().trim();
+        
+    } else if (nodeType === 'condition') {
+        node.config.expression = $('#edit-expression').val();
+        
+    } else if (nodeType === 'hitl') {
+        node.config.task_type = $('#edit-task-type').val();
+        node.config.timeout = parseInt($('#edit-timeout').val()) || 3600;
+        node.config.instructions = $('#edit-instructions').val();
+        
+    } else if (nodeType === 'http') {
+        node.config.method = $('#edit-method').val();
+        node.config.url = $('#edit-url').val();
+        node.config.body = $('#edit-body').val();
+        try {
+            node.config.headers = JSON.parse($('#edit-headers').val() || '{}');
+        } catch(e) {}
+        
+    } else if (nodeType === 'memory') {
+        node.config.operation = $('#edit-operation').val();
+        node.config.key = $('#edit-key').val();
+        
+    } else if (nodeType === 'tool') {
+        try {
+            node.config.parameters = JSON.parse($('#edit-tool-params').val() || '{}');
+        } catch(e) {}
+        
     } else {
         try {
             node.config = JSON.parse($('#edit-json').val());
         } catch(e) {
-            showToast('Invalid JSON', 'error');
+            showToast('Invalid JSON configuration', 'error');
             return;
         }
     }
     
+    // Update node display
     $('#' + nodeId + ' .node-title').text(node.name);
     $('#' + nodeId + ' .node-body').text(getNodeSummary(node));
     showNodeProperties(node);
+    redrawCanvas();
     
     bootstrap.Modal.getInstance('#nodeEditModal').hide();
-    showToast('Node updated', 'success');
+    showToast('Node configuration saved', 'success');
 }
 
 // ============================================

@@ -5,7 +5,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.5.1
+Version: 1.5.2
 """
 
 from .code_fragment_sync import (

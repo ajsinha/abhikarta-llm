@@ -12,7 +12,7 @@ with support for:
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 
-Version: 1.5.1
+Version: 1.5.2
 """
 
 import json

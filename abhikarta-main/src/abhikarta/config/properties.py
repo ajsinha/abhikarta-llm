@@ -13,7 +13,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.5.1
+Version: 1.5.2
 """
 
 import os
@@ -32,7 +32,7 @@ class PropertiesParser:
     Example properties file:
         # Application settings
         app.name=Abhikarta-LLM
-        app.version=1.5.1
+        app.version=1.5.2
         app.debug=false
         
         # Database

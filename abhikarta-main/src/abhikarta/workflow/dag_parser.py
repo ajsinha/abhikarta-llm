@@ -4,7 +4,7 @@ DAG Parser - Parse and validate DAG workflow definitions.
 Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 
-Version: 1.5.1-fix2 (edge format fix for from/to)
+Version: 1.5.2-fix2 (edge format fix for from/to)
 """
 
 import json
@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 logger = logging.getLogger(__name__)
 
 # Log version on module load
-logger.info("DAG Parser v1.5.1-fix2 loaded (supports from/to edge format)")
+logger.info("DAG Parser v1.5.2-fix2 loaded (supports from/to edge format)")
 
 
 @dataclass

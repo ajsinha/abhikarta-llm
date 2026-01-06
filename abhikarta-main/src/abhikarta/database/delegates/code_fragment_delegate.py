@@ -5,7 +5,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.5.1
+Version: 1.5.2
 """
 
 from typing import Any, Dict, List, Optional
@@ -27,7 +27,7 @@ class CodeFragmentDelegate(DatabaseDelegate):
     
     Handles table: code_fragments
     
-    Version 1.5.1 adds:
+    Version 1.5.2 adds:
     - module_name: Valid Python identifier for import
     - checksum: SHA256 hash for change detection
     - last_synced_at: Timestamp of last sync
@@ -179,7 +179,7 @@ class CodeFragmentDelegate(DatabaseDelegate):
         ) or []
     
     # ==========================================================================
-    # SYNC-RELATED METHODS (v1.5.1)
+    # SYNC-RELATED METHODS (v1.5.2)
     # ==========================================================================
     
     def get_syncable_fragments(self) -> List[Dict]:

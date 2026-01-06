@@ -776,7 +776,7 @@ class UserRoutes(AbstractRoutes):
                     f"Working directory: {os.getcwd()}\n\n"
                     f"Searched paths:\n" + "\n".join(f"  • {p}" for p in possible_paths[:8]) +
                     (f"\n\nDebug info:\n" + "\n".join(debug_info) if debug_info else "") +
-                    f"\n\nLog files are generated for executions started after v1.5.1."
+                    f"\n\nLog files are generated for executions started after v1.5.2."
                 )
                 logger.warning(f"Execution log not found. Entity: {entity_type}, ID: {execution_id}")
             
@@ -945,7 +945,7 @@ class UserRoutes(AbstractRoutes):
                     'success': False,
                     'error': 'Execution log not found',
                     'searched_paths': possible_paths[:5],
-                    'message': 'Log files are generated for executions started after v1.5.1'
+                    'message': 'Log files are generated for executions started after v1.5.2'
                 }), 404
         
         # =====================================================================

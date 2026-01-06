@@ -1299,7 +1299,7 @@ class AdminRoutes(AbstractRoutes):
                         provider_config = {}
                 
                 # Get default model
-                models = self.db_facade.llm.get_provider_models(provider_id, is_enabled=True)
+                models = self.db_facade.llm.get_provider_models(provider_id, active_only=True)
                 default_model = None
                 if models:
                     for m in models:
@@ -1364,7 +1364,7 @@ class AdminRoutes(AbstractRoutes):
                 
                 # Get default model for this provider
                 provider_id = default_provider.get('provider_id')
-                models = self.db_facade.llm.get_provider_models(provider_id, is_enabled=True)
+                models = self.db_facade.llm.get_provider_models(provider_id, active_only=True)
                 default_model = None
                 if models:
                     for m in models:

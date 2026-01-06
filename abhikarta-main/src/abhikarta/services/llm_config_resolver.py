@@ -15,7 +15,7 @@ Copyright © 2025-2030, All Rights Reserved
 Ashutosh Sinha
 Email: ajsinha@gmail.com
 
-Version: 1.5.1
+Version: 1.5.2
 """
 
 import json
@@ -198,7 +198,7 @@ class LLMConfigResolver:
         try:
             provider_id = provider.get('provider_id')
             if provider_id and self.db_facade:
-                models = self.db_facade.llm.get_provider_models(provider_id, is_enabled=True)
+                models = self.db_facade.llm.get_provider_models(provider_id, active_only=True)
                 if models:
                     # Find default model
                     for m in models:
