@@ -156,8 +156,10 @@ class WorkflowExecutor:
     def _execute_with_langgraph(self, workflow: DAGWorkflow,
                                 input_data: Dict[str, Any] = None) -> WorkflowExecution:
         """Execute workflow using LangGraph."""
+        from ..utils.helpers import generate_execution_id, EntityType as HelperEntityType
+        
         execution = WorkflowExecution(
-            execution_id=str(uuid.uuid4()),
+            execution_id=generate_execution_id(HelperEntityType.WORKFLOW, workflow.name),
             workflow_id=workflow.workflow_id,
             status='running',
             input_data=input_data,
@@ -546,8 +548,10 @@ class WorkflowExecutor:
         Returns:
             WorkflowExecution with results
         """
+        from ..utils.helpers import generate_execution_id, EntityType as HelperEntityType
+        
         execution = WorkflowExecution(
-            execution_id=str(uuid.uuid4()),
+            execution_id=generate_execution_id(HelperEntityType.WORKFLOW, workflow.name),
             workflow_id=workflow.workflow_id,
             status='running',
             input_data=input_data,
@@ -649,16 +653,19 @@ class WorkflowExecutor:
         Returns:
             WorkflowExecution with results
         """
+        from ..utils.helpers import generate_execution_id, EntityType as HelperEntityType
+        
         workflow = self.parser.parse_json(json_str)
         
         if not workflow:
             execution = WorkflowExecution(
-                execution_id=str(uuid.uuid4()),
+                execution_id=generate_execution_id(HelperEntityType.WORKFLOW, 'parse_error'),
                 workflow_id='unknown',
                 status='failed',
                 error_message=f"Failed to parse workflow: {self.parser.get_errors()}",
                 started_at=datetime.now(),
-                completed_at=datetime.now()
+                completed_at=datetime.now(),
+                metadata={'entity_type': 'workflow'}
             )
             return execution
         
@@ -676,16 +683,19 @@ class WorkflowExecutor:
         Returns:
             WorkflowExecution with results
         """
+        from ..utils.helpers import generate_execution_id, EntityType as HelperEntityType
+        
         workflow = self.parser.parse_dict(workflow_dict)
         
         if not workflow:
             execution = WorkflowExecution(
-                execution_id=str(uuid.uuid4()),
+                execution_id=generate_execution_id(HelperEntityType.WORKFLOW, 'parse_error'),
                 workflow_id='unknown',
                 status='failed',
                 error_message=f"Failed to parse workflow: {self.parser.get_errors()}",
                 started_at=datetime.now(),
-                completed_at=datetime.now()
+                completed_at=datetime.now(),
+                metadata={'entity_type': 'workflow'}
             )
             return execution
         
@@ -974,16 +984,19 @@ class WorkflowManager:
                         input_data: Dict[str, Any] = None,
                         user_id: str = 'system') -> WorkflowExecution:
         """Execute a stored workflow."""
+        from ..utils.helpers import generate_execution_id, EntityType as HelperEntityType
+        
         workflow_data = self.get_workflow(workflow_id)
         
         if not workflow_data:
             return WorkflowExecution(
-                execution_id=str(uuid.uuid4()),
+                execution_id=generate_execution_id(HelperEntityType.WORKFLOW, 'not_found'),
                 workflow_id=workflow_id,
                 status='failed',
                 error_message=f"Workflow not found: {workflow_id}",
                 started_at=datetime.now(),
-                completed_at=datetime.now()
+                completed_at=datetime.now(),
+                metadata={'entity_type': 'workflow'}
             )
         
         # Parse workflow
@@ -996,12 +1009,13 @@ class WorkflowManager:
         
         if not workflow:
             return WorkflowExecution(
-                execution_id=str(uuid.uuid4()),
+                execution_id=generate_execution_id(HelperEntityType.WORKFLOW, workflow_data.get('name', 'parse_error')),
                 workflow_id=workflow_id,
                 status='failed',
                 error_message=f"Failed to parse workflow: {self.parser.get_errors()}",
                 started_at=datetime.now(),
-                completed_at=datetime.now()
+                completed_at=datetime.now(),
+                metadata={'entity_type': 'workflow'}
             )
         
         # Execute

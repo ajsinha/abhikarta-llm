@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 import threading
 
 logger = logging.getLogger(__name__)
@@ -526,6 +526,61 @@ class ExecutionLogger:
         """Get the file path for an execution log."""
         return self._get_log_path(entity_type, execution_id)
     
+    def detect_entity_type_from_id(self, execution_id: str) -> Optional[EntityType]:
+        """
+        Detect entity type from execution ID if it uses the traceable format.
+        
+        Format: <type>_<name>_<uuid> or <type>_<uuid>
+        Prefixes: wflow=workflow, agent=agent, swarm=swarm, aiorg=aiorg
+        
+        Args:
+            execution_id: Execution ID to parse
+            
+        Returns:
+            EntityType if detected, None otherwise
+        """
+        if not execution_id:
+            return None
+        
+        prefix = execution_id.split('_')[0] if '_' in execution_id else None
+        
+        type_map = {
+            'wflow': EntityType.WORKFLOW,
+            'agent': EntityType.AGENT,
+            'swarm': EntityType.SWARM,
+            'aiorg': EntityType.AIORG,
+        }
+        
+        return type_map.get(prefix)
+    
+    def find_log_file(self, execution_id: str) -> Optional[Tuple[EntityType, Path]]:
+        """
+        Find a log file by execution ID, auto-detecting entity type if possible.
+        
+        First tries to detect entity type from execution ID format.
+        If that fails, searches all entity type directories.
+        
+        Args:
+            execution_id: Execution ID to find
+            
+        Returns:
+            Tuple of (EntityType, Path) if found, None otherwise
+        """
+        # Try to detect from execution ID format
+        detected_type = self.detect_entity_type_from_id(execution_id)
+        if detected_type:
+            log_path = self._get_log_path(detected_type, execution_id)
+            if log_path.exists():
+                return (detected_type, log_path)
+        
+        # Search all entity type directories
+        for entity_type in EntityType:
+            log_path = self._get_log_path(entity_type, execution_id)
+            if log_path.exists():
+                return (entity_type, log_path)
+        
+        return None
+    
     def read_log_file(self, entity_type: EntityType, execution_id: str) -> Optional[Dict[str, Any]]:
         """Read a log file from disk."""
         log_path = self._get_log_path(entity_type, execution_id)
@@ -542,6 +597,22 @@ class ExecutionLogger:
         except Exception as e:
             logger.error(f"Failed to read log file {log_path}: {e}")
             return None
+    
+    def read_log_file_auto(self, execution_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Read a log file, auto-detecting entity type from execution ID.
+        
+        Args:
+            execution_id: Execution ID
+            
+        Returns:
+            Log data dict if found, None otherwise
+        """
+        result = self.find_log_file(execution_id)
+        if result:
+            entity_type, log_path = result
+            return self.read_log_file(entity_type, execution_id)
+        return None
     
     def list_logs(self, entity_type: EntityType, limit: int = 100) -> List[Dict[str, Any]]:
         """List recent execution logs for an entity type."""

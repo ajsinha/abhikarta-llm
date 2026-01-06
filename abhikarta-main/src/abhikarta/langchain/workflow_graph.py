@@ -1598,21 +1598,26 @@ class WorkflowGraphExecutor:
         Returns:
             WorkflowExecutionResult
         """
-        execution_id = str(uuid.uuid4())
+        from ..utils.helpers import generate_execution_id, EntityType as HelperEntityType
+        
+        # Load workflow first to get name for execution ID
+        workflow = self.db_facade.fetch_one(
+            "SELECT * FROM workflows WHERE workflow_id = ?",
+            (workflow_id,)
+        )
+        
+        workflow_name = workflow.get('name', '') if workflow else ''
+        execution_id = generate_execution_id(HelperEntityType.WORKFLOW, workflow_name)
+        
         result = WorkflowExecutionResult(
             execution_id=execution_id,
             workflow_id=workflow_id,
             input_data=input_data,
             started_at=datetime.utcnow()
         )
+        result.metadata['entity_type'] = 'workflow'
         
         try:
-            # Load workflow configuration
-            workflow = self.db_facade.fetch_one(
-                "SELECT * FROM workflows WHERE workflow_id = ?",
-                (workflow_id,)
-            )
-            
             if not workflow:
                 raise ValueError(f"Workflow not found: {workflow_id}")
             

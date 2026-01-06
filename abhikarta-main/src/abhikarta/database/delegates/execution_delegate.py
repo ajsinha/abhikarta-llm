@@ -102,9 +102,39 @@ class ExecutionDelegate(DatabaseDelegate):
     def create_execution(self, agent_id: str, user_id: str,
                          agent_version: str = None, status: str = 'pending',
                          input_data: str = None, execution_config: str = '{}',
-                         trace_data: str = '[]') -> Optional[str]:
-        """Create a new execution and return execution_id."""
-        execution_id = str(uuid.uuid4())
+                         trace_data: str = '[]',
+                         entity_type: str = 'agent',
+                         entity_name: str = None) -> Optional[str]:
+        """
+        Create a new execution and return execution_id.
+        
+        Args:
+            agent_id: ID of the agent/workflow/swarm being executed
+            user_id: User initiating the execution
+            agent_version: Version of the entity
+            status: Initial status (default: 'pending')
+            input_data: Input data as JSON string
+            execution_config: Execution configuration as JSON string
+            trace_data: Trace data as JSON string
+            entity_type: Type of entity ('agent', 'workflow', 'swarm', 'aiorg')
+            entity_name: Name of the entity for traceable execution ID
+            
+        Returns:
+            Execution ID or None if failed
+        """
+        from ...utils.helpers import generate_execution_id, EntityType as HelperEntityType
+        
+        # Map entity type string to enum
+        entity_type_map = {
+            'agent': HelperEntityType.AGENT,
+            'workflow': HelperEntityType.WORKFLOW,
+            'swarm': HelperEntityType.SWARM,
+            'aiorg': HelperEntityType.AIORG,
+        }
+        helper_entity_type = entity_type_map.get(entity_type, HelperEntityType.AGENT)
+        
+        execution_id = generate_execution_id(helper_entity_type, entity_name)
+        
         try:
             self.execute(
                 """INSERT INTO executions 

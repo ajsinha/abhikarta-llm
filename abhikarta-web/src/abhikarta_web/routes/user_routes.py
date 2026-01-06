@@ -589,46 +589,61 @@ class UserRoutes(AbstractRoutes):
             
             logger.info(f"Execution log search - Project root: {project_root}, CWD: {os.getcwd()}, Entity: {entity_type}")
             
-            # Approach 1: Use the execution logger service
+            # Approach 1: Use the execution logger service with auto-detection
             try:
                 from abhikarta.services.execution_logger import get_execution_logger, EntityType
                 exec_logger = get_execution_logger()
                 
-                # Map entity type string to EntityType enum
-                entity_type_enum = {
-                    'workflow': EntityType.WORKFLOW,
-                    'agent': EntityType.AGENT,
-                    'swarm': EntityType.SWARM,
-                    'aiorg': EntityType.AIORG
-                }.get(entity_type, EntityType.WORKFLOW)
-                
-                # Get path from logger and check with absolute path
-                log_path = exec_logger.get_log_path(entity_type_enum, execution_id)
-                abs_log_path = os.path.abspath(log_path)
-                possible_paths.append(f"Logger: {abs_log_path}")
-                
-                # Try reading via logger first
-                log_data = exec_logger.read_log_file(entity_type_enum, execution_id)
-                
-                if log_data:
-                    log_found = True
-                    if isinstance(log_data, dict):
-                        log_content = json.dumps(log_data, indent=2, default=str)
-                    else:
-                        log_content = str(log_data)
-                    logger.info(f"Found execution log via logger service: {abs_log_path}")
-                else:
-                    # Logger didn't find it, try direct read with absolute path
-                    if os.path.exists(abs_log_path):
-                        with open(abs_log_path, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                        try:
-                            log_data = json.loads(content)
-                            log_content = json.dumps(log_data, indent=2, default=str)
-                        except json.JSONDecodeError:
-                            log_content = content
+                # First try auto-detection from execution ID (for new traceable IDs)
+                auto_result = exec_logger.find_log_file(execution_id)
+                if auto_result:
+                    detected_type, log_path = auto_result
+                    log_data = exec_logger.read_log_file(detected_type, execution_id)
+                    if log_data:
                         log_found = True
-                        logger.info(f"Found execution log via direct read: {abs_log_path}")
+                        if isinstance(log_data, dict):
+                            log_content = json.dumps(log_data, indent=2, default=str)
+                        else:
+                            log_content = str(log_data)
+                        logger.info(f"Found execution log via auto-detection: {log_path} (type: {detected_type.value})")
+                        entity_type = detected_type.value  # Update entity_type to detected one
+                
+                if not log_found:
+                    # Map entity type string to EntityType enum
+                    entity_type_enum = {
+                        'workflow': EntityType.WORKFLOW,
+                        'agent': EntityType.AGENT,
+                        'swarm': EntityType.SWARM,
+                        'aiorg': EntityType.AIORG
+                    }.get(entity_type, EntityType.WORKFLOW)
+                    
+                    # Get path from logger and check with absolute path
+                    log_path = exec_logger.get_log_path(entity_type_enum, execution_id)
+                    abs_log_path = os.path.abspath(log_path)
+                    possible_paths.append(f"Logger: {abs_log_path}")
+                    
+                    # Try reading via logger
+                    log_data = exec_logger.read_log_file(entity_type_enum, execution_id)
+                
+                    if log_data:
+                        log_found = True
+                        if isinstance(log_data, dict):
+                            log_content = json.dumps(log_data, indent=2, default=str)
+                        else:
+                            log_content = str(log_data)
+                        logger.info(f"Found execution log via logger service: {abs_log_path}")
+                    else:
+                        # Logger didn't find it, try direct read with absolute path
+                        if os.path.exists(abs_log_path):
+                            with open(abs_log_path, 'r', encoding='utf-8') as f:
+                                content = f.read()
+                            try:
+                                log_data = json.loads(content)
+                                log_content = json.dumps(log_data, indent=2, default=str)
+                            except json.JSONDecodeError:
+                                log_content = content
+                            log_found = True
+                            logger.info(f"Found execution log via direct read: {abs_log_path}")
                     
             except ImportError as ie:
                 logger.warning(f"Execution logger import failed: {ie}")

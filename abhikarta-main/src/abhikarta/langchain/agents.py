@@ -580,20 +580,26 @@ class AgentExecutor:
         Returns:
             AgentExecutionResult with execution details
         """
-        execution_id = str(uuid.uuid4())
+        from ..utils.helpers import generate_execution_id, EntityType as HelperEntityType
+        
+        # Load agent config first to get name for execution ID
+        agent_config = self._load_agent_config(agent_id)
+        agent_name = agent_config.get('name', '') if agent_config else ''
+        
+        execution_id = generate_execution_id(HelperEntityType.AGENT, agent_name)
         result = AgentExecutionResult(
             execution_id=execution_id,
             agent_id=agent_id,
             input_data=input_data,
             started_at=datetime.now(timezone.utc)
         )
+        result.metadata['entity_type'] = 'agent'
         
         logger.info(f"[AGENT:{agent_id}] Starting execution: {execution_id}")
         logger.info(f"[AGENT:{agent_id}] Input: {str(input_data)[:500]}...")
         
         try:
-            # Load agent configuration
-            agent_config = self._load_agent_config(agent_id)
+            # Use pre-loaded agent config
             if not agent_config:
                 raise ValueError(f"Agent not found: {agent_id}")
             
