@@ -5,19 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="014fc29a-e95d-4fe0-82c3-f3b357c9f648" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-main/src/abhikarta/langchain/workflow_graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-main/src/abhikarta/langchain/workflow_graph.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-main/src/abhikarta/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-main/src/abhikarta/services/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/admin_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/admin_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/agent_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/agent_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/user_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/workflow_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/routes/workflow_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/agents/designer.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/agents/designer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/user/executions.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/user/executions.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/workflows/designer.html" beforeDir="false" afterPath="$PROJECT_DIR$/abhikarta-web/src/abhikarta_web/templates/workflows/designer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/abhikarta.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/abhikarta.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/abhikarta.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/abhikarta.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_server.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

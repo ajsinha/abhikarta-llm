@@ -493,3 +493,438 @@ The optimal strategy for learning physics is a balanced approach that includes:
 2026-01-05 19:42:44,447 - abhikarta_web.routes.user_routes - INFO - Determined entity_type: workflow for execution wflow_wf1_7df92c3a36b0
 2026-01-05 19:42:44,448 - abhikarta_web.routes.user_routes - INFO - Execution log search - Project root: /home/ashutosh/PycharmProjects/abhikarta-llm, CWD: /home/ashutosh/PycharmProjects/abhikarta-llm, Entity: workflow
 2026-01-05 19:42:44,449 - abhikarta_web.routes.user_routes - INFO - Found execution log via auto-detection: /home/ashutosh/PycharmProjects/abhikarta-llm/executionlog/workflow/wflow_wf1_7df92c3a36b0.json (type: workflow)
+2026-01-05 19:45:06,026 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
+2026-01-05 19:45:06,038 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
+2026-01-05 19:45:09,753 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
+2026-01-05 19:45:09,763 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
+2026-01-05 19:45:15,090 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
+2026-01-05 19:45:15,101 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
+2026-01-05 19:45:15,101 - abhikarta_web.routes.workflow_routes - INFO - Applied admin LLM defaults to workflow template
+2026-01-05 19:45:15,105 - abhikarta_web.routes.workflow_routes - INFO - Created workflow wf_d03a81a754ed from template wf_adaptive_learning
+2026-01-05 19:45:15,179 - abhikarta_web.routes.admin_routes - ERROR - Error getting LLM defaults: LLMDelegate.get_provider_models() got an unexpected keyword argument 'is_enabled'
+Traceback (most recent call last):
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-web/src/abhikarta_web/routes/admin_routes.py", line 1367, in api_llm_config_defaults
+    models = self.db_facade.llm.get_provider_models(provider_id, is_enabled=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: LLMDelegate.get_provider_models() got an unexpected keyword argument 'is_enabled'
+2026-01-05 19:46:51,685 - abhikarta_web.routes.workflow_routes - INFO - Raw dag_definition type: <class 'str'>
+2026-01-05 19:46:51,685 - abhikarta_web.routes.workflow_routes - INFO - Raw dag_definition preview: {"name": "wf2", "description": "", "nodes": [{"id": "context_loader", "type": "function", "title": "Context Loader", "config": {"function": "load_learning_context", "include_history": true, "include_feedback": true, "output_key": "learning_context"}, "position": {"x": 100, "y": 300}}, {"id": "task_analyzer", "type": "llm", "title": "Task Analyzer", "config": {"prompt_template": "Analyze this task with learning context:\n\nTASK:\n{input}\n\nHISTORICAL CONTEXT:\n{learning_context}\n\nConsider:\n1....
+2026-01-05 19:46:51,685 - abhikarta_web.routes.workflow_routes - INFO - Parsed dag_def keys: ['name', 'description', 'nodes', 'edges', 'entry_point', 'output_node', 'llm_config', 'learning_config', 'workflow_id', 'python_modules']
+2026-01-05 19:46:51,685 - abhikarta_web.routes.workflow_routes - INFO - dag_def['nodes'] count: 13
+2026-01-05 19:46:51,685 - abhikarta_web.routes.workflow_routes - INFO - dag_def['edges'] count: 16
+2026-01-05 19:46:51,686 - abhikarta_web.routes.workflow_routes - INFO - dag_def['entry_point']: context_loader
+2026-01-05 19:46:51,686 - abhikarta_web.routes.workflow_routes - INFO - First edge: type=<class 'dict'>, value={'from': 'context_loader', 'to': 'task_analyzer', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:46:51,686 - abhikarta.workflow.dag_parser - INFO - Parsing workflow definition with keys: ['name', 'description', 'nodes', 'edges', 'entry_point', 'output_node', 'llm_config', 'learning_config', 'workflow_id', 'python_modules']
+2026-01-05 19:46:51,686 - abhikarta.workflow.dag_parser - INFO - Parsing 13 nodes
+2026-01-05 19:46:51,686 - abhikarta.workflow.dag_parser - INFO - Loaded 13 nodes: ['context_loader', 'task_analyzer', 'strategy_selector', 'execution_engine', 'self_evaluator', 'quality_gate', 'improvement_analyzer', 'iterative_improver', 'output_finalizer', 'best_effort_output', 'learning_extractor', 'memory_updater', 'output_assembler']
+2026-01-05 19:46:51,686 - abhikarta.workflow.dag_parser - INFO - Parsing 16 edges from workflow definition
+2026-01-05 19:46:51,686 - abhikarta.workflow.dag_parser - INFO - raw_edges type: <class 'list'>
+2026-01-05 19:46:51,686 - abhikarta.workflow.dag_parser - INFO - First raw_edge type: <class 'dict'>, value: {'from': 'context_loader', 'to': 'task_analyzer', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:46:51,686 - abhikarta.workflow.dag_parser - INFO - Edge 0: type=<class 'dict'>, content={'from': 'context_loader', 'to': 'task_analyzer', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:46:51,686 - abhikarta.workflow.dag_parser - INFO - Edge 0 extracted: source='context_loader', target='task_analyzer'
+2026-01-05 19:46:51,686 - abhikarta.workflow.dag_parser - INFO - Edge 1: type=<class 'dict'>, content={'from': 'task_analyzer', 'to': 'strategy_selector', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Edge 1 extracted: source='task_analyzer', target='strategy_selector'
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Edge 2: type=<class 'dict'>, content={'from': 'strategy_selector', 'to': 'execution_engine', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Edge 2 extracted: source='strategy_selector', target='execution_engine'
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Edge 3: type=<class 'dict'>, content={'from': 'execution_engine', 'to': 'self_evaluator', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Edge 3 extracted: source='execution_engine', target='self_evaluator'
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Edge 4: type=<class 'dict'>, content={'from': 'self_evaluator', 'to': 'quality_gate', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Edge 4 extracted: source='self_evaluator', target='quality_gate'
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Loaded 16 valid edges
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - First 5 edges: [('context_loader', 'task_analyzer', ''), ('task_analyzer', 'strategy_selector', ''), ('strategy_selector', 'execution_engine', ''), ('execution_engine', 'self_evaluator', ''), ('self_evaluator', 'quality_gate', '')]
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Validating workflow with 13 nodes and 16 edges
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Workflow contains cycles - this is allowed for iterative workflows with conditional edges
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Edge validation: 16 valid edges out of 16 total
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Workflow parsed successfully
+2026-01-05 19:46:51,687 - abhikarta.workflow.dag_parser - INFO - Parsed workflow: wf_d03a81a754ed, 13 nodes, 16 edges, entry_point=context_loader
+2026-01-05 19:46:51,688 - abhikarta.workflow.executor - INFO - LangGraph workflow executor initialized
+2026-01-05 19:46:51,688 - abhikarta.workflow.executor - INFO - Starting LangGraph workflow execution: wflow_wf2_ef14ad5b7429
+2026-01-05 19:46:51,688 - abhikarta.services.execution_logger - INFO - Started execution log: wflow_wf2_ef14ad5b7429 (workflow)
+2026-01-05 19:46:51,688 - abhikarta.workflow.executor - WARNING - Failed to initialize execution logging: 'DAGWorkflow' object has no attribute 'dependencies'
+2026-01-05 19:46:51,688 - abhikarta.workflow.executor - INFO - === Converting workflow to LangGraph config ===
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO - Workflow ID: wf_d03a81a754ed
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO - DAGWorkflow has 13 nodes and 16 edges
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO - DAGWorkflow.entry_point: 'context_loader'
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO - Processing 16 edges from DAGWorkflow
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO - Entry point from DAGWorkflow.entry_point: 'context_loader'
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO - Final entry_point set in config: 'context_loader'
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO - === LangGraph config result ===
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO -   Nodes: 13
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO -   Edges: 16
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO -   Entry point: 'context_loader'
+2026-01-05 19:46:51,689 - abhikarta.workflow.executor - INFO -   First 5 edges: [{'source': 'context_loader', 'target': 'task_analyzer'}, {'source': 'task_analyzer', 'target': 'strategy_selector'}, {'source': 'strategy_selector', 'target': 'execution_engine'}, {'source': 'execution_engine', 'target': 'self_evaluator'}, {'source': 'self_evaluator', 'target': 'quality_gate'}]
+2026-01-05 19:46:51,689 - abhikarta.langchain.workflow_graph - INFO - === Creating workflow graph ===
+2026-01-05 19:46:51,689 - abhikarta.langchain.workflow_graph - INFO - Config keys: ['nodes', 'edges', 'metadata', 'entry_point']
+2026-01-05 19:46:51,689 - abhikarta.langchain.workflow_graph - INFO - Entry point in config: context_loader
+2026-01-05 19:46:51,689 - abhikarta.langchain.workflow_graph - INFO - Nodes count: 13
+2026-01-05 19:46:51,690 - abhikarta.langchain.workflow_graph - INFO - Edges count: 16
+2026-01-05 19:46:51,690 - abhikarta.langchain.workflow_graph - INFO - First edges: [{'source': 'context_loader', 'target': 'task_analyzer'}, {'source': 'task_analyzer', 'target': 'strategy_selector'}, {'source': 'strategy_selector', 'target': 'execution_engine'}, {'source': 'execution_engine', 'target': 'self_evaluator'}, {'source': 'self_evaluator', 'target': 'quality_gate'}]
+2026-01-05 19:46:51,694 - abhikarta.langchain.workflow_graph - INFO - Entry point from config: 'context_loader'
+2026-01-05 19:46:51,695 - abhikarta.langchain.workflow_graph - INFO - Executable node IDs: ['context_loader', 'task_analyzer', 'strategy_selector', 'execution_engine', 'self_evaluator', 'quality_gate', 'improvement_analyzer', 'iterative_improver', 'output_finalizer', 'best_effort_output', 'learning_extractor', 'memory_updater', 'output_assembler']
+2026-01-05 19:46:51,695 - abhikarta.langchain.workflow_graph - INFO - ✓ Setting entry point from config: context_loader
+2026-01-05 19:46:51,695 - abhikarta.langchain.workflow_graph - INFO - Edges by source: ['context_loader', 'task_analyzer', 'strategy_selector', 'execution_engine', 'self_evaluator', 'quality_gate', 'improvement_analyzer', 'iterative_improver', 'output_finalizer', 'best_effort_output', 'learning_extractor']
+2026-01-05 19:46:51,695 - abhikarta.langchain.workflow_graph - INFO - === Processing 16 edges ===
+2026-01-05 19:46:51,695 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: context_loader -> task_analyzer
+2026-01-05 19:46:51,695 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: task_analyzer -> strategy_selector
+2026-01-05 19:46:51,696 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: strategy_selector -> execution_engine
+2026-01-05 19:46:51,696 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: execution_engine -> self_evaluator
+2026-01-05 19:46:51,696 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: self_evaluator -> quality_gate
+2026-01-05 19:46:51,696 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: quality_gate -> ['output_finalizer', 'best_effort_output', 'improvement_analyzer'] (default: output_finalizer)
+2026-01-05 19:46:51,697 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: improvement_analyzer -> iterative_improver
+2026-01-05 19:46:51,697 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: iterative_improver -> self_evaluator
+2026-01-05 19:46:51,697 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: output_finalizer -> ['learning_extractor', 'output_assembler'] (default: learning_extractor)
+2026-01-05 19:46:51,697 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: best_effort_output -> ['learning_extractor', 'output_assembler'] (default: learning_extractor)
+2026-01-05 19:46:51,697 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: learning_extractor -> ['memory_updater', 'output_assembler'] (default: memory_updater)
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO - === Edge processing summary ===
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   Regular edges: 16
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   Conditional edges: 0
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   To END: 0
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   Entry points: 0
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   Skipped: 5
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   Sources with conditionals: ['best_effort_output', 'context_loader', 'improvement_analyzer', 'learning_extractor', 'self_evaluator', 'quality_gate', 'output_finalizer', 'execution_engine', 'iterative_improver', 'strategy_selector', 'task_analyzer']
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   Total edges added to graph: 16
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO - === Workflow graph created ===
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   Nodes: 13 executable
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   Entry point: context_loader
+2026-01-05 19:46:51,698 - abhikarta.langchain.workflow_graph - INFO -   Edges by source: [('context_loader', 1), ('task_analyzer', 1), ('strategy_selector', 1), ('execution_engine', 1), ('self_evaluator', 1)]...
+2026-01-05 19:46:51,741 - abhikarta.langchain.workflow_graph - INFO - Graph compiled successfully
+2026-01-05 19:46:51,741 - abhikarta.langchain.workflow_graph - INFO - Executing function node: context_loader
+2026-01-05 19:46:51,741 - abhikarta.langchain.workflow_graph - INFO - Function node context_loader (load_learning_context) completed successfully
+2026-01-05 19:46:51,742 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: task_analyzer
+2026-01-05 19:46:51,742 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://localhost:11434
+2026-01-05 19:46:51,742 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://localhost:11434
+2026-01-05 19:46:51,742 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://localhost:11434
+2026-01-05 19:46:51,775 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] Raw input type: dict
+2026-01-05 19:46:51,775 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] Extracted input value: How you describe all continents in world ?...
+2026-01-05 19:46:51,775 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] LLM Input prompt (558 chars): Analyze this task with learning context:
+
+TASK:
+How you describe all continents in world ?
+
+HISTORICAL CONTEXT:
+Learning Context:
+- Historical patterns: None recorded yet (new session)
+- Successful strategies: Starting fresh
+- Failed approaches: None recorded
+- This is iteration 1
+- Task: How you describe all continents in world ?
+
+Consider:
+1. TASK_TYPE: What kind of task is this
+2. SIMILAR_PAST_TASKS: Related previous tasks
+3. SUCCESSFUL_APPROACHES: What worked before
+4. FAILED_APPROACHES: Wha...
+2026-01-05 19:46:51,776 - httpx - INFO - HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 404 Not Found"
+2026-01-05 19:46:51,777 - abhikarta.langchain.workflow_graph - ERROR - LLM node task_analyzer failed: model "llama3.2:3b" not found, try pulling it first (status code: 404)
+2026-01-05 19:46:51,778 - abhikarta.langchain.workflow_graph - ERROR - Full traceback:
+Traceback (most recent call last):
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/src/abhikarta/langchain/workflow_graph.py", line 336, in llm_node
+    response = llm.invoke(messages)
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 398, in invoke
+    self.generate_prompt(
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1117, in generate_prompt
+    return self.generate(prompt_messages, stop=stop, callbacks=callbacks, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 927, in generate
+    self._generate_with_cache(
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1221, in _generate_with_cache
+    result = self._generate(
+             ^^^^^^^^^^^^^^^
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_ollama/chat_models.py", line 1030, in _generate
+    final_chunk = self._chat_stream_with_aggregation(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_ollama/chat_models.py", line 965, in _chat_stream_with_aggregation
+    for chunk in self._iterate_over_stream(messages, stop, **kwargs):
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_ollama/chat_models.py", line 1054, in _iterate_over_stream
+    for stream_resp in self._create_chat_stream(messages, stop, **kwargs):
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/langchain_ollama/chat_models.py", line 952, in _create_chat_stream
+    yield from self._client.chat(**chat_params)
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/.venv/lib/python3.12/site-packages/ollama/_client.py", line 179, in inner
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: model "llama3.2:3b" not found, try pulling it first (status code: 404)
+
+2026-01-05 19:46:51,779 - abhikarta.langchain.workflow_graph - WARNING - [task_analyzer] Routing to END due to error: LLM Model Not Found: 'llama3.2:3b'
+
+The Ollama model 'llama3.2:3b' is not installed.
+
+To fix this, run one of the following:
+  ollama pull llama3.2:3b
+  ollama pull llama3.2:latest
+  ollama pull mistral:latest
+
+Or update the workflow template to use an installed model.
+Check available models with: ollama list
+2026-01-05 19:46:51,780 - abhikarta.services.execution_logger - INFO - Completed execution log: wflow_wf2_ef14ad5b7429 (failed)
+2026-01-05 19:47:10,098 - abhikarta_web.routes.admin_routes - ERROR - Error getting LLM defaults: LLMDelegate.get_provider_models() got an unexpected keyword argument 'is_enabled'
+Traceback (most recent call last):
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-web/src/abhikarta_web/routes/admin_routes.py", line 1367, in api_llm_config_defaults
+    models = self.db_facade.llm.get_provider_models(provider_id, is_enabled=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: LLMDelegate.get_provider_models() got an unexpected keyword argument 'is_enabled'
+2026-01-05 19:49:08,062 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
+2026-01-05 19:49:08,074 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
+2026-01-05 19:49:11,135 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
+2026-01-05 19:49:11,146 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
+2026-01-05 19:49:16,221 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
+2026-01-05 19:49:16,234 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
+2026-01-05 19:49:16,235 - abhikarta_web.routes.workflow_routes - INFO - Applied admin LLM defaults to workflow template
+2026-01-05 19:49:16,240 - abhikarta_web.routes.workflow_routes - INFO - Created workflow wf_0b673d39368e from template wf_adaptive_learning
+2026-01-05 19:49:16,302 - abhikarta_web.routes.admin_routes - ERROR - Error getting LLM defaults: LLMDelegate.get_provider_models() got an unexpected keyword argument 'is_enabled'
+Traceback (most recent call last):
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-web/src/abhikarta_web/routes/admin_routes.py", line 1367, in api_llm_config_defaults
+    models = self.db_facade.llm.get_provider_models(provider_id, is_enabled=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: LLMDelegate.get_provider_models() got an unexpected keyword argument 'is_enabled'
+2026-01-05 19:52:13,074 - abhikarta_web.routes.workflow_routes - INFO - Raw dag_definition type: <class 'str'>
+2026-01-05 19:52:13,074 - abhikarta_web.routes.workflow_routes - INFO - Raw dag_definition preview: {"name": "wf2", "description": "", "nodes": [{"id": "context_loader", "type": "function", "title": "Context Loader", "config": {"function": "load_learning_context", "include_history": true, "include_feedback": true, "output_key": "learning_context"}, "position": {"x": 100, "y": 300}}, {"id": "task_analyzer", "type": "llm", "title": "Task Analyzer", "config": {"prompt_template": "Analyze this task with learning context:\n\nTASK:\n{input}\n\nHISTORICAL CONTEXT:\n{learning_context}\n\nConsider:\n1....
+2026-01-05 19:52:13,074 - abhikarta_web.routes.workflow_routes - INFO - Parsed dag_def keys: ['name', 'description', 'nodes', 'edges', 'entry_point', 'output_node', 'llm_config', 'learning_config', 'workflow_id', 'python_modules']
+2026-01-05 19:52:13,074 - abhikarta_web.routes.workflow_routes - INFO - dag_def['nodes'] count: 13
+2026-01-05 19:52:13,074 - abhikarta_web.routes.workflow_routes - INFO - dag_def['edges'] count: 16
+2026-01-05 19:52:13,074 - abhikarta_web.routes.workflow_routes - INFO - dag_def['entry_point']: context_loader
+2026-01-05 19:52:13,075 - abhikarta_web.routes.workflow_routes - INFO - First edge: type=<class 'dict'>, value={'from': 'context_loader', 'to': 'task_analyzer', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Parsing workflow definition with keys: ['name', 'description', 'nodes', 'edges', 'entry_point', 'output_node', 'llm_config', 'learning_config', 'workflow_id', 'python_modules']
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Parsing 13 nodes
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Loaded 13 nodes: ['context_loader', 'task_analyzer', 'strategy_selector', 'execution_engine', 'self_evaluator', 'quality_gate', 'improvement_analyzer', 'iterative_improver', 'output_finalizer', 'best_effort_output', 'learning_extractor', 'memory_updater', 'output_assembler']
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Parsing 16 edges from workflow definition
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - raw_edges type: <class 'list'>
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - First raw_edge type: <class 'dict'>, value: {'from': 'context_loader', 'to': 'task_analyzer', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 0: type=<class 'dict'>, content={'from': 'context_loader', 'to': 'task_analyzer', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 0 extracted: source='context_loader', target='task_analyzer'
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 1: type=<class 'dict'>, content={'from': 'task_analyzer', 'to': 'strategy_selector', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 1 extracted: source='task_analyzer', target='strategy_selector'
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 2: type=<class 'dict'>, content={'from': 'strategy_selector', 'to': 'execution_engine', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 2 extracted: source='strategy_selector', target='execution_engine'
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 3: type=<class 'dict'>, content={'from': 'execution_engine', 'to': 'self_evaluator', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 3 extracted: source='execution_engine', target='self_evaluator'
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 4: type=<class 'dict'>, content={'from': 'self_evaluator', 'to': 'quality_gate', 'fromPort': 'output', 'toPort': 'input'}
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Edge 4 extracted: source='self_evaluator', target='quality_gate'
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - Loaded 16 valid edges
+2026-01-05 19:52:13,075 - abhikarta.workflow.dag_parser - INFO - First 5 edges: [('context_loader', 'task_analyzer', ''), ('task_analyzer', 'strategy_selector', ''), ('strategy_selector', 'execution_engine', ''), ('execution_engine', 'self_evaluator', ''), ('self_evaluator', 'quality_gate', '')]
+2026-01-05 19:52:13,076 - abhikarta.workflow.dag_parser - INFO - Validating workflow with 13 nodes and 16 edges
+2026-01-05 19:52:13,076 - abhikarta.workflow.dag_parser - INFO - Workflow contains cycles - this is allowed for iterative workflows with conditional edges
+2026-01-05 19:52:13,076 - abhikarta.workflow.dag_parser - INFO - Edge validation: 16 valid edges out of 16 total
+2026-01-05 19:52:13,076 - abhikarta.workflow.dag_parser - INFO - Workflow parsed successfully
+2026-01-05 19:52:13,076 - abhikarta.workflow.dag_parser - INFO - Parsed workflow: wf_0b673d39368e, 13 nodes, 16 edges, entry_point=context_loader
+2026-01-05 19:52:13,076 - abhikarta.workflow.executor - INFO - LangGraph workflow executor initialized
+2026-01-05 19:52:13,076 - abhikarta.workflow.executor - INFO - Starting LangGraph workflow execution: wflow_wf2_f98cccfcd14d
+2026-01-05 19:52:13,076 - abhikarta.services.execution_logger - INFO - Started execution log: wflow_wf2_f98cccfcd14d (workflow)
+2026-01-05 19:52:13,076 - abhikarta.workflow.executor - WARNING - Failed to initialize execution logging: 'DAGWorkflow' object has no attribute 'dependencies'
+2026-01-05 19:52:13,076 - abhikarta.workflow.executor - INFO - === Converting workflow to LangGraph config ===
+2026-01-05 19:52:13,076 - abhikarta.workflow.executor - INFO - Workflow ID: wf_0b673d39368e
+2026-01-05 19:52:13,076 - abhikarta.workflow.executor - INFO - DAGWorkflow has 13 nodes and 16 edges
+2026-01-05 19:52:13,077 - abhikarta.workflow.executor - INFO - DAGWorkflow.entry_point: 'context_loader'
+2026-01-05 19:52:13,077 - abhikarta.workflow.executor - INFO - Processing 16 edges from DAGWorkflow
+2026-01-05 19:52:13,077 - abhikarta.workflow.executor - INFO - Entry point from DAGWorkflow.entry_point: 'context_loader'
+2026-01-05 19:52:13,077 - abhikarta.workflow.executor - INFO - Final entry_point set in config: 'context_loader'
+2026-01-05 19:52:13,077 - abhikarta.workflow.executor - INFO - === LangGraph config result ===
+2026-01-05 19:52:13,077 - abhikarta.workflow.executor - INFO -   Nodes: 13
+2026-01-05 19:52:13,077 - abhikarta.workflow.executor - INFO -   Edges: 16
+2026-01-05 19:52:13,077 - abhikarta.workflow.executor - INFO -   Entry point: 'context_loader'
+2026-01-05 19:52:13,077 - abhikarta.workflow.executor - INFO -   First 5 edges: [{'source': 'context_loader', 'target': 'task_analyzer'}, {'source': 'task_analyzer', 'target': 'strategy_selector'}, {'source': 'strategy_selector', 'target': 'execution_engine'}, {'source': 'execution_engine', 'target': 'self_evaluator'}, {'source': 'self_evaluator', 'target': 'quality_gate'}]
+2026-01-05 19:52:13,077 - abhikarta.langchain.workflow_graph - INFO - === Creating workflow graph ===
+2026-01-05 19:52:13,077 - abhikarta.langchain.workflow_graph - INFO - Config keys: ['nodes', 'edges', 'metadata', 'entry_point']
+2026-01-05 19:52:13,077 - abhikarta.langchain.workflow_graph - INFO - Entry point in config: context_loader
+2026-01-05 19:52:13,077 - abhikarta.langchain.workflow_graph - INFO - Nodes count: 13
+2026-01-05 19:52:13,077 - abhikarta.langchain.workflow_graph - INFO - Edges count: 16
+2026-01-05 19:52:13,077 - abhikarta.langchain.workflow_graph - INFO - First edges: [{'source': 'context_loader', 'target': 'task_analyzer'}, {'source': 'task_analyzer', 'target': 'strategy_selector'}, {'source': 'strategy_selector', 'target': 'execution_engine'}, {'source': 'execution_engine', 'target': 'self_evaluator'}, {'source': 'self_evaluator', 'target': 'quality_gate'}]
+2026-01-05 19:52:13,081 - abhikarta.langchain.workflow_graph - INFO - Entry point from config: 'context_loader'
+2026-01-05 19:52:13,081 - abhikarta.langchain.workflow_graph - INFO - Executable node IDs: ['context_loader', 'task_analyzer', 'strategy_selector', 'execution_engine', 'self_evaluator', 'quality_gate', 'improvement_analyzer', 'iterative_improver', 'output_finalizer', 'best_effort_output', 'learning_extractor', 'memory_updater', 'output_assembler']
+2026-01-05 19:52:13,081 - abhikarta.langchain.workflow_graph - INFO - ✓ Setting entry point from config: context_loader
+2026-01-05 19:52:13,081 - abhikarta.langchain.workflow_graph - INFO - Edges by source: ['context_loader', 'task_analyzer', 'strategy_selector', 'execution_engine', 'self_evaluator', 'quality_gate', 'improvement_analyzer', 'iterative_improver', 'output_finalizer', 'best_effort_output', 'learning_extractor']
+2026-01-05 19:52:13,081 - abhikarta.langchain.workflow_graph - INFO - === Processing 16 edges ===
+2026-01-05 19:52:13,081 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: context_loader -> task_analyzer
+2026-01-05 19:52:13,081 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: task_analyzer -> strategy_selector
+2026-01-05 19:52:13,082 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: strategy_selector -> execution_engine
+2026-01-05 19:52:13,082 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: execution_engine -> self_evaluator
+2026-01-05 19:52:13,082 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: self_evaluator -> quality_gate
+2026-01-05 19:52:13,082 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: quality_gate -> ['output_finalizer', 'best_effort_output', 'improvement_analyzer'] (default: output_finalizer)
+2026-01-05 19:52:13,082 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: improvement_analyzer -> iterative_improver
+2026-01-05 19:52:13,082 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: iterative_improver -> self_evaluator
+2026-01-05 19:52:13,082 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: output_finalizer -> ['learning_extractor', 'output_assembler'] (default: learning_extractor)
+2026-01-05 19:52:13,082 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: best_effort_output -> ['learning_extractor', 'output_assembler'] (default: learning_extractor)
+2026-01-05 19:52:13,082 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: learning_extractor -> ['memory_updater', 'output_assembler'] (default: memory_updater)
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO - === Edge processing summary ===
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   Regular edges: 16
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   Conditional edges: 0
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   To END: 0
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   Entry points: 0
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   Skipped: 5
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   Sources with conditionals: ['best_effort_output', 'context_loader', 'improvement_analyzer', 'learning_extractor', 'self_evaluator', 'quality_gate', 'output_finalizer', 'execution_engine', 'iterative_improver', 'strategy_selector', 'task_analyzer']
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   Total edges added to graph: 16
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO - === Workflow graph created ===
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   Nodes: 13 executable
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   Entry point: context_loader
+2026-01-05 19:52:13,083 - abhikarta.langchain.workflow_graph - INFO -   Edges by source: [('context_loader', 1), ('task_analyzer', 1), ('strategy_selector', 1), ('execution_engine', 1), ('self_evaluator', 1)]...
+2026-01-05 19:52:13,123 - abhikarta.langchain.workflow_graph - INFO - Graph compiled successfully
+2026-01-05 19:52:13,124 - abhikarta.langchain.workflow_graph - INFO - Executing function node: context_loader
+2026-01-05 19:52:13,124 - abhikarta.langchain.workflow_graph - INFO - Function node context_loader (load_learning_context) completed successfully
+2026-01-05 19:52:13,124 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: task_analyzer
+2026-01-05 19:52:13,124 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:13,125 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:13,125 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:13,157 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] Raw input type: dict
+2026-01-05 19:52:13,157 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] Extracted input value: how you best desribe united nations...
+2026-01-05 19:52:13,157 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] LLM Input prompt (544 chars): Analyze this task with learning context:
+
+TASK:
+how you best desribe united nations
+
+HISTORICAL CONTEXT:
+Learning Context:
+- Historical patterns: None recorded yet (new session)
+- Successful strategies: Starting fresh
+- Failed approaches: None recorded
+- This is iteration 1
+- Task: how you best desribe united nations
+
+Consider:
+1. TASK_TYPE: What kind of task is this
+2. SIMILAR_PAST_TASKS: Related previous tasks
+3. SUCCESSFUL_APPROACHES: What worked before
+4. FAILED_APPROACHES: What didn't work
+...
+2026-01-05 19:52:15,004 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-05 19:52:17,589 - abhikarta.langchain.workflow_graph - INFO - [NODE:task_analyzer] LLM Output (1915 chars): Analysis:
+
+**TASK_TYPE:** This task is a descriptive writing prompt, where the individual needs to provide a clear and concise description of the United Nations.
+
+**SIMILAR_PAST_TASKS:** None recorded yet, as this is iteration 1. However, in future sessions, related tasks may include:
+- Describing other international organizations
+- Explaining the role of diplomacy in global relations
+- Writing about specific UN initiatives or programs
+
+**SUCCESSFUL_APPROACHES:** Since this is the first iteratio...
+2026-01-05 19:52:17,599 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: strategy_selector
+2026-01-05 19:52:17,600 - abhikarta.langchain.workflow_graph - INFO - [NODE:strategy_selector] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:17,600 - abhikarta.langchain.workflow_graph - INFO - [NODE:strategy_selector] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:17,600 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:17,640 - abhikarta.langchain.workflow_graph - INFO - [NODE:strategy_selector] Raw input type: dict
+2026-01-05 19:52:17,640 - abhikarta.langchain.workflow_graph - INFO - [NODE:strategy_selector] Extracted input value: how you best desribe united nations...
+2026-01-05 19:52:17,640 - abhikarta.langchain.workflow_graph - INFO - [NODE:strategy_selector] LLM Input prompt (2137 chars): Select execution strategy:
+
+TASK ANALYSIS:
+Analysis:
+
+**TASK_TYPE:** This task is a descriptive writing prompt, where the individual needs to provide a clear and concise description of the United Nations.
+
+**SIMILAR_PAST_TASKS:** None recorded yet, as this is iteration 1. However, in future sessions, related tasks may include:
+- Describing other international organizations
+- Explaining the role of diplomacy in global relations
+- Writing about specific UN initiatives or programs
+
+**SUCCESSFUL_APP...
+2026-01-05 19:52:17,873 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-05 19:52:20,136 - abhikarta.langchain.workflow_graph - INFO - [NODE:strategy_selector] LLM Output (1807 chars): Based on the analysis provided, I recommend selecting the **Hybrid Approach** (Strategy 4) for this task.
+
+The Hybrid Approach combines elements of different strategies to create a unique approach that leverages the strengths of each. In this case, it allows individuals to:
+
+1. Build upon successful approaches from similar tasks (although there are none recorded yet), by adopting general best practices for descriptive writing prompts.
+2. Adapt to the specific requirements and challenges of this ...
+2026-01-05 19:52:20,148 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: execution_engine
+2026-01-05 19:52:20,149 - abhikarta.langchain.workflow_graph - INFO - [NODE:execution_engine] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:20,149 - abhikarta.langchain.workflow_graph - INFO - [NODE:execution_engine] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:20,149 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:20,199 - abhikarta.langchain.workflow_graph - INFO - [NODE:execution_engine] Raw input type: dict
+2026-01-05 19:52:20,199 - abhikarta.langchain.workflow_graph - INFO - [NODE:execution_engine] Extracted input value: how you best desribe united nations...
+2026-01-05 19:52:20,199 - abhikarta.langchain.workflow_graph - INFO - [NODE:execution_engine] LLM Input prompt (3954 chars): Execute task:
+
+TASK:
+how you best desribe united nations
+
+STRATEGY:
+Based on the analysis provided, I recommend selecting the **Hybrid Approach** (Strategy 4) for this task.
+
+The Hybrid Approach combines elements of different strategies to create a unique approach that leverages the strengths of each. In this case, it allows individuals to:
+
+1. Build upon successful approaches from similar tasks (although there are none recorded yet), by adopting general best practices for descriptive writing pr...
+2026-01-05 19:52:20,540 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-05 19:52:25,060 - abhikarta.langchain.workflow_graph - INFO - [NODE:execution_engine] LLM Output (3488 chars): The United Nations (UN) is a complex and multifaceted organization that plays a vital role in promoting peace, security, and cooperation among nations. At its core, the UN is an international organization dedicated to achieving five main goals: maintaining peace and security, delivering humanitarian aid, advancing sustainable development, protecting human rights, and upholding international law.
+
+The UN was established in 1945, in the aftermath of World War II, with the signing of the United Nat...
+2026-01-05 19:52:25,072 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: self_evaluator
+2026-01-05 19:52:25,073 - abhikarta.langchain.workflow_graph - INFO - [NODE:self_evaluator] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:25,073 - abhikarta.langchain.workflow_graph - INFO - [NODE:self_evaluator] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:25,073 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:25,112 - abhikarta.langchain.workflow_graph - INFO - [NODE:self_evaluator] Raw input type: dict
+2026-01-05 19:52:25,112 - abhikarta.langchain.workflow_graph - INFO - [NODE:self_evaluator] Extracted input value: how you best desribe united nations...
+2026-01-05 19:52:25,112 - abhikarta.langchain.workflow_graph - INFO - [NODE:self_evaluator] LLM Input prompt (5598 chars): Evaluate this execution:
+
+TASK:
+how you best desribe united nations
+
+RESULT:
+The United Nations (UN) is a complex and multifaceted organization that plays a vital role in promoting peace, security, and cooperation among nations. At its core, the UN is an international organization dedicated to achieving five main goals: maintaining peace and security, delivering humanitarian aid, advancing sustainable development, protecting human rights, and upholding international law.
+
+The UN was established ...
+2026-01-05 19:52:25,455 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-05 19:52:27,781 - abhikarta.langchain.workflow_graph - INFO - [NODE:self_evaluator] LLM Output (1536 chars): Evaluation:
+
+1. QUALITY_SCORE: 8/10
+The description is clear, concise, and well-organized, effectively addressing the task's requirements. However, there are a few areas where it could be improved, such as providing more specific examples or statistics to support claims.
+
+2. COMPLETENESS: 7/10
+The description covers most aspects of the United Nations, including its purposes, mechanisms, and achievements. However, some details, such as the UN's budget or personnel numbers, are not included, which...
+2026-01-05 19:52:27,792 - abhikarta.langchain.workflow_graph - INFO - Executing condition node: quality_gate
+2026-01-05 19:52:27,793 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: output_finalizer
+2026-01-05 19:52:27,794 - abhikarta.langchain.workflow_graph - INFO - [NODE:output_finalizer] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:27,794 - abhikarta.langchain.workflow_graph - INFO - [NODE:output_finalizer] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:27,794 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:27,840 - abhikarta.langchain.workflow_graph - INFO - [NODE:output_finalizer] Raw input type: dict
+2026-01-05 19:52:27,840 - abhikarta.langchain.workflow_graph - INFO - [NODE:output_finalizer] Extracted input value: how you best desribe united nations...
+2026-01-05 19:52:27,840 - abhikarta.langchain.workflow_graph - INFO - [NODE:output_finalizer] LLM Input prompt (5100 chars): Finalize output:
+
+RESULT:
+The United Nations (UN) is a complex and multifaceted organization that plays a vital role in promoting peace, security, and cooperation among nations. At its core, the UN is an international organization dedicated to achieving five main goals: maintaining peace and security, delivering humanitarian aid, advancing sustainable development, protecting human rights, and upholding international law.
+
+The UN was established in 1945, in the aftermath of World War II, with the...
+2026-01-05 19:52:28,117 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-05 19:52:38,488 - abhikarta.langchain.workflow_graph - INFO - [NODE:output_finalizer] LLM Output (7539 chars): RESULT:
+
+The United Nations (UN) is a complex and multifaceted organization that plays a vital role in promoting peace, security, and cooperation among nations. At its core, the UN is an international organization dedicated to achieving five main goals: maintaining peace and security, delivering humanitarian aid, advancing sustainable development, protecting human rights, and upholding international law.
+
+The UN was established in 1945, in the aftermath of World War II, with the signing of the U...
+2026-01-05 19:52:38,500 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: learning_extractor
+2026-01-05 19:52:38,501 - abhikarta.langchain.workflow_graph - INFO - [NODE:learning_extractor] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:38,501 - abhikarta.langchain.workflow_graph - INFO - [NODE:learning_extractor] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:38,501 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-05 19:52:38,545 - abhikarta.langchain.workflow_graph - INFO - [NODE:learning_extractor] Raw input type: dict
+2026-01-05 19:52:38,545 - abhikarta.langchain.workflow_graph - INFO - [NODE:learning_extractor] Extracted input value: how you best desribe united nations...
+2026-01-05 19:52:38,545 - abhikarta.langchain.workflow_graph - INFO - [NODE:learning_extractor] LLM Input prompt (11202 chars): Extract learnings:
+
+TASK:
+how you best desribe united nations
+
+STRATEGY:
+Based on the analysis provided, I recommend selecting the **Hybrid Approach** (Strategy 4) for this task.
+
+The Hybrid Approach combines elements of different strategies to create a unique approach that leverages the strengths of each. In this case, it allows individuals to:
+
+1. Build upon successful approaches from similar tasks (although there are none recorded yet), by adopting general best practices for descriptive writi...
+2026-01-05 19:52:39,042 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
+2026-01-05 19:52:41,442 - abhikarta.langchain.workflow_graph - INFO - [NODE:learning_extractor] LLM Output (1723 chars): Here are the learnings extracted from the task:
+
+**Key Findings**
+
+1. **Hybrid Approach**: The Hybrid Approach, which combines elements of different strategies, is recommended for this task.
+2. **Strengths of Successful Approaches**: Clear and concise language, relevant details, and logical organization are key strengths of successful approaches.
+3. **Weaknesses of Failed Approaches**: Overly broad or vague descriptions, lack of specific examples, and failing to address key aspects can lead to i...
+2026-01-05 19:52:41,453 - abhikarta.langchain.workflow_graph - INFO - Executing function node: memory_updater
+2026-01-05 19:52:41,454 - abhikarta.langchain.workflow_graph - INFO - Function node memory_updater (update_learning_memory) completed successfully
+2026-01-05 19:52:41,462 - abhikarta.services.execution_logger - INFO - Completed execution log: wflow_wf2_f98cccfcd14d (completed)
+2026-01-05 19:53:12,130 - abhikarta.swarm.swarm_template - INFO - Found 5 JSON swarm template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/swarms
+2026-01-05 19:53:12,131 - abhikarta.swarm.swarm_template - INFO - SwarmTemplateManager initialized with 7 templates
+2026-01-05 19:53:19,256 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
+2026-01-05 19:53:19,266 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
+2026-01-05 19:53:23,094 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
+2026-01-05 19:53:23,101 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
+2026-01-05 19:53:37,160 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
+2026-01-05 19:53:37,170 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
+2026-01-05 19:53:37,170 - abhikarta_web.routes.workflow_routes - INFO - Applied admin LLM defaults to workflow template
+2026-01-05 19:53:37,174 - abhikarta_web.routes.workflow_routes - INFO - Created workflow wf_1b80a5b78835 from template wf_chain_of_verification
+2026-01-05 19:53:37,237 - abhikarta_web.routes.admin_routes - ERROR - Error getting LLM defaults: LLMDelegate.get_provider_models() got an unexpected keyword argument 'is_enabled'
+Traceback (most recent call last):
+  File "/home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-web/src/abhikarta_web/routes/admin_routes.py", line 1367, in api_llm_config_defaults
+    models = self.db_facade.llm.get_provider_models(provider_id, is_enabled=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: LLMDelegate.get_provider_models() got an unexpected keyword argument 'is_enabled'
