@@ -15,7 +15,7 @@ Ashutosh Sinha
 import json
 import logging
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field, asdict
 from enum import Enum
@@ -166,7 +166,7 @@ class HITLManager:
             Created HITLTask
         """
         task_id = f"hitl_{uuid.uuid4().hex[:16]}"
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         # Calculate due_at if not specified
         if not due_at and timeout_minutes:
@@ -331,7 +331,7 @@ class HITLManager:
     
     def get_overdue_tasks(self) -> List[HITLTask]:
         """Get overdue tasks."""
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(timezone.utc).isoformat()
         rows = self.db_facade.fetch_all(
             """SELECT * FROM hitl_tasks 
                WHERE status IN ('pending', 'assigned', 'in_progress')
@@ -382,7 +382,7 @@ class HITLManager:
             return False
         
         old_assignee = task.assigned_to
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         # Update task
         self.db_facade.execute(
@@ -411,7 +411,7 @@ class HITLManager:
         if not task:
             return False
         
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         self.db_facade.execute(
             """UPDATE hitl_tasks SET
@@ -445,7 +445,7 @@ class HITLManager:
     
     def start_task(self, task_id: str, user_id: str) -> bool:
         """Mark task as in progress."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         self.db_facade.execute(
             """UPDATE hitl_tasks SET status = 'in_progress', updated_at = ?
@@ -496,7 +496,7 @@ class HITLManager:
         if not task:
             return False
         
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         self.db_facade.execute(
             """UPDATE hitl_tasks SET
@@ -526,7 +526,7 @@ class HITLManager:
     def cancel_task(self, task_id: str, cancelled_by: str, 
                    reason: str = None) -> bool:
         """Cancel a task."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         self.db_facade.execute(
             """UPDATE hitl_tasks SET
@@ -578,7 +578,7 @@ class HITLManager:
             Created HITLComment
         """
         comment_id = f"cmt_{uuid.uuid4().hex[:12]}"
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         hitl_comment = HITLComment(
             comment_id=comment_id,
@@ -676,7 +676,7 @@ class HITLManager:
             """SELECT COUNT(*) as cnt FROM hitl_tasks 
                WHERE status IN ('pending', 'assigned', 'in_progress')
                  AND due_at < ?""",
-            (datetime.utcnow().isoformat(),)
+            (datetime.now(timezone.utc).isoformat(),)
         )
         
         return {
@@ -692,7 +692,7 @@ class HITLManager:
     
     def expire_overdue_tasks(self) -> int:
         """Mark overdue tasks as expired. Returns count of expired tasks."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         result = self.db_facade.execute(
             """UPDATE hitl_tasks SET

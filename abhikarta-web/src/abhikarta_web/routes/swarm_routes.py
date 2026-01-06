@@ -888,7 +888,18 @@ class SwarmRoutes(AbstractRoutes):
                 query = data.get('query', '')
                 
                 import uuid
-                execution_id = str(uuid.uuid4())
+                import time
+                from abhikarta.utils.helpers import generate_execution_id, EntityType as HelperEntityType
+                
+                # Get swarm info for execution ID
+                swarm = self.db_facade.fetch_one(
+                    "SELECT * FROM swarms WHERE swarm_id = ?",
+                    (swarm_id,)
+                )
+                swarm_name = swarm.get('name', '') if swarm else ''
+                
+                execution_id = generate_execution_id(HelperEntityType.SWARM, swarm_name)
+                start_time = time.time()
                 
                 # Create execution record
                 self.db_facade.execute(
@@ -896,11 +907,46 @@ class SwarmRoutes(AbstractRoutes):
                        (execution_id, swarm_id, trigger_type, trigger_data, status, user_id)
                        VALUES (?, ?, ?, ?, ?, ?)""",
                     (execution_id, swarm_id, 'user_query',
-                     json.dumps({'query': query}), 'pending',
+                     json.dumps({'query': query}), 'running',
                      session.get('user_id'))
                 )
                 
+                # Start execution logging
+                try:
+                    from abhikarta.services.execution_logger import get_execution_logger, EntityType
+                    exec_logger = get_execution_logger()
+                    
+                    if exec_logger and exec_logger.config.enabled:
+                        exec_log = exec_logger.start_execution(
+                            execution_id=execution_id,
+                            entity_type=EntityType.SWARM,
+                            entity_id=swarm_id,
+                            entity_name=swarm_name,
+                            user_input=query
+                        )
+                        
+                        exec_log.entity_config = {
+                            'swarm_name': swarm_name,
+                            'trigger_type': 'user_query'
+                        }
+                        
+                        # Get swarm agents
+                        agents = self.db_facade.fetch_all(
+                            "SELECT agent_name, role FROM swarm_agents WHERE swarm_id = ?",
+                            (swarm_id,)
+                        ) or []
+                        
+                        exec_log.execution_json = {
+                            'swarm_id': swarm_id,
+                            'name': swarm_name,
+                            'agents': [dict(a) for a in agents],
+                            'query': query
+                        }
+                except Exception as log_err:
+                    logger.debug(f"Could not start execution logging: {log_err}")
+                
                 # TODO: Actually execute through orchestrator
+                # For now, mark as pending and return
                 
                 return jsonify({
                     'success': True,
@@ -1253,5 +1299,110 @@ class SwarmRoutes(AbstractRoutes):
             except Exception as e:
                 logger.error(f"Error updating swarm: {e}", exc_info=True)
                 return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/swarms/test', methods=['POST'])
+        @login_required
+        def api_test_swarm_design():
+            """API: Test a swarm during design time (before saving)."""
+            import time
+            
+            try:
+                data = request.get_json()
+                input_text = data.get('input', '')
+                swarm_config = data.get('swarm', {})
+                agents = data.get('agents', [])
+                
+                if not input_text:
+                    return jsonify({'success': False, 'error': 'Input is required'}), 400
+                
+                start_time = time.time()
+                
+                # For design-time testing, we simulate swarm behavior
+                # by executing the first LLM-capable agent with the input
+                output = None
+                provider = 'ollama'
+                model = 'llama3.2:3b'
+                
+                # Find an LLM config from agents
+                for agent_def in agents:
+                    llm_config = agent_def.get('llm_config', {})
+                    if llm_config.get('provider'):
+                        provider = llm_config.get('provider')
+                        model = llm_config.get('model', model)
+                        break
+                
+                # Apply admin defaults if not set
+                try:
+                    from abhikarta.services.llm_config_resolver import get_llm_config_resolver
+                    resolver = get_llm_config_resolver(self.db_facade)
+                    admin_defaults = resolver.get_admin_defaults()
+                    if not provider or provider == 'ollama':
+                        provider = admin_defaults.get('provider', provider)
+                        model = admin_defaults.get('model', model)
+                except:
+                    pass
+                
+                try:
+                    from langchain_ollama import ChatOllama
+                    from langchain_openai import ChatOpenAI
+                    from langchain_anthropic import ChatAnthropic
+                    from langchain_core.messages import HumanMessage, SystemMessage
+                    
+                    # Create LLM based on provider
+                    if provider.lower() == 'ollama':
+                        base_url = admin_defaults.get('base_url', 'http://localhost:11434') if admin_defaults else 'http://localhost:11434'
+                        llm = ChatOllama(model=model, base_url=base_url)
+                    elif provider.lower() == 'openai':
+                        llm = ChatOpenAI(model=model)
+                    elif provider.lower() == 'anthropic':
+                        llm = ChatAnthropic(model=model)
+                    else:
+                        llm = ChatOllama(model=model)
+                    
+                    # Build prompt for swarm simulation
+                    swarm_name = swarm_config.get('name', 'Unnamed Swarm')
+                    system_prompt = f"You are simulating a swarm named '{swarm_name}' with {len(agents)} agents. Process the user's request as a coordinated team."
+                    
+                    messages = [
+                        SystemMessage(content=system_prompt),
+                        HumanMessage(content=input_text)
+                    ]
+                    
+                    response = llm.invoke(messages)
+                    output = response.content if hasattr(response, 'content') else str(response)
+                    
+                    duration_ms = int((time.time() - start_time) * 1000)
+                    
+                    return jsonify({
+                        'success': True,
+                        'output': output,
+                        'status': 'completed',
+                        'duration_ms': duration_ms,
+                        'provider': provider,
+                        'model': model,
+                        'agents_simulated': len(agents)
+                    })
+                    
+                except ImportError as ie:
+                    return jsonify({
+                        'success': False,
+                        'error': f'LLM library not available: {str(ie)}',
+                        'status': 'failed'
+                    }), 500
+                except Exception as exec_err:
+                    error_msg = str(exec_err)
+                    if 'not found' in error_msg.lower() or '404' in error_msg:
+                        error_msg = f"Model '{model}' not found. Run 'ollama pull {model}' to install it."
+                    
+                    return jsonify({
+                        'success': False,
+                        'error': error_msg,
+                        'status': 'failed',
+                        'duration_ms': int((time.time() - start_time) * 1000)
+                    }), 500
+                    
+            except Exception as e:
+                logger.error(f"Error in design-time swarm test: {e}", exc_info=True)
+                return jsonify({'success': False, 'error': str(e)}), 500
         
         logger.info("Swarm export routes registered")

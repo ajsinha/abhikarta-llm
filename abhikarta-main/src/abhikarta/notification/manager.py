@@ -10,7 +10,7 @@ Author: Ashutosh Sinha (ajsinha@gmail.com)
 import asyncio
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any, Type
 from dataclasses import dataclass, field
 
@@ -47,7 +47,7 @@ class NotificationQueueItem:
     channels: List[NotificationChannel]
     priority: int = 0
     retry_count: int = 0
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class NotificationManager:
@@ -429,7 +429,7 @@ class NotificationManager:
                     message.source,
                     message.source_type,
                     message.correlation_id,
-                    datetime.utcnow().isoformat() if result.success else None
+                    datetime.now(timezone.utc).isoformat() if result.success else None
                 )
             )
         except Exception as e:
@@ -518,7 +518,7 @@ class NotificationManager:
                 source="notification_manager",
                 source_type="system",
                 fields={
-                    "Test Time": datetime.utcnow().isoformat(),
+                    "Test Time": datetime.now(timezone.utc).isoformat(),
                     "Channel": channel
                 }
             )

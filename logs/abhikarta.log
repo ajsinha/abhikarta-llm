@@ -1,438 +1,206 @@
-2026-01-06 08:35:26,703 - __main__ - INFO - Properties configuration initialized
-2026-01-06 08:35:26,754 - abhikarta.monitoring.metrics - INFO - Prometheus metrics initialized successfully
-2026-01-06 08:35:26,754 - __main__ - INFO - Prometheus metrics initialized successfully
-2026-01-06 08:35:26,754 - __main__ - INFO - Metrics endpoint: /metrics
-2026-01-06 08:35:26,808 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
-2026-01-06 08:35:26,808 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
-2026-01-06 08:35:26,808 - abhikarta.database.db_facade - INFO - Database delegates initialized (including NotificationDelegate)
-2026-01-06 08:35:26,808 - abhikarta.database.db_facade - INFO - Database connected
-2026-01-06 08:35:26,808 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
-2026-01-06 08:35:26,906 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
-2026-01-06 08:35:27,120 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
-2026-01-06 08:35:27,127 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
-2026-01-06 08:35:27,134 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.5.2)
-2026-01-06 08:35:27,134 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
-2026-01-06 08:35:27,134 - abhikarta.database.db_facade - INFO - Database schema initialized
-2026-01-06 08:35:27,134 - __main__ - INFO - Database initialized: sqlite
-2026-01-06 08:35:27,173 - abhikarta.services.execution_logger - INFO - ExecutionLogger initialized: enabled=True, path=/home/ashutosh/PycharmProjects/abhikarta-llm/executionlog
-2026-01-06 08:35:27,173 - __main__ - INFO - Execution logger initialized: path=executionlog
-2026-01-06 08:35:27,174 - __main__ - INFO - Execution logger ready: /home/ashutosh/PycharmProjects/abhikarta-llm/executionlog
-2026-01-06 08:35:27,174 - abhikarta.services.llm_config_resolver - INFO - LLM Config Resolver initialized
-2026-01-06 08:35:27,177 - __main__ - INFO - LLM Config Resolver ready: default provider=ollama, model=llama3.2:3b
-2026-01-06 08:35:27,180 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
-2026-01-06 08:35:27,181 - __main__ - INFO - User management initialized
-2026-01-06 08:35:27,285 - abhikarta.tools.registry - INFO - ToolsRegistry initialized
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: get_current_datetime (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: parse_date (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: calculate_date_difference (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: add_days_to_date (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: get_business_days (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: calculate_expression (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: calculate_percentage (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: calculate_compound_interest (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_emi (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: convert_currency (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: extract_text_patterns (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: clean_text (type=function)
-2026-01-06 08:35:27,287 - abhikarta.tools.registry - INFO - Registered tool: extract_entities (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: generate_summary_stats (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: mask_sensitive_data (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: validate_email (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: validate_phone (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: validate_credit_card (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: validate_iban (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: validate_ssn (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: json_to_csv (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: csv_to_json (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: base64_encode (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: base64_decode (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: generate_hash (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: generate_uuid (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: generate_reference_number (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.registry - INFO - Registered tool: generate_account_number (type=function)
-2026-01-06 08:35:27,288 - abhikarta.tools.prebuilt.common_tools - INFO - Registered 28 common tools
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: verify_identity_document (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: calculate_kyc_risk_score (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: verify_address (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: calculate_credit_score (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: assess_debt_to_income (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_eligibility (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: generate_amortization_schedule (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: analyze_transaction (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: detect_transaction_patterns (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: calculate_transaction_limits (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: check_sanctions_list (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: generate_aml_report (type=function)
-2026-01-06 08:35:27,289 - abhikarta.tools.registry - INFO - Registered tool: validate_regulatory_compliance (type=function)
-2026-01-06 08:35:27,290 - abhikarta.tools.prebuilt.banking_tools - INFO - Registered 13 banking tools
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: make_http_request (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: build_query_string (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: parse_json_response (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: validate_api_response (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: format_email_template (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: create_notification (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: format_sms_message (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: map_fields (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: flatten_nested_dict (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: unflatten_dict (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: merge_dicts (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: filter_dict_keys (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: filter_list (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: sort_list (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: group_by (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: aggregate_list (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: paginate_list (type=function)
-2026-01-06 08:35:27,291 - abhikarta.tools.registry - INFO - Registered tool: create_workflow_context (type=function)
-2026-01-06 08:35:27,292 - abhikarta.tools.registry - INFO - Registered tool: update_workflow_context (type=function)
-2026-01-06 08:35:27,292 - abhikarta.tools.registry - INFO - Registered tool: evaluate_condition (type=function)
-2026-01-06 08:35:27,292 - abhikarta.tools.prebuilt.integration_tools - INFO - Registered 20 integration tools
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: web_search (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: web_fetch (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: intranet_search (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: news_search (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: read_document (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: write_document (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: convert_document (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: extract_document_metadata (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: list_files (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: copy_file (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: move_file (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: delete_file (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: get_system_info (type=function)
-2026-01-06 08:35:27,293 - abhikarta.tools.registry - INFO - Registered tool: execute_shell_command (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: get_environment_variable (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: set_environment_variable (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: check_url_status (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: ping_host (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: dns_lookup (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: parse_url (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: url_encode (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: url_decode (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: html_encode (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered tool: html_decode (type=function)
-2026-01-06 08:35:27,294 - abhikarta.tools.prebuilt.general_tools - INFO - Registered 24 general-purpose tools
-2026-01-06 08:35:27,294 - __main__ - INFO - Registered 85 pre-built tools
-2026-01-06 08:35:27,294 - abhikarta.tools.registry - INFO - Registered 0 tools from code fragments
-2026-01-06 08:35:27,294 - __main__ - INFO - Registered 0 code fragment tools
-2026-01-06 08:35:27,294 - __main__ - INFO - Tools registry initialized with 85 tools
-2026-01-06 08:35:27,308 - abhikarta.mcp.manager - INFO - MCPServerManager initialized
-2026-01-06 08:35:27,309 - abhikarta.mcp.manager - INFO - Loaded 0 MCP servers from database
-2026-01-06 08:35:27,309 - __main__ - INFO - Loaded 0 MCP servers from database
-2026-01-06 08:35:27,309 - __main__ - INFO - Connected to 0 MCP servers
-2026-01-06 08:35:27,311 - abhikarta.mcp.manager - INFO - Health monitor started (interval: 30s)
-2026-01-06 08:35:27,311 - __main__ - INFO - MCP health monitor started (interval: 30s)
-2026-01-06 08:35:27,311 - __main__ - INFO - MCP manager initialized with 0 servers
-2026-01-06 08:35:27,311 - abhikarta.actor.dispatcher - INFO - DefaultDispatcher initialized with 8 threads
-2026-01-06 08:35:27,312 - abhikarta.actor.scheduler - INFO - Scheduler started
-2026-01-06 08:35:27,312 - abhikarta.actor.system - INFO - ActorSystem 'abhikarta-actors' started
-2026-01-06 08:35:27,312 - __main__ - INFO - Actor system 'abhikarta-actors' started
-2026-01-06 08:35:27,312 - __main__ - INFO -   Default dispatcher threads: 8
-2026-01-06 08:35:27,312 - __main__ - INFO -   I/O dispatcher threads: 16
-2026-01-06 08:35:27,312 - __main__ - INFO -   Dead letter logging: True
-2026-01-06 08:35:27,312 - __main__ - INFO - Actor system 'abhikarta-actors' ready for concurrent execution
-2026-01-06 08:35:27,407 - abhikarta_web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
-2026-01-06 08:35:27,407 - abhikarta_web.abhikarta_llm_web - INFO - User facade set
-2026-01-06 08:35:27,407 - abhikarta_web.abhikarta_llm_web - INFO - Database facade set
-2026-01-06 08:35:27,543 - abhikarta_web.routes.metrics_routes - INFO - Prometheus metrics available: True
-2026-01-06 08:35:27,545 - abhikarta_web.abhikarta_llm_web - INFO - Prometheus metrics routes registered
-2026-01-06 08:35:27,545 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
-2026-01-06 08:35:27,545 - abhikarta_web.routes.auth_routes - INFO - AuthRoutes initialized
-2026-01-06 08:35:27,550 - abhikarta_web.routes.auth_routes - INFO - Auth routes registered
-2026-01-06 08:35:27,550 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
-2026-01-06 08:35:27,550 - abhikarta_web.routes.admin_routes - INFO - AdminRoutes initialized
-2026-01-06 08:35:27,580 - abhikarta_web.routes.admin_routes - INFO - Admin routes registered
-2026-01-06 08:35:27,581 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
-2026-01-06 08:35:27,581 - abhikarta_web.routes.user_routes - INFO - UserRoutes initialized
-2026-01-06 08:35:27,594 - abhikarta_web.routes.user_routes - INFO - User routes registered
-2026-01-06 08:35:27,595 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
-2026-01-06 08:35:27,595 - abhikarta_web.routes.agent_routes - INFO - AgentRoutes initialized
-2026-01-06 08:35:27,604 - abhikarta_web.routes.agent_routes - INFO - Agent routes registered
-2026-01-06 08:35:27,604 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
-2026-01-06 08:35:27,604 - abhikarta_web.routes.mcp_routes - INFO - MCPRoutes initialized
-2026-01-06 08:35:27,607 - abhikarta_web.routes.mcp_routes - INFO - MCP routes registered
-2026-01-06 08:35:27,607 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
-2026-01-06 08:35:27,608 - abhikarta_web.routes.api_routes - INFO - APIRoutes initialized
-2026-01-06 08:35:27,619 - abhikarta_web.routes.api_routes - INFO - API routes registered
-2026-01-06 08:35:27,619 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
-2026-01-06 08:35:27,632 - abhikarta_web.routes.workflow_routes - INFO - Workflow routes registered
-2026-01-06 08:35:27,632 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: SwarmRoutes
-2026-01-06 08:35:27,648 - abhikarta_web.routes.swarm_routes - INFO - Swarm export routes registered
-2026-01-06 08:35:27,648 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: NotificationRoutes
-2026-01-06 08:35:27,656 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: AIORGRoutes
-2026-01-06 08:35:27,670 - abhikarta_web.routes.aiorg_routes - INFO - AI Org routes registered
-2026-01-06 08:35:27,670 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: ScriptRoutes
-2026-01-06 08:35:27,670 - abhikarta_web.routes.script_routes - INFO - ScriptRoutes initialized
-2026-01-06 08:35:27,676 - abhikarta_web.routes.script_routes - INFO - Script routes registered
-2026-01-06 08:35:27,676 - abhikarta_web.abhikarta_llm_web - INFO - All routes registered successfully
-2026-01-06 08:35:27,677 - abhikarta_web.abhikarta_llm_web - INFO - Error handlers registered
-2026-01-06 08:35:27,677 - abhikarta_web.abhikarta_llm_web - INFO - Routes prepared successfully
-2026-01-06 08:35:27,677 - abhikarta_web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
-2026-01-06 08:35:42,499 - abhikarta.user_management.user_facade - INFO - User authenticated successfully: admin
-2026-01-06 08:35:42,504 - abhikarta_web.routes.auth_routes - INFO - User logged in: admin
-2026-01-06 08:35:45,650 - abhikarta.workflow.dag_parser - INFO - DAG Parser v1.5.2-fix2 loaded (supports from/to edge format)
-2026-01-06 08:35:45,663 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
-2026-01-06 08:35:45,667 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
-2026-01-06 08:35:49,474 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
-2026-01-06 08:35:49,479 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
-2026-01-06 08:35:57,287 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
-2026-01-06 08:35:57,297 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
-2026-01-06 08:35:57,298 - abhikarta_web.routes.workflow_routes - INFO - Applied admin LLM defaults to workflow template
-2026-01-06 08:35:57,301 - abhikarta_web.routes.workflow_routes - INFO - Created workflow wf_85c9d3e22673 from template wf_chain_of_verification
-2026-01-06 08:36:20,218 - abhikarta_web.routes.auth_routes - INFO - User logged out: admin
-2026-01-06 08:36:26,903 - abhikarta.user_management.user_facade - INFO - User authenticated successfully: admin
-2026-01-06 08:36:26,918 - abhikarta_web.routes.auth_routes - INFO - User logged in: admin
-2026-01-06 08:36:49,299 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
-2026-01-06 08:36:49,310 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
-2026-01-06 08:36:51,571 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
-2026-01-06 08:36:51,582 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
-2026-01-06 08:36:57,093 - abhikarta.workflow.workflow_template - INFO - Found 22 JSON template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/workflows
-2026-01-06 08:36:57,098 - abhikarta.workflow.workflow_template - INFO - WorkflowTemplateManager initialized with 27 templates
-2026-01-06 08:36:57,098 - abhikarta_web.routes.workflow_routes - INFO - Applied admin LLM defaults to workflow template
-2026-01-06 08:36:57,101 - abhikarta_web.routes.workflow_routes - INFO - Created workflow wf_4234e3449978 from template wf_chain_of_verification
-2026-01-06 08:39:11,227 - abhikarta_web.routes.workflow_routes - INFO - Raw dag_definition type: <class 'str'>
-2026-01-06 08:39:11,228 - abhikarta_web.routes.workflow_routes - INFO - Raw dag_definition preview: {"name": "wf3", "description": "", "nodes": [{"id": "input_processor", "type": "llm", "title": "Input Processor", "config": {"prompt_template": "Process this input for verification:\n\n{input}\n\nPrepare:\n1. Extract key claims or assertions\n2. Identify verifiable elements\n3. Note context and constraints\n4. Flag ambiguous areas", "output_key": "processed_input", "provider": "ollama", "model": "llama3.2:3b", "base_url": "http://192.168.2.36:11434", "temperature": 0.3}, "position": {"x": 100, "...
-2026-01-06 08:39:11,228 - abhikarta_web.routes.workflow_routes - INFO - Parsed dag_def keys: ['name', 'description', 'nodes', 'edges', 'entry_point', 'output_node', 'llm_config', 'workflow_id', 'python_modules']
-2026-01-06 08:39:11,228 - abhikarta_web.routes.workflow_routes - INFO - dag_def['nodes'] count: 13
-2026-01-06 08:39:11,228 - abhikarta_web.routes.workflow_routes - INFO - dag_def['edges'] count: 17
-2026-01-06 08:39:11,228 - abhikarta_web.routes.workflow_routes - INFO - dag_def['entry_point']: input_processor
-2026-01-06 08:39:11,228 - abhikarta_web.routes.workflow_routes - INFO - First edge: type=<class 'dict'>, value={'from': 'input_processor', 'to': 'claim_extractor', 'fromPort': 'output', 'toPort': 'input'}
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Parsing workflow definition with keys: ['name', 'description', 'nodes', 'edges', 'entry_point', 'output_node', 'llm_config', 'workflow_id', 'python_modules']
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Parsing 13 nodes
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Loaded 13 nodes: ['input_processor', 'claim_extractor', 'factual_verifier', 'logical_verifier', 'computational_verifier', 'consistency_verifier', 'verification_aggregator', 'decision_gate', 'revision_generator', 'approval_processor', 'rejection_processor', 'output_formatter', 'audit_logger']
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Parsing 17 edges from workflow definition
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - raw_edges type: <class 'list'>
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - First raw_edge type: <class 'dict'>, value: {'from': 'input_processor', 'to': 'claim_extractor', 'fromPort': 'output', 'toPort': 'input'}
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Edge 0: type=<class 'dict'>, content={'from': 'input_processor', 'to': 'claim_extractor', 'fromPort': 'output', 'toPort': 'input'}
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Edge 0 extracted: source='input_processor', target='claim_extractor'
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Edge 1: type=<class 'dict'>, content={'from': 'claim_extractor', 'to': 'factual_verifier', 'fromPort': 'output', 'toPort': 'input'}
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Edge 1 extracted: source='claim_extractor', target='factual_verifier'
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Edge 2: type=<class 'dict'>, content={'from': 'claim_extractor', 'to': 'logical_verifier', 'fromPort': 'output', 'toPort': 'input'}
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Edge 2 extracted: source='claim_extractor', target='logical_verifier'
-2026-01-06 08:39:11,228 - abhikarta.workflow.dag_parser - INFO - Edge 3: type=<class 'dict'>, content={'from': 'claim_extractor', 'to': 'computational_verifier', 'fromPort': 'output', 'toPort': 'input'}
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - Edge 3 extracted: source='claim_extractor', target='computational_verifier'
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - Edge 4: type=<class 'dict'>, content={'from': 'claim_extractor', 'to': 'consistency_verifier', 'fromPort': 'output', 'toPort': 'input'}
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - Edge 4 extracted: source='claim_extractor', target='consistency_verifier'
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - Loaded 17 valid edges
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - First 5 edges: [('input_processor', 'claim_extractor', ''), ('claim_extractor', 'factual_verifier', ''), ('claim_extractor', 'logical_verifier', ''), ('claim_extractor', 'computational_verifier', ''), ('claim_extractor', 'consistency_verifier', '')]
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - Validating workflow with 13 nodes and 17 edges
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - Workflow contains cycles - this is allowed for iterative workflows with conditional edges
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - Edge validation: 17 valid edges out of 17 total
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - Workflow parsed successfully
-2026-01-06 08:39:11,229 - abhikarta.workflow.dag_parser - INFO - Parsed workflow: wf_4234e3449978, 13 nodes, 17 edges, entry_point=input_processor
-2026-01-06 08:39:11,247 - abhikarta.workflow.executor - INFO - LangGraph workflow executor initialized
-2026-01-06 08:39:11,247 - abhikarta.workflow.executor - INFO - Starting LangGraph workflow execution: wflow_wf3_8dc44d3b0291
-2026-01-06 08:39:11,248 - abhikarta.services.execution_logger - INFO - Started execution log: wflow_wf3_8dc44d3b0291 (workflow)
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - WARNING - Failed to initialize execution logging: 'DAGWorkflow' object has no attribute 'dependencies'
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO - === Converting workflow to LangGraph config ===
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO - Workflow ID: wf_4234e3449978
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO - DAGWorkflow has 13 nodes and 17 edges
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO - DAGWorkflow.entry_point: 'input_processor'
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO - Processing 17 edges from DAGWorkflow
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO - Entry point from DAGWorkflow.entry_point: 'input_processor'
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO - Final entry_point set in config: 'input_processor'
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO - === LangGraph config result ===
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO -   Nodes: 13
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO -   Edges: 17
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO -   Entry point: 'input_processor'
-2026-01-06 08:39:11,248 - abhikarta.workflow.executor - INFO -   First 5 edges: [{'source': 'input_processor', 'target': 'claim_extractor'}, {'source': 'claim_extractor', 'target': 'factual_verifier'}, {'source': 'claim_extractor', 'target': 'logical_verifier'}, {'source': 'claim_extractor', 'target': 'computational_verifier'}, {'source': 'claim_extractor', 'target': 'consistency_verifier'}]
-2026-01-06 08:39:11,560 - abhikarta.langchain.workflow_graph - INFO - === Creating workflow graph ===
-2026-01-06 08:39:11,560 - abhikarta.langchain.workflow_graph - INFO - Config keys: ['nodes', 'edges', 'metadata', 'entry_point']
-2026-01-06 08:39:11,560 - abhikarta.langchain.workflow_graph - INFO - Entry point in config: input_processor
-2026-01-06 08:39:11,560 - abhikarta.langchain.workflow_graph - INFO - Nodes count: 13
-2026-01-06 08:39:11,560 - abhikarta.langchain.workflow_graph - INFO - Edges count: 17
-2026-01-06 08:39:11,560 - abhikarta.langchain.workflow_graph - INFO - First edges: [{'source': 'input_processor', 'target': 'claim_extractor'}, {'source': 'claim_extractor', 'target': 'factual_verifier'}, {'source': 'claim_extractor', 'target': 'logical_verifier'}, {'source': 'claim_extractor', 'target': 'computational_verifier'}, {'source': 'claim_extractor', 'target': 'consistency_verifier'}]
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Entry point from config: 'input_processor'
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Executable node IDs: ['input_processor', 'claim_extractor', 'factual_verifier', 'logical_verifier', 'computational_verifier', 'consistency_verifier', 'verification_aggregator', 'decision_gate', 'revision_generator', 'approval_processor', 'rejection_processor', 'output_formatter', 'audit_logger']
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - ✓ Setting entry point from config: input_processor
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Edges by source: ['input_processor', 'claim_extractor', 'factual_verifier', 'logical_verifier', 'computational_verifier', 'consistency_verifier', 'verification_aggregator', 'decision_gate', 'revision_generator', 'approval_processor', 'rejection_processor', 'output_formatter']
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - === Processing 17 edges ===
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: input_processor -> claim_extractor
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: claim_extractor -> ['factual_verifier', 'logical_verifier', 'computational_verifier', 'consistency_verifier'] (default: factual_verifier)
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: factual_verifier -> verification_aggregator
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: logical_verifier -> verification_aggregator
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: computational_verifier -> verification_aggregator
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: consistency_verifier -> verification_aggregator
-2026-01-06 08:39:11,562 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: verification_aggregator -> decision_gate
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO - Adding multi-target router: decision_gate -> ['approval_processor', 'revision_generator', 'rejection_processor'] (default: approval_processor)
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: revision_generator -> claim_extractor
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: approval_processor -> output_formatter
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: rejection_processor -> output_formatter
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO - Adding error-checked edge: output_formatter -> audit_logger
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO - === Edge processing summary ===
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   Regular edges: 17
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   Conditional edges: 0
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   To END: 0
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   Entry points: 0
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   Skipped: 5
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   Sources with conditionals: ['rejection_processor', 'approval_processor', 'computational_verifier', 'consistency_verifier', 'revision_generator', 'claim_extractor', 'input_processor', 'decision_gate', 'factual_verifier', 'output_formatter', 'logical_verifier', 'verification_aggregator']
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   Total edges added to graph: 17
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO - === Workflow graph created ===
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   Nodes: 13 executable
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   Entry point: input_processor
-2026-01-06 08:39:11,563 - abhikarta.langchain.workflow_graph - INFO -   Edges by source: [('input_processor', 1), ('claim_extractor', 4), ('factual_verifier', 1), ('logical_verifier', 1), ('computational_verifier', 1)]...
-2026-01-06 08:39:11,602 - abhikarta.langchain.workflow_graph - INFO - Graph compiled successfully
-2026-01-06 08:39:11,603 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: input_processor
-2026-01-06 08:39:11,604 - abhikarta.langchain.workflow_graph - INFO - [NODE:input_processor] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:11,604 - abhikarta.langchain.workflow_graph - INFO - [NODE:input_processor] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:11,604 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:11,750 - abhikarta.langchain.workflow_graph - INFO - [NODE:input_processor] Raw input type: dict
-2026-01-06 08:39:11,750 - abhikarta.langchain.workflow_graph - INFO - [NODE:input_processor] Extracted input value: What are the top 3 benefits of AI...
-2026-01-06 08:39:11,750 - abhikarta.langchain.workflow_graph - INFO - [NODE:input_processor] LLM Input prompt (205 chars): Process this input for verification:
-
-What are the top 3 benefits of AI
-
-Prepare:
-1. Extract key claims or assertions
-2. Identify verifiable elements
-3. Note context and constraints
-4. Flag ambiguous areas...
-2026-01-06 08:39:13,479 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-06 08:39:15,129 - abhikarta.langchain.workflow_graph - INFO - [NODE:input_processor] LLM Output (1228 chars): Based on the input, here's the process for verification:
-
-**Extract Key Claims or Assertions:**
-
-* The top 3 benefits of AI are to be identified.
-
-**Identify Verifiable Elements:**
-
-* None explicitly mentioned in the input. However, some potential verifiable elements could include:
- + Improved efficiency
- + Enhanced decision-making capabilities
- + Increased productivity
-
-These claims would need to be verified through external sources or research studies to confirm their accuracy.
-
-**Note Context...
-2026-01-06 08:39:15,133 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: claim_extractor
-2026-01-06 08:39:15,133 - abhikarta.langchain.workflow_graph - INFO - [NODE:claim_extractor] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:15,133 - abhikarta.langchain.workflow_graph - INFO - [NODE:claim_extractor] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:15,133 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:15,177 - abhikarta.langchain.workflow_graph - INFO - [NODE:claim_extractor] Raw input type: dict
-2026-01-06 08:39:15,178 - abhikarta.langchain.workflow_graph - INFO - [NODE:claim_extractor] Extracted input value: What are the top 3 benefits of AI...
-2026-01-06 08:39:15,178 - abhikarta.langchain.workflow_graph - INFO - [NODE:claim_extractor] LLM Input prompt (1438 chars): Extract all verifiable claims from:
-
-Based on the input, here's the process for verification:
-
-**Extract Key Claims or Assertions:**
-
-* The top 3 benefits of AI are to be identified.
-
-**Identify Verifiable Elements:**
-
-* None explicitly mentioned in the input. However, some potential verifiable elements could include:
- + Improved efficiency
- + Enhanced decision-making capabilities
- + Increased productivity
-
-These claims would need to be verified through external sources or research studies to co...
-2026-01-06 08:39:15,371 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-06 08:39:16,770 - abhikarta.langchain.workflow_graph - INFO - [NODE:claim_extractor] LLM Output (1028 chars): Based on the provided input, here are the extracted claims with their corresponding details:
-
-1. **Claim ID:** AI_Benefit_1
-**Claim Text:** Improved efficiency
-**Claim Type:** Factual
-**Verification Method Needed:** Research studies or industry reports on AI adoption and implementation.
-**Confidence that claim is verifiable:** High
-
-2. **Claim ID:** AI_Benefit_2
-**Claim Text:** Enhanced decision-making capabilities
-**Claim Type:** Logical/Computational
-**Verification Method Needed:** Analysis of...
-2026-01-06 08:39:16,782 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: factual_verifier
-2026-01-06 08:39:16,783 - abhikarta.langchain.workflow_graph - INFO - [NODE:factual_verifier] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:16,783 - abhikarta.langchain.workflow_graph - INFO - [NODE:factual_verifier] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:16,783 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:16,824 - abhikarta.langchain.workflow_graph - INFO - [NODE:factual_verifier] Raw input type: dict
-2026-01-06 08:39:16,825 - abhikarta.langchain.workflow_graph - INFO - [NODE:factual_verifier] Extracted input value: What are the top 3 benefits of AI...
-2026-01-06 08:39:16,825 - abhikarta.langchain.workflow_graph - INFO - [NODE:factual_verifier] LLM Input prompt (1229 chars): Verify factual accuracy of these claims:
-
-Based on the provided input, here are the extracted claims with their corresponding details:
-
-1. **Claim ID:** AI_Benefit_1
-**Claim Text:** Improved efficiency
-**Claim Type:** Factual
-**Verification Method Needed:** Research studies or industry reports on AI adoption and implementation.
-**Confidence that claim is verifiable:** High
-
-2. **Claim ID:** AI_Benefit_2
-**Claim Text:** Enhanced decision-making capabilities
-**Claim Type:** Logical/Computational
-*...
-2026-01-06 08:39:17,012 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-06 08:39:20,380 - abhikarta.langchain.workflow_graph - INFO - [NODE:factual_verifier] LLM Output (2458 chars): I can help you verify the factual accuracy of these claims. Since I don't have access to external research or studies, I'll provide a general assessment based on my knowledge cutoff.
-
-**Claim ID:** AI_Benefit_1
-**Claim Text:** Improved efficiency
-**Claim Type:** Factual
-**Verification Method Needed:** Research studies or industry reports on AI adoption and implementation.
-**Confidence that claim is verifiable:** High
-
-Assessment: TRUE
-Evidence/Reasoning: Studies have shown that AI can automate r...
-2026-01-06 08:39:20,391 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: verification_aggregator
-2026-01-06 08:39:20,392 - abhikarta.langchain.workflow_graph - INFO - [NODE:verification_aggregator] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:20,392 - abhikarta.langchain.workflow_graph - INFO - [NODE:verification_aggregator] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:20,393 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:20,430 - abhikarta.langchain.workflow_graph - INFO - [NODE:verification_aggregator] Raw input type: dict
-2026-01-06 08:39:20,430 - abhikarta.langchain.workflow_graph - INFO - [NODE:verification_aggregator] Extracted input value: What are the top 3 benefits of AI...
-2026-01-06 08:39:20,430 - abhikarta.langchain.workflow_graph - WARNING - [NODE:verification_aggregator] Missing template variable: 'logical_verification'
-2026-01-06 08:39:20,430 - abhikarta.langchain.workflow_graph - INFO - [NODE:verification_aggregator] LLM Input prompt (2712 chars): Aggregate verification results:
-
-Factual: I can help you verify the factual accuracy of these claims. Since I don't have access to external research or studies, I'll provide a general assessment based on my knowledge cutoff.
-
-**Claim ID:** AI_Benefit_1
-**Claim Text:** Improved efficiency
-**Claim Type:** Factual
-**Verification Method Needed:** Research studies or industry reports on AI adoption and implementation.
-**Confidence that claim is verifiable:** High
-
-Assessment: TRUE
-Evidence/Reasoning:...
-2026-01-06 08:39:20,681 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-06 08:39:22,070 - abhikarta.langchain.workflow_graph - INFO - [NODE:verification_aggregator] LLM Output (964 chars): Based on the provided assessments, here is the requested information:
-
-1. Overall verification status: PARTIALLY_VERIFIED
-
-The claims AI_Benefit_1 and AI_Benefit_3 have been verified as TRUE with a high confidence score of 90. However, the claim AI_Benefit_2 has an uncertain assessment due to ongoing debates and limited empirical evidence.
-
-2. Summary of issues found:
-- The claim AI_Benefit_2 requires more research or analysis to determine its accuracy.
-- No significant issues were found for cla...
-2026-01-06 08:39:22,083 - abhikarta.langchain.workflow_graph - INFO - Executing condition node: decision_gate
-2026-01-06 08:39:22,085 - abhikarta.langchain.workflow_graph - INFO - Executing LLM node: approval_processor
-2026-01-06 08:39:22,085 - abhikarta.langchain.workflow_graph - INFO - [NODE:approval_processor] Resolved config: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:22,085 - abhikarta.langchain.workflow_graph - INFO - [NODE:approval_processor] Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:22,085 - abhikarta.langchain.workflow_graph - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
-2026-01-06 08:39:22,129 - abhikarta.langchain.workflow_graph - INFO - [NODE:approval_processor] Raw input type: dict
-2026-01-06 08:39:22,129 - abhikarta.langchain.workflow_graph - INFO - [NODE:approval_processor] Extracted input value: What are the top 3 benefits of AI...
-2026-01-06 08:39:22,129 - abhikarta.langchain.workflow_graph - INFO - [NODE:approval_processor] LLM Input prompt (2391 chars): Prepare verified content for output:
-
-Content: Based on the input, here's the process for verification:
-
-**Extract Key Claims or Assertions:**
-
-* The top 3 benefits of AI are to be identified.
-
-**Identify Verifiable Elements:**
-
-* None explicitly mentioned in the input. However, some potential verifiable elements could include:
- + Improved efficiency
- + Enhanced decision-making capabilities
- + Increased productivity
-
-These claims would need to be verified through external sources or research stu...
-2026-01-06 08:39:22,333 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"
-2026-01-06 08:39:25,268 - abhikarta.langchain.workflow_graph - INFO - [NODE:approval_processor] LLM Output (2090 chars): **Verified Content:**
-
-The top 3 benefits of Artificial Intelligence (AI) are:
-
-1. **Improved Efficiency**: AI has been shown to automate repetitive and mundane tasks, freeing up human resources for more strategic and creative work. Studies have demonstrated significant improvements in productivity and efficiency across various industries.
-2. **Enhanced Decision-Making Capabilities**: AI's ability to analyze vast amounts of data and identify patterns can provide valuable insights that inform bus...
-2026-01-06 08:39:25,280 - abhikarta.langchain.workflow_graph - INFO - Executing aggregator node: output_formatter
-2026-01-06 08:39:25,282 - abhikarta.langchain.workflow_graph - INFO - Executing function node: audit_logger
-2026-01-06 08:39:25,282 - abhikarta.langchain.workflow_graph - WARNING - Unknown function 'log_verification_audit', using passthrough with task context
-2026-01-06 08:39:25,282 - abhikarta.langchain.workflow_graph - INFO - Function node audit_logger (log_verification_audit) completed successfully
-2026-01-06 08:39:25,287 - abhikarta.services.execution_logger - INFO - Completed execution log: wflow_wf3_8dc44d3b0291 (completed)
-2026-01-06 08:39:47,412 - abhikarta_web.routes.user_routes - INFO - Determined entity_type: workflow for execution wflow_wf3_8dc44d3b0291
-2026-01-06 08:39:47,412 - abhikarta_web.routes.user_routes - INFO - Execution log search - Project root: /home/ashutosh/PycharmProjects/abhikarta-llm, CWD: /home/ashutosh/PycharmProjects/abhikarta-llm, Entity: workflow
-2026-01-06 08:39:47,413 - abhikarta_web.routes.user_routes - INFO - Found execution log via auto-detection: /home/ashutosh/PycharmProjects/abhikarta-llm/executionlog/workflow/wflow_wf3_8dc44d3b0291.json (type: workflow)
+2026-01-06 11:19:46,555 - __main__ - INFO - Properties configuration initialized
+2026-01-06 11:19:46,597 - abhikarta.monitoring.metrics - INFO - Prometheus metrics initialized successfully
+2026-01-06 11:19:46,597 - __main__ - INFO - Prometheus metrics initialized successfully
+2026-01-06 11:19:46,597 - __main__ - INFO - Metrics endpoint: /metrics
+2026-01-06 11:19:46,650 - abhikarta.database.sqlite_handler - INFO - SQLite handler created for: ./data/abhikarta.db
+2026-01-06 11:19:46,650 - abhikarta.database.db_facade - INFO - Initialized SQLite handler: ./data/abhikarta.db
+2026-01-06 11:19:46,650 - abhikarta.database.db_facade - INFO - Database delegates initialized (including NotificationDelegate)
+2026-01-06 11:19:46,651 - abhikarta.database.db_facade - INFO - Database connected
+2026-01-06 11:19:46,651 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite tables...
+2026-01-06 11:19:46,756 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite indexes...
+2026-01-06 11:19:46,962 - abhikarta.database.schema.sqlite_schema - INFO - Creating SQLite triggers...
+2026-01-06 11:19:46,970 - abhikarta.database.schema.sqlite_schema - INFO - Inserting default data...
+2026-01-06 11:19:46,976 - abhikarta.database.schema.sqlite_schema - INFO - SQLite database initialized successfully (schema v1.5.2)
+2026-01-06 11:19:46,976 - abhikarta.database.sqlite_handler - INFO - SQLite schema initialized via schema module
+2026-01-06 11:19:46,976 - abhikarta.database.db_facade - INFO - Database schema initialized
+2026-01-06 11:19:46,976 - __main__ - INFO - Database initialized: sqlite
+2026-01-06 11:19:47,002 - abhikarta.services.execution_logger - INFO - ExecutionLogger initialized: enabled=True, path=/home/ashutosh/PycharmProjects/abhikarta-llm/executionlog
+2026-01-06 11:19:47,003 - __main__ - INFO - Execution logger initialized: path=executionlog
+2026-01-06 11:19:47,003 - __main__ - INFO - Execution logger ready: /home/ashutosh/PycharmProjects/abhikarta-llm/executionlog
+2026-01-06 11:19:47,003 - __main__ - INFO - Execution log cleanup scheduler started (interval: 24h)
+2026-01-06 11:19:47,003 - __main__ - INFO - Execution log cleanup scheduler started: file retention=10d, db retention=30d, interval=24h
+2026-01-06 11:19:47,003 - abhikarta.services.llm_config_resolver - INFO - LLM Config Resolver initialized
+2026-01-06 11:19:47,006 - __main__ - INFO - LLM Config Resolver ready: default provider=ollama, model=llama3.2:3b
+2026-01-06 11:19:47,009 - abhikarta.user_management.user_facade - INFO - Loaded 7 users from data/users.json
+2026-01-06 11:19:47,009 - __main__ - INFO - User management initialized
+2026-01-06 11:19:47,115 - abhikarta.tools.registry - INFO - ToolsRegistry initialized
+2026-01-06 11:19:47,117 - abhikarta.tools.registry - INFO - Registered tool: get_current_datetime (type=function)
+2026-01-06 11:19:47,117 - abhikarta.tools.registry - INFO - Registered tool: parse_date (type=function)
+2026-01-06 11:19:47,117 - abhikarta.tools.registry - INFO - Registered tool: calculate_date_difference (type=function)
+2026-01-06 11:19:47,117 - abhikarta.tools.registry - INFO - Registered tool: add_days_to_date (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: get_business_days (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: calculate_expression (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: calculate_percentage (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: calculate_compound_interest (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_emi (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: convert_currency (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: extract_text_patterns (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: clean_text (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: extract_entities (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: generate_summary_stats (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: mask_sensitive_data (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: validate_email (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: validate_phone (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: validate_credit_card (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: validate_iban (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: validate_ssn (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: json_to_csv (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: csv_to_json (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: base64_encode (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: base64_decode (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: generate_hash (type=function)
+2026-01-06 11:19:47,118 - abhikarta.tools.registry - INFO - Registered tool: generate_uuid (type=function)
+2026-01-06 11:19:47,119 - abhikarta.tools.registry - INFO - Registered tool: generate_reference_number (type=function)
+2026-01-06 11:19:47,119 - abhikarta.tools.registry - INFO - Registered tool: generate_account_number (type=function)
+2026-01-06 11:19:47,119 - abhikarta.tools.prebuilt.common_tools - INFO - Registered 28 common tools
+2026-01-06 11:19:47,119 - abhikarta.tools.registry - INFO - Registered tool: verify_identity_document (type=function)
+2026-01-06 11:19:47,119 - abhikarta.tools.registry - INFO - Registered tool: calculate_kyc_risk_score (type=function)
+2026-01-06 11:19:47,119 - abhikarta.tools.registry - INFO - Registered tool: verify_address (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: calculate_credit_score (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: assess_debt_to_income (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: calculate_loan_eligibility (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: generate_amortization_schedule (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: analyze_transaction (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: detect_transaction_patterns (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: calculate_transaction_limits (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: check_sanctions_list (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: generate_aml_report (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.registry - INFO - Registered tool: validate_regulatory_compliance (type=function)
+2026-01-06 11:19:47,120 - abhikarta.tools.prebuilt.banking_tools - INFO - Registered 13 banking tools
+2026-01-06 11:19:47,121 - abhikarta.tools.registry - INFO - Registered tool: make_http_request (type=function)
+2026-01-06 11:19:47,121 - abhikarta.tools.registry - INFO - Registered tool: build_query_string (type=function)
+2026-01-06 11:19:47,121 - abhikarta.tools.registry - INFO - Registered tool: parse_json_response (type=function)
+2026-01-06 11:19:47,121 - abhikarta.tools.registry - INFO - Registered tool: validate_api_response (type=function)
+2026-01-06 11:19:47,121 - abhikarta.tools.registry - INFO - Registered tool: format_email_template (type=function)
+2026-01-06 11:19:47,121 - abhikarta.tools.registry - INFO - Registered tool: create_notification (type=function)
+2026-01-06 11:19:47,121 - abhikarta.tools.registry - INFO - Registered tool: format_sms_message (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: map_fields (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: flatten_nested_dict (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: unflatten_dict (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: merge_dicts (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: filter_dict_keys (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: filter_list (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: sort_list (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: group_by (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: aggregate_list (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: paginate_list (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: create_workflow_context (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: update_workflow_context (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.registry - INFO - Registered tool: evaluate_condition (type=function)
+2026-01-06 11:19:47,122 - abhikarta.tools.prebuilt.integration_tools - INFO - Registered 20 integration tools
+2026-01-06 11:19:47,123 - abhikarta.tools.registry - INFO - Registered tool: web_search (type=function)
+2026-01-06 11:19:47,123 - abhikarta.tools.registry - INFO - Registered tool: web_fetch (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: intranet_search (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: news_search (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: read_document (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: write_document (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: convert_document (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: extract_document_metadata (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: list_files (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: copy_file (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: move_file (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: delete_file (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: get_system_info (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: execute_shell_command (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: get_environment_variable (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: set_environment_variable (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: check_url_status (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: ping_host (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: dns_lookup (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: parse_url (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: url_encode (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: url_decode (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: html_encode (type=function)
+2026-01-06 11:19:47,124 - abhikarta.tools.registry - INFO - Registered tool: html_decode (type=function)
+2026-01-06 11:19:47,125 - abhikarta.tools.prebuilt.general_tools - INFO - Registered 24 general-purpose tools
+2026-01-06 11:19:47,125 - __main__ - INFO - Registered 85 pre-built tools
+2026-01-06 11:19:47,125 - abhikarta.tools.registry - INFO - Registered 0 tools from code fragments
+2026-01-06 11:19:47,125 - __main__ - INFO - Registered 0 code fragment tools
+2026-01-06 11:19:47,125 - __main__ - INFO - Tools registry initialized with 85 tools
+2026-01-06 11:19:47,139 - abhikarta.mcp.manager - INFO - MCPServerManager initialized
+2026-01-06 11:19:47,139 - abhikarta.mcp.manager - INFO - Loaded 0 MCP servers from database
+2026-01-06 11:19:47,140 - __main__ - INFO - Loaded 0 MCP servers from database
+2026-01-06 11:19:47,140 - __main__ - INFO - Connected to 0 MCP servers
+2026-01-06 11:19:47,140 - abhikarta.mcp.manager - INFO - Health monitor started (interval: 30s)
+2026-01-06 11:19:47,140 - __main__ - INFO - MCP health monitor started (interval: 30s)
+2026-01-06 11:19:47,140 - __main__ - INFO - MCP manager initialized with 0 servers
+2026-01-06 11:19:47,140 - abhikarta.actor.dispatcher - INFO - DefaultDispatcher initialized with 8 threads
+2026-01-06 11:19:47,140 - abhikarta.actor.scheduler - INFO - Scheduler started
+2026-01-06 11:19:47,140 - abhikarta.actor.system - INFO - ActorSystem 'abhikarta-actors' started
+2026-01-06 11:19:47,140 - __main__ - INFO - Actor system 'abhikarta-actors' started
+2026-01-06 11:19:47,141 - __main__ - INFO -   Default dispatcher threads: 8
+2026-01-06 11:19:47,141 - __main__ - INFO -   I/O dispatcher threads: 16
+2026-01-06 11:19:47,141 - __main__ - INFO -   Dead letter logging: True
+2026-01-06 11:19:47,141 - __main__ - INFO - Actor system 'abhikarta-actors' ready for concurrent execution
+2026-01-06 11:19:47,238 - abhikarta_web.abhikarta_llm_web - INFO - Abhikarta LLM Web Application initialized
+2026-01-06 11:19:47,238 - abhikarta_web.abhikarta_llm_web - INFO - User facade set
+2026-01-06 11:19:47,238 - abhikarta_web.abhikarta_llm_web - INFO - Database facade set
+2026-01-06 11:19:47,380 - abhikarta_web.routes.metrics_routes - INFO - Prometheus metrics available: True
+2026-01-06 11:19:47,382 - abhikarta_web.abhikarta_llm_web - INFO - Prometheus metrics routes registered
+2026-01-06 11:19:47,382 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: AuthRoutes
+2026-01-06 11:19:47,382 - abhikarta_web.routes.auth_routes - INFO - AuthRoutes initialized
+2026-01-06 11:19:47,387 - abhikarta_web.routes.auth_routes - INFO - Auth routes registered
+2026-01-06 11:19:47,387 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: AdminRoutes
+2026-01-06 11:19:47,387 - abhikarta_web.routes.admin_routes - INFO - AdminRoutes initialized
+2026-01-06 11:19:47,415 - abhikarta_web.routes.admin_routes - INFO - Admin routes registered
+2026-01-06 11:19:47,415 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: UserRoutes
+2026-01-06 11:19:47,415 - abhikarta_web.routes.user_routes - INFO - UserRoutes initialized
+2026-01-06 11:19:47,429 - abhikarta_web.routes.user_routes - INFO - User routes registered
+2026-01-06 11:19:47,429 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: AgentRoutes
+2026-01-06 11:19:47,429 - abhikarta_web.routes.agent_routes - INFO - AgentRoutes initialized
+2026-01-06 11:19:47,440 - abhikarta_web.routes.agent_routes - INFO - Agent routes registered
+2026-01-06 11:19:47,440 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: MCPRoutes
+2026-01-06 11:19:47,440 - abhikarta_web.routes.mcp_routes - INFO - MCPRoutes initialized
+2026-01-06 11:19:47,443 - abhikarta_web.routes.mcp_routes - INFO - MCP routes registered
+2026-01-06 11:19:47,443 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: APIRoutes
+2026-01-06 11:19:47,443 - abhikarta_web.routes.api_routes - INFO - APIRoutes initialized
+2026-01-06 11:19:47,455 - abhikarta_web.routes.api_routes - INFO - API routes registered
+2026-01-06 11:19:47,456 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: WorkflowRoutes
+2026-01-06 11:19:47,467 - abhikarta_web.routes.workflow_routes - INFO - Workflow routes registered
+2026-01-06 11:19:47,467 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: SwarmRoutes
+2026-01-06 11:19:47,483 - abhikarta_web.routes.swarm_routes - INFO - Swarm export routes registered
+2026-01-06 11:19:47,483 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: NotificationRoutes
+2026-01-06 11:19:47,490 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: AIORGRoutes
+2026-01-06 11:19:47,505 - abhikarta_web.routes.aiorg_routes - INFO - AI Org routes registered
+2026-01-06 11:19:47,505 - abhikarta_web.abhikarta_llm_web - INFO - Registering routes: ScriptRoutes
+2026-01-06 11:19:47,505 - abhikarta_web.routes.script_routes - INFO - ScriptRoutes initialized
+2026-01-06 11:19:47,511 - abhikarta_web.routes.script_routes - INFO - Script routes registered
+2026-01-06 11:19:47,512 - abhikarta_web.abhikarta_llm_web - INFO - All routes registered successfully
+2026-01-06 11:19:47,512 - abhikarta_web.abhikarta_llm_web - INFO - Error handlers registered
+2026-01-06 11:19:47,512 - abhikarta_web.abhikarta_llm_web - INFO - Routes prepared successfully
+2026-01-06 11:19:47,512 - abhikarta_web.abhikarta_llm_web - INFO - Starting Abhikarta LLM Web Application on 0.0.0.0:5000
+2026-01-06 11:28:26,589 - abhikarta.agent.agent_manager - INFO - AgentManager initialized
+2026-01-06 11:28:26,594 - abhikarta.agent.agent_template - INFO - Found 12 JSON agent template files in /home/ashutosh/PycharmProjects/abhikarta-llm/abhikarta-main/entity_definitions/agents
+2026-01-06 11:28:26,595 - abhikarta.agent.agent_template - INFO - AgentTemplateManager initialized with 24 templates
+2026-01-06 11:28:39,735 - abhikarta.agent.agent_template - INFO - Creating agent 'ag2' from template 'tpl_plan_execute_basic'
+2026-01-06 11:28:39,736 - abhikarta.agent.agent_template - INFO - Template llm_config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
+2026-01-06 11:28:39,736 - abhikarta.agent.agent_template - INFO - Template agent_type: plan_and_execute
+2026-01-06 11:28:39,736 - abhikarta.agent.agent_manager - INFO - Creating agent: ag2 (plan_and_execute)
+2026-01-06 11:28:39,736 - abhikarta.agent.agent_manager - INFO - LLM config: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}
+2026-01-06 11:28:39,736 - abhikarta.agent.agent_manager - INFO - Workflow: {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Task', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'plan', 'node_type': 'llm', 'name': 'Create Plan', 'position': {'x': 300, 'y': 200}, 'config': {'system_prompt': 'Break down the task into sequential steps. Output as JSON list.'}}, {'node_id': 'step1', 'node_type': 'llm', 'name': 'Execute Step 1', 'position': {'x': 500, 'y': 200}, 'config': {'system_prompt': 'Execute the first step of the plan.'}}, {'node_id': 'step2', 'node_type': 'llm', 'name': 'Execute Step 2', 'position': {'x': 700, 'y': 200}, 'config': {'system_prompt': 'Execute the second step using previous result.'}}, {'node_id': 'step3', 'node_type': 'llm', 'name': 'Execute Step 3', 'position': {'x': 900, 'y': 200}, 'config': {'system_prompt': 'Execute the third step using previous results.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Final Result', 'position': {'x': 1100, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'plan'}, {'source': 'plan', 'target': 'step1'}, {'source': 'step1', 'target': 'step2'}, {'source': 'step2', 'target': 'step3'}, {'source': 'step3', 'target': 'output'}]}
+2026-01-06 11:28:39,736 - abhikarta.agent.agent_manager - INFO - Final config to save: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps. Output as JSON list."}}, {"node_id": "step1", "node_type": "llm", "name": "Execute Step 1", "position": {"x": 500, "y": 200}, "config": {"system_prompt": "Execute the first step of the plan."}}, {"no...
+2026-01-06 11:28:39,736 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,736 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps....
+2026-01-06 11:28:39,738 - abhikarta.agent.agent_manager - INFO - Inserting new agent: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,740 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,740 - abhikarta.agent.agent_manager - INFO - Agent saved to database: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,740 - abhikarta.agent.agent_manager - INFO - Created agent: agent_6448c89980b3_1767716919 - ag2
+2026-01-06 11:28:39,740 - abhikarta.agent.agent_template - INFO - Agent created with ID: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,740 - abhikarta.agent.agent_template - INFO - Agent config: {'workflow': {'nodes': [{'node_id': 'input', 'node_type': 'input', 'name': 'Task', 'position': {'x': 100, 'y': 200}, 'config': {}}, {'node_id': 'plan', 'node_type': 'llm', 'name': 'Create Plan', 'position': {'x': 300, 'y': 200}, 'config': {'system_prompt': 'Break down the task into sequential steps. Output as JSON list.'}}, {'node_id': 'step1', 'node_type': 'llm', 'name': 'Execute Step 1', 'position': {'x': 500, 'y': 200}, 'config': {'system_prompt': 'Execute the first step of the plan.'}}, {'node_id': 'step2', 'node_type': 'llm', 'name': 'Execute Step 2', 'position': {'x': 700, 'y': 200}, 'config': {'system_prompt': 'Execute the second step using previous result.'}}, {'node_id': 'step3', 'node_type': 'llm', 'name': 'Execute Step 3', 'position': {'x': 900, 'y': 200}, 'config': {'system_prompt': 'Execute the third step using previous results.'}}, {'node_id': 'output', 'node_type': 'output', 'name': 'Final Result', 'position': {'x': 1100, 'y': 200}, 'config': {}}], 'edges': [{'source': 'input', 'target': 'plan'}, {'source': 'plan', 'target': 'step1'}, {'source': 'step1', 'target': 'step2'}, {'source': 'step2', 'target': 'step3'}, {'source': 'step3', 'target': 'output'}]}, 'llm_config': {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.5}}
+2026-01-06 11:28:39,741 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,741 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps....
+2026-01-06 11:28:39,741 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,743 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,743 - abhikarta.agent.agent_manager - INFO - Updated agent: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,743 - abhikarta.agent.agent_manager - INFO - Saving agent to DB: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,743 - abhikarta.agent.agent_manager - INFO - Config being saved: {"workflow": {"nodes": [{"node_id": "input", "node_type": "input", "name": "Task", "position": {"x": 100, "y": 200}, "config": {}}, {"node_id": "plan", "node_type": "llm", "name": "Create Plan", "position": {"x": 300, "y": 200}, "config": {"system_prompt": "Break down the task into sequential steps....
+2026-01-06 11:28:39,743 - abhikarta.agent.agent_manager - INFO - Updating existing agent: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,745 - abhikarta.agent.agent_manager - INFO - Agent saved successfully: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,745 - abhikarta.agent.agent_manager - INFO - Updated agent: agent_6448c89980b3_1767716919
+2026-01-06 11:28:39,745 - abhikarta_web.routes.agent_routes - INFO - Applied admin LLM defaults to agent and workflow nodes: base_url=http://localhost:11434
+2026-01-06 11:29:21,354 - abhikarta_web.routes.agent_routes - INFO - Design-time test request: input=who is elon musk...
+2026-01-06 11:29:21,355 - abhikarta_web.routes.agent_routes - INFO - Found LLM node config: {'base_url': 'http://192.168.2.36:11434', 'model': 'llama3.2:3b', 'provider': 'ollama', 'system_prompt': 'Break down the task into sequential steps. Output as JSON list.', 'temperature': 0.7, 'prompt': ''}
+2026-01-06 11:29:21,355 - abhikarta_web.routes.agent_routes - INFO - Final LLM config for test: {'provider': 'ollama', 'model': 'llama3.2:3b', 'base_url': 'http://192.168.2.36:11434', 'temperature': 0.7}
+2026-01-06 11:29:22,129 - abhikarta_web.routes.agent_routes - INFO - Creating LLM: provider=ollama, model=llama3.2:3b, base_url=http://192.168.2.36:11434
+2026-01-06 11:29:22,129 - abhikarta_web.routes.agent_routes - INFO - Ollama effective base_url: http://192.168.2.36:11434
+2026-01-06 11:29:24,025 - httpx - INFO - HTTP Request: POST http://192.168.2.36:11434/api/chat "HTTP/1.1 200 OK"

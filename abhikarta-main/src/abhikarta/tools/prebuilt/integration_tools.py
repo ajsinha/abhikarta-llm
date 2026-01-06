@@ -15,7 +15,7 @@ Ashutosh Sinha
 import logging
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from urllib.parse import urlencode, urlparse
 
@@ -60,7 +60,7 @@ def make_http_request(url: str, method: str = "GET", headers: Dict[str, str] = N
             "headers": headers or {},
             "has_body": body is not None
         },
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -209,7 +209,7 @@ def create_notification(notification_type: str, recipient: str, subject: str,
         "message": message[:500],  # Truncate for preview
         "priority": priority,
         "status": "queued",
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
         "metadata": metadata or {}
     }
 
@@ -548,7 +548,7 @@ def create_workflow_context(initial_data: Dict[str, Any] = None,
     return {
         "execution_id": f"EXEC-{uuid.uuid4().hex[:12].upper()}",
         "workflow_id": workflow_id or "unknown",
-        "started_at": datetime.utcnow().isoformat(),
+        "started_at": datetime.now(timezone.utc).isoformat(),
         "status": "running",
         "data": initial_data or {},
         "steps_completed": [],
@@ -574,7 +574,7 @@ def update_workflow_context(context: Dict[str, Any], step_name: str,
     updated = context.copy()
     updated["steps_completed"].append({
         "step": step_name,
-        "completed_at": datetime.utcnow().isoformat(),
+        "completed_at": datetime.now(timezone.utc).isoformat(),
         "success": success
     })
     

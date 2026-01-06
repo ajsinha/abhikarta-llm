@@ -10,7 +10,7 @@ Copyright © 2025-2030, All Rights Reserved
 
 import logging
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
 from .models import (
@@ -29,7 +29,7 @@ def _timestamp_now() -> str:
     Uses space separator instead of T for Python 3.14 compatibility.
     Format: YYYY-MM-DD HH:MM:SS.ffffff
     """
-    return datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
+    return datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')
 
 
 class AIORGDBOps:
@@ -947,7 +947,7 @@ class AIORGDBOps:
                     target_node_id=data.get('target_node_id'),
                     task_id=data.get('task_id'),
                     payload=data['payload'],
-                    created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.utcnow()
+                    created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.now(timezone.utc)
                 ))
             
             return events

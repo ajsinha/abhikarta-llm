@@ -12,7 +12,7 @@ Copyright © 2025-2030, All Rights Reserved
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, List, Optional
 import uuid
 
@@ -83,7 +83,7 @@ class HITLManager:
         """
         # Calculate expiration
         timeout_hours = node.hitl_config.timeout_hours
-        expires_at = datetime.utcnow() + timedelta(hours=timeout_hours)
+        expires_at = datetime.now(timezone.utc) + timedelta(hours=timeout_hours)
         
         item = HITLQueueItem(
             item_id=str(uuid.uuid4()),
@@ -93,7 +93,7 @@ class HITLManager:
             review_type=review_type,
             content=content,
             status="pending",
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
             expires_at=expires_at
         )
         
@@ -113,7 +113,7 @@ class HITLManager:
                 "node_id": node.node_id,
                 "task_id": task.task_id,
                 "review_type": review_type,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             })
         
         return item
@@ -335,7 +335,7 @@ class HITLManager:
         new_response.original_ai_content = original_content
         new_response.modification_reason = reason
         new_response.modified_by = user_id
-        new_response.modified_at = datetime.utcnow()
+        new_response.modified_at = datetime.now(timezone.utc)
         
         self.db.save_response(new_response)
         
@@ -600,7 +600,7 @@ class HITLManager:
                     review_type=data['review_type'],
                     content=content,
                     status=data['status'],
-                    created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.utcnow(),
+                    created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.now(timezone.utc),
                     expires_at=datetime.fromisoformat(data['expires_at']) if data.get('expires_at') else None
                 )
             return None
@@ -632,7 +632,7 @@ class HITLManager:
                         review_type=data['review_type'],
                         content=content,
                         status=data['status'],
-                        created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.utcnow(),
+                        created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.now(timezone.utc),
                         expires_at=datetime.fromisoformat(data['expires_at']) if data.get('expires_at') else None
                     ))
             except Exception as e:
@@ -642,7 +642,7 @@ class HITLManager:
     
     def _get_expired_items(self) -> List[HITLQueueItem]:
         """Get all expired pending items."""
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(timezone.utc).isoformat()
         items = []
         
         try:
@@ -665,7 +665,7 @@ class HITLManager:
                     review_type=data['review_type'],
                     content=content,
                     status=data['status'],
-                    created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.utcnow(),
+                    created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.now(timezone.utc),
                     expires_at=datetime.fromisoformat(data['expires_at']) if data.get('expires_at') else None
                 ))
         except Exception as e:
@@ -678,7 +678,7 @@ class HITLManager:
         if not item.expires_at:
             return None
         
-        remaining = item.expires_at - datetime.utcnow()
+        remaining = item.expires_at - datetime.now(timezone.utc)
         if remaining.total_seconds() <= 0:
             return "Expired"
         
@@ -741,7 +741,7 @@ Abhikarta AI Org
                 "task_id": item.task_id,
                 "review_type": item.review_type,
                 "response_id": use_response.response_id if use_response else None,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             })
     
     async def _handle_rejection(
@@ -764,5 +764,5 @@ Abhikarta AI Org
                 "node_id": item.node_id,
                 "task_id": item.task_id,
                 "reason": reason,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             })

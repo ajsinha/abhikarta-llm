@@ -14,7 +14,7 @@ Ashutosh Sinha
 
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 import json
 
@@ -135,7 +135,7 @@ class RabbitMQBroker(MessageBroker):
                 success=True,
                 message_id=message.id,
                 topic=message.topic,
-                timestamp=datetime.utcnow()
+                timestamp=datetime.now(timezone.utc)
             )
             
         except Exception as e:

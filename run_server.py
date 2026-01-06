@@ -188,6 +188,60 @@ def prepare_execution_logger(prop_conf):
         return None
 
 
+def start_execution_log_cleanup_scheduler(prop_conf, db_facade):
+    """
+    Start a background thread for periodic execution log cleanup.
+    
+    Args:
+        prop_conf: PropertiesConfigurator instance
+        db_facade: Database facade for DB log cleanup
+    """
+    import threading
+    import time
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        from abhikarta.services.execution_logger import get_execution_logger
+        
+        exec_logger = get_execution_logger()
+        if not exec_logger or not exec_logger.config.enabled:
+            return
+        
+        interval_hours = exec_logger.config.cleanup_interval_hours
+        interval_seconds = interval_hours * 3600
+        
+        file_retention = exec_logger.config.file_retention_days
+        db_retention = exec_logger.config.db_retention_days
+        
+        def cleanup_task():
+            """Periodic cleanup task."""
+            logger.info(f"Execution log cleanup scheduler started (interval: {interval_hours}h)")
+            
+            # Run initial cleanup on startup
+            time.sleep(60)  # Wait 1 minute after startup
+            
+            while True:
+                try:
+                    exec_logger.cleanup_old_logs(db_facade)
+                    logger.debug(f"Execution log cleanup completed")
+                except Exception as e:
+                    logger.error(f"Error during execution log cleanup: {e}")
+                
+                time.sleep(interval_seconds)
+        
+        # Start background thread
+        cleanup_thread = threading.Thread(target=cleanup_task, daemon=True, name="exec-log-cleanup")
+        cleanup_thread.start()
+        
+        logger.info(f"Execution log cleanup scheduler started: "
+                   f"file retention={file_retention}d, db retention={db_retention}d, "
+                   f"interval={interval_hours}h")
+        
+    except Exception as e:
+        logger.warning(f"Failed to start execution log cleanup scheduler: {e}")
+
+
 def prepare_user_facade(prop_conf):
     """
     Initialize user management facade.
@@ -532,6 +586,8 @@ def main():
         exec_logger = prepare_execution_logger(prop_conf)
         if exec_logger:
             logger.info(f"Execution logger ready: {exec_logger.config.base_path}")
+            # Start background cleanup scheduler
+            start_execution_log_cleanup_scheduler(prop_conf, db_facade)
         
         # 3.6 Initialize LLM Config Resolver (for admin defaults)
         try:

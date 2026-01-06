@@ -16,7 +16,7 @@ Ashutosh Sinha
 import asyncio
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 import uuid
 
@@ -141,7 +141,7 @@ class SwarmOrchestrator:
                 definition.swarm_id = str(uuid.uuid4())
             
             definition.status = SwarmStatus.INACTIVE
-            definition.created_at = datetime.utcnow()
+            definition.created_at = datetime.now(timezone.utc)
             
             # Persist to database
             if self.db_facade:
@@ -238,7 +238,7 @@ class SwarmOrchestrator:
                     master_actor=master_actor,
                     agent_pools=agent_pools,
                     trigger_tasks=trigger_tasks,
-                    started_at=datetime.utcnow()
+                    started_at=datetime.now(timezone.utc)
                 )
                 
                 self._swarms[swarm_id] = instance
@@ -291,7 +291,7 @@ class SwarmOrchestrator:
                 # Stop event bus
                 await instance.event_bus.stop()
                 
-                instance.stopped_at = datetime.utcnow()
+                instance.stopped_at = datetime.now(timezone.utc)
                 instance.definition.status = SwarmStatus.INACTIVE
                 
                 del self._swarms[swarm_id]
@@ -404,7 +404,7 @@ class SwarmOrchestrator:
         cron_expr = trigger.config.get('cron', '0 * * * *')
         
         try:
-            cron = croniter.croniter(cron_expr, datetime.utcnow())
+            cron = croniter.croniter(cron_expr, datetime.now(timezone.utc))
         except:
             logger.error(f"Invalid cron expression: {cron_expr}")
             return
@@ -413,7 +413,7 @@ class SwarmOrchestrator:
             try:
                 # Wait until next scheduled time
                 next_time = cron.get_next(datetime)
-                wait_seconds = (next_time - datetime.utcnow()).total_seconds()
+                wait_seconds = (next_time - datetime.now(timezone.utc)).total_seconds()
                 
                 if wait_seconds > 0:
                     await asyncio.sleep(wait_seconds)
@@ -430,7 +430,7 @@ class SwarmOrchestrator:
                         }
                     )
                     trigger.trigger_count += 1
-                    trigger.last_triggered = datetime.utcnow()
+                    trigger.last_triggered = datetime.now(timezone.utc)
                     
             except asyncio.CancelledError:
                 break
@@ -470,7 +470,7 @@ class SwarmOrchestrator:
                         }
                     )
                     trigger.trigger_count += 1
-                    trigger.last_triggered = datetime.utcnow()
+                    trigger.last_triggered = datetime.now(timezone.utc)
             
             topic = trigger.config.get('topic', 'default')
             await broker.subscribe_handler(topic, on_message)
@@ -507,7 +507,7 @@ class SwarmOrchestrator:
                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
                 (definition.swarm_id, definition.name, definition.description,
                  definition.status.value, definition.to_json(),
-                 definition.created_at.isoformat(), datetime.utcnow().isoformat())
+                 definition.created_at.isoformat(), datetime.now(timezone.utc).isoformat())
             )
         except Exception as e:
             logger.error(f"Error saving swarm definition: {e}")
@@ -520,7 +520,7 @@ class SwarmOrchestrator:
         try:
             self.db_facade.execute(
                 "UPDATE swarms SET status = ?, updated_at = ? WHERE swarm_id = ?",
-                (status.value, datetime.utcnow().isoformat(), swarm_id)
+                (status.value, datetime.now(timezone.utc).isoformat(), swarm_id)
             )
         except Exception as e:
             logger.error(f"Error updating swarm status: {e}")

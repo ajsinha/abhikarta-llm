@@ -14,7 +14,7 @@ import re
 import hashlib
 import base64
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, List, Optional
 import math
 
@@ -33,8 +33,8 @@ logger = logging.getLogger(__name__)
 
 def get_current_datetime(format: str = "%Y-%m-%d %H:%M:%S", timezone: str = "UTC") -> str:
     """Get current date and time in specified format."""
-    from datetime import datetime
-    now = datetime.utcnow()
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
     return now.strftime(format)
 
 def parse_date(date_string: str, input_format: str = "%Y-%m-%d") -> Dict[str, Any]:

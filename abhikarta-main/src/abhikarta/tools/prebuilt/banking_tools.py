@@ -16,7 +16,7 @@ Ashutosh Sinha
 import logging
 import json
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, List, Optional
 import random
 import math
@@ -735,7 +735,7 @@ def check_sanctions_list(entity_name: str, entity_type: str = "individual") -> D
     result = {
         "entity_name": entity_name,
         "entity_type": entity_type,
-        "check_timestamp": datetime.utcnow().isoformat(),
+        "check_timestamp": datetime.now(timezone.utc).isoformat(),
         "lists_checked": [
             "OFAC SDN List",
             "UN Security Council",
@@ -776,7 +776,7 @@ def generate_aml_report(customer_id: str, transactions: List[Dict[str, Any]],
         "report_id": f"AML-{datetime.now().strftime('%Y%m%d%H%M%S')}",
         "customer_id": customer_id,
         "reporting_period": reporting_period,
-        "generated_at": datetime.utcnow().isoformat(),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "transaction_summary": {
             "total_count": len(transactions),
             "total_amount": sum(t.get("amount", 0) for t in transactions),
@@ -887,7 +887,7 @@ def validate_regulatory_compliance(account_data: Dict[str, Any],
     
     return {
         "account_id": account_data.get("account_id"),
-        "assessment_date": datetime.utcnow().isoformat(),
+        "assessment_date": datetime.now(timezone.utc).isoformat(),
         "overall_status": overall_status,
         "compliance_checks": compliance_checks,
         "required_actions": [c["details"] for c in compliance_checks if c["status"] != "compliant"]

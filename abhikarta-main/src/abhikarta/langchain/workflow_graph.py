@@ -20,7 +20,7 @@ import logging
 import time
 import uuid
 from typing import Dict, Any, Optional, List, Callable, TypedDict, Annotated, Union
-from datetime import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from operator import add
 
@@ -1629,7 +1629,7 @@ class WorkflowGraphExecutor:
             execution_id=execution_id,
             workflow_id=workflow_id,
             input_data=input_data,
-            started_at=datetime.utcnow()
+            started_at=datetime.now(timezone.utc)
         )
         result.metadata['entity_type'] = 'workflow'
         
@@ -1669,7 +1669,7 @@ class WorkflowGraphExecutor:
                 "hitl_response": None,
                 "execution_id": execution_id,
                 "workflow_id": workflow_id,
-                "started_at": datetime.utcnow().isoformat(),
+                "started_at": datetime.now(timezone.utc).isoformat(),
                 "messages": []
             }
             
@@ -1692,7 +1692,7 @@ class WorkflowGraphExecutor:
             else:
                 result.status = 'completed'
             
-            result.completed_at = datetime.utcnow()
+            result.completed_at = datetime.now(timezone.utc)
             
             # Track metrics
             if _metrics_available:
@@ -1719,8 +1719,8 @@ class WorkflowGraphExecutor:
             logger.error(f"Workflow execution failed: {e}", exc_info=True)
             result.status = 'failed'
             result.error_message = str(e)
-            result.completed_at = datetime.utcnow()
-            result.duration_ms = int((datetime.utcnow() - result.started_at).total_seconds() * 1000)
+            result.completed_at = datetime.now(timezone.utc)
+            result.duration_ms = int((datetime.now(timezone.utc) - result.started_at).total_seconds() * 1000)
             
             # Track failure metrics
             if _metrics_available:

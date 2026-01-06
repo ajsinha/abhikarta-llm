@@ -14,7 +14,7 @@ Copyright © 2025-2030, All Rights Reserved
 
 import logging
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional, Tuple
 import asyncio
 
@@ -113,7 +113,7 @@ class TaskEngine:
         # Add submission context
         task.context = {
             "submitted_by": submitted_by,
-            "submitted_at": datetime.utcnow().isoformat()
+            "submitted_at": datetime.now(timezone.utc).isoformat()
         }
         
         if self.db.save_task(task):
@@ -161,7 +161,7 @@ class TaskEngine:
         try:
             # Update task status
             task.status = TaskStatus.IN_PROGRESS
-            task.started_at = datetime.utcnow()
+            task.started_at = datetime.now(timezone.utc)
             self.db.save_task(task)
             
             # Update node's current task
@@ -531,7 +531,7 @@ class TaskEngine:
         
         # Update task
         task.status = TaskStatus.COMPLETED
-        task.completed_at = datetime.utcnow()
+        task.completed_at = datetime.now(timezone.utc)
         task.output_data = response.content
         self.db.save_task(task)
         
@@ -672,7 +672,7 @@ This is an automated notification from Abhikarta AI Org.
         """Publish event to event bus."""
         if self.event_bus:
             channel = f"aiorg:{org_id}"
-            event["timestamp"] = datetime.utcnow().isoformat()
+            event["timestamp"] = datetime.now(timezone.utc).isoformat()
             await self.event_bus.publish_async(channel, event)
     
     # =========================================================================

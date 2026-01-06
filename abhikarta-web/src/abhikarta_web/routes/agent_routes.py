@@ -448,10 +448,28 @@ class AgentRoutes(AbstractRoutes):
                         if current_config.get('temperature') is None:
                             current_config['temperature'] = admin_defaults.get('temperature', 0.7)
                         
-                        self.agent_manager.update_agent(agent.agent_id, 
-                                                        {'llm_config': current_config})
+                        # Also apply defaults to workflow nodes
+                        workflow = agent.workflow or {}
+                        nodes = workflow.get('nodes', [])
+                        for node in nodes:
+                            if node.get('node_type') == 'llm':
+                                node_config = node.get('config', {})
+                                if not node_config.get('provider'):
+                                    node_config['provider'] = admin_defaults.get('provider', 'ollama')
+                                if not node_config.get('model'):
+                                    node_config['model'] = admin_defaults.get('model', 'llama3.2:3b')
+                                if not node_config.get('base_url'):
+                                    node_config['base_url'] = admin_defaults.get('base_url', '')
+                                if node_config.get('temperature') is None:
+                                    node_config['temperature'] = admin_defaults.get('temperature', 0.7)
+                                node['config'] = node_config
                         
-                        logger.info(f"Applied admin LLM defaults to agent: {admin_defaults.get('provider')}, {admin_defaults.get('model')}")
+                        self.agent_manager.update_agent(agent.agent_id, {
+                            'llm_config': current_config,
+                            'workflow': workflow
+                        })
+                        
+                        logger.info(f"Applied admin LLM defaults to agent and workflow nodes: base_url={admin_defaults.get('base_url')}")
                             
                     except Exception as prov_err:
                         logger.warning(f"Could not apply provider settings: {prov_err}")
@@ -734,5 +752,173 @@ class AgentRoutes(AbstractRoutes):
             except Exception as e:
                 logger.error(f"Error updating agent from JSON: {e}", exc_info=True)
                 return jsonify({'error': str(e)}), 500
+        
+        @self.app.route('/api/agents/test', methods=['POST'])
+        @login_required
+        def api_test_agent_design():
+            """API: Test an agent during design time (before saving)."""
+            try:
+                data = request.get_json()
+                input_text = data.get('input', '')
+                agent_config = data.get('agent', {})
+                workflow = data.get('workflow', {})
+                
+                logger.info(f"Design-time test request: input={input_text[:50]}...")
+                logger.debug(f"Workflow nodes: {workflow.get('nodes', [])}")
+                
+                if not input_text:
+                    return jsonify({'success': False, 'error': 'Input is required'}), 400
+                
+                # Build a temporary agent config for execution
+                temp_config = {
+                    'name': agent_config.get('name', 'Test Agent'),
+                    'agent_type': agent_config.get('type', 'conversational'),
+                    'system_prompt': '',
+                    'llm_config': {},
+                    'tools': [],
+                    'workflow': workflow
+                }
+                
+                # Get admin defaults first
+                admin_defaults = {}
+                try:
+                    from abhikarta.services.llm_config_resolver import get_llm_config_resolver
+                    resolver = get_llm_config_resolver(self.db_facade)
+                    admin_defaults = resolver.get_admin_defaults()
+                    logger.debug(f"Admin defaults: {admin_defaults}")
+                except Exception as e:
+                    logger.debug(f"Could not get admin defaults: {e}")
+                
+                # Extract LLM config from workflow nodes
+                nodes = workflow.get('nodes', [])
+                for node in nodes:
+                    if node.get('node_type') == 'llm':
+                        config = node.get('config', {})
+                        logger.info(f"Found LLM node config: {config}")
+                        
+                        # Use node config values, fall back to admin defaults
+                        temp_config['llm_config'] = {
+                            'provider': config.get('provider') or admin_defaults.get('provider', 'ollama'),
+                            'model': config.get('model') or admin_defaults.get('model', 'llama3.2:3b'),
+                            'base_url': config.get('base_url') or admin_defaults.get('base_url', ''),
+                            'temperature': config.get('temperature') if config.get('temperature') is not None else admin_defaults.get('temperature', 0.7),
+                        }
+                        temp_config['system_prompt'] = config.get('system_prompt', '')
+                        break
+                
+                # If no LLM node found, use admin defaults
+                if not temp_config['llm_config']:
+                    temp_config['llm_config'] = admin_defaults
+                
+                logger.info(f"Final LLM config for test: {temp_config['llm_config']}")
+                
+                # Execute the agent
+                import time
+                start_time = time.time()
+                
+                try:
+                    # For design-time testing, we create a lightweight execution
+                    from langchain_ollama import ChatOllama
+                    from langchain_openai import ChatOpenAI
+                    from langchain_anthropic import ChatAnthropic
+                    
+                    llm_config = temp_config.get('llm_config', {})
+                    provider = (llm_config.get('provider') or 'ollama').lower()
+                    model = llm_config.get('model') or 'llama3.2:3b'
+                    base_url = llm_config.get('base_url') or ''
+                    temperature = llm_config.get('temperature', 0.7)
+                    
+                    # Ensure temperature is a float
+                    try:
+                        temperature = float(temperature)
+                    except:
+                        temperature = 0.7
+                    
+                    logger.info(f"Creating LLM: provider={provider}, model={model}, base_url={base_url}")
+                    
+                    # Create LLM based on provider
+                    if provider == 'ollama':
+                        # For Ollama, base_url is required - use admin default or localhost
+                        effective_base_url = base_url or admin_defaults.get('base_url') or 'http://localhost:11434'
+                        logger.info(f"Ollama effective base_url: {effective_base_url}")
+                        llm = ChatOllama(
+                            model=model,
+                            base_url=effective_base_url,
+                            temperature=temperature
+                        )
+                    elif provider == 'openai':
+                        llm = ChatOpenAI(
+                            model=model,
+                            temperature=temperature
+                        )
+                    elif provider == 'anthropic':
+                        llm = ChatAnthropic(
+                            model=model,
+                            temperature=temperature
+                        )
+                    else:
+                        # Default to Ollama
+                        effective_base_url = base_url or admin_defaults.get('base_url') or 'http://localhost:11434'
+                        llm = ChatOllama(
+                            model=model,
+                            base_url=effective_base_url,
+                            temperature=temperature
+                        )
+                    
+                    # Simple invocation for testing
+                    from langchain_core.messages import HumanMessage, SystemMessage
+                    
+                    messages = []
+                    if temp_config.get('system_prompt'):
+                        messages.append(SystemMessage(content=temp_config['system_prompt']))
+                    messages.append(HumanMessage(content=input_text))
+                    
+                    response = llm.invoke(messages)
+                    output = response.content if hasattr(response, 'content') else str(response)
+                    
+                    duration_ms = int((time.time() - start_time) * 1000)
+                    
+                    # Get the effective base_url that was used
+                    used_base_url = base_url or admin_defaults.get('base_url') or 'http://localhost:11434'
+                    
+                    return jsonify({
+                        'success': True,
+                        'output': output,
+                        'status': 'completed',
+                        'duration_ms': duration_ms,
+                        'provider': provider,
+                        'model': model,
+                        'base_url': used_base_url
+                    })
+                    
+                except ImportError as ie:
+                    return jsonify({
+                        'success': False, 
+                        'error': f'LLM library not available: {str(ie)}',
+                        'status': 'failed'
+                    }), 500
+                except Exception as exec_err:
+                    error_msg = str(exec_err)
+                    used_base_url = base_url or admin_defaults.get('base_url') or 'http://localhost:11434'
+                    
+                    # Provide user-friendly error messages
+                    if 'not found' in error_msg.lower() or '404' in error_msg:
+                        error_msg = f"Model '{model}' not found on {used_base_url}. Run 'ollama pull {model}' to install it."
+                    elif 'connection' in error_msg.lower() or 'refused' in error_msg.lower():
+                        error_msg = f"Cannot connect to {used_base_url}. Check that Ollama is running."
+                    
+                    logger.error(f"Design-time test error: {exec_err}, base_url={used_base_url}")
+                    
+                    return jsonify({
+                        'success': False,
+                        'error': error_msg,
+                        'status': 'failed',
+                        'duration_ms': int((time.time() - start_time) * 1000),
+                        'base_url': used_base_url
+                    }), 500
+                    
+            except Exception as e:
+                logger.error(f"Error in design-time agent test: {e}", exc_info=True)
+                return jsonify({'success': False, 'error': str(e)}), 500
         
         logger.info("Agent routes registered")

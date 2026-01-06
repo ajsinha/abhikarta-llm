@@ -16,7 +16,7 @@ Ashutosh Sinha
 import asyncio
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 import uuid
@@ -55,7 +55,7 @@ class MasterDecision:
     # Metadata
     reasoning: str = ""                     # LLM reasoning
     confidence: float = 1.0                 # Decision confidence
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -211,7 +211,7 @@ class MasterActor:
         self._pending_tasks[correlation_id] = {
             'trigger_type': trigger_type,
             'trigger_data': trigger_data,
-            'start_time': datetime.utcnow(),
+            'start_time': datetime.now(timezone.utc),
             'results': [],
             'status': 'processing',
             'iterations': 0,
@@ -372,7 +372,7 @@ class MasterActor:
     async def _wait_for_completion(self, correlation_id: str) -> Dict[str, Any]:
         """Wait for task completion or timeout."""
         timeout = self.config.aggregation_timeout
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         
         while True:
             task_state = self._pending_tasks.get(correlation_id)
@@ -386,7 +386,7 @@ class MasterActor:
                     'status': 'success',
                     'results': task_state['results'],
                     'iterations': task_state['iterations'],
-                    'duration': (datetime.utcnow() - task_state['start_time']).total_seconds()
+                    'duration': (datetime.now(timezone.utc) - task_state['start_time']).total_seconds()
                 }
             
             if task_state['status'] == 'failed':
@@ -398,7 +398,7 @@ class MasterActor:
                 }
             
             # Check timeout
-            elapsed = (datetime.utcnow() - start_time).total_seconds()
+            elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
             if elapsed > timeout:
                 self._metrics['tasks_failed'] += 1
                 return {

@@ -15,7 +15,7 @@ Author: Ashutosh Sinha (ajsinha@gmail.com)
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 
 from ..database_delegate import DatabaseDelegate
@@ -188,7 +188,7 @@ class NotificationDelegate(DatabaseDelegate):
             (
                 notification_id, channel_id, channel_type, recipient, title, body,
                 level, status, source, source_type, correlation_id, error_message,
-                datetime.utcnow().isoformat() if status == 'sent' else None
+                datetime.now(timezone.utc).isoformat() if status == 'sent' else None
             )
         )
         return notification_id
@@ -200,8 +200,8 @@ class NotificationDelegate(DatabaseDelegate):
         error_message: str = None
     ) -> bool:
         """Update notification delivery status."""
-        sent_at = datetime.utcnow().isoformat() if status == 'sent' else None
-        delivered_at = datetime.utcnow().isoformat() if status == 'delivered' else None
+        sent_at = datetime.now(timezone.utc).isoformat() if status == 'sent' else None
+        delivered_at = datetime.now(timezone.utc).isoformat() if status == 'delivered' else None
         
         self.db_facade.execute(
             """UPDATE notification_logs 

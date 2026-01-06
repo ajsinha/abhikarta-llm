@@ -16,7 +16,7 @@ import asyncio
 import fnmatch
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 import uuid
@@ -86,7 +86,7 @@ class SwarmEvent:
     
     # Metadata
     priority: EventPriority = EventPriority.NORMAL
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     correlation_id: Optional[str] = None    # Links related events
     parent_id: Optional[str] = None         # Parent event ID
     
@@ -122,7 +122,7 @@ class SwarmEvent:
             payload=data.get('payload'),
             headers=data.get('headers', {}),
             priority=EventPriority(data.get('priority', 1)),
-            timestamp=datetime.fromisoformat(data['timestamp']) if data.get('timestamp') else datetime.utcnow(),
+            timestamp=datetime.fromisoformat(data['timestamp']) if data.get('timestamp') else datetime.now(timezone.utc),
             correlation_id=data.get('correlation_id'),
             parent_id=data.get('parent_id'),
             ttl=data.get('ttl'),
@@ -304,7 +304,7 @@ class SwarmEventBus:
                 
                 # Check TTL
                 if event.ttl:
-                    age = (datetime.utcnow() - event.timestamp).total_seconds()
+                    age = (datetime.now(timezone.utc) - event.timestamp).total_seconds()
                     if age > event.ttl:
                         self._metrics['events_dropped'] += 1
                         logger.debug(f"Dropped expired event: {event.event_id}")

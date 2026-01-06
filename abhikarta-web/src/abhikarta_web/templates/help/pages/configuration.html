@@ -332,6 +332,24 @@ database.postgresql.password=${PG_PASSWORD:}</code></pre>
     </table>
 </div>
 
+<h5>Workflow Execution Properties</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>workflow.langgraph.recursion.limit</code></td><td>Integer</td><td>100</td><td>Maximum recursion depth for LangGraph workflows. Increase for complex multi-step workflows.</td></tr>
+            <tr><td><code>workflow.execution.timeout.seconds</code></td><td>Integer</td><td>600</td><td>Maximum execution time per workflow (10 minutes)</td></tr>
+        </tbody>
+    </table>
+</div>
+<div class="alert alert-info mt-2">
+    <i class="bi bi-lightbulb"></i> <strong>Tip:</strong> If you encounter "Recursion limit reached" errors, 
+    increase <code>workflow.langgraph.recursion.limit</code>. Complex workflows with many nodes may require 
+    higher limits (e.g., 200 or 500).
+</div>
+
 <h5>HITL (Human-in-the-Loop) Properties</h5>
 <div class="table-responsive">
     <table class="table table-sm table-bordered table-striped">
@@ -434,7 +452,7 @@ database.postgresql.password=${PG_PASSWORD:}</code></pre>
 <div class="alert alert-info">
     <i class="bi bi-info-circle me-2"></i>
     <strong>Log Location:</strong> Logs are stored in <code>&lt;execution.log.path&gt;/&lt;entity_type&gt;/&lt;execution_id&gt;.log</code>
-    <br>For example: <code>executionlog/workflow/abc12345.log</code>
+    <br>For example: <code>executionlog/workflow/wflow_adaptive_learning_loop_abc12345.log</code>
 </div>
 
 <div class="table-responsive">
@@ -447,10 +465,21 @@ database.postgresql.password=${PG_PASSWORD:}</code></pre>
             <tr><td><code>execution.log.path</code></td><td>String</td><td>executionlog</td><td>Base directory for log files (relative or absolute path)</td></tr>
             <tr><td><code>execution.log.format</code></td><td>String</td><td>json</td><td>Log format: <code>json</code> or <code>text</code></td></tr>
             <tr><td><code>execution.log.include.llm.responses</code></td><td>Boolean</td><td>true</td><td>Include full LLM responses (can be large)</td></tr>
-            <tr><td><code>execution.log.retention.days</code></td><td>Integer</td><td>30</td><td>Days to keep logs (0 = keep forever)</td></tr>
+            <tr><td><code>execution.log.file.retention.days</code></td><td>Integer</td><td>10</td><td>Days to keep log files (0 = keep forever)</td></tr>
+            <tr><td><code>execution.log.db.retention.days</code></td><td>Integer</td><td>30</td><td>Days to keep database execution records (0 = keep forever)</td></tr>
+            <tr><td><code>execution.log.cleanup.interval.hours</code></td><td>Integer</td><td>24</td><td>How often to run automatic cleanup (in hours)</td></tr>
         </tbody>
     </table>
 </div>
+
+<h5>Automatic Cleanup</h5>
+<p>Abhikarta automatically cleans up old execution logs to prevent disk space issues:</p>
+<ul>
+    <li><strong>File Logs</strong> - Log files older than <code>file.retention.days</code> (default: 10) are deleted from the filesystem</li>
+    <li><strong>Database Records</strong> - Execution records older than <code>db.retention.days</code> (default: 30) are deleted from the database</li>
+    <li><strong>Cleanup Schedule</strong> - Runs every <code>cleanup.interval.hours</code> (default: 24 hours)</li>
+    <li><strong>Tables Cleaned</strong> - <code>executions</code>, <code>agent_executions</code>, <code>swarm_executions</code>, <code>workflow_executions</code></li>
+</ul>
 
 <h5>Log Contents</h5>
 <p>Each execution log file contains:</p>
@@ -463,6 +492,18 @@ database.postgresql.password=${PG_PASSWORD:}</code></pre>
     <li><strong>LLM Calls</strong> - Each LLM API call with prompt and response</li>
     <li><strong>Output/Error</strong> - Final result or error with traceback</li>
 </ul>
+
+<h5>Example: application.properties</h5>
+<pre class="bg-dark text-light p-3 rounded"><code># Execution Logging Configuration
+execution.log.enabled=true
+execution.log.path=executionlog
+execution.log.format=json
+execution.log.include.llm.responses=true
+
+# Retention Settings
+execution.log.file.retention.days=10    # Keep files for 10 days
+execution.log.db.retention.days=30      # Keep DB records for 30 days
+execution.log.cleanup.interval.hours=24 # Run cleanup daily</code></pre>
 
 <hr class="my-5">
 

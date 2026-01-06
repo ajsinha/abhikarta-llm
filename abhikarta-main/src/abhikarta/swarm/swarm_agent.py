@@ -12,7 +12,7 @@ Ashutosh Sinha
 import asyncio
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 import uuid
@@ -189,7 +189,7 @@ class SwarmAgent:
     async def _process_task(self, event: SwarmEvent) -> None:
         """Process a task event."""
         task_id = event.event_id
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         
         # Track task
         self._active_tasks[task_id] = {
@@ -245,7 +245,7 @@ class SwarmAgent:
         
         finally:
             # Update processing time
-            elapsed = (datetime.utcnow() - start_time).total_seconds()
+            elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
             self._metrics['total_processing_time'] += elapsed
             
             # Remove from active tasks

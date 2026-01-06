@@ -917,7 +917,81 @@ class AgentExecutor:
         return tools
     
     def _log_execution(self, result: AgentExecutionResult, agent_config: Dict):
-        """Log agent execution to database."""
+        """Log agent execution to database and execution log file."""
+        # Log to execution log file
+        try:
+            from ..services.execution_logger import get_execution_logger, EntityType
+            
+            exec_logger = get_execution_logger()
+            if exec_logger:
+                # Start execution log
+                exec_log = exec_logger.start_execution(
+                    execution_id=result.execution_id,
+                    entity_type=EntityType.AGENT,
+                    entity_id=result.agent_id,
+                    entity_name=agent_config.get('name', result.agent_id),
+                    user_input=result.input_data
+                )
+                
+                # Log agent config
+                exec_log.entity_config = {
+                    'agent_type': agent_config.get('agent_type', 'unknown'),
+                    'name': agent_config.get('name', ''),
+                    'description': agent_config.get('description', ''),
+                }
+                
+                # Log LLM config (masked)
+                llm_config = agent_config.get('llm_config', {})
+                if isinstance(llm_config, str):
+                    try:
+                        llm_config = json.loads(llm_config)
+                    except:
+                        llm_config = {}
+                exec_log.llm_config = self._mask_sensitive_config(llm_config)
+                
+                # Log full entity definition
+                exec_log.execution_json = {
+                    'agent_id': result.agent_id,
+                    'name': agent_config.get('name', ''),
+                    'agent_type': agent_config.get('agent_type', ''),
+                    'system_prompt': agent_config.get('system_prompt', '')[:500] if agent_config.get('system_prompt') else '',
+                    'tools': agent_config.get('tools', []),
+                    'metadata': result.metadata
+                }
+                
+                # Log intermediate steps as node executions
+                for i, step in enumerate(result.intermediate_steps):
+                    exec_logger.log_node_execution(
+                        execution_id=result.execution_id,
+                        node_id=f"step_{i+1}",
+                        node_type='tool_call',
+                        output_data=step
+                    )
+                
+                # Log tool calls
+                for tc in result.tool_calls:
+                    exec_logger.log_entry(
+                        execution_id=result.execution_id,
+                        level='info',
+                        message=f"Tool call: {tc.get('tool', 'unknown')}",
+                        data=tc
+                    )
+                
+                # Complete execution log
+                exec_logger.complete_execution(
+                    execution_id=result.execution_id,
+                    status=result.status,
+                    output=result.output,
+                    error=result.error_message
+                )
+                
+                logger.info(f"[AGENT:{result.agent_id}] Execution log written: {result.execution_id}")
+        except ImportError:
+            logger.debug("Execution logger service not available")
+        except Exception as e:
+            logger.warning(f"Failed to write execution log file: {e}")
+        
+        # Log to database
         try:
             self.db_facade.execute(
                 """INSERT INTO agent_executions
@@ -945,7 +1019,28 @@ class AgentExecutor:
                 )
             )
         except Exception as e:
-            logger.warning(f"Failed to log agent execution: {e}")
+            logger.warning(f"Failed to log agent execution to database: {e}")
+    
+    def _mask_sensitive_config(self, config: Dict) -> Dict:
+        """Mask sensitive values in config for logging."""
+        if not config:
+            return {}
+        
+        masked = {}
+        sensitive_keys = ['api_key', 'secret', 'password', 'token', 'key', 'credential', 'auth']
+        
+        for k, v in config.items():
+            if any(s in k.lower() for s in sensitive_keys):
+                if isinstance(v, str) and len(v) > 4:
+                    masked[k] = v[:4] + '****'
+                else:
+                    masked[k] = '****'
+            elif isinstance(v, dict):
+                masked[k] = self._mask_sensitive_config(v)
+            else:
+                masked[k] = v
+        
+        return masked
 
 
 def execute_agent_from_config(db_facade, agent_id: str, input_data: Any,

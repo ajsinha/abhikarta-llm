@@ -8,7 +8,7 @@ Author: Ashutosh Sinha (ajsinha@gmail.com)
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Optional, Any
 import json
@@ -123,7 +123,7 @@ class NotificationMessage:
     source: str = "system"              # agent_id, workflow_id, swarm_id
     source_type: str = "system"         # agent, workflow, swarm, system
     source_name: str = ""               # Human-readable name
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     correlation_id: Optional[str] = None  # For tracking across systems
     
     # Channel-specific overrides (optional)
@@ -169,7 +169,7 @@ class NotificationResult:
     status: NotificationStatus
     message_id: Optional[str] = None  # Channel-specific message ID
     error: Optional[str] = None
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -237,7 +237,7 @@ class WebhookEndpoint:
     
     # Metadata
     created_by: Optional[str] = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 # =============================================================================

@@ -14,7 +14,7 @@ Ashutosh Sinha
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Union
 import json
@@ -130,7 +130,7 @@ class Message:
     headers: Dict[str, str] = field(default_factory=dict)
     
     # Metadata
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     source: str = ""                          # Sender identifier
     correlation_id: Optional[str] = None      # For request-response
     reply_to: Optional[str] = None            # Reply topic
@@ -169,7 +169,7 @@ class Message:
             topic=data.get('topic', ''),
             payload=data.get('payload'),
             headers=data.get('headers', {}),
-            timestamp=datetime.fromisoformat(data['timestamp']) if 'timestamp' in data else datetime.utcnow(),
+            timestamp=datetime.fromisoformat(data['timestamp']) if 'timestamp' in data else datetime.now(timezone.utc),
             source=data.get('source', ''),
             correlation_id=data.get('correlation_id'),
             reply_to=data.get('reply_to'),
@@ -243,7 +243,7 @@ class Subscription:
     
     # State
     is_active: bool = True
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 # =============================================================================

@@ -13,7 +13,7 @@ Ashutosh Sinha
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 import uuid
@@ -111,7 +111,7 @@ class EventSubscription:
     
     # State
     is_active: bool = True
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -139,7 +139,7 @@ class EventSubscription:
             filter_headers=data.get('filter_headers', {}),
             filter_expression=data.get('filter_expression'),
             is_active=data.get('is_active', True),
-            created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.utcnow(),
+            created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.now(timezone.utc),
         )
 
 
@@ -301,8 +301,8 @@ class SwarmDefinition:
     
     # State
     status: SwarmStatus = SwarmStatus.DRAFT
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str = ""
     
     # Statistics
@@ -347,8 +347,8 @@ class SwarmDefinition:
             tags=data.get('tags', []),
             category=data.get('category', 'general'),
             status=SwarmStatus(data.get('status', 'draft')),
-            created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.utcnow(),
-            updated_at=datetime.fromisoformat(data['updated_at']) if data.get('updated_at') else datetime.utcnow(),
+            created_at=datetime.fromisoformat(data['created_at']) if data.get('created_at') else datetime.now(timezone.utc),
+            updated_at=datetime.fromisoformat(data['updated_at']) if data.get('updated_at') else datetime.now(timezone.utc),
             created_by=data.get('created_by', ''),
             total_executions=data.get('total_executions', 0),
             successful_executions=data.get('successful_executions', 0),
@@ -378,7 +378,7 @@ class SwarmDefinition:
             ]
         )
         self.agents.append(membership)
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
         return membership
     
     def add_trigger(self, trigger_type: TriggerType, name: str, 
@@ -390,7 +390,7 @@ class SwarmDefinition:
             config=config
         )
         self.triggers.append(trigger)
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
         return trigger
     
     def get_agent(self, agent_id: str) -> Optional[AgentMembership]:

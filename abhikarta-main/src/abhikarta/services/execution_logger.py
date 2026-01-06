@@ -14,7 +14,7 @@ import logging
 import os
 import traceback
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, Tuple
@@ -44,7 +44,14 @@ class ExecutionLogConfig:
     base_path: str = "executionlog"
     log_format: LogFormat = LogFormat.JSON
     include_llm_responses: bool = True
-    retention_days: int = 30
+    file_retention_days: int = 10  # File system log retention
+    db_retention_days: int = 30    # Database log retention
+    cleanup_interval_hours: int = 24  # How often to run cleanup
+    
+    # Backward compatibility
+    @property
+    def retention_days(self) -> int:
+        return self.file_retention_days
     
     @classmethod
     def from_properties(cls, prop_conf) -> 'ExecutionLogConfig':
@@ -62,10 +69,24 @@ class ExecutionLogConfig:
                 'execution.log.include.llm.responses', 'true'
             ).lower() == 'true'
             
+            # New separate retention settings
             try:
-                config.retention_days = int(prop_conf.get('execution.log.retention.days', '30'))
+                config.file_retention_days = int(prop_conf.get(
+                    'execution.log.file.retention.days', 
+                    prop_conf.get('execution.log.retention.days', '10')  # Fallback to old setting
+                ))
             except ValueError:
-                config.retention_days = 30
+                config.file_retention_days = 10
+            
+            try:
+                config.db_retention_days = int(prop_conf.get('execution.log.db.retention.days', '30'))
+            except ValueError:
+                config.db_retention_days = 30
+            
+            try:
+                config.cleanup_interval_hours = int(prop_conf.get('execution.log.cleanup.interval.hours', '24'))
+            except ValueError:
+                config.cleanup_interval_hours = 24
         
         return config
 
@@ -125,7 +146,7 @@ class ExecutionLog:
     def add_entry(self, level: str, message: str, data: Optional[Dict[str, Any]] = None):
         """Add a log entry."""
         entry = ExecutionLogEntry(
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             level=level,
             message=message,
             data=data
@@ -137,7 +158,7 @@ class ExecutionLog:
                           duration_ms: float = None, error: str = None):
         """Add a node/step execution record."""
         record = {
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'node_id': node_id,
             'node_type': node_type,
             'input': input_data,
@@ -369,7 +390,7 @@ class ExecutionLogger:
                 entity_type=entity_type,
                 entity_id=entity_id,
                 entity_name=entity_name,
-                started_at=datetime.utcnow().isoformat()
+                started_at=datetime.now(timezone.utc).isoformat()
             )
         
         log = ExecutionLog(
@@ -378,7 +399,7 @@ class ExecutionLogger:
             entity_id=entity_id,
             entity_name=entity_name,
             user_id=user_id,
-            started_at=datetime.utcnow().isoformat(),
+            started_at=datetime.now(timezone.utc).isoformat(),
             user_input=user_input,
             entity_config=entity_config,
             llm_config=llm_config,
@@ -478,7 +499,7 @@ class ExecutionLogger:
         
         log = self._active_logs.get(execution_id)
         if log:
-            log.completed_at = datetime.utcnow().isoformat()
+            log.completed_at = datetime.now(timezone.utc).isoformat()
             log.status = status
             log.output = output
             log.error = error
@@ -641,13 +662,23 @@ class ExecutionLogger:
         
         return logs
     
-    def cleanup_old_logs(self):
-        """Remove logs older than retention period."""
-        if self.config.retention_days <= 0:
-            return  # Keep forever
+    def cleanup_old_logs(self, db_facade=None):
+        """Remove logs older than retention period (both files and database)."""
+        file_count = self._cleanup_old_log_files()
+        db_count = self._cleanup_old_db_logs(db_facade) if db_facade else 0
+        
+        if file_count > 0 or db_count > 0:
+            logger.info(f"Execution log cleanup: removed {file_count} files, {db_count} database records")
+        
+        return file_count, db_count
+    
+    def _cleanup_old_log_files(self) -> int:
+        """Remove log files older than file retention period."""
+        if self.config.file_retention_days <= 0:
+            return 0  # Keep forever
         
         from datetime import timedelta
-        cutoff = datetime.now() - timedelta(days=self.config.retention_days)
+        cutoff = datetime.now() - timedelta(days=self.config.file_retention_days)
         
         removed_count = 0
         base_path = Path(self.config.base_path)
@@ -658,15 +689,74 @@ class ExecutionLogger:
                 continue
             
             for log_file in dir_path.glob("*"):
-                if log_file.stat().st_mtime < cutoff.timestamp():
-                    try:
+                try:
+                    if log_file.stat().st_mtime < cutoff.timestamp():
                         log_file.unlink()
                         removed_count += 1
-                    except Exception as e:
-                        logger.error(f"Failed to remove old log {log_file}: {e}")
+                except Exception as e:
+                    logger.error(f"Failed to remove old log {log_file}: {e}")
         
         if removed_count > 0:
-            logger.info(f"Cleaned up {removed_count} old execution logs")
+            logger.info(f"Cleaned up {removed_count} old execution log files")
+        
+        return removed_count
+    
+    def _cleanup_old_db_logs(self, db_facade) -> int:
+        """Remove database execution records older than DB retention period."""
+        if self.config.db_retention_days <= 0 or not db_facade:
+            return 0  # Keep forever or no DB access
+        
+        from datetime import timedelta
+        cutoff = datetime.now() - timedelta(days=self.config.db_retention_days)
+        cutoff_str = cutoff.isoformat()
+        
+        removed_count = 0
+        
+        # Tables to clean up with possible date column names
+        # Try multiple column names for each table for compatibility
+        # Order: preferred column first, then fallbacks for older schemas
+        tables = [
+            ('executions', ['started_at', 'created_at']),
+            ('agent_executions', ['started_at', 'created_at']),
+            ('swarm_executions', ['started_at', 'created_at', 'start_time']),
+        ]
+        
+        for table, date_columns in tables:
+            # First check if table exists
+            try:
+                table_check = db_facade.fetch_one(
+                    f"SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                    (table,)
+                )
+                if not table_check:
+                    continue  # Table doesn't exist, skip
+            except Exception:
+                continue  # Error checking table, skip
+            
+            # Try each possible date column
+            for date_column in date_columns:
+                try:
+                    # Check if column exists by trying a simple query
+                    result = db_facade.fetch_one(
+                        f"SELECT COUNT(*) as cnt FROM {table} WHERE {date_column} < ?",
+                        (cutoff_str,)
+                    )
+                    if result:
+                        count = result.get('cnt', 0) if isinstance(result, dict) else result[0]
+                        if count > 0:
+                            db_facade.execute(
+                                f"DELETE FROM {table} WHERE {date_column} < ?",
+                                (cutoff_str,)
+                            )
+                            removed_count += count
+                            logger.info(f"Cleaned up {count} old records from {table}")
+                    break  # Column found and processed, move to next table
+                except Exception as e:
+                    # Column doesn't exist, try next one
+                    logger.debug(f"Column {date_column} not found in {table}: {e}")
+                    continue
+        
+        return removed_count
 
 
 # Singleton accessor functions

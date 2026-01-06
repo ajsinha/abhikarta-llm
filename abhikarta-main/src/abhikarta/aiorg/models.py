@@ -13,7 +13,7 @@ Copyright © 2025-2030, All Rights Reserved
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, Any, List, Optional
 import uuid
@@ -47,7 +47,7 @@ def _parse_timestamp(val: Optional[str]) -> Optional[datetime]:
         else:
             return datetime.strptime(val, '%Y-%m-%d %H:%M:%S')
     except Exception:
-        return datetime.utcnow()
+        return datetime.now(timezone.utc)
 
 
 class OrgStatus(Enum):
@@ -147,7 +147,7 @@ class AIOrg:
     ) -> 'AIOrg':
         """Create a new AI Organization."""
         org_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         return cls(
             org_id=org_id,
             name=name,
@@ -186,8 +186,8 @@ class AIOrg:
             config=data.get("config", {}),
             event_bus_channel=data.get("event_bus_channel", f"aiorg:{data['org_id']}"),
             created_by=data.get("created_by", "system"),
-            created_at=_parse_timestamp(data.get("created_at")) or datetime.utcnow(),
-            updated_at=_parse_timestamp(data.get("updated_at")) or datetime.utcnow(),
+            created_at=_parse_timestamp(data.get("created_at")) or datetime.now(timezone.utc),
+            updated_at=_parse_timestamp(data.get("updated_at")) or datetime.now(timezone.utc),
             root_node_id=data.get("root_node_id")
         )
 
@@ -318,7 +318,7 @@ class AINode:
     ) -> 'AINode':
         """Create a new AI Node."""
         node_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         return cls(
             node_id=node_id,
             org_id=org_id,
@@ -411,8 +411,8 @@ class AINode:
             position_y=data.get("position_y", 0),
             status=data.get("status", "active"),
             current_task_id=data.get("current_task_id"),
-            created_at=_parse_timestamp(data.get("created_at")) or datetime.utcnow(),
-            updated_at=_parse_timestamp(data.get("updated_at")) or datetime.utcnow()
+            created_at=_parse_timestamp(data.get("created_at")) or datetime.now(timezone.utc),
+            updated_at=_parse_timestamp(data.get("updated_at")) or datetime.now(timezone.utc)
         )
 
 
@@ -480,7 +480,7 @@ class AITask:
     ) -> 'AITask':
         """Create a new task."""
         task_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         return cls(
             task_id=task_id,
             org_id=org_id,
@@ -565,8 +565,8 @@ class AITask:
             completed_at=_parse_timestamp(data.get("completed_at")),
             error_message=data.get("error_message"),
             retry_count=data.get("retry_count", 0),
-            created_at=_parse_timestamp(data.get("created_at")) or datetime.utcnow(),
-            updated_at=_parse_timestamp(data.get("updated_at")) or datetime.utcnow()
+            created_at=_parse_timestamp(data.get("created_at")) or datetime.now(timezone.utc),
+            updated_at=_parse_timestamp(data.get("updated_at")) or datetime.now(timezone.utc)
         )
 
 
@@ -632,7 +632,7 @@ class AIResponse:
             modification_reason=None,
             modified_by=None,
             modified_at=None,
-            created_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc)
         )
     
     def to_dict(self) -> Dict[str, Any]:
@@ -673,7 +673,7 @@ class AIResponse:
             modification_reason=data.get("modification_reason"),
             modified_by=data.get("modified_by"),
             modified_at=_parse_timestamp(data.get("modified_at")),
-            created_at=_parse_timestamp(data.get("created_at")) or datetime.utcnow()
+            created_at=_parse_timestamp(data.get("created_at")) or datetime.now(timezone.utc)
         )
 
 
@@ -737,7 +737,7 @@ class AIHITLAction:
             message=message,
             ip_address=None,
             user_agent=None,
-            created_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc)
         )
     
     def to_dict(self) -> Dict[str, Any]:
@@ -776,7 +776,7 @@ class AIHITLAction:
             message=data.get("message"),
             ip_address=data.get("ip_address"),
             user_agent=data.get("user_agent"),
-            created_at=_parse_timestamp(data.get("created_at")) or datetime.utcnow()
+            created_at=_parse_timestamp(data.get("created_at")) or datetime.now(timezone.utc)
         )
 
 
@@ -811,7 +811,7 @@ class AIEventLog:
             target_node_id=target_node_id,
             task_id=task_id,
             payload=payload,
-            created_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc)
         )
     
     def to_dict(self) -> Dict[str, Any]:

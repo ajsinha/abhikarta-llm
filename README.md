@@ -12,7 +12,36 @@ Abhikarta-LLM is a comprehensive platform for building, deploying, and managing 
 
 ## 🚀 What's New in v1.5.2
 
-### 📦 Code Fragment Module System (NEW!)
+### 📝 Enhanced Execution Logging (NEW!)
+Comprehensive execution logging with automatic cleanup:
+
+```properties
+# Execution Log Configuration (application.properties)
+execution.log.enabled=true
+execution.log.path=executionlog
+execution.log.format=json
+
+# Separate retention for files and database
+execution.log.file.retention.days=10    # Keep files for 10 days
+execution.log.db.retention.days=30      # Keep DB records for 30 days
+execution.log.cleanup.interval.hours=24 # Run cleanup daily
+```
+
+**Key Features:**
+- **Automatic Cleanup** - Old logs are automatically deleted based on retention settings
+- **Separate Retention** - Configure different retention periods for file logs vs database records
+- **All Entity Types** - Workflows, agents, swarms, and AI orgs all produce execution logs
+- **Traceable Execution IDs** - Format: `wflow_adaptive_learning_loop_abc123`
+- **Design-Time Testing** - Test agents, swarms, and AI orgs before saving
+
+### 🎨 Enhanced Node Editor Modal (NEW!)
+Full-featured modal dialog for editing workflow/agent nodes:
+- **XL Modal Dialog** - Spacious editing with organized sections
+- **Clickable Default Values** - Click admin defaults to auto-populate fields
+- **Visual Feedback** - Green border flash when defaults are applied
+- **Node-Type Specific Editors** - Specialized forms for LLM, Code, Tool, HITL, HTTP nodes
+
+### 📦 Code Fragment Module System
 Code fragments are now synced as a proper Python package with standard imports:
 
 ```python

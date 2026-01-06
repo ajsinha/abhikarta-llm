@@ -1374,4 +1374,177 @@ class AIORGRoutes(AbstractRoutes):
                 logger.error(f"Error deleting organization: {e}", exc_info=True)
                 return jsonify({'error': str(e)}), 500
         
+        @self.app.route('/api/aiorg/test', methods=['POST'])
+        @login_required
+        def api_test_aiorg_design():
+            """API: Test an AI organization during design time."""
+            import time
+            
+            try:
+                data = request.get_json()
+                input_text = data.get('input', '')
+                org_config = data.get('org', {})
+                nodes = data.get('nodes', [])
+                
+                if not input_text:
+                    return jsonify({'success': False, 'error': 'Input is required'}), 400
+                
+                start_time = time.time()
+                
+                # Find an LLM config from nodes
+                provider = 'ollama'
+                model = 'llama3.2:3b'
+                
+                for node in nodes:
+                    llm_config = node.get('llm_config', {})
+                    if llm_config.get('provider'):
+                        provider = llm_config.get('provider')
+                        model = llm_config.get('model', model)
+                        break
+                
+                # Apply admin defaults
+                admin_defaults = {}
+                try:
+                    from abhikarta.services.llm_config_resolver import get_llm_config_resolver
+                    resolver = get_llm_config_resolver(self.db_facade)
+                    admin_defaults = resolver.get_admin_defaults()
+                    if not provider or provider == 'ollama':
+                        provider = admin_defaults.get('provider', provider)
+                        model = admin_defaults.get('model', model)
+                except:
+                    pass
+                
+                try:
+                    from langchain_ollama import ChatOllama
+                    from langchain_openai import ChatOpenAI
+                    from langchain_anthropic import ChatAnthropic
+                    from langchain_core.messages import HumanMessage, SystemMessage
+                    
+                    # Create LLM
+                    if provider.lower() == 'ollama':
+                        base_url = admin_defaults.get('base_url', 'http://localhost:11434')
+                        llm = ChatOllama(model=model, base_url=base_url)
+                    elif provider.lower() == 'openai':
+                        llm = ChatOpenAI(model=model)
+                    elif provider.lower() == 'anthropic':
+                        llm = ChatAnthropic(model=model)
+                    else:
+                        llm = ChatOllama(model=model)
+                    
+                    # Build org simulation prompt
+                    org_name = org_config.get('name', 'Unnamed AI Organization')
+                    system_prompt = f"You are simulating an AI organization named '{org_name}' with {len(nodes)} AI nodes. Process the user's request as a coordinated organization."
+                    
+                    messages = [
+                        SystemMessage(content=system_prompt),
+                        HumanMessage(content=input_text)
+                    ]
+                    
+                    response = llm.invoke(messages)
+                    output = response.content if hasattr(response, 'content') else str(response)
+                    
+                    duration_ms = int((time.time() - start_time) * 1000)
+                    
+                    return jsonify({
+                        'success': True,
+                        'output': output,
+                        'status': 'completed',
+                        'duration_ms': duration_ms,
+                        'provider': provider,
+                        'model': model,
+                        'nodes_simulated': len(nodes)
+                    })
+                    
+                except ImportError as ie:
+                    return jsonify({
+                        'success': False,
+                        'error': f'LLM library not available: {str(ie)}',
+                        'status': 'failed'
+                    }), 500
+                except Exception as exec_err:
+                    error_msg = str(exec_err)
+                    if 'not found' in error_msg.lower() or '404' in error_msg:
+                        error_msg = f"Model '{model}' not found. Run 'ollama pull {model}' to install it."
+                    
+                    return jsonify({
+                        'success': False,
+                        'error': error_msg,
+                        'status': 'failed',
+                        'duration_ms': int((time.time() - start_time) * 1000)
+                    }), 500
+                    
+            except Exception as e:
+                logger.error(f"Error in design-time AI org test: {e}", exc_info=True)
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.app.route('/api/aiorg/<org_id>/execute', methods=['POST'])
+        @login_required
+        def api_execute_aiorg(org_id):
+            """API: Execute a task through the AI organization."""
+            try:
+                data = request.get_json()
+                task = data.get('task', '')
+                
+                if not task:
+                    return jsonify({'success': False, 'error': 'Task is required'}), 400
+                
+                import time
+                from abhikarta.utils.helpers import generate_execution_id, EntityType as HelperEntityType
+                
+                # Get org info
+                org = self.db_facade.fetch_one(
+                    "SELECT * FROM ai_orgs WHERE org_id = ?",
+                    (org_id,)
+                )
+                org_name = org.get('name', '') if org else ''
+                
+                execution_id = generate_execution_id(HelperEntityType.AIORG, org_name)
+                start_time = time.time()
+                
+                # Start execution logging
+                try:
+                    from abhikarta.services.execution_logger import get_execution_logger, EntityType
+                    exec_logger = get_execution_logger()
+                    
+                    if exec_logger and exec_logger.config.enabled:
+                        exec_log = exec_logger.start_execution(
+                            execution_id=execution_id,
+                            entity_type=EntityType.AIORG,
+                            entity_id=org_id,
+                            entity_name=org_name,
+                            user_input=task
+                        )
+                        
+                        exec_log.entity_config = {
+                            'org_name': org_name,
+                            'org_type': org.get('org_type', 'functional') if org else ''
+                        }
+                        
+                        # Get org nodes
+                        nodes = self.db_facade.fetch_all(
+                            "SELECT node_name, node_type, role FROM ai_nodes WHERE org_id = ?",
+                            (org_id,)
+                        ) or []
+                        
+                        exec_log.execution_json = {
+                            'org_id': org_id,
+                            'name': org_name,
+                            'nodes': [dict(n) for n in nodes],
+                            'task': task
+                        }
+                except Exception as log_err:
+                    logger.debug(f"Could not start execution logging: {log_err}")
+                
+                # TODO: Actually execute through AI org orchestrator
+                
+                return jsonify({
+                    'success': True,
+                    'execution_id': execution_id,
+                    'message': 'Execution started'
+                })
+                
+            except Exception as e:
+                logger.error(f"Error executing AI org: {e}", exc_info=True)
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
         logger.info("AI Org routes registered")

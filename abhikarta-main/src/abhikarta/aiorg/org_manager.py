@@ -13,7 +13,7 @@ Copyright © 2025-2030, All Rights Reserved
 
 import logging
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional, Tuple
 
 from .models import (
@@ -152,7 +152,7 @@ class OrgManager:
         
         # Update status
         org.status = OrgStatus.ACTIVE
-        org.updated_at = datetime.utcnow()
+        org.updated_at = datetime.now(timezone.utc)
         
         if not self.db.save_org(org):
             return False, "Failed to update org status"
@@ -169,7 +169,7 @@ class OrgManager:
             self.event_bus.publish(org.event_bus_channel, {
                 "type": "ORG_ACTIVATED",
                 "org_id": org_id,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             })
         
         self._log_event(org_id, "ORG_ACTIVATED", {})
@@ -192,7 +192,7 @@ class OrgManager:
             return False, "Organization not found"
         
         org.status = OrgStatus.PAUSED
-        org.updated_at = datetime.utcnow()
+        org.updated_at = datetime.now(timezone.utc)
         
         if not self.db.save_org(org):
             return False, "Failed to update org status"
@@ -221,7 +221,7 @@ class OrgManager:
             self.pause_org(org_id)
         
         org.status = OrgStatus.ARCHIVED
-        org.updated_at = datetime.utcnow()
+        org.updated_at = datetime.now(timezone.utc)
         
         if not self.db.save_org(org):
             return False, "Failed to archive org"
@@ -326,7 +326,7 @@ class OrgManager:
     
     def update_node(self, node: AINode) -> bool:
         """Update a node's configuration."""
-        node.updated_at = datetime.utcnow()
+        node.updated_at = datetime.now(timezone.utc)
         return self.db.save_node(node)
     
     def remove_node(self, node_id: str, reassign_children_to: Optional[str] = None) -> Tuple[bool, str]:
@@ -394,7 +394,7 @@ class OrgManager:
         
         old_parent = node.parent_node_id
         node.parent_node_id = new_parent_id
-        node.updated_at = datetime.utcnow()
+        node.updated_at = datetime.now(timezone.utc)
         
         if self.db.save_node(node):
             self._log_event(node.org_id, "NODE_RESTRUCTURED", {
@@ -434,7 +434,7 @@ class OrgManager:
         # Build export structure
         export = {
             "version": "1.4.7",
-            "exported_at": datetime.utcnow().isoformat(),
+            "exported_at": datetime.now(timezone.utc).isoformat(),
             "org": {
                 "name": org.name,
                 "description": org.description,

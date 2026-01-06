@@ -15,7 +15,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, asdict
 from typing import Dict, Any, Optional, List, Callable, Union
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -160,7 +160,7 @@ class ToolMetadata:
     requires_auth: bool = False
     rate_limit: int = 0  # calls per minute, 0 = unlimited
     timeout_seconds: int = 30
-    created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)
@@ -328,7 +328,7 @@ class BaseTool(ABC):
             
             # Update statistics
             self._execution_count += 1
-            self._last_execution = datetime.utcnow().isoformat()
+            self._last_execution = datetime.now(timezone.utc).isoformat()
             
             # Ensure result has execution time
             if result.execution_time_ms == 0:

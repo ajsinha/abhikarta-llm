@@ -291,9 +291,20 @@ class WorkflowExecutor:
                 "messages": []
             }
             
-            # Execute graph
+            # Execute graph with configurable recursion limit
             start_time = time.time()
-            final_state = graph.invoke(initial_state)
+            
+            # Get recursion limit from properties or use default
+            recursion_limit = 100  # Default to 100 (up from 25)
+            if self.prop_conf:
+                try:
+                    recursion_limit = int(self.prop_conf.get('workflow.langgraph.recursion.limit', '100'))
+                except (ValueError, AttributeError):
+                    pass
+            
+            # Configure execution with recursion limit
+            config = {"recursion_limit": recursion_limit}
+            final_state = graph.invoke(initial_state, config=config)
             execution.duration_ms = int((time.time() - start_time) * 1000)
             
             # Extract results

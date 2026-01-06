@@ -1949,7 +1949,13 @@ function saveNodeEdit() {
     const nodeId = $('#edit-node-id').val();
     const nodeType = $('#edit-node-type').val();
     const node = designer.nodes.find(n => n.node_id === nodeId);
-    if (!node) return;
+    if (!node) {
+        console.error('Node not found:', nodeId);
+        return;
+    }
+    
+    console.log('Saving node:', nodeId, 'type:', nodeType);
+    console.log('Node config before save:', JSON.stringify(node.config));
     
     node.name = $('#edit-name').val();
     
@@ -1958,8 +1964,14 @@ function saveNodeEdit() {
         node.config.model = $('#edit-model').val();
         
         var baseUrl = $('#edit-base-url').val().trim();
-        if (baseUrl) node.config.base_url = baseUrl;
-        else delete node.config.base_url;
+        console.log('Base URL from form:', baseUrl);
+        if (baseUrl) {
+            node.config.base_url = baseUrl;
+            console.log('Set base_url:', baseUrl);
+        } else {
+            delete node.config.base_url;
+            console.log('Deleted base_url (empty)');
+        }
         
         var temp = parseFloat($('#edit-temp').val());
         if (!isNaN(temp)) node.config.temperature = temp;
@@ -1974,6 +1986,8 @@ function saveNodeEdit() {
         
         node.config.system_prompt = $('#edit-system').val();
         node.config.prompt = $('#edit-prompt').val();
+        
+        console.log('Node config after save:', JSON.stringify(node.config));
         
     } else if (nodeType === 'python') {
         node.config.uri = $('#edit-uri').val();
@@ -2225,18 +2239,84 @@ function testAgent() {
 }
 
 function runTest() {
-    const input = $('#test-input').val();
-    $('#test-progress').removeClass('d-none');
-    $('#test-output').text('Running...');
+    const input = $('#test-input').val().trim();
     
-    setTimeout(() => {
+    if (!input) {
+        $('#test-output').html('<span class="text-danger">Please enter test input</span>');
+        return;
+    }
+    
+    $('#test-progress').removeClass('d-none');
+    $('#test-output').text('Running agent...');
+    
+    // Gather current agent configuration
+    const agentConfig = {
+        name: $('#agent-name-input').val(),
+        type: $('#agent-type-select').val(),
+        provider: $('#agent-provider-select').val(),
+        model: $('#agent-model-select').val()
+    };
+    
+    const workflow = {
+        nodes: designer.nodes,
+        edges: designer.edges,
+        entry_node: designer.nodes.find(n => n.node_type === 'input')?.node_id || null,
+        exit_nodes: designer.nodes.filter(n => n.node_type === 'output').map(n => n.node_id)
+    };
+    
+    // Debug logging
+    console.log('=== Design-Time Test ===');
+    console.log('Agent config:', agentConfig);
+    console.log('Workflow nodes:', workflow.nodes.map(n => ({
+        id: n.node_id,
+        type: n.node_type,
+        config: n.config
+    })));
+    
+    // Find and log LLM node config specifically
+    const llmNode = workflow.nodes.find(n => n.node_type === 'llm');
+    if (llmNode) {
+        console.log('LLM Node config:', JSON.stringify(llmNode.config, null, 2));
+    } else {
+        console.log('No LLM node found in workflow');
+    }
+    
+    // Call the design-time test API
+    fetch('/api/agents/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            input: input,
+            agent: agentConfig,
+            workflow: workflow
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
         $('#test-progress').addClass('d-none');
-        $('#test-output').text(JSON.stringify({
-            status: 'success',
-            nodes_executed: designer.nodes.length,
-            output: 'Test completed successfully'
-        }, null, 2));
-    }, 1500);
+        
+        if (data.success) {
+            $('#test-output').html(
+                '<div class="text-success mb-2"><i class="bi bi-check-circle me-1"></i>Completed in ' + data.duration_ms + 'ms</div>' +
+                '<div class="small text-muted mb-2">Provider: ' + data.provider + ' | Model: ' + data.model + (data.base_url ? ' | URL: ' + data.base_url : '') + '</div>' +
+                '<hr>' +
+                '<div class="output-text">' + escapeHtmlAgent(data.output) + '</div>'
+            );
+        } else {
+            $('#test-output').html(
+                '<div class="text-danger"><i class="bi bi-x-circle me-1"></i>Error</div>' +
+                (data.base_url ? '<div class="small text-muted mb-2">Attempted URL: ' + data.base_url + '</div>' : '') +
+                '<div class="mt-2 text-danger">' + escapeHtmlAgent(data.error) + '</div>'
+            );
+        }
+    })
+    .catch(error => {
+        $('#test-progress').addClass('d-none');
+        $('#test-output').html(
+            '<div class="text-danger"><i class="bi bi-x-circle me-1"></i>Request Failed</div>' +
+            '<div class="mt-2">' + escapeHtmlAgent(error.message || 'Network error') + '</div>'
+        );
+    });
 }
 
 function showToast(msg, type) {

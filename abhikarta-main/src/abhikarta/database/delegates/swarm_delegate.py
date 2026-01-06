@@ -184,10 +184,10 @@ class SwarmDelegate:
                 trigger_data TEXT,
                 
                 -- Execution state
-                status TEXT DEFAULT 'running',
-                start_time TIMESTAMP,
-                end_time TIMESTAMP,
-                duration_seconds REAL,
+                status TEXT DEFAULT 'pending',
+                started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                completed_at TIMESTAMP,
+                duration_ms INTEGER,
                 
                 -- Results
                 result_json TEXT,
@@ -198,8 +198,8 @@ class SwarmDelegate:
                 agents_used INTEGER DEFAULT 0,
                 iterations INTEGER DEFAULT 0,
                 
-                -- Timestamps
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                -- User info
+                user_id TEXT,
                 
                 FOREIGN KEY (swarm_id) REFERENCES swarms(swarm_id)
             )
@@ -667,16 +667,17 @@ class SwarmDelegate:
     
     def start_execution(self, execution_id: str, swarm_id: str,
                        trigger_type: str, trigger_id: str = None,
-                       trigger_data: Any = None, correlation_id: str = None) -> bool:
+                       trigger_data: Any = None, correlation_id: str = None,
+                       user_id: str = None) -> bool:
         """Record start of a swarm execution."""
         try:
             self.db.execute(
                 """INSERT INTO swarm_executions 
                    (execution_id, swarm_id, correlation_id, trigger_type, trigger_id,
-                    trigger_data, status, start_time)
-                   VALUES (?, ?, ?, ?, ?, ?, 'running', CURRENT_TIMESTAMP)""",
+                    trigger_data, status, started_at, user_id)
+                   VALUES (?, ?, ?, ?, ?, ?, 'running', CURRENT_TIMESTAMP, ?)""",
                 (execution_id, swarm_id, correlation_id, trigger_type, trigger_id,
-                 json.dumps(trigger_data) if trigger_data else None)
+                 json.dumps(trigger_data) if trigger_data else None, user_id)
             )
             return True
         except Exception as e:
@@ -689,11 +690,12 @@ class SwarmDelegate:
                           iterations: int = 0) -> bool:
         """Record completion of a swarm execution."""
         try:
-            status = 'success' if success else 'failed'
+            status = 'completed' if success else 'failed'
+            # Calculate duration in milliseconds
             self.db.execute(
                 """UPDATE swarm_executions 
-                   SET status = ?, end_time = CURRENT_TIMESTAMP,
-                       duration_seconds = (julianday(CURRENT_TIMESTAMP) - julianday(start_time)) * 86400,
+                   SET status = ?, completed_at = CURRENT_TIMESTAMP,
+                       duration_ms = CAST((julianday(CURRENT_TIMESTAMP) - julianday(started_at)) * 86400000 AS INTEGER),
                        result_json = ?, error_message = ?,
                        events_processed = ?, agents_used = ?, iterations = ?
                    WHERE execution_id = ?""",
@@ -715,7 +717,7 @@ class SwarmDelegate:
             query += " AND status = ?"
             params.append(status)
         
-        query += " ORDER BY start_time DESC LIMIT ?"
+        query += " ORDER BY started_at DESC LIMIT ?"
         params.append(limit)
         
         rows = self.db.fetch_all(query, tuple(params)) or []

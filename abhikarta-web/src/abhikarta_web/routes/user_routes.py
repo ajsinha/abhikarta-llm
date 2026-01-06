@@ -171,34 +171,28 @@ class UserRoutes(AbstractRoutes):
                 from datetime import datetime
                 
                 input_data = request.form.get('input_data', '')
-                execution_id = f"exec_{uuid.uuid4().hex[:16]}"
                 started_at = datetime.now()
                 
                 try:
-                    # Create execution record with 'running' status
-                    self.db_facade.execute(
-                        """INSERT INTO executions 
-                           (execution_id, agent_id, user_id, status, input_data, started_at)
-                           VALUES (?, ?, ?, ?, ?, ?)""",
-                        (execution_id, agent_id, session.get('user_id'), 'running',
-                         input_data, started_at.isoformat())
-                    )
-                    
-                    # Execute agent using LangChain
+                    # Execute agent using LangChain - this generates the execution_id
                     try:
                         from abhikarta.langchain.agents import AgentExecutor as LangChainAgentExecutor
                         
                         executor = LangChainAgentExecutor(self.db_facade)
                         result = executor.execute_agent(agent_id, input_data)
                         
-                        # Update execution record with results
+                        # Use the execution_id from the result (this matches the log file name)
+                        execution_id = result.execution_id
+                        
+                        # Create/update execution record with the correct execution_id
                         self.db_facade.execute(
-                            """UPDATE executions SET 
-                               status = ?, output_data = ?, error_message = ?,
-                               completed_at = ?, duration_ms = ?, metadata = ?
-                               WHERE execution_id = ?""",
+                            """INSERT OR REPLACE INTO executions 
+                               (execution_id, agent_id, user_id, status, input_data, started_at,
+                                output_data, error_message, completed_at, duration_ms, metadata)
+                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                             (
-                                result.status,
+                                execution_id, agent_id, session.get('user_id'), 
+                                result.status, input_data, started_at.isoformat(),
                                 result.output,
                                 result.error_message,
                                 datetime.now().isoformat(),
@@ -206,9 +200,9 @@ class UserRoutes(AbstractRoutes):
                                 json.dumps({
                                     'intermediate_steps': result.intermediate_steps,
                                     'tool_calls': result.tool_calls,
-                                    'execution_mode': 'langchain'
-                                }),
-                                execution_id
+                                    'execution_mode': 'langchain',
+                                    'entity_type': 'agent'
+                                })
                             )
                         )
                         
@@ -218,11 +212,16 @@ class UserRoutes(AbstractRoutes):
                             flash(f'Agent execution finished with status: {result.status}', 'warning')
                             
                     except ImportError as ie:
-                        # LangChain not available, log for manual processing
+                        # LangChain not available, create placeholder execution
                         logger.warning(f"LangChain not available, execution pending: {ie}")
+                        execution_id = f"exec_{uuid.uuid4().hex[:16]}"
                         self.db_facade.execute(
-                            "UPDATE executions SET status = 'pending', metadata = ? WHERE execution_id = ?",
-                            (json.dumps({'note': 'LangChain not installed', 'error': str(ie)}), execution_id)
+                            """INSERT INTO executions 
+                               (execution_id, agent_id, user_id, status, input_data, started_at, metadata)
+                               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                            (execution_id, agent_id, session.get('user_id'), 'pending',
+                             input_data, started_at.isoformat(),
+                             json.dumps({'note': 'LangChain not installed', 'error': str(ie), 'entity_type': 'agent'}))
                         )
                         flash(f'Agent execution queued: {execution_id}', 'info')
                     
@@ -233,14 +232,15 @@ class UserRoutes(AbstractRoutes):
                     
                 except Exception as e:
                     logger.error(f"Error executing agent: {e}", exc_info=True)
-                    # Update execution as failed
+                    # Try to update execution as failed if we have an execution_id
                     try:
-                        self.db_facade.execute(
-                            """UPDATE executions SET 
-                               status = 'failed', error_message = ?, completed_at = ?
-                               WHERE execution_id = ?""",
-                            (str(e), datetime.now().isoformat(), execution_id)
-                        )
+                        if 'execution_id' in locals():
+                            self.db_facade.execute(
+                                """UPDATE executions SET 
+                                   status = 'failed', error_message = ?, completed_at = ?
+                                   WHERE execution_id = ?""",
+                                (str(e), datetime.now().isoformat(), execution_id)
+                            )
                     except:
                         pass
                     flash(f'Agent execution failed: {str(e)}', 'error')

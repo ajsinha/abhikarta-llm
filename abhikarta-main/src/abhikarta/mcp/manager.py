@@ -15,7 +15,7 @@ import logging
 import threading
 import time
 from typing import Dict, Any, Optional, List, Callable
-from datetime import datetime
+from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor
 
 from .server import (
@@ -205,7 +205,7 @@ class MCPServerManager:
             # Attempt connection
             if client.connect():
                 server.state.status = MCPServerStatus.CONNECTED
-                server.state.last_connected = datetime.utcnow()
+                server.state.last_connected = datetime.now(timezone.utc)
                 server.state.error_count = 0
                 
                 # Load tools

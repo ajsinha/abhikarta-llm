@@ -15,7 +15,7 @@ Ashutosh Sinha
 import logging
 import threading
 from typing import Dict, Any, Optional, List, Callable, Type
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .base_tool import (
     BaseTool, ToolMetadata, ToolSchema, ToolResult,
@@ -344,7 +344,7 @@ class ToolsRegistry:
     def _log_execution(self, tool: BaseTool, params: Dict, result: ToolResult):
         """Log tool execution."""
         log_entry = {
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'tool_name': tool.name,
             'tool_type': tool.tool_type.value,
             'success': result.success,

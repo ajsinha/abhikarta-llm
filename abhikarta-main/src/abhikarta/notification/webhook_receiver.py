@@ -22,7 +22,7 @@ import json
 import logging
 import time
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Any, Callable, Awaitable
 from dataclasses import dataclass, field
 from collections import defaultdict
@@ -406,7 +406,7 @@ class WebhookReceiver:
             payload=payload,
             headers=dict(headers),
             query_params=query_params or {},
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             source_ip=source_ip,
             verified=True,
             signature=headers.get('X-Hub-Signature-256') or headers.get('X-Signature')
@@ -555,7 +555,7 @@ class WebhookReceiver:
         # Clean up old nonces
         now = time.time()
         if now - self._last_nonce_cleanup > self._nonce_cleanup_interval:
-            cutoff = datetime.utcnow() - timedelta(hours=1)
+            cutoff = datetime.now(timezone.utc) - timedelta(hours=1)
             self._seen_nonces = {
                 k: v for k, v in self._seen_nonces.items()
                 if v > cutoff
@@ -577,7 +577,7 @@ class WebhookReceiver:
         if nonce:
             if nonce in self._seen_nonces:
                 return False
-            self._seen_nonces[nonce] = datetime.utcnow()
+            self._seen_nonces[nonce] = datetime.now(timezone.utc)
         
         return True
     

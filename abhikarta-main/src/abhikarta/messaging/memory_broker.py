@@ -17,7 +17,7 @@ import fnmatch
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional, Set
 from queue import Queue, Empty
 import threading
@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 class TopicInfo:
     """Information about an in-memory topic."""
     name: str
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     message_count: int = 0
     subscriber_count: int = 0
 
@@ -163,7 +163,7 @@ class InMemoryBroker(MessageBroker):
             topic=topic,
             partition=0,
             offset=self._topics[topic].message_count,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         )
     
     async def _deliver_message(self, message: Message, subscription: Subscription) -> None:

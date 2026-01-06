@@ -13,7 +13,7 @@ Ashutosh Sinha
 
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 import json
 
@@ -54,7 +54,7 @@ def format_email(to: str, subject: str, body: str,
         "subject": subject,
         "body": body,
         "content_type": "text/html" if is_html else "text/plain",
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
     
     if from_email:
@@ -334,7 +334,7 @@ def format_sms(to: str, message: str, sender_id: str = None) -> Dict[str, Any]:
         "character_count": len(message),
         "segments": segments,
         "is_unicode": is_unicode,
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -435,7 +435,7 @@ def create_push_notification(title: str, body: str,
                 }
             }
         },
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
     
     return notification
@@ -464,7 +464,7 @@ def create_in_app_notification(type: str, title: str, message: str,
         "action_url": action_url,
         "metadata": metadata or {},
         "read": False,
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -485,7 +485,7 @@ def batch_notifications(notifications: List[Dict[str, Any]],
         "channel": channel,
         "notification_count": len(notifications),
         "notifications": notifications,
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
     
     return batch
