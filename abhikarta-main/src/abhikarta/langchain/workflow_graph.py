@@ -217,22 +217,38 @@ class LangGraphNodeFactory:
             logger.info(f"Executing LLM node: {node_id}")
             
             try:
-                # Check if we have direct provider/model config (from JSON template)
-                # or if we need to look up from database
-                provider = node_config.get('provider')
-                model = node_config.get('model')
-                base_url = node_config.get('base_url')
+                # Use LLM Config Resolver to apply admin defaults for missing values
+                try:
+                    from ..services.llm_config_resolver import get_llm_config_resolver
+                    resolver = get_llm_config_resolver(self.db_facade)
+                    resolved_config = resolver.resolve_node_config(node_config)
+                    
+                    provider = resolved_config.get('provider')
+                    model = resolved_config.get('model')
+                    base_url = resolved_config.get('base_url')
+                    temperature = resolved_config.get('temperature', 0.7)
+                    max_tokens = resolved_config.get('max_tokens')
+                    
+                    logger.info(f"[NODE:{node_id}] Resolved config: provider={provider}, model={model}, base_url={base_url}")
+                except ImportError:
+                    # Fallback to direct config if resolver not available
+                    provider = node_config.get('provider') or node_config.get('provider_type')
+                    model = node_config.get('model')
+                    base_url = node_config.get('base_url')
+                    temperature = node_config.get('temperature', 0.7)
+                    max_tokens = node_config.get('max_tokens')
+                    logger.info(f"[NODE:{node_id}] Using direct config: provider={provider}, model={model}")
                 
                 llm = None
                 
-                # If we have direct config with provider and model, create LLM directly
+                # If we have provider and model, create LLM directly
                 if provider and model:
-                    logger.info(f"[NODE:{node_id}] Creating LLM directly: provider={provider}, model={model}")
+                    logger.info(f"[NODE:{node_id}] Creating LLM: provider={provider}, model={model}, base_url={base_url}")
                     llm = self._create_llm_from_config(
                         provider=provider,
                         model=model,
                         base_url=base_url,
-                        temperature=node_config.get('temperature', 0.7),
+                        temperature=temperature,
                         api_key=node_config.get('api_key')
                     )
                 else:

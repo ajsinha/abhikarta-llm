@@ -533,6 +533,15 @@ def main():
         if exec_logger:
             logger.info(f"Execution logger ready: {exec_logger.config.base_path}")
         
+        # 3.6 Initialize LLM Config Resolver (for admin defaults)
+        try:
+            from abhikarta.services.llm_config_resolver import init_llm_config_resolver
+            llm_resolver = init_llm_config_resolver(db_facade)
+            admin_defaults = llm_resolver.get_admin_defaults()
+            logger.info(f"LLM Config Resolver ready: default provider={admin_defaults.get('provider')}, model={admin_defaults.get('model')}")
+        except Exception as e:
+            logger.warning(f"LLM Config Resolver not initialized: {e}")
+        
         # 4. Initialize user facade
         print_step(4, TOTAL_STARTUP_STEPS, "Loading User Management System", 'starting')
         user_facade = prepare_user_facade(prop_conf)

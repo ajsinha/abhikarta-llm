@@ -514,6 +514,17 @@ class WorkflowRoutes(AbstractRoutes):
                     flash('Template not found', 'error')
                     return redirect(url_for('workflow_templates'))
                 
+                # Use LLM Config Resolver to apply admin defaults
+                dag_definition = template.dag_definition.copy()
+                
+                try:
+                    from abhikarta.services.llm_config_resolver import get_llm_config_resolver
+                    resolver = get_llm_config_resolver(self.db_facade)
+                    dag_definition = resolver.apply_defaults_to_nodes(dag_definition)
+                    logger.info("Applied admin LLM defaults to workflow template")
+                except ImportError:
+                    logger.warning("LLM config resolver not available, using template defaults")
+                
                 # Create new workflow from template
                 workflow_id = f"wf_{uuid.uuid4().hex[:12]}"
                 
@@ -525,7 +536,7 @@ class WorkflowRoutes(AbstractRoutes):
                         workflow_id,
                         workflow_name,
                         description or template.description,
-                        json.dumps(template.dag_definition),
+                        json.dumps(dag_definition),
                         json.dumps(template.python_modules),
                         'draft',
                         session.get('user_id'),

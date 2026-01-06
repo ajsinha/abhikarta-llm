@@ -30,6 +30,15 @@ from .execution_logger import (
     init_execution_logger_from_properties,
 )
 
+from .llm_config_resolver import (
+    LLMConfig,
+    LLMConfigResolver,
+    get_llm_config_resolver,
+    init_llm_config_resolver,
+    resolve_llm_config,
+    SYSTEM_DEFAULTS,
+)
+
 __all__ = [
     # Code Fragment Sync
     'CodeFragmentSyncService',
@@ -49,4 +58,11 @@ __all__ = [
     'get_execution_logger',
     'init_execution_logger',
     'init_execution_logger_from_properties',
+    # LLM Config Resolver
+    'LLMConfig',
+    'LLMConfigResolver',
+    'get_llm_config_resolver',
+    'init_llm_config_resolver',
+    'resolve_llm_config',
+    'SYSTEM_DEFAULTS',
 ]

@@ -1243,24 +1243,151 @@ class AdminRoutes(AbstractRoutes):
         @self.app.route('/api/llm/providers')
         @login_required
         def api_llm_providers():
-            """Get all active LLM providers for dropdowns."""
+            """Get all active LLM providers for dropdowns with full config."""
             try:
                 providers = self.db_facade.llm.get_all_providers(active_only=True)
+                result = []
+                
+                for p in providers:
+                    # Parse provider config JSON
+                    provider_config = p.get('config', '{}')
+                    if isinstance(provider_config, str):
+                        try:
+                            provider_config = json.loads(provider_config)
+                        except:
+                            provider_config = {}
+                    
+                    result.append({
+                        'provider_id': p.get('provider_id'),
+                        'name': p.get('name'),
+                        'provider_type': p.get('provider_type'),
+                        'description': p.get('description', ''),
+                        'api_endpoint': p.get('api_endpoint', ''),
+                        'is_default': p.get('is_default', 0),
+                        'config': {
+                            'temperature': provider_config.get('temperature', 0.7),
+                            'max_tokens': provider_config.get('max_tokens', 2048),
+                            'top_p': provider_config.get('top_p', 1.0),
+                            'frequency_penalty': provider_config.get('frequency_penalty', 0),
+                            'presence_penalty': provider_config.get('presence_penalty', 0),
+                        }
+                    })
+                
                 return jsonify({
                     'success': True,
-                    'providers': [
-                        {
-                            'provider_id': p.get('provider_id'),
-                            'name': p.get('name'),
-                            'provider_type': p.get('provider_type'),
-                            'description': p.get('description', ''),
-                            'is_default': p.get('is_default', 0)
-                        }
-                        for p in providers
-                    ]
+                    'providers': result
                 })
             except Exception as e:
                 logger.error(f"Error getting LLM providers: {e}", exc_info=True)
+                return jsonify({'success': False, 'error': str(e)})
+        
+        @self.app.route('/api/llm/providers/<provider_id>')
+        @login_required
+        def api_llm_provider_detail(provider_id):
+            """Get detailed LLM provider config including api_endpoint."""
+            try:
+                provider = self.db_facade.llm.get_provider(provider_id)
+                if not provider:
+                    return jsonify({'success': False, 'error': 'Provider not found'}), 404
+                
+                # Parse provider config JSON
+                provider_config = provider.get('config', '{}')
+                if isinstance(provider_config, str):
+                    try:
+                        provider_config = json.loads(provider_config)
+                    except:
+                        provider_config = {}
+                
+                # Get default model
+                models = self.db_facade.llm.get_provider_models(provider_id, is_enabled=True)
+                default_model = None
+                if models:
+                    for m in models:
+                        if m.get('is_default'):
+                            default_model = m.get('model_id')
+                            break
+                    if not default_model:
+                        default_model = models[0].get('model_id') if models else None
+                
+                return jsonify({
+                    'success': True,
+                    'provider': {
+                        'provider_id': provider.get('provider_id'),
+                        'name': provider.get('name'),
+                        'provider_type': provider.get('provider_type'),
+                        'api_endpoint': provider.get('api_endpoint', ''),
+                        'is_default': provider.get('is_default', 0),
+                        'default_model': default_model,
+                        'config': {
+                            'temperature': provider_config.get('temperature', 0.7),
+                            'max_tokens': provider_config.get('max_tokens', 2048),
+                            'top_p': provider_config.get('top_p', 1.0),
+                            'frequency_penalty': provider_config.get('frequency_penalty', 0),
+                            'presence_penalty': provider_config.get('presence_penalty', 0),
+                        }
+                    }
+                })
+            except Exception as e:
+                logger.error(f"Error getting provider {provider_id}: {e}", exc_info=True)
+                return jsonify({'success': False, 'error': str(e)})
+        
+        @self.app.route('/api/llm/config/defaults')
+        @login_required
+        def api_llm_config_defaults():
+            """Get default LLM configuration from admin settings for use in editors."""
+            try:
+                # Get default provider
+                default_provider = self.db_facade.llm.get_default_provider()
+                if not default_provider:
+                    providers = self.db_facade.llm.get_all_providers(active_only=True)
+                    default_provider = providers[0] if providers else None
+                
+                if not default_provider:
+                    return jsonify({
+                        'success': True,
+                        'defaults': {
+                            'provider': 'ollama',
+                            'model': 'llama3.2:3b',
+                            'base_url': 'http://localhost:11434',
+                            'temperature': 0.7,
+                            'max_tokens': 2048
+                        }
+                    })
+                
+                # Parse provider config
+                provider_config = default_provider.get('config', '{}')
+                if isinstance(provider_config, str):
+                    try:
+                        provider_config = json.loads(provider_config)
+                    except:
+                        provider_config = {}
+                
+                # Get default model for this provider
+                provider_id = default_provider.get('provider_id')
+                models = self.db_facade.llm.get_provider_models(provider_id, is_enabled=True)
+                default_model = None
+                if models:
+                    for m in models:
+                        if m.get('is_default'):
+                            default_model = m.get('model_id')
+                            break
+                    if not default_model and models:
+                        default_model = models[0].get('model_id')
+                
+                return jsonify({
+                    'success': True,
+                    'defaults': {
+                        'provider': default_provider.get('provider_type', 'ollama'),
+                        'provider_id': provider_id,
+                        'model': default_model or 'llama3.2:3b',
+                        'base_url': default_provider.get('api_endpoint', ''),
+                        'temperature': provider_config.get('temperature', 0.7),
+                        'max_tokens': provider_config.get('max_tokens', 2048),
+                        'top_p': provider_config.get('top_p', 1.0),
+                    }
+                })
+            except Exception as e:
+                logger.error(f"Error getting LLM defaults: {e}", exc_info=True)
                 return jsonify({'success': False, 'error': str(e)})
         
         @self.app.route('/api/llm/providers/<provider_id>/models')

@@ -2,6 +2,40 @@
 
 {% block title %}My Executions - {{ app_name }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Execution ID display - show full ID with proper styling */
+    .execution-id-display {
+        font-size: 0.75rem;
+        max-width: 220px;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    
+    /* Expand on hover for full visibility */
+    .execution-id-display:hover {
+        max-width: none;
+        overflow: visible;
+        white-space: normal;
+        word-break: break-all;
+    }
+    
+    /* Purple badge for AI Org */
+    .bg-purple {
+        background-color: #6f42c1 !important;
+        color: white;
+    }
+    
+    /* Table responsiveness */
+    .table-responsive {
+        overflow-x: auto;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -116,7 +150,7 @@
                         <table class="table table-hover" id="executionsTable">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th style="min-width: 200px;">Execution ID</th>
                                     <th>Type</th>
                                     <th>Agent/Workflow</th>
                                     <th>Status</th>
@@ -132,15 +166,21 @@
                                         data-agent="{{ exec.agent_name or exec.workflow_name or '' }}"
                                         data-date="{{ exec.started_at }}">
                                         <td>
-                                            <a href="{{ url_for('execution_detail', execution_id=exec.execution_id) }}" class="text-decoration-none">
-                                                <code>{{ exec.execution_id[:8] }}...</code>
+                                            <a href="{{ url_for('execution_detail', execution_id=exec.execution_id) }}" 
+                                               class="text-decoration-none"
+                                               title="{{ exec.execution_id }}">
+                                                <code class="execution-id-display">{{ exec.execution_id }}</code>
                                             </a>
                                         </td>
                                         <td>
-                                            {% if exec.agent_id %}
-                                            <span class="badge bg-primary">Agent</span>
+                                            {% if exec.entity_type == 'workflow' %}
+                                            <span class="badge bg-info"><i class="bi bi-diagram-3 me-1"></i>Workflow</span>
+                                            {% elif exec.entity_type == 'swarm' %}
+                                            <span class="badge bg-warning text-dark"><i class="bi bi-hive me-1"></i>Swarm</span>
+                                            {% elif exec.entity_type == 'aiorg' %}
+                                            <span class="badge bg-purple"><i class="bi bi-building me-1"></i>AI Org</span>
                                             {% else %}
-                                            <span class="badge bg-info">Workflow</span>
+                                            <span class="badge bg-primary"><i class="bi bi-robot me-1"></i>Agent</span>
                                             {% endif %}
                                         </td>
                                         <td>

@@ -829,6 +829,7 @@ const nodeTypes = {
 // ============================================
 $(document).ready(function() {
     initDesigner();
+    loadLLMAdminDefaults();
     loadLLMProviders();
     loadExistingWorkflow();
     updateMinimap();
@@ -838,6 +839,43 @@ $(document).ready(function() {
 // LLM PROVIDER/MODEL DYNAMIC LOADING
 // ============================================
 var llmProvidersCache = null;
+var llmAdminDefaults = null;
+
+function loadLLMAdminDefaults() {
+    // Load admin-configured defaults for LLM configuration
+    fetch('/api/llm/config/defaults')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.defaults) {
+                llmAdminDefaults = data.defaults;
+                console.log('Loaded admin LLM defaults:', llmAdminDefaults);
+            }
+        })
+        .catch(function(err) {
+            console.error('Error loading LLM admin defaults:', err);
+            llmAdminDefaults = {
+                provider: 'ollama',
+                model: 'llama3.2:3b',
+                base_url: 'http://localhost:11434',
+                temperature: 0.7,
+                max_tokens: 2048
+            };
+        });
+}
+
+function getAdminDefault(key) {
+    if (llmAdminDefaults && llmAdminDefaults[key] !== undefined) {
+        return llmAdminDefaults[key];
+    }
+    var defaults = {
+        provider: 'ollama',
+        model: 'llama3.2:3b',
+        base_url: 'http://localhost:11434',
+        temperature: 0.7,
+        max_tokens: 2048
+    };
+    return defaults[key];
+}
 
 function loadLLMProviders() {
     fetch('/api/llm/providers')
@@ -851,7 +889,7 @@ function loadLLMProviders() {
                 var defaultProvider = null;
                 data.providers.forEach(function(p) {
                     var isDefault = p.is_default ? ' (default)' : '';
-                    select.append('<option value="' + p.provider_id + '">' + p.name + isDefault + '</option>');
+                    select.append('<option value="' + p.provider_id + '" data-api-endpoint="' + (p.api_endpoint || '') + '" data-provider-type="' + (p.provider_type || '') + '">' + p.name + isDefault + '</option>');
                     if (p.is_default) defaultProvider = p.provider_id;
                 });
                 
@@ -924,7 +962,7 @@ function loadLLMNodeProviders(nodeId, currentProvider, currentModel) {
     if (llmProvidersCache) {
         provSelect.empty();
         llmProvidersCache.forEach(function(p) {
-            provSelect.append('<option value="' + p.provider_id + '">' + p.name + '</option>');
+            provSelect.append('<option value="' + p.provider_id + '" data-api-endpoint="' + (p.api_endpoint || '') + '" data-provider-type="' + (p.provider_type || '') + '">' + p.name + '</option>');
         });
         
         if (currentProvider) {
@@ -933,6 +971,9 @@ function loadLLMNodeProviders(nodeId, currentProvider, currentModel) {
             var defaultProv = llmProvidersCache.find(function(p) { return p.is_default; });
             if (defaultProv) provSelect.val(defaultProv.provider_id);
         }
+        
+        // Update base_url hint for selected provider
+        updateProviderBaseUrlHint(nodeId, provSelect.val());
         
         loadLLMNodeModels(nodeId, provSelect.val(), currentModel);
     } else {
@@ -943,16 +984,30 @@ function loadLLMNodeProviders(nodeId, currentProvider, currentModel) {
                     llmProvidersCache = data.providers;
                     provSelect.empty();
                     data.providers.forEach(function(p) {
-                        provSelect.append('<option value="' + p.provider_id + '">' + p.name + '</option>');
+                        provSelect.append('<option value="' + p.provider_id + '" data-api-endpoint="' + (p.api_endpoint || '') + '" data-provider-type="' + (p.provider_type || '') + '">' + p.name + '</option>');
                     });
                     
                     if (currentProvider) {
                         provSelect.val(currentProvider);
                     }
                     
+                    // Update base_url hint for selected provider
+                    updateProviderBaseUrlHint(nodeId, provSelect.val());
+                    
                     loadLLMNodeModels(nodeId, provSelect.val(), currentModel);
                 }
             });
+    }
+}
+
+function updateProviderBaseUrlHint(nodeId, providerId) {
+    var baseUrlInput = $('#llm-baseurl-' + nodeId);
+    if (!baseUrlInput.length || !providerId) return;
+    
+    var provider = llmProvidersCache ? llmProvidersCache.find(function(p) { return p.provider_id === providerId; }) : null;
+    if (provider && provider.api_endpoint) {
+        baseUrlInput.attr('placeholder', provider.api_endpoint);
+        baseUrlInput.next('small').html('Admin default: <code>' + provider.api_endpoint + '</code>');
     }
 }
 
@@ -988,7 +1043,39 @@ function loadLLMNodeModels(nodeId, providerId, currentModel) {
 
 function updateLLMNodeProvider(nodeId, providerId) {
     updateConfig(nodeId, 'provider', providerId);
+    
+    // Update provider_type from cache
+    if (llmProvidersCache) {
+        var provider = llmProvidersCache.find(function(p) { return p.provider_id === providerId; });
+        if (provider) {
+            updateConfig(nodeId, 'provider_type', provider.provider_type || providerId);
+            
+            // Update base_url hint
+            var baseUrlInput = $('#llm-baseurl-' + nodeId);
+            if (baseUrlInput.length && provider.api_endpoint) {
+                baseUrlInput.attr('placeholder', provider.api_endpoint);
+                baseUrlInput.next('small').html('Admin default: <code>' + provider.api_endpoint + '</code>');
+            }
+        }
+    }
+    
     loadLLMNodeModels(nodeId, providerId, null);
+}
+
+function updateLLMConfigField(nodeId, fieldName, value) {
+    // Update config field, storing empty string as null/undefined so admin defaults apply
+    if (value === '' || value === null || value === undefined) {
+        // Remove the field so admin default applies at execution
+        var node = workflowNodes.find(function(n) { return n.node_id === nodeId; });
+        if (node && node.config) {
+            delete node.config[fieldName];
+        }
+        console.log('Cleared LLM config field:', fieldName, '- admin default will be used');
+    } else {
+        updateConfig(nodeId, fieldName, value);
+        console.log('Updated LLM config field:', fieldName, '=', value);
+    }
+    redrawCanvas();
 }
 
 // Edit modal helpers for LLM provider/model
@@ -1391,21 +1478,77 @@ function getTypeProperties(node) {
         case 'llm':
             var modelSelectId = 'llm-model-' + node.node_id;
             var providerSelectId = 'llm-provider-' + node.node_id;
+            var baseUrlId = 'llm-baseurl-' + node.node_id;
+            var tempId = 'llm-temp-' + node.node_id;
+            var maxTokensId = 'llm-maxtokens-' + node.node_id;
+            
+            // Get current values or empty for admin defaults
+            var currentBaseUrl = node.config.base_url || '';
+            var currentTemp = node.config.temperature !== undefined ? node.config.temperature : '';
+            var currentMaxTokens = node.config.max_tokens || '';
+            var currentSystemPrompt = node.config.system_prompt || '';
+            
+            // Get admin defaults for placeholders
+            var adminBaseUrl = getAdminDefault('base_url');
+            var adminTemp = getAdminDefault('temperature');
+            var adminMaxTokens = getAdminDefault('max_tokens');
+            
             setTimeout(function() { loadLLMNodeProviders(node.node_id, node.config.provider, node.config.model); }, 50);
+            
             return '<div class="property-group">' +
                 '<label>Provider</label>' +
                 '<select class="form-select form-select-sm" id="' + providerSelectId + '" ' +
                 'onchange="updateLLMNodeProvider(\'' + node.node_id + '\', this.value)">' +
-                '<option value="">Loading...</option></select></div>' +
+                '<option value="">Loading...</option></select>' +
+                '<small class="form-text text-muted">Select LLM provider</small></div>' +
+                
                 '<div class="property-group">' +
                 '<label>Model</label>' +
                 '<select class="form-select form-select-sm" id="' + modelSelectId + '" ' +
                 'onchange="updateConfig(\'' + node.node_id + '\',\'model\',this.value)">' +
                 '<option value="">Select provider first</option></select></div>' +
+                
                 '<div class="property-group">' +
-                '<label>Temp: ' + (node.config.temperature||0.7) + '</label>' +
-                '<input type="range" class="form-range" min="0" max="1" step="0.1" value="' + (node.config.temperature||0.7) + '" ' +
-                'onchange="updateConfig(\'' + node.node_id + '\',\'temperature\',parseFloat(this.value));$(this).prev().text(\'Temp: \'+this.value)"></div>';
+                '<label>Base URL <small class="text-muted">(optional)</small></label>' +
+                '<input type="text" class="form-control form-control-sm" id="' + baseUrlId + '" ' +
+                'value="' + currentBaseUrl + '" ' +
+                'placeholder="' + adminBaseUrl + '" ' +
+                'onchange="updateLLMConfigField(\'' + node.node_id + '\',\'base_url\',this.value)">' +
+                '<small class="form-text text-muted">Admin default: <code>' + adminBaseUrl + '</code></small>' +
+                '</div>' +
+                
+                '<div class="property-group">' +
+                '<label>Temperature <small class="text-muted">(0.0 - 2.0)</small></label>' +
+                '<div class="d-flex align-items-center gap-2">' +
+                '<input type="range" class="form-range flex-grow-1" id="' + tempId + '" min="0" max="2" step="0.1" ' +
+                'value="' + (currentTemp !== '' ? currentTemp : adminTemp) + '" ' +
+                'oninput="$(\'#' + tempId + '-val\').text(this.value)" ' +
+                'onchange="updateLLMConfigField(\'' + node.node_id + '\',\'temperature\',parseFloat(this.value))">' +
+                '<span id="' + tempId + '-val" class="badge bg-secondary">' + (currentTemp !== '' ? currentTemp : adminTemp) + '</span>' +
+                '</div>' +
+                '<small class="form-text text-muted">Admin default: ' + adminTemp + '</small>' +
+                '</div>' +
+                
+                '<div class="property-group">' +
+                '<label>Max Tokens <small class="text-muted">(optional)</small></label>' +
+                '<input type="number" class="form-control form-control-sm" id="' + maxTokensId + '" ' +
+                'value="' + currentMaxTokens + '" min="1" max="128000" ' +
+                'placeholder="' + adminMaxTokens + '" ' +
+                'onchange="updateLLMConfigField(\'' + node.node_id + '\',\'max_tokens\',this.value ? parseInt(this.value) : null)">' +
+                '<small class="form-text text-muted">Admin default: ' + adminMaxTokens + '</small>' +
+                '</div>' +
+                
+                '<div class="property-group">' +
+                '<label>System Prompt</label>' +
+                '<textarea class="form-control form-control-sm" rows="3" id="llm-sysprompt-' + node.node_id + '" ' +
+                'placeholder="Enter system prompt..." ' +
+                'onchange="updateConfig(\'' + node.node_id + '\',\'system_prompt\',this.value)">' + 
+                currentSystemPrompt + '</textarea>' +
+                '</div>' +
+                
+                '<div class="alert alert-info py-2 mt-2">' +
+                '<small><i class="bi bi-info-circle me-1"></i>Empty fields use admin defaults at execution.</small>' +
+                '</div>';
         case 'python':
             return `
                 <div class="property-group">

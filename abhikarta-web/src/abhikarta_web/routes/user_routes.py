@@ -262,7 +262,55 @@ class UserRoutes(AbstractRoutes):
             
             try:
                 # Get agent/workflow executions
-                executions = self.db_facade.executions.get_all_executions(user_id=user_id)
+                raw_executions = self.db_facade.executions.get_all_executions(user_id=user_id)
+                
+                # Add entity_type to each execution
+                for exec_row in (raw_executions or []):
+                    exec_dict = dict(exec_row) if exec_row else {}
+                    
+                    # Determine entity type from execution ID prefix or metadata
+                    execution_id = exec_dict.get('execution_id', '')
+                    entity_type = 'agent'  # default
+                    
+                    # Parse from new traceable execution ID format
+                    if execution_id.startswith('wflow_'):
+                        entity_type = 'workflow'
+                    elif execution_id.startswith('agent_'):
+                        entity_type = 'agent'
+                    elif execution_id.startswith('swarm_'):
+                        entity_type = 'swarm'
+                    elif execution_id.startswith('aiorg_'):
+                        entity_type = 'aiorg'
+                    else:
+                        # Fallback: check metadata
+                        metadata = exec_dict.get('metadata', '{}')
+                        if isinstance(metadata, str):
+                            try:
+                                metadata = json.loads(metadata)
+                            except:
+                                metadata = {}
+                        
+                        if metadata.get('entity_type'):
+                            entity_type = metadata['entity_type']
+                        elif metadata.get('execution_mode') == 'langgraph':
+                            entity_type = 'workflow'
+                        else:
+                            # Check if agent_id is actually a workflow_id
+                            ref_id = exec_dict.get('agent_id')
+                            if ref_id:
+                                try:
+                                    workflow = self.db_facade.fetch_one(
+                                        "SELECT workflow_id FROM workflows WHERE workflow_id = ?",
+                                        (ref_id,)
+                                    )
+                                    if workflow:
+                                        entity_type = 'workflow'
+                                except:
+                                    pass
+                    
+                    exec_dict['entity_type'] = entity_type
+                    executions.append(exec_dict)
+                    
             except Exception as e:
                 logger.error(f"Error getting executions: {e}", exc_info=True)
             

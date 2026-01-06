@@ -430,6 +430,32 @@ class AgentRoutes(AbstractRoutes):
                         self.agent_manager.update_agent(agent.agent_id, 
                                                         {'description': description})
                     
+                    # Apply admin-configured LLM defaults using the resolver
+                    try:
+                        from abhikarta.services.llm_config_resolver import get_llm_config_resolver
+                        resolver = get_llm_config_resolver(self.db_facade)
+                        admin_defaults = resolver.get_admin_defaults()
+                        
+                        # Update agent llm_config with admin defaults for missing values
+                        current_config = agent.llm_config or {}
+                        
+                        if not current_config.get('provider'):
+                            current_config['provider'] = admin_defaults.get('provider', 'ollama')
+                        if not current_config.get('model'):
+                            current_config['model'] = admin_defaults.get('model', 'llama3.2:3b')
+                        if not current_config.get('base_url'):
+                            current_config['base_url'] = admin_defaults.get('base_url', '')
+                        if current_config.get('temperature') is None:
+                            current_config['temperature'] = admin_defaults.get('temperature', 0.7)
+                        
+                        self.agent_manager.update_agent(agent.agent_id, 
+                                                        {'llm_config': current_config})
+                        
+                        logger.info(f"Applied admin LLM defaults to agent: {admin_defaults.get('provider')}, {admin_defaults.get('model')}")
+                            
+                    except Exception as prov_err:
+                        logger.warning(f"Could not apply provider settings: {prov_err}")
+                    
                     flash(f'Agent "{agent_name}" created from template!', 'success')
                     self.log_audit('create_from_template', 'agent', agent.agent_id,
                                    {'template': template_id})
